@@ -47,6 +47,7 @@ import javax.transaction.xa.Xid;
 
 import org.omg.CORBA.INVALID_TRANSACTION;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
+import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CosTransactions.NoTransaction;
 import org.omg.CosTransactions.RecoveryCoordinator;
@@ -947,32 +948,38 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
     static final TransactionImple getTransaction() {
         TransactionImple tx = null;
 
-        ControlWrapper otx = OTSImpleManager.current().getControlWrapper();
+        try {
+            ControlWrapper otx = OTSImpleManager.current().getControlWrapper();
 
-        if (otx != null) {
-            synchronized (TransactionImple._transactions) {
-                try {
-                    tx = (TransactionImple) TransactionImple._transactions.get(otx.get_uid());
+            if (otx != null) {
+                synchronized (TransactionImple._transactions) {
+                    try {
+                        tx = (TransactionImple) TransactionImple._transactions.get(otx.get_uid());
 
-                    if (tx == null) {
-                        /*
-                         * If it isn't active then don't add it to the
-                         * hashtable.
-                         */
+                        if (tx == null) {
+                            /*
+                             * If it isn't active then don't add it to the
+                             * hashtable.
+                             */
 
-                        tx = new TransactionImple(new AtomicTransaction(otx));
+                            tx = new TransactionImple(new AtomicTransaction(otx));
 
-                        try {
-                            if (tx.getStatus() == javax.transaction.Status.STATUS_ACTIVE) {
-                                putTransaction(tx);
+                            try {
+                                if (tx.getStatus() == javax.transaction.Status.STATUS_ACTIVE) {
+                                    putTransaction(tx);
+                                }
+                            } catch (Exception ex) {
+                                // shouldn't happen!
                             }
-                        } catch (Exception ex) {
-                            // shouldn't happen!
                         }
+                    } catch (ClassCastException ex) {
+                        jtaxLogger.i18NLogger.warn_jtax_transaction_jts_nottximple();
                     }
-                } catch (ClassCastException ex) {
-                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_nottximple();
                 }
+            }
+        } catch (TRANSACTION_UNAVAILABLE e) {
+            if (e.minor != 1) {
+                throw e;
             }
         }
 
