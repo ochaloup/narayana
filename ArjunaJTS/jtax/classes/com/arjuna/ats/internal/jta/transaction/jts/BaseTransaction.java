@@ -167,6 +167,10 @@ public class BaseTransaction {
             }
         }
 
+        if (theTransaction == null) {
+            return javax.transaction.Status.STATUS_NO_TRANSACTION;
+        }
+
         try {
             return theTransaction.getStatus();
         } catch (NullPointerException ex) {
