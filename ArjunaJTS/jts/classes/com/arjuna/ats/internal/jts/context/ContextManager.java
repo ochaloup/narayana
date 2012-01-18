@@ -607,6 +607,9 @@ public class ContextManager {
 
                     return new ControlWrapper(theFactory.recreate(theContext));
                 }
+            } catch (TRANSACTION_UNAVAILABLE ex) {
+                // Already logged this
+                throw ex;
             } catch (SystemException ex) {
                 jtsLogger.i18NLogger.warn_context_genfail("ContextManager.createHierarchy", ex);
 

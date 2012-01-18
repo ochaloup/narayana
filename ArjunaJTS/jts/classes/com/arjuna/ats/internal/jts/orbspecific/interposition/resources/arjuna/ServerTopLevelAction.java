@@ -114,7 +114,6 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
             Coordinator realCoordinator = _theControl.originalCoordinator();
 
             if (!(_valid = registerResource(realCoordinator))) {
-                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_ipfailed("ServerTopLevelAction");
 
                 /*
                  * Failed to register. Valid is set, and the interposition
@@ -538,16 +537,21 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
                         tx.setRecoveryCoordinator(recoveryCoord);
 
                         result = true;
-                    } else
+                    } else {
                         result = false;
+                        jtsLogger.i18NLogger
+                                .warn_orbspecific_interposition_resources_arjuna_ipfailed("ServerTopLevelAction");
+                    }
                 } else
                     result = true;
             } catch (ClassCastException classCastException) {
                 jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror(
                         "ServerTopLevelAction.registerResource", classCastException);
             } catch (Inactive ine) {
-                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror(
+                jtsLogger.i18NLogger.warn_server_top_level_action_inactive();
+                jtsLogger.i18NLogger.debug_orbspecific_interposition_resources_arjuna_generror(
                         "ServerTopLevelAction.registerResource", ine);
+                transactionInactive = true;
             } catch (TRANSACTION_ROLLEDBACK ex1) {
                 jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror(
                         "ServerTopLevelAction.registerResource", ex1);
@@ -566,7 +570,12 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
         return result;
     }
 
+    public boolean isTransactionInactive() {
+        return transactionInactive;
+    }
+
     protected org.omg.CosTransactions.ResourcePOATie _theResource;
     protected Resource _resourceRef;
+    private boolean transactionInactive;
 
 }
