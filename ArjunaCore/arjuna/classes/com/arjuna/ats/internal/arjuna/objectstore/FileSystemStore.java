@@ -297,7 +297,12 @@ public abstract class FileSystemStore extends ObjectStore {
         try {
             if (ifile != null)
                 ifile.close();
-            else
+        } catch (Exception e) {
+            closedOk = false;
+        }
+
+        try {
+            if (ofile != null)
                 ofile.close();
         } catch (Exception e) {
             closedOk = false;
