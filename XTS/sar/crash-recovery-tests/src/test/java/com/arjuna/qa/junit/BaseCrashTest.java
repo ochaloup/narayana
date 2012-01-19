@@ -1,7 +1,6 @@
 package com.arjuna.qa.junit;
 
 import java.io.File;
-
 import org.jboss.arquillian.container.test.api.Config;
 import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -14,6 +13,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Assert;
 
 public class BaseCrashTest {
     protected String XTSServiceTest = " -Dorg.jboss.jbossts.xts.servicetests.XTSServiceTestName=@TestName@";
@@ -21,11 +21,9 @@ public class BaseCrashTest {
     protected String javaVmArguments;
     protected String testName;
     protected String scriptName;
-    private final static String xtstestWar = "../../sar/tests/target/xtstest.war";
-
+    private final static String xtstestWar = "../tests/build/webapps/xtstest.war";
     @ArquillianResource
     private ContainerController controller;
-
     @ArquillianResource
     private Deployer deployer;
 
@@ -39,6 +37,7 @@ public class BaseCrashTest {
 
         return archive;
     }
+
     @Before
     public void setUp() {
         javaVmArguments = BytemanArgs.replace("@BMScript@", scriptName);
@@ -46,6 +45,27 @@ public class BaseCrashTest {
         File file = new File("testlog");
         if (file.isFile() && file.exists()) {
             file.delete();
+        }
+
+        // Ensure ObjectStore is empty:
+        String jbossHome = System.getenv("JBOSS_HOME");
+        if (jbossHome == null) {
+            Assert.fail("$JBOSS_HOME not set");
+        } else {
+            File objectStore = new File(jbossHome + File.separator + "standalone" + File.separator + "data"
+                    + File.separator + "tx-object-store");
+            System.out.println("Deleting: " + objectStore.getPath());
+
+            if (objectStore.exists()) {
+                boolean success = deleteDirectory(objectStore);
+                if (!success) {
+                    System.err.println("Failed to remove tx-object-store");
+                    Assert.fail("Failed to remove tx-object-store: " + objectStore.getPath());
+                } else {
+                    System.out.println("remove tx-object-store: " + objectStore.getPath());
+                }
+            }
+
         }
     }
 
@@ -93,5 +113,19 @@ public class BaseCrashTest {
         // deployer.undeploy("xtstest");
         // controller.stop("jboss-as");
         controller.kill("jboss-as");
+    }
+
+    private boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+        }
+        return (path.delete());
     }
 }
