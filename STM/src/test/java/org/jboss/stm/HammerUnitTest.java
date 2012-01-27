@@ -82,7 +82,7 @@ public class HammerUnitTest extends TestCase {
         public void run() {
             Random rand = new Random();
 
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 100; i++) {
                 AtomicAction A = new AtomicAction();
                 boolean doCommit = true;
 

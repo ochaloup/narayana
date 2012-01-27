@@ -51,6 +51,7 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
+import com.arjuna.ats.internal.txoj.LockConflictManager;
 import com.arjuna.ats.internal.txoj.LockList;
 import com.arjuna.ats.internal.txoj.LockListIterator;
 import com.arjuna.ats.internal.txoj.abstractrecords.CadaverLockRecord;
@@ -296,7 +297,7 @@ public class LockManager extends StateManager {
      * @return <code>LockResult</code> indicating outcome.
      */
 
-    public final int setlock(Lock toSet, int retry, int sleepTime) {
+    public int setlock(Lock toSet, int retry, int sleepTime) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::setlock(" + toSet + ", " + retry + ", " + sleepTime + ")");
         }
@@ -584,7 +585,7 @@ public class LockManager extends StateManager {
         super.terminate();
     }
 
-    private final void cleanUp() {
+    protected final void cleanUp() {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::cleanUp() for object-id " + get_uid());
         }
@@ -644,7 +645,7 @@ public class LockManager extends StateManager {
      * appropriate.
      */
 
-    private final boolean doRelease(Uid u, boolean all) {
+    protected final boolean doRelease(Uid u, boolean all) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::doRelease(" + u + ", " + all + ")");
         }
@@ -766,7 +767,7 @@ public class LockManager extends StateManager {
      * 'synchronized' as can only be called from synchronized methods.
      */
 
-    private final void freeState() {
+    protected final void freeState() {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::freeState()");
         }
@@ -854,7 +855,7 @@ public class LockManager extends StateManager {
         return result;
     }
 
-    private final boolean isAncestorOf(Lock heldLock) {
+    protected final boolean isAncestorOf(Lock heldLock) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::isAncestorOf(" + heldLock.getCurrentOwner() + ")");
         }
@@ -877,7 +878,7 @@ public class LockManager extends StateManager {
      * be called from other synchronized methods.
      */
 
-    private final boolean loadState() {
+    protected final boolean loadState() {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::loadState()");
         }
@@ -977,7 +978,7 @@ public class LockManager extends StateManager {
      * ancestors.
      */
 
-    private final int lockConflict(Lock otherLock) {
+    protected final int lockConflict(Lock otherLock) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::lockConflict(" + otherLock.get_uid() + ")");
         }
@@ -1009,7 +1010,7 @@ public class LockManager extends StateManager {
      * freeing the semaphore.
      */
 
-    private final boolean unloadState() {
+    protected final boolean unloadState() {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("LockManager::unloadState()");
         }
@@ -1092,39 +1093,41 @@ public class LockManager extends StateManager {
         }
     }
 
-    private String lockStoreType = txojPropertyManager.getTxojEnvironmentBean().getLockStoreType();
+    protected String lockStoreType = txojPropertyManager.getTxojEnvironmentBean().getLockStoreType();
 
-    private String systemKey; /* used in accessing system resources */
+    protected String systemKey; /* used in accessing system resources */
 
-    private LockList locksHeld; /* the actual list of locks set */
+    protected LockList locksHeld; /* the actual list of locks set */
 
-    private final Object locksHeldLockObject = new Object(); // mutex for sync
+    protected final Object locksHeldLockObject = new Object(); // mutex for sync
                                                                 // on locksHeld.
                                                                 // Can't use
                                                                 // locksHeld
                                                                 // itself, it's
                                                                 // mutable.
 
-    private LockStore lockStore; /* locks held in shared memory */
+    protected LockStore lockStore; /* locks held in shared memory */
 
-    private boolean stateLoaded;
+    protected boolean stateLoaded;
 
-    private boolean hasBeenLocked;/* Locked at least once */
+    protected boolean hasBeenLocked;/* Locked at least once */
 
-    private boolean objectLocked;/* Semaphore grabbed */
+    protected boolean objectLocked;/* Semaphore grabbed */
 
-    private com.arjuna.ats.internal.arjuna.common.BasicMutex mutex; /*
-                                                                     * Controls
-                                                                     * access to
-                                                                     * the lock
-                                                                     * store
-                                                                     */
+    protected com.arjuna.ats.internal.arjuna.common.BasicMutex mutex; /*
+                                                                         * Controls
+                                                                         * access
+                                                                         * to
+                                                                         * the
+                                                                         * lock
+                                                                         * store
+                                                                         */
 
-    private LockConflictManager conflictManager;
+    protected LockConflictManager conflictManager;
 
-    private static final int DOZE_TIME = 1000000;
+    protected static final int DOZE_TIME = 1000000;
 
-    private static boolean nestedLocking = true;
+    protected static boolean nestedLocking = true;
 
     static {
         nestedLocking = txojPropertyManager.getTxojEnvironmentBean().isAllowNestedLocking();
