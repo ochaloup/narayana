@@ -87,6 +87,7 @@ import com.arjuna.ats.jts.logging.jtsLogger;
 
 public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.AbstractRecord {
 
+    private boolean lastRecord;
     /**
      * @param propagate
      *            tells us whether to propagate the resource at nested commit or
@@ -422,25 +423,26 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
             jtsLogger.logger.trace("ExtendedResourceRecord::topLevelCommit() for " + order());
         }
 
-        try {
-            if (resourceHandle() != null) {
-                _resourceHandle.commit();
-            } else
-                return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (NotPrepared e1) {
-            return TwoPhaseOutcome.NOT_PREPARED;
-        } catch (HeuristicRollback e2) {
-            return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
-        } catch (HeuristicMixed e3) {
-            return TwoPhaseOutcome.HEURISTIC_MIXED;
-        } catch (HeuristicHazard e4) {
-            return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        } catch (OBJECT_NOT_EXIST e5) {
-            jtsLogger.i18NLogger.warn_1pc_commit_one();
-        } catch (SystemException e6) {
-            jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelCommit", e6);
+        if (!lastRecord) {
 
-            return TwoPhaseOutcome.FINISH_ERROR;
+            try {
+                if (resourceHandle() != null) {
+                    _resourceHandle.commit();
+                } else
+                    return TwoPhaseOutcome.FINISH_ERROR;
+            } catch (NotPrepared e1) {
+                return TwoPhaseOutcome.NOT_PREPARED;
+            } catch (HeuristicRollback e2) {
+                return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
+            } catch (HeuristicMixed e3) {
+                return TwoPhaseOutcome.HEURISTIC_MIXED;
+            } catch (HeuristicHazard e4) {
+                return TwoPhaseOutcome.HEURISTIC_HAZARD;
+            } catch (SystemException e6) {
+                jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelCommit", e6);
+
+                return TwoPhaseOutcome.FINISH_ERROR;
+            }
         }
 
         return TwoPhaseOutcome.FINISH_OK;
@@ -601,6 +603,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 }
             } else
                 _stringifiedResourceHandle = null;
+
+            lastRecord = os.unpackBoolean();
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -690,6 +694,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                         jtsLogger.logger.trace("Packed rec co uid of " + _recCoordUid);
                     }
                 }
+
+                os.packBoolean(lastRecord);
             }
         } catch (IOException e) {
             result = false;
@@ -959,8 +965,10 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
 
     private final OTSAbstractRecord otsRecord() {
         try {
-            if (_otsARHandle == null)
+            if (_otsARHandle == null) {
                 _otsARHandle = com.arjuna.ArjunaOTS.OTSAbstractRecordHelper.narrow(_resourceHandle);
+                lastRecord = RecordType.LASTRESOURCE == _otsARHandle.type_id();
+            }
 
             if (_otsARHandle == null)
                 throw new BAD_PARAM();
