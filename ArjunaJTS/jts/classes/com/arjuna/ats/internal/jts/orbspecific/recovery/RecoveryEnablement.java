@@ -81,12 +81,18 @@ public class RecoveryEnablement implements RecoveryActivator {
      * This static method is used by the RecoveryManager to suppress aspects of
      * recovery enablement in it's own process, without requiring further
      * property manipulations
+     * 
+     * @deprecated Only used by tests
      */
 
     public static void isNotANormalProcess() {
         _isNormalProcess = false;
     }
 
+    /**
+     * 
+     * @deprecated Only used by tests
+     */
     public static boolean isNormalProcess() {
         return _isNormalProcess;
     }
