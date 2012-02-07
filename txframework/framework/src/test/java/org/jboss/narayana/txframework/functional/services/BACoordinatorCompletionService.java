@@ -45,10 +45,7 @@ import java.lang.annotation.Annotation;
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
 @Stateless
-@WebService(serviceName = "BACoordinatorCompletionService", portName = "BACoordinatorCompletionService", name = "BACoordinatorCompletion", targetNamespace = "http://www.jboss.com/functional/ba/participantcompletion/")
-// todo: Can the framework specify the handlerchain if not isPresent? Would have
-// to be added earlier in the chain than we currently intercept
-@HandlerChain(file = "/context-handlers.xml", name = "Context Handlers")
+@WebService(serviceName = "BACoordinatorCompletionService", portName = "BACoordinatorCompletionService", name = "BACoordinatorCompletion", targetNamespace = "http://www.jboss.com/functional/ba/coordinatorcompletion/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @WSBA(completionType = CompletionType.COORDINATOR)
 public class BACoordinatorCompletionService implements BACoordinatorCompletion {
