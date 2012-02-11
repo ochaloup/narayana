@@ -228,8 +228,11 @@ public class PersistenceRecord extends RecoveryRecord {
                      */
 
                     try {
-                        targetParticipantStore.write_uncommitted(sm.get_uid(), sm.type(), dummy);
-                        result = TwoPhaseOutcome.PREPARE_OK;
+                        if (targetParticipantStore.write_uncommitted(sm.get_uid(), sm.type(), dummy))
+                            result = TwoPhaseOutcome.PREPARE_OK;
+                        else {
+                            result = TwoPhaseOutcome.PREPARE_NOTOK;
+                        }
                     } catch (ObjectStoreException e) {
                         tsLogger.i18NLogger.warn_PersistenceRecord_21(e);
                     }
@@ -248,6 +251,8 @@ public class PersistenceRecord extends RecoveryRecord {
 
                     result = TwoPhaseOutcome.PREPARE_OK;
                 } else {
+                    topLevelState = null;
+
                     tsLogger.i18NLogger.warn_PersistenceRecord_7();
                 }
             }

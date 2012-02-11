@@ -221,4 +221,4 @@ public class AtomicObject extends LockManager {
 
     private boolean printDebug;
     private int retry = 0;
-};
+}

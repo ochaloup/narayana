@@ -76,7 +76,7 @@ public class BasicAction extends StateManager {
         heuristicList = null;
 
         currentHierarchy = null;
-        participantStore = null;
+        transactionStore = null;
         savedIntentionList = false;
 
         actionStatus = ActionStatus.CREATED;
@@ -111,7 +111,7 @@ public class BasicAction extends StateManager {
         heuristicList = null;
 
         currentHierarchy = null;
-        participantStore = null;
+        transactionStore = null;
         savedIntentionList = false;
 
         actionStatus = ActionStatus.CREATED;
@@ -194,7 +194,7 @@ public class BasicAction extends StateManager {
         failedList = null;
         heuristicList = null;
 
-        participantStore = null;
+        transactionStore = null;
         currentHierarchy = null;
 
         _checkedAction = null;
@@ -366,11 +366,11 @@ public class BasicAction extends StateManager {
      */
 
     public ParticipantStore getStore() {
-        if (participantStore == null) {
-            participantStore = StoreManager.getParticipantStore();
+        if (transactionStore == null) {
+            transactionStore = StoreManager.getParticipantStore();
         }
 
-        return participantStore;
+        return transactionStore;
     }
 
     /**
@@ -1471,7 +1471,7 @@ public class BasicAction extends StateManager {
         heuristicList = null;
 
         currentHierarchy = null;
-        participantStore = null;
+        transactionStore = null;
         savedIntentionList = false;
 
         actionStatus = ActionStatus.CREATED;
@@ -1500,7 +1500,7 @@ public class BasicAction extends StateManager {
         heuristicList = null;
 
         currentHierarchy = null;
-        participantStore = null;
+        transactionStore = null;
         savedIntentionList = false;
 
         actionStatus = ActionStatus.CREATED;
@@ -1992,7 +1992,7 @@ public class BasicAction extends StateManager {
 
             if (state.notempty()) {
                 try {
-                    if (!participantStore.write_committed(u, tn, state)) {
+                    if (!transactionStore.write_committed(u, tn, state)) {
                         tsLogger.i18NLogger.warn_coordinator_BasicAction_46(get_uid());
 
                         criticalEnd();
@@ -2796,7 +2796,7 @@ public class BasicAction extends StateManager {
 
                 if (state.notempty()) {
                     try {
-                        if (!participantStore.write_committed(u, tn, state)) {
+                        if (!transactionStore.write_committed(u, tn, state)) {
                             tsLogger.i18NLogger.warn_coordinator_BasicAction_65();
                         }
                     } catch (ObjectStoreException e) {
@@ -2806,7 +2806,7 @@ public class BasicAction extends StateManager {
             } else {
                 try {
                     if (savedIntentionList) {
-                        if (participantStore.remove_committed(getSavingUid(), type())) {
+                        if (transactionStore.remove_committed(getSavingUid(), type())) {
                             savedIntentionList = false;
                         }
                     }
@@ -3180,7 +3180,8 @@ public class BasicAction extends StateManager {
     protected boolean savedIntentionList;
 
     private ActionHierarchy currentHierarchy;
-    private ParticipantStore participantStore;
+    private ParticipantStore transactionStore; // a ParticipantStore is also a
+                                                // TxLog
 
     // private boolean savedIntentionList;
 

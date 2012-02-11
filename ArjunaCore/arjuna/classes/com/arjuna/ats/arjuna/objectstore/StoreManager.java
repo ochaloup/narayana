@@ -35,8 +35,7 @@ public class StoreManager {
     private static ObjectStoreAPI actionStore = null; // for BasicAction i.e. tx
                                                         // logging / recovery
     private static ObjectStoreAPI stateStore = null; // for StateManager i.e.
-                                                        // txoj object type
-                                                        // store.
+                                                        // object type store.
     private static ObjectStoreAPI communicationStore = null; // for IPC e.g.
                                                                 // JacOrbRCServiceInit,
                                                                 // TransactionStatusManagerItem
@@ -52,6 +51,8 @@ public class StoreManager {
         StoreManager.stateStore = stateStore;
         StoreManager.communicationStore = communicationStore;
     }
+
+    // should these values be null after stop?
 
     public static final void shutdown() {
         if (actionStore != null) {
@@ -72,6 +73,11 @@ public class StoreManager {
     public static final TxLog getTxLog() {
         return getActionStore();
     }
+
+    /*
+     * This is wrong. The participant store should not be the same as the
+     * transaction log. Why has this been changed from the default?
+     */
 
     public static final ParticipantStore getParticipantStore() {
         return getActionStore();
@@ -110,6 +116,10 @@ public class StoreManager {
 
         return actionStore;
     }
+
+    /*
+     * Why are rootName and shareStatus not used?
+     */
 
     public static ParticipantStore setupStore(String rootName, int sharedStatus) {
         if (stateStore != null) {
