@@ -233,7 +233,6 @@ public class RawOptimisticHammerUnitTest extends TestCase {
     public class Worker extends Thread {
         public static final int COMMIT = 0;
         public static final int ABORT = 1;
-        public static final int RANDOM = 2;
 
         public Worker(AtomicObject obj1, int commitOutcome) {
             _obj1 = obj1;
@@ -241,8 +240,6 @@ public class RawOptimisticHammerUnitTest extends TestCase {
         }
 
         public void run() {
-            Random rand = new Random();
-
             for (int i = 0; i < 10; i++) {
                 boolean fault;
 
@@ -257,19 +254,12 @@ public class RawOptimisticHammerUnitTest extends TestCase {
                     try {
                         _obj1.incr(1);
                     } catch (final Throwable ex) {
-                        ex.printStackTrace();
-
                         doCommit = false;
                         fault = true;
                     }
 
                     if (_commit == ABORT)
                         doCommit = false;
-
-                    if (doCommit && (_commit == RANDOM)) {
-                        if (rand.nextInt() % 2 == 0)
-                            doCommit = false;
-                    }
 
                     if (doCommit) {
                         if (A.commit() != ActionStatus.COMMITTED) {
@@ -288,73 +278,41 @@ public class RawOptimisticHammerUnitTest extends TestCase {
         private int _commit;
     }
 
-    public void testDummy() {
+    public void testBasic() throws Exception {
+        AtomicObject obj1 = new AtomicObject();
+        AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
 
+        obj1.set(1234);
+
+        assertEquals(obj2.get(), 1234);
     }
 
     /*
      * public void testRecoverableHammerAbort () throws Exception { init();
      * 
-     * AtomicObject obj1 = new AtomicObject(); int workers = 2; AtomicObject[]
-     * objs = new AtomicObject[workers-1];
+     * AtomicObject obj1 = new AtomicObject(); AtomicObject obj2 = new
+     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE); Worker worker1 = new
+     * Worker(obj1, Worker.ABORT); Worker worker2 = new Worker(obj2,
+     * Worker.ABORT);
      * 
-     * for (int m = 0; m < workers-1; m++) objs[m] = new
-     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+     * worker1.start(); worker2.start();
      * 
-     * Worker[] worker = new Worker[workers];
-     * 
-     * for (int i = 0; i < workers; i++) { if (i == 0) worker[0] = new
-     * Worker(obj1, Worker.ABORT); else worker[i] = new Worker(objs[i-1],
-     * Worker.ABORT); }
-     * 
-     * for (int j = 0; j < workers; j++) worker[j].start();
-     * 
-     * try { for (int k = 0; k < workers; k++) worker[k].join(); } catch (final
-     * Throwable ex) { }
+     * try { worker1.join(); worker2.join(); } catch (final Throwable ex) { }
      * 
      * assertEquals(obj1.get(), 0); }
      * 
      * public void testRecoverableHammerCommit () throws Exception { init();
      * 
-     * AtomicObject obj1 = new AtomicObject(); int workers = 2; AtomicObject[]
-     * objs = new AtomicObject[workers-1];
+     * AtomicObject obj1 = new AtomicObject(); AtomicObject obj2 = new
+     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE); Worker worker1 = new
+     * Worker(obj1, Worker.COMMIT); Worker worker2 = new Worker(obj2,
+     * Worker.COMMIT);
      * 
-     * for (int m = 0; m < workers-1; m++) objs[m] = new
-     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+     * worker1.start(); worker2.start();
      * 
-     * Worker[] worker = new Worker[workers];
-     * 
-     * for (int i = 0; i < workers; i++) { if (i == 0) worker[0] = new
-     * Worker(obj1, Worker.COMMIT); else worker[i] = new Worker(objs[i-1],
-     * Worker.COMMIT); }
-     * 
-     * for (int j = 0; j < workers; j++) worker[j].start();
-     * 
-     * try { for (int k = 0; k < workers; k++) worker[k].join(); } catch (final
-     * Throwable ex) { }
+     * try { worker1.join(); worker2.join(); } catch (final Throwable ex) { }
      * 
      * assertEquals(obj1.get(), 600); }
-     * 
-     * public void testRecoverableHammerRandom () throws Exception { init();
-     * 
-     * AtomicObject obj1 = new AtomicObject(); int workers = 2; AtomicObject[]
-     * objs = new AtomicObject[workers-1];
-     * 
-     * for (int m = 0; m < workers-1; m++) objs[m] = new
-     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
-     * 
-     * Worker[] worker = new Worker[workers];
-     * 
-     * for (int i = 0; i < workers; i++) { if (i == 0) worker[0] = new
-     * Worker(obj1, Worker.RANDOM); else worker[i] = new Worker(objs[i-1],
-     * Worker.RANDOM); }
-     * 
-     * for (int j = 0; j < workers; j++) worker[j].start();
-     * 
-     * try { for (int k = 0; k < workers; k++) worker[k].join(); } catch (final
-     * Throwable ex) { }
-     * 
-     * assertEquals(obj1.get(), 0); }
      */
     private static synchronized void init() throws Exception {
         if (!_init) {
