@@ -24,7 +24,7 @@ package org.jboss.stm;
 
 import java.util.Random;
 
-import org.jboss.stm.annotations.Nested;
+import org.jboss.stm.annotations.Optimistic;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.annotations.ReadLock;
 import org.jboss.stm.annotations.State;
@@ -40,9 +40,9 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class NestedHammerUnitTest extends TestCase {
+public class OptimisticHammerUnitTest extends TestCase {
     @Transactional
-    @Nested
+    @Optimistic
     public interface Sample {
         public void increment();
         public void decrement();
@@ -51,6 +51,7 @@ public class NestedHammerUnitTest extends TestCase {
     }
 
     @Transactional
+    @Optimistic
     public class SampleLockable implements Sample {
         public SampleLockable(int init) {
             _isState = init;
@@ -84,7 +85,7 @@ public class NestedHammerUnitTest extends TestCase {
         public void run() {
             Random rand = new Random();
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 10; i++) {
                 AtomicAction A = new AtomicAction();
                 boolean doCommit = true;
 
@@ -96,16 +97,19 @@ public class NestedHammerUnitTest extends TestCase {
                     _obj1.increment();
                     _obj2.decrement();
                 } catch (final Throwable ex) {
+                    ex.printStackTrace();
+
                     doCommit = false;
                 }
 
                 if (rand.nextInt() % 2 == 0)
                     doCommit = false;
 
-                if (doCommit)
+                if (doCommit) {
                     A.commit();
-                else
+                } else {
                     A.abort();
+                }
             }
         }
 
@@ -117,34 +121,20 @@ public class NestedHammerUnitTest extends TestCase {
         RecoverableContainer<Sample> theContainer = new RecoverableContainer<Sample>();
         Sample obj1 = theContainer.enlist(new SampleLockable(10));
         Sample obj2 = theContainer.enlist(new SampleLockable(10));
-        Worker worker1 = new Worker(obj1, obj2);
-        Worker worker2 = new Worker(obj1, obj2);
+        Sample obj3 = theContainer.enlist(new SampleLockable(0), theContainer.getUidForHandle(obj1));
+        Sample obj4 = theContainer.enlist(new SampleLockable(0), theContainer.getUidForHandle(obj1));
+        int workers = 2;
+        Worker[] worker = new Worker[workers];
 
-        worker1.start();
-        worker2.start();
+        worker[0] = new Worker(obj1, obj2);
+        worker[1] = new Worker(obj3, obj4);
 
-        try {
-            worker1.join();
-            worker2.join();
-        } catch (final Throwable ex) {
-        }
-
-        assertEquals(obj1.value() + obj2.value(), 20);
-    }
-
-    public void testPersistentHammer() {
-        PersistentContainer<Sample> theContainer = new PersistentContainer<Sample>();
-        Sample obj1 = theContainer.enlist(new SampleLockable(10));
-        Sample obj2 = theContainer.enlist(new SampleLockable(10));
-        Worker worker1 = new Worker(obj1, obj2);
-        Worker worker2 = new Worker(obj1, obj2);
-
-        worker1.start();
-        worker2.start();
+        for (int j = 0; j < workers; j++)
+            worker[j].start();
 
         try {
-            worker1.join();
-            worker2.join();
+            for (int k = 0; k < workers; k++)
+                worker[k].join();
         } catch (final Throwable ex) {
         }
 

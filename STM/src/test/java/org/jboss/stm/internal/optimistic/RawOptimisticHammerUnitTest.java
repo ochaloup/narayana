@@ -25,6 +25,7 @@ package org.jboss.stm.internal.optimistic;
 import java.io.IOException;
 import java.util.Random;
 
+import org.jboss.stm.OptimisticHammerUnitTest.Worker;
 import org.jboss.stm.annotations.State;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.annotations.ReadLock;
@@ -56,7 +57,7 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class OptimisticUnitTest extends TestCase {
+public class RawOptimisticHammerUnitTest extends TestCase {
 
     public class AtomicObject extends OptimisticLockManager {
         public AtomicObject() {
@@ -80,10 +81,10 @@ public class OptimisticUnitTest extends TestCase {
             }
         }
 
-        public AtomicObject(Uid id, int objectModel) {
-            super(id, objectModel);
+        public AtomicObject(Uid u, int objectModel) {
+            super(u, objectModel);
 
-            state = -1;
+            state = 0;
 
             AtomicAction A = new AtomicAction();
 
@@ -91,7 +92,7 @@ public class OptimisticUnitTest extends TestCase {
 
             if (setlock(new OptimisticLock(LockMode.READ), 0) == LockResult.GRANTED) {
                 if (A.commit() == ActionStatus.COMMITTED)
-                    System.out.println("Recreated persistent object " + get_uid());
+                    System.out.println("Created persistent object " + get_uid());
                 else
                     System.out.println("Action.commit error.");
             } else {
@@ -192,7 +193,7 @@ public class OptimisticUnitTest extends TestCase {
             throw new Exception("Read lock error.");
         }
 
-        public boolean save_state(OutputObjectState os, int ot) {
+        public synchronized boolean save_state(OutputObjectState os, int ot) {
             boolean result = super.save_state(os, ot);
 
             if (!result)
@@ -207,7 +208,7 @@ public class OptimisticUnitTest extends TestCase {
             return result;
         }
 
-        public boolean restore_state(InputObjectState os, int ot) {
+        public synchronized boolean restore_state(InputObjectState os, int ot) {
             boolean result = super.restore_state(os, ot);
 
             if (!result)
@@ -223,15 +224,20 @@ public class OptimisticUnitTest extends TestCase {
         }
 
         public String type() {
-            return "/StateManager/LockManager/OptimisticLockManager/AtomicObject";
+            return "/StateManager/LockManager/AtomicObject";
         }
 
         private int state;
     }
 
     public class Worker extends Thread {
-        public Worker(AtomicObject obj) {
-            _obj = obj;
+        public static final int COMMIT = 0;
+        public static final int ABORT = 1;
+        public static final int RANDOM = 2;
+
+        public Worker(AtomicObject obj1, int commitOutcome) {
+            _obj1 = obj1;
+            _commit = commitOutcome;
         }
 
         public void run() {
@@ -249,7 +255,7 @@ public class OptimisticUnitTest extends TestCase {
                     A.begin();
 
                     try {
-                        _obj.incr(i);
+                        _obj1.incr(1);
                     } catch (final Throwable ex) {
                         ex.printStackTrace();
 
@@ -257,15 +263,18 @@ public class OptimisticUnitTest extends TestCase {
                         fault = true;
                     }
 
-                    try {
-                        Thread.sleep(500);
-                    } catch (final Throwable ex) {
+                    if (_commit == ABORT)
+                        doCommit = false;
+
+                    if (doCommit && (_commit == RANDOM)) {
+                        if (rand.nextInt() % 2 == 0)
+                            doCommit = false;
                     }
 
                     if (doCommit) {
-                        int s = A.commit();
+                        if (A.commit() != ActionStatus.COMMITTED) {
+                            System.err.println("Failed to commit!");
 
-                        if ((s != ActionStatus.COMMITTED) && (A.status() != ActionStatus.COMMITTED)) {
                             fault = true;
                         }
                     } else
@@ -275,112 +284,101 @@ public class OptimisticUnitTest extends TestCase {
             }
         }
 
-        private AtomicObject _obj;
+        private AtomicObject _obj1;
+        private int _commit;
     }
 
-    public void testAtomicObject() throws Exception {
-        init();
-
-        AtomicObject obj = new AtomicObject();
-        AtomicAction a = new AtomicAction();
-
-        a.begin();
-
-        obj.set(1234);
-
-        a.commit();
-
-        assertEquals(obj.get(), 1234);
-
-        a = new AtomicAction();
-
-        a.begin();
-
-        obj.incr(1);
-
-        a.abort();
-
-        assertEquals(obj.get(), 1234);
-    }
-
-    public void testMultiSet() throws Exception {
-        init();
-
-        AtomicObject obj = new AtomicObject();
-        AtomicAction a = new AtomicAction();
-
-        a.begin();
-
-        obj.set(1234);
-        obj.set(345);
-
-        a.commit();
-
-        assertEquals(obj.get(), 345);
-    }
-
-    public void testNestedAbort() throws Exception {
-        init();
-
-        AtomicObject obj = new AtomicObject();
-        AtomicAction a = new AtomicAction();
-        AtomicAction b = new AtomicAction();
-
-        a.begin();
-
-        obj.set(1234);
-
-        b.begin();
-
-        obj.set(345);
-
-        b.abort();
-
-        a.commit();
-
-        assertEquals(obj.get(), 1234);
-    }
-
-    public void testNestedCommit() throws Exception {
-        init();
-
-        AtomicObject obj = new AtomicObject();
-        AtomicAction a = new AtomicAction();
-        AtomicAction b = new AtomicAction();
-
-        a.begin();
-
-        obj.set(1234);
-
-        b.begin();
-
-        obj.set(345);
-
-        b.commit();
-
-        a.commit();
-
-        assertEquals(obj.get(), 345);
-    }
-
-    public void testRecoverableHammer() throws Exception {
+    public void testRecoverableHammerAbort() throws Exception {
         init();
 
         AtomicObject obj1 = new AtomicObject();
-        AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
-        Worker worker1 = new Worker(obj1);
-        Worker worker2 = new Worker(obj2);
+        int workers = 6;
+        AtomicObject[] objs = new AtomicObject[workers - 1];
 
-        worker1.start();
-        worker2.start();
+        for (int m = 0; m < workers - 1; m++)
+            objs[m] = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+
+        Worker[] worker = new Worker[workers];
+
+        for (int i = 0; i < workers; i++) {
+            if (i == 0)
+                worker[0] = new Worker(obj1, Worker.ABORT);
+            else
+                worker[i] = new Worker(objs[i - 1], Worker.ABORT);
+        }
+
+        for (int j = 0; j < workers; j++)
+            worker[j].start();
 
         try {
-            worker1.join();
-            worker2.join();
+            for (int k = 0; k < workers; k++)
+                worker[k].join();
         } catch (final Throwable ex) {
         }
 
-        assertEquals(obj1.get(), 90);
+        assertEquals(obj1.get(), 0);
+    }
+
+    public void testRecoverableHammerCommit() throws Exception {
+        init();
+
+        AtomicObject obj1 = new AtomicObject();
+        int workers = 6;
+        AtomicObject[] objs = new AtomicObject[workers - 1];
+
+        for (int m = 0; m < workers - 1; m++)
+            objs[m] = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+
+        Worker[] worker = new Worker[workers];
+
+        for (int i = 0; i < workers; i++) {
+            if (i == 0)
+                worker[0] = new Worker(obj1, Worker.COMMIT);
+            else
+                worker[i] = new Worker(objs[i - 1], Worker.COMMIT);
+        }
+
+        for (int j = 0; j < workers; j++)
+            worker[j].start();
+
+        try {
+            for (int k = 0; k < workers; k++)
+                worker[k].join();
+        } catch (final Throwable ex) {
+        }
+
+        assertEquals(obj1.get(), 600);
+    }
+
+    public void testRecoverableHammerRandom() throws Exception {
+        init();
+
+        AtomicObject obj1 = new AtomicObject();
+        int workers = 6;
+        AtomicObject[] objs = new AtomicObject[workers - 1];
+
+        for (int m = 0; m < workers - 1; m++)
+            objs[m] = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+
+        Worker[] worker = new Worker[workers];
+
+        for (int i = 0; i < workers; i++) {
+            if (i == 0)
+                worker[0] = new Worker(obj1, Worker.RANDOM);
+            else
+                worker[i] = new Worker(objs[i - 1], Worker.RANDOM);
+        }
+
+        for (int j = 0; j < workers; j++)
+            worker[j].start();
+
+        try {
+            for (int k = 0; k < workers; k++)
+                worker[k].join();
+        } catch (final Throwable ex) {
+        }
+
+        assertEquals(obj1.get(), 0);
     }
 
     private static synchronized void init() throws Exception {
