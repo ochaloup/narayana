@@ -36,6 +36,7 @@ public class BAParticipantCompletionTest extends BaseFunctionalTest {
     public void teardownTest() throws Exception {
         assertDataAvailable();
         client.clearEventLog();
+        cancelIfActive(uba);
     }
 
     @Test

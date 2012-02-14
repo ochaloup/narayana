@@ -1,5 +1,7 @@
 package org.jboss.narayana.txframework.functional;
 
+import com.arjuna.mw.wst11.UserBusinessActivity;
+import com.arjuna.mw.wst11.UserTransaction;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -8,6 +10,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 public class BaseFunctionalTest {
+
     @Deployment
     public static JavaArchive createTestArchive() {
         // todo: Does the application developer have to specify the interceptor?
@@ -27,4 +30,21 @@ public class BaseFunctionalTest {
 
         return archive;
     }
+
+    public void rollbackIfActive(UserTransaction ut) {
+        try {
+            ut.rollback();
+        } catch (Throwable th2) {
+            // do nothing, not active
+        }
+    }
+
+    public void cancelIfActive(UserBusinessActivity uba) {
+        try {
+            uba.cancel();
+        } catch (Throwable e) {
+            // do nothing, not active
+        }
+    }
+
 }
