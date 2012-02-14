@@ -36,6 +36,7 @@ public class ATTest extends BaseFunctionalTest {
     public void teardownTest() throws Exception {
         assertDataAvailable();
         client.clearLogs();
+        rollbackIfActive(ut);
     }
 
     @Test

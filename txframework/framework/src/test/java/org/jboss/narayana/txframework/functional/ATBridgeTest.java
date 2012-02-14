@@ -21,58 +21,35 @@ public class ATBridgeTest extends BaseFunctionalTest {
 
     @After
     public void teardownTest() throws Exception {
-
-        try {
-            ut.begin();
-            client.reset();
-            ut.commit();
-        } finally {
-            rollbackIfActive(ut);
-        }
-
+        ut.begin();
+        client.reset();
+        ut.commit();
+        rollbackIfActive(ut);
     }
 
     @Test
     public void testSimple() throws Exception {
-        try {
+        ut.begin();
+        client.incrementCounter(1);
+        ut.commit();
 
-            ut.begin();
-            client.incrementCounter(1);
-            ut.commit();
+        ut.begin();
+        int counter = client.getCounter();
+        ut.commit();
 
-            ut.begin();
-            int counter = client.getCounter();
-            ut.commit();
-
-            Assert.assertEquals(1, counter);
-        } finally {
-            rollbackIfActive(ut);
-        }
+        Assert.assertEquals(1, counter);
     }
 
     @Test
     public void testClientDrivenRollback() throws Exception {
-        try {
-            ut.begin();
-            client.incrementCounter(1);
-            ut.rollback();
+        ut.begin();
+        client.incrementCounter(1);
+        ut.rollback();
 
-            ut.begin();
-            int counter = client.getCounter();
-            ut.commit();
+        ut.begin();
+        int counter = client.getCounter();
+        ut.commit();
 
-            Assert.assertEquals(0, counter);
-        } finally {
-            rollbackIfActive(ut);
-        }
+        Assert.assertEquals(0, counter);
     }
-
-    private void rollbackIfActive(UserTransaction ut) {
-        try {
-            ut.rollback();
-        } catch (Throwable th2) {
-            // do nothing, not active
-        }
-    }
-
 }
