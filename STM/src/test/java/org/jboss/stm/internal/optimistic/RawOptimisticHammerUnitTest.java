@@ -255,7 +255,6 @@ public class RawOptimisticHammerUnitTest extends TestCase {
                         _obj1.incr(1);
                     } catch (final Throwable ex) {
                         doCommit = false;
-                        fault = true;
                     }
 
                     if (_commit == ABORT)
@@ -279,6 +278,8 @@ public class RawOptimisticHammerUnitTest extends TestCase {
     }
 
     public void testBasic() throws Exception {
+        init();
+
         AtomicObject obj1 = new AtomicObject();
         AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
 
@@ -287,33 +288,46 @@ public class RawOptimisticHammerUnitTest extends TestCase {
         assertEquals(obj2.get(), 1234);
     }
 
-    /*
-     * public void testRecoverableHammerAbort () throws Exception { init();
-     * 
-     * AtomicObject obj1 = new AtomicObject(); AtomicObject obj2 = new
-     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE); Worker worker1 = new
-     * Worker(obj1, Worker.ABORT); Worker worker2 = new Worker(obj2,
-     * Worker.ABORT);
-     * 
-     * worker1.start(); worker2.start();
-     * 
-     * try { worker1.join(); worker2.join(); } catch (final Throwable ex) { }
-     * 
-     * assertEquals(obj1.get(), 0); }
-     * 
-     * public void testRecoverableHammerCommit () throws Exception { init();
-     * 
-     * AtomicObject obj1 = new AtomicObject(); AtomicObject obj2 = new
-     * AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE); Worker worker1 = new
-     * Worker(obj1, Worker.COMMIT); Worker worker2 = new Worker(obj2,
-     * Worker.COMMIT);
-     * 
-     * worker1.start(); worker2.start();
-     * 
-     * try { worker1.join(); worker2.join(); } catch (final Throwable ex) { }
-     * 
-     * assertEquals(obj1.get(), 600); }
-     */
+    public void testRecoverableHammerAbort() throws Exception {
+        init();
+
+        AtomicObject obj1 = new AtomicObject();
+        AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+        Worker worker1 = new Worker(obj1, Worker.ABORT);
+        Worker worker2 = new Worker(obj2, Worker.ABORT);
+
+        worker1.start();
+        worker2.start();
+
+        try {
+            worker1.join();
+            worker2.join();
+        } catch (final Throwable ex) {
+        }
+
+        assertEquals(obj1.get(), 0);
+    }
+
+    public void testRecoverableHammerCommit() throws Exception {
+        init();
+
+        AtomicObject obj1 = new AtomicObject();
+        AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
+        Worker worker1 = new Worker(obj1, Worker.COMMIT);
+        Worker worker2 = new Worker(obj2, Worker.COMMIT);
+
+        worker1.start();
+        worker2.start();
+
+        try {
+            worker1.join();
+            worker2.join();
+        } catch (final Throwable ex) {
+        }
+
+        assertTrue(obj1.get() > 0);
+    }
+
     private static synchronized void init() throws Exception {
         if (!_init) {
             StoreManager sm = new StoreManager(null, new TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()), null);

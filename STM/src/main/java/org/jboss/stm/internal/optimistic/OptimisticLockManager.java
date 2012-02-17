@@ -64,7 +64,7 @@ public class OptimisticLockManager extends LockManager {
 
     public int setlock(Lock toSet, int retry, int sleepTime) {
         if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("LockManager::setlock(" + toSet + ", " + retry + ", " + sleepTime + ")");
+            txojLogger.logger.trace("OptimisticLockManager::setlock(" + toSet + ", " + retry + ", " + sleepTime + ")");
         }
 
         int conflict = ConflictType.CONFLICT;
@@ -78,6 +78,8 @@ public class OptimisticLockManager extends LockManager {
 
             return LockResult.REFUSED;
         }
+
+        initialise();
 
         currAct = BasicAction.Current();
 
@@ -102,108 +104,111 @@ public class OptimisticLockManager extends LockManager {
                 && ((retry >= 0) || ((retry == LockManager.waitTotalTimeout) && (sleepTime > 0)))) {
             Object syncObject = ((currAct == null) ? getMutex() : currAct);
 
-            synchronized (syncObject) {
-                synchronized (locksHeldLockObject) {
-                    conflict = ConflictType.CONFLICT;
+            synchronized (super.lockStore.getClass()) {
+                synchronized (syncObject) {
+                    synchronized (locksHeldLockObject) {
+                        conflict = ConflictType.CONFLICT;
 
-                    if (loadState()) {
-                        conflict = lockConflict(toSet);
-                    } else {
-                        txojLogger.i18NLogger.warn_LockManager_4();
-                    }
+                        if (loadState()) {
+                            conflict = lockConflict(toSet);
+                        } else {
+                            txojLogger.i18NLogger.warn_LockManager_4();
+                        }
 
-                    if (conflict != ConflictType.CONFLICT) {
-                        /*
-                         * When here the conflict was resolved or the retry
-                         * limit expired.
-                         */
+                        if (conflict != ConflictType.CONFLICT) {
+                            /*
+                             * When here the conflict was resolved or the retry
+                             * limit expired.
+                             */
 
-                        /* no conflict so set lock */
+                            /* no conflict so set lock */
 
-                        modifyRequired = toSet.modifiesObject();
+                            modifyRequired = toSet.modifiesObject();
 
-                        /* trigger object load from store */
+                            /* trigger object load from store */
 
-                        if (super.activate()) {
-                            returnStatus = LockResult.GRANTED;
+                            if (super.activate()) {
+                                returnStatus = LockResult.GRANTED;
 
-                            if (conflict == ConflictType.COMPATIBLE) {
-                                int lrStatus = AddOutcome.AR_ADDED;
+                                if (conflict == ConflictType.COMPATIBLE) {
+                                    int lrStatus = AddOutcome.AR_ADDED;
 
-                                if (currAct != null) {
-                                    /* add new lock record to action list */
+                                    if (currAct != null) {
+                                        /* add new lock record to action list */
 
-                                    newLockR = new OptimisticLockRecord(this, (modifyRequired ? false : true), currAct,
-                                            true);
+                                        newLockR = new OptimisticLockRecord(this, (modifyRequired ? false : true),
+                                                currAct, true);
 
-                                    if ((lrStatus = currAct.add(newLockR)) != AddOutcome.AR_ADDED) {
-                                        newLockR = null;
+                                        if ((lrStatus = currAct.add(newLockR)) != AddOutcome.AR_ADDED) {
+                                            newLockR = null;
 
-                                        if (lrStatus == AddOutcome.AR_REJECTED)
-                                            returnStatus = LockResult.REFUSED;
+                                            if (lrStatus == AddOutcome.AR_REJECTED)
+                                                returnStatus = LockResult.REFUSED;
+                                        }
+
                                     }
 
-                                }
-
-                                if (returnStatus == LockResult.GRANTED) {
-                                    locksHeld.insert(
-                                            toSet); /*
-                                                     * add to local lock list
-                                                     */
+                                    if (returnStatus == LockResult.GRANTED) {
+                                        locksHeld
+                                                .insert(toSet); /*
+                                                                 * add to local
+                                                                 * lock list
+                                                                 */
+                                    }
+                                } else {
+                                    if (modifyRequired)
+                                        returnStatus = LockResult.GRANTED;
                                 }
                             } else {
-                                if (modifyRequired)
-                                    returnStatus = LockResult.GRANTED;
-                            }
-                        } else {
-                            /* activate failed - refuse request */
-                            txojLogger.i18NLogger.warn_LockManager_5();
-
-                            returnStatus = LockResult.REFUSED;
-                        }
-                    }
-
-                    /*
-                     * Unload internal state into lock store only if lock list
-                     * was modified if this fails claim the setlock failed. If
-                     * we are using the lock daemon we can arbitrarily throw the
-                     * lock away as the daemon has it.
-                     */
-
-                    if ((returnStatus == LockResult.GRANTED) && (conflict == ConflictType.COMPATIBLE)) {
-                        if (!unloadState()) {
-                            txojLogger.i18NLogger.warn_LockManager_6();
-
-                            returnStatus = LockResult.REFUSED;
-                        }
-                    } else
-                        freeState();
-
-                    /*
-                     * Postpone call on modified to here so that semaphore will
-                     * have been released. This means when modified invokes
-                     * save_state that routine may set another lock without
-                     * blocking.
-                     */
-
-                    if (returnStatus == LockResult.GRANTED) {
-                        if (modifyRequired) {
-                            if (super.modified()) {
-                                hasBeenLocked = true;
-                            } else {
-                                conflict = ConflictType.CONFLICT;
+                                /* activate failed - refuse request */
+                                txojLogger.i18NLogger.warn_LockManager_5();
 
                                 returnStatus = LockResult.REFUSED;
                             }
                         }
+
+                        /*
+                         * Unload internal state into lock store only if lock
+                         * list was modified if this fails claim the setlock
+                         * failed. If we are using the lock daemon we can
+                         * arbitrarily throw the lock away as the daemon has it.
+                         */
+
+                        if ((returnStatus == LockResult.GRANTED) && (conflict == ConflictType.COMPATIBLE)) {
+                            if (!unloadState()) {
+                                txojLogger.i18NLogger.warn_LockManager_6();
+
+                                returnStatus = LockResult.REFUSED;
+                            }
+                        } else
+                            freeState();
+
+                        /*
+                         * Postpone call on modified to here so that semaphore
+                         * will have been released. This means when modified
+                         * invokes save_state that routine may set another lock
+                         * without blocking.
+                         */
+
+                        if (returnStatus == LockResult.GRANTED) {
+                            if (modifyRequired) {
+                                if (super.modified()) {
+                                    hasBeenLocked = true;
+                                } else {
+                                    conflict = ConflictType.CONFLICT;
+
+                                    returnStatus = LockResult.REFUSED;
+                                }
+                            }
+                        }
+
+                        /*
+                         * Make sure we free state while we still have the lock.
+                         */
+
+                        if (conflict == ConflictType.CONFLICT)
+                            freeState();
                     }
-
-                    /*
-                     * Make sure we free state while we still have the lock.
-                     */
-
-                    if (conflict == ConflictType.CONFLICT)
-                        freeState();
                 }
             }
 
@@ -221,6 +226,18 @@ public class OptimisticLockManager extends LockManager {
         }
 
         return returnStatus;
+    }
+
+    protected boolean doRelease(Uid u, boolean all) {
+        synchronized (super.lockStore.getClass()) {
+            return super.doRelease(u, all);
+        }
+    }
+
+    public final boolean propagate(Uid from, Uid to) {
+        synchronized (super.lockStore.getClass()) {
+            return super.propagate(from, to);
+        }
     }
 
     /**
