@@ -6,6 +6,7 @@ import com.arjuna.wst.TransactionRolledBackException;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.wsat.*;
 import org.jboss.narayana.txframework.functional.clients.ATClient;
 import org.jboss.narayana.txframework.functional.common.ServiceCommand;
+import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
 import org.jboss.narayana.txframework.functional.interfaces.AT;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.junit.After;
@@ -22,7 +23,7 @@ import java.util.List;
 import static org.jboss.narayana.txframework.functional.common.ServiceCommand.*;
 
 @RunWith(Arquillian.class)
-public class ATTest extends BaseFunctionalTest {
+public class ATTest extends BaseFunctionalTestWar {
     private UserTransaction ut;
     private AT client;
 
@@ -90,9 +91,7 @@ public class ATTest extends BaseFunctionalTest {
             ut.begin();
             client.invoke(THROW_APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
-        } catch (SOAPFaultException e) {
-            // todo: can we pass application exceptions over SOAP when using an
-            // EJB exposed as a JAX-WS ws?
+        } catch (SomeApplicationException e) {
             System.out.println("Caught exception");
         } finally {
             ut.rollback();

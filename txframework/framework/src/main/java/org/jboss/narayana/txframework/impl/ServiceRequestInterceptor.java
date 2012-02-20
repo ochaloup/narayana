@@ -15,10 +15,18 @@ public class ServiceRequestInterceptor {
     public Object intercept(InvocationContext ic) throws Throwable {
         Method serviceMethod = ic.getMethod();
         Object serviceImpl = ic.getTarget();
-
         ProtocolHandler protocolHandler = HandlerFactory.createInstance(serviceImpl, serviceMethod);
 
-        return protocolHandler.proceed(ic);
+        Object result = null;
+        try {
+            result = protocolHandler.proceed(ic);
+            protocolHandler.notifySuccess();
+        } catch (Exception e) {
+            protocolHandler.notifyFailure();
+            throw e;
+        }
+
+        return result;
     }
 
 }

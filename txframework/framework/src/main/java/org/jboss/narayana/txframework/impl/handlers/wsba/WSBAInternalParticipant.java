@@ -16,7 +16,7 @@ public class WSBAInternalParticipant {
             BusinessActivityManager businessActivityManager = BusinessActivityManagerFactory.businessActivityManager();
             txid = businessActivityManager.currentTransaction().toString();
         } catch (SystemException e) {
-            throw new ParticipantRegistrationException("Unable to lookup current tranaction id", e);
+            throw new ParticipantRegistrationException("Unable to lookup current transaction id", e);
         }
     }
 

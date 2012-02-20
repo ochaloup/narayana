@@ -31,7 +31,7 @@ import java.util.List;
 
 public class ATClient {
     public static AT newInstance() throws Exception {
-        URL wsdlLocation = new URL("http://localhost:8080/test/ATService/AT?wsdl");
+        URL wsdlLocation = new URL("http://localhost:8080/echo_service/ATService?wsdl");
         QName serviceName = new QName("http://www.jboss.com/functional/at/", "ATService");
         QName portName = new QName("http://www.jboss.com/functional/at/", "AT");
 
