@@ -19,9 +19,10 @@
  * @author mark.little@jboss.com
  */
 
-package org.jboss.stm;
+package org.jboss.stm.internal;
 
 import java.lang.reflect.Proxy;
+
 import org.jboss.stm.internal.reflect.InvocationHandler;
 
 import com.arjuna.ats.arjuna.ObjectType;
@@ -67,6 +68,8 @@ public class PersistentContainer<T> extends RecoverableContainer<T> {
 
     public PersistentContainer(final String name) {
         super(name);
+
+        _type = ObjectType.ANDPERSISTENT;
     }
 
     /**
@@ -120,7 +123,7 @@ public class PersistentContainer<T> extends RecoverableContainer<T> {
         T proxy = _transactionalProxies.get(member);
 
         if (proxy == null) {
-            Class c = member.getClass();
+            Class<?> c = member.getClass();
 
             proxy = (T) Proxy.newProxyInstance(c.getClassLoader(), c.getInterfaces(),
                     new InvocationHandler<T>(this, member, id));
