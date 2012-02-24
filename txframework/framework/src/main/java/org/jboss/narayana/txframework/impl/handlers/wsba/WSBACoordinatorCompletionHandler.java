@@ -1,6 +1,5 @@
 package org.jboss.narayana.txframework.impl.handlers.wsba;
 
-import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.mw.wst11.BusinessActivityManager;
 import com.arjuna.mw.wst11.BusinessActivityManagerFactory;
 import com.arjuna.wst.SystemException;
@@ -10,6 +9,7 @@ import com.arjuna.wst11.BAParticipantManager;
 import org.jboss.narayana.txframework.api.exception.TXFrameworkException;
 import org.jboss.narayana.txframework.impl.handlers.ParticipantRegistrationException;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class WSBACoordinatorCompletionHandler extends WSBAHandler {
     public WSBACoordinatorCompletionHandler(Object serviceImpl, Method serviceMethod) throws TXFrameworkException {
@@ -46,7 +46,7 @@ public class WSBACoordinatorCompletionHandler extends WSBAHandler {
                             participantObject);
 
                     baParticipantManager = businessActivityManager.enlistForBusinessAgreementWithCoordinatorCompletion(
-                            coordinatorCompletionParticipant, participantClass.getName() + new Uid().toString());
+                            coordinatorCompletionParticipant, participantClass.getName() + UUID.randomUUID());
 
                     participantRegistry.register(txid, participantClass, baParticipantManager);
                 } else {

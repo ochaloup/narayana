@@ -1,6 +1,5 @@
 package org.jboss.narayana.txframework.impl.handlers.wsat;
 
-import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.mw.wst.TxContext;
 import com.arjuna.mw.wst11.TransactionManager;
 import com.arjuna.mw.wst11.TransactionManagerFactory;
@@ -14,6 +13,7 @@ import org.jboss.narayana.txframework.impl.handlers.ProtocolHandler;
 import javax.interceptor.InvocationContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 public class WSATHandler implements ProtocolHandler {
     private Object serviceImpl;
@@ -77,8 +77,8 @@ public class WSATHandler implements ProtocolHandler {
                     Durable2PCParticipant durableParticipant = new WSATDurable2PCParticipant(participant);
 
                     TransactionManager transactionManager = TransactionManagerFactory.transactionManager();
-                    transactionManager.enlistForVolatileTwoPhase(volatileParticipant, idPrefix + new Uid().toString());
-                    transactionManager.enlistForDurableTwoPhase(durableParticipant, idPrefix + new Uid().toString());
+                    transactionManager.enlistForVolatileTwoPhase(volatileParticipant, idPrefix + UUID.randomUUID());
+                    transactionManager.enlistForDurableTwoPhase(durableParticipant, idPrefix + UUID.randomUUID());
 
                     participantRegistry.register(txid, participant.getClass());
                 }
