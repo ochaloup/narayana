@@ -186,6 +186,8 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                                                                                 // including
                                                                                 // private
 
+                    _fields = new ArrayList<Field>();
+
                     try {
                         for (Field afield : fields) {
                             // ignore if flagged with @NotState
@@ -195,6 +197,8 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                             }
                         }
                     } catch (final Throwable ex) {
+                        ex.printStackTrace();
+
                         res = false;
                     }
                 }
@@ -220,6 +224,8 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                 }
             }
         } catch (final Throwable ex) {
+            ex.printStackTrace();
+
             res = false;
         }
 

@@ -171,6 +171,8 @@ public class LockManagerProxy<T> extends LockManager {
                                                                                 // including
                                                                                 // private
 
+                    _fields = new ArrayList<Field>();
+
                     try {
                         for (Field afield : fields) {
                             // ignore if flagged with @NotState
@@ -349,8 +351,7 @@ public class LockManagerProxy<T> extends LockManager {
         return res;
     }
 
-    @SuppressWarnings("unchecked")
-    private void checkValidity(Class toCheck) throws InvalidAnnotationException {
+    private void checkValidity(Class<?> toCheck) throws InvalidAnnotationException {
         if (_checkSaveRestore)
             return;
 
@@ -373,7 +374,7 @@ public class LockManagerProxy<T> extends LockManager {
                 return;
             } else {
                 if ((_restoreState == null) && (_saveState == null)) {
-                    Class superClass = toCheck.getSuperclass();
+                    Class<?> superClass = toCheck.getSuperclass();
 
                     if (superClass != Object.class)
                         checkValidity(superClass);

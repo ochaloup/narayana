@@ -142,8 +142,9 @@ public class OptimisticLockManager extends LockManager {
                                         if ((lrStatus = currAct.add(newLockR)) != AddOutcome.AR_ADDED) {
                                             newLockR = null;
 
-                                            if (lrStatus == AddOutcome.AR_REJECTED)
+                                            if (lrStatus == AddOutcome.AR_REJECTED) {
                                                 returnStatus = LockResult.REFUSED;
+                                            }
                                         }
 
                                     }

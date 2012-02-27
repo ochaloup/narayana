@@ -53,6 +53,18 @@ import com.arjuna.ats.txoj.LockMode;
 import com.arjuna.ats.txoj.LockResult;
 
 public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler {
+    /*
+     * If no locks are defined in annotations then we try to use the names of
+     * the methods to infer a lock type to use.
+     * 
+     * todo do we need a "disable inference" annotation/rule? Maybe not since
+     * you can always either explicitly define the lock or change the method
+     * name!
+     */
+
+    private static final String GETTER_NAME = "GET";
+    private static final String SETTER_NAME = "SET";
+
     class LockInformation {
         public LockInformation(int lockType) {
             this(lockType, LockManager.defaultSleepTime, LockManager.defaultRetry);
@@ -121,15 +133,17 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
             }
         }
 
+        if (_optimistic) {
+            if (!initialiseStore()) {
+                _txObject = null;
+
+                return;
+            }
+        }
+
         if (u != null) {
             if (_optimistic) {
-                if (initialiseStore())
-                    _txObject = new OptimisticLockManagerProxy<T>(obj, u, ObjectModel.MULTIPLE, cont);
-                else {
-                    _txObject = null;
-
-                    return;
-                }
+                _txObject = new OptimisticLockManagerProxy<T>(obj, u, ObjectModel.MULTIPLE, cont);
             } else
                 _txObject = new LockManagerProxy<T>(obj, u, cont);
         } else {
@@ -143,14 +157,8 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
              */
 
             if (_optimistic) {
-                if (initialiseStore())
-                    _txObject = new OptimisticLockManagerProxy<T>(obj, ObjectType.ANDPERSISTENT, ObjectModel.MULTIPLE,
-                            cont); // recoverable or persistent
-                else {
-                    _txObject = null;
-
-                    return;
-                }
+                _txObject = new OptimisticLockManagerProxy<T>(obj, ObjectType.ANDPERSISTENT, ObjectModel.MULTIPLE,
+                        cont); // recoverable or persistent
             } else
                 _txObject = new LockManagerProxy<T>(obj, ot, cont); // recoverable
                                                                     // or
@@ -311,7 +319,7 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
 
     private static boolean initialiseStore() {
         synchronized (InvocationHandler.class) {
-            if (_storeManager != null) {
+            if (_storeManager == null) {
                 try {
                     _storeManager = new StoreManager(null, new TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()),
                             null);
@@ -335,7 +343,7 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
     private LockManager _txObject;
     private Method[] _methods;
     private HashMap<Method, InvocationHandler<T>.LockInformation> _cachedMethods = new HashMap<Method, InvocationHandler<T>.LockInformation>();
-    private boolean _nestedTransactions = false;
+    private boolean _nestedTransactions = false; // todo change default?
     private boolean _optimistic = false;
 
     private static StoreManager _storeManager = null;

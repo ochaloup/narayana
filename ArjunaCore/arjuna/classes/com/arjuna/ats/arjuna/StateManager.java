@@ -244,6 +244,8 @@ public class StateManager {
                     try {
                         oldState = participantStore.read_committed(objectUid, type());
                     } catch (ObjectStoreException e) {
+                        e.printStackTrace();
+
                         oldState = null;
                     }
 

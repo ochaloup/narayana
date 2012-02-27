@@ -155,20 +155,11 @@ public class Container<T> {
      *         should use to manipulate the object.
      */
 
-    public synchronized T clone(Class<?> type, T proxy) {
-        if (type == null)
+    public synchronized T clone(T instance, T proxy) {
+        if (instance == null)
             throw new InvalidParameterException();
 
-        try {
-            @SuppressWarnings("unchecked")
-            T instance = (T) type.newInstance();
-
-            return _theContainer.enlist(instance, _theContainer.getUidForHandle(proxy));
-        } catch (final IllegalAccessException ex) {
-            return null;
-        } catch (final InstantiationException ex) {
-            return null;
-        }
+        return _theContainer.enlist(instance, _theContainer.getUidForHandle(proxy));
     }
 
     /*
