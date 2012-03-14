@@ -162,6 +162,11 @@ public class TxSupport {
 
         // the returned document contains transaction URLs delimited by the
         // TXN_LIST_SEP character
+        // If the string is empty split returns an array of size 1 with the
+        // empty string as the element
+        if (content.length() == 0) {
+            return txns;
+        }
         for (String txn : content.split(URI_SEPARATOR))
             txns.add(txn.trim());
 
