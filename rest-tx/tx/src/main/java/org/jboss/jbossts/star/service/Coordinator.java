@@ -20,6 +20,8 @@
  */
 package org.jboss.jbossts.star.service;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
@@ -61,9 +63,11 @@ import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 public class Coordinator {
     protected final static Logger log = Logger.getLogger(Coordinator.class);
 
-    private static Map<String, Transaction> transactions = Collections.synchronizedMap(new HashMap());
+    private static Map<String, Transaction> transactions = Collections
+            .synchronizedMap(new ConcurrentHashMap<String, Transaction>());
     // each participant may only be enlisted in one transaction
-    private static Map<String, LinkHolder> participants = Collections.synchronizedMap(new HashMap());
+    private static Map<String, LinkHolder> participants = Collections
+            .synchronizedMap(new ConcurrentHashMap<String, LinkHolder>());
 
     /**
      * Performing a GET on the transaction-manager returns a list of all
@@ -350,9 +354,9 @@ public class Coordinator {
         if (!tx.isAlive()) {
             transactions.remove(txId);
 
-            for (Iterator<String> i = participants.keySet().iterator(); i.hasNext();)
-                if (enlistmentIds.contains(i.next()))
-                    i.remove();
+            for (String enlistmentId : enlistmentIds) {
+                participants.remove(enlistmentId);
+            }
         } else if (tx.isFinishing()) {
             // TODO who cleans up in this case
             log.debug("transaction is still terminating: " + status);
