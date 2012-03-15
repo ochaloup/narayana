@@ -20,8 +20,6 @@
  */
 package org.jboss.jbossts.star.test;
 
-import java.util.Collection;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
@@ -162,14 +160,5 @@ public class CoordinatorTest extends BaseTest {
                 TxSupport.DO_COMMIT, null);
         // commit it properly
         txn.commitTx();
-    }
-
-    @Test
-    public void testListTransactionsWhenNoActiveTxns() throws IOException {
-        TxSupport txn = new TxSupport();
-
-        Collection<String> transactionsInProgress = txn.getTransactions();
-
-        Assert.assertEquals(0, transactionsInProgress.size());
     }
 }
