@@ -311,9 +311,16 @@ public class TxSupport {
         if (content != null) {
             connection.setDoOutput(true);
 
-            OutputStream os = connection.getOutputStream();
-            os.write(content.getBytes());
-            os.flush();
+            OutputStream os = null;
+            try {
+                os = connection.getOutputStream();
+                os.write(content.getBytes());
+                os.flush();
+            } finally {
+                if (os != null) {
+                    os.close();
+                }
+            }
         }
 
         return connection;
@@ -325,15 +332,21 @@ public class TxSupport {
 
     private StringBuilder getContent(HttpURLConnection connection, StringBuilder builder) throws IOException {
         char[] buffer = new char[1024];
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        int wasRead;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            int wasRead;
 
-        do {
-            wasRead = reader.read(buffer, 0, 1024);
-            if (wasRead > 0)
-                builder.append(buffer, 0, wasRead);
-        } while (wasRead > -1);
-
+            do {
+                wasRead = reader.read(buffer, 0, 1024);
+                if (wasRead > 0)
+                    builder.append(buffer, 0, wasRead);
+            } while (wasRead > -1);
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
         return builder;
     }
 
