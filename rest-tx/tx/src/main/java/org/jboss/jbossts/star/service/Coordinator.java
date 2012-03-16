@@ -26,8 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -63,11 +61,9 @@ import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 public class Coordinator {
     protected final static Logger log = Logger.getLogger(Coordinator.class);
 
-    private static Map<String, Transaction> transactions = Collections
-            .synchronizedMap(new ConcurrentHashMap<String, Transaction>());
+    private static Map<String, Transaction> transactions = new ConcurrentHashMap<String, Transaction>();
     // each participant may only be enlisted in one transaction
-    private static Map<String, LinkHolder> participants = Collections
-            .synchronizedMap(new ConcurrentHashMap<String, LinkHolder>());
+    private static Map<String, LinkHolder> participants = new ConcurrentHashMap<String, LinkHolder>();
 
     /**
      * Performing a GET on the transaction-manager returns a list of all
