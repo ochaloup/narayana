@@ -85,6 +85,10 @@ public class Container<T> {
         this(new Uid().stringForm(), TYPE.RECOVERABLE);
     }
 
+    public Container(final TYPE type) {
+        this(new Uid().stringForm(), type);
+    }
+
     /**
      * Create a named container.
      * 
@@ -159,7 +163,15 @@ public class Container<T> {
         if (instance == null)
             throw new InvalidParameterException();
 
-        return _theContainer.enlist(instance, _theContainer.getUidForHandle(proxy));
+        /*
+         * If we are using pessimistic cc then we don't need to do a clone and
+         * can return the same instance. No MVCC needed here, so shortcut.
+         */
+
+        if (_theContainer.isPessimistic(proxy))
+            return proxy;
+        else
+            return _theContainer.enlist(instance, _theContainer.getUidForHandle(proxy));
     }
 
     /*
