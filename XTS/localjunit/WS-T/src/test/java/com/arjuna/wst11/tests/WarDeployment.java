@@ -50,8 +50,7 @@ public class WarDeployment {
                 .addClass(TestUnknownTransactionExceptionBusinessActivityTerminator.class)
                 .addClass(TestTransactionRolledBackExceptionBusinessActivityTerminator.class)
                 .addClass(TestSystemExceptionBusinessActivityTerminator.class).addClasses(args)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .setWebXML(new File("src/test/resources/web.xml"));
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").setWebXML(new File("web.xml"));
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 

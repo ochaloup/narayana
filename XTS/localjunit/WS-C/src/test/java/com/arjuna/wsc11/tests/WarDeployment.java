@@ -15,7 +15,7 @@ public class WarDeployment {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war").addClass(TestInitialisation.class)
                 .addClass(TestContextFactory.class).addClass(TestUtil.class).addClass(TestUtil11.class)
                 .addClass(TestRegistrar.class).addClasses(args).addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .setWebXML(new File("src/test/resources/web.xml"));
+                .setWebXML(new File("web.xml"));
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 
