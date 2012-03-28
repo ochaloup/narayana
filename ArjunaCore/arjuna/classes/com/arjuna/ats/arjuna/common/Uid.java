@@ -532,6 +532,7 @@ public class Uid implements Cloneable, Serializable {
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         if (_valid) {
+            out.defaultWriteObject();
             out.writeLong(hostAddr[0]);
             out.writeLong(hostAddr[1]);
             out.writeInt(process);
@@ -550,6 +551,8 @@ public class Uid implements Cloneable, Serializable {
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         try {
+            in.defaultReadObject();
+
             hostAddr = new long[2];
 
             hostAddr[0] = in.readLong();
