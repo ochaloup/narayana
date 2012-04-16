@@ -24,10 +24,8 @@ public class WSATParticipantRegistry {
                 participantMap.put(txid, participantList);
             }
 
-            synchronized (participantMap.get(txid)) {
-                if (!participantList.contains(participant)) {
-                    participantList.add(participant);
-                }
+            if (!participantList.contains(participant)) {
+                participantList.add(participant);
             }
         }
     }

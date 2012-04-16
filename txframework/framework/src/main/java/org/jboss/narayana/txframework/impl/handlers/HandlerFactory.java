@@ -1,9 +1,11 @@
 package org.jboss.narayana.txframework.impl.handlers;
 
+import org.jboss.narayana.txframework.api.annotation.transaction.RESTAT;
 import org.jboss.narayana.txframework.api.annotation.transaction.WSAT;
 import org.jboss.narayana.txframework.api.annotation.transaction.WSBA;
 import org.jboss.narayana.txframework.api.configuration.transaction.CompletionType;
 import org.jboss.narayana.txframework.api.exception.TXFrameworkException;
+import org.jboss.narayana.txframework.impl.handlers.restat.service.RESTATHandler;
 import org.jboss.narayana.txframework.impl.handlers.wsat.WSATHandler;
 import org.jboss.narayana.txframework.impl.handlers.wsba.WSBACoordinatorCompletionHandler;
 import org.jboss.narayana.txframework.impl.handlers.wsba.WSBAParticipantCompletionHandler;
@@ -28,6 +30,11 @@ public class HandlerFactory {
         WSAT wsat = (WSAT) serviceClass.getAnnotation(WSAT.class);
         if (wsat != null) {
             return new WSATHandler(serviceImpl, serviceMethod);
+        }
+
+        RESTAT restat = (RESTAT) serviceClass.getAnnotation(RESTAT.class);
+        if (restat != null) {
+            return new RESTATHandler(serviceImpl, serviceMethod);
         }
 
         throw new UnsupportedProtocolException(

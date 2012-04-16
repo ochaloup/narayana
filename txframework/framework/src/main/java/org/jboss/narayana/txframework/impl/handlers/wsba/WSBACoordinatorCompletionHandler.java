@@ -20,7 +20,9 @@ public class WSBACoordinatorCompletionHandler extends WSBAHandler {
     protected BAParticipantManager registerParticipants(Object participant, Method serviceMethod)
             throws ParticipantRegistrationException {
         try {
-            register(new WSBAInternalParticipant()).completed();
+            BAParticipantManager participantManager = register(new WSBAInternalParticipant());
+            // This particular participant does no work, so notify Completed
+            participantManager.completed();
         } catch (Exception e) {
             throw new ParticipantRegistrationException("", e);
         }
