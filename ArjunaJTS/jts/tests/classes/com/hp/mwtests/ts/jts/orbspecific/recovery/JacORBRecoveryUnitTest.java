@@ -34,6 +34,10 @@ package com.hp.mwtests.ts.jts.orbspecific.recovery;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.orbportability.ORBInfo;
+import com.arjuna.orbportability.ORBType;
+import com.arjuna.orbportability.common.opPropertyManager;
 import org.junit.Test;
 import org.omg.CosTransactions.RecoveryCoordinator;
 
@@ -88,6 +92,9 @@ public class JacORBRecoveryUnitTest extends TestBase {
 
     @Test
     public void testRecoverIOR() throws Exception {
+        if (ORBInfo.getOrbEnumValue() != ORBType.JACORB)
+            return;
+
         RecoverIOR ior = new RecoverIOR();
 
         try {
