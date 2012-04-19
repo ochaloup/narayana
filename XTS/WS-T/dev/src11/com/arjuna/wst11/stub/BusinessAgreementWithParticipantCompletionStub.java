@@ -98,7 +98,10 @@ public class BusinessAgreementWithParticipantCompletionStub
          */
         final State state = participant.cancel();
 
-        if (state == State.STATE_CANCELING) {
+        if (state == State.STATE_COMPLETED) {
+            // Complete arrived, whilst the coordinator was trying to abort.
+            compensate();
+        } else if (state == State.STATE_CANCELING) {
             throw new SystemException();
         } else if (state == State.STATE_FAILING_CANCELING) {
             throw new FaultedException();
