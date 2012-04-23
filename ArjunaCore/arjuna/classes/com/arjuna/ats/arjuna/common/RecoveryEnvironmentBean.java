@@ -43,7 +43,7 @@ import com.arjuna.common.internal.util.propertyservice.PropertyPrefix;
 public class RecoveryEnvironmentBean implements RecoveryEnvironmentBeanMBean {
     private volatile int periodicRecoveryPeriod = PeriodicRecovery._defaultRecoveryPeriod;
     private volatile int recoveryBackoffPeriod = PeriodicRecovery._defaultBackoffPeriod;
-    private volatile boolean recoveryListener = true;
+    private volatile boolean recoveryListener = false;
     private volatile int recoveryPort = 0;
     private volatile String recoveryAddress = "localhost";
     private volatile int transactionStatusManagerPort = 0;
