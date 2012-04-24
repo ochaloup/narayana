@@ -23,10 +23,8 @@ public class WSBAParticipantRegistry {
                 participantMap.put(txid, baParticipantManagerMap);
             }
 
-            synchronized (participantMap.get(txid)) {
-                if (baParticipantManagerMap.get(participant) == null) {
-                    baParticipantManagerMap.put(participant, baParticipantManager);
-                }
+            if (baParticipantManagerMap.get(participant) == null) {
+                baParticipantManagerMap.put(participant, baParticipantManager);
             }
         }
     }
