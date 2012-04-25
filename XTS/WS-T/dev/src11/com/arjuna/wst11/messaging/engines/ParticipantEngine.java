@@ -220,20 +220,21 @@ public class ParticipantEngine implements ParticipantInboundEvents {
             }
         }
 
-        if (current != State.STATE_COMMITTING) {
-            if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)
-                    || (current == State.STATE_PREPARED_SUCCESS)) {
-                // n.b. if state is PREPARING the participant may still be in
-                // the middle
-                // of prepare or may even be told to prepare after this is
-                // called. according
-                // to the spec that is not our lookout. however, rollback should
-                // only get
-                // called once here.
+        if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)
+                || (current == State.STATE_PREPARED_SUCCESS)) {
+            // n.b. if state is PREPARING the participant may still be in the
+            // middle
+            // of prepare or may even be told to prepare after this is called.
+            // according
+            // to the spec that is not our lookout. however, rollback should
+            // only get
+            // called once here.
 
-                if (!executeRollback()) {
-                    return;
+            if (!executeRollback()) {
+                synchronized (this) {
+                    state = current;
                 }
+                return;
             }
 
             // if the participant managed to persist the log record then we
@@ -252,16 +253,13 @@ public class ParticipantEngine implements ParticipantInboundEvents {
                     // hmm, could not delete entry -- leave it so we can maybe
                     // retry later
                     WSTLogger.i18NLogger.warn_wst11_messaging_engines_ParticipantEngine_rollback_1(id);
-
-                    return;
                 }
             }
 
             sendAborted();
-
-            if (current != null) {
-                forget();
-            }
+            forget();
+        } else if (current != State.STATE_ABORTING) {
+            sendAborted();
         }
     }
 
@@ -371,8 +369,8 @@ public class ParticipantEngine implements ParticipantInboundEvents {
     /**
      * Handle the commit decision event.
      *
-     * Preparing -> PreparedSuccess (send Prepared) Committing -> Committing
-     * (send committed and forget)
+     * Preparing -> PreparedSuccess (send Prepared) Committing -> null (send
+     * committed and forget)
      */
     private void commitDecision() {
         State current;
