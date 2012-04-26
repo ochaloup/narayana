@@ -30,11 +30,13 @@ public class WSATDurable2PCParticipant extends org.jboss.narayana.txframework.im
 
     public Vote prepare() throws WrongStateException, SystemException {
         // todo check type
-        Vote vote = (Vote) invoke(Prepare.class);
-        if (vote == null) {
+        Boolean prepare = (Boolean) invoke(Prepare.class);
+        if (prepare == null) {
+            return new Prepared();
+        } else if (prepare) {
             return new Prepared();
         } else {
-            return vote;
+            return new Aborted();
         }
     }
 
