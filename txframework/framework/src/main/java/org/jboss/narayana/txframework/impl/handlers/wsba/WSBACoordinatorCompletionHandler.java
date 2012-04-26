@@ -45,7 +45,7 @@ public class WSBACoordinatorCompletionHandler extends WSBAHandler {
                 if (!participantRegistry.isRegistered(txid, participantClass)) {
 
                     WSBACoordinatorCompletionParticipant coordinatorCompletionParticipant = new WSBACoordinatorCompletionParticipant(
-                            participantObject);
+                            participantObject, true);
 
                     baParticipantManager = businessActivityManager.enlistForBusinessAgreementWithCoordinatorCompletion(
                             coordinatorCompletionParticipant, participantClass.getName() + UUID.randomUUID());

@@ -23,18 +23,19 @@ package org.jboss.narayana.txframework.functional.services;
 import com.arjuna.wst.*;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Error;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.*;
+import org.jboss.narayana.txframework.api.annotation.management.DataManagement;
 import org.jboss.narayana.txframework.api.annotation.service.ServiceRequest;
 import org.jboss.narayana.txframework.api.annotation.transaction.AT;
 import org.jboss.narayana.txframework.api.configuration.BridgeType;
-import org.jboss.narayana.txframework.api.management.DataControl;
 import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
 import org.jboss.narayana.txframework.functional.common.EventLog;
 import org.jboss.narayana.txframework.functional.common.ServiceCommand;
-import javax.inject.Inject;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /**
  * @author Paul Robinson (paul.robinson@redhat.com)
@@ -43,15 +44,16 @@ import java.lang.annotation.Annotation;
 @WebService(serviceName = "ATService", portName = "AT", name = "AT", targetNamespace = "http://www.jboss.com/functional/at/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class ATService {
-    @Inject
-    DataControl dataControl;
+    @DataManagement
+    private Map txDataMap;
+
     private boolean rollback = false;
     private EventLog eventLog = new EventLog();
 
     @WebMethod
     @ServiceRequest
     public void invoke(ServiceCommand[] serviceCommands) throws SomeApplicationException {
-        dataControl.put("data", "data");
+        txDataMap.put("data", "data");
         if (isPresent(ServiceCommand.THROW_APPLICATION_EXCEPTION, serviceCommands)) {
             throw new SomeApplicationException("Intentionally thrown Exception");
         }
@@ -130,7 +132,7 @@ public class ATService {
 
     private void logEvent(Class<? extends Annotation> event) {
         // Check data is available
-        if (dataControl.get("data") == null) {
+        if (txDataMap.get("data") == null) {
             eventLog.addDataUnavailable(event);
         }
 

@@ -14,7 +14,7 @@ public class WSBACoordinatorCompletionParticipantTest {
     @Test
     public void testCallbacks() throws Exception {
         LifecycleImpl lifecycle = new LifecycleImpl();
-        WSBACoordinatorCompletionParticipant participant = new WSBACoordinatorCompletionParticipant(lifecycle);
+        WSBACoordinatorCompletionParticipant participant = new WSBACoordinatorCompletionParticipant(lifecycle, false);
 
         participant.cancel();
         participant.close();

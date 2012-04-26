@@ -22,11 +22,11 @@ package org.jboss.narayana.txframework.functional.services;
 
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Error;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.*;
+import org.jboss.narayana.txframework.api.annotation.management.DataManagement;
 import org.jboss.narayana.txframework.api.annotation.management.TxManagement;
 import org.jboss.narayana.txframework.api.annotation.service.ServiceRequest;
 import org.jboss.narayana.txframework.api.annotation.transaction.BA;
 import org.jboss.narayana.txframework.api.configuration.transaction.CompletionType;
-import org.jboss.narayana.txframework.api.management.DataControl;
 import org.jboss.narayana.txframework.api.management.WSBATxControl;
 import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
 import org.jboss.narayana.txframework.functional.interfaces.BAParticipantCompletion;
@@ -39,6 +39,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 import static org.jboss.narayana.txframework.functional.common.ServiceCommand.*;
 
@@ -54,8 +55,8 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
     public WSBATxControl txControl;
     @Inject
     private EventLog eventLog = new EventLog();
-    @Inject
-    DataControl dataControl;
+    @DataManagement
+    private Map TXDataMap;
 
     @WebMethod
     @ServiceRequest
@@ -71,7 +72,7 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
     }
 
     private void saveData(ServiceCommand[] serviceCommands) throws SomeApplicationException {
-        dataControl.put("data", "data");
+        TXDataMap.put("data", "data");
         try {
             if (present(THROW_APPLICATION_EXCEPTION, serviceCommands)) {
                 throw new SomeApplicationException("Intentionally thrown Exception");
@@ -160,7 +161,7 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
 
     private void logEvent(Class<? extends Annotation> event) {
         // Check data is available
-        if (dataControl.get("data") == null) {
+        if (TXDataMap.get("data") == null) {
             eventLog.addDataUnavailable(event);
         }
 
