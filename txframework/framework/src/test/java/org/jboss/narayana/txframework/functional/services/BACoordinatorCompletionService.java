@@ -20,11 +20,11 @@
  */
 package org.jboss.narayana.txframework.functional.services;
 
-import org.jboss.narayana.txframework.api.annotation.lifecycle.wsba.Error;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.wsba.*;
+import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Error;
+import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.*;
 import org.jboss.narayana.txframework.api.annotation.management.TxManagement;
 import org.jboss.narayana.txframework.api.annotation.service.ServiceRequest;
-import org.jboss.narayana.txframework.api.annotation.transaction.WSBA;
+import org.jboss.narayana.txframework.api.annotation.transaction.BA;
 import org.jboss.narayana.txframework.api.configuration.transaction.CompletionType;
 import org.jboss.narayana.txframework.api.management.DataControl;
 import org.jboss.narayana.txframework.api.management.WSBATxControl;
@@ -35,7 +35,6 @@ import org.jboss.narayana.txframework.functional.common.ServiceCommand;
 import org.jboss.narayana.txframework.impl.TXControlException;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
@@ -47,7 +46,7 @@ import java.lang.annotation.Annotation;
 @Stateless
 @WebService(serviceName = "BACoordinatorCompletionService", portName = "BACoordinatorCompletionService", name = "BACoordinatorCompletion", targetNamespace = "http://www.jboss.com/functional/ba/coordinatorcompletion/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-@WSBA(completionType = CompletionType.COORDINATOR)
+@BA(completionType = CompletionType.COORDINATOR)
 public class BACoordinatorCompletionService implements BACoordinatorCompletion {
     @TxManagement
     public WSBATxControl txControl;
@@ -128,7 +127,7 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
     @Error
     @WebMethod(exclude = true)
     private void error() {
-        logEvent(org.jboss.narayana.txframework.api.annotation.lifecycle.wsba.Error.class);
+        logEvent(org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Error.class);
     }
 
     @Status

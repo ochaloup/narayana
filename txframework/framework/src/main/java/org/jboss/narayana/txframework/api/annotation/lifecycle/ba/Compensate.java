@@ -1,4 +1,4 @@
-package org.jboss.narayana.txframework.api.annotation.lifecycle.wsba;
+package org.jboss.narayana.txframework.api.annotation.lifecycle.ba;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
