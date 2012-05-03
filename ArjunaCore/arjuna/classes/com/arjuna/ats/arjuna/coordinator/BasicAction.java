@@ -710,6 +710,8 @@ public class BasicAction extends StateManager {
 
         try {
             packHeader(os, new Header(get_uid(), Utility.getProcessUid()));
+
+            os.packBoolean(pastFirstParticipant);
         } catch (IOException e) {
             return false;
         }
@@ -972,6 +974,8 @@ public class BasicAction extends StateManager {
             Header hdr = new Header();
 
             unpackHeader(os, hdr);
+
+            pastFirstParticipant = os.unpackBoolean();
         } catch (IOException e) {
             return false;
         }
@@ -2403,7 +2407,6 @@ public class BasicAction extends StateManager {
     protected int doCommit(RecordList rl, boolean reportHeuristics) {
         if ((rl != null) && (rl.size() > 0)) {
             AbstractRecord rec;
-            boolean pastFirstParticipant = false;
 
             while (((rec = rl.getFront()) != null)) {
                 int outcome = doCommit(reportHeuristics, rec);
@@ -3196,6 +3199,8 @@ public class BasicAction extends StateManager {
     private int heuristicDecision;
     private CheckedAction _checkedAction; // control what happens if threads
                                             // active when terminating.
+    private boolean pastFirstParticipant; // remember where we are (were) in
+                                            // committing during recovery
 
     /*
      * We need to keep track of the number of threads associated with each
