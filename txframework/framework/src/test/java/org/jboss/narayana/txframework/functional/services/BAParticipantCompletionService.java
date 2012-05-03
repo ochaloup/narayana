@@ -52,7 +52,7 @@ import static org.jboss.narayana.txframework.functional.common.ServiceCommand.*;
 @BA(completionType = CompletionType.PARTICIPANT)
 public class BAParticipantCompletionService implements BAParticipantCompletion {
     @TxManagement
-    public WSBATxControl txControl;
+    private WSBATxControl txControl;
     @Inject
     private EventLog eventLog = new EventLog();
     @DataManagement

@@ -36,10 +36,10 @@ public abstract class WSBAHandler implements ProtocolHandler {
 
     // todo: Use CDI to do injection
     private void injectTxManagement(WSBATxControl wsbaTxControl) throws TXFrameworkException {
-        Field[] fields = serviceImpl.getClass().getFields();
-        for (Field field : serviceImpl.getClass().getFields()) {
+        for (Field field : serviceImpl.getClass().getDeclaredFields()) {
             if (field.getAnnotation(TxManagement.class) != null) {
                 try {
+                    field.setAccessible(true);
                     // todo: check field type
                     field.set(serviceImpl, wsbaTxControl);
                 } catch (IllegalAccessException e) {
