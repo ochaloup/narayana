@@ -164,10 +164,10 @@ public class RecoveryManagerStartStopTest {
             // don't write anything just sit on a read until the socket is
             // closed
             try {
-                String host;
+                InetAddress host;
                 int port;
 
-                host = InetAddress.getLocalHost().getHostName();
+                host = InetAddress.getLocalHost();
 
                 port = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryPort();
 
@@ -179,9 +179,7 @@ public class RecoveryManagerStartStopTest {
                 } catch (final Exception ex) {
                     // in case local host name bind fails (e.g., on Mac OS)
 
-                    host = "127.0.0.1";
-
-                    connectorSocket = new Socket(host, port);
+                    connectorSocket = new Socket("127.0.0.1", port);
                 }
 
                 System.out.println("connected!!!");
