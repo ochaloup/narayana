@@ -164,22 +164,29 @@ public class RecoveryManagerStartStopTest {
             // don't write anything just sit on a read until the socket is
             // closed
             try {
-                InetAddress host;
+                String host;
                 int port;
 
-                host = InetAddress.getLocalHost();
+                host = InetAddress.getLocalHost().getHostName();
 
                 port = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryPort();
 
-                System.out.println("client atempting to connect to host " + host + " port " + port);
+                System.out.println("client attempting to connect to host " + host + " port " + port);
                 System.out.flush();
 
                 try {
                     connectorSocket = new Socket(host, port);
                 } catch (final Exception ex) {
                     // in case local host name bind fails (e.g., on Mac OS)
-
-                    connectorSocket = new Socket("127.0.0.1", port);
+                    System.out.println(
+                            "caught exception " + ex.getMessage() + " trying IPv4 loopback connection instead");
+                    try {
+                        connectorSocket = new Socket("127.0.0.1", port);
+                    } catch (IOException e) {
+                        System.out.println(
+                                "caught exception " + ex.getMessage() + " trying IPv6 loopback connection instead");
+                        connectorSocket = new Socket("::1", port);
+                    }
                 }
 
                 System.out.println("connected!!!");
