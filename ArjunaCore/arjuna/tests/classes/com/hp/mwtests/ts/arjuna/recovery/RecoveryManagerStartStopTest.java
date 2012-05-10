@@ -181,7 +181,7 @@ public class RecoveryManagerStartStopTest {
                     System.out.println(
                             "caught exception " + ex.getMessage() + " trying IPv4 loopback connection instead");
                     try {
-                        connectorSocket = new Socket("127.0.0.1", port);
+                        connectorSocket = new Socket("localhost", port);
                     } catch (IOException e) {
                         System.out.println(
                                 "caught exception " + ex.getMessage() + " trying IPv6 loopback connection instead");
