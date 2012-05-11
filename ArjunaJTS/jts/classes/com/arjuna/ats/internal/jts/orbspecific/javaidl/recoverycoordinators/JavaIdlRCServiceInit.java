@@ -123,10 +123,11 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
                     recoveryManagerAddr);
 
             final Properties p = new Properties();
-            p.setProperty("OAPort", recoveryManagerPort);
+            p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", recoveryManagerPort);
 
             if (recoveryManagerAddr != null && recoveryManagerAddr.length() > 0) {
                 p.setProperty("OAIAddr", recoveryManagerAddr);
+                // TODO what is the JAVA Idl equivalent
             }
 
             try {
