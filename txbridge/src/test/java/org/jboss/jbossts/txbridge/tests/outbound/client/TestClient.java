@@ -74,7 +74,7 @@ public class TestClient extends HttpServlet {
             userTransaction = (UserTransaction) ic.lookup("java:comp/UserTransaction");
 
             URL wsdlLocation = new URL("http://localhost:8080/txbridge-outbound-tests-service/TestServiceImpl?wsdl");
-            QName serviceName = new QName("http://service.outbound.tests.txbridge.jbossts.jboss.org/",
+            QName serviceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/",
                     "TestServiceImplService");
 
             Service service = Service.create(wsdlLocation, serviceName);
