@@ -79,7 +79,6 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
         if (_poa == null) {
             String domainName = "recovery_coordinator";
             String poaName = POA_NAME_PREFIX + rcServiceName + domainName;
-            RC_KEY = OBJ_KEY_PREFIX + poaName + '/' + RC_ID;
 
             try {
                 POA rootPOA = _oa.rootPoa();
@@ -221,13 +220,19 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
         return "/RecoveryCoordinator";
     }
 
+    private static String initRCKey() {
+        String domainName = "recovery_coordinator";
+        String poaName = POA_NAME_PREFIX + GenericRecoveryCreator.getRecCoordServiceName() + domainName;
+        return OBJ_KEY_PREFIX + poaName + '/' + RC_ID;
+    }
+
     private static final String POA_NAME_PREFIX = "RcvCo-";
     private static String OBJ_KEY_PREFIX = ""; // is there an equivalent of
                                                 // JacORBs jacorb.implname
     protected static POA _poa = null;
     static String RC_ID = "RecoveryManager";
 
-    static String RC_KEY = null;
+    static String RC_KEY = initRCKey();
 
     protected static com.arjuna.orbportability.ORB _orb = null;
     protected static RootOA _oa = null;
