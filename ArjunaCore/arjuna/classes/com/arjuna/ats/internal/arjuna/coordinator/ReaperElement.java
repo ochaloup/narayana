@@ -59,7 +59,7 @@ public class ReaperElement implements Comparable<ReaperElement> {
          * the current time of day in milliseconds.
          */
 
-        _absoluteTimeoutMills = (timeout * 1000) + System.currentTimeMillis();
+        _absoluteTimeoutMills = (timeout * 1000L) + System.currentTimeMillis();
 
         // add additional variation to distinguish instances created in the same
         // millisecond.
