@@ -45,6 +45,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                                                     // are used to represent
                                                     // object store types
     private Map<String, List<UidWrapper>> allUids;
+    private boolean exposeAllLogs = false;
 
     /**
      * Initialise the MBean
@@ -219,7 +220,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                                 allUids.put(tname, uids);
                             }
 
-                            if (beanTypes.containsKey(tname))
+                            if (exposeAllLogs || beanTypes.containsKey(tname))
                                 updateMBeans(uids, System.currentTimeMillis(), true, tname);
                         }
                     } catch (IOException e1) {
@@ -260,6 +261,10 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         }
     }
 
+    public void setExposeAllRecordsAsMBeans(boolean exposeAllLogs) {
+        this.exposeAllLogs = exposeAllLogs;
+    }
+
     /**
      * Register new MBeans of the requested type (or unregister ones whose
      * corresponding ObjectStore entry has been removed)
@@ -282,6 +287,13 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         return uids;
     }
 
+    private String getBeanType(String type) {
+        if (beanTypes.containsKey(type))
+            return beanTypes.get(type);
+
+        return OSEntryBean.class.getName();
+    }
+
     private void updateMBeans(List<UidWrapper> uids, long tstamp, boolean register, String type) {
         ObjectStoreIterator iter = new ObjectStoreIterator(StoreManager.getRecoveryStore(), type);
 
@@ -290,7 +302,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
             if (u == null || Uid.nullUid().equals(u))
                 break;
 
-            UidWrapper w = new UidWrapper(this, beanTypes.get(type), type, stateTypes.get(type), u);
+            UidWrapper w = new UidWrapper(this, getBeanType(type), type, stateTypes.get(type), u);
             int i = uids.indexOf(w);
 
             if (i == -1) {
