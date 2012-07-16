@@ -533,8 +533,11 @@ public class SpecTest extends BaseTest {
         }
         public void run() {
             try {
+                Thread.sleep(500);
                 status = txn.commitTx();
             } catch (HttpResponseException e) {
+                status = "";
+            } catch (InterruptedException e) {
                 status = "";
             }
         }
