@@ -146,4 +146,9 @@ public class CrashRecoveryDelays {
     private static void awaitReplayCompletion(int seconds) throws InterruptedException {
         Thread.sleep(seconds * 1000);
     }
+
+    public static void awaitReplayCompletionCR06() throws InterruptedException {
+        awaitReplayCompletion(10); // was 5
+    }
+
 }
