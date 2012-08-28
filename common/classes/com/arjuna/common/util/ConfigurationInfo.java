@@ -99,6 +99,7 @@ public class ConfigurationInfo {
          */
         String classFileName = ConfigurationInfo.class.getSimpleName() + ".class";
         String pathToThisClass = ConfigurationInfo.class.getResource(classFileName).toString();
+
         // we need to strip off the class name bit so we can replace it with the
         // manifest name:
         int suffixLength = ("/" + ConfigurationInfo.class.getCanonicalName() + ".class").length();

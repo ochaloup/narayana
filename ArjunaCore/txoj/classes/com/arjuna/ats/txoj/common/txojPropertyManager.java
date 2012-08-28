@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.txoj.common;
 
+import com.arjuna.ats.arjuna.utils.Utility;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
 /**
@@ -40,6 +41,13 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  */
 public class txojPropertyManager {
     public static TxojEnvironmentBean getTxojEnvironmentBean() {
-        return BeanPopulator.getDefaultInstance(TxojEnvironmentBean.class);
+        try {
+            return BeanPopulator.getDefaultInstance(TxojEnvironmentBean.class);
+        } catch (final java.lang.RuntimeException ex) {
+            if (Utility.isAndroid())
+                return new TxojEnvironmentBean(); // todo android
+            else
+                throw ex;
+        }
     }
 }
