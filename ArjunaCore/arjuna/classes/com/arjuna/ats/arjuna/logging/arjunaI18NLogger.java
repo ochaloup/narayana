@@ -24,6 +24,7 @@ import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.FATAL;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.Logger.Level.TRACE;
 import static org.jboss.logging.Message.Format.MESSAGE_FORMAT;
 
 import org.jboss.logging.Cause;
@@ -1066,7 +1067,7 @@ public interface arjunaI18NLogger {
 
     @Message(id = 12259, value = "JDBCStore could not setup store < {0} , {1} >", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
-    public void fatal_objectstore_JDBCStore_1(String arg0, String arg1);
+    public void fatal_objectstore_JDBCStore_1(String arg0, String arg1, @Cause() Throwable arg2);
 
     @Message(id = 12260, value = "Received exception for {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
@@ -1525,6 +1526,14 @@ public interface arjunaI18NLogger {
 
     @Message(id = 12369, value = "The node identifier was already set", format = MESSAGE_FORMAT)
     public String get_node_identifier_reset_attempt();
+
+    @Message(id = 12370, value = "Previously committed row(s) deleted {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = TRACE)
+    public void trace_JDBCImple_previouslycommitteddeleted(int rowcount);
+
+    @Message(id = 12371, value = "Image size {0} is greater than max allowed {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_objectstore_JDBCImple_over_max_image_size(int imageSize, int maxStateSize);
 
     /*
      * Allocate new messages directly above this notice. - id: use the next id

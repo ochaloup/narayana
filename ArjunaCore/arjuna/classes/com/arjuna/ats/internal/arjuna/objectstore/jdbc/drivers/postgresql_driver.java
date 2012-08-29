@@ -18,26 +18,33 @@
  * (C) 2009,
  * @author JBoss by Red Hat.
  */
-package com.arjuna.ats.internal.arjuna.objectstore.jdbc;
+package com.arjuna.ats.internal.arjuna.objectstore.jdbc.drivers;
 
 import java.sql.SQLException;
-import java.sql.Statement;
+
+import com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver;
 
 /**
- * JDBC store implementation driver-specific code. This version for MySQL JDBC
- * Drivers.
+ * JDBC store implementation driver-specific code. This version for PostgreSQL
+ * JDBC Drivers.
  */
-public class mysql_ab_driver extends com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple {
-    protected void createTable(Statement stmt, String tableName) throws SQLException {
-        stmt.executeUpdate("CREATE TABLE " + tableName
-                + " (StateType INTEGER, TypeName VARCHAR(255), UidString VARCHAR(255), ObjectState BLOB, PRIMARY KEY(UidString, StateType, TypeName))");
+public class postgresql_driver extends JDBCImple_driver {
+
+    @Override
+    protected void checkCreateTableError(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42P07")) {
+            throw ex;
+        }
     }
 
-    public String name() {
-        return "mysql";
-    }
-
-    protected int getMaxStateSize() {
-        return 65535;
+    @Override
+    protected void checkDropTableException(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42P01")) {
+            throw ex;
+        } else {
+            // For some reason PSQL leaves the transaction in a bad state on a
+            // failed drop
+            connection.get().commit();
+        }
     }
 }

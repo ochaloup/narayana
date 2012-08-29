@@ -19,7 +19,7 @@
  * @author JBoss Inc.
  */
 /*
- * $Id: microsoft_driver.java 2342 2006-03-30 13:06:17Z  $
+ * $Id: oracle_driver.java 2342 2006-03-30 13:06:17Z  $
  *
  * Copyright (c) 2001 Hewlett-Packard Company
  * Hewlett-Packard Company Confidential
@@ -35,26 +35,49 @@
  * Note: This impl has come from HP-TS-2.2 via. HP-MS 1.0
  */
 
-package com.arjuna.ats.internal.arjuna.objectstore.jdbc;
-
-import java.sql.SQLException;
-import java.sql.Statement;
-
-/**
- * JDBC store implementation driver-specific code. This version for MS SQL
- * Server JDBC Drivers 2 (server 2005/2008).
+/*
+ * JDBC store implementation driver-specific code.
+ * This version for Oracle 8.1/9.* JDBC Drivers (OCI or Thin) ONLY.
  */
-public class microsoft_driver extends JDBCImple {
-    protected void createTable(Statement stmt, String tableName) throws SQLException {
-        stmt.executeUpdate("CREATE TABLE " + tableName
-                + " (StateType INTEGER, TypeName VARCHAR(1024), UidString VARCHAR(255), ObjectState VARBINARY(MAX), PRIMARY KEY(UidString, StateType, TypeName))");
+package com.arjuna.ats.internal.arjuna.objectstore.jdbc.drivers;
+
+import java.sql.Blob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver;
+
+public class oracle_driver extends JDBCImple_driver {
+
+    @Override
+    protected String getObjectStateSQLType() {
+        return "BLOB";
     }
 
-    public String name() {
-        return "mssqlserver";
+    @Override
+    public int getMaxStateSize() {
+        // Oracle BLOBs should be OK up to > 4 GB, but cap @ 10 MB for
+        // testing/performance:
+        return 1024 * 1024 * 10;
     }
 
-    protected int getMaxStateSize() {
-        return 65535;
+    @Override
+    protected void updateBytes(ResultSet rs, int i, byte[] b) throws SQLException {
+        Blob myBlob = rs.getBlob(i);
+        myBlob.setBytes(i, b);
+    }
+
+    @Override
+    protected void checkCreateTableError(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42000") && ex.getErrorCode() != 955) {
+            throw ex;
+        }
+    }
+
+    @Override
+    protected void checkDropTableException(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42000") && ex.getErrorCode() != 942) {
+            throw ex;
+        }
     }
 }

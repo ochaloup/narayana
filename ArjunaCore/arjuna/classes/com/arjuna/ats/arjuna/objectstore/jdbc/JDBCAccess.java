@@ -33,6 +33,9 @@ package com.arjuna.ats.arjuna.objectstore.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.StringTokenizer;
+
+import javax.naming.NamingException;
 
 /**
  * Do not return a connection which participates within the transaction 2-phase
@@ -44,46 +47,20 @@ import java.sql.SQLException;
  */
 
 public interface JDBCAccess {
-    /*
-     * Locations within initialize array for parameters.
-     */
-
-    public static final int URL = 0;
-    public static final int TABLE_NAME = 1;
-    public static final int DROP_TABLE = 2;
-
     /**
      * @return the connection to use for the object store. If a pool of
      *         connections is used, this method may be called up to maxpoolsize
      *         times. It <EM>must<EM> not return the same connection each time.
+     * @throws NamingException
      */
 
-    public Connection getConnection() throws SQLException;
-
-    /**
-     * Called from the object store when a connection is no longer used.
-     */
-
-    public void putConnection(Connection conn);
-
-    /**
-     * @return the name of the table to use for storing the state.
-     */
-
-    public String tableName();
-
-    /**
-     * @return <code>true</code> if the table is to be deleted and recreated
-     *         prior to use, <code>false</code> otherwise.
-     */
-
-    public boolean dropTable();
+    public Connection getConnection() throws SQLException, NamingException;
 
     /**
      * This method can be used to pass additional information to the
      * implementation.
      */
 
-    public void initialise(Object[] objName);
+    public void initialise(StringTokenizer stringTokenizer);
 
 }

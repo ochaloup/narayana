@@ -52,7 +52,7 @@ import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 public class PersistenceTest {
     @Test
     public void test() throws Throwable {
-        ParticipantStore store = new ShadowingStore(new ObjectStoreEnvironmentBean());
+        ParticipantStore store = StoreManager.getParticipantStore();
         OutputObjectState state = new OutputObjectState();
         Uid u = new Uid();
 
@@ -61,11 +61,13 @@ public class PersistenceTest {
         InputObjectState inputState = store.read_committed(u, "/StateManager/LockManager/foo");
 
         assertNotNull(inputState);
+        store.stop();
     }
 
     @Test
-    public void testTwoPhaseVolatile() throws Throwable {
-        StoreManager sm = new StoreManager(null, new TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()), null);
+    public void testAtomicObject() throws Throwable {
+        // StoreManager sm = new StoreManager(null, new
+        // TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()), null);
 
         AtomicObject obj1 = new AtomicObject(ObjectModel.MULTIPLE);
 
@@ -73,7 +75,7 @@ public class PersistenceTest {
 
         AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
 
-        assertTrue(obj1.getStore().getClass().getName().equals(TwoPhaseVolatileStore.class.getName()));
+        // assertTrue(obj1.getStore().getClass().getName().equals(TwoPhaseVolatileStore.class.getName()));
 
         obj1.set(101);
 

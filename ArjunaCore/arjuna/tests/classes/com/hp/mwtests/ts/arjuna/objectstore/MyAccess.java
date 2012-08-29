@@ -33,6 +33,7 @@ package com.hp.mwtests.ts.arjuna.objectstore;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.StringTokenizer;
 
 public class MyAccess implements com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess {
 
@@ -40,18 +41,7 @@ public class MyAccess implements com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAcce
         return null;
     }
 
-    public void putConnection(Connection conn) {
-    }
-
-    public String tableName() {
-        return null;
-    }
-
-    public boolean dropTable() {
-        return false;
-    }
-
-    public void initialise(Object[] objName) {
+    public void initialise(StringTokenizer objName) {
     }
 
 }

@@ -32,67 +32,41 @@
 package com.arjuna.ats.internal.arjuna.objectstore.jdbc.accessors;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.StringTokenizer;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import com.arjuna.ats.arjuna.exceptions.FatalError;
 import com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess;
 
-/**
- * Do not return a connection which participates within the transaction 2-phase
- * commit protocol! All connections will have auto-commit set to true, or we
- * will not be able to use them. So don't return an Arjuna JDBC 1.0 or 2.x
- * connection.
- *
- * @since JTS 2.1.
- */
+public class DataSourceJDBCAccess implements JDBCAccess {
 
-public class accessor implements JDBCAccess {
+    private String datasourceName;
 
-    public accessor() {
-        _tableName = null;
-        _dropTable = false;
-        _url = null;
+    public Connection getConnection() throws SQLException, NamingException {
+        Connection connection = ((DataSource) new InitialContext().lookup(datasourceName)).getConnection();
+        connection.setAutoCommit(false);
+        return connection;
     }
 
-    public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(_url, null);
-    }
-
-    public void putConnection(Connection conn) {
-    }
-
-    public String tableName() {
-        return _tableName;
-    }
-
-    public boolean dropTable() {
-        return _dropTable;
-    }
-
-    public void initialise(Object[] objName) {
-        if (objName != null) {
+    public void initialise(StringTokenizer tokenizer) {
+        while (tokenizer.hasMoreElements()) {
             try {
-                _url = (String) objName[JDBCAccess.URL];
-                _tableName = (String) objName[JDBCAccess.TABLE_NAME];
-
-                // TODO make this a boolean now!
-
-                long drop = (Long) objName[JDBCAccess.DROP_TABLE];
-
-                if (drop == 1)
-                    _dropTable = true;
+                String[] split = tokenizer.nextToken().split("=");
+                if (split[0].equalsIgnoreCase("datasourceName")) {
+                    datasourceName = split[1];
+                }
             } catch (Exception ex) {
                 throw new FatalError(toString() + " : " + ex, ex);
             }
         }
 
-        if (_url == null)
-            throw new FatalError(toString() + " : invalid ObjectName parameter!");
+        if (datasourceName == null) {
+            throw new FatalError("The JDBC ObjectStore was not configured with a datasource name");
+        }
     }
-
-    private String _tableName;
-    private boolean _dropTable;
-    private String _url;
 
 }

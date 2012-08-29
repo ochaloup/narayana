@@ -18,27 +18,33 @@
  * (C) 2009,
  * @author JBoss by Red Hat.
  */
-package com.arjuna.ats.internal.arjuna.objectstore.jdbc;
+package com.arjuna.ats.internal.arjuna.objectstore.jdbc.drivers;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
- * JDBC store implementation driver-specific code. This version for IBM DB2
- * Universal JDBC Drivers.
+ * JDBC store implementation driver-specific code. This version for MySQL JDBC
+ * Drivers.
  */
-public class ibm_driver extends com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple {
-    protected void createTable(Statement stmt, String tableName) throws SQLException {
-        stmt.executeUpdate("CREATE TABLE " + tableName
-                + " (StateType INTEGER NOT NULL, TypeName VARCHAR(255) NOT NULL, UidString VARCHAR(255) NOT NULL, ObjectState BLOB"
-                + ", PRIMARY KEY(UidString, StateType, TypeName))");
+public class mysql_ab_driver extends com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver {
+
+    @Override
+    protected String getObjectStateSQLType() {
+        return "BLOB";
     }
 
-    public String name() {
-        return "ibm db2";
+    @Override
+    protected void checkCreateTableError(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42S01")) {
+            throw ex;
+        }
+
     }
 
-    protected int getMaxStateSize() {
-        return 65535;
+    @Override
+    protected void checkDropTableException(SQLException ex) throws SQLException {
+        if (!ex.getSQLState().equals("42S02")) {
+            throw ex;
+        }
     }
 }
