@@ -16,7 +16,7 @@ public class UserTransaction {
         if (threadTX.get() != null) {
             throw new IllegalStateException("Transaction already running");
         }
-        TxSupport txSupport = new TxSupport(coordinatorUrl);
+        TxSupport txSupport = new TxSupport();
         txSupport.startTx();
         threadTX.set(txSupport);
     }
