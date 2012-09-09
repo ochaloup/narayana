@@ -61,8 +61,10 @@ public class Coordinator {
     private final static String REST_TXN_TYPE = new AtomicAction().type();
 
     private static Map<String, Transaction> transactions = new ConcurrentHashMap<String, Transaction>();
-    // each participant may only be enlisted in one transaction
-    private static Map<String, HashMap<TxLinkRel, String>> participants = new ConcurrentHashMap<String, HashMap<TxLinkRel, String>>();
+    // each participant may only be enlisted in one transaction - map each
+    // registration id to a map of
+    // link name to link uri
+    private static Map<String, HashMap<String, String>> participants = new ConcurrentHashMap<String, HashMap<String, String>>();
 
     private static Map<String, RecoveringTransaction> recoveringTransactions = getRecoveringTransactions(transactions);
 
@@ -108,8 +110,8 @@ public class Coordinator {
         Response.ResponseBuilder builder = Response.ok(txns.toString());
         builder.header("Content-Length", txns.length());
 
-        TxSupport.setLinkHeader(builder, "Transaction Statistics", TxLinkRel.STATISTICS.linkName(),
-                info.getAbsolutePath().toString() + "/statistics", TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
+        TxSupport.setLinkHeader(builder, "Transaction Statistics", TxLinkNames.STATISTICS,
+                info.getAbsolutePath().toString() + "/" + TxLinkNames.STATISTICS, TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
 
         return builder.build();
     }
@@ -119,14 +121,11 @@ public class Coordinator {
     @Produces(TxMediaType.TX_STATUS_EXT_MEDIA_TYPE)
     public TransactionManagerElement getTransactionManagerInfo(@Context UriInfo info) {
         TransactionManagerElement tm = new TransactionManagerElement();
-        StringBuilder txns = new StringBuilder();
 
         updateTransactions();
 
-        Iterator<String> i = transactions.keySet().iterator();
-
-        while (i.hasNext()) {
-            URI uri = TxSupport.getUri(info, info.getPathSegments().size(), i.next());
+        for (String s : transactions.keySet()) {
+            URI uri = TxSupport.getUri(info, info.getPathSegments().size(), s);
             tm.addCoordinator(uri.toString());
         }
 
@@ -138,7 +137,7 @@ public class Coordinator {
     }
 
     @GET
-    @Path(TxSupport.TX_SEGMENT + "/statistics")
+    @Path(TxSupport.TX_SEGMENT + TxLinkNames.STATISTICS)
     @Produces(TxMediaType.TX_STATUS_EXT_MEDIA_TYPE)
     public TransactionStatisticsElement getTransactionStatistics() {
         // for prepared we could go through every transaction and get its status
@@ -158,18 +157,18 @@ public class Coordinator {
      * @return http response
      */
     @HEAD
-    @Path(TxSupport.TX_SEGMENT + "/{id}")
+    @Path(TxSupport.TX_SEGMENT + "{id}")
     @Produces(TxMediaType.TX_LIST_MEDIA_TYPE)
     public Response getTransactionURIs(@Context UriInfo info, @PathParam("id") String id) {
         log.tracef("coordinator txn head request for txn %s", id);
         getTransaction(id); // throws an exception if the transaction does not
                             // exist
 
-        String terminator = TxLinkRel.TERMINATOR.linkName();
+        String terminator = TxLinkNames.TERMINATOR;
         Response.ResponseBuilder builder = Response.ok();
 
         TxSupport.addLinkHeader(builder, info, terminator, terminator, terminator);
-        TxSupport.addLinkHeader(builder, info, TxLinkRel.PARTICIPANT.linkName(), TxLinkRel.PARTICIPANT.linkName());
+        TxSupport.addLinkHeader(builder, info, TxLinkNames.PARTICIPANT, TxLinkNames.PARTICIPANT);
 
         return builder.build();
     }
@@ -186,7 +185,7 @@ public class Coordinator {
      * @return content representing the status of the transaction
      */
     @GET
-    @Path(TxSupport.TX_SEGMENT + "/{id}")
+    @Path(TxSupport.TX_SEGMENT + "{id}")
     @Produces(TxMediaType.TX_STATUS_MEDIA_TYPE)
     public Response getTransactionStatus(@Context UriInfo info, @PathParam("id") String id) {
         log.tracef("coordinator: status: transaction-coordinator/%s", id);
@@ -197,18 +196,17 @@ public class Coordinator {
     }
 
     @GET
-    @Path(TxSupport.TX_SEGMENT + "/{id}")
+    @Path(TxSupport.TX_SEGMENT + "{id}")
     @Produces(TxMediaType.TX_STATUS_EXT_MEDIA_TYPE)
     public Response getTransactionExtStatus(@Context UriInfo info, @PathParam("id") String id) {
         log.tracef("coordinator: status: transaction-coordinator/%s", id);
         Transaction txn = getTransaction(id);
-        String terminator = TxLinkRel.TERMINATOR.linkName();
+        String terminator = TxLinkNames.TERMINATOR;
         Collection<String> enlistmentIds = new ArrayList<String>();
         CoordinatorElement coordinatorElement = txn.toXML();
         String txnURI = TxSupport.getUri(info, info.getPathSegments().size()).toString();
         URI terminateURI = TxSupport.getUri(info, info.getPathSegments().size(), terminator);
-        URI volatileURI = TxSupport.getUri(info, info.getPathSegments().size(),
-                TxLinkRel.VOLATILE_PARTICIPANT.linkName());
+        URI volatileURI = TxSupport.getUri(info, info.getPathSegments().size(), TxLinkNames.VOLATILE_PARTICIPANT);
 
         coordinatorElement.setTxnURI(txnURI);
         coordinatorElement.setTerminateURI(terminateURI.toString());
@@ -218,10 +216,10 @@ public class Coordinator {
         txn.getParticipants(enlistmentIds);
 
         for (String enlistmentId : enlistmentIds) {
-            Map<TxLinkRel, String> participantInfo = participants.get(enlistmentId);
-            String terminatorURI = participantInfo.get(TxLinkRel.PARTICIPANT_TERMINATOR);
-            String participantURI = participantInfo.get(TxLinkRel.PARTICIPANT_RESOURCE);
-            String recoveryURI = participantInfo.get(TxLinkRel.PARTICIPANT_RECOVERY);
+            Map<String, String> participantInfo = participants.get(enlistmentId);
+            String terminatorURI = participantInfo.get(TxLinkNames.PARTICIPANT_TERMINATOR);
+            String participantURI = participantInfo.get(TxLinkNames.PARTICIPANT_RESOURCE);
+            String recoveryURI = participantInfo.get(TxLinkNames.PARTICIPANT_RECOVERY);
             TwoPhaseAwareParticipantElement participantElement = new TwoPhaseAwareParticipantElement();
 
             participantElement.setTerminatorURI(terminatorURI);
@@ -244,7 +242,7 @@ public class Coordinator {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     @DELETE
-    @Path(TxSupport.TX_SEGMENT + "/{id}")
+    @Path(TxSupport.TX_SEGMENT + "{id}")
     public Response deleteTransaction(@PathParam("id") String id) {
         return Response.status(HttpURLConnection.HTTP_FORBIDDEN).build();
     }
@@ -253,31 +251,31 @@ public class Coordinator {
     // url generates a 400 status code
     @SuppressWarnings({"UnusedDeclaration"})
     @HEAD
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response tt1(@PathParam("TxId") String txId) {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
     }
     @SuppressWarnings({"UnusedDeclaration"})
     @GET
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response tt2(@PathParam("TxId") String txId) {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
     }
     @SuppressWarnings({"UnusedDeclaration"})
     @POST
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response tt3(@PathParam("TxId") String txId) {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
     }
     @SuppressWarnings({"UnusedDeclaration"})
     @DELETE
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response tt4(@PathParam("TxId") String txId) {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
     }
     @SuppressWarnings({"UnusedDeclaration"})
     @OPTIONS
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response tt5(@PathParam("TxId") String txId) {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
     }
@@ -285,9 +283,9 @@ public class Coordinator {
     private Response.ResponseBuilder addTransactionHeaders(Response.ResponseBuilder builder, UriInfo info,
             Transaction tx, boolean includeTxId) {
         String uid = tx.get_uid().fileStringForm();
-        String terminator = TxLinkRel.TERMINATOR.linkName();
-        String participant = TxLinkRel.PARTICIPANT.linkName();
-        String vparticipant = TxLinkRel.VOLATILE_PARTICIPANT.linkName();
+        String terminator = TxLinkNames.TERMINATOR;
+        String participant = TxLinkNames.PARTICIPANT;
+        String vparticipant = TxLinkNames.VOLATILE_PARTICIPANT;
 
         if (includeTxId) {
             TxSupport.addLinkHeader(builder, info, terminator, terminator, uid, terminator);
@@ -314,8 +312,8 @@ public class Coordinator {
      * (typically referred to as the server). These linked URLs can be of
      * arbitrary format. The rel names for the links are:
      * 
-     * @see org.jboss.jbossts.star.util.TxLinkRel#TERMINATOR and @see
-     *      TxLinkRel#PARTICIPANT
+     * @see org.jboss.jbossts.star.util.TxLinkNames#TERMINATOR and @see
+     *      TxLinkNames#PARTICIPANT
      *
      * @param info
      *            uri context
@@ -330,7 +328,7 @@ public class Coordinator {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     @POST
-    @Path(TxSupport.TX_SEGMENT + "/")
+    @Path(TxSupport.TX_SEGMENT)
     @Consumes(TxMediaType.POST_MEDIA_TYPE)
     // @Produces("application/vnd.rht.txstatus+text;version=0.1")
     public Response beginTransaction(@Context UriInfo info, @Context HttpHeaders headers,
@@ -398,7 +396,7 @@ public class Coordinator {
      * @return http response code
      */
     @PUT
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/terminator")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.TERMINATOR)
     public Response terminateTransaction(@PathParam("TxId") String txId,
             @QueryParam("fault") @DefaultValue("") String fault, String content) {
         log.tracef("coordinator: commit: transaction-manager/%s/terminator : content: %s", txId, content);
@@ -407,7 +405,6 @@ public class Coordinator {
         String how = TxSupport.getStringValue(content, TxStatusMediaType.STATUS_PROPERTY);
         String status;
         int scRes;
-        int ihow;
 
         /*
          * 275If the transaction no longer exists then an implementation MAY
@@ -482,11 +479,11 @@ public class Coordinator {
             // Cleanup synchronization could not pass in the participants (tx
             // timed out)
             // locate the enlistment ids
-            Iterator<Entry<String, HashMap<TxLinkRel, String>>> j = participants.entrySet().iterator();
+            Iterator<Entry<String, HashMap<String, String>>> j = participants.entrySet().iterator();
             while (j.hasNext()) {
-                Map.Entry<java.lang.String, HashMap<TxLinkRel, String>> entry = j.next();
-                HashMap<TxLinkRel, String> linkHolder = entry.getValue();
-                String participantTxId = linkHolder.get(TxLinkRel.TRANSACTION);
+                Map.Entry<java.lang.String, HashMap<String, String>> entry = j.next();
+                HashMap<String, String> linkHolder = entry.getValue();
+                String participantTxId = linkHolder.get(TxLinkNames.TRANSACTION);
                 if (participantTxId.equals(txId)) {
                     j.remove();
                 }
@@ -514,7 +511,7 @@ public class Coordinator {
      * @return unique resource ref for the participant
      */
     @POST
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}")
     public Response enlistParticipant(@HeaderParam("Link") String linkHeader, @Context UriInfo info,
             @PathParam("TxId") String txId, String content) {
         log.tracef("enlistParticipant request uri %s txid:  %s content: %s", info.getRequestUri(), txId, content);
@@ -527,13 +524,13 @@ public class Coordinator {
         if (!tx.isRunning())
             return Response.status(HttpURLConnection.HTTP_PRECON_FAILED).build();
 
-        Map<TxLinkRel, String> links = TxSupport.decodeLinkHeader(linkHeader);
+        Map<String, String> links = TxSupport.decodeLinkHeader(linkHeader);
 
-        if (links.containsKey(TxLinkRel.VOLATILE_PARTICIPANT))
-            tx.addVolatileParticipant(links.get(TxLinkRel.VOLATILE_PARTICIPANT));
+        if (links.containsKey(TxLinkNames.VOLATILE_PARTICIPANT))
+            tx.addVolatileParticipant(links.get(TxLinkNames.VOLATILE_PARTICIPANT));
 
-        String participantURI = links.get(TxLinkRel.PARTICIPANT_RESOURCE);
-        String terminatorURI = links.get(TxLinkRel.PARTICIPANT_TERMINATOR);
+        String participantURI = links.get(TxLinkNames.PARTICIPANT_RESOURCE);
+        String terminatorURI = links.get(TxLinkNames.PARTICIPANT_TERMINATOR);
 
         if (participantURI == null)
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("Missing Enlistment Link Header").build();
@@ -550,10 +547,10 @@ public class Coordinator {
                     .build();
 
         if (terminatorURI == null) {
-            String commitURI = links.get(TxLinkRel.PARTICIPANT_COMMIT);
-            String prepareURI = links.get(TxLinkRel.PARTICIPANT_PREPARE);
-            String rollbackURI = links.get(TxLinkRel.PARTICIPANT_ROLLBACK);
-            String commitOnePhaseURI = links.get(TxLinkRel.PARTICIPANT_COMMIT_ONE_PHASE);
+            String commitURI = links.get(TxLinkNames.PARTICIPANT_COMMIT);
+            String prepareURI = links.get(TxLinkNames.PARTICIPANT_PREPARE);
+            String rollbackURI = links.get(TxLinkNames.PARTICIPANT_ROLLBACK);
+            String commitOnePhaseURI = links.get(TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE);
 
             if (commitURI == null || prepareURI == null || rollbackURI == null)
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("Missing TwoPhaseUnawareLink Header")
@@ -569,10 +566,10 @@ public class Coordinator {
                                     // must have started)
             return Response.status(HttpURLConnection.HTTP_FORBIDDEN).entity("2PC has started").build();
 
-        links.put(TxLinkRel.PARTICIPANT_RECOVERY, tx.getRecoveryUrl());
-        links.put(TxLinkRel.TRANSACTION, txId);
+        links.put(TxLinkNames.PARTICIPANT_RECOVERY, tx.getRecoveryUrl());
+        links.put(TxLinkNames.TRANSACTION, txId);
 
-        participants.put(coordinatorId, new HashMap<TxLinkRel, String>(links));
+        participants.put(coordinatorId, new HashMap<String, String>(links));
 
         log.debug("enlisted participant: content=" + content + " in tx " + txId + " Coordinator url base: "
                 + recoveryUrlBase);
@@ -581,7 +578,7 @@ public class Coordinator {
     }
 
     @PUT
-    @Path(TxSupport.TX_SEGMENT + "/{TxId}/volatile-participant")
+    @Path(TxSupport.TX_SEGMENT + "{TxId}/" + TxLinkNames.VOLATILE_PARTICIPANT)
     public Response enlistVolatileParticipant(@HeaderParam("Link") String linkHeader, @Context UriInfo info,
             @PathParam("TxId") String txId) {
         log.tracef("enlistParticipant request uri %s txid:  %s", info.getRequestUri(), txId);
@@ -590,8 +587,8 @@ public class Coordinator {
         if (tx.isFinishing())
             return Response.status(HttpURLConnection.HTTP_PRECON_FAILED).build();
 
-        Map<TxLinkRel, String> links = TxSupport.decodeLinkHeader(linkHeader);
-        String vparticipantURI = links.get(TxLinkRel.VOLATILE_PARTICIPANT);
+        Map<String, String> links = TxSupport.decodeLinkHeader(linkHeader);
+        String vparticipantURI = links.get(TxLinkNames.VOLATILE_PARTICIPANT);
 
         if (vparticipantURI == null)
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("Missing Enlistment Link Header").build();
@@ -617,7 +614,7 @@ public class Coordinator {
     @Path(RC_SEGMENT + "/{TxId}/{RecCoordId}")
     public Response lookupParticipant(@PathParam("TxId") String txId, @PathParam("RecCoordId") String enlistmentId) {
         log.tracef("coordinator: lookup: transaction-coordinator: %s/%s", txId, enlistmentId);
-        HashMap<TxLinkRel, String> p = participants.get(enlistmentId);
+        HashMap<String, String> p = participants.get(enlistmentId);
 
         if (p == null)
             return Response.status(HttpURLConnection.HTTP_NOT_FOUND).build();
@@ -637,21 +634,21 @@ public class Coordinator {
      * participant may use this url to notifiy the coordinator that he has moved
      * to a new location.
      *
+     * @param linkHeader
+     *            link header containing participant links
      * @param txId
      *            transaction id that this recovery url belongs to
      * @param enlistmentId
      *            id by the participant is known
-     * @param content
-     *            http body
      * @return http status code
      */
     @PUT
     @Path(RC_SEGMENT + "/{TxId}/{RecCoordId}")
     public Response replaceParticipant(@HeaderParam("Link") String linkHeader, @PathParam("TxId") String txId,
-            @PathParam("RecCoordId") String enlistmentId, String content) {
-        Map<TxLinkRel, String> links = TxSupport.decodeLinkHeader(linkHeader);
-        String terminatorUrl = links.get(TxLinkRel.PARTICIPANT_TERMINATOR);
-        String participantUrl = links.get(TxLinkRel.PARTICIPANT_RESOURCE);
+            @PathParam("RecCoordId") String enlistmentId) {
+        Map<String, String> links = TxSupport.decodeLinkHeader(linkHeader);
+        String terminatorUrl = links.get(TxLinkNames.PARTICIPANT_TERMINATOR);
+        String participantUrl = links.get(TxLinkNames.PARTICIPANT_RESOURCE);
 
         if (participantUrl == null)
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity("Missing Link Header").build();
@@ -662,7 +659,7 @@ public class Coordinator {
         getTransaction(txId); // throws not found exception if the txn has
                                 // finished
 
-        participants.put(enlistmentId, new HashMap<TxLinkRel, String>(links));
+        participants.put(enlistmentId, new HashMap<String, String>(links));
 
         return Response.status(HttpURLConnection.HTTP_OK).build();
     }
@@ -678,13 +675,13 @@ public class Coordinator {
     @Path(RC_SEGMENT + "/{RecCoordId}")
     public Response deleteParticipant(@PathParam("RecCoordId") String enlistmentId) {
         log.tracef("coordinator: participant leaving via Delete: recovery-coordinator/%s", enlistmentId);
-        HashMap<TxLinkRel, String> p = participants.get(enlistmentId);
+        HashMap<String, String> p = participants.get(enlistmentId);
         Transaction txn;
 
-        if (p == null || (txn = transactions.get(p.get(TxLinkRel.TRANSACTION))) == null)
+        if (p == null || (txn = transactions.get(p.get(TxLinkNames.TRANSACTION))) == null)
             return Response.status(HttpURLConnection.HTTP_NOT_FOUND).build();
 
-        if (txn.forgetParticipant(p.get(TxLinkRel.PARTICIPANT_RESOURCE)))
+        if (txn.forgetParticipant(p.get(TxLinkNames.PARTICIPANT_RESOURCE)))
             return Response.status(HttpURLConnection.HTTP_OK).build();
 
         return Response.status(HttpURLConnection.HTTP_CONFLICT).build();

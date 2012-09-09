@@ -25,10 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.jbossts.star.provider.HttpResponseException;
-import org.jboss.jbossts.star.util.TxLinkRel;
-import org.jboss.jbossts.star.util.TxMediaType;
-import org.jboss.jbossts.star.util.TxStatus;
-import org.jboss.jbossts.star.util.TxSupport;
+import org.jboss.jbossts.star.util.*;
 import org.jboss.logging.Logger;
 
 import com.arjuna.ats.arjuna.common.Uid;
@@ -389,19 +386,19 @@ public class RESTRecord extends AbstractRecord {
             new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, recoveryURI, "GET",
                     TxMediaType.PLAIN_MEDIA_TYPE, null, links);
 
-            String terminateURI = links.get(TxLinkRel.PARTICIPANT_TERMINATOR.linkName());
+            String terminateURI = links.get(TxLinkNames.PARTICIPANT_TERMINATOR);
 
-            if (links.containsKey(TxLinkRel.PARTICIPANT_TERMINATOR.linkName())) {
+            if (links.containsKey(TxLinkNames.PARTICIPANT_TERMINATOR)) {
                 // participant has moved so remember the new location
-                this.participantURI = links.get(TxLinkRel.PARTICIPANT_RESOURCE.linkName());
+                this.participantURI = links.get(TxLinkNames.PARTICIPANT_RESOURCE);
             }
 
             if (terminateURI == null) {
                 // see if it is two phase unaware
-                String commitURI = links.get(TxLinkRel.PARTICIPANT_COMMIT.linkName());
-                String prepareURI = links.get(TxLinkRel.PARTICIPANT_PREPARE.linkName());
-                String rollbackURI = links.get(TxLinkRel.PARTICIPANT_ROLLBACK.linkName());
-                String commitOnePhaseURI = links.get(TxLinkRel.PARTICIPANT_COMMIT_ONE_PHASE.linkName());
+                String commitURI = links.get(TxLinkNames.PARTICIPANT_COMMIT);
+                String prepareURI = links.get(TxLinkNames.PARTICIPANT_PREPARE);
+                String rollbackURI = links.get(TxLinkNames.PARTICIPANT_ROLLBACK);
+                String commitOnePhaseURI = links.get(TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE);
 
                 if (commitURI != null)
                     this.commitURI = commitURI;
@@ -446,11 +443,16 @@ public class RESTRecord extends AbstractRecord {
             os.packString(txId);
             os.packBoolean(prepared);
             os.packString(participantURI);
-            os.packString(terminateURI);
             os.packString(coordinatorURI);
             os.packString(recoveryURI);
             os.packString(coordinatorID);
             os.packString(status.name());
+
+            os.packString(terminateURI);
+            os.packString(commitURI);
+            os.packString(prepareURI);
+            os.packString(rollbackURI);
+            os.packString(commitOnePhaseURI);
 
             return super.save_state(os, t);
         } catch (Exception e) {
@@ -465,11 +467,20 @@ public class RESTRecord extends AbstractRecord {
             txId = os.unpackString();
             prepared = os.unpackBoolean();
             participantURI = os.unpackString();
-            terminateURI = os.unpackString();
             coordinatorURI = os.unpackString();
             recoveryURI = os.unpackString();
             coordinatorID = os.unpackString();
             status = TxStatus.fromStatus(os.unpackString());
+
+            terminateURI = os.unpackString();
+            commitURI = os.unpackString();
+            prepareURI = os.unpackString();
+            rollbackURI = os.unpackString();
+            commitOnePhaseURI = os.unpackString();
+
+            if (commitURI == null) {
+                prepareURI = commitURI = rollbackURI = commitOnePhaseURI = terminateURI;
+            }
 
             if (log.isInfoEnabled())
                 log.infof("restore_state %s", terminateURI);
