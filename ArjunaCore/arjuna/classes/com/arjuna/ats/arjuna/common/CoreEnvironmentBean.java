@@ -60,6 +60,9 @@ public class CoreEnvironmentBean implements CoreEnvironmentBeanMBean {
     private volatile boolean allowMultipleLastResources = false;
     private volatile boolean disableMultipleLastResourcesWarning = false;
 
+    @FullPropertyName(name = "timeout.factor")
+    private volatile int timeoutFactor = 1;
+
     /**
      * Returns the 'var' directory path.
      *
@@ -129,6 +132,14 @@ public class CoreEnvironmentBean implements CoreEnvironmentBeanMBean {
     public void setSocketProcessIdPort(int socketProcessIdPort) {
         Utility.validatePortRange(socketProcessIdPort);
         this.socketProcessIdPort = socketProcessIdPort;
+    }
+
+    public int getTimeoutFactor() {
+        return timeoutFactor;
+    }
+
+    public void setTimeoutFactor(int timeoutFactor) {
+        this.timeoutFactor = timeoutFactor;
     }
 
     /**
