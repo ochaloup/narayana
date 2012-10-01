@@ -63,5 +63,5 @@ public interface TerminationParticipantPortType {
     @WebMethod(operationName = "FaultOperation", action = "http://schemas.arjuna.com/ws/2005/10/wsarjtx/Fault")
     @Oneway
     public void faultOperation(
-            @WebParam(name = "Fault", targetNamespace = "http://schemas.arjuna.com/ws/2005/10/wsarjtx", partName = "parameters") Fault parameters);
+            @WebParam(name = "Fault", targetNamespace = "http://schemas.xmlsoap.org/soap/envelope/", partName = "parameters") Fault parameters);
 }
