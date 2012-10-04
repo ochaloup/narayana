@@ -88,7 +88,7 @@ public class ATTest extends BaseFunctionalTestWar {
             client.invoke(THROW_APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (SomeApplicationException e) {
-            System.out.println("Caught exception");
+            // Exception expected
         } finally {
             ut.rollback();
         }
