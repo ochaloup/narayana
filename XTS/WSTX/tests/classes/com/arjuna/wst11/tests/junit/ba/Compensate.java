@@ -67,6 +67,8 @@ public class Compensate {
             throw eouter;
         }
 
+        // [JBTM-1292]
+        Thread.sleep(3 * 1000);
         uba.cancel();
 
         assertTrue(p.passed());
