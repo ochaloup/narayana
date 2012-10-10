@@ -66,6 +66,8 @@ public class Exit {
             throw eouter;
         }
 
+        // [JBTM-1292]
+        Thread.sleep(3 * 1000);
         uba.close();
 
         assertTrue(p.passed());
