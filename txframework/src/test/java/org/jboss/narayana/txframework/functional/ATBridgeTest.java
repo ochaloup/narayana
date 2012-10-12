@@ -34,7 +34,7 @@ public class ATBridgeTest extends BaseFunctionalTest {
         ut.commit();
 
         // JBTM-1293
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
         ut.begin();
         int counter = client.getCounter();
@@ -50,7 +50,7 @@ public class ATBridgeTest extends BaseFunctionalTest {
         ut.rollback();
 
         // JBTM-1293
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
         ut.begin();
         int counter = client.getCounter();
