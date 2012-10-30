@@ -41,6 +41,9 @@ import org.jboss.jbossts.txbridge.utils.txbridgeLogger;
  * @author jonathan.halliday@redhat.com, 2007-04-30
  */
 public class JaxWSTxInboundBridgeHandler implements Handler {
+
+    private InboundBridge inboundBridge;
+
     /**
      * Process a message. Determines if it is inbound or outbound and dispatches
      * accordingly.
@@ -90,7 +93,7 @@ public class JaxWSTxInboundBridgeHandler implements Handler {
         txbridgeLogger.logger.trace("JaxWSTxInboundBridgeHandler.handleInbound()");
 
         try {
-            InboundBridge inboundBridge = org.jboss.jbossts.txbridge.inbound.InboundBridgeManager.getInboundBridge();
+            inboundBridge = org.jboss.jbossts.txbridge.inbound.InboundBridgeManager.getInboundBridge();
             inboundBridge.start();
         } catch (Exception e) {
             txbridgeLogger.logger.error(e);
@@ -124,7 +127,6 @@ public class JaxWSTxInboundBridgeHandler implements Handler {
         txbridgeLogger.logger.trace("JaxWSTxInboundBridgeHandler.suspendTransaction()");
 
         try {
-            org.jboss.jbossts.txbridge.inbound.InboundBridge inboundBridge = InboundBridgeManager.getInboundBridge();
             inboundBridge.stop();
         } catch (Exception e) {
             txbridgeLogger.logger.error(e);
