@@ -6,20 +6,24 @@ import com.arjuna.wst.Vote;
 import com.arjuna.wst.WrongStateException;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Commit;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Error;
+import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Prepare;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Rollback;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Unknown;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Prepare;
+import org.jboss.narayana.txframework.impl.ServiceInvocationMeta;
 import org.junit.Test;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class WSATDurable2PCParticipantTest {
     @Test
     public void testCallbacks() throws Exception {
         LifecycleImpl lifecycle = new LifecycleImpl();
-        WSATDurable2PCParticipant participant = new WSATDurable2PCParticipant(lifecycle, false);
+        ServiceInvocationMeta serviceInvocationMeta = new ServiceInvocationMeta(lifecycle, LifecycleImpl.class, null);
+        WSATDurable2PCParticipant participant = new WSATDurable2PCParticipant(serviceInvocationMeta, new HashMap());
 
         participant.prepare();
         participant.commit();
