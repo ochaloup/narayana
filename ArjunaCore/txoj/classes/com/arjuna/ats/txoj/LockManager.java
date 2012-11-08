@@ -34,12 +34,12 @@ package com.arjuna.ats.txoj;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.ObjectStatus;
 import com.arjuna.ats.arjuna.ObjectType;
 import com.arjuna.ats.arjuna.StateManager;
-import com.arjuna.ats.arjuna.common.Mutex;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
@@ -136,7 +136,7 @@ public class LockManager extends StateManager {
         cleanUp();
 
         if (mutex != null) {
-            if (mutex.lock() == Mutex.LOCKED)
+            if (mutex.isLocked())
                 doSignal = true;
         }
 
@@ -822,34 +822,32 @@ public class LockManager extends StateManager {
             systemKey = type();
 
             if (mutex == null) {
-                // TODO add a factory if we ever have more than one
-                // implementation
 
-                mutex = new com.arjuna.ats.internal.arjuna.common.BasicMutex();
+                mutex = new ReentrantLock();
             }
 
             if (mutex != null) {
-                if (mutex.lock() == Mutex.LOCKED) {
-                    /*
-                     * At some point we may want to add a factory to hide this,
-                     * but since we only have two implementations at the moment
-                     * it is perhaps overkill.
-                     * 
-                     * TODO add factory.
-                     */
+                mutex.lock();
 
-                    if (lockStore == null) {
-                        try {
-                            if (lockStoreType.equals(BasicLockStore.class.getName())) {
-                                lockStore = new BasicLockStore();
-                            } else {
-                                ObjectStoreEnvironmentBean objectStoreEnvironmentBean = new ObjectStoreEnvironmentBean();
-                                objectStoreEnvironmentBean.setLocalOSRoot(systemKey);
-                                lockStore = new BasicPersistentLockStore(objectStoreEnvironmentBean);
-                            }
-                        } catch (final Exception ex) {
-                            lockStore = null;
+                /*
+                 * At some point we may want to add a factory to hide this, but
+                 * since we only have two implementations at the moment it is
+                 * perhaps overkill.
+                 * 
+                 * TODO add factory.
+                 */
+
+                if (lockStore == null) {
+                    try {
+                        if (lockStoreType.equals(BasicLockStore.class.getName())) {
+                            lockStore = new BasicLockStore();
+                        } else {
+                            ObjectStoreEnvironmentBean objectStoreEnvironmentBean = new ObjectStoreEnvironmentBean();
+                            objectStoreEnvironmentBean.setLocalOSRoot(systemKey);
+                            lockStore = new BasicPersistentLockStore(objectStoreEnvironmentBean);
                         }
+                    } catch (final Exception ex) {
+                        lockStore = null;
                     }
                 }
 
@@ -901,7 +899,7 @@ public class LockManager extends StateManager {
                 return false; /* init failed */
             }
 
-            if ((mutex == null) || (mutex.tryLock() == Mutex.WOULD_BLOCK)) {
+            if ((mutex == null) || (!mutex.tryLock())) {
                 return false;
             }
 
@@ -1119,14 +1117,7 @@ public class LockManager extends StateManager {
 
     protected boolean objectLocked;/* Semaphore grabbed */
 
-    protected com.arjuna.ats.internal.arjuna.common.BasicMutex mutex; /*
-                                                                         * Controls
-                                                                         * access
-                                                                         * to
-                                                                         * the
-                                                                         * lock
-                                                                         * store
-                                                                         */
+    protected ReentrantLock mutex; /* Controls access to the lock store */
 
     protected LockConflictManager conflictManager;
 
