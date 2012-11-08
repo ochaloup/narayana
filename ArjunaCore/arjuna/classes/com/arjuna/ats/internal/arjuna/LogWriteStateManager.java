@@ -121,6 +121,8 @@ public class LogWriteStateManager extends StateManager {
              * BasicList insert returns FALSE if the entry is already present.
              */
 
+            createLists();
+
             synchronized (modifyingActions) {
                 if ((modifyingActions.size() > 0) && (modifyingActions.get(action.get_uid()) != null)) {
                     return true;

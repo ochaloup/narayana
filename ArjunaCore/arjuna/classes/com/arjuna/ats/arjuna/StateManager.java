@@ -207,6 +207,8 @@ public class StateManager {
              */
 
             synchronized (mutex) {
+                createLists();
+
                 if (usingActions.get(action.get_uid()) == null) {
                     /*
                      * May cause us to add parent as well as child.
@@ -671,22 +673,7 @@ public class StateManager {
 
     protected StateManager(Uid objUid, int ot, int om) {
         objectModel = om;
-
-        if (ot == ObjectType.NEITHER) {
-            modifyingActions = null;
-            usingActions = null;
-        } else {
-            modifyingActions = new Hashtable();
-            usingActions = new Hashtable();
-        }
-
-        activated = false;
-        currentlyActivated = false;
-        currentStatus = ObjectStatus.PASSIVE;
-        initialStatus = ObjectStatus.PASSIVE;
         myType = ot;
-        participantStore = null;
-        storeRoot = null;
 
         objectUid = objUid;
 
@@ -705,24 +692,11 @@ public class StateManager {
 
     protected StateManager(int ot, int om) {
         objectModel = om;
-
-        if (ot == ObjectType.NEITHER) {
-            modifyingActions = null;
-            usingActions = null;
-        } else {
-            modifyingActions = new Hashtable();
-            usingActions = new Hashtable();
-        }
-
-        activated = false;
-        currentlyActivated = false;
         currentStatus = (((objectModel == ObjectModel.SINGLE) && (ot == ObjectType.RECOVERABLE))
                 ? ObjectStatus.ACTIVE
                 : ObjectStatus.PASSIVE_NEW);
         initialStatus = currentStatus;
         myType = ot;
-        participantStore = null;
-        storeRoot = null;
 
         objectUid = new Uid();
 
@@ -777,6 +751,8 @@ public class StateManager {
              * Check if this is the first call to modified in this action.
              * BasicList insert returns FALSE if the entry is already present.
              */
+
+            createLists();
 
             synchronized (modifyingActions) {
                 if ((modifyingActions.size() > 0) && (modifyingActions.get(action.get_uid()) != null)) {
@@ -1070,6 +1046,8 @@ public class StateManager {
                     + ")" + " for object-id " + objectUid);
         }
 
+        createLists();
+
         synchronized (modifyingActions) {
             modifyingActions.remove(action.get_uid());
         }
@@ -1180,6 +1158,20 @@ public class StateManager {
     }
 
     /*
+     * Delay creating these lists until we really need them. Some transactions
+     * may start and end without adding any participants or being involved with
+     * multiple threads. Some classes (e.g., AbstractRecords) that inherit from
+     * StateManager may never need these lists either.
+     */
+
+    protected synchronized void createLists() {
+        if (modifyingActions == null) {
+            modifyingActions = new Hashtable();
+            usingActions = new Hashtable();
+        }
+    }
+
+    /*
      * Package scope.
      */
 
@@ -1192,28 +1184,18 @@ public class StateManager {
         currentStatus = ObjectStatus.DESTROYED;
     }
 
-    protected Hashtable modifyingActions;
-
-    protected Hashtable usingActions;
-
+    protected Hashtable modifyingActions = null;
+    protected Hashtable usingActions = null;
     protected final Uid objectUid;
-
     protected int objectModel = ObjectModel.SINGLE;
 
-    private boolean activated;
-
-    private boolean currentlyActivated;
-
-    private int currentStatus;
-
-    private int initialStatus;
-
+    private boolean activated = false;
+    private boolean currentlyActivated = false;
+    private int currentStatus = ObjectStatus.PASSIVE;
+    private int initialStatus = ObjectStatus.PASSIVE;
     private int myType;
-
-    private ParticipantStore participantStore;
-
-    private String storeRoot;
-
+    private ParticipantStore participantStore = null;
+    private String storeRoot = null;
     private ReentrantLock mutex = new ReentrantLock();
 
     private static final String marker = "#ARJUNA#";
