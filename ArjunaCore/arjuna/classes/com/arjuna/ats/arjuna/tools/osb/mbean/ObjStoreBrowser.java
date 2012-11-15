@@ -211,26 +211,37 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                 do {
                     try {
                         tname = types.unpackString();
-
-                        if (tname.length() != 0) {
-                            List<UidWrapper> uids = allUids.get(tname);
-
-                            if (uids == null) {
-                                uids = new ArrayList<UidWrapper>();
-                                allUids.put(tname, uids);
-                            }
-
-                            if (exposeAllLogs || beanTypes.containsKey(tname))
-                                updateMBeans(uids, System.currentTimeMillis(), true, tname);
-                        }
                     } catch (IOException e1) {
                         tname = "";
+                    }
+
+                    if (tname.length() != 0) {
+                        List<UidWrapper> uids = allUids.get(tname);
+
+                        if (uids == null) {
+                            uids = new ArrayList<UidWrapper>();
+                            allUids.put(tname, uids);
+                        }
                     }
                 } while (tname.length() != 0);
             }
         } catch (ObjectStoreException e2) {
             if (tsLogger.logger.isTraceEnabled())
                 tsLogger.logger.trace(e2.toString());
+        }
+
+        Iterator<String> iterator = allUids.keySet().iterator();
+        while (iterator.hasNext()) {
+            String tname = iterator.next();
+            List<UidWrapper> uids = allUids.get(tname);
+
+            if (uids == null) {
+                uids = new ArrayList<UidWrapper>();
+                allUids.put(tname, uids);
+            }
+
+            if (exposeAllLogs || beanTypes.containsKey(tname))
+                updateMBeans(uids, System.currentTimeMillis(), true, tname);
         }
     }
 
@@ -271,14 +282,40 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
      * 
      * @param type
      *            the ObjectStore entry type
-     * @param beantype
-     *            the class name of the MBean implementation used to represent
-     *            the request type
      * @return the list of MBeans representing the requested ObjectStore type
      */
-    public List<UidWrapper> probe(String type, String beantype) {
-        if (!allUids.containsKey(type))
-            return null;
+    public List<UidWrapper> probe(String type) {
+        if (!allUids.containsKey(type)) {
+            InputObjectState types = new InputObjectState();
+
+            try {
+                if (StoreManager.getRecoveryStore().allTypes(types)) {
+                    String tname;
+
+                    do {
+                        try {
+                            tname = types.unpackString();
+                        } catch (IOException e1) {
+                            tname = "";
+                        }
+
+                        if (tname.length() != 0) {
+                            List<UidWrapper> uids = allUids.get(tname);
+
+                            if (uids == null) {
+                                uids = new ArrayList<UidWrapper>();
+                                allUids.put(tname, uids);
+                            }
+                        }
+                    } while (tname.length() != 0);
+                }
+            } catch (ObjectStoreException e2) {
+                if (tsLogger.logger.isTraceEnabled())
+                    tsLogger.logger.trace(e2.toString());
+            }
+            if (!allUids.containsKey(type))
+                return null;
+        }
 
         List<UidWrapper> uids = allUids.get(type);
 
