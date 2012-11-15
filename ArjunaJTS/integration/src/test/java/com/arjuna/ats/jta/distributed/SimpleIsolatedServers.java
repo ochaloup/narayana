@@ -138,7 +138,7 @@ public class SimpleIsolatedServers {
                 SimpleIsolatedServers.class.getPackage().getName(), null, classLoaderForTransactionManager);
         localServers[index] = (LocalServer) classLoader
                 .loadClass("com.arjuna.ats.jta.distributed.server.impl.ServerImpl").newInstance();
-        Thread.currentThread().setContextClassLoader(localServers[index].getClassLoader());
+        Thread.currentThread().setContextClassLoader(classLoaderForTransactionManager);
         localServers[index].initialise(lookupProvider, serverNodeNames[index], serverPortOffsets[index],
                 clusterBuddies[index], classLoaderForTransactionManager);
         lookupProvider.bind(index, localServers[index].connectTo());
