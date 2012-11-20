@@ -162,8 +162,9 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
 
         ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
 
-        // ThreadActionData.pushAction(theTransaction); // unnecessary if
-        // context goes with all calls.
+        ThreadActionData.pushAction(theTransaction); // LockManager needs to
+                                                        // know if there is a
+                                                        // transaction
 
         int result = TwoPhaseOutcome.PREPARE_NOTOK;
 
@@ -259,7 +260,9 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
 
         ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
 
-        // ThreadActionData.pushAction(theTransaction);
+        ThreadActionData.pushAction(theTransaction); // LockManager needs to
+                                                        // know if there is a
+                                                        // transaction
 
         int actionStatus = theTransaction.status();
 
@@ -342,7 +345,9 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
 
         ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
 
-        // ThreadActionData.pushAction(theTransaction);
+        ThreadActionData.pushAction(theTransaction); // LockManager needs to
+                                                        // know if there is a
+                                                        // transaction
 
         int actionStatus = theTransaction.status();
         boolean notPrepared = false;
@@ -439,7 +444,9 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
             throw new INVALID_TRANSACTION(ExceptionCodes.NO_TRANSACTION, CompletionStatus.COMPLETED_NO);
         }
 
-        // ThreadActionData.pushAction(theTransaction);
+        ThreadActionData.pushAction(theTransaction); // LockManager needs to
+                                                        // know if there is a
+                                                        // transaction
 
         try {
             /*
