@@ -33,6 +33,8 @@ package com.arjuna.ats.arjuna.coordinator;
 
 import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
 
+import java.util.concurrent.Callable;
+
 /**
  * This class is responsible for performing asynchronous termination of a
  * transaction. Despite its name, it is also able to perform asynchronous
@@ -48,53 +50,35 @@ import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
  * Default visibility.
  */
 
-class AsyncCommit extends Thread {
+class AsyncCommit implements Runnable {
+    public void run() {
+        {
+            if (_theAction != null) {
+                /*
+                 * This is a transient thread so we don't want to register it
+                 * with the action it is committing/aborting, only change its
+                 * notion of the current transaction so that any abstract
+                 * records that need that information can still have it.
+                 */
+
+                ThreadActionData.pushAction(_theAction, false);
+
+                if (_commit)
+                    doPhase2Commit();
+                else
+                    doPhase2Abort();
+
+                ThreadActionData.popAction(false);
+            }
+        }
+    }
 
     /**
      * Create a new instance, and give it the transaction to control. The commit
      * parameter determines whether the thread should commit or rollback the
      * transaction.
      */
-
-    public static AsyncCommit create(BasicAction toControl, boolean commit) {
-        AsyncCommit c = new AsyncCommit(toControl, commit);
-
-        c.start();
-
-        Thread.yield();
-
-        return c;
-    }
-
-    /**
-     * Overloads Thread.run
-     */
-
-    public void run() {
-        if (_theAction != null) {
-            /*
-             * This is a transient thread so we don't want to register it with
-             * the action it is committing/aborting, only change its notion of
-             * the current transaction so that any abstract records that need
-             * that information can still have it.
-             */
-
-            ThreadActionData.pushAction(_theAction, false);
-
-            if (_commit)
-                doPhase2Commit();
-            else
-                doPhase2Abort();
-
-            ThreadActionData.popAction(false);
-        }
-    }
-
-    /**
-     * The actual constructor for a new instance.
-     */
-
-    protected AsyncCommit(BasicAction toControl, boolean commit) {
+    AsyncCommit(BasicAction toControl, boolean commit) {
         _theAction = toControl;
         _commit = commit;
     }
@@ -133,4 +117,4 @@ class AsyncCommit extends Thread {
     private BasicAction _theAction;
     private boolean _commit;
 
-};
+}

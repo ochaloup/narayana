@@ -32,9 +32,13 @@
 package com.arjuna.ats.arjuna.coordinator;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import com.arjuna.ats.arjuna.ObjectType;
 import com.arjuna.ats.arjuna.StateManager;
@@ -547,7 +551,7 @@ public class BasicAction extends StateManager {
         synchronized (this) {
             if (actionStatus <= ActionStatus.ABORTING) {
                 if (_childThreads == null)
-                    _childThreads = new Hashtable();
+                    _childThreads = new Hashtable<String, Thread>();
 
                 _childThreads.put(ThreadUtil.getThreadId(t), t); // makes sure
                                                                     // so we
@@ -647,7 +651,7 @@ public class BasicAction extends StateManager {
 
             if (actionStatus <= ActionStatus.ABORTING) {
                 if (_childActions == null)
-                    _childActions = new Hashtable();
+                    _childActions = new Hashtable<BasicAction, BasicAction>();
 
                 _childActions.put(act, act);
                 result = true;
@@ -1151,7 +1155,7 @@ public class BasicAction extends StateManager {
         int size = ((_childActions == null) ? 0 : _childActions.size());
 
         if (size > 0) {
-            Collection c = _childActions.values();
+            Collection<BasicAction> c = _childActions.values();
 
             return c.toArray();
         }
@@ -1328,12 +1332,12 @@ public class BasicAction extends StateManager {
                     tsLogger.i18NLogger.warn_coordinator_BasicAction_38();
 
                     if (!reportHeuristics && TxControl.asyncCommit && (parentAction == null)) {
-                        AsyncCommit.create(this, false);
+                        TwoPhaseCommitThreadPool.submitJob(new AsyncCommit(this, false));
                     } else
                         phase2Abort(reportHeuristics); /* first phase failed */
                 } else {
                     if (!reportHeuristics && TxControl.asyncCommit && (parentAction == null)) {
-                        AsyncCommit.create(this, true);
+                        TwoPhaseCommitThreadPool.submitJob(new AsyncCommit(this, true));
                     } else
                         phase2Commit(
                                 reportHeuristics); /* first phase succeeded */
@@ -1752,6 +1756,36 @@ public class BasicAction extends StateManager {
         }
     }
 
+    protected int async_prepare(boolean reportHeuristics) {
+        int p = TwoPhaseOutcome.PREPARE_OK;
+        AbstractRecord lastRec = pendingList.getRear();
+        Collection<Future<Integer>> tasks = new ArrayList<Future<Integer>>();
+
+        while (pendingList.size() != 0)
+            tasks.add(TwoPhaseCommitThreadPool
+                    .submitJob(new AsyncPrepare(this, reportHeuristics, pendingList.getFront())));
+
+        // prepare the last (or only) participant on the callers thread
+        if (lastRec != null)
+            p = doPrepare(reportHeuristics, lastRec);
+
+        // get the results
+        for (Future<Integer> task : tasks) {
+            try {
+                int outcome = task.get();
+
+                if (p == TwoPhaseOutcome.PREPARE_OK)
+                    p = outcome;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return p;
+    }
+
     /**
      * Phase one of a two phase commit protocol. This function returns the
      * ouctome of the prepare operation. If all goes well it will be PREPARE_OK,
@@ -1817,58 +1851,7 @@ public class BasicAction extends StateManager {
          */
 
         if ((actionType == ActionType.TOP_LEVEL) && (TxControl.asyncPrepare)) {
-            int numberOfThreads = ((pendingList != null) ? pendingList.size() : 0);
-            Thread[] threads = new Thread[numberOfThreads];
-            int i;
-
-            /*
-             * First create them in a suspended way, so that we can purge the
-             * list before it is added to (in the event of failures!)
-             */
-
-            for (i = 0; i < numberOfThreads; i++) {
-                threads[i] = AsyncPrepare.create(this, reportHeuristics, pendingList.getFront());
-            }
-
-            /*
-             * Now start the threads running.
-             */
-
-            for (i = 0; i < numberOfThreads; i++) {
-                threads[i].start();
-                Thread.yield();
-            }
-
-            /*
-             * If one of these threads fails (PREPARE_NOTOK) do we terminate the
-             * others or simply let them finish? Currently we wait and let them
-             * all terminate regardless.
-             */
-
-            /*
-             * Now synchronise with the threads.
-             */
-
-            for (int j = 0; j < numberOfThreads; j++) {
-                while (threads[j].isAlive()) {
-                    try {
-                        threads[j].join();
-                    } catch (Exception e) {
-                        tsLogger.logger.warn(e);
-
-                        p = TwoPhaseOutcome.PREPARE_NOTOK;
-                    }
-                }
-
-                /*
-                 * Only set the outcome if the current value is PREPARE_OK.
-                 */
-
-                if (p == TwoPhaseOutcome.PREPARE_OK)
-                    p = ((AsyncPrepare) threads[j]).outcome();
-
-                threads[j] = null;
-            }
+            p = async_prepare(reportHeuristics);
         } else {
             // single threaded prepare
 
@@ -2921,7 +2904,7 @@ public class BasicAction extends StateManager {
         if ((_childActions != null) && (_childActions.size() > 0)) {
             problem = true;
 
-            Enumeration iter = _childActions.elements();
+            Enumeration<BasicAction> iter = _childActions.elements();
             BasicAction child = null;
             boolean printError = true;
 
@@ -2935,7 +2918,7 @@ public class BasicAction extends StateManager {
              */
 
             while (iter.hasMoreElements()) {
-                child = (BasicAction) iter.nextElement();
+                child = iter.nextElement();
 
                 if (child.status() != ActionStatus.ABORTED) {
                     if (printError) {
@@ -2991,11 +2974,11 @@ public class BasicAction extends StateManager {
              * action.
              */
 
-            Enumeration iter = _childThreads.elements();
+            Enumeration<Thread> iter = _childThreads.elements();
             Thread t = null;
 
             while (iter.hasMoreElements()) {
-                t = (Thread) iter.nextElement();
+                t = iter.nextElement();
 
                 if (tsLogger.logger.isTraceEnabled()) {
                     tsLogger.logger
@@ -3210,8 +3193,8 @@ public class BasicAction extends StateManager {
      * provide an explicit means of registering threads with an action.
      */
 
-    private Hashtable _childThreads;
-    private Hashtable _childActions;
+    private Hashtable<String, Thread> _childThreads;
+    private Hashtable<BasicAction, BasicAction> _childActions;
 
     private BasicActionFinalizer finalizerObject;
     private static final boolean finalizeBasicActions = arjPropertyManager.getCoordinatorEnvironmentBean()
