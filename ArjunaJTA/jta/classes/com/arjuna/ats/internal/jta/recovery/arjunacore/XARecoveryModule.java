@@ -201,7 +201,7 @@ public class XARecoveryModule implements RecoveryModule {
      * @return the XAResource than can be used to commit/rollback the specified
      *         record.
      */
-    public XAResource getNewXAResource(XAResourceRecord xaResourceRecord) {
+    public synchronized XAResource getNewXAResource(XAResourceRecord xaResourceRecord) {
         return getNewXAResource(xaResourceRecord.getXid());
     }
 
@@ -385,7 +385,8 @@ public class XARecoveryModule implements RecoveryModule {
                         try {
                             resource = ri.getXAResource();
 
-                            xaRecovery(resource);
+                            xaRecoveryStart(resource);
+                            xaRecoveryEnd(resource);
                         } catch (Exception exp) {
                             jtaLogger.i18NLogger.warn_recovery_getxaresource(exp);
                         }
@@ -405,6 +406,21 @@ public class XARecoveryModule implements RecoveryModule {
                 try {
                     XAResource[] xaResources = xaResourceRecoveryHelper.getXAResources();
                     if (xaResources != null) {
+                        synchronized (this) {
+                            for (XAResource xaResource : xaResources) {
+                                try {
+                                    // This calls out to remote systems and may
+                                    // block. Consider using alternate
+                                    // concurrency
+                                    // control rather than sync on
+                                    // __xaResourceRecoveryHelpers to avoid
+                                    // blocking problems?
+                                    xaRecoveryStart(xaResource);
+                                } catch (Exception ex) {
+                                    jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+                                }
+                            }
+                        }
                         for (XAResource xaResource : xaResources) {
                             try {
                                 // This calls out to remote systems and may
@@ -412,7 +428,7 @@ public class XARecoveryModule implements RecoveryModule {
                                 // control rather than sync on
                                 // __xaResourceRecoveryHelpers to avoid blocking
                                 // problems?
-                                xaRecovery(xaResource);
+                                xaRecoveryEnd(xaResource);
                             } catch (Exception ex) {
                                 jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
                             }
@@ -427,72 +443,73 @@ public class XARecoveryModule implements RecoveryModule {
         return true;
     }
 
-    private final boolean xaRecovery(XAResource xares) {
+    private final void xaRecoveryStart(XAResource xares) {
         if (jtaLogger.logger.isDebugEnabled()) {
             jtaLogger.logger.debug("xarecovery of " + xares);
         }
 
+        Xid[] trans = null;
+
         try {
-            Xid[] trans = null;
+            trans = xares.recover(XAResource.TMSTARTRSCAN);
+
+            if (jtaLogger.logger.isDebugEnabled()) {
+                jtaLogger.logger.debug("Found " + ((trans != null) ? trans.length : 0) + " xids in doubt");
+            }
+        } catch (XAException e) {
+            jtaLogger.i18NLogger.warn_recovery_xarecovery1(_logName + ".xaRecovery", XAHelper.printXAErrorCode(e), e);
 
             try {
-                trans = xares.recover(XAResource.TMSTARTRSCAN);
-
-                if (jtaLogger.logger.isDebugEnabled()) {
-                    jtaLogger.logger.debug("Found " + ((trans != null) ? trans.length : 0) + " xids in doubt");
-                }
-            } catch (XAException e) {
-                jtaLogger.i18NLogger.warn_recovery_xarecovery1(_logName + ".xaRecovery", XAHelper.printXAErrorCode(e),
-                        e);
-
-                try {
-                    xares.recover(XAResource.TMENDRSCAN);
-                } catch (Exception e1) {
-                }
-
-                return false;
+                xares.recover(XAResource.TMENDRSCAN);
+            } catch (Exception e1) {
             }
 
-            RecoveryXids xidsToRecover = null;
+            // return false;TODO
+        }
 
-            if (_xidScans == null)
-                _xidScans = new Hashtable<XAResource, RecoveryXids>();
-            else {
-                refreshXidScansForEquivalentXAResourceImpl(xares, trans);
+        RecoveryXids xidsToRecover = null;
 
-                xidsToRecover = _xidScans.get(xares);
+        if (_xidScans == null)
+            _xidScans = new Hashtable<XAResource, RecoveryXids>();
+        else {
+            refreshXidScansForEquivalentXAResourceImpl(xares, trans);
 
-                if (xidsToRecover == null) {
-                    // this is probably redundant now due to
-                    // updateIfEquivalentRM,
-                    // but in some implementations hashcode/equals does not
-                    // behave itself.
-
-                    java.util.Enumeration<RecoveryXids> elements = _xidScans.elements();
-                    boolean found = false;
-
-                    while (elements.hasMoreElements()) {
-                        xidsToRecover = elements.nextElement();
-
-                        if (xidsToRecover.isSameRM(xares)) {
-                            found = true;
-
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                        xidsToRecover = null;
-                }
-            }
+            xidsToRecover = _xidScans.get(xares);
 
             if (xidsToRecover == null) {
-                xidsToRecover = new RecoveryXids(xares);
+                // this is probably redundant now due to updateIfEquivalentRM,
+                // but in some implementations hashcode/equals does not behave
+                // itself.
 
-                _xidScans.put(xares, xidsToRecover);
+                java.util.Enumeration<RecoveryXids> elements = _xidScans.elements();
+                boolean found = false;
+
+                while (elements.hasMoreElements()) {
+                    xidsToRecover = elements.nextElement();
+
+                    if (xidsToRecover.isSameRM(xares)) {
+                        found = true;
+
+                        break;
+                    }
+                }
+
+                if (!found)
+                    xidsToRecover = null;
             }
+        }
 
-            xidsToRecover.nextScan(trans);
+        if (xidsToRecover == null) {
+            xidsToRecover = new RecoveryXids(xares);
+
+            _xidScans.put(xares, xidsToRecover);
+        }
+        xidsToRecover.nextScan(trans);
+    }
+
+    private final boolean xaRecoveryEnd(XAResource xares) {
+        try {
+            RecoveryXids xidsToRecover = _xidScans.get(xares);
 
             Xid[] xids = xidsToRecover.toRecover();
 
