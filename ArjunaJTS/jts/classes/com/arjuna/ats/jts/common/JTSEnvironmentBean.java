@@ -55,12 +55,12 @@ public class JTSEnvironmentBean implements JTSEnvironmentBeanMBean {
     private volatile int commitedTransactionRetryLimit = 3;
 
     /**
-     * Returns if an extenal transaction manager process should be used.
+     * Returns if an external transaction manager process should be used.
      *
      * Default: false Equivalent deprecated property:
      * com.arjuna.ats.jts.transactionManager
      *
-     * @return true for separate transaction manaager process, false for
+     * @return true for separate transaction manager process, false for
      *         in-process.
      */
     public boolean isTransactionManager() {
