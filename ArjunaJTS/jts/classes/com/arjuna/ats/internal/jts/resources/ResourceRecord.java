@@ -491,7 +491,7 @@ public class ResourceRecord extends com.arjuna.ats.arjuna.coordinator.AbstractRe
     }
 
     public static void remove(AbstractRecord toDelete) {
-        toDelete = null;
+        // toDelete = null;
     }
 
     public void print(PrintWriter strm) {
