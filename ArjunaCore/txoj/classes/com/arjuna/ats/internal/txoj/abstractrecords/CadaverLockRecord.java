@@ -71,8 +71,7 @@ public class CadaverLockRecord extends LockRecord {
             doRelease = true;
 
         if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord(" + store + ", "
-                    + ((lm != null) ? lm.get_uid() : Uid.nullUid()) + ")");
+            txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord(" + store + ", " + lm.get_uid() + ")");
         }
     }
 
