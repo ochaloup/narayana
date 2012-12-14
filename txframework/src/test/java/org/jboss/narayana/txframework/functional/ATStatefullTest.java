@@ -1,3 +1,25 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2012, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package org.jboss.narayana.txframework.functional;
 
 import com.arjuna.mw.wst11.UserTransaction;
@@ -19,17 +41,20 @@ import java.util.List;
 
 @RunWith(Arquillian.class)
 public class ATStatefullTest extends BaseFunctionalTest {
+
     private UserTransaction ut;
     private ATStatefull client;
 
     @Before
     public void setupTest() throws Exception {
+
         ut = UserTransactionFactory.userTransaction();
         client = ATStatefullClient.newInstance();
     }
 
     @After
     public void teardownTest() throws Exception {
+
         assertDataAvailable();
         client.clearLogs();
         rollbackIfActive(ut);
@@ -37,6 +62,7 @@ public class ATStatefullTest extends BaseFunctionalTest {
 
     @Test
     public void testSimple() throws Exception {
+
         ut.begin();
         client.invoke1();
         client.invoke2();
@@ -73,10 +99,12 @@ public class ATStatefullTest extends BaseFunctionalTest {
      */
 
     private void assertOrder(Class<? extends Annotation>... expectedOrder) {
+
         Assert.assertEquals(Arrays.asList(expectedOrder), client.getEventLog().getEventLog());
     }
 
     private void assertDataAvailable() {
+
         List<Class<? extends Annotation>> log = client.getEventLog().getDataUnavailableLog();
         if (!log.isEmpty()) {
             Assert.fail("One or more lifecycle methods could not access the managed data: " + log.toString());

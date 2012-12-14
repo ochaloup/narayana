@@ -1,30 +1,28 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
- * of individual contributors.
- * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License,
- * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
- * 
- * (C) 2005-2006,
- * @author JBoss Inc.
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2012, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.jboss.narayana.txframework.functional.services;
 
-import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Commit;
+import org.jboss.narayana.txframework.api.annotation.lifecycle.at.*;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Error;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Prepare;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Rollback;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Unknown;
 import org.jboss.narayana.txframework.api.annotation.service.ServiceRequest;
 import org.jboss.narayana.txframework.api.annotation.transaction.Transactional;
 import org.jboss.narayana.txframework.api.configuration.BridgeType;
@@ -51,6 +49,7 @@ import java.util.Map;
 @WebService(serviceName = "ATStatefullService", portName = "ATStatefull", name = "AT", targetNamespace = "http://www.jboss.com/functional/atstatefull/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class ATStatefullService implements ATStatefull {
+
     @Inject
     private Map TXDataMap;
     private boolean rollback = false;
@@ -92,29 +91,34 @@ public class ATStatefullService implements ATStatefull {
 
     @WebMethod
     public EventLog getEventLog() {
+
         return eventLog;
     }
 
     @WebMethod
     public void clearLogs() {
+
         eventLog.clear();
     }
 
     @Commit
     @WebMethod(exclude = true)
     public void commit() {
+
         logEvent(Commit.class);
     }
 
     @Rollback
     @WebMethod(exclude = true)
     public void rollback() {
+
         logEvent(Rollback.class);
     }
 
     @Prepare
     @WebMethod(exclude = true)
     public Boolean prepare() {
+
         logEvent(Prepare.class);
         if (rollback) {
             return false;
@@ -126,16 +130,19 @@ public class ATStatefullService implements ATStatefull {
     @Unknown
     @WebMethod(exclude = true)
     public void unknown() {
+
         logEvent(Unknown.class);
     }
 
     @Error
     @WebMethod(exclude = true)
     public void error() {
+
         logEvent(Error.class);
     }
 
     private boolean isPresent(ServiceCommand expectedServiceCommand, ServiceCommand... serviceCommands) {
+
         for (ServiceCommand foundServiceCommand : serviceCommands) {
             if (foundServiceCommand == expectedServiceCommand) {
                 return true;
