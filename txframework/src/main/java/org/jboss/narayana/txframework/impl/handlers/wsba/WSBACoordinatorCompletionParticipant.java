@@ -35,10 +35,10 @@ public class WSBACoordinatorCompletionParticipant extends WSBAParticipantComplet
         implements
             BusinessAgreementWithCoordinatorCompletionParticipant {
 
-    public WSBACoordinatorCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap, String txid)
+    public WSBACoordinatorCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap)
             throws ParticipantRegistrationException {
 
-        super(serviceInvocationMeta, txDataMap, txid);
+        super(serviceInvocationMeta, txDataMap);
 
         registerEventsOfInterest(Complete.class);
     }

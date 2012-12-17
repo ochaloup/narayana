@@ -43,7 +43,7 @@ public class WSBACoordinatorCompletionParticipantTest {
         LifecycleImpl lifecycle = new LifecycleImpl();
         ServiceInvocationMeta serviceInvocationMeta = new ServiceInvocationMeta(lifecycle, LifecycleImpl.class, null);
         WSBACoordinatorCompletionParticipant participant = new WSBACoordinatorCompletionParticipant(
-                serviceInvocationMeta, new HashMap(), null);
+                serviceInvocationMeta, new HashMap());
 
         participant.cancel();
         participant.close();

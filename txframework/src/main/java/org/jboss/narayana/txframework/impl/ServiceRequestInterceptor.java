@@ -46,7 +46,7 @@ public class ServiceRequestInterceptor {
         Class serviceClass = getServiceClass(serviceImpl);
 
         ProtocolHandler protocolHandler = HandlerFactory
-                .createInstance(new ServiceInvocationMeta(serviceImpl, serviceClass, serviceMethod));
+                .getInstance(new ServiceInvocationMeta(serviceImpl, serviceClass, serviceMethod));
 
         Object result;
         try {
@@ -64,8 +64,8 @@ public class ServiceRequestInterceptor {
 
         if (serviceImpl instanceof TargetInstanceProxy) // Weld proxy
         {
-            final BeanInfo bi2 = Introspector.getBeanInfo(serviceImpl.getClass().getSuperclass());
-            return bi2.getBeanDescriptor().getBeanClass();
+            final BeanInfo beanInfo = Introspector.getBeanInfo(serviceImpl.getClass().getSuperclass());
+            return beanInfo.getBeanDescriptor().getBeanClass();
         } else // EJB Proxy
         {
             return serviceImpl.getClass();
