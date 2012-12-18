@@ -34,28 +34,21 @@ public class WSATVolatile2PCParticipant extends org.jboss.narayana.txframework.i
         implements
             Volatile2PCParticipant {
 
-    protected final WSATParticipantRegistry participantRegistry = new WSATParticipantRegistry();
-    private String txid;
-
-    public WSATVolatile2PCParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap, String txid)
+    public WSATVolatile2PCParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap)
             throws ParticipantRegistrationException {
 
         super(serviceInvocationMeta, txDataMap);
-        this.txid = txid;
-
         registerEventsOfInterest(PrePrepare.class, PostCommit.class, Rollback.class, Error.class, Unknown.class);
     }
 
     public void commit() throws WrongStateException, SystemException {
 
         invoke(PostCommit.class);
-        participantRegistry.forget(txid);
     }
 
     public void rollback() throws WrongStateException, SystemException {
 
         invoke(Rollback.class);
-        participantRegistry.forget(txid);
     }
 
     public void error() throws SystemException {
