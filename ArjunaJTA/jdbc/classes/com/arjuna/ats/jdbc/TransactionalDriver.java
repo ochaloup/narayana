@@ -132,6 +132,10 @@ public class TransactionalDriver implements java.sql.Driver {
         throw new SQLFeatureNotSupportedException();
     }
 
+    /**
+     * Static block registers instance of TransactionalDriver with sql drivers
+     * manager.
+     */
     static {
         try {
             DriverManager.registerDriver(new TransactionalDriver());

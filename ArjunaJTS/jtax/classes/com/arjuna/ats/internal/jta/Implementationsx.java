@@ -70,6 +70,9 @@ public class Implementationsx {
 
     private static boolean _added = false;
 
+    /**
+     * Static block triggers initialization of ExtendedXAResourceRecordMap.
+     */
     static {
         initialise();
     }

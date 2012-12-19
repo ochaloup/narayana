@@ -126,6 +126,11 @@ public class ORBInfo {
     private static ORBData _theData = null;
     private static SimpleXMLParser _xml = null;
 
+    /**
+     * Static block is used to initialize _theData and _xml static variables.
+     * They are later used to receive runtime ORB's information such as name or
+     * version.
+     */
     static {
         try {
             _theData = opPropertyManager.getOrbPortabilityEnvironmentBean().getOrbData();

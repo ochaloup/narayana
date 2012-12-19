@@ -1197,9 +1197,6 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
     private String _cachedUidStringForm;
 
-    private static boolean _rollbackOptimization = false;
-
-    static {
-        _rollbackOptimization = jtaPropertyManager.getJTAEnvironmentBean().isXaRollbackOptimization();
-    }
+    private static boolean _rollbackOptimization = jtaPropertyManager.getJTAEnvironmentBean()
+            .isXaRollbackOptimization();
 }

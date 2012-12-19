@@ -38,13 +38,9 @@ package com.arjuna.ats.jts.common;
  */
 
 public class InterceptorInfo {
-    private static final boolean OTS_NEED_TRAN_CONTEXT;
-    private static final boolean OTS_ALWAYS_PROPAGATE;
-
-    static {
-        OTS_NEED_TRAN_CONTEXT = jtsPropertyManager.getJTSEnvironmentBean().isNeedTranContext();
-        OTS_ALWAYS_PROPAGATE = jtsPropertyManager.getJTSEnvironmentBean().isAlwaysPropagateContext();
-    }
+    private static final boolean OTS_NEED_TRAN_CONTEXT = jtsPropertyManager.getJTSEnvironmentBean().isNeedTranContext();
+    private static final boolean OTS_ALWAYS_PROPAGATE = jtsPropertyManager.getJTSEnvironmentBean()
+            .isAlwaysPropagateContext();
 
     /**
      * Get the flag indicating whether a transaction context is required.

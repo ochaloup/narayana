@@ -242,9 +242,6 @@ public class BaseTransaction {
         }
     }
 
-    private static boolean _supportSubtransactions = false;
-
-    static {
-        _supportSubtransactions = jtaPropertyManager.getJTAEnvironmentBean().isSupportSubtransactions();
-    }
+    private static boolean _supportSubtransactions = jtaPropertyManager.getJTAEnvironmentBean()
+            .isSupportSubtransactions();
 }
