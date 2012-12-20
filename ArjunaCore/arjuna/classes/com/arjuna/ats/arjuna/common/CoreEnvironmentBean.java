@@ -24,6 +24,7 @@ import com.arjuna.ats.internal.arjuna.utils.AndroidProcessId;
 
 import java.io.File;
 
+import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.utils.Process;
 import com.arjuna.ats.arjuna.utils.Utility;
 import com.arjuna.ats.internal.arjuna.common.ClassloadingUtility;
@@ -39,6 +40,8 @@ import com.arjuna.common.util.ConfigurationInfo;
  */
 @PropertyPrefix(prefix = "com.arjuna.ats.arjuna.")
 public class CoreEnvironmentBean implements CoreEnvironmentBeanMBean {
+    public static final int NODE_NAME_SIZE = 64;
+
     @FullPropertyName(name = "com.arjuna.ats.arjuna.common.varDir")
     private volatile String varDir = System.getProperty("user.dir") + File.separator + "var" + File.separator + "tmp";
 
@@ -104,9 +107,20 @@ public class CoreEnvironmentBean implements CoreEnvironmentBeanMBean {
      * @param nodeIdentifier
      *            the Node Identifier.
      * @throws CoreEnvironmentBeanException
+     *             if node identifier is null or too long.
      */
-    public void setNodeIdentifier(String nodeIdentifierAsString) {
-        this.nodeIdentifier = nodeIdentifierAsString;
+    public void setNodeIdentifier(String nodeIdentifier) throws CoreEnvironmentBeanException {
+        if (nodeIdentifier == null) {
+            tsLogger.i18NLogger.fatal_nodename_null();
+            throw new CoreEnvironmentBeanException(tsLogger.i18NLogger.get_fatal_nodename_null());
+        }
+
+        if (nodeIdentifier.getBytes().length > NODE_NAME_SIZE) {
+            tsLogger.i18NLogger.fatal_nodename_too_long(nodeIdentifier);
+            throw new CoreEnvironmentBeanException(tsLogger.i18NLogger.get_fatal_nodename_too_long(nodeIdentifier));
+        }
+
+        this.nodeIdentifier = nodeIdentifier;
     }
 
     /**
