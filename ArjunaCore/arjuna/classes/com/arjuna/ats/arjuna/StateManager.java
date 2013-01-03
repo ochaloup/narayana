@@ -831,6 +831,8 @@ public class StateManager {
         BasicAction action = null;
 
         synchronized (mutex) {
+            createLists();
+
             if (usingActions.size() > 0) {
                 Enumeration e = usingActions.keys();
 
@@ -1094,6 +1096,10 @@ public class StateManager {
         if (recordType != RecordType.RECOVERY) {
             if ((action != null) && (action.status() == ActionStatus.RUNNING)) {
                 synchronized (mutex) {
+                    createLists(); // if there wasn't a transaction running when
+                                    // we were activated then we need to do this
+                                    // now
+
                     if (usingActions.get(action.get_uid()) == null)
                         usingActions.put(action.get_uid(), action);
                 }
