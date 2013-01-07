@@ -27,10 +27,13 @@ package com.arjuna.ats.txoj.common;
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
 public interface TxojEnvironmentBeanMBean {
+    @Deprecated
     String getLockStoreDir();
 
+    @Deprecated
     String getMultipleLockStore();
 
+    @Deprecated
     String getSingleLockStore();
 
     boolean isAllowNestedLocking();
