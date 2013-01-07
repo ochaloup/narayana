@@ -505,6 +505,7 @@ public class CoordinatorEngine implements CoordinatorInboundEvents {
             while (state == origState) {
                 final long remaining = end - System.currentTimeMillis();
                 if (remaining <= 0) {
+                    WSTLogger.i18NLogger.warn_state_change_timeout(String.valueOf(delay), origState.toString());
                     break;
                 }
                 try {
