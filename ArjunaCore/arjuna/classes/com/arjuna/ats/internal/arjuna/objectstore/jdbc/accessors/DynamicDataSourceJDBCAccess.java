@@ -59,7 +59,7 @@ public class DynamicDataSourceJDBCAccess implements JDBCAccess {
             Map<String, String> configuration = new HashMap<String, String>();
             while (tokenizer.hasMoreTokens()) {
                 String[] split = tokenizer.nextToken().split("=");
-                configuration.put(split[0], split[1]);
+                configuration.put(split[0], split[1].replace("\\equ", "="));
             }
             try {
                 this.dataSource = (DataSource) Class.forName(configuration.remove("ClassName")).newInstance();
@@ -70,7 +70,8 @@ public class DynamicDataSourceJDBCAccess implements JDBCAccess {
                     Method method = null;
                     try {
                         method = dataSource.getClass().getMethod("set" + key, java.lang.String.class);
-                        method.invoke(dataSource, value);
+                        String replace = value.replace("\\semi", ";");
+                        method.invoke(dataSource, value.replace("\\semi", ";"));
                     } catch (NoSuchMethodException nsme) {
                         method = dataSource.getClass().getMethod("set" + key, int.class);
                         method.invoke(dataSource, Integer.valueOf(value));
