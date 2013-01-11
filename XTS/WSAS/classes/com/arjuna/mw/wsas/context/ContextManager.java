@@ -74,7 +74,7 @@ public class ContextManager {
             // type
 
             String currentServiceType = UserActivityFactory.userActivity().serviceType();
-            if (currentServiceType == serviceType) {
+            if (currentServiceType.equals(serviceType)) {
                 service = _manager.getHighLevelService(serviceType);
             }
         } catch (NoActivityException nae) {

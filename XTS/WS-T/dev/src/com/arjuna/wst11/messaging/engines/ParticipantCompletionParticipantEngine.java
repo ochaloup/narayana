@@ -667,7 +667,7 @@ public class ParticipantCompletionParticipantEngine implements ParticipantComple
     private void commsTimeout(TimerTask caller) {
         final State current;
         synchronized (this) {
-            if (timerTask != caller) {
+            if (!timerTask.equals(caller)) {
                 // the timer was cancelled but it went off before it could be
                 // cancelled
 
