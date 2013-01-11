@@ -20,10 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.txframework.functional.clients;
+package org.jboss.narayana.txframework.functional.ws.at.simplePOJO;
 
 import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
-import org.jboss.narayana.txframework.functional.interfaces.AT;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;

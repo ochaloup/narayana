@@ -19,26 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.jboss.narayana.txframework.functional.interfaces;
-
-import org.jboss.narayana.txframework.functional.common.EventLog;
-import org.jboss.narayana.txframework.functional.common.ServiceCommand;
-import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
+package org.jboss.narayana.txframework.functional.ws.at.bridged;
 
 import javax.ejb.Remote;
 import javax.jws.WebMethod;
 
+/**
+ * Server side version of the business logic API.
+ *
+ * @author jonathan.halliday@redhat.com, 2007-04-30
+ */
 @Remote
-public interface BACoordinatorCompletion {
+public interface ATBridge {
 
     @WebMethod
-    public void saveData(ServiceCommand... serviceCommands) throws SomeApplicationException;
+    public void incrementCounter(int how_many);
 
     @WebMethod
-    public EventLog getEventLog();
+    public int getCounter();
 
     @WebMethod
-    public void clearEventLog();
-
+    public void reset();
 }

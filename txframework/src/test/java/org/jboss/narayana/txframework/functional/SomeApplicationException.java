@@ -20,28 +20,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.txframework.functional.clients;
+package org.jboss.narayana.txframework.functional;
 
-import org.jboss.narayana.txframework.functional.interfaces.JAXWSHandlerAnnotation;
+import java.io.Serializable;
 
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import java.net.URL;
+public class SomeApplicationException extends Exception implements Serializable {
 
-public class JAXWSHandlerAnnotationClient {
+    public SomeApplicationException(String message, Throwable cause) {
 
-    public static JAXWSHandlerAnnotation newInstance() throws Exception {
-
-        URL wsdlLocation = new URL(
-                "http://localhost:8080/test/JAXWSHandlerAnnotatonService/JAXWSHandlerAnnotatonImpl?wsdl");
-        QName serviceName = new QName("http://www.jboss.com/functional/JAXWSHandlerAnnotatonImpl",
-                "JAXWSHandlerAnnotatonService");
-        QName portName = new QName("http://www.jboss.com/functional/JAXWSHandlerAnnotatonImpl",
-                "JAXWSHandlerAnnotatonPort");
-
-        Service service = Service.create(wsdlLocation, serviceName);
-        JAXWSHandlerAnnotation client = service.getPort(portName, JAXWSHandlerAnnotation.class);
-
-        return client;
+        super(message, cause);
     }
+
+    public SomeApplicationException(String message) {
+
+        super(message);
+    }
+
 }

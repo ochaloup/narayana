@@ -19,52 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.txframework.functional.services;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.io.Serializable;
+package org.jboss.narayana.txframework.functional.ws.ba.participantCompletion;
 
-/**
- * EJB3 Entity Bean implementation of the business app state.
- *
- * @author paul.robinson@redhat.com
- */
-@Entity
-public class SimpleEntity implements Serializable {
+import org.jboss.narayana.txframework.functional.EventLog;
+import org.jboss.narayana.txframework.functional.ServiceCommand;
+import org.jboss.narayana.txframework.functional.SomeApplicationException;
 
-    private int id;
-    private int bookingCount;
+import javax.ejb.Remote;
+import javax.jws.WebMethod;
 
-    public SimpleEntity() {
+@Remote
+public interface BAParticipantCompletion {
 
-    }
+    @WebMethod
+    public void saveDataAutoComplete(ServiceCommand... serviceCommands) throws SomeApplicationException;
 
-    @Id
-    @GeneratedValue
-    public int getId() {
+    @WebMethod
+    public void saveDataManualComplete(ServiceCommand... serviceCommands) throws SomeApplicationException;
 
-        return id;
-    }
+    @WebMethod
+    public EventLog getEventLog();
 
-    public void setId(int id) {
+    @WebMethod
+    public void clearEventLog();
 
-        this.id = id;
-    }
-
-    public int getCounter() {
-
-        return bookingCount;
-    }
-
-    public void setCounter(int counter) {
-
-        this.bookingCount = counter;
-    }
-
-    public void incrimentCounter(int how_many) {
-
-        setCounter(getCounter() + how_many);
-    }
 }

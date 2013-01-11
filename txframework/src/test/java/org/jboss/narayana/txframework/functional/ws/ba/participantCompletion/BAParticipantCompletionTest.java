@@ -20,43 +20,53 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.txframework.functional;
+package org.jboss.narayana.txframework.functional.ws.ba.participantCompletion;
 
 import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mw.wst11.UserBusinessActivityFactory;
 import com.arjuna.wst.TransactionRolledBackException;
 import junit.framework.Assert;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Cancel;
+import org.jboss.jbossts.xts.bytemanSupport.BMScript;
+import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Close;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Complete;
+import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Compensate;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.ConfirmCompleted;
-import org.jboss.narayana.txframework.functional.clients.BACoordinatorCompletionClient;
-import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
-import org.jboss.narayana.txframework.functional.interfaces.BACoordinatorCompletion;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.jboss.narayana.txframework.functional.BaseFunctionalTest;
+import org.jboss.narayana.txframework.functional.ws.ba.participantCompletion.BAParticipantCompletionClient;
+import org.jboss.narayana.txframework.functional.ServiceCommand;
+import org.jboss.narayana.txframework.functional.SomeApplicationException;
+import org.jboss.narayana.txframework.functional.ws.ba.participantCompletion.BAParticipantCompletion;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jboss.narayana.txframework.functional.common.ServiceCommand.CANNOT_COMPLETE;
-import static org.jboss.narayana.txframework.functional.common.ServiceCommand.THROW_APPLICATION_EXCEPTION;
-
 @RunWith(Arquillian.class)
-public class BACoordinatorCompletionTest extends BaseFunctionalTest {
+public class BAParticipantCompletionTest extends BaseFunctionalTest {
 
     UserBusinessActivity uba;
-    BACoordinatorCompletion client;
+    BAParticipantCompletion client;
+
+    @BeforeClass()
+    public static void submitBytemanScript() throws Exception {
+
+        BMScript.submit(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
+    }
+
+    @AfterClass()
+    public static void removeBytemanScript() {
+
+        BMScript.remove(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
+    }
 
     @Before
     public void setupTest() throws Exception {
 
         uba = UserBusinessActivityFactory.userBusinessActivity();
-        client = BACoordinatorCompletionClient.newInstance();
+        client = BAParticipantCompletionClient.newInstance();
     }
 
     @After
@@ -68,34 +78,53 @@ public class BACoordinatorCompletionTest extends BaseFunctionalTest {
     }
 
     @Test
-    public void testSimple() throws Exception {
+    public void testAutoComplete() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
 
         uba.begin();
-        client.saveData();
+        client.saveDataAutoComplete();
         uba.close();
 
-        assertOrder(Complete.class, ConfirmCompleted.class, Close.class);
+        assertOrder(ConfirmCompleted.class, Close.class);
+
+    }
+
+    @Test
+    public void testManualComplete() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
+
+        uba.begin();
+        client.saveDataManualComplete(ServiceCommand.COMPLETE);
+        uba.close();
+
+        assertOrder(ConfirmCompleted.class, Close.class);
     }
 
     @Test
     public void testMultiInvoke() throws Exception {
 
+        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
+
         uba.begin();
-        client.saveData();
-        client.saveData();
+        client.saveDataManualComplete();
+        client.saveDataManualComplete(ServiceCommand.COMPLETE);
         uba.close();
 
-        assertOrder(Complete.class, ConfirmCompleted.class, Close.class);
+        assertOrder(ConfirmCompleted.class, Close.class);
     }
 
     @Test
-    public void testClientDrivenCancel() throws Exception {
+    public void testClientDrivenCompensate() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
 
         uba.begin();
-        client.saveData();
+        client.saveDataAutoComplete();
         uba.cancel();
 
-        assertOrder(Cancel.class);
+        assertOrder(ConfirmCompleted.class, Compensate.class);
     }
 
     @Test
@@ -103,7 +132,7 @@ public class BACoordinatorCompletionTest extends BaseFunctionalTest {
 
         try {
             uba.begin();
-            client.saveData(THROW_APPLICATION_EXCEPTION);
+            client.saveDataAutoComplete(ServiceCommand.THROW_APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (SomeApplicationException e) {
             // Exception expected
@@ -117,7 +146,7 @@ public class BACoordinatorCompletionTest extends BaseFunctionalTest {
     public void testCannotComplete() throws Exception {
 
         uba.begin();
-        client.saveData(CANNOT_COMPLETE);
+        client.saveDataAutoComplete(ServiceCommand.CANNOT_COMPLETE);
         uba.close();
 
         assertOrder();
