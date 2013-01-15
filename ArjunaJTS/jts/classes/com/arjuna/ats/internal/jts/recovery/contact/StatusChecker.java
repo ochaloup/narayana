@@ -78,14 +78,10 @@ public class StatusChecker {
     // FactoryContactItem
     private Hashtable _itemFromUid;
 
-    private static StatusChecker _checker;
-
     /**
-     * create a static singleton to do the work for the static methods
+     * A static singleton to do the work for the static methods
      */
-    static {
-        _checker = new StatusChecker();
-    }
+    private static final StatusChecker _checker = new StatusChecker();
 
     /**
      * get the status in the original process, given the uid of the contact item

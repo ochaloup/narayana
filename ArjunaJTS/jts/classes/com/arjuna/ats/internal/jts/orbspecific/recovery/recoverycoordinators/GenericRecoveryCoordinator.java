@@ -351,10 +351,7 @@ public class GenericRecoveryCoordinator extends org.omg.CosTransactions.Recovery
 
     private RecoveryCoordinatorId _id;
 
-    private static boolean _issueRecoveryRollback;
-
-    static {
-        _issueRecoveryRollback = jtsPropertyManager.getJTSEnvironmentBean().isIssueRecoveryRollback();
-    }
+    private static final boolean _issueRecoveryRollback = jtsPropertyManager.getJTSEnvironmentBean()
+            .isIssueRecoveryRollback();
 
 }

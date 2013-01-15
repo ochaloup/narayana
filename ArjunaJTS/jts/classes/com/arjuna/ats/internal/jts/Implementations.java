@@ -83,6 +83,10 @@ public class Implementations {
 
     private static boolean _added = false;
 
+    /**
+     * Static block triggers initialization of ResourceRecordMap and
+     * ExtendedResourceRecordMap.
+     */
     static {
         initialise();
     }
