@@ -74,7 +74,7 @@ public class LastResourceUnitTest {
         assertEquals(cr.value(), null);
         cr.setValue(null);
 
-        assertTrue(cr.shouldAdd(new PersistenceRecord()));
+        assertFalse(cr.shouldAdd(new PersistenceRecord()));
         assertFalse(cr.shouldAlter(new PersistenceRecord()));
         assertFalse(cr.shouldMerge(new PersistenceRecord()));
         assertFalse(cr.shouldReplace(new PersistenceRecord()));

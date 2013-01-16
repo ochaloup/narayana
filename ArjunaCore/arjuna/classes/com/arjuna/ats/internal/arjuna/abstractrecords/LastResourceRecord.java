@@ -176,7 +176,7 @@ public class LastResourceRecord extends AbstractRecord {
                 return false;
             }
         } else {
-            return true;
+            return false;
         }
     }
 
