@@ -476,7 +476,6 @@ public class BasicAction extends StateManager {
      *
      * @return <code>true</code> on success, <code>false</code> otherwise.
      * 
-     * @deprecated Only called in tests
      */
 
     public boolean deactivate() {
@@ -580,8 +579,6 @@ public class BasicAction extends StateManager {
      * Remove a child thread. The current thread is removed.
      *
      * @return <code>true</code> if successful, <code>false</code> otherwise.
-     * 
-     * @deprecated Only called from a test
      */
 
     public final boolean removeChildThread() // current thread

@@ -38,9 +38,6 @@ import javax.naming.Reference;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
-/**
- * @deprecated Only used by tests
- */
 public class JNDIManager {
     /**
      * Bind the underlying JTA implementations to the appropriate JNDI contexts.
