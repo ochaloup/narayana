@@ -9,7 +9,7 @@ import java.util.Properties;
  * change this template use File | Settings | File Templates.
  */
 public class XTSPropertiesFactory {
-    private static volatile Properties defaultProperties = null;
+    private static Properties defaultProperties = null;
 
     /**
      * Returns the systems default properties, as read from the configuration
@@ -17,9 +17,11 @@ public class XTSPropertiesFactory {
      * 
      * @return the configuration Properties
      */
-    public static Properties getDefaultProperties() {
-        if (defaultProperties == null) {
+    public static synchronized Properties getDefaultProperties() {
+        try {
             initDefaultProperties("org.jboss.jbossts.xts.propertiesFile");
+        } catch (Exception e) {
+            defaultProperties = new Properties(System.getProperties());
         }
 
         return defaultProperties;
@@ -37,7 +39,7 @@ public class XTSPropertiesFactory {
         }
     }
 
-    private static synchronized void initDefaultProperties(String fileNamePropertyKey) {
+    private static void initDefaultProperties(String fileNamePropertyKey) {
         if (defaultProperties != null) {
             return;
         }
