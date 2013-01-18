@@ -4,6 +4,7 @@ import com.arjuna.mw.wsas.activity.ActivityHierarchy;
 import com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException;
 import com.arjuna.mw.wscf11.model.sagas.CoordinatorManagerFactory;
 import com.arjuna.mw.wscf.model.sagas.api.CoordinatorManager;
+import com.arjuna.mw.wstx.logging.wstxLogger;
 import com.arjuna.webservices11.wsarjtx.processors.TerminationCoordinatorProcessor;
 import com.arjuna.wst11.BusinessActivityTerminator;
 import com.arjuna.wst.SystemException;
@@ -51,6 +52,7 @@ public class BusinessActivityTerminatorImple implements BusinessActivityTerminat
         } catch (com.arjuna.mw.wsas.exceptions.ProtocolViolationException ex) {
             throw new SystemException(ex.toString());
         } catch (com.arjuna.mw.wscf.model.sagas.exceptions.CoordinatorCancelledException ex) {
+            wstxLogger.i18NLogger.warn_mwlabs_wst11_ba_coordinator_cancelled_activity();
             throw new TransactionRolledBackException();
         } catch (com.arjuna.mw.wscf.exceptions.NoCoordinatorException ex) {
             throw new UnknownTransactionException();

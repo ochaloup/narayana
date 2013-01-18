@@ -39,6 +39,9 @@ public class MultiCloseTest {
 
     @Test
     public void testMultiClose() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(2);
+
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
 
         BusinessActivityManager bam = BusinessActivityManager.getBusinessActivityManager();
