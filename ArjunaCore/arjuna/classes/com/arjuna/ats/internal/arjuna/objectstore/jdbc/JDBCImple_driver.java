@@ -66,42 +66,56 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
 
         boolean result = false;
-
+        PreparedStatement pstmt = null;
+        PreparedStatement pstmt2 = null;
         try {
             // Delete any previously committed state
-            {
-                PreparedStatement pstmt = connection.get().prepareStatement(
-                        "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
+            pstmt = connection.get().prepareStatement(
+                    "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
 
-                pstmt.setString(1, objUid.stringForm());
-                pstmt.setString(2, typeName);
-                pstmt.setInt(3, 1);
+            pstmt.setString(1, objUid.stringForm());
+            pstmt.setString(2, typeName);
+            pstmt.setInt(3, 1);
 
-                int rowcount = pstmt.executeUpdate();
-                if (rowcount > 0) {
-                    tsLogger.i18NLogger.trace_JDBCImple_previouslycommitteddeleted(rowcount);
-                }
+            int rowcount = pstmt.executeUpdate();
+            if (rowcount > 0) {
+                tsLogger.i18NLogger.trace_JDBCImple_previouslycommitteddeleted(rowcount);
             }
+
             // now do the commit itself:
-            {
-                PreparedStatement pstmt = connection.get()
-                        .prepareStatement("UPDATE " + tableName
-                                + " SET StateType = 1 WHERE UidString = ? AND TypeName = ? AND StateType = "
-                                + StateStatus.OS_UNCOMMITTED);
+            pstmt2 = connection.get()
+                    .prepareStatement("UPDATE " + tableName
+                            + " SET StateType = 1 WHERE UidString = ? AND TypeName = ? AND StateType = "
+                            + StateStatus.OS_UNCOMMITTED);
 
-                pstmt.setString(1, objUid.stringForm());
-                pstmt.setString(2, typeName);
+            pstmt2.setString(1, objUid.stringForm());
+            pstmt2.setString(2, typeName);
 
-                int rowcount = pstmt.executeUpdate();
-                if (rowcount > 0) {
-                    result = true;
-                    connection.get().commit();
-                } else {
-                    connection.get().rollback();
-                }
+            int rowcount2 = pstmt2.executeUpdate();
+            if (rowcount2 > 0) {
+                result = true;
+                connection.get().commit();
+            } else {
+                connection.get().rollback();
             }
+
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_writefailed(e);
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
+            if (pstmt2 != null) {
+                try {
+                    pstmt2.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
         }
 
         return result;
@@ -113,8 +127,9 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
         boolean result = false;
 
+        PreparedStatement pstmt = null;
         try {
-            PreparedStatement pstmt = connection.get().prepareStatement(
+            pstmt = connection.get().prepareStatement(
                     "UPDATE " + tableName + " SET Hidden = 1 WHERE UidString = ? AND TypeName = ? AND Hidden = 0");
 
             pstmt.setString(1, objUid.stringForm());
@@ -127,6 +142,14 @@ public abstract class JDBCImple_driver {
             connection.get().commit();
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_1(e);
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
         }
 
         return result;
@@ -138,8 +161,9 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
         boolean result = false;
 
+        PreparedStatement pstmt = null;
         try {
-            PreparedStatement pstmt = connection.get().prepareStatement(
+            pstmt = connection.get().prepareStatement(
                     "UPDATE " + tableName + " SET Hidden = 0 WHERE UidString = ? AND TypeName = ? AND Hidden = 1");
 
             pstmt.setString(1, objUid.stringForm());
@@ -152,6 +176,14 @@ public abstract class JDBCImple_driver {
             connection.get().commit();
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_2(e);
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
         }
 
         return result;
@@ -169,9 +201,9 @@ public abstract class JDBCImple_driver {
         int theState = StateStatus.OS_UNKNOWN;
         ResultSet rs = null;
 
+        PreparedStatement pstmt = null;
         try {
-
-            PreparedStatement pstmt = connection.get().prepareStatement(
+            pstmt = connection.get().prepareStatement(
                     "SELECT StateType, Hidden FROM " + tableName + " WHERE UidString = ? AND TypeName = ?");
 
             pstmt.setString(1, objUid.stringForm());
@@ -226,6 +258,21 @@ public abstract class JDBCImple_driver {
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_3(e);
             theState = StateStatus.OS_UNKNOWN;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    // ignore
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
         }
 
         return theState;
@@ -353,9 +400,9 @@ public abstract class JDBCImple_driver {
         if (typeName != null) {
             if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
 
+                PreparedStatement pstmt = null;
                 try {
-
-                    PreparedStatement pstmt = connection.get().prepareStatement(
+                    pstmt = connection.get().prepareStatement(
                             "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
 
                     pstmt.setString(1, objUid.stringForm());
@@ -369,6 +416,14 @@ public abstract class JDBCImple_driver {
                     connection.get().commit();
                 } catch (SQLException e) {
                     tsLogger.i18NLogger.warn_objectstore_JDBCImple_8(e);
+                } finally {
+                    if (pstmt != null) {
+                        try {
+                            pstmt.close();
+                        } catch (SQLException e) {
+                            // Ignore
+                        }
+                    }
                 }
             } else {
                 // can only remove (UN)COMMITTED objs
@@ -390,8 +445,9 @@ public abstract class JDBCImple_driver {
         if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
             ResultSet rs = null;
 
+            PreparedStatement pstmt = null;
             try {
-                PreparedStatement pstmt = connection.get().prepareStatement("SELECT ObjectState FROM " + tableName
+                pstmt = connection.get().prepareStatement("SELECT ObjectState FROM " + tableName
                         + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
                 pstmt.setString(1, objUid.stringForm());
                 pstmt.setString(2, typeName);
@@ -413,12 +469,20 @@ public abstract class JDBCImple_driver {
             } catch (SQLException e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_14(e);
             } finally {
-                if (rs != null)
+                if (rs != null) {
                     try {
                         rs.close();
                     } catch (SQLException e) {
                         // Ignore
                     }
+                }
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+                    } catch (SQLException e) {
+                        // Ignore
+                    }
+                }
             }
         }
 
@@ -440,8 +504,10 @@ public abstract class JDBCImple_driver {
             byte[] b = state.buffer();
             ResultSet rs = null;
 
+            PreparedStatement pstmt = null;
+            PreparedStatement pstmt2 = null;
             try {
-                PreparedStatement pstmt = connection.get().prepareStatement(
+                pstmt = connection.get().prepareStatement(
                         "SELECT ObjectState, UidString, StateType, TypeName FROM " + tableName
                                 + " WHERE UidString = ? AND StateType = ? AND TypeName = ? FOR UPDATE",
                         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
@@ -458,7 +524,7 @@ public abstract class JDBCImple_driver {
                 } else {
                     connection.get().commit();
                     // not in database, do insert:
-                    PreparedStatement pstmt2 = connection.get().prepareStatement("INSERT INTO " + tableName
+                    pstmt2 = connection.get().prepareStatement("INSERT INTO " + tableName
                             + " (StateType,Hidden,TypeName,UidString,ObjectState) VALUES (?,0,?,?,?)");
 
                     pstmt2.setInt(1, stateType);
@@ -474,12 +540,27 @@ public abstract class JDBCImple_driver {
             } catch (SQLException e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_writefailed(e);
             } finally {
-                if (rs != null)
+                if (rs != null) {
                     try {
                         rs.close();
                     } catch (SQLException e) {
                         // Ignore
                     }
+                }
+                if (pstmt != null) {
+                    try {
+                        pstmt.close();
+                    } catch (SQLException e) {
+                        // Ignore
+                    }
+                }
+                if (pstmt2 != null) {
+                    try {
+                        pstmt2.close();
+                    } catch (SQLException e) {
+                        // Ignore
+                    }
+                }
             }
 
         }
@@ -526,6 +607,8 @@ public abstract class JDBCImple_driver {
                 checkCreateTableError(ex);
             }
         }
+
+        stmt.close();
 
         // This can be the case when triggering via EmptyObjectStore
         if (!connection.get().getAutoCommit()) {
