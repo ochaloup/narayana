@@ -88,11 +88,10 @@ public class WSBAHandler implements ProtocolHandler {
         WSBATxControlImpl.resume(participantManager);
     }
 
-    public Object proceed(InvocationContext ic) throws Exception {
+    public void preInvocation() throws Exception {
 
         WSBATxControlImpl.resume(participantManager);
         participant.resume();
-        return ic.proceed();
     }
 
     @Override
