@@ -99,7 +99,7 @@ public class RESTRecord extends AbstractRecord {
     }
 
     public int typeIs() {
-        return RecordType.USER_DEF_FIRST0;
+        return RecordType.RESTAT_RECORD;
     }
 
     public Object value() {

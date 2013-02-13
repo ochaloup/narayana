@@ -65,7 +65,7 @@ public class TMApplication extends Application {
                     return RESTRecord.class;
                 }
                 public int getType() {
-                    return RecordType.USER_DEF_FIRST0;
+                    return RecordType.RESTAT_RECORD;
                 }
             });
         } catch (Throwable e) {
