@@ -442,9 +442,12 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelCommit", e6);
 
                 return TwoPhaseOutcome.FINISH_ERROR;
+            } catch (Exception e2) {
+                e2.printStackTrace();
+
+                return TwoPhaseOutcome.FINISH_ERROR;
             }
         }
-
         return TwoPhaseOutcome.FINISH_OK;
     }
 

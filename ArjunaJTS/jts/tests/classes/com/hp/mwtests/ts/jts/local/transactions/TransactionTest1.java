@@ -110,6 +110,8 @@ public class TransactionTest1 {
                 fail();
             } catch (INVALID_TRANSACTION e1) {
                 System.err.println("Nested commit failed! " + e1);
+            } catch (TRANSACTION_ROLLEDBACK e1) {
+                System.err.println("Nested commit failed! " + e1);
             } catch (Exception e2) {
                 fail("Nested commit threw unexpected exception: " + e2);
             }
