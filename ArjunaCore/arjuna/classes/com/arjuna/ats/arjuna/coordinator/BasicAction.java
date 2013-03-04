@@ -1753,6 +1753,14 @@ public class BasicAction extends StateManager {
         }
     }
 
+    /*
+     * Various optimisations which are possible during synchronous prepare are
+     * not possible for asynchronous prepare due to lack of ordering. For
+     * instance dynamically determining one-phase optimisation while running
+     * through the intentions list and getting read-only responses from N-1
+     * participants.
+     */
+
     protected int async_prepare(boolean reportHeuristics) {
         int p = TwoPhaseOutcome.PREPARE_OK;
         Collection<AbstractRecord> lastResourceRecords = new ArrayList<AbstractRecord>();
@@ -1813,7 +1821,11 @@ public class BasicAction extends StateManager {
      * all the records indicate that they are readonly records. Such records do
      * not take part in the second phase commit processing.
      *
-     * @return <code>TwoPhaseOutcome</code> indicating outcome.
+     * @return <code>TwoPhaseOutcome</code> indicating outcome. Note that if 1PC
+     *         optimisation is enabled then it is possible for prepare to
+     *         dynamically optimise and commit if the first N-1 participants
+     *         return read-only, causing the protcol to commit the last
+     *         participant rather than go through prepare.
      */
 
     protected synchronized final int prepare(boolean reportHeuristics) {
@@ -1880,6 +1892,21 @@ public class BasicAction extends StateManager {
             if (pendingList.size() > 0) {
                 p = doPrepare(reportHeuristics);
             }
+        }
+
+        /*
+         * Now let's see if we are able to dynamically optimise 1PC. As we went
+         * through prepare, if the first N-1 participants returned read-only
+         * then we returned read-only from doPrepare but left one entry on the
+         * intentions list.
+         */
+
+        if ((p == TwoPhaseOutcome.PREPARE_READONLY) && (pendingList.size() == 1)) {
+            onePhaseCommit(reportHeuristics);
+
+            ActionManager.manager().remove(get_uid());
+
+            return TwoPhaseOutcome.PREPARE_ONE_PHASE_COMMITTED;
         }
 
         if ((p != TwoPhaseOutcome.PREPARE_OK) && (p != TwoPhaseOutcome.PREPARE_READONLY)) {
@@ -2272,6 +2299,22 @@ public class BasicAction extends StateManager {
 
             keepGoing = (individualTwoPhaseOutcome == TwoPhaseOutcome.PREPARE_OK)
                     || (individualTwoPhaseOutcome == TwoPhaseOutcome.PREPARE_READONLY);
+
+            /*
+             * If we are allowed to do 1PC optimisation then check to see if the
+             * first N-1 participants returned read-only and there's a single
+             * entry left on the intentions list.
+             */
+
+            if (keepGoing && TxControl.onePhase) {
+                /*
+                 * If N-1 returned read-only and 1 record left then exit prepare
+                 * now and force a call to commitOnePhase on the last record.
+                 */
+
+                if ((pendingList.size() == 1) && (overallTwoPhaseOutcome == TwoPhaseOutcome.PREPARE_READONLY))
+                    keepGoing = false;
+            }
         }
 
         return overallTwoPhaseOutcome;
