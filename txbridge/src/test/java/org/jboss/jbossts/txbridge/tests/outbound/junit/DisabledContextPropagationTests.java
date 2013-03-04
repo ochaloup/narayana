@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public final class DisabledContextPropagationTest {
+public final class DisabledContextPropagationTests {
 
     public static final String OUTBOUND_SERVICE_DEPLOYMENT_NAME = "txbridge-outbound-tests-service";
 
