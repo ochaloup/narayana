@@ -52,10 +52,6 @@ import java.io.PrintWriter;
 
 public class TwoPhaseOutcome {
 
-    /*
-     * WARNING!! Do not re-order this list.
-     */
-
     public static final int PREPARE_OK = 0; // prepared OK
     public static final int PREPARE_NOTOK = 1; // did not prepare so force roll
                                                 // back
@@ -91,12 +87,6 @@ public class TwoPhaseOutcome {
                                                     // nested or top-level
                                                     // usage.
     public static final int INVALID_TRANSACTION = 11; // invalid!
-    public static final int PREPARE_ONE_PHASE_COMMITTED = 12; // dynamic
-                                                                // one-phase
-                                                                // commit
-                                                                // optimisation
-                                                                // during
-                                                                // prepare
 
     public TwoPhaseOutcome(int outcome) {
         _outcome = outcome;
@@ -140,8 +130,6 @@ public class TwoPhaseOutcome {
                 return "TwoPhaseOutcome.ONE_PHASE_ERROR";
             case INVALID_TRANSACTION :
                 return "TwoPhaseOutcome.INVALID_TRANSACTION";
-            case PREPARE_ONE_PHASE_COMMITTED :
-                return "TwoPhaseOutcome.PREPARE_ONE_PHASE_COMMITTED";
             default :
                 return "Unknown";
         }
