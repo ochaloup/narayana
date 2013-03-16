@@ -162,9 +162,8 @@ public class ServerTopLevelAction extends ServerResource implements org.omg.CosT
 
         ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
 
-        ThreadActionData.pushAction(theTransaction); // LockManager needs to
-                                                        // know if there is a
-                                                        // transaction
+        // ThreadActionData.pushAction(theTransaction); // LockManager needs to
+        // know if there is a transaction
 
         int result = TwoPhaseOutcome.PREPARE_NOTOK;
 

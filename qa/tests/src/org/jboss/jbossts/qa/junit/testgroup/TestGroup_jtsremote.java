@@ -47,7 +47,7 @@ public class TestGroup_jtsremote extends TestGroupBase {
         server2.terminate();
     }
 
-    // TODO re-enable when CI job narayana-JBTM-1211 is fixed
+    @Test
     public void JTSRemote_DistributedHammerTest2() {
         Task server1 = createTask("server1", com.hp.mwtests.ts.jts.remote.servers.HammerServer.class,
                 Task.TaskType.EXPECT_READY, 480);
