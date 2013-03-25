@@ -62,6 +62,8 @@ public class HornetqJournalEnvironmentBean implements HornetqJournalEnvironmentB
 
     private volatile boolean logRates = false;
 
+    private volatile boolean asyncIO = true;
+
     /**
      * Returns the desired size in bytes of each log file. Minimum 1024.
      *
@@ -341,5 +343,29 @@ public class HornetqJournalEnvironmentBean implements HornetqJournalEnvironmentB
      */
     public void setLogRates(boolean logRates) {
         this.logRates = logRates;
+    }
+
+    /**
+     * Returns the IO type of Journal.
+     *
+     * Default: true
+     *
+     * @return true if AsyncIO is enabled, false otherwise which means NIO
+     */
+    public boolean isAsyncIO() {
+        return asyncIO;
+    }
+
+    /**
+     * Sets the type of Journal.
+     *
+     * <i>Note that Journal silently falls back to NIO if AIO native libraries
+     * are not available.</i>
+     *
+     * @param asyncIO
+     *            true to enable AsyncIO, false to disable
+     */
+    public void setAsyncIO(boolean asyncIO) {
+        this.asyncIO = asyncIO;
     }
 }
