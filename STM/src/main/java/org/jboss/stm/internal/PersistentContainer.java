@@ -25,8 +25,11 @@ import java.lang.reflect.Proxy;
 
 import org.jboss.stm.internal.reflect.InvocationHandler;
 
+import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.ObjectType;
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.internal.txoj.lockstore.BasicPersistentLockStore;
+import com.arjuna.ats.txoj.common.txojPropertyManager;
 
 /**
  * Instances of this class represent the transactional memory within which
@@ -56,7 +59,7 @@ public class PersistentContainer<T> extends RecoverableContainer<T> {
      */
 
     public PersistentContainer() {
-        super();
+        this(ObjectModel.SINGLE);
     }
 
     /**
@@ -67,9 +70,41 @@ public class PersistentContainer<T> extends RecoverableContainer<T> {
      */
 
     public PersistentContainer(final String name) {
-        super(name);
+        this(name, ObjectModel.SINGLE);
+    }
+
+    /**
+     * Create a container without a name. A name will be assigned automatically.
+     *
+     * @param global
+     *            whether the instances are to be shared across address spaces
+     *            or classloaders.
+     */
+
+    public PersistentContainer(int objectModel) {
+        super(objectModel);
+
+        if (objectModel == ObjectModel.MULTIPLE)
+            txojPropertyManager.getTxojEnvironmentBean().setLockStoreType(BasicPersistentLockStore.class.getName());
+    }
+
+    /**
+     * Create a named container.
+     * 
+     * @param name
+     *            the name (should be unique, but this is not enforced).
+     * @param global
+     *            whether the instances are to be shared across address spaces
+     *            or classloaders.
+     */
+
+    public PersistentContainer(final String name, int objectModel) {
+        super(name, objectModel);
 
         _type = ObjectType.ANDPERSISTENT;
+
+        if (objectModel == ObjectModel.MULTIPLE)
+            txojPropertyManager.getTxojEnvironmentBean().setLockStoreType(BasicPersistentLockStore.class.getName());
     }
 
     /**
