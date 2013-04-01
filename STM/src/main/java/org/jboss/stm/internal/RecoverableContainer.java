@@ -30,6 +30,7 @@ import org.jboss.stm.annotations.Optimistic;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.internal.reflect.InvocationHandler;
 
+import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.ObjectType;
 import com.arjuna.ats.arjuna.StateManager;
 import com.arjuna.ats.arjuna.common.Uid;
@@ -63,7 +64,7 @@ public class RecoverableContainer<T> {
      */
 
     public RecoverableContainer() {
-        this(new Uid().stringForm());
+        this(ObjectModel.SINGLE);
     }
 
     /**
@@ -74,8 +75,35 @@ public class RecoverableContainer<T> {
      */
 
     public RecoverableContainer(final String name) {
+        this(name, ObjectModel.SINGLE);
+    }
+
+    /*
+     * Create a container without a name. A name will be assigned automatically.
+     * 
+     * @param objectModel whether the instances are to be shared across address
+     * spaces or classloaders.
+     */
+
+    protected RecoverableContainer(int objectModel) {
+        this(new Uid().stringForm());
+
+        _objectModel = objectModel;
+    }
+
+    /*
+     * Create a named container.
+     * 
+     * @param name the name (should be unique, but this is not enforced).
+     * 
+     * @param global whether the instances are to be shared across address
+     * spaces or classloaders.
+     */
+
+    protected RecoverableContainer(final String name, int objectModel) {
         _name = name;
         _type = ObjectType.RECOVERABLE;
+        _objectModel = objectModel;
     }
 
     /**
@@ -180,7 +208,7 @@ public class RecoverableContainer<T> {
             Class<?> c = member.getClass();
 
             proxy = (T) Proxy.newProxyInstance(c.getClassLoader(), c.getInterfaces(),
-                    new InvocationHandler<T>(this, member, ot));
+                    new InvocationHandler<T>(this, member));
 
             _transactionalProxies.put(member, proxy);
         }
@@ -285,6 +313,10 @@ public class RecoverableContainer<T> {
         return _type;
     }
 
+    public final int objectModel() {
+        return _objectModel;
+    }
+
     public final boolean isPessimistic(Object member) {
         Class<?> c = member.getClass().getSuperclass();
 
@@ -334,6 +366,7 @@ public class RecoverableContainer<T> {
 
     protected WeakHashMap<T, T> _transactionalProxies = new WeakHashMap<T, T>();
     protected int _type;
+    protected int _objectModel = ObjectModel.SINGLE;
 
     private final String _name;
 }

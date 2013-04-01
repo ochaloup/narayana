@@ -33,6 +33,7 @@ import org.jboss.stm.annotations.SaveState;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.internal.RecoverableContainer;
 
+import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
@@ -45,28 +46,29 @@ public class LockManagerProxy<T> extends LockManager {
     }
 
     public LockManagerProxy(T candidate, RecoverableContainer<T> cont) {
-        this(candidate, com.arjuna.ats.arjuna.ObjectType.RECOVERABLE, cont);
+        this(candidate, com.arjuna.ats.arjuna.ObjectType.RECOVERABLE, ObjectModel.SINGLE, cont);
     }
 
     public LockManagerProxy(T candidate, int ot) {
-        this(candidate, ot, null);
+        this(candidate, ot, ObjectModel.SINGLE, null);
 
     }
-    public LockManagerProxy(T candidate, int ot, RecoverableContainer<T> cont) {
-        super(ot);
+    public LockManagerProxy(T candidate, int ot, int om, RecoverableContainer<T> cont) {
+        super(ot, om);
 
         _theObject = candidate;
         _container = cont;
     }
 
     public LockManagerProxy(T candidate, Uid u) {
-        this(candidate, u, null);
+        this(candidate, u, ObjectModel.SINGLE, null);
     }
 
     // if there's a Uid then this is a persistent object
 
-    public LockManagerProxy(T candidate, Uid u, RecoverableContainer<T> cont) {
-        super(u); // TODO make configurable through annotation
+    public LockManagerProxy(T candidate, Uid u, int objectModel, RecoverableContainer<T> cont) {
+        super(u, cont.objectType(), objectModel); // TODO make configurable
+                                                    // through annotation
 
         _theObject = candidate;
         _container = cont;

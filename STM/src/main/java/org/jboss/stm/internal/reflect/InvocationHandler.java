@@ -62,7 +62,9 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
      * name!
      */
 
+    @SuppressWarnings("unused")
     private static final String GETTER_NAME = "GET";
+    @SuppressWarnings("unused")
     private static final String SETTER_NAME = "SET";
 
     class LockInformation {
@@ -85,18 +87,28 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
         public int _retry;
     }
 
+    /*
+     * Not all possible LockManager options are available. We only support those
+     * that we need at any given moment in STM.
+     */
+
     public InvocationHandler(RecoverableContainer<T> c, T obj) {
-        this(c, obj, ObjectType.RECOVERABLE);
+        this(c, obj, c.objectType(), null);
     }
-
-    public InvocationHandler(RecoverableContainer<T> c, T obj, int ot) {
-        this(c, obj, ot, null);
-    }
-
+    /*
+     * public InvocationHandler (RecoverableContainer<T> c, T obj, int ot) {
+     * this(c, obj, ot, null); }
+     */
     public InvocationHandler(RecoverableContainer<T> c, T obj, Uid u) {
         this(c, obj, ObjectType.ANDPERSISTENT, u);
     }
-
+    /*
+     * public InvocationHandler (RecoverableContainer<T> c, T obj, Uid u, int
+     * objectModel) { this(c, obj, ObjectType.ANDPERSISTENT, u, objectModel); }
+     * 
+     * public InvocationHandler (RecoverableContainer<T> cont, T obj, int ot,
+     * Uid u) { this(cont, obj, ot, u, ObjectModel.SINGLE); }
+     */
     public InvocationHandler(RecoverableContainer<T> cont, T obj, int ot, Uid u) {
         _container = cont;
         _theObject = obj;
@@ -145,10 +157,10 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
             if (_optimistic) {
                 _txObject = new OptimisticLockManagerProxy<T>(obj, u, ObjectModel.MULTIPLE, cont);
             } else
-                _txObject = new LockManagerProxy<T>(obj, u, cont);
+                _txObject = new LockManagerProxy<T>(obj, u, _container.objectModel(), cont);
         } else {
             /*
-             * todo currently we optimistic always uses persistent objects, but
+             * todo currently optimistic always uses persistent objects, but
              * with an in-memory object store. This is to ensure that concurrent
              * threads do not interfere with each others current state view. If
              * the application is written in such a way that a single instance
@@ -160,9 +172,9 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                 _txObject = new OptimisticLockManagerProxy<T>(obj, ObjectType.ANDPERSISTENT, ObjectModel.MULTIPLE,
                         cont); // recoverable or persistent
             } else
-                _txObject = new LockManagerProxy<T>(obj, ot, cont); // recoverable
-                                                                    // or
-                                                                    // persistent
+                _txObject = new LockManagerProxy<T>(obj, ot, _container.objectModel(), cont); // recoverable
+                                                                                                // or
+                                                                                                // persistent
         }
 
         _methods = obj.getClass().getDeclaredMethods();
@@ -335,7 +347,6 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
         return true;
     }
 
-    @SuppressWarnings(value = {"unused"})
     private RecoverableContainer<T> _container; // could be a persistent
                                                 // container, but not an issue
                                                 // for this class
