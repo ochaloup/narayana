@@ -29,7 +29,6 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
@@ -51,7 +50,6 @@ public class RegistrationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    @Ignore // JBTM-1637
     public void testAlreadyRegisteredProtocolIdentifierException() throws Exception {
         final String messageId = "testAlreadyRegisteredProtocolIdentifierException";
         final String protocolIdentifier = TestUtil.ALREADY_REGISTERED_PROTOCOL_IDENTIFIER;
@@ -71,7 +69,6 @@ public class RegistrationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    @Ignore // JBTM-1637
     public void testInvalidProtocolProtocolIdentifierException() throws Exception {
         final String messageId = "testInvalidProtocolProtocolIdentifierException";
         final String protocolIdentifier = TestUtil.INVALID_PROTOCOL_PROTOCOL_IDENTIFIER;
@@ -91,7 +88,6 @@ public class RegistrationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    @Ignore // JBTM-1637
     public void testInvalidStateProtocolIdentifierException() throws Exception {
         final String messageId = "testInvalidStateProtocolIdentifierException";
         final String protocolIdentifier = TestUtil.INVALID_STATE_PROTOCOL_IDENTIFIER;
@@ -111,7 +107,6 @@ public class RegistrationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    @Ignore // JBTM-1637
     public void testNoActivityProtocolIdentifierException() throws Exception {
         final String messageId = "testNoActivityProtocolIdentifierException";
         final String protocolIdentifier = TestUtil.NO_ACTIVITY_PROTOCOL_IDENTIFIER;

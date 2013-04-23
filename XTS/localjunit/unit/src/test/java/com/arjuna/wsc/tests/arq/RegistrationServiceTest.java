@@ -30,7 +30,6 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
@@ -71,7 +70,6 @@ public class RegistrationServiceTest extends BaseWSCTest {
     }
 
     @Test
-    @Ignore // JBTM-1637
     public void testUnknownCoordinationType() throws Exception {
         final String messageId = "testUnknownCoordinationType";
         final String protocolIdentifier = TestUtil.UNKNOWN_PROTOCOL_IDENTIFIER;
