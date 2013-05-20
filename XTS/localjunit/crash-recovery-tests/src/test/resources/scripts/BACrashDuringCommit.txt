@@ -274,59 +274,41 @@
 #   removed committed activity XXXXXX
 #
 
-######################################################################
-#JBTM-1115 Rules
-#
-
 #####################################################################
-# Setup counter MultiParticipantParticipantCompletionParticipantCloseTest
+# JBTM-1115
+#####################################################################
+# Setup counter for Multi* XTSServiceTest(s)
 #
-RULE setup counter MultiParticipantParticipantCompletionParticipantCloseTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiParticipantParticipantCompletionParticipantCloseTest
+RULE setup counters for Multi* XTSServiceTest(s)
+CLASS ^org.jboss.jbossts.xts.servicetests.test.XTSServiceTestBase
 METHOD run()
 AT ENTRY
-IF TRUE
-DO debug("creating counter and rendezvous"),
-   createCounter("closes", 3),
-   createRendezvous("closes-complete", 2)
-ENDRULE
-#####################################################################
-# Setup counter MultiParticipantCoordinatorCompletionParticipantCloseTest
-#
-RULE setup counter MultiParticipantCoordinatorCompletionParticipantCloseTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiParticipantParticipantCompletionParticipantCloseAndExitTest
-METHOD run()
-AT ENTRY
-IF TRUE
-DO debug("creating counter and rendezvous"),
-   createCounter("closes", 3),
-   createRendezvous("closes-complete", 2)
-ENDRULE
-#####################################################################
-# Setup counter MultiServiceParticipantCompletionParticipantCloseTest
-#
-RULE setup counter MultiServiceParticipantCompletionParticipantCloseTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiServiceParticipantCompletionParticipantCloseTest
-METHOD run()
-AT ENTRY
-IF TRUE
-DO debug("creating counter and rendezvous"),
-   createCounter("closes", 3),
-   createRendezvous("closes-complete", 2)
-ENDRULE
-#####################################################################
-# Setup counter MultiServiceParticipantCompletionParticipantCloseAndExitTest
-#
-RULE setup counter MultiServiceParticipantCompletionParticipantCloseAndExitTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiServiceParticipantCompletionParticipantCloseAndExitTest
-METHOD run()
-AT ENTRY
-IF TRUE
+IF $0.getClass().getSimpleName().startsWith("Multi")
+   AND
+   $0.getClass().getSimpleName().contains("CompletionParticipantClose")
+   AND
+   $0.getClass().getPackage().getName().equals("org.jboss.jbossts.xts.servicetests.test.ba")
 DO debug("creating counter and rendezvous"),
    createCounter("closes", 3),
    createRendezvous("closes-complete", 2)
 ENDRULE
 
+#####################################################################
+# Wait on Rendezvous before calling uba.close() on Multi* XTSServiceTest(s)
+#
+RULE wait for closes Multi* XTSServiceTest(s)
+CLASS ^org.jboss.jbossts.xts.servicetests.test.XTSServiceTestBase
+METHOD run()
+AT CALL UserBusinessActivity.close()
+IF $0.getClass().getSimpleName().startsWith("Multi")
+   AND 
+   $0.getClass().getSimpleName().contains("CompletionParticipantClose")
+   AND
+   $0.getClass().getPackage().getName().equals("org.jboss.jbossts.xts.servicetests.test.ba")
+DO debug("waiting to call close"),
+   rendezvous("closes-complete"),
+   debug("rendezvous complete, calling close")
+ENDRULE
 
 
 #####################################################################
@@ -354,59 +336,6 @@ DO debug("closes-complete, triggering rendezvous"),
 ENDRULE
 
 
-
-#####################################################################
-# Wait on Rendezvous before calling uba.close() on MultiServiceParticipantCompletionParticipantCloseTest
-# 
-RULE wait for closes MultiParticipantParticipantCompletionParticipantCloseTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiParticipantParticipantCompletionParticipantCloseTest
-METHOD run()
-AT CALL UserBusinessActivity.close()
-IF TRUE
-DO debug("waiting to call close"),
-   rendezvous("closes-complete"),
-   debug("rendezvous complete, calling close")
-ENDRULE
-#####################################################################
-# Wait on Rendezvous before calling uba.close() on MultiParticipantParticipantCompletionParticipantCloseAndExitTest
-#
-RULE wait for closes MultiParticipantParticipantCompletionParticipantCloseAndExitTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiParticipantParticipantCompletionParticipantCloseAndExitTest
-METHOD run()
-AT CALL UserBusinessActivity.close()
-IF TRUE
-DO debug("waiting to call close"),
-   rendezvous("closes-complete"),
-   debug("rendezvous complete, calling close")
-ENDRULE
-#####################################################################
-# Wait on Rendezvous before calling uba.close() on MultiServiceParticipantCompletionParticipantCloseTest
-#
-RULE wait for closes MultiServiceParticipantCompletionParticipantCloseTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiServiceParticipantCompletionParticipantCloseTest
-METHOD run()
-AT CALL UserBusinessActivity.close()
-IF TRUE
-DO debug("waiting to call close"),
-   rendezvous("closes-complete"),
-   debug("rendezvous complete, calling close")
-ENDRULE
-#####################################################################
-# Wait on Rendezvous before calling uba.close() on MultiServiceParticipantCompletionParticipantCloseAndExitTest
-#
-RULE wait for closes MultiServiceParticipantCompletionParticipantCloseAndExitTest
-CLASS org.jboss.jbossts.xts.servicetests.test.ba.MultiServiceParticipantCompletionParticipantCloseAndExitTest
-METHOD run()
-AT CALL UserBusinessActivity.close()
-IF TRUE
-DO debug("waiting to call close"),
-   rendezvous("closes-complete"),
-   debug("rendezvous complete, calling close")
-ENDRULE
-
-
-
-
 #######################################################################
 # This rule resets the periodic recovery wait period to 10 seconds
 # in order to speed up the test. Setting this any lower may result
@@ -419,7 +348,6 @@ AT ENTRY
 IF TRUE
 DO return 10
 ENDRULE
-
 
 #######################################################################
 # This rule opens a file for the trace output during XTS startup
@@ -434,15 +362,17 @@ IF TRUE
 DO openTrace("log", "testlog")
 ENDRULE
 
+
+
 #######################################################################
 ## rules for first run of AS
-
+##
 #######################################################################
 # This rule is triggered when a non-recovered participant completion
 # participant stub (ParticipantCompletionCoordinatorEngine) is sent
 # a close message. It exits the JVM, simulating a crash.
 # The trigger location is on entry
-
+#
 RULE kill JVM at participant completion close
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD close
@@ -463,7 +393,7 @@ ENDRULE
 # participant stub (CoordinatorCompletionCoordinatorEngine) is sent
 # a close message. It exits the JVM, simulating a crash.
 # The trigger location is on entry
-
+#
 RULE kill JVM at coordinator completion close
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD close
@@ -482,7 +412,7 @@ ENDRULE
 # This rule is triggered when a non-recovered coordinator completion
 # participant stub (CoordinatorCompletionCoordinatorEngine) is requested
 # to send a complete message. It traces the call.
-
+#
 RULE trace coordinator completion complete
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD complete
@@ -499,7 +429,7 @@ ENDRULE
 # This rule is triggered when a non-recovered participant completion
 # participant stub (ParticipantCompletionCoordinatorEngine) receives a
 # completed message. It traces the call.
-
+#
 RULE trace participant completion completed
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD completed(NotificationType, MAP, ArjunaContext)
@@ -516,7 +446,7 @@ ENDRULE
 # This rule is triggered when a non-recovered coordinator completion
 # participant stub (CoordinatorCompletionCoordinatorEngine) receives a
 # completed message. It traces the call.
-
+#
 RULE trace coordinator completion completed
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD completed(NotificationType, MAP, ArjunaContext)
@@ -533,7 +463,7 @@ ENDRULE
 # This rule is triggered when a non-recovered participant completion
 # participant stub (ParticipantCompletionCoordinatorEngine) receives an
 # exit message. It traces the call.
-
+#
 RULE trace participant completion exit
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD exit(NotificationType, MAP, ArjunaContext)
@@ -550,7 +480,6 @@ ENDRULE
 # This rule is triggered when a non-recovered coordinator completion
 # participant stub (CoordinatorCompletionCoordinatorEngine) receives an
 # exit message. It traces the call.
-
 RULE trace coordinator completion exit
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD exit(NotificationType, MAP, ArjunaContext)
@@ -563,16 +492,18 @@ DO debug("received exit message for coordinator completion participant stub " + 
    traceln("log", "received exit message for coordinator completion participant stub " + identifier)
 ENDRULE
 
+
+
 #######################################################################
 ## rules for reboot run of AS
-
+##
 #######################################################################
 # This rule is triggered when a participant completion participant stub
 # (ParticipantCompletionCoordinatorEngine) is created from details
 # located in the log record. It traces the create operation
 # The trigger location is at entry but the rule should only be triggered
 # after calling the super constructor
-
+#
 RULE trace participant completion engine create
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD <init>(String, W3CEndpointReference, State, boolean)
@@ -590,7 +521,7 @@ ENDRULE
 # located in the log record. It traces the create operation
 # The trigger location is at entry but the rule should only be triggered
 # after calling the super constructor
-
+#
 RULE trace coordinator completion engine create
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD <init>(String, W3CEndpointReference, State, boolean)
@@ -607,7 +538,7 @@ ENDRULE
 # participant stub (ParticipantCompletionCoordinatorEngine) is requested
 # to send a close message. This happens during replay of a prepared TX from
 # the log. It traces the call.
-
+#
 RULE trace participant completion close
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD close
@@ -625,7 +556,7 @@ ENDRULE
 # participant stub (CoordinatorCompletionCoordinatorEngine) is requested
 # to send a close message. This happens during replay of a prepared TX from
 # the log. It traces the call.
-
+#
 RULE trace coordinator completion close
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD close
@@ -642,7 +573,7 @@ ENDRULE
 # This rule is triggered when a non-recovered participant completion
 # participant stub (ParticipantCompletionCoordinatorEngine) receives a
 # closed message. It traces the call.
-
+#
 RULE trace participant completion closed
 CLASS com.arjuna.wst11.messaging.engines.ParticipantCompletionCoordinatorEngine
 METHOD closed(NotificationType, MAP, ArjunaContext)
@@ -659,7 +590,7 @@ ENDRULE
 # This rule is triggered when a non-recovered coordinator completion
 # participant stub (CoordinatorCompletionCoordinatorEngine) receives a
 # closed message. It traces the call.
-
+#
 RULE trace coordinator completion closed
 CLASS com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine
 METHOD closed(NotificationType, MAP, ArjunaContext)
@@ -677,7 +608,7 @@ ENDRULE
 # activity in the log and reruns the phase 2 commit operation.
 # It prints a message which can be used to verify that the test has
 # progressed as expected.
-
+#
 RULE trace prepared replay
 CLASS org.jboss.jbossts.xts.recovery.coordinator.ba.RecoveryBACoordinator
 METHOD replayPhase2
@@ -697,7 +628,7 @@ ENDRULE
 # activity from the log. It prints a message which can be used to
 # verify that the test has completed. As a convenience itt also kills
 # the JVM to halt the test.
-
+#
 RULE trace remove committed state
 CLASS com.arjuna.ats.arjuna.coordinator.BasicAction
 METHOD updateState

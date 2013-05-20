@@ -281,8 +281,6 @@
 
 #####################################################################
 #JBTM-1115 Rules
-#
-
 #####################################################################
 # Setup counter MultiParticipantParticipantCompletionParticipantCloseTest
 #

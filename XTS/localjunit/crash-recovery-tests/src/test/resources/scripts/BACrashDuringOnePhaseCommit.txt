@@ -117,7 +117,7 @@
 # participants are used then the client must script the participants
 # to perform a complete.
 #
-# This script contians rules which respond to events triggered by either the
+# This script contains rules which respond to events triggered by either the
 # XTS coordinator services or the XTS participant services. It needs to be
 # passed to a Byteman agent in the JVM running these services both at first boot
 # and at reboot. Output will be written to file testlog in the working directory
@@ -209,8 +209,6 @@
 
 ######################################################################
 #JBTM-1115 Rules
-#
-
 #####################################################################
 # Setup counter SingleParticipantCompletionParticipantCloseTest
 #
