@@ -29,7 +29,7 @@ public class FailureXAResource implements XAResource {
         none, prepare, commit, rollback, end, prepare_and_rollback
     };
     public enum FailType {
-        normal, timeout, heurcom, nota, inval, proto, rmfail, rollback
+        normal, timeout, heurcom, nota, inval, proto, rmfail, rollback, XA_RBCOMMFAIL
     };
 
     public FailureXAResource() {
@@ -79,6 +79,9 @@ public class FailureXAResource implements XAResource {
 
             if (_type == FailType.timeout)
                 throw new XAException(XAException.XA_RBTIMEOUT);
+
+            if (_type == FailType.XA_RBCOMMFAIL)
+                throw new XAException(XAException.XA_RBCOMMFAIL);
         }
     }
 

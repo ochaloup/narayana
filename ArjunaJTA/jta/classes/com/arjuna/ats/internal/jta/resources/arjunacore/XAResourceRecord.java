@@ -523,6 +523,7 @@ public class XAResourceRecord extends AbstractRecord {
                     return _heuristic;
 
                 XAException endHeuristic = null;
+                XAException endRBOnly = null;
 
                 try {
                     /*
@@ -562,6 +563,7 @@ public class XAResourceRecord extends AbstractRecord {
                              * to call rollback.
                              */
 
+                            endRBOnly = e1;
                             commit = false;
                             break;
                         case XAException.XAER_RMERR :
@@ -598,8 +600,10 @@ public class XAResourceRecord extends AbstractRecord {
 
                     if (commit)
                         _theXAResource.commit(_tranID, true);
-                    else
+                    else {
                         _theXAResource.rollback(_tranID);
+                        throw endRBOnly;
+                    }
                 } catch (XAException e1) {
                     jtaLogger.i18NLogger.warn_resources_arjunacore_opcerror(XAHelper.xidToString(_tranID),
                             _theXAResource.toString(), XAHelper.printXAErrorCode(e1), e1);
