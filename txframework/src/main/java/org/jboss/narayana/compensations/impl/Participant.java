@@ -31,28 +31,40 @@ import org.jboss.narayana.compensations.api.CompensationHandler;
 import org.jboss.narayana.compensations.api.CompensationTransactionRuntimeException;
 import org.jboss.narayana.compensations.api.ConfirmationHandler;
 import org.jboss.narayana.compensations.api.TransactionLoggedHandler;
+import org.jboss.weld.bootstrap.api.SingletonProvider;
+import org.jboss.weld.bootstrap.api.helpers.TCCLSingletonProvider;
+
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.Map;
 
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
-public class CompensationParticipant
-        implements
-            BusinessAgreementWithParticipantCompletionParticipant,
-            ConfirmCompletedParticipant {
+public class Participant implements BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant {
 
-    private CompensationHandler compensationHandler;
+    private Class<? extends CompensationHandler> compensationHandler;
 
-    private ConfirmationHandler confirmationHandler;
+    private Class<? extends ConfirmationHandler> confirmationHandler;
 
-    private TransactionLoggedHandler transactionLoggedHandler;
+    private Class<? extends TransactionLoggedHandler> transactionLoggedHandler;
 
-    public CompensationParticipant(Class<? extends CompensationHandler> compensationHandlerClass,
+    private Map<String, Object> rememberedBeans;
+
+    private SingletonProvider singletonProvider;
+
+    private BeanManager beanManager;
+
+    public Participant(Class<? extends CompensationHandler> compensationHandlerClass,
             Class<? extends ConfirmationHandler> confirmationHandlerClass,
             Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) {
 
-        this.compensationHandler = instantiate(compensationHandlerClass);
-        this.confirmationHandler = instantiate(confirmationHandlerClass);
-        this.transactionLoggedHandler = instantiate(transactionLoggedHandlerClass);
+        this.compensationHandler = compensationHandlerClass;
+        this.confirmationHandler = confirmationHandlerClass;
+        this.transactionLoggedHandler = transactionLoggedHandlerClass;
+
+        rememberedBeans = CompensationContext.getBeansForThisTransaction();
+        beanManager = BeanManagerLookup.getBeanManager();
+        singletonProvider = TCCLSingletonProvider.instance();
     }
 
     private <T extends Object> T instantiate(Class<T> clazz) {
@@ -60,31 +72,27 @@ public class CompensationParticipant
         if (clazz == null) {
             return null;
         }
-        try {
-            return (T) clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new CompensationTransactionRuntimeException(
-                    "Error instantiating handler of type: " + clazz.getName());
-        } catch (IllegalAccessException e) {
-            throw new CompensationTransactionRuntimeException(
-                    "Error instantiating handler of type: " + clazz.getName());
-        }
+        return (T) ProgrammaticBeanLookup.lookup(clazz, beanManager);
     }
 
     @Override
     public void confirmCompleted(boolean confirmed) {
 
         if (transactionLoggedHandler != null) {
-            transactionLoggedHandler.transactionLogged(confirmed);
+            TransactionLoggedHandler handler = instantiate(transactionLoggedHandler);
+            handler.transactionLogged(confirmed);
         }
     }
 
     @Override
     public void close() throws WrongStateException, SystemException {
 
+        CompensationContext.rememberForAfterTransaction(rememberedBeans);
         if (confirmationHandler != null) {
-            confirmationHandler.confirm();
+            ConfirmationHandler handler = instantiate(confirmationHandler);
+            handler.confirm();
         }
+        CompensationContext.forgetAfterTransactionBeans();
     }
 
     @Override
@@ -95,8 +103,17 @@ public class CompensationParticipant
     @Override
     public void compensate() throws FaultedException, WrongStateException, SystemException {
 
-        if (compensationHandler != null) {
-            compensationHandler.compensate();
+        try {
+            CompensationContext.rememberForAfterTransaction(rememberedBeans);
+            TCCLSingletonProvider.reset();
+            TCCLSingletonProvider.initialize(singletonProvider);
+            if (compensationHandler != null) {
+                CompensationHandler handler = instantiate(compensationHandler);
+                handler.compensate();
+            }
+            CompensationContext.forgetAfterTransactionBeans();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
