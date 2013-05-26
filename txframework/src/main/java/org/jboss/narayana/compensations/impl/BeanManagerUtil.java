@@ -5,7 +5,6 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.lang.reflect.Type;
 import java.util.Iterator;
 
 public class BeanManagerUtil {
