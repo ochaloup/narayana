@@ -2,6 +2,7 @@ package org.jboss.narayana.rest.integration;
 
 import org.jboss.jbossts.star.util.TxStatus;
 import org.jboss.jbossts.star.util.TxSupport;
+import org.jboss.narayana.rest.integration.api.ParticipantDeserializer;
 import org.jboss.narayana.rest.integration.api.HeuristicType;
 import org.jboss.narayana.rest.integration.api.Participant;
 import org.jboss.narayana.rest.integration.api.ParticipantsManager;
@@ -15,7 +16,7 @@ import com.arjuna.ats.arjuna.common.Uid;
  */
 public final class ParticipantsManagerImpl implements ParticipantsManager {
 
-    public String baseUrl;
+    private String baseUrl;
 
     @Override
     public String getBaseUrl() {
@@ -28,22 +29,18 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
     }
 
     @Override
-    public Uid enlist(final TxSupport txSupport, final Participant participant) {
-        return enlist(txSupport.getDurableParticipantEnlistmentURI(), participant);
-    }
-
-    @Override
-    public Uid enlist(final String participantEnlistmentURL, final Participant participant) {
+    public String enlist(final String applicationId, final String participantEnlistmentURL,
+            final Participant participant) {
         if (baseUrl == null) {
             throw new IllegalStateException("Base URL was not defined.");
         }
 
-        final Uid participantId = new Uid();
+        final String participantId = new Uid().toString();
         final String participantUrl = getParticipantUrl(participantId, baseUrl);
 
         String participantRecoveryURL = enlistParticipant(participantUrl, participantEnlistmentURL);
 
-        ParticipantInformation participantInformation = new ParticipantInformation(participantId,
+        ParticipantInformation participantInformation = new ParticipantInformation(participantId, applicationId,
                 participantRecoveryURL, baseUrl, participant);
         participantInformation.setStatus(TxStatus.TransactionActive.name());
 
@@ -53,7 +50,12 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
     }
 
     @Override
-    public void reportHeuristic(Uid participantId, HeuristicType heuristicType) {
+    public void registerDeserializer(final String applicationId, final ParticipantDeserializer deserializer) {
+        RecoveryManager.getInstance().registerDeserializer(applicationId, deserializer);
+    }
+
+    @Override
+    public void reportHeuristic(String participantId, HeuristicType heuristicType) {
         final ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
                 .getParticipantInformation(participantId);
 
@@ -77,6 +79,8 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
             default :
                 throw new IllegalArgumentException("Unknown heuristic type");
         }
+
+        RecoveryManager.getInstance().persistParticipantInformation(participantInformation);
     }
 
     private String enlistParticipant(final String participantUrl, final String participantEnlistmentURL) {
@@ -87,7 +91,7 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
         return recoveryUrl;
     }
 
-    private String getParticipantUrl(final Uid participantId, String baseUrl) {
+    private String getParticipantUrl(final String participantId, String baseUrl) {
         if (!baseUrl.substring(baseUrl.length() - 1).equals("/")) {
             baseUrl += "/";
         }
