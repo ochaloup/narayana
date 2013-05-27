@@ -26,6 +26,8 @@ import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mw.wst11.UserBusinessActivityFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.jbossts.xts.bytemanSupport.BMScript;
+import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
 import org.jboss.narayana.compensations.api.TransactionCompensatedException;
 import org.jboss.narayana.compensations.functional.common.DummyCompensationHandler1;
 import org.jboss.narayana.compensations.functional.common.DummyCompensationHandler2;
@@ -40,8 +42,10 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
@@ -62,6 +66,7 @@ public class CompensationManagerTest {
 
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addPackages(true, "org.jboss.narayana.compensations.functional")
+                .addClass(ParticipantCompletionCoordinatorRules.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsManifestResource("META-INF/services/javax.enterprise.inject.spi.Extension",
                         "services/javax.enterprise.inject.spi.Extension");
@@ -73,6 +78,18 @@ public class CompensationManagerTest {
         archive.setManifest(new StringAsset(ManifestMF));
 
         return archive;
+    }
+
+    @BeforeClass()
+    public static void submitBytemanScript() throws Exception {
+
+        BMScript.submit(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
+    }
+
+    @AfterClass()
+    public static void removeBytemanScript() {
+
+        BMScript.remove(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
     }
 
     @After
@@ -114,6 +131,8 @@ public class CompensationManagerTest {
     @Test
     public void testNested() throws Exception {
 
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         try {
             compensationManagerService.doWorkRecursively();
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
@@ -148,6 +167,8 @@ public class CompensationManagerTest {
     @Test
     public void testNestedCancelOnFailureWithFailure() throws Exception {
 
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         try {
             compensationManagerService.doWorkRecursivelyCompensateIfFail(true);
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
@@ -166,6 +187,8 @@ public class CompensationManagerTest {
 
     @Test
     public void testNestedCancelOnFailureWithNoFailure() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
 
         compensationManagerService.doWorkRecursivelyCompensateIfFail(false);
 
