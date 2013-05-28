@@ -117,6 +117,8 @@ public class XAOnePhaseResource implements OnePhaseResource {
             if (jtaLogger.logger.isTraceEnabled()) {
                 jtaLogger.logger.trace("XAOnePhaseResource.commit(" + xid + ") " + xae.getMessage());
             }
+            jtaLogger.i18NLogger.warn_resources_arjunacore_opcerror(XAHelper.xidToString(xid), xaResource.toString(),
+                    XAHelper.printXAErrorCode(xae), xae);
 
             switch (xae.errorCode) {
                 case XAException.XA_HEURHAZ :
@@ -157,9 +159,15 @@ public class XAOnePhaseResource implements OnePhaseResource {
                                                             // retry
             }
         } catch (final Throwable ex) {
+            String xidString = xid == null ? "<  >" : XAHelper.xidToString(xid);
+            String resourceString = xaResource == null ? "null XA resource" : xaResource.toString();
+
             if (jtaLogger.logger.isTraceEnabled()) {
                 jtaLogger.logger.trace("XAOnePhaseResource.commit(" + xid + ") " + ex.getMessage());
             }
+
+            jtaLogger.i18NLogger.warn_resources_arjunacore_commitxaerror(xidString, resourceString, "-", ex);
+
         } finally {
             try {
                 if (doForget)
