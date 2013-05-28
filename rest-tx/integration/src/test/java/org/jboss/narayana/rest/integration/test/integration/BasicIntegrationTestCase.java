@@ -28,8 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.arjuna.ats.arjuna.common.Uid;
-
 /**
  *
  * TODO implement test for heuristics after prepare.
@@ -39,6 +37,8 @@ import com.arjuna.ats.arjuna.common.Uid;
  */
 @RunWith(Arquillian.class)
 public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase {
+
+    private static final String APPLICATION_ID = "org.jboss.narayana.rest.integration.test.integration.BasicIntegrationTestCase";
 
     private static final String DEPENDENCIES = "Dependencies: org.jboss.narayana.rts\n";
 
@@ -64,8 +64,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         LoggingParticipant participant1 = new LoggingParticipant(new Prepared());
         LoggingParticipant participant2 = new LoggingParticipant(new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, participant1);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, participant2);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                participant1);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                participant2);
 
         txSupport.commitTx();
 
@@ -79,7 +81,8 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
 
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, participant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                participant);
 
         txSupport.commitTx();
 
@@ -95,7 +98,8 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
                         new LoggingParticipant(new Prepared()), new LoggingParticipant(new Prepared())});
 
         for (LoggingParticipant p : participants) {
-            ParticipantsManagerFactory.getInstance().enlist(txSupport, p);
+            ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID,
+                    txSupport.getDurableParticipantEnlistmentURI(), p);
         }
 
         txSupport.commitTx();
@@ -121,8 +125,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         LoggingParticipant participant1 = new LoggingParticipant(new Prepared());
         LoggingParticipant participant2 = new LoggingParticipant(new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, participant1);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, participant2);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                participant1);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                participant2);
 
         txSupport.rollbackTx();
 
@@ -138,7 +144,8 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
                 new LoggingParticipant(new Aborted()), new LoggingParticipant(new Aborted()),});
 
         for (LoggingParticipant p : participants) {
-            ParticipantsManagerFactory.getInstance().enlist(txSupport, p);
+            ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID,
+                    txSupport.getDurableParticipantEnlistmentURI(), p);
         }
 
         txSupport.commitTx();
@@ -164,10 +171,11 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         final List<LoggingParticipant> participants = Arrays.asList(new LoggingParticipant[]{
                 new LoggingParticipant(new Prepared()), new LoggingParticipant(new Prepared())});
 
-        Uid lastParticipantid = null;
+        String lastParticipantid = null;
 
         for (LoggingParticipant p : participants) {
-            lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(txSupport, p);
+            lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID,
+                    txSupport.getDurableParticipantEnlistmentURI(), p);
         }
 
         ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_ROLLBACK);
@@ -191,10 +199,11 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         final List<LoggingParticipant> participants = Arrays.asList(new LoggingParticipant[]{
                 new LoggingParticipant(new Prepared()), new LoggingParticipant(new Prepared())});
 
-        Uid lastParticipantid = null;
+        String lastParticipantid = null;
 
         for (LoggingParticipant p : participants) {
-            lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(txSupport, p);
+            lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID,
+                    txSupport.getDurableParticipantEnlistmentURI(), p);
         }
 
         ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_COMMIT);
@@ -213,8 +222,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         LoggingParticipant loggingParticipant1 = new LoggingParticipant(new Aborted());
         LoggingParticipant loggingParticipant2 = new LoggingParticipant(new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant1);
-        Uid lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant2);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant1);
+        String lastParticipantid = ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID,
+                txSupport.getDurableParticipantEnlistmentURI(), loggingParticipant2);
 
         ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_COMMIT);
 
@@ -236,8 +247,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         HeuristicParticipant heuristicParticipant = new HeuristicParticipant(HeuristicType.HEURISTIC_COMMIT,
                 new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, heuristicParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                heuristicParticipant);
 
         final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
 
@@ -254,8 +267,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         HeuristicParticipant heuristicParticipant = new HeuristicParticipant(HeuristicType.HEURISTIC_COMMIT,
                 new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, heuristicParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                heuristicParticipant);
 
         final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
 
@@ -272,8 +287,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         HeuristicParticipant heuristicParticipant = new HeuristicParticipant(HeuristicType.HEURISTIC_ROLLBACK,
                 new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, heuristicParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                heuristicParticipant);
 
         final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
 
@@ -290,8 +307,10 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         HeuristicParticipant heuristicParticipant = new HeuristicParticipant(HeuristicType.HEURISTIC_ROLLBACK,
                 new Prepared());
 
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, loggingParticipant);
-        ParticipantsManagerFactory.getInstance().enlist(txSupport, heuristicParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                heuristicParticipant);
 
         final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
 
