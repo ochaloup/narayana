@@ -101,10 +101,10 @@ class JaxBaseHeaderContextProcessor {
             }
 
             final CoordinationContextType coordinationContext;
-            if (atContext != null) {
-                coordinationContext = atContext.getCoordinationContext();
-            } else if (baContext != null) {
+            if (baContext != null) {
                 coordinationContext = baContext.getCoordinationContext();
+            } else if (atContext != null) {
+                coordinationContext = atContext.getCoordinationContext();
             } else {
                 coordinationContext = null;
             }
