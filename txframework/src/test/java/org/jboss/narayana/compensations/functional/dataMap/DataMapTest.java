@@ -102,6 +102,8 @@ public class DataMapTest {
     public void resetParticipants() {
 
         DataConfirmationHandler.reset();
+        DataCompensationHandler.reset();
+        DataTxLoggedHandler.reset();
     }
 
     @Test
