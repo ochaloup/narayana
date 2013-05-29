@@ -122,6 +122,9 @@ public abstract class AbstractIntegrationTestCase {
 
         if (baseAddress == null) {
             baseAddress = "http://localhost";
+        } else if (!baseAddress.toLowerCase().startsWith("http://")
+                && !baseAddress.toLowerCase().startsWith("https://")) {
+            baseAddress = "http://" + baseAddress;
         }
 
         if (basePort == null) {
