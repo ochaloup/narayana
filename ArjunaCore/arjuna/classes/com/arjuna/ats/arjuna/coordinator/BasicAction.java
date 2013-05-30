@@ -218,7 +218,7 @@ public class BasicAction extends StateManager {
      * Return the action hierarchy for this transaction.
      */
 
-    public final synchronized ActionHierarchy getHierarchy() {
+    public final ActionHierarchy getHierarchy() {
         return currentHierarchy;
     }
 
@@ -302,7 +302,7 @@ public class BasicAction extends StateManager {
      * @return the depth of the current transaction hierarchy.
      */
 
-    public final synchronized int hierarchyDepth() {
+    public final int hierarchyDepth() {
         if (currentHierarchy != null)
             return currentHierarchy.depth();
         else
