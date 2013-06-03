@@ -74,6 +74,7 @@ import com.arjuna.ats.jta.exceptions.InactiveTransactionException;
 import com.arjuna.ats.jta.exceptions.InvalidTerminationStateException;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.resources.LastResourceCommitOptimisation;
+import com.arjuna.ats.jta.utils.JTAHelper;
 import com.arjuna.ats.jta.utils.XAHelper;
 import com.arjuna.ats.jta.xa.XAModifier;
 
@@ -348,13 +349,17 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
 
         if (_theTransaction != null) {
             try {
-                return StatusConverter.convert(_theTransaction.get_status());
+                status = StatusConverter.convert(_theTransaction.get_status());
             } catch (org.omg.CORBA.SystemException e2) {
                 javax.transaction.SystemException systemException = new javax.transaction.SystemException(
                         e2.toString());
                 systemException.initCause(e2);
                 throw systemException;
             }
+        }
+
+        if (jtaLogger.logger.isTraceEnabled()) {
+            jtaLogger.logger.trace("TransactionImple.getStatus: " + JTAHelper.stringForm(status));
         }
 
         return status;
