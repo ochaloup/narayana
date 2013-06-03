@@ -144,8 +144,13 @@ public class LockManager extends StateManager {
         lockStore = null;
         conflictManager = null;
 
-        if (doSignal) // mutex must be set
-            mutex.unlock();
+        try {
+            if (doSignal) // mutex must be set
+            {
+                mutex.unlock();
+            }
+        } catch (final Throwable ex) {
+        }
 
         mutex = null;
 
@@ -541,7 +546,6 @@ public class LockManager extends StateManager {
         systemKey = null;
         locksHeld = new LockList();
         lockStore = null;
-        mutex = null;
         stateLoaded = false;
         hasBeenLocked = false;
         objectLocked = false;
@@ -573,7 +577,6 @@ public class LockManager extends StateManager {
         systemKey = null;
         locksHeld = new LockList();
         lockStore = null;
-        mutex = null;
         stateLoaded = false;
         hasBeenLocked = false;
         objectLocked = false;
@@ -837,10 +840,6 @@ public class LockManager extends StateManager {
         if (systemKey == null) {
             systemKey = type();
 
-            if (mutex == null) {
-                mutex = new ReentrantLock();
-            }
-
             if (mutex != null) {
                 mutex.lock();
 
@@ -964,8 +963,9 @@ public class LockManager extends StateManager {
                                         current = null;
                                         cleanLoad = false;
                                     }
-                                } else
+                                } else {
                                     cleanLoad = false;
+                                }
                             } catch (IOException e) {
                                 cleanLoad = false;
                             }
@@ -986,6 +986,15 @@ public class LockManager extends StateManager {
             } catch (LockStoreException e) {
                 txojLogger.logger.warn(e);
             }
+        }
+
+        if (!stateLoaded) {
+            if (mutex != null) // means object model != SINGLE
+            {
+                mutex.unlock(); // and exit mutual exclusion
+            }
+
+            objectLocked = false;
         }
 
         return stateLoaded;
@@ -1104,7 +1113,9 @@ public class LockManager extends StateManager {
                 objectLocked = false;
 
                 if (mutex != null) // means object model != SINGLE
+                {
                     mutex.unlock(); // and exit mutual exclusion
+                }
             }
 
             return unloadOk;
@@ -1132,7 +1143,10 @@ public class LockManager extends StateManager {
 
     protected boolean objectLocked;/* Semaphore grabbed */
 
-    protected ReentrantLock mutex; /* Controls access to the lock store */
+    protected ReentrantLock mutex = new ReentrantLock(); /*
+                                                             * Controls access to
+                                                             * the lock store
+                                                             */
 
     protected LockConflictManager conflictManager;
 

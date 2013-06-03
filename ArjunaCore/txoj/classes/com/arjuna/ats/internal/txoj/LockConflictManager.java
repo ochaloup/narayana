@@ -70,7 +70,12 @@ public class LockConflictManager {
          * Release the mutex on the LockManager instance.
          */
 
-        _instance.unlock();
+        boolean lock = false;
+
+        if (_instance.isHeldByCurrentThread()) {
+            _instance.unlock();
+            lock = true;
+        }
 
         Date d1 = Calendar.getInstance().getTime();
 
@@ -90,7 +95,8 @@ public class LockConflictManager {
 
         Date d2 = Calendar.getInstance().getTime();
 
-        _instance.lock();
+        if (lock)
+            _instance.lock();
 
         return (int) (d2.getTime() - d1.getTime());
     }
