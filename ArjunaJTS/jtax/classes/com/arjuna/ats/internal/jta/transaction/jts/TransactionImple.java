@@ -754,7 +754,7 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
     public boolean delistResource(XAResource xaRes, int flags)
             throws IllegalStateException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("TransactionImple.delistResource ( " + xaRes + " )");
+            jtaxLogger.logger.trace("TransactionImple.delistResource ( " + xaRes + ", " + flags + " )");
         }
 
         if (xaRes == null)
