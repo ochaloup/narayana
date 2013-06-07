@@ -433,6 +433,7 @@ public class Coordinator {
 
         Transaction tx = getTransaction(txId);
         String how = TxSupport.getStringValue(content, TxStatusMediaType.STATUS_PROPERTY);
+        TxStatus currentStatus = tx.getTxStatus();
         String status;
         int scRes;
 
@@ -442,7 +443,7 @@ public class Coordinator {
          * transactions that have rolled back, (not necessary for presumed
          * 277rollback semantics) but at a minimum MUST return 404.
          */
-        if (!tx.isRunning())
+        if (!currentStatus.isRunning() && !currentStatus.isRollbackOnly())
             return Response.status(HttpURLConnection.HTTP_PRECON_FAILED).build();
 
         /*
