@@ -734,7 +734,7 @@ public class IDLCompiler extends Task {
                         if (variableElement.equalsIgnoreCase(VALUE_ELEMENT)) {
                             value = value.substring(value.indexOf('=') + 1);
                         } else {
-                            throw new BuildException("Unknow variable element '" + variableElement + "'");
+                            throw new BuildException("Unknown variable element '" + variableElement + "'");
                         }
                     }
                 }
