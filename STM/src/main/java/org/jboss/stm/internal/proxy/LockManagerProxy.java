@@ -118,8 +118,6 @@ public class LockManagerProxy<T> extends LockManager {
                                  */
 
                                 if (!((afield.getModifiers() & Modifier.FINAL) == Modifier.FINAL)) {
-                                    System.err.println("**NOT final");
-
                                     _fields.add(afield);
                                 }
                             }
