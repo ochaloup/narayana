@@ -370,8 +370,8 @@ public class BaseTest {
             if (name.length() != 0) {
                 if (value.length() != 0) {
                     if (work == null) {
-                        work = makeWork(new TxSupport(), info.getAbsolutePath().toString(), String.valueOf(++pid), null,
-                                null, isTwoPhaseAware, isVolatile, null, null);
+                        work = makeWork(new TxSupport(), TxSupport.extractUri(info), String.valueOf(++pid), null, null,
+                                isTwoPhaseAware, isVolatile, null, null);
                         work.oldState.put(name, value);
                         faults.put(work.id, work);
                         return work.id;
@@ -429,15 +429,16 @@ public class BaseTest {
                                             // volatile phase
             String vParticipantLink = null; // URI for handling pre and post 2PC
                                             // phases
+            String path = TxSupport.extractUri(info);
 
             if (work == null) {
                 int id = ++pid;
 
-                work = makeWork(txn, info.getAbsolutePath().toString(), String.valueOf(id), txId, enlistUrl,
-                        isTwoPhaseAware, isVolatileParticipant, null, fault);
+                work = makeWork(txn, path, String.valueOf(id), txId, enlistUrl, isTwoPhaseAware, isVolatileParticipant,
+                        null, fault);
             } else {
-                Work newWork = makeWork(txn, info.getAbsolutePath().toString(), work.id, txId, enlistUrl,
-                        isTwoPhaseAware, isVolatileParticipant, null, fault);
+                Work newWork = makeWork(txn, path, work.id, txId, enlistUrl, isTwoPhaseAware, isVolatileParticipant,
+                        null, fault);
                 newWork.oldState = work.oldState;
                 newWork.newState = work.newState;
                 work = newWork;
@@ -452,8 +453,8 @@ public class BaseTest {
                 enlistUrl = urls[0];
                 vRegistration = urls[1];
 
-                String vParticipant = new StringBuilder(info.getAbsolutePath().toString()).append('/').append(work.id)
-                        .append('/').append(txId).append('/').append("vp").toString();
+                String vParticipant = new StringBuilder(path).append('/').append(work.id).append('/').append(txId)
+                        .append('/').append("vp").toString();
                 vParticipantLink = txn
                         .addLink2(new StringBuilder(), TxLinkNames.VOLATILE_PARTICIPANT, vParticipant, true).toString();
             }
