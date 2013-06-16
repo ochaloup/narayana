@@ -32,7 +32,11 @@
 package com.hp.mwtests.ts.jts.orbspecific.local.timeout;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Hashtable;
 
 import org.junit.Test;
 import org.omg.CORBA.SystemException;
@@ -42,6 +46,9 @@ import org.omg.CosTransactions.Coordinator;
 import org.omg.CosTransactions.Status;
 import org.omg.CosTransactions.Terminator;
 
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.coordinator.CheckedAction;
+import com.arjuna.ats.arjuna.coordinator.CheckedActionFactory;
 import com.arjuna.ats.internal.jts.ORBManager;
 import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.internal.jts.orbspecific.CurrentImple;
@@ -50,6 +57,14 @@ import com.arjuna.ats.jts.OTSManager;
 import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
+
+class FakeCheckedAction extends CheckedAction {
+    public void check(boolean isCommit, Uid actUid, Hashtable list) {
+        called = true;
+    }
+
+    public boolean called = false;
+}
 
 public class TerminationTest {
     @Test
@@ -125,8 +140,12 @@ public class TerminationTest {
 
         try {
             CurrentImple current = OTSImpleManager.current();
+            FakeCheckedAction act = new FakeCheckedAction();
 
             current.set_timeout(2);
+            current.setCheckedAction(act);
+
+            assertEquals(act, current.getCheckedAction());
 
             System.out.println("\nNow creating current transaction with 2 second timeout.");
 
@@ -154,6 +173,8 @@ public class TerminationTest {
                 current.rollback();
 
             assertFalse(commit);
+
+            assertTrue(act.called);
         } catch (UserException e) {
             System.err.println("Caught UserException: " + e);
             System.out.println("Test did not completed successfully.");
