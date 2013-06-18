@@ -34,6 +34,7 @@ package com.arjuna.ats.internal.jts.interposition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.omg.CORBA.SystemException;
+import org.omg.CORBA.INVALID_TRANSACTION;
 import org.omg.CosTransactions.Control;
 import org.omg.CosTransactions.PropagationContext;
 
@@ -50,7 +51,6 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  */
 
 class FactoryElement {
-
     public FactoryElement(FactoryCreator create, int formatID) {
         _create = create;
         _formatID = formatID;
@@ -70,7 +70,6 @@ class FactoryElement {
     public FactoryElement _next;
 
     private FactoryCreator _create;
-
 }
 
 /*
@@ -83,18 +82,24 @@ class FactoryElement {
  */
 
 public class FactoryList {
+    public static final int DEFAULT_ID = 0;
 
     public FactoryList() {
         FactoryList.add(new InterpositionCreator(), Arjuna.XID());
         FactoryList.add(new StrictInterpositionCreator(), Arjuna.strictXID());
         FactoryList.add(new RestrictedInterpositionCreator(), Arjuna.restrictedXID());
         FactoryList.add(new OSIInterpositionCreator(), 0); // 0 is OSI TP!
-        FactoryList.addDefault(new OSIInterpositionCreator(), 0); // 0 is OSI
-                                                                    // TP!
+        FactoryList.addDefault(new OSIInterpositionCreator(), DEFAULT_ID); // 0
+                                                                            // is
+                                                                            // OSI
+                                                                            // TP!
     }
 
     public static ControlImple recreateLocal(PropagationContext ctx, int formatID) throws SystemException {
         ControlImple toReturn = null;
+
+        if (ctx == null)
+            throw new INVALID_TRANSACTION();
 
         FactoryElement ptr = find(formatID);
 
@@ -107,6 +112,9 @@ public class FactoryList {
 
     public static Control recreate(PropagationContext ctx, int formatID) throws SystemException {
         Control toReturn = null;
+
+        if (ctx == null)
+            throw new INVALID_TRANSACTION();
 
         FactoryElement ptr = find(formatID);
 
@@ -227,8 +235,7 @@ public class FactoryList {
     }
 
     private static FactoryElement _list = null;
-    private static FactoryElement _default = null; // used if no formatID
-                                                    // values match.
+    private static FactoryElement _default = null; // used if no formatID values
+                                                    // match.
     private static ReentrantLock _lock = new ReentrantLock();
-
 }
