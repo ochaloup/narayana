@@ -134,5 +134,4 @@ public class TransactionServer {
         if (myORB != null)
             myORB.shutdown();
     }
-
 }

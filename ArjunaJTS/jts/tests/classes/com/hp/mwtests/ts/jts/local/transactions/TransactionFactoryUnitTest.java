@@ -138,8 +138,13 @@ public class TransactionFactoryUnitTest extends TestBase {
                                                                                                                 // yet!
 
         PropagationContext ctx = tx.get_coordinator().get_txcontext();
-
         Control cont = factory.recreate(ctx);
+        String toString = Utility.getHierarchy(ctx);
+
+        System.out.println(toString);
+
+        assertTrue(toString != null);
+        assertTrue(toString.length() > 1);
 
         assertTrue(Utility.getUid(cont).equals(tx.get_uid()));
 
