@@ -25,6 +25,7 @@ package org.jboss.narayana.txframework.functional.rest.at.simpleEJB;
 import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.narayana.common.URLUtils;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Commit;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Prepare;
 import org.jboss.narayana.txframework.functional.common.EventLog;
@@ -57,6 +58,7 @@ public class ClientTXInterceptorTest {
 
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackage(ClientTXInterceptorTest.class.getPackage()).addPackage(EventLog.class.getPackage())
+                .addClass(URLUtils.class)
                 .addAsWebInfResource(new ByteArrayAsset(
                         "<interceptors><class>org.jboss.narayana.txframework.impl.handlers.restat.client.RestTXRequiredInterceptor</class></interceptors>"
                                 .getBytes()),

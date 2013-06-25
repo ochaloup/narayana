@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.narayana.common.URLUtils;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Commit;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Prepare;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.at.Rollback;
@@ -60,15 +61,16 @@ public class IndirectTXManagementTest {
 
     // construct the endpoint for the example web service that will take part in
     // a transaction
+    private static final URLUtils URL_UTILS = new URLUtils();
     private static final int SERVICE_PORT = 8080;
-    private static final String SERVICE_URL = "http://localhost:" + SERVICE_PORT + "/test";
+    private static final String SERVICE_URL = URL_UTILS.getBaseUrl() + ":" + SERVICE_PORT + "/test";
 
     @Deployment
     public static WebArchive createTestArchive() {
 
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackage(ClientTXInterceptorTest.class.getPackage()).addPackage(EventLog.class.getPackage())
-                .addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
+                .addClass(URLUtils.class).addAsWebInfResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
                 .addAsWebInfResource("resttx.ejb.web.xml", "web.xml");
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 
