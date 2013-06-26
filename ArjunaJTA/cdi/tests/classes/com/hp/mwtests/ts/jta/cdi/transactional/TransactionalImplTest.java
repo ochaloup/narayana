@@ -72,6 +72,7 @@ public class TransactionalImplTest {
     @After
     public void tearDown() {
 
+        AssertionParticipant.reset();
         try {
             userTransaction.rollback();
         } catch (Exception e) {
@@ -296,8 +297,6 @@ public class TransactionalImplTest {
         Utills.assertTransactionActive(true);
         tm.commit();
         Utills.assertTransactionActive(false);
-
-        AssertionParticipant.assertCommitted();
     }
 
     @Test
@@ -315,7 +314,6 @@ public class TransactionalImplTest {
 
         Utills.assertTransactionActive(false);
         tm.begin();
-        Transaction tx = Utills.getCurrentTransaction();
         Utills.assertTransactionActive(true);
 
         try {
@@ -328,8 +326,6 @@ public class TransactionalImplTest {
         Utills.assertTransactionActive(true);
         tm.commit();
         Utills.assertTransactionActive(false);
-
-        AssertionParticipant.assertCommitted();
     }
 
     @Test
@@ -359,8 +355,6 @@ public class TransactionalImplTest {
         Utills.assertTransactionActive(true);
         tm.commit();
         Utills.assertTransactionActive(false);
-
-        AssertionParticipant.assertCommitted();
     }
 
     @Test
