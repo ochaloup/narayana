@@ -33,7 +33,6 @@ package com.arjuna.ats.internal.jta.recovery.arjunacore;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -147,11 +146,11 @@ public class XARecoveryModule implements RecoveryModule {
         // we possibly can to assist subordinate transactions recovering
 
         // scan using statically configured plugins;
-        List<XAResource> resources = resourceInitiatedRecovery();
+        _resources = resourceInitiatedRecovery();
         // scan using dynamically configured plugins:
-        resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
+        _resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
 
-        for (XAResource xaResource : resources) {
+        for (XAResource xaResource : _resources) {
             try {
                 // This calls out to remote systems and may block. Consider
                 // using alternate concurrency
@@ -368,19 +367,16 @@ public class XARecoveryModule implements RecoveryModule {
      * @see XARecoveryModule#getNewXAResource(XAResourceRecord)
      */
     private void bottomUpRecovery() {
-        if (_xidScans != null) {
-            List<XAResource> resources = Collections.list(_xidScans.keys());
-            for (XAResource xaResource : resources) {
-                try {
-                    // This calls out to remote systems and may block. Consider
-                    // using alternate concurrency
-                    // control rather than sync on __xaResourceRecoveryHelpers
-                    // to
-                    // avoid blocking problems?
-                    xaRecoverySecondPass(xaResource);
-                } catch (Exception ex) {
-                    jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
-                }
+        for (XAResource xaResource : _resources) {
+            try {
+                // This calls out to remote systems and may block. Consider
+                // using alternate concurrency
+                // control rather than sync on __xaResourceRecoveryHelpers
+                // to
+                // avoid blocking problems?
+                xaRecoverySecondPass(xaResource);
+            } catch (Exception ex) {
+                jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
             }
         }
 
@@ -813,7 +809,7 @@ public class XARecoveryModule implements RecoveryModule {
 
     private InputObjectState _uids = new InputObjectState();
 
-    // private List<XAResource> _resources;
+    private List<XAResource> _resources;
 
     private boolean requireFirstPass = true;
 
