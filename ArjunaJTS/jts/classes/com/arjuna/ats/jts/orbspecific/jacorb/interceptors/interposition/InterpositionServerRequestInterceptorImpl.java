@@ -51,6 +51,7 @@ import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.jts.OTSManager;
 import com.arjuna.ats.jts.common.InterceptorInfo;
 import com.arjuna.ats.jts.logging.jtsLogger;
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
 /**
  * PortableInterceptor::ServerRequestInterceptor implementation which checks
@@ -104,10 +105,15 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
         return "OTS_Interposition";
     }
 
+    private void trace_request(String method, ServerRequestInfo request_info) {
+        jtsLogger.logger.tracef("InterpositionServerRequestInterceptorImpl::%s ( %s ) nodeId=%s requestId=%d", method,
+                request_info.operation(), arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier(),
+                request_info.request_id());
+    }
+
     public void receive_request_service_contexts(ServerRequestInfo request_info) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("InterpositionServerRequestInterceptorImpl::receive_request_service_contexts ( "
-                    + request_info.operation() + " )");
+            trace_request("receive_request_service_contexts", request_info);
         }
 
         try {
@@ -168,8 +174,7 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
 
     public void receive_request(ServerRequestInfo request_info) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "InterpositionServerRequestInterceptorImpl.receive_request ( " + request_info.operation() + " )");
+            trace_request("receive_request", request_info);
         }
     }
 
@@ -182,8 +187,7 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
          */
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "InterpositionServerRequestInterceptorImpl::send_reply ( " + request_info.operation() + " )");
+            trace_request("send_reply", request_info);
         }
 
         try {
@@ -203,8 +207,7 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
 
     public void send_exception(ServerRequestInfo request_info) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "InterpositionServerRequestInterceptorImpl::send_exception ( " + request_info.operation() + " )");
+            trace_request("send_exception", request_info);
         }
 
         try {
@@ -224,8 +227,7 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
 
     public void send_other(ServerRequestInfo request_info) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "InterpositionServerRequestInterceptorImpl::send_other ( " + request_info.operation() + " )");
+            trace_request("send_other", request_info);
         }
 
         try {
@@ -253,8 +255,7 @@ class InterpositionServerRequestInterceptorImpl extends LocalObject implements S
 
     private void suspendContext(ServerRequestInfo request_info) throws SystemException, InvalidSlot {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "InterpositionServerRequestInterceptorImpl.suspendContext ( " + request_info.operation() + " )");
+            trace_request("suspendContext", request_info);
         }
 
         Any data = request_info.get_slot(_dataSlot);
