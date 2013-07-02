@@ -40,8 +40,13 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
 public class TestBase {
+    public void beforeSetupClass() {
+    }
+
     @Before
     public void setUp() throws Exception {
+        beforeSetupClass();
+
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
