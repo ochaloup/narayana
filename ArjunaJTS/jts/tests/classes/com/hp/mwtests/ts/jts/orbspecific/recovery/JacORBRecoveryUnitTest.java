@@ -100,9 +100,9 @@ public class JacORBRecoveryUnitTest extends TestBase {
         try {
             String iorString = RecoverIOR.newObjectKey("foo", "bar");
 
-            assertTrue(iorString != null);
-
             RecoverIOR.printIORinfo(iorString);
+
+            assertTrue(iorString != null);
         } catch (final Exception ex) {
         }
     }
