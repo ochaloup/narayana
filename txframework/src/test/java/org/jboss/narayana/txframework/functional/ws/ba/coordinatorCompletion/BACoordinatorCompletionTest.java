@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
+import org.jboss.narayana.common.URLUtils;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Cancel;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Close;
 import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Complete;
@@ -61,7 +62,7 @@ public class BACoordinatorCompletionTest {
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addPackages(false, BACoordinatorCompletionTest.class.getPackage())
                 .addPackage(EventLog.class.getPackage()).addAsManifestResource("persistence.xml")
-                .addClass(ParticipantCompletionCoordinatorRules.class)
+                .addClass(ParticipantCompletionCoordinatorRules.class).addClass(URLUtils.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
