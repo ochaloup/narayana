@@ -55,7 +55,6 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  */
 
 public class FactoryContactItem {
-
     private static final String _pseudoTypeName = "/Recovery/FactoryContact";
     private static final int version = 1;
 
@@ -86,7 +85,7 @@ public class FactoryContactItem {
 
     /**
      * construct the item known by this uid from the ObjectStore (assuming it is
-     * there - otherwise return null
+     * there - otherwise return null)
      *
      * Used in the RecoveryManager
      */
@@ -305,6 +304,10 @@ public class FactoryContactItem {
         return false;
     }
 
+    /*
+     * Not used by recovery currently.
+     */
+
     private static boolean removeMe(Uid uid) {
         try {
             return getStore().remove_committed(uid, _pseudoTypeName);
@@ -316,5 +319,4 @@ public class FactoryContactItem {
         }
         return false;
     }
-
 }
