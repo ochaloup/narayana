@@ -50,11 +50,10 @@ import com.arjuna.orbportability.orb.PostShutdown;
 import com.arjuna.orbportability.orb.PreShutdown;
 
 /**
- * An attempt at some ORB portable ways of interacting with the ORB.
- *
- * NOTE: initORB *must* be called if you want to use the pre- and post-
- * initialisation mechanisms.
- *
+ * An attempt at some ORB portable ways of interacting with the ORB. NOTE:
+ * initORB *must* be called if you want to use the pre- and post- initialisation
+ * mechanisms.
+ * 
  * @author Mark Little (mark@arjuna.com), Richard Begg (richard.begg@arjuna.com)
  * @version $Id: ORB.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
@@ -213,10 +212,18 @@ public class ORB {
     }
 
     /**
-     * Shutdown the ORB.
+     * Shutdown the ORB asynchronously.
      */
 
     public synchronized void shutdown() {
+        shutdown(false);
+    }
+
+    /**
+     * Shutdown the ORB. Define whether this should be sync or async.
+     */
+
+    public synchronized void shutdown(boolean waitForCompletion) {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("ORB::shutdown ()");
         }
@@ -245,7 +252,7 @@ public class ORB {
         }
 
         if (_orb.initialised())
-            _orb.shutdown();
+            _orb.shutdown(waitForCompletion);
 
         if (!_postORBShutdown.isEmpty()) {
             Enumeration elements = _postORBShutdown.elements();
@@ -380,7 +387,7 @@ public class ORB {
     /**
      * Retrieve an ORB instance given a unique name, if an ORB instance with
      * this name doesn't exist then create it.
-     *
+     * 
      * @param uniqueId
      *            The name of the ORB instance to retrieve.
      * @return The ORB instance refered to by the name given.
@@ -408,8 +415,11 @@ public class ORB {
     com.arjuna.orbportability.orb.core.ORB _orb = new com.arjuna.orbportability.orb.core.ORB();
 
     private Hashtable _preORBShutdown = new Hashtable();
+
     private Hashtable _postORBShutdown = new Hashtable();
+
     private Hashtable _preORBInitProperty = new Hashtable();
+
     private Hashtable _postORBInitProperty = new Hashtable();
 
     private String _orbName = null;
