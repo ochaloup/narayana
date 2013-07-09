@@ -71,7 +71,7 @@ public class TransactionServer {
             if (args[i].compareTo("-test") == 0)
                 printReady = true;
             if (args[i].compareTo("-help") == 0) {
-                System.out.println("foo Usage: [-otsname <name>] [-help] [-version]");
+                System.out.println("Usage: [-otsname <name>] [-help] [-version]");
                 System.exit(0);
             }
             if (args[i].compareTo("-version") == 0) {
