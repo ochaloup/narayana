@@ -50,14 +50,13 @@ import org.omg.CORBA.SystemException;
 
 /**
  * The Object Request Broker interface.
- *
+ * 
  * @author Mark Little (mark@arjuna.com)
  * @version $Id: ORBImple.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 2.1.
  */
 
 public interface ORBImple {
-
     /**
      * Is the ORB initialised?
      */
@@ -69,14 +68,22 @@ public interface ORBImple {
      */
 
     public void init() throws SystemException;
+
     public void init(Applet a, Properties p) throws SystemException;
+
     public void init(String[] s, Properties p) throws SystemException;
 
     /**
-     * Shutdown the ORB.
+     * Shutdown the ORB. Do not wait for explicit completion ack from the ORB.
      */
 
     public void shutdown() throws SystemException;
+
+    /**
+     * Shutdown the ORB and signal whether to do this synchronously.
+     */
+
+    public void shutdown(boolean waitForCompletion) throws SystemException;
 
     /**
      * Destroy the ORB.
@@ -96,5 +103,4 @@ public interface ORBImple {
      */
 
     public void orb(org.omg.CORBA.ORB o) throws SystemException;
-
 }

@@ -72,8 +72,12 @@ public class ORBBase implements ORBImple {
     }
 
     public synchronized void shutdown() throws SystemException {
+        shutdown(false);
+    }
+
+    public synchronized void shutdown(boolean waitForCompletion) throws SystemException {
         if (_init) {
-            _orb.shutdown(false);
+            _orb.shutdown(waitForCompletion);
             _init = false;
         }
     }
@@ -95,6 +99,7 @@ public class ORBBase implements ORBImple {
     }
 
     protected org.omg.CORBA.ORB _orb = null;
+
     protected boolean _init = false;
 
 }
