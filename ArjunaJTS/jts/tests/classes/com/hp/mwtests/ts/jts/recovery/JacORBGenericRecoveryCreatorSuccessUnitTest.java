@@ -47,7 +47,7 @@ import com.arjuna.ats.internal.jts.recovery.recoverycoordinators.GenericRecovery
 import com.hp.mwtests.ts.jts.orbspecific.resources.DemoResource;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class JacORBGenericRecoveryCreatorUnitTest extends TestBase {
+public class JacORBGenericRecoveryCreatorSuccessUnitTest extends TestBase {
     public void beforeSetupClass() {
         // persistent POAs can't be anonymous, need a name:
         System.setProperty("jacorb.implname", "arjuna");
@@ -58,28 +58,6 @@ public class JacORBGenericRecoveryCreatorUnitTest extends TestBase {
         System.clearProperty("jacorb.implname");
 
         super.tearDown();
-    }
-
-    @Test
-    public void testFail() throws Exception {
-        JacOrbRCServiceInit init = new JacOrbRCServiceInit();
-        JacOrbRecoveryInit rinit = new JacOrbRecoveryInit();
-
-        init.startRCservice();
-
-        RecoveryCreator creator = RecoveryCreator.getCreator();
-        GenericRecoveryCreator generic = null;
-
-        if (creator instanceof GenericRecoveryCreator)
-            generic = (GenericRecoveryCreator) creator;
-
-        assertTrue(generic != null);
-
-        DemoResource demo = new DemoResource();
-
-        assertTrue(generic.create(demo.getResource(), null) == null);
-
-        JacOrbRCServiceInit.shutdownRCService();
     }
 
     @Test
