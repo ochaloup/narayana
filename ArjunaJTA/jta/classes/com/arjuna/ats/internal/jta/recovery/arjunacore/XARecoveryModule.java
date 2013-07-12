@@ -553,6 +553,11 @@ public class XARecoveryModule implements RecoveryModule {
     }
 
     private void xaRecoverySecondPass(XAResource xares) {
+
+        if (jtaLogger.logger.isDebugEnabled()) {
+            jtaLogger.logger.debug("xarecovery second pass of " + xares);
+        }
+
         RecoveryXids xidsToRecover = _xidScans.get(xares);
         try {
             Xid[] xids = xidsToRecover.toRecover();
