@@ -59,7 +59,7 @@ public final class ParticipantsManagerTestCase {
     private void registerParticipant(final String participantId, final Participant participant)
             throws MalformedURLException {
         ParticipantInformation participantInformation = new ParticipantInformation(participantId, APPLICATION_ID, "",
-                "", participant);
+                participant);
         participantInformation.setStatus(TxStatus.TransactionActive.name());
         ParticipantsContainer.getInstance().addParticipantInformation(participantId, participantInformation);
     }
