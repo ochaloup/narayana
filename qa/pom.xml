@@ -58,7 +58,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.jboss.netty</groupId>
+            <groupId>org.io.netty</groupId>
             <artifactId>netty</artifactId>
         </dependency>
 
