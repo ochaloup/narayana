@@ -807,6 +807,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 try {
                     result = resHandle.shouldAdd(rec);
                 } catch (OBJECT_NOT_EXIST ex) {
+                    // A common example of this is when two XA resources return
+                    // XA_RDONLY
                 } catch (Exception e) {
                     _endpointFailed = true;
 
@@ -833,6 +835,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 try {
                     result = resHandle.shouldAlter(rec);
                 } catch (OBJECT_NOT_EXIST ex) {
+                    // A common example of this is when two XA resources return
+                    // XA_RDONLY
                 } catch (Exception e) {
                     _endpointFailed = true;
 
@@ -859,6 +863,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 try {
                     result = resHandle.shouldMerge(rec);
                 } catch (OBJECT_NOT_EXIST ex) {
+                    // A common example of this is when two XA resources return
+                    // XA_RDONLY
                 } catch (Exception e) {
                     _endpointFailed = true;
 
@@ -885,6 +891,8 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
                 try {
                     result = resHandle.shouldReplace(rec);
                 } catch (OBJECT_NOT_EXIST ex) {
+                    // A common example of this is when two XA resources return
+                    // XA_RDONLY
                 } catch (Exception e) {
                     _endpointFailed = true;
 
