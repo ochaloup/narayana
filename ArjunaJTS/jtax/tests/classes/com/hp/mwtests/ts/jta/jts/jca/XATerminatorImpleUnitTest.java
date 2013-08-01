@@ -70,7 +70,7 @@ public class XATerminatorImpleUnitTest extends TestBase {
 
         imp.importTransaction(xid);
 
-        xa.commit(xid, false);
+        xa.commit(xid, true);
     }
 
     @Test

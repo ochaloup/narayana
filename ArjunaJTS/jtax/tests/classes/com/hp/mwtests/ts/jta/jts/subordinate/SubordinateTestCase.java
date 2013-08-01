@@ -43,10 +43,10 @@ public class SubordinateTestCase extends com.hp.mwtests.ts.jta.subordinate.Subor
 
     @Before
     public void setUp() throws Exception {
-        System.setProperty("com.arjuna.ats.jta.jtaTMImplementation",
-                "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple");
-        System.setProperty("com.arjuna.ats.jta.jtaUTImplementation",
-                "com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple");
+        // System.setProperty("com.arjuna.ats.jta.jtaTMImplementation",
+        // "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple");
+        // System.setProperty("com.arjuna.ats.jta.jtaUTImplementation",
+        // "com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple");
 
         orb = ORB.getInstance("test");
         oa = OA.getRootOA(orb);
@@ -66,8 +66,8 @@ public class SubordinateTestCase extends com.hp.mwtests.ts.jta.subordinate.Subor
         if (orb != null) {
             orb.shutdown();
         }
-        System.clearProperty("com.arjuna.ats.jta.jtaTMImplementation");
-        System.clearProperty("com.arjuna.ats.jta.jtaUTImplementation");
+        // System.clearProperty("com.arjuna.ats.jta.jtaTMImplementation");
+        // System.clearProperty("com.arjuna.ats.jta.jtaUTImplementation");
     }
 
     @Override
