@@ -63,7 +63,8 @@ public class TxConfirmInterceptor extends ParticipantInterceptor {
         }
 
         Class<? extends ConfirmationHandler> confirmationHandler = getConfirmationHandler(method);
-        Participant compensationParticipant = new Participant(null, confirmationHandler, null);
+        Participant compensationParticipant = new Participant(null, confirmationHandler, null,
+                bam.currentTransaction());
         return bam.enlistForBusinessAgreementWithParticipantCompletion(compensationParticipant,
                 String.valueOf(UUID.randomUUID()));
     }
