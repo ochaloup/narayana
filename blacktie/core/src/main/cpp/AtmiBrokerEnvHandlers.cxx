@@ -22,11 +22,15 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "expat.h"
+#include <xercesc/sax2/Attributes.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
+#include <xercesc/sax/SAXException.hpp>
+
 
 #include "AtmiBrokerEnv.h"
 #include "AtmiBrokerEnvXml.h"
-#include "XsdValidator.h"
+#include "AtmiBrokerEnvHandlers.h"
+
 
 #include "log4cxx/logger.h"
 #include "ace/ACE.h"
@@ -35,8 +39,34 @@
 #include "ace/OS_NS_string.h"
 #include "ace/Default_Constants.h"
 
-log4cxx::LoggerPtr loggerAtmiBrokerEnvXml(log4cxx::Logger::getLogger(
-        "AtmiBrokerEnvXml"));
+#include <string>
+using namespace std;
+
+log4cxx::LoggerPtr loggerAtmiBrokerEnvHandlers(log4cxx::Logger::getLogger(
+        "AtmiBrokerEnvHandlers"));
+log4cxx::LoggerPtr AtmiBrokerEnvHandlers::logger(log4cxx::Logger::getLogger("AtmiBrokerEnvHandlers"));
+
+
+static int warnCnt = 0;
+static void warn(const char * reason) {
+    if (warnCnt++ == 0)
+        LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) reason);
+}
+
+static int MEM_CHAR_SIZE = sizeof(char);//1;
+static int MEM_LONG_SIZE = sizeof(long);//8;
+static int MEM_INT_SIZE = sizeof(int);//4;
+static int MEM_SHORT_SIZE = sizeof(short);//2;
+static int MEM_FLOAT_SIZE = sizeof(float);//INT_SIZE;
+static int MEM_DOUBLE_SIZE = sizeof(double);//LONG_SIZE;
+
+static int WIRE_CHAR_SIZE = 1;
+static int WIRE_LONG_SIZE = 8;
+static int WIRE_INT_SIZE = 4;
+static int WIRE_SHORT_SIZE = 2;
+static int WIRE_FLOAT_SIZE = 4;
+static int WIRE_DOUBLE_SIZE = 8;
+
 xarm_config_t * xarmp = 0;
 ServersInfo servers;
 ServiceInfo service;
@@ -76,51 +106,7 @@ static int envVariableCount = 0;
 
 static bool processingXaResource = false;
 static bool processingEnvVariable = false;
-static char* configuration = NULL;
 static char* currentBufferName = NULL;
-
-static int MEM_CHAR_SIZE = sizeof(char);//1;
-static int MEM_LONG_SIZE = sizeof(long);//8;
-static int MEM_INT_SIZE = sizeof(int);//4;
-static int MEM_SHORT_SIZE = sizeof(short);//2;
-static int MEM_FLOAT_SIZE = sizeof(float);//INT_SIZE;
-static int MEM_DOUBLE_SIZE = sizeof(double);//LONG_SIZE;
-
-static int WIRE_CHAR_SIZE = 1;
-static int WIRE_LONG_SIZE = 8;
-static int WIRE_INT_SIZE = 4;
-static int WIRE_SHORT_SIZE = 2;
-static int WIRE_FLOAT_SIZE = 4;
-static int WIRE_DOUBLE_SIZE = 8;
-
-static XML_Parser parser;
-static enum XML_Error parseErr = XML_ERROR_NONE;
-
-static void abortParser() {
-    // disable further parsing
-    XML_SetElementHandler (parser, NULL, NULL);
-    XML_SetCharacterDataHandler(parser, NULL);
-    parseErr = XML_ERROR_ABORTED;
-}
-
-AtmiBrokerEnvXml::AtmiBrokerEnvXml() {
-    depth = 0;
-    envVariableCount = 0;
-
-    processingXaResource = false;
-    processingEnvVariable = false;
-    currentBufferName = NULL;
-    configuration = NULL;
-}
-
-AtmiBrokerEnvXml::~AtmiBrokerEnvXml() {
-}
-
-static int warnCnt = 0;
-static void warn(const char * reason) {
-    if (warnCnt++ == 0)
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) reason);
-}
 
 /**
  * Duplicate a value. If the value contains an expression of the for ${ENV}
@@ -131,13 +117,18 @@ static void warn(const char * reason) {
  */
 static char * copy_value_impl(char *value);
 
-static char * XMLCALL copy_value(const char *value) {
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, "copy_value" << value);
+static char * copy_value(const XMLCh *value) {
+    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, "copy_value: " << value);
+    return copy_value_impl(strdup(StrX(value).localForm()));
+}
+
+static char * copy_value(const char *value) {
+    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, "copy_value: " << value);
     return copy_value_impl(strdup(value));
 }
 
 static char * copy_value_impl(char *value) {
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, "copy_value_impl" << value);
+    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, "copy_value_impl: " << value);
     char *s = (char *) strchr(value, '$');
     char *e;
 
@@ -150,36 +141,37 @@ static char * copy_value_impl(char *value) {
         char *v;
 
         if (ev == NULL) {
-            LOG4CXX_WARN(loggerAtmiBrokerEnvXml, (char*) "env variable is unset: " << en);
+            LOG4CXX_WARN(loggerAtmiBrokerEnvHandlers, (char*) "env variable is unset: " << en);
             ev = (char *) "";
         }
 
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char *) "expanding env: "
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char *) "expanding env: "
                 << (s + 2) << (char *) " and e=" << e << (char *) " and en="
                 << en << (char *) " and pr=" << pr << (char *) " and ev=" << ev);
         e += 1;
         rsz = ACE_OS::strlen(pr) + ACE_OS::strlen(e) + ACE_OS::strlen(ev) + 1; /* add 1 for null terminator */
         v = (char *) malloc(rsz);
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, "copy_value_impl malloc");
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, "copy_value_impl malloc");
 
         ACE_OS::snprintf(v, rsz, "%s%s%s", pr, ev, e);
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, value << (char*) " -> " << v);
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, value << (char*) " -> " << v);
 
         free(en);
         free(pr);
 
-        LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, "Freeing previous value" << value);
+        LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, "Freeing previous value" << value);
         free(value);
         return copy_value_impl(v);
     }
 
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, "Returning value" << value);
+    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, "Returning value" << value);
     return value;
 }
 
 
 
-static bool applicable_config(char *config, const char *attribute) {
+static bool applicable_config(const char *config, const char *attribute) {
+       
     if (config == NULL || ACE_OS::strlen(config) == 0) {
         // see if it is set in the environment
         if ((config = ACE_OS::getenv("BLACKTIE_CONFIGURATION")) == 0)
@@ -189,7 +181,7 @@ static bool applicable_config(char *config, const char *attribute) {
     char * conf = copy_value(attribute);
     bool rtn = strcmp(conf, config);
 
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "comparing " << conf
+    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "comparing " << conf
             << " with " << config);
     free(conf);
 
@@ -208,82 +200,101 @@ static bool checkService(char* serverName, const char* serviceName) {
     return false;
 }
 
-static void XMLCALL startElement
-(void *userData, const char *name, const char **atts) {
-    std::vector<envVar_t>* aEnvironmentStructPtr = (std::vector<envVar_t>*) userData;
+AtmiBrokerEnvHandlers::AtmiBrokerEnvHandlers(std::vector<envVar_t>& iEnv, const char* conf) {
+    depth = 0;
+    envVariableCount = 0;
 
-    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processing element " << name);
-    if (strcmp(name, "ENVIRONMENT xmnls") == 0 || strcmp(name, "ENVIRONMENT") == 0) {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "starting to read");
-    } else if (strcmp(name, "ORB") == 0) {
-        for(int i = 0; atts[i]; i += 2) {
-            if(strcmp(atts[i], "OPT") == 0) {
-                orbConfig.opt = copy_value(atts[i+1]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set opt: " << orbConfig.opt);
-            } else if(strcmp(atts[i], "TRANS_FACTORY_ID") == 0) {
-                orbConfig.transactionFactoryName = copy_value(atts[i+1]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set tFN: " << orbConfig.transactionFactoryName);
-            } else if(strcmp(atts[i], "INTERFACE") == 0) {
-                orbConfig.interface = copy_value(atts[i+1]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set tFN: " << orbConfig.interface);
+    processingXaResource = false;
+    processingEnvVariable = false;
+    currentBufferName = NULL;
+    configuration = conf;
+    aEnvironmentStructPtr = &iEnv;
+}
+
+AtmiBrokerEnvHandlers::~AtmiBrokerEnvHandlers() {
+}
+
+void AtmiBrokerEnvHandlers::startElement(const XMLCh* const uri, const XMLCh* const localName, const XMLCh* const qname, const xercesc::Attributes& attributes) {
+
+    StrX name = localName;
+        
+    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processing element " << name);
+    if (name == "ENVIRONMENT xmnls" || name == "ENVIRONMENT") {
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "starting to read");
+    } else if (name == "ORB") {
+        for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                StrX attvalue = attributes.getLocalName(i);
+            if(attvalue == "OPT") {
+                orbConfig.opt = copy_value(attributes.getValue(i));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set opt: " << orbConfig.opt);
+            } else if(attvalue == "TRANS_FACTORY_ID") {
+                orbConfig.transactionFactoryName = copy_value(attributes.getValue(i));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set tFN: " << orbConfig.transactionFactoryName);
+            } else if(attvalue == "INTERFACE") {
+                orbConfig.interface = copy_value(attributes.getValue(i));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set tFN: " << orbConfig.interface);
             }
         }
-    } else if (strcmp(name, "TXN_CFG") == 0) {
-        for(int i = 0; atts[i]; i += 2) {
-            if(strcmp(atts[i], "MGR_URL") == 0) {
-                txnConfig.mgrEP = copy_value(atts[i+1]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "txn manager URL: " << txnConfig.mgrEP);
-            } else if(strcmp(atts[i], "RES_EP") == 0) {
-                txnConfig.resourceEP = copy_value(atts[i+1]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "resource host:port: " << txnConfig.resourceEP);
+    } else if (name == "TXN_CFG") {
+        for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                StrX attvalue = attributes.getLocalName(i);
+            if(attvalue == "MGR_URL") {
+                txnConfig.mgrEP = copy_value(attributes.getValue(i));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "txn manager URL: " << txnConfig.mgrEP);
+            } else if(attvalue == "RES_EP") {
+                txnConfig.resourceEP = copy_value(attributes.getValue(i));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "resource host:port: " << txnConfig.resourceEP);
             }
         }
-    } else if (strcmp(name, "MQ") == 0) {
-        for(int i = 0; atts[i]; i += 2) {
-            if(strcmp(atts[i], "HOST") == 0) {
-                mqConfig.host = copy_value(atts[i+1]);
-            } else if(strcmp(atts[i], "PORT") == 0) {
-                mqConfig.port = atoi(atts[i+1]);
-            } else if(strcmp(atts[i], "USER") == 0) {
-                mqConfig.user = copy_value(atts[i+1]);
-            } else if(strcmp(atts[i], "PASSWORD") == 0) {
-                mqConfig.pwd = copy_value(atts[i+1]);
-            } else if(strcmp(atts[i], "DESTINATION_TIMEOUT") == 0) {
-                mqConfig.destinationTimeout = atoi(atts[i+1]);
-            } else if(strcmp(atts[i], "RECEIVE_TIMEOUT") == 0) {
-                mqConfig.requestTimeout = atoi(atts[i+1]);
-            } else if(strcmp(atts[i], "TIME_TO_LIVE") == 0) {
-                mqConfig.timeToLive = atoi(atts[i+1]);
-            } else if(strcmp(atts[i], "NOREPLY_TIME_TO_LIVE") == 0) {
-                mqConfig.noReplyTimeToLive = atoi(atts[i+1]);
+    } else if (name == "MQ") {
+        for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                StrX attvalue = attributes.getLocalName(i);
+            if(attvalue == "HOST") {
+                mqConfig.host = copy_value(attributes.getValue(i));
+            } else if(attvalue == "PORT") {
+                mqConfig.port = atoi(StrX(attributes.getValue(i)).localForm());
+            } else if(attvalue == "USER") {
+                mqConfig.user = copy_value(attributes.getValue(i));
+            } else if(attvalue == "PASSWORD") {
+                mqConfig.pwd = copy_value(attributes.getValue(i));
+            } else if(attvalue == "DESTINATION_TIMEOUT") {
+                mqConfig.destinationTimeout = atoi(StrX(attributes.getValue(i)).localForm());
+            } else if(attvalue == "RECEIVE_TIMEOUT") {
+                mqConfig.requestTimeout = atoi(StrX(attributes.getValue(i)).localForm());
+            } else if(attvalue == "TIME_TO_LIVE") {
+                mqConfig.timeToLive = atoi(StrX(attributes.getValue(i)).localForm());
+            } else if(attvalue == "NOREPLY_TIME_TO_LIVE") {
+                mqConfig.noReplyTimeToLive = atoi(StrX(attributes.getValue(i)).localForm());
             }
         }
-    } else if (strcmp(name, "SOCKETSERVER") == 0) {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processing SOCKETSERVER");
-        for(int i = 0; atts[i]; i += 2) {
-            if(strcmp(atts[i], "HOST") == 0) {
-                cbConfig.host = copy_value(atts[i+1]);
-            } else if(strcmp(atts[i], "PORT") == 0) {
-                cbConfig.port = atoi(atts[i+1]);
+    } else if (name == "SOCKETSERVER") {
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processing SOCKETSERVER");
+        for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+            StrX attvalue = attributes.getLocalName(i);
+            if(attvalue == "HOST") {
+                cbConfig.host = copy_value(attributes.getValue(i));
+            } else if(attvalue == "PORT") {
+                cbConfig.port = atoi(StrX(attributes.getValue(i)).localForm());
             }
         }
-    } else if (strcmp(name, "SERVER") == 0) {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processing SERVER");
+    } else if (name == "SERVER") {
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processing SERVER");
 
         ServerInfo* server = new ServerInfo;
         server->function_name = NULL;
         server->done_function_name = NULL;
         server->library_name = NULL;
         server->xa = true;
-        for(int i = 0; atts[i]; i += 2) {
-            if(atts[i] && strcmp(atts[i], "name") == 0) {
-                server->serverName = copy_value(atts[i+1]);
-            } else if(atts[i] && strcmp(atts[i], "init_function") == 0) {
-                server->function_name = copy_value(atts[i+1]);
-            } else if(atts[i] && strcmp(atts[i], "done_function") == 0) {
-                server->done_function_name = copy_value(atts[i+1]);
-            } else if(atts[i] && strcmp(atts[i], "xa") == 0) {
-                                if(strcmp(atts[i+1], "true") == 0) {
+        for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                StrX attvalue = attributes.getLocalName(i);
+            if(attvalue == "name") {
+                server->serverName = copy_value(attributes.getValue(i));
+            } else if(attvalue == "init_function") {
+                server->function_name = copy_value(attributes.getValue(i));
+            } else if(attvalue == "done_function") {
+                server->done_function_name = copy_value(attributes.getValue(i));
+            } else if(attvalue == "xa") {
+                                if(StrX(attributes.getValue(i)) == "true") {
                                         server->xa = true;
                                 } else {
                                         server->xa = false;
@@ -292,20 +303,23 @@ static void XMLCALL startElement
         }
 
         servers.push_back(server);
-    } else if (strcmp(name, "INIT_FUNCTION_LIBRARY_NAME") == 0) {
-        if(atts != 0 && atts[0] && strcmp(atts[0], "configuration") == 0) {
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "comparing" << atts[1] << " with " << configuration);
-            if (strcmp(atts[1], configuration) == 0) {
-                servers.back()->library_name = copy_value(atts[3]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processed INIT_FUNCTION_LIBRARY_NAME: " << servers.back()->library_name);
+    } else if (name == "INIT_FUNCTION_LIBRARY_NAME") {
+        if(attributes.getLength() > 0 && StrX(attributes.getLocalName(0)) == "configuration") {
+                StrX attvalue = attributes.getValue((XMLSize_t)0);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "comparing" << attvalue << " with " << configuration);
+            if (attvalue == configuration) {
+                servers.back()->library_name = copy_value(attributes.getValue(1));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processed INIT_FUNCTION_LIBRARY_NAME: " << servers.back()->library_name);
             } else {
-                LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "CONFIGURATION NOT APPLICABLE FOR LIBRARY_NAME: " << atts[1]);
+                LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "CONFIGURATION NOT APPLICABLE FOR LIBRARY_NAME: " << attributes.getValue(1));
             }
         }
-    } else if (strcmp(name, "XA_RESOURCE") == 0) {
-        if(strcmp(atts[0], "configuration") == 0 && applicable_config(configuration, atts[1])) {
+    } else if (name == "XA_RESOURCE") {
+            StrX attname = attributes.getLocalName(0);
+        StrX attvalue = attributes.getValue((XMLSize_t)0);
+        if(attname == "configuration" && applicable_config(configuration, attvalue.localForm())) {
 
-            LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processing xaresource");
+            LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processing xaresource");
             processingXaResource = true;
             xarm_config_t *p;
             if ((p = (xarm_config_t *) malloc(sizeof(xarm_config_t))) == 0) {
@@ -323,16 +337,17 @@ static void XMLCALL startElement
                 xarmp = p;
             }
         } else {
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "CONFIGURATION NOT APPLICABLE FOR XA_RESOURCE: " << atts[1]);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "CONFIGURATION NOT APPLICABLE FOR XA_RESOURCE: " << attvalue);
         }
-    } else if (strcmp(name, "ENV_VARIABLE") == 0) {
-        if(atts != 0 && atts[0] && strcmp(atts[0], "configuration") == 0) {
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "comparing" << atts[1] << " with " << configuration);
-            if (strcmp(atts[1], configuration) == 0) {
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processing ENV_VARIABLE");
+    } else if (name == "ENV_VARIABLE") {
+        if(attributes.getLength() > 0 && StrX(attributes.getLocalName(0)) == "configuration") {
+                StrX attname = attributes.getValue((XMLSize_t)0);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "comparing " << attname << " with " << configuration);
+            if (attname == configuration) {
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processing ENV_VARIABLE");
                 processingEnvVariable = true;
             } else {
-                LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "CONFIGURATION NOT APPLICABLE FOR ENV_VARIABLE: " << atts[1]);
+                LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "CONFIGURATION NOT APPLICABLE FOR ENV_VARIABLE: " << attname);
             }
         } else {
             processingEnvVariable = true;
@@ -343,8 +358,8 @@ static void XMLCALL startElement
             envVar_t envVar;
             (*aEnvironmentStructPtr).push_back(envVar);
         }
-    } else if (strcmp(name, "BUFFER") == 0) {
-        char * bufferName = copy_value(atts[1]);
+    } else if (name == "BUFFER") {
+        char * bufferName = copy_value(attributes.getValue((XMLSize_t)0));
         Buffer* buffer = buffers[bufferName];
         if (buffer == NULL) {
             currentBufferName = bufferName;
@@ -355,11 +370,11 @@ static void XMLCALL startElement
             buffer->lastPad = 0;
             buffers[buffer->name] = buffer;
         } else {
-            LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "Duplicate buffer detected: " << currentBufferName);
+            LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) "Duplicate buffer detected: " << currentBufferName);
             free (bufferName);
             currentBufferName = NULL;
         }
-    } else if (strcmp(name, "ATTRIBUTE") == 0) {
+    } else if (name == "ATTRIBUTE") {
         if (currentBufferName != NULL) {
             Buffer* buffer = buffers[currentBufferName];
             Attribute* attribute = new Attribute();
@@ -369,15 +384,16 @@ static void XMLCALL startElement
             attribute->length = 0;
             attribute->wirePosition = 0;
             attribute->memPosition = 0;
-            for(int i = 0; atts[i]; i += 2) {
-                if(strcmp(atts[i], "id") == 0) {
-                    attribute->id = copy_value(atts[i+1]);
-                } else if(strcmp(atts[i], "type") == 0) {
-                    attribute->type = copy_value(atts[i+1]);
-                } else if(strcmp(atts[i], "arrayCount") == 0) {
-                    attribute->count = atoi(atts[i+1]);
-                } else if(strcmp(atts[i], "arrayLength") == 0) {
-                    attribute->length = atoi(atts[i+1]);
+            for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                    StrX attvalue = attributes.getLocalName(i);
+                if(attvalue == "id") {
+                    attribute->id = copy_value(attributes.getValue(i));
+                } else if(attvalue == "type") {
+                    attribute->type = copy_value(attributes.getValue(i));
+                } else if(attvalue == "arrayCount") {
+                    attribute->count = atoi(StrX(attributes.getValue(i)).localForm());
+                } else if(attvalue == "arrayLength") {
+                    attribute->length = atoi(StrX(attributes.getValue(i)).localForm());
                 }
             }
 
@@ -480,7 +496,7 @@ static void XMLCALL startElement
                     attribute->memSize = memTypeSize * attribute->length * attribute->count;
                     attribute->wireSize = wireTypeSize * attribute->length * attribute->count;
                 } else {
-                    LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "Unknown attribute type: " << attribute->type);
+                    LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) "Unknown attribute type: " << attribute->type);
                     fail = true;
                 }
 
@@ -508,22 +524,22 @@ static void XMLCALL startElement
                     buffer->wireSize = buffer->wireSize + attribute->wireSize;
                     buffer->memSize = buffer->memSize + attribute->memSize;
                 } else {
-                    LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "Cleaning attribute: " << attribute->id);
+                    LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) "Cleaning attribute: " << attribute->id);
                     free(attribute->id);
                     free(attribute->type);
                     delete attribute;
                 }
             } else {
-                LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "Duplicate attribute detected: " << attribute->id);
+                LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) "Duplicate attribute detected: " << attribute->id);
                 free(attribute->id);
                 free(attribute->type);
                 delete attribute;
             }
         } else {
-            LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "No buffer is being processed");
+            LOG4CXX_ERROR(loggerAtmiBrokerEnvHandlers, (char*) "No buffer is being processed");
         }
-    } else if(strcmp(name, "SERVICE") == 0) {
-        if(atts != 0) {
+    } else if(name == "SERVICE") {
+        if(attributes.getLength() != 0) {
             char  adm[16];
             char* server;
 
@@ -539,110 +555,114 @@ static void XMLCALL startElement
             service.externally_managed_destination = false;
             service.poolSize = 1;
 
-            for(int i = 0; atts[i]; i += 2) {
-                if(strcmp(atts[i], "name") == 0) {
-                    if(ACE_OS::strstr(atts[i+1], adm) || 
-                       ACE_OS::strcmp(atts[i+1], "BTStompAdmin") == 0 ||
-                       ACE_OS::strcmp(atts[i+1], "BTDomainAdmin") == 0) {
-                        LOG4CXX_WARN(loggerAtmiBrokerEnvXml, (char*) "Can not define " << atts[i+1]);
+            for(XMLSize_t i = 0; i < attributes.getLength(); i++) {
+                    StrX attvalue = attributes.getLocalName(i);
+                StrX att = attributes.getValue(i);
+                if(attvalue == "name") {
+                    if(strstr(att.localForm(), adm) || 
+                       att == "BTStompAdmin" ||
+                       att == "BTDomainAdmin") {
+                        LOG4CXX_WARN(loggerAtmiBrokerEnvHandlers, (char*) "Cannot define " << att);
                         // disable further parsing
-                        abortParser();
-
-                        return;
+                        XMLCh* etxt = XMLString::transcode("Cannot define service");
+                        SAXParseException exc(etxt, *locator);
+                        XMLString::release(&etxt);
+                        fatalError(exc);
                     }
 
-                    if(checkService(server, atts[i+1])) {
-                        LOG4CXX_WARN(loggerAtmiBrokerEnvXml, (char*) "Can not define Same Service " << atts[i+1]);
+                    if(checkService(server, att.localForm())) {
+                        LOG4CXX_WARN(loggerAtmiBrokerEnvHandlers, (char*) "Cannot define Same Service " << att);
                         // disable further parsing
-                        abortParser();
-
-                        return;
+                        XMLCh* etxt = XMLString::transcode("Cannot define same service");
+                        SAXParseException exc(etxt, *locator);
+                        XMLString::release(&etxt);
+                        fatalError(exc);
                     }
 
-                    service.serviceName = copy_value(atts[i+1]);
-                    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set name: " << service.serviceName);
-                } else if(strcmp(atts[i], "function_name") == 0) {
-                    service.function_name = strdup(atts[i+1]);
-                    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set function_name: " << service.function_name);
-                } else if(strcmp(atts[i], "advertised") == 0) {
-                    if(strcmp(atts[i+1], "true") == 0) {
+                    service.serviceName = copy_value(att.localForm());
+                    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set name: " << service.serviceName);
+                } else if(attvalue == "function_name") {
+                    service.function_name = strdup(att.localForm());
+                    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set function_name: " << service.function_name);
+                } else if(attvalue == "advertised") {
+                    if(att == "true") {
                         service.advertised = true;
                     } else {
                         service.advertised = false;
                     }
-                } else if(strcmp(atts[i], "conversational") == 0) {
-                    if(strcmp(atts[i+1], "true") == 0) {
+                } else if(attvalue == "conversational") {
+                    if(att == "true") {
                         service.conversational = true;
                     } else {
                         service.conversational = false;
                     }
-                } else if(strcmp(atts[i], "externally-managed-destination") == 0) {
-                    if(strcmp(atts[i+1], "true") == 0) {
+                } else if(attvalue == "externally-managed-destination") {
+                    if(att == "true") {
                         service.externally_managed_destination = true;
                     } else {
                         service.externally_managed_destination = false;
                     }
-                } else if (strcmp(atts[i], "size") == 0) {
-                    service.poolSize = (short) atol(atts[i+1]);
-                    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "storing size " << service.poolSize);
-                } else if(strcmp(atts[i], "type") == 0) {
-                    service.serviceType = copy_value(atts[i+1]);
-                    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set type: " << service.serviceType);
-                } else if(strcmp(atts[i], "coding_type") == 0) {
-                    service.coding_type = copy_value(atts[i+1]);
-                    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "set coding type: " << service.coding_type);
+                } else if (attvalue == "size") {
+                    service.poolSize = (short) atol(att.localForm());
+                    LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "storing size " << service.poolSize);
+                } else if(attvalue == "type") {
+                    service.serviceType = copy_value(attributes.getValue(i));
+                    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set type: " << service.serviceType);
+                } else if(attvalue == "coding_type") {
+                    service.coding_type = copy_value(attributes.getValue(i));
+                    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "set coding type: " << service.coding_type);
                 }
             }
 
 
             if(service.advertised && service.function_name == NULL) {
-                LOG4CXX_WARN(loggerAtmiBrokerEnvXml, (char*) "Can not mark a service as advertised if it does not define a function_name" << service.serviceName);
+                LOG4CXX_WARN(loggerAtmiBrokerEnvHandlers, (char*) "Can not mark a service as advertised if it does not define a function_name" << service.serviceName);
                 // disable further parsing
-                abortParser();
-
-                return;
+                XMLCh* etxt = XMLString::transcode("Can not mark a service as advertised if it does not define a function_name");
+                SAXParseException exc(etxt, *locator);
+                XMLString::release(&etxt);
+                fatalError(exc);
             }
 
             if(service.serviceType == NULL) {
                 service.serviceType = strdup("queue");
             }
 
-            LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "setting transportlib");
+            LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "setting transportlib");
 #ifdef WIN32
             service.transportLib = strdup("atmibroker-hybrid.dll");
 #else
             service.transportLib = strdup("libatmibroker-hybrid.so");
 #endif
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "set transportlib: " << service.transportLib);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "set transportlib: " << service.transportLib);
         }
-    } else if (strcmp(name, "LIBRARY_NAME") == 0) {
-        if(atts != 0 && atts[0] && strcmp(atts[0], "configuration") == 0) {
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "comparing" << atts[1] << " with " << configuration);
-            if (strcmp(atts[1], configuration) == 0) {
-                service.library_name = copy_value(atts[3]);
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "processed LIBRARY_NAME: " << service.library_name);
+    } else if (name == "LIBRARY_NAME") {
+        if(attributes.getLength() > 0 && StrX(attributes.getLocalName(0)) == "configuration") {
+                StrX attvalue = attributes.getValue((XMLSize_t)0);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "comparing" << attvalue << " with " << configuration);
+            if (attvalue == configuration) {
+                service.library_name = copy_value(attributes.getValue(1));
+                LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "processed LIBRARY_NAME: " << service.library_name);
             } else {
-                LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "CONFIGURATION NOT APPLICABLE FOR LIBRARY_NAME: " << atts[1]);
+                LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "CONFIGURATION NOT APPLICABLE FOR LIBRARY_NAME: " << attvalue);
             }
         }
     }
-    strcpy(element, name);
+    strcpy(element, name.localForm());
     strcpy(value, "");
 
     depth += 1;
 }
 
-static void XMLCALL endElement
-(void *userData, const char *name) {
-    std::vector<envVar_t>* aEnvironmentStructPtr = (std::vector<envVar_t>*) userData;
+void AtmiBrokerEnvHandlers::endElement( const XMLCh* const uri, const XMLCh* const name, const XMLCh* const qname) {
 
-    strcpy(last_element, name);
+    strcpy(last_element, StrX(name).localForm());
     strcpy(last_value, value);
 
-    LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "storing element: " << last_element);
+    LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "storing element: " << last_element);
 
     if (strcmp(last_element, "DOMAIN") == 0) {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "storing domain value: " << last_value);
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "storing domain value: " << last_value);
         strcpy(domain, last_value);
     } else if (strcmp(last_element, "XA_RESOURCE") == 0) {
         processingXaResource = false;
@@ -673,20 +693,20 @@ static void XMLCALL endElement
     } else if (strcmp(last_element, "ENV_VARIABLE") == 0) {
         if (processingEnvVariable) {
             int index = envVariableCount - 1;
-            LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "stored EnvVariable at index %d" << index);
+            LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "stored EnvVariable at index %d" << index);
         }
         processingEnvVariable = false;
     } else if (strcmp(last_element, "NAME") == 0) {
         if (processingEnvVariable) {
             int index = envVariableCount - 1;
             (*aEnvironmentStructPtr)[index].name = copy_value(last_value);
-            LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "stored EnvName %s at index %d" << last_value << index);
+            LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "stored EnvName %s at index %d" << last_value << index);
         }
     } else if (strcmp(last_element, "VALUE") == 0) {
         if (processingEnvVariable) {
             int index = envVariableCount - 1;
             (*aEnvironmentStructPtr)[index].value = copy_value(last_value);
-            LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "stored Env Value %s at index %d" << last_value << index);
+            LOG4CXX_DEBUG(loggerAtmiBrokerEnvHandlers, (char*) "stored Env Value %s at index %d" << last_value << index);
         }
     } else if (strcmp(last_element, "BUFFER") == 0) {
         if (currentBufferName != NULL) {
@@ -711,157 +731,47 @@ static void XMLCALL endElement
     depth -= 1;
 }
 
-static void XMLCALL characterData
-(void *userData, const char *cdata, int len) {
-    int i = 0;
-    int j = 0;
-    int priorLength = strlen(value);
+
+void AtmiBrokerEnvHandlers::characters(const XMLCh* const name,
+                                  const XMLSize_t length) {
+    XMLSize_t i = 0;
+    XMLSize_t j = 0;
+    XMLSize_t priorLength = strlen(value);
 
     i = priorLength;
-    for (; i < len + priorLength; i++, j++) {
-        value[i] = cdata[j];
+    for (; i < length + priorLength; i++, j++) {
+        value[i] = name[j];
     }
     value[i] = '\0';
     if (value[0] == '\n') {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "value starts with newline (may be other character data)");
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "value starts with newline (may be other character data)");
     } else {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "value is :" << value);
+        LOG4CXX_TRACE(loggerAtmiBrokerEnvHandlers, (char*) "value is :" << value);
     }
 }
 
-bool AtmiBrokerEnvXml::parseXmlDescriptor(
-        std::vector<envVar_t>* aEnvironmentStructPtr,
-        const char * configurationDir, char * conf) {
-
-    char aDescriptorFileName[256];
-
-    if (configurationDir != NULL) {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "read env from dir: "
-                << configurationDir);
-        ACE_OS::snprintf(aDescriptorFileName, 256, "%s"ACE_DIRECTORY_SEPARATOR_STR_A"btconfig.xml",
-                configurationDir);
-        LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml,
-                (char*) "in parseXmlDescriptor() " << aDescriptorFileName);
-    } else {
-        LOG4CXX_TRACE(loggerAtmiBrokerEnvXml,
-                (char*) "read env from default file");
-        ACE_OS::strcpy(aDescriptorFileName, "btconfig.xml");
-    }
-    configuration = conf;
-
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, "BLACKTIE_CONFIGURATION: " << configuration);
-
-    bool toReturn = true;
-    char schemaPath[256];
-    char* schemaDir;
-
-    schemaDir = ACE_OS::getenv("BLACKTIE_SCHEMA_DIR");
-    if (schemaDir) {
-        ACE_OS::snprintf(schemaPath, 256, "%s"ACE_DIRECTORY_SEPARATOR_STR_A"btconfig.xsd", schemaDir);
-    } else {
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml,
-                (char*) "BLACKTIE_SCHEMA_DIR is not set, cannot validate configuration");
-        return false;
-    }
-
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "schemaPath is "
-            << schemaPath);
-
-    XsdValidator validator;
-    if (validator.validate(schemaPath, aDescriptorFileName) == false) {
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml,
-                (char*) "btconfig.xml did not validate against btconfig.xsd");
-        return false;
-    }
-    struct stat s; /* file stats */
-    FILE *aDescriptorFile = fopen(aDescriptorFileName, "r");
-
-    if (!aDescriptorFile) {
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml,
-                (char*) "loadfile: fopen failed on %s" << aDescriptorFileName);
-        return false;
-    }
-
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml, (char*) "read file %p"
-            << aDescriptorFile);
-
-    /* Use fstat to obtain the file size */
-    if (fstat(fileno(aDescriptorFile), &s) != 0) {
-        /* fstat failed */
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml,
-                (char*) "loadfile: fstat failed on %s" << aDescriptorFileName);
-        return false;
-    }
-    if (s.st_size == 0) {
-        LOG4CXX_ERROR(loggerAtmiBrokerEnvXml,
-                (char*) "loadfile: file %s is empty" << aDescriptorFileName);
-    }
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml,
-            (char*) "loadfile: file %s is %d long" << aDescriptorFileName
-                    << s.st_size);
-
-    char *buf = (char *) malloc(sizeof(char) * s.st_size + 1);
-    if (!buf) {
-        /* malloc failed */
-        LOG4CXX_ERROR(
-                loggerAtmiBrokerEnvXml,
-                (char*) "loadfile: Could not allocate enough memory to load file %s"
-                        << aDescriptorFileName);
-        return false;
-    }
-    memset(buf, '\0', s.st_size + 1);
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml,
-            (char*) "loadfile: Allocated enough memory to load file %d"
-                    << s.st_size);
-
-    parser = XML_ParserCreate(NULL);
-    parseErr = XML_ERROR_NONE;
-
-    int done;
-    strcpy(element, "");
-    strcpy(value, "");
-    XML_SetUserData(parser, aEnvironmentStructPtr);
-    XML_SetElementHandler(parser, startElement, endElement);
-    XML_SetCharacterDataHandler(parser, characterData);
-    try {
-        do {
-            LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "reading file");
-            size_t len = fread(buf, 1, s.st_size, aDescriptorFile);
-            done = len < sizeof(buf);
-            if (len > 0) {
-                LOG4CXX_TRACE(loggerAtmiBrokerEnvXml, (char*) "buf is " << buf);
-
-                if (XML_Parse(parser, buf, len, done) == XML_STATUS_ERROR ||
-                    parseErr != XML_ERROR_NONE) {
-                    LOG4CXX_ERROR(loggerAtmiBrokerEnvXml, (char*) "%d at line %d"
-                            << XML_ErrorString(XML_GetErrorCode(parser))
-                            << XML_GetCurrentLineNumber(parser));
-                    toReturn = false;
-                    break;
-                }
-            }
-        } while (!done);
-    } catch (...) {
-        free(buf);
-        XML_ParserFree(parser);
-        fflush(aDescriptorFile);
-        fclose(aDescriptorFile);
-        throw;
-    }
-
-    free(buf);
-    XML_ParserFree(parser);
-
-    fflush(aDescriptorFile);
-    fclose(aDescriptorFile);
-
-    LOG4CXX_DEBUG(loggerAtmiBrokerEnvXml,
-            (char*) "leaving parseXmlDescriptor() %s" << aDescriptorFileName);
-
-    if (warnCnt) {
-        warnCnt = 0;
-        return false;
-    }
-
-    return toReturn;
+void AtmiBrokerEnvHandlers::resetDocument() {
 }
+
+void AtmiBrokerEnvHandlers::error(const SAXParseException& e) {
+    LOG4CXX_ERROR(logger, "Error at (file " << StrX(e.getSystemId())
+            << ", line " << e.getLineNumber()
+            << ", char " << e.getColumnNumber()
+            << "): " << StrX(e.getMessage()));
+}
+
+void AtmiBrokerEnvHandlers::fatalError(const SAXParseException& e) {
+    LOG4CXX_ERROR(logger, "Fatal Error at (file " << StrX(e.getSystemId())
+            << ", line " << e.getLineNumber()
+            << ", char " << e.getColumnNumber()
+            << "): " << StrX(e.getMessage()));
+    throw e;
+}
+
+void AtmiBrokerEnvHandlers::warning(const SAXParseException& e) {
+    LOG4CXX_WARN(logger, "Warning at (file " << StrX(e.getSystemId())
+            << ", line " << e.getLineNumber()
+            << ", char " << e.getColumnNumber()
+            << "): " << StrX(e.getMessage()));
+}
+
