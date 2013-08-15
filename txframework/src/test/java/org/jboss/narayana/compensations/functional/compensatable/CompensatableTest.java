@@ -30,6 +30,8 @@ import com.arjuna.wst.UnknownTransactionException;
 import com.arjuna.wst.WrongStateException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.jbossts.xts.bytemanSupport.BMScript;
+import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
 import org.jboss.narayana.compensations.api.InvalidTransactionException;
 import org.jboss.narayana.compensations.api.TransactionCompensatedException;
 import org.jboss.narayana.compensations.api.TransactionRequiredException;
@@ -48,8 +50,10 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -70,6 +74,7 @@ public class CompensatableTest {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackage("org.jboss.narayana.compensations.functional.common")
                 .addPackage("org.jboss.narayana.compensations.functional.compensatable")
+                .addClass(ParticipantCompletionCoordinatorRules.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
 
         String ManifestMF = "Manifest-Version: 1.0\n" + "Dependencies: org.jboss.narayana.txframework,org.jboss.xts\n";
@@ -77,6 +82,16 @@ public class CompensatableTest {
         archive.setManifest(new StringAsset(ManifestMF));
 
         return archive;
+    }
+
+    @BeforeClass()
+    public static void submitBytemanScript() throws Exception {
+        BMScript.submit(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
+    }
+
+    @AfterClass()
+    public static void removeBytemanScript() {
+        BMScript.remove(ParticipantCompletionCoordinatorRules.RESOURCE_PATH);
     }
 
     @Before
@@ -100,6 +115,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultNoExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         testTransactionalBean.invokeWithDefault();
         Utills.assertTransactionActive(false);
@@ -112,6 +129,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -133,6 +152,8 @@ public class CompensatableTest {
 
     @Test
     public void testRequiresNewNoExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         testTransactionalBean.invokeWithRequiresNew(null);
         Utills.assertTransactionActive(false);
@@ -145,6 +166,8 @@ public class CompensatableTest {
 
     @Test
     public void testRequiresNewExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -165,6 +188,8 @@ public class CompensatableTest {
 
     @Test
     public void testMandatoryNoExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         try {
             testTransactionalBean.invokeWithMandatory(null);
@@ -179,6 +204,8 @@ public class CompensatableTest {
 
     @Test
     public void testMandatoryExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -206,6 +233,8 @@ public class CompensatableTest {
 
     @Test
     public void testSupportsExistingTX() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -293,6 +322,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultThrowRuntimeExceptionNoExistingTX() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
 
         try {
@@ -316,6 +347,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultThrowRuntimeExceptionExistingTX() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -347,6 +380,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultThrowExceptionNoExistingTX() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
         Utills.assertTransactionActive(false);
 
         try {
@@ -371,6 +406,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultThrowExceptionExistingTX() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
         Utills.assertTransactionActive(false);
         beginBusinessActivity();
         Utills.assertTransactionActive(true);
@@ -399,6 +436,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultWithCancelOn() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
         Utills.assertTransactionActive(false);
 
         try {
@@ -425,6 +464,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultWithDontCancelOn() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(3);
+
         Utills.assertTransactionActive(false);
 
         try {
@@ -450,6 +491,8 @@ public class CompensatableTest {
 
     @Test
     public void testDefaultWithDoAndDontRollbackOn() throws Throwable {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
         Utills.assertTransactionActive(false);
 
         try {
