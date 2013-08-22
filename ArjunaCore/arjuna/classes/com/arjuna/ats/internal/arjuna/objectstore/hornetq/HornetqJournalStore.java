@@ -155,11 +155,15 @@ public class HornetqJournalStore {
                                             // there any more.
             getContentForType(typeName).remove(uid);
             journal.appendDeleteRecord(id, syncDeletes);
+
+            return true;
+        } catch (IllegalStateException e) {
+            tsLogger.i18NLogger.warn_hornetqobjectstore_remove_state_exception(e);
+
+            return false;
         } catch (Exception e) {
             throw new ObjectStoreException(e);
         }
-
-        return true;
     }
 
     /**
