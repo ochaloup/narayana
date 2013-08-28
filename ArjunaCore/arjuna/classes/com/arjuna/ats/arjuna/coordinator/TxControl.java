@@ -197,6 +197,12 @@ public class TxControl {
 
     static final boolean asyncRollback = arjPropertyManager.getCoordinatorEnvironmentBean().isAsyncRollback();
 
+    static final boolean asyncBeforeSynch = arjPropertyManager.getCoordinatorEnvironmentBean()
+            .isAsyncBeforeSynchronization();
+
+    static final boolean asyncAfterSynch = arjPropertyManager.getCoordinatorEnvironmentBean()
+            .isAsyncAfterSynchronization();
+
     static final boolean onePhase = arjPropertyManager.getCoordinatorEnvironmentBean().isCommitOnePhase();
 
     static final boolean readonlyOptimisation = arjPropertyManager.getCoordinatorEnvironmentBean()

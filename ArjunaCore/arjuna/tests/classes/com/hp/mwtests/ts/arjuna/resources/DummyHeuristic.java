@@ -15,48 +15,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  *
- * (C) 2011,
+ * (C) 2005-2006,
  * @author JBoss Inc.
  */
+package com.hp.mwtests.ts.arjuna.resources;
 
-package com.arjuna.ats.arjuna.coordinator;
+import com.arjuna.ats.arjuna.coordinator.HeuristicNotification;
 
-import com.arjuna.ats.arjuna.common.Uid;
-
-/*
- * @author Mark Little (mark@arjuna.com)
- * @since 3.0.
- */
-
-/*
- * If the caller doesn't want to be informed of heuristics during completion
- * then it's possible the application (or admin) may still want to be informed.
- * So special participants can be registered with the transaction which are
- * triggered during the Synchronization phase and given the true outcome of
- * the transaction. We do not dictate a specific implementation for what these
- * participants do with the information (e.g., OTS allows for the CORBA Notification Service
- * to be used).
- */
-
-public abstract class HeuristicNotification implements SynchronizationRecord {
-    public abstract void heuristicOutcome(int actionStatus);
-
-    public Uid get_uid() {
-        return _uid;
+public class DummyHeuristic extends HeuristicNotification {
+    public int getStatus() {
+        return _status;
     }
 
-    public boolean beforeCompletion() {
-        return true;
+    @Override
+    public void heuristicOutcome(int actionStatus) {
+        _status = actionStatus;
     }
 
-    public boolean afterCompletion(int status) {
-        return true;
+    @Override
+    public int compareTo(Object o) {
+        DummyHeuristic sr = (DummyHeuristic) o;
+        if (get_uid().equals(sr.get_uid())) {
+            return 0;
+        } else {
+            return get_uid().lessThan(sr.get_uid()) ? -1 : 1;
+        }
     }
+
+    private int _status = -1;
 
     @Override
     public boolean isInterposed() {
         return false;
     }
-
-    private Uid _uid = new Uid();
 }

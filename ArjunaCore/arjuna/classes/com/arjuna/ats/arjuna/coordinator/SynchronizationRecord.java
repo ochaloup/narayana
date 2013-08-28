@@ -45,4 +45,6 @@ public interface SynchronizationRecord extends Comparable {
     public boolean beforeCompletion();
 
     public boolean afterCompletion(int status);
+
+    boolean isInterposed();
 }
