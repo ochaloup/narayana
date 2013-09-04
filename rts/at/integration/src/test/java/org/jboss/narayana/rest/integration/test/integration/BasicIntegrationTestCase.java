@@ -21,6 +21,7 @@ import org.jboss.narayana.rest.integration.api.Prepared;
 import org.jboss.narayana.rest.integration.api.ReadOnly;
 import org.jboss.narayana.rest.integration.test.common.HeuristicParticipant;
 import org.jboss.narayana.rest.integration.test.common.LoggingParticipant;
+import org.jboss.narayana.rest.integration.test.common.LoggingVolatileParticipant;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -45,8 +46,8 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
     @Deployment(name = DEPLOYMENT_NAME, managed = false, testable = true)
     public static WebArchive getDeployment() {
         return ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME + ".war").addClass(AbstractIntegrationTestCase.class)
-                .addClass(LoggingParticipant.class).addClass(HeuristicParticipant.class)
-                .addAsWebInfResource(new File("web.xml"), "web.xml")
+                .addClass(LoggingParticipant.class).addClass(LoggingVolatileParticipant.class)
+                .addClass(HeuristicParticipant.class).addAsWebInfResource(new File("web.xml"), "web.xml")
                 .addAsManifestResource(new StringAsset(DEPENDENCIES), "MANIFEST.MF");
     }
 
@@ -180,9 +181,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
 
         ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_ROLLBACK);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), txStatus);
 
         if (participants.get(0).getInvocations().size() == 1) {
             Assert.assertEquals(Arrays.asList(new String[]{"rollback"}), participants.get(0).getInvocations());
@@ -208,9 +209,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
 
         ParticipantsManagerFactory.getInstance().reportHeuristic(lastParticipantid, HeuristicType.HEURISTIC_COMMIT);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionCommitted.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionCommitted.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "commit"}), participants.get(0).getInvocations());
         Assert.assertEquals(Collections.EMPTY_LIST, participants.get(1).getInvocations());
     }
@@ -232,9 +233,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         System.out
                 .println(ParticipantsContainer.getInstance().getParticipantInformation(lastParticipantid).getStatus());
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionHeuristicCommit.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionHeuristicCommit.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), loggingParticipant1.getInvocations());
         Assert.assertEquals(Collections.EMPTY_LIST, loggingParticipant2.getInvocations());
     }
@@ -252,9 +253,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
                 heuristicParticipant);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionCommitted.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionCommitted.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "commit"}), loggingParticipant.getInvocations());
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "commit"}), heuristicParticipant.getInvocations());
     }
@@ -272,9 +273,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
                 heuristicParticipant);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionHeuristicCommit.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionHeuristicCommit.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), loggingParticipant.getInvocations());
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), heuristicParticipant.getInvocations());
     }
@@ -292,9 +293,9 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
                 heuristicParticipant);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionHeuristicMixed.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionHeuristicMixed.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "commit"}), loggingParticipant.getInvocations());
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "commit"}), heuristicParticipant.getInvocations());
     }
@@ -312,11 +313,49 @@ public final class BasicIntegrationTestCase extends AbstractIntegrationTestCase 
         ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
                 heuristicParticipant);
 
-        final String transactionStatus = TxSupport.getStatus(txSupport.commitTx());
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
 
-        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), transactionStatus);
+        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), txStatus);
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), loggingParticipant.getInvocations());
         Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), heuristicParticipant.getInvocations());
+    }
+
+    @Test
+    public void testCommitWithVolatileParticipant() {
+        txSupport.startTx();
+        LoggingParticipant loggingParticipant = new LoggingParticipant(new Prepared());
+        LoggingVolatileParticipant loggingVolatileParticipant = new LoggingVolatileParticipant();
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance()
+                .enlistVolatileParticipant(txSupport.getVolatileParticipantEnlistmentURI(), loggingVolatileParticipant);
+
+        final String txStatus = TxSupport.getStatus(txSupport.commitTx());
+
+        Assert.assertEquals(TxStatus.TransactionCommitted.name(), txStatus);
+        Assert.assertEquals(Arrays.asList(new String[]{"commitOnePhase"}), loggingParticipant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"beforeCompletion", "afterCompletion"}),
+                loggingVolatileParticipant.getInvocations());
+        Assert.assertEquals(TxStatus.TransactionCommitted, loggingVolatileParticipant.getTxStatus());
+    }
+
+    @Test
+    public void testRollbackWithVolatileParticipant() {
+        txSupport.startTx();
+        LoggingParticipant loggingParticipant = new LoggingParticipant(new Prepared());
+        LoggingVolatileParticipant loggingVolatileParticipant = new LoggingVolatileParticipant();
+        ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, txSupport.getDurableParticipantEnlistmentURI(),
+                loggingParticipant);
+        ParticipantsManagerFactory.getInstance()
+                .enlistVolatileParticipant(txSupport.getVolatileParticipantEnlistmentURI(), loggingVolatileParticipant);
+
+        final String txStatus = TxSupport.getStatus(txSupport.rollbackTx());
+
+        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), txStatus);
+        Assert.assertEquals(Arrays.asList(new String[]{"rollback"}), loggingParticipant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"afterCompletion"}),
+                loggingVolatileParticipant.getInvocations());
+        Assert.assertEquals(TxStatus.TransactionRolledBack, loggingVolatileParticipant.getTxStatus());
     }
 
 }
