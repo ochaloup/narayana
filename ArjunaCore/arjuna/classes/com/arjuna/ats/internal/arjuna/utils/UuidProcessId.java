@@ -38,12 +38,7 @@ import java.util.UUID;
  */
 
 public class UuidProcessId implements com.arjuna.ats.arjuna.utils.Process {
-    /**
-     * @return the process id. This had better be unique between processes on
-     *         the same machine. If not we're in trouble!
-     */
-
-    public int getpid() {
+    public UuidProcessId() {
         /*
          * UUID contains 2*64 bit fields, which we need to convert to a 32 bit
          * number. We will lose accuracy and increase the probability of a
@@ -55,7 +50,14 @@ public class UuidProcessId implements com.arjuna.ats.arjuna.utils.Process {
                 _pid = (int) (_theUid.getLeastSignificantBits() ^ _theUid.getMostSignificantBits());
             }
         }
+    }
 
+    /**
+     * @return the process id. This had better be unique between processes on
+     *         the same machine. If not we're in trouble!
+     */
+
+    public int getpid() {
         return _pid;
     }
 
