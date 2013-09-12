@@ -1352,6 +1352,12 @@ public class BasicAction extends StateManager {
             }
         }
 
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.tracef("BasicAction::End() result for action-id (%s) is (%s) node id: (%s)", get_uid(),
+                    TwoPhaseOutcome.stringForm(actionStatus),
+                    arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier());
+        }
+
         boolean returnCurrentStatus = false;
 
         if (reportHeuristics || (!reportHeuristics && !TxControl.asyncCommit))
@@ -2342,6 +2348,13 @@ public class BasicAction extends StateManager {
 
         p = ((actionType == ActionType.TOP_LEVEL) ? record.topLevelPrepare() : record.nestedPrepare());
 
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.tracef(
+                    "BasicAction::doPrepare() result for action-id (%s) on record id: (%s) is (%s) node id: (%s)",
+                    get_uid(), record.order(), TwoPhaseOutcome.stringForm(p),
+                    arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier());
+        }
+
         if (p == TwoPhaseOutcome.PREPARE_OK) {
             record = insertRecord(preparedList, record);
         } else {
@@ -2602,6 +2615,14 @@ public class BasicAction extends StateManager {
             if (ok != TwoPhaseOutcome.FINISH_OK) {
                 /* Preserve error messages */
             }
+
+            if (tsLogger.logger.isTraceEnabled()) {
+                tsLogger.logger.tracef(
+                        "BasicAction::doCommit() result for action-id (%s) on record id: (%s) is (%s) node id: (%s)",
+                        get_uid(), record.order(), TwoPhaseOutcome.stringForm(ok),
+                        arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier());
+            }
+
         }
 
         return ok;
@@ -2680,6 +2701,14 @@ public class BasicAction extends StateManager {
 
                 recordBeingHandled = null;
             }
+
+            if (tsLogger.logger.isTraceEnabled()) {
+                tsLogger.logger.tracef(
+                        "BasicAction::doAbort() result for action-id (%s) on record id: (%s) is (%s) node id: (%s)",
+                        get_uid(), record.order(), TwoPhaseOutcome.stringForm(ok),
+                        arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier());
+            }
+
         }
 
         return ok;
