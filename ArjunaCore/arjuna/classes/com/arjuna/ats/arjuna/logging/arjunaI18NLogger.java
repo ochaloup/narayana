@@ -1568,4 +1568,8 @@ public interface arjunaI18NLogger {
      * return type have prefix get_, all others are log methods and have prefix
      * <level>_
      */
+
+    @Message(id = 12378, value = "ReaperElement appears to be wedged: {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void wedged_reaperelement(String arg0);
 }
