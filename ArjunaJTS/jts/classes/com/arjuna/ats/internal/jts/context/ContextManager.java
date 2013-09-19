@@ -466,8 +466,8 @@ public class ContextManager {
          * need it when we pop the transaction later.
          */
 
-        if (action != null)
-            action.determineLocality();
+        // if (action != null)
+        action.determineLocality();
 
         /*
          * Doesn't need to be synchronized since only this thread can play with
