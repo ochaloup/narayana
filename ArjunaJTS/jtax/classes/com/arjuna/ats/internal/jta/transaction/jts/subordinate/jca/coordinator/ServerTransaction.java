@@ -95,12 +95,12 @@ public class ServerTransaction
 
     public boolean save_state(OutputObjectState os, int ot) {
         try {
-            if (_theXid != null)
+            if (_theXid != null) {
                 os.packBoolean(true);
-            else
-                os.packBoolean(false);
 
-            _theXid.packInto(os);
+                _theXid.packInto(os);
+            } else
+                os.packBoolean(false);
 
             return super.save_state(os, ot);
         } catch (IOException e) {
