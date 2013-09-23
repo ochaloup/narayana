@@ -113,9 +113,9 @@ class InterpositionClientRequestInterceptorImpl extends LocalObject implements C
     }
 
     private void trace_request(String method, ClientRequestInfo request_info) {
-        jtsLogger.logger.tracef("InterpositionClientRequestInterceptorImpl::%s ( %s ) nodeId=%s requestId=%d", method,
-                request_info.operation(), arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier(),
-                request_info.request_id());
+        jtsLogger.logger.tracef("InterpositionClientRequestInterceptorImpl::%s ( %s ) nodeId=%s requestId=%d target=%s",
+                method, request_info.operation(), arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier(),
+                request_info.request_id(), request_info.target().toString());
     }
 
     public void send_request(ClientRequestInfo request_info) throws SystemException {
