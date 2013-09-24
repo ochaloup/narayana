@@ -21,6 +21,7 @@
 package com.arjuna.ats.jbossatx.jts;
 
 import com.arjuna.ats.internal.jts.ORBManager;
+import com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators.JacOrbRCServiceInit;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 import com.arjuna.ats.jbossatx.logging.jbossatxLogger;
@@ -34,6 +35,8 @@ import com.arjuna.ats.jbossatx.logging.jbossatxLogger;
 public class RecoveryManagerService extends com.arjuna.ats.jbossatx.jta.RecoveryManagerService {
     public RecoveryManagerService(org.omg.CORBA.ORB theCorbaORB) throws Exception {
         jbossatxLogger.i18NLogger.info_jts_RecoveryManagerService_init();
+
+        JacOrbRCServiceInit.waitForRunningORBRunner();
 
         /**
          * Create an ORB portability wrapper around the CORBA ORB services orb

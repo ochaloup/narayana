@@ -33,6 +33,7 @@ package com.arjuna.ats.internal.jts;
 
 import com.arjuna.ats.jts.logging.jtsLogger;
 import com.arjuna.orbportability.ORB;
+import com.arjuna.orbportability.ORBShutdownListener;
 import com.arjuna.orbportability.RootOA;
 
 /**
@@ -60,6 +61,14 @@ public class ORBManager {
     public static final boolean setORB(com.arjuna.orbportability.ORB theOrb) {
         if (_theOrb == null) {
             _theOrb = theOrb;
+
+            theOrb.setORBShutdownListener(new ORBShutdownListener() {
+
+                @Override
+                public void orbShutdown() {
+                    ORBManager.reset();
+                }
+            });
 
             return true;
         }
