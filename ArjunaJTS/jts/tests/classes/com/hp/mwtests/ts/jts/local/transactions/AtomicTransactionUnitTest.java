@@ -132,5 +132,7 @@ public class AtomicTransactionUnitTest extends TestBase {
         A.resume();
 
         assertTrue(OTSImpleManager.current() != null);
+
+        A.rollback();
     }
 }
