@@ -61,6 +61,9 @@ public class CrashRecovery2 {
     public void test() throws NotSupportedException, SystemException, IllegalStateException, RollbackException,
             SecurityException, HeuristicMixedException, HeuristicRollbackException, NoSuchFieldException,
             IllegalArgumentException, IllegalAccessException {
+
+        jtaPropertyManager.getJTAEnvironmentBean().setOrphanSafetyInterval(0);
+
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
 
         // ok, now drive a TX to completion. the script should ensure that the
@@ -102,10 +105,6 @@ public class CrashRecovery2 {
 
         RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
         manager.initialize();
-
-        Field safetyIntervalMillis = RecoveryXids.class.getDeclaredField("safetyIntervalMillis");
-        safetyIntervalMillis.setAccessible(true);
-        safetyIntervalMillis.set(null, 0);
 
         manager.scan();
 
