@@ -49,8 +49,10 @@ import org.omg.CosTransactions.Vote;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
+import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
 import com.arjuna.ats.internal.jta.resources.jts.orbspecific.XAResourceRecord;
 import com.arjuna.ats.internal.jta.transaction.jts.TransactionImple;
+import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.jta.recovery.XARecoveryResource;
 import com.arjuna.ats.jta.xa.XidImple;
 import com.hp.mwtests.ts.jta.common.DummyRecoverableXAConnection;
@@ -76,6 +78,9 @@ class DummyXAResourceRecord extends XAResourceRecord {
 public class XAResourceRecordUnitTest extends TestBase {
     @Test
     public void test() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         XAResourceRecord xares = new XAResourceRecord();
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
         Object[] params = new Object[1];
@@ -113,6 +118,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testPackUnpack() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         XAResourceRecord xares;
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
         Object[] params = new Object[1];
@@ -134,6 +142,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testReadonly() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         XAResourceRecord xares;
 
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
@@ -155,6 +166,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testCommitFailure() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         FailureXAResource fxa = new FailureXAResource(FailureXAResource.FailLocation.commit);
         TransactionImple tx = new TransactionImple();
         XAResourceRecord xares = new XAResourceRecord(tx, fxa, tx.getTxId(), null);
@@ -173,6 +187,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testRollbackFailure() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         FailureXAResource fxa = new FailureXAResource(FailureXAResource.FailLocation.rollback);
         TransactionImple tx = new TransactionImple();
         XAResourceRecord xares = new XAResourceRecord(tx, fxa, tx.getTxId(), null);
@@ -191,6 +208,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testValid2PC() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         TransactionImple tx = new TransactionImple();
         DummyXA res = new DummyXA(false);
         XAResourceRecord xares = new XAResourceRecord(tx, res, tx.getTxId(), null);
@@ -202,6 +222,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testValid1PC() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         TransactionImple tx = new TransactionImple();
         DummyXA res = new DummyXA(false);
         XAResourceRecord xares = new XAResourceRecord(tx, res, tx.getTxId(), null);
@@ -211,6 +234,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testInvalid() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         XAResourceRecord xares = new XAResourceRecord();
 
         assertEquals(xares.getXid(), null);
@@ -231,6 +257,9 @@ public class XAResourceRecordUnitTest extends TestBase {
 
     @Test
     public void testNested() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
         XAResourceRecord xares = new XAResourceRecord();
 
         assertEquals(xares.prepare_subtransaction(), Vote.VoteRollback);
