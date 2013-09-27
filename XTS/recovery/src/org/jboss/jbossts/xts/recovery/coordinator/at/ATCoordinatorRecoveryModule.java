@@ -71,9 +71,8 @@ public class ATCoordinatorRecoveryModule implements XTSRecoveryModule {
         // one gets there first creates it. No synchronization is needed as
         // modules are only ever
         // installed in a single thread
-        XTSATRecoveryManager atRecoveryManager = XTSATRecoveryManager.getRecoveryManager();
-        if (atRecoveryManager == null) {
-            atRecoveryManager = new XTSATRecoveryManagerImple(_recoveryStore);
+        if (!XTSATRecoveryManagerImple.isRecoveryManagerInitialised()) {
+            XTSATRecoveryManager atRecoveryManager = new XTSATRecoveryManagerImple(_recoveryStore);
             XTSATRecoveryManager.setRecoveryManager(atRecoveryManager);
         }
 
