@@ -461,10 +461,6 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return new ParticipantRecord();
     }
 
-    public void remove(AbstractRecord toDelete) {
-        toDelete = null;
-    }
-
     public void print(PrintWriter strm) {
         super.print(strm);
 
