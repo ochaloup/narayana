@@ -138,7 +138,7 @@ public class XTSBARecoveryManagerImple extends XTSBARecoveryManager {
      * @param uid
      */
     public boolean isParticipantPresent(Uid uid) {
-        return (uidMap.get(uid) != null);
+        return (uidMap.get(uid.toString()) != null);
     }
 
     /**
