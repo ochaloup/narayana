@@ -1054,18 +1054,22 @@ public class CoordinatorCompletionParticipantEngine implements CoordinatorComple
         try {
             participant.cancel();
         } catch (final FaultedException fe) {
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCancel_1(fe);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Faulted exception from participant cancel for WS-BA participant {0}",
-                        new Object[]{id}, fe);
+                WSTLogger.logger.tracev(fe, "Faulted exception from participant cancel for WS-BA participant");
             }
+
             // fail here because the participant doesn't want to retry the
             // cancel
             fail(BusinessActivityConstants.WSBA_ELEMENT_FAIL_QNAME);
         } catch (final Throwable th) {
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCancel_2(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant cancel for WS-BA participant {0}",
-                        new Object[]{id}, th);
+                WSTLogger.logger.tracev(th, "Unexpected exception from participant cancel for WS-BA participant");
             }
+
             /*
              * we can get here from state ACTIVE or CONPLETING. we could roll
              * back the state as though the cancel never happened. the only
@@ -1103,9 +1107,12 @@ public class CoordinatorCompletionParticipantEngine implements CoordinatorComple
         try {
             participant.close();
         } catch (final Throwable th) {
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeClose_1(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant close for WS-BA participant {0}", th);
+                WSTLogger.logger.tracev(th, "Unexpected exception from participant close for WS-BA participant");
             }
+
             // restore previous state so we can retry the close otherwise we get
             // stuck in state closing forever
             changeState(State.STATE_COMPLETED);
@@ -1146,10 +1153,12 @@ public class CoordinatorCompletionParticipantEngine implements CoordinatorComple
         try {
             participant.compensate();
         } catch (final FaultedException fe) {
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_1(fe);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Faulted exception from participant compensate for WS-BA participant {0}",
-                        new Object[]{id}, fe);
+                WSTLogger.logger.tracev(fe, "Faulted exception from participant compensate for WS-BA participant");
             }
+
             // fail here because the participant doesn't want to retry the
             // compensate
             fail(BusinessActivityConstants.WSBA_ELEMENT_FAIL_QNAME);
@@ -1165,10 +1174,12 @@ public class CoordinatorCompletionParticipantEngine implements CoordinatorComple
                 initiateTimer();
             }
 
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_2(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant compensate for WS-BA participant {0}",
-                        new Object[]{id}, th);
+                WSTLogger.logger.tracev(th, "Unexpected exception from participant compensate for WS-BA participant");
             }
+
             return;
         }
 
@@ -1215,10 +1226,12 @@ public class CoordinatorCompletionParticipantEngine implements CoordinatorComple
         try {
             participant.complete();
         } catch (final Throwable th) {
+            WSTLogger.i18NLogger.warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeComplete_1(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant complete for WS-BA participant {0}",
-                        new Object[]{id}, th);
+                WSTLogger.logger.tracev(th, "Unexpected exception from participant complete for WS-BA participant");
             }
+
             return;
         }
 

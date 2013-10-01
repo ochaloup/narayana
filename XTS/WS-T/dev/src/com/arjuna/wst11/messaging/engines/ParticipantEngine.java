@@ -570,8 +570,11 @@ public class ParticipantEngine implements ParticipantInboundEvents {
                     state = State.STATE_PREPARED_SUCCESS;
                 }
             }
+
+            WSTLogger.i18NLogger.warn_messaging_engines_ParticipantEngine_executeCommit_1(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant commit", th);
+                WSTLogger.logger.tracev(th, "Unexpected exception thrown from commit");
             }
         }
     }
@@ -584,10 +587,18 @@ public class ParticipantEngine implements ParticipantInboundEvents {
         try {
             participant.rollback();
         } catch (final SystemException se) {
+            WSTLogger.i18NLogger.warn_messaging_engines_ParticipantEngine_executeRollback_1(se);
+
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev(se, "SystemException thrown from rollback");
+            }
+
             return false;
         } catch (final Throwable th) {
+            WSTLogger.i18NLogger.warn_messaging_engines_ParticipantEngine_executeRollback_2(th);
+
             if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception from participant rollback", th);
+                WSTLogger.logger.tracev(th, "Unexpected exception thrown from rollback");
             }
         }
         return true;
