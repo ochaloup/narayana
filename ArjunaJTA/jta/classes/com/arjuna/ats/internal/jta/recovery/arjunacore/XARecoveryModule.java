@@ -200,7 +200,7 @@ public class XARecoveryModule implements RecoveryModule {
 
         synchronized (_xaResourceRecoveryHelpers) {
             scanning = false;
-            _xaResourceRecoveryHelpers.notify();
+            _xaResourceRecoveryHelpers.notifyAll();
         }
     }
 
@@ -826,7 +826,7 @@ public class XARecoveryModule implements RecoveryModule {
 
     private List<XAResource> _resources;
 
-    private boolean scanning;
+    private volatile boolean scanning;
 
     private final List<XAResourceRecovery> _xaRecoverers;
 
