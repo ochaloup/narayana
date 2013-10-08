@@ -34,6 +34,8 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.impl.ConnectionImpl;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.impl.SessionImpl;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.impl.TPSVCINFO_Impl;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.impl.X_OCTET_Impl;
+import org.jboss.narayana.rest.bridge.inbound.InboundBridge;
+import org.jboss.narayana.rest.bridge.inbound.InboundBridgeManager;
 
 /**
  * MDB services implementations extend this class as it provides the core
@@ -109,6 +111,7 @@ public abstract class BlackTieService implements Service {
             String subtype = null;
             SessionImpl serviceSession = ((ConnectionImpl) connection).createServiceSession(serviceName, message.cd,
                     message.replyTo);
+            InboundBridge inboundBridge = null;
             try {
                 boolean hasTPCONV = (message.flags & Connection.TPCONV) == Connection.TPCONV;
                 Boolean conversational = (Boolean) connectionFactory.getProperties()
@@ -161,12 +164,23 @@ public abstract class BlackTieService implements Service {
 
                 hasTx = (message.control != null && message.control.length() != 0);
 
-                log.debug("hasTx=" + hasTx + " ior: " + message.control);
+                log.debug("hasTx=" + hasTx + " control: " + message.control);
 
-                if (hasTx) // make sure any foreign tx is resumed before calling
+                if (hasTx) {
+                    // make sure any foreign tx is resumed before calling
                     // the
                     // service routine
-                    JtsTransactionImple.resume(message.control);
+                    if (message.control.startsWith("IOR")) {
+                        log.debug("resume OTS transaction");
+                        JtsTransactionImple.resume(message.control);
+                    } else if (message.control.startsWith("http")) {
+                        log.debug("start inbound bridge");
+                        inboundBridge = InboundBridgeManager.getInstance().createInboundBridge(message.control);
+                        inboundBridge.start();
+                    } else {
+                        log.error(message.control + " is not OTS or RTS when resume the transaction");
+                    }
+                }
 
                 log.debug("Invoking the XATMI service");
                 Response response = null;
@@ -222,8 +236,21 @@ public abstract class BlackTieService implements Service {
                     log.debug("No need to send a response");
                 }
             } finally {
-                if (hasTx) // and suspend it again
-                    JtsTransactionImple.suspend();
+                if (hasTx) {
+                    // and suspend it again
+                    if (message.control.startsWith("IOR")) {
+                        log.debug("suspend OTS transaction");
+                        JtsTransactionImple.suspend();
+                    } else if (message.control.startsWith("http")) {
+                        log.debug("inbound bridge stop");
+                        if (inboundBridge != null) {
+                            inboundBridge.stop();
+                        }
+                    } else {
+                        log.error(message.control + " is not OTS or RTS when suspend the transaction");
+                    }
+                }
+
                 if (responseSendable) {
                     // Even though we can provide the cd we don't as
                     // atmibroker-xatmi doesn't because tpreturn doesn't
