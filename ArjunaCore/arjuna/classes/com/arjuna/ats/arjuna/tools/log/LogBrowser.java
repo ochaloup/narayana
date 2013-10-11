@@ -282,7 +282,8 @@ class LogConsole {
         InputObjectState buff = new InputObjectState();
 
         try {
-            if (StoreManager.getRecoveryStore().allObjUids(type, buff)) {
+            if (StoreManager.getRecoveryStore()
+                    .allObjUids(TransactionTypeManager.getInstance().getTransactionType(type), buff)) {
                 Uid u = null;
 
                 do {
@@ -308,7 +309,8 @@ class LogConsole {
         if (id.equals(Uid.nullUid()))
             return false;
 
-        ObjectStoreIterator iter = new ObjectStoreIterator(StoreManager.getRecoveryStore(), _transactionType);
+        ObjectStoreIterator iter = new ObjectStoreIterator(StoreManager.getRecoveryStore(),
+                TransactionTypeManager.getInstance().getTransactionType(_transactionType));
         Uid u;
 
         do {
@@ -335,7 +337,10 @@ class LogConsole {
     }
 
     private String _currentLog = "";
-    private String _transactionType = "";
+    private String _transactionType = ""; // short hand for the log type (we
+                                            // don't want users having to write
+                                            // the real type string as it can be
+                                            // long!)
 }
 
 public class LogBrowser {
