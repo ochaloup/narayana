@@ -56,48 +56,55 @@ public class ConnectionManager {
         String user = info.getProperty(TransactionalDriver.userName);
         String passwd = info.getProperty(TransactionalDriver.password);
         String dynamic = info.getProperty(TransactionalDriver.dynamicClass);
+        String poolConnections = info.getProperty(TransactionalDriver.poolConnections, "true");
+
         if (dynamic == null)
             dynamic = "";
 
-        for (ConnectionImple conn : _connections) {
-            ConnectionControl connControl = conn.connectionControl();
-            TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-            Transaction tx1, tx2 = null;
+        boolean poolingEnabled = "true".equalsIgnoreCase(poolConnections);
 
-            tx1 = connControl.transaction();
-            try {
-                tx2 = tm.getTransaction();
-            } catch (javax.transaction.SystemException se) {
-                /* Ignore: tx2 is null already */
-            }
+        if (poolingEnabled) {
+            for (ConnectionImple conn : _connections) {
+                ConnectionControl connControl = conn.connectionControl();
+                TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+                Transaction tx1, tx2 = null;
 
-            /* Check transaction and database connection. */
-            if ((tx1 != null && tx1.equals(tx2)) && connControl.url().equals(dbUrl) && connControl.user().equals(user)
-                    && connControl.password().equals(passwd) && connControl.dynamicClass().equals(dynamic)) {
+                tx1 = connControl.transaction();
                 try {
-                    /*
-                     * Should not overload the meaning of closed. Change!
-                     */
-
-                    if (!conn.isClosed()) {
-                        // ConnectionImple does not actually implement
-                        // Connection, but its
-                        // concrete child classes do. See ConnectionImple
-                        // javadoc.
-                        return (Connection) conn;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    SQLException sqlException = new SQLException(ex.getMessage());
-                    sqlException.initCause(ex);
-                    throw sqlException;
+                    tx2 = tm.getTransaction();
+                } catch (javax.transaction.SystemException se) {
+                    /* Ignore: tx2 is null already */
                 }
-            } else {
-                // no longer being used by a transaction, so let's discard.
-                // JBTM-764
 
-                if (tx1 == null)
-                    remove(conn);
+                /* Check transaction and database connection. */
+                if ((tx1 != null && tx1.equals(tx2)) && connControl.url().equals(dbUrl)
+                        && connControl.user().equals(user) && connControl.password().equals(passwd)
+                        && connControl.dynamicClass().equals(dynamic)) {
+                    try {
+                        /*
+                         * Should not overload the meaning of closed. Change!
+                         */
+
+                        if (!conn.isClosed()) {
+                            // ConnectionImple does not actually implement
+                            // Connection, but its
+                            // concrete child classes do. See ConnectionImple
+                            // javadoc.
+                            return (Connection) conn;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        SQLException sqlException = new SQLException(ex.getMessage());
+                        sqlException.initCause(ex);
+                        throw sqlException;
+                    }
+                } else {
+                    // no longer being used by a transaction, so let's discard.
+                    // JBTM-764
+
+                    if (tx1 == null)
+                        remove(conn);
+                }
             }
         }
 
@@ -108,7 +115,8 @@ public class ConnectionManager {
          * connection information.
          */
 
-        _connections.add(conn);
+        if (poolingEnabled)
+            _connections.add(conn);
 
         // ConnectionImple does not actually implement Connection, but its
         // concrete child classes do. See ConnectionImple javadoc.
