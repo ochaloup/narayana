@@ -56,20 +56,15 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients1;
  * $Id: Client05a.java,v 1.2 2003/06/26 11:43:30 rbegg Exp $
  */
 
-import org.jboss.jbossts.qa.CrashRecovery05.*;
-import org.jboss.jbossts.qa.Utils.OAInterface;
-import org.jboss.jbossts.qa.Utils.ORBInterface;
-import org.jboss.jbossts.qa.Utils.ServerIORStore;
-import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
+import org.jboss.jbossts.qa.CrashRecovery05.CheckBehavior;
+import org.jboss.jbossts.qa.CrashRecovery05.ResourceTrace;
 
 public class Client05a {
     public static void main(String[] args) {
-        try {
-            ORBInterface.initORB(args, null);
-            OAInterface.initOA();
+        ClientAfterCrash afterCrash = new ClientAfterCrash(Client05a.class.getSimpleName());
 
-            String serviceIOR = ServerIORStore.loadIOR(args[args.length - 1]);
-            AfterCrashService service = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR));
+        try {
+            afterCrash.initOrb(args);
 
             CheckBehavior[] checkBehaviors = new CheckBehavior[1];
             checkBehaviors[0] = new CheckBehavior();
@@ -80,35 +75,17 @@ public class Client05a {
             checkBehaviors[0].allow_returned_rolledback = true;
             checkBehaviors[0].allow_raised_not_prepared = false;
 
-            boolean correct = true;
+            afterCrash.serviceSetup(checkBehaviors);
 
-            service.setup_oper(1);
+            afterCrash.waitForRecovery();
 
-            correct = service.check_oper(checkBehaviors) && service.is_correct();
+            afterCrash.checkResourceTrace(ResourceTrace.ResourceTraceRollback);
 
-            CrashRecoveryDelays.awaitReplayCompletionCR05();
-
-            ResourceTrace resourceTrace = service.get_resource_trace(0);
-
-            correct = correct && (resourceTrace == ResourceTrace.ResourceTraceRollback);
-
-            if (correct) {
-                System.out.println("Passed");
-            } else {
-                System.out.println("Failed");
-            }
+            afterCrash.reportStatus();
         } catch (Exception exception) {
-            System.out.println("Failed");
-            System.err.println("Client05a.main: " + exception);
-            exception.printStackTrace(System.err);
-        }
-
-        try {
-            OAInterface.shutdownOA();
-            ORBInterface.shutdownORB();
-        } catch (Exception exception) {
-            System.err.println("Client05a.main: " + exception);
-            exception.printStackTrace(System.err);
+            afterCrash.reportException(exception);
+        } finally {
+            afterCrash.shutdownOrb();
         }
     }
 }

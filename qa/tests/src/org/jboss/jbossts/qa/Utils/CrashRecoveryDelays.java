@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.PrintStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.InetAddress;
 
 /**
  * Utility class to hold delay functions for crash recovery tests.
@@ -37,6 +36,10 @@ import java.net.InetAddress;
 public class CrashRecoveryDelays {
     public static void awaitRecoveryArjunaCore() throws InterruptedException {
         doRecovery();
+    }
+
+    public static void awaitRecoveryCR05() throws InterruptedException {
+        awaitRecovery(2, 1);
     }
 
     public static void awaitRecoveryCR07(int num_clients) throws InterruptedException {
@@ -126,7 +129,8 @@ public class CrashRecoveryDelays {
                     out.close();
                 }
 
-                sckt.close();
+                if (sckt != null)
+                    sckt.close();
             } catch (Exception e) {
             }
         }
@@ -169,7 +173,6 @@ public class CrashRecoveryDelays {
     private static int getDelayFactor() {
         if (delayFactor < 0) {
             delayFactor = arjPropertyManager.getCoreEnvironmentBean().getTimeoutFactor();
-            // delayFactor = Integer.getInteger("timeout.factor", 1);
 
             if (delayFactor <= 0)
                 delayFactor = 1;
