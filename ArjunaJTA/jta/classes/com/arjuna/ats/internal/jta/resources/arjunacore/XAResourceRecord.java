@@ -50,8 +50,6 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.recovery.SerializableXAResourceDeserializer;
 import com.arjuna.ats.jta.recovery.XARecoveryResource;
-import com.arjuna.ats.jta.resources.EndXAResource;
-import com.arjuna.ats.jta.resources.StartXAResource;
 import com.arjuna.ats.jta.utils.XAHelper;
 import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 import com.arjuna.ats.jta.xa.XidImple;
@@ -70,6 +68,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
+import org.jboss.tm.FirstResource;
+import org.jboss.tm.LastResource;
 
 /**
  * @author Mark Little (mark_little@hp.com)
@@ -129,14 +130,12 @@ public class XAResourceRecord extends AbstractRecord {
     }
 
     public Uid order() {
-        if (_theXAResource instanceof StartXAResource)
+        if (_theXAResource instanceof FirstResource)
             return START_XARESOURCE;
-        else {
-            if (_theXAResource instanceof EndXAResource)
-                return END_XARESOURCE;
-            else
-                return super.order();
-        }
+        else if (_theXAResource instanceof LastResource)
+            return END_XARESOURCE;
+
+        return super.order();
     }
 
     public boolean propagateOnCommit() {
