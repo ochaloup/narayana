@@ -89,7 +89,7 @@ public class ORBSetup implements InitClassInterface {
                 ORBManager.setPOA(oa);
             }
         } else {
-            jtsLogger.i18NLogger.warn_utils_ORBSetup_orbalreadyset();
+            jtsLogger.i18NLogger.info_utils_ORBSetup_orbalreadyset();
         }
     }
 }
