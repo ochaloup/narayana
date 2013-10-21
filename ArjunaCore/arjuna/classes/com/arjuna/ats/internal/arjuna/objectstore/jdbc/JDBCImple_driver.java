@@ -42,6 +42,7 @@ import javax.naming.NamingException;
 
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.exceptions.FatalError;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
@@ -590,6 +591,9 @@ public abstract class JDBCImple_driver {
      * Set up the store for use.
      * 
      * @throws NamingException
+     * @throws {@link
+     *             FatalError} In case the configured store cannot be connected
+     *             to
      */
     public void initialise(final JDBCAccess jdbcAccess, String tableName,
             ObjectStoreEnvironmentBean jdbcStoreEnvironmentBean) throws SQLException, NamingException {
