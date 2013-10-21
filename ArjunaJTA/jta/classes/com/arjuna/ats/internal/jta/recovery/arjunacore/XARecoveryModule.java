@@ -51,7 +51,6 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
-import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
@@ -89,15 +88,26 @@ public class XARecoveryModule implements RecoveryModule {
     public void removeXAResourceRecoveryHelper(XAResourceRecoveryHelper xaResourceRecoveryHelper) {
         synchronized (_xaResourceRecoveryHelpers) {
             if (scanning) {
-                try {
-                    // do not allow a recovery helper to be removed while the
-                    // scan is in progress
-                    _xaResourceRecoveryHelpers.wait();
-                } catch (InterruptedException e) {
-                    tsLogger.logger.warn("problem waiting for scanLock", e);
+                XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
+                for (int i = 0; i < xaResources.length; i++) {
+                    RecoveryXids recoveryXids = _xidScans.get(xaResources[i]);
+                    if (recoveryXids != null) {
+                        if (recoveryXids.size() > 0) {
+                            jtaLogger.logger.warn("RecoveryManager is using this service, may delay up to 10 seconds");
+                            try {
+                                // do not allow a recovery helper to be removed
+                                // while the
+                                // scan is in progress
+                                _xaResourceRecoveryHelpers.wait();
+                            } catch (InterruptedException e) {
+                                tsLogger.logger.warn("problem waiting for scanLock", e);
+                            }
+                            break;
+                        }
+                    }
                 }
+                _xaResourceRecoveryHelpers.remove(xaResourceRecoveryHelper);
             }
-            _xaResourceRecoveryHelpers.remove(xaResourceRecoveryHelper);
         }
     }
 
@@ -448,6 +458,8 @@ public class XARecoveryModule implements RecoveryModule {
     private List<XAResource> resourceInitiatedRecoveryForRecoveryHelpers() {
         List<XAResource> xaresources = new ArrayList<XAResource>();
         synchronized (_xaResourceRecoveryHelpers) {
+            recoveryHelpersXAResource.clear();
+
             for (XAResourceRecoveryHelper xaResourceRecoveryHelper : _xaResourceRecoveryHelpers) {
                 try {
                     XAResource[] xaResources = xaResourceRecoveryHelper.getXAResources();
@@ -455,6 +467,7 @@ public class XARecoveryModule implements RecoveryModule {
                         for (XAResource xaResource : xaResources) {
                             xaresources.add(xaResource);
                         }
+                        recoveryHelpersXAResource.put(xaResourceRecoveryHelper, xaResources);
                     }
                 } catch (Exception ex) {
                     jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
@@ -835,6 +848,8 @@ public class XARecoveryModule implements RecoveryModule {
     private final List<XAResourceOrphanFilter> _xaResourceOrphanFilters;
 
     private Hashtable _failures = null;
+
+    private Hashtable<XAResourceRecoveryHelper, XAResource[]> recoveryHelpersXAResource = new Hashtable<XAResourceRecoveryHelper, XAResource[]>();
 
     private Hashtable<XAResource, RecoveryXids> _xidScans = null;
 
