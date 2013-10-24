@@ -31,13 +31,11 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionScoped;
-import javax.transaction.TransactionSynchronizationRegistry;
+import javax.transaction.*;
 import java.lang.annotation.Annotation;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author paul.robinson@redhat.com 01/05/2013
@@ -48,9 +46,10 @@ public class TransactionContext implements Context {
 
     private static TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
+    private Map<Transaction, TransactionScopeCleanup> transactions = new HashMap<Transaction, TransactionScopeCleanup>();
+
     @Override
     public Class<? extends Annotation> getScope() {
-
         return TransactionScoped.class;
     }
 
@@ -70,8 +69,21 @@ public class TransactionContext implements Context {
         if (resource != null) {
             return (T) resource;
         } else if (creationalContext != null) {
+            Transaction currentTransaction = getCurrentTransaction();
             T t = contextual.create(creationalContext);
             tsr.putResource(bean.getId(), t);
+
+            synchronized (transactions) {
+                TransactionScopeCleanup synch = transactions.get(currentTransaction);
+
+                if (synch == null) {
+                    synch = new TransactionScopeCleanup(this, currentTransaction);
+                    transactions.put(currentTransaction, synch);
+                }
+
+                synch.registerBean(contextual, creationalContext, t);
+            }
+
             return t;
         } else {
             return null;
@@ -98,6 +110,12 @@ public class TransactionContext implements Context {
                     || currentStatus == Status.STATUS_ROLLING_BACK;
         } catch (SystemException e) {
             throw new RuntimeException(jtaLogger.i18NLogger.get_error_getting_tx_status(), e);
+        }
+    }
+
+    void cleanupScope(Transaction transaction) {
+        synchronized (transactions) {
+            transactions.remove(transaction);
         }
     }
 
