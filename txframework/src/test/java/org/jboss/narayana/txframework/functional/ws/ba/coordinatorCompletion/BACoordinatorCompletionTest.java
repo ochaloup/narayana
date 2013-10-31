@@ -67,7 +67,7 @@ public class BACoordinatorCompletionTest {
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 
-        String ManifestMF = "Manifest-Version: 1.0\n" + "Dependencies: org.jboss.xts\n";
+        String ManifestMF = "Manifest-Version: 1.0\n" + "Dependencies: org.jboss.xts, org.jboss.narayana.txframework\n";
 
         archive.setManifest(new StringAsset(ManifestMF));
 
