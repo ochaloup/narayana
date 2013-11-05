@@ -438,7 +438,7 @@ public class ProtocolConverter {
         // have acked the clients ack
         synchronized (session) {
             // Allow another message to be consumed
-            session.start();
+            session.resume();
             sendResponse(command);
         }
         log.debug("Session started");
