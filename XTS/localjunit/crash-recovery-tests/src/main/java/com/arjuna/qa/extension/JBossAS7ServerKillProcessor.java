@@ -12,9 +12,9 @@ import java.util.logging.Logger;
 public class JBossAS7ServerKillProcessor implements ServerKillProcessor {
 
     private static final Logger logger = Logger.getLogger(JBossAS7ServerKillProcessor.class.getName());
-    private static final String CHECK_JBOSS_ALIVE_CMD = "if [ \"$(jps | grep jboss-modules.jar)\" == \"\" ]; then exit 1; fi";
+    private static final String CHECK_JBOSS_ALIVE_CMD = "if [ \"$(ps aux | grep 'jboss-module[s]')\" == \"\" ]; then exit 1; fi";
     private static final String CHECK_FOR_DEFUNCT_JAVA_CMD = "if [ \"$(ps aux | grep '\\[java\\] <defunct>')\" == \"\" ]; then exit 1; fi";
-    private static final String SHUTDOWN_JBOSS_CMD = "jps | grep jboss-modules.jar | awk '{ print $1 }' | xargs kill";
+    private static final String SHUTDOWN_JBOSS_CMD = "ps axu | grep jboss-module[s] | awk '{print $2}' | xargs kill";
 
     private int checkPeriodMillis = 10 * 1000;
     private int numChecks = 60;
