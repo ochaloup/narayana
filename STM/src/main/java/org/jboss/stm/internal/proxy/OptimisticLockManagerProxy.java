@@ -42,19 +42,24 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
 
 public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
     public OptimisticLockManagerProxy(T candidate) {
-        this(candidate, (RecoverableContainer<T>) null);
+        super();
+
+        _theObject = candidate;
+        _container = null;
     }
 
     public OptimisticLockManagerProxy(T candidate, RecoverableContainer<T> cont) {
-        this(candidate, com.arjuna.ats.arjuna.ObjectType.ANDPERSISTENT, cont);
+        super(cont.objectType(), cont.objectModel());
+
+        _theObject = candidate;
+        _container = cont;
     }
 
     public OptimisticLockManagerProxy(T candidate, int ot) {
-        this(candidate, ot, null);
-    }
+        super(ot, ObjectModel.SINGLE);
 
-    public OptimisticLockManagerProxy(T candidate, int ot, RecoverableContainer<T> cont) {
-        this(candidate, ot, ObjectModel.SINGLE, cont);
+        _theObject = candidate;
+        _container = null;
     }
 
     public OptimisticLockManagerProxy(T candidate, int ot, int om, RecoverableContainer<T> cont) {
@@ -65,11 +70,10 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
     }
 
     public OptimisticLockManagerProxy(T candidate, Uid u) {
-        this(candidate, u, ObjectModel.SINGLE);
-    }
+        super(u, ObjectModel.SINGLE);
 
-    public OptimisticLockManagerProxy(T candidate, Uid u, int om) {
-        this(candidate, u, om, null);
+        _theObject = candidate;
+        _container = null;
     }
 
     // if there's a Uid then this is a persistent object
