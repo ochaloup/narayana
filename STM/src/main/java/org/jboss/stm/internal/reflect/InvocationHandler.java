@@ -93,24 +93,10 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
      */
 
     public InvocationHandler(RecoverableContainer<T> c, T obj) {
-        this(c, obj, c.objectType(), null);
+        this(c, obj, null);
     }
 
-    public InvocationHandler(RecoverableContainer<T> c, T obj, int ot) {
-        this(c, obj, ot, null);
-    }
-
-    public InvocationHandler(RecoverableContainer<T> c, T obj, Uid u) {
-        this(c, obj, ObjectType.ANDPERSISTENT, u);
-    }
-    /*
-     * public InvocationHandler (RecoverableContainer<T> c, T obj, Uid u, int
-     * objectModel) { this(c, obj, ObjectType.ANDPERSISTENT, u, objectModel); }
-     * 
-     * public InvocationHandler (RecoverableContainer<T> cont, T obj, int ot,
-     * Uid u) { this(cont, obj, ot, u, ObjectModel.SINGLE); }
-     */
-    public InvocationHandler(RecoverableContainer<T> cont, T obj, int ot, Uid u) {
+    public InvocationHandler(RecoverableContainer<T> cont, T obj, Uid u) {
         _container = cont;
         _theObject = obj;
 
@@ -158,7 +144,7 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
             if (_optimistic) {
                 _txObject = new OptimisticLockManagerProxy<T>(obj, u, ObjectModel.MULTIPLE, cont);
             } else
-                _txObject = new LockManagerProxy<T>(obj, u, _container.objectModel(), cont);
+                _txObject = new LockManagerProxy<T>(obj, u, cont);
         } else {
             /*
              * todo currently optimistic always uses persistent objects, but
@@ -173,9 +159,8 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                 _txObject = new OptimisticLockManagerProxy<T>(obj, ObjectType.ANDPERSISTENT, ObjectModel.MULTIPLE,
                         cont); // recoverable or persistent
             } else
-                _txObject = new LockManagerProxy<T>(obj, ot, _container.objectModel(), cont); // recoverable
-                                                                                                // or
-                                                                                                // persistent
+                _txObject = new LockManagerProxy<T>(obj, cont); // recoverable
+                                                                // or persistent
         }
 
         _methods = obj.getClass().getDeclaredMethods();

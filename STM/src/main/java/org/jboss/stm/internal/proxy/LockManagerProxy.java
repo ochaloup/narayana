@@ -43,33 +43,40 @@ import com.arjuna.ats.txoj.LockManager;
 
 public class LockManagerProxy<T> extends LockManager {
     public LockManagerProxy(T candidate) {
-        this(candidate, (RecoverableContainer<T>) null);
+        super();
+
+        _theObject = candidate;
+        _container = null;
     }
 
     public LockManagerProxy(T candidate, RecoverableContainer<T> cont) {
-        this(candidate, com.arjuna.ats.arjuna.ObjectType.RECOVERABLE, ObjectModel.SINGLE, cont);
-    }
-
-    public LockManagerProxy(T candidate, int ot) {
-        this(candidate, ot, ObjectModel.SINGLE, null);
-
-    }
-    public LockManagerProxy(T candidate, int ot, int om, RecoverableContainer<T> cont) {
-        super(ot, om);
+        super(cont.objectType(), cont.objectModel());
 
         _theObject = candidate;
         _container = cont;
     }
 
+    public LockManagerProxy(T candidate, int ot) {
+        super(ot, ObjectModel.SINGLE);
+
+        _theObject = candidate;
+        _container = null;
+    }
+
     public LockManagerProxy(T candidate, Uid u) {
-        this(candidate, u, ObjectModel.SINGLE, null);
+        super(u, ObjectModel.SINGLE);
+
+        _theObject = candidate;
+        _container = null;
     }
 
     // if there's a Uid then this is a persistent object
 
-    public LockManagerProxy(T candidate, Uid u, int objectModel, RecoverableContainer<T> cont) {
-        super(u, cont.objectType(), objectModel); // TODO make configurable
-                                                    // through annotation
+    public LockManagerProxy(T candidate, Uid u, RecoverableContainer<T> cont) {
+        super(u, cont.objectType(), cont.objectModel()); // TODO make
+                                                            // configurable
+                                                            // through
+                                                            // annotation
 
         _theObject = candidate;
         _container = cont;

@@ -175,7 +175,7 @@ public class PersistentContainer<T> extends RecoverableContainer<T> {
             Class<?> c = member.getClass();
 
             proxy = (T) Proxy.newProxyInstance(c.getClassLoader(), c.getInterfaces(),
-                    new InvocationHandler<T>(this, member, ObjectType.ANDPERSISTENT, id));
+                    new InvocationHandler<T>(this, member, id));
 
             _transactionalProxies.put(member, proxy);
         }
