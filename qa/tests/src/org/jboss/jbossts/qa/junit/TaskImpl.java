@@ -176,6 +176,8 @@ public class TaskImpl implements Task {
 
     private String taskPrefix;
 
+    private SimpleDateFormat simpleDateFormat;
+
     /**
      * create a new task
      * 
@@ -210,7 +212,8 @@ public class TaskImpl implements Task {
         this.taskReaderThread = null;
         this.outputDirectory = null;
         this.id = nextId.incrementAndGet();
-        this.taskPrefix = "Task [" + taskName + " " + id + "]: ";
+        this.taskPrefix = ": Task [" + taskName + " " + id + "]: ";
+        this.simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
     }
 
     TaskImpl(String taskName, Class clazz, TaskType type, PrintStream out, int timeout,
@@ -238,8 +241,8 @@ public class TaskImpl implements Task {
      *            class
      */
     public void perform(String... params) {
-        if (type != TaskType.EXPECT_PASS_FAIL) {
-            throw new RuntimeException(taskPrefix + "can't perform an EXPECT_READY task");
+        if (type == TaskType.EXPECT_READY) {
+            throw new RuntimeException(getTaskPrefix() + "can't perform an EXPECT_READY task");
         }
 
         boolean printedPassed = false;
@@ -254,7 +257,7 @@ public class TaskImpl implements Task {
 
         synchronized (this) {
             if (started) {
-                throw new RuntimeException(taskPrefix + "invalid state for perform");
+                throw new RuntimeException(getTaskPrefix() + "invalid state for perform");
             }
             // first make sure we can create a subprocess
 
@@ -273,14 +276,15 @@ public class TaskImpl implements Task {
                 // builder.redirectErrorStream(true);
                 process = builder.start();
             } catch (Exception e) {
-                Assert.fail(taskPrefix + "perform: processBuilder exception " + e.toString());
+                Assert.fail(getTaskPrefix() + "perform: processBuilder exception " + e.toString());
             }
 
             // ok, we have started so register with the task reaper -- need to
             // synchronize so we can set
             // started atomically
 
-            System.out.printf("%sInsert into task reaper queue with timeout %d secs%n", taskPrefix, timeout * 1000);
+            System.out.printf("%sInsert into task reaper queue with timeout %d secs%n", getTaskPrefix(),
+                    timeout * 1000);
             TaskReaper.getReaper().insert(this, timeout * 1000);
 
             started = true;
@@ -297,7 +301,7 @@ public class TaskImpl implements Task {
             // now read stdout checking for passed or failed
             bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+
             while ((line = bufferedReader.readLine()) != null) {
                 // need to redirect to file
                 Date date = new Date();
@@ -312,10 +316,11 @@ public class TaskImpl implements Task {
                 }
             }
 
-            System.out.printf("%sReached end of input passed=%b failed=%b%n", taskPrefix, printedPassed, printedFailed);
+            System.out.printf("%sReached end of input passed=%b failed=%b%n", getTaskPrefix(), printedPassed,
+                    printedFailed);
         } catch (Exception e) {
             // if we fail here then the reaper task will clean up the thread
-            Assert.fail(taskPrefix + e.toString());
+            Assert.fail(getTaskPrefix() + e.toString());
         } finally {
             try {
                 if (bufferedReader != null) {
@@ -338,20 +343,20 @@ public class TaskImpl implements Task {
         try {
             process.waitFor();
         } catch (Exception e) {
-            Assert.fail(taskPrefix + e.toString());
+            Assert.fail(getTaskPrefix() + e.toString());
         }
 
         // ok, now ensure we sort out the race between the reaper task and this
         // one
         synchronized (this) {
             if (!isTimedOut) {
-                System.out.printf("%s perform removing task from reaper%n", taskPrefix);
+                System.out.printf("%s perform removing task from reaper%n", getTaskPrefix());
                 // we got through the waitFor and relocked this before we could
                 // be timed out so remove the
                 // task from the reaper list
                 TaskReaper.getReaper().remove(this);
             } else {
-                System.out.printf("%s perform timed out%n", taskPrefix);
+                System.out.printf("%s perform timed out%n", getTaskPrefix());
             }
             // setting this will forestall any pending attempt to timeout this
             // task
@@ -361,9 +366,9 @@ public class TaskImpl implements Task {
         }
         // we barf if we didn't exit with status 0 or print Passed or Failed
 
-        Assert.assertEquals(taskPrefix, 0, process.exitValue());
-        Assert.assertFalse(taskPrefix + " printed failed", printedFailed);
-        Assert.assertTrue(taskPrefix, printedPassed);
+        Assert.assertEquals(getTaskPrefix(), 0, process.exitValue());
+        Assert.assertFalse(getTaskPrefix() + " printed failed", printedFailed);
+        Assert.assertTrue(getTaskPrefix(), printedPassed);
 
         // clean exit -- hurrah!
     }
@@ -398,7 +403,7 @@ public class TaskImpl implements Task {
 
         synchronized (this) {
             if (started) {
-                throw new RuntimeException(taskPrefix + "invalid state for start");
+                throw new RuntimeException(getTaskPrefix() + "invalid state for start");
             }
 
             // first make sure we can create a subprocess
@@ -417,10 +422,10 @@ public class TaskImpl implements Task {
                 // builder.redirectErrorStream(true);
                 process = builder.start();
             } catch (Exception e) {
-                Assert.fail(taskPrefix + e.toString());
+                Assert.fail(getTaskPrefix() + e.toString());
             }
 
-            System.out.printf("%s Task started, insert into task reaper queue with timeout %d secs%n", taskPrefix,
+            System.out.printf("%s Task started, insert into task reaper queue with timeout %d secs%n", getTaskPrefix(),
                     timeout * 1000);
 
             TaskReaper.getReaper().insert(this, timeout * 1000);
@@ -442,13 +447,13 @@ public class TaskImpl implements Task {
             taskReaderThread = new TaskReaderThread(taskName, bufferedReader, out, "out: ");
             taskReaderThread.start();
 
-            if (type.equals(TaskType.EXPECT_READY)) {
+            if (type.equals(TaskType.EXPECT_READY) || type.equals(TaskType.EXPECT_READY_PASS_FAIL)) {
                 taskReaderThread.blockingWaitForReady();
                 // System.out.println("got ready");
             }
 
         } catch (Exception e) {
-            Assert.fail(taskPrefix + e.toString());
+            Assert.fail(getTaskPrefix() + e.toString());
         }
     }
 
@@ -459,16 +464,16 @@ public class TaskImpl implements Task {
      */
     public void waitFor() {
         if (type.equals(TaskType.EXPECT_READY)) {
-            Assert.fail(taskPrefix + "should not waitFor EXPECT_READY tasks (use terminate)");
+            Assert.fail(getTaskPrefix() + "should not waitFor EXPECT_READY tasks (use terminate)");
         }
 
         synchronized (this) {
             if (isDone || !started) {
-                throw new RuntimeException(taskPrefix + "invalid state for waitFor");
+                throw new RuntimeException(getTaskPrefix() + "invalid state for waitFor");
             }
 
             if (isTimedOut) {
-                throw new RuntimeException(taskPrefix + "wait for timed out task");
+                throw new RuntimeException(getTaskPrefix() + "wait for timed out task");
             }
         }
 
@@ -485,7 +490,7 @@ public class TaskImpl implements Task {
         try {
             process.waitFor();
         } catch (Exception e) {
-            Assert.fail(taskPrefix + e.toString());
+            Assert.fail(getTaskPrefix() + e.toString());
         }
 
         // ok, now ensure we sort out the race between the reaper task and this
@@ -496,10 +501,10 @@ public class TaskImpl implements Task {
                 // we got through the waitFor and relocked this before we could
                 // be timed out so remove the
                 // task from the reaper list
-                System.out.printf("%s waitFor removing task from reaper%n", taskPrefix);
+                System.out.printf("%s waitFor removing task from reaper%n", getTaskPrefix());
                 TaskReaper.getReaper().remove(this);
             } else {
-                System.out.printf("%s waitFor timed out%n", taskPrefix);
+                System.out.printf("%s waitFor timed out%n", getTaskPrefix());
             }
             // setting this will forestall any pending attempt to timeout this
             // task
@@ -509,7 +514,7 @@ public class TaskImpl implements Task {
         }
 
         // throw up if we didn't exit with exit code 0
-        Assert.assertEquals(taskPrefix, 0, process.exitValue());
+        Assert.assertEquals(getTaskPrefix(), 0, process.exitValue());
 
         // the taskReaderThread will throw up if it did nto get a clean finish
         // or get a Passed and no Failed
@@ -523,17 +528,17 @@ public class TaskImpl implements Task {
      * terminate a type READY task
      */
     public void terminate() {
-        if (type.equals(TaskType.EXPECT_PASS_FAIL)) {
-            Assert.fail(taskPrefix + "Should not terminate EXPECT_PASS_FAIL tasks (use waitFor)");
+        if (type.equals(TaskType.EXPECT_PASS_FAIL) || type.equals(TaskType.EXPECT_READY_PASS_FAIL)) {
+            Assert.fail(getTaskPrefix() + "Should not terminate EXPECT_PASS_FAIL tasks (use waitFor)");
         }
 
         synchronized (this) {
             if (isDone || !started) {
-                throw new RuntimeException(taskPrefix + "invalid state for terminate");
+                throw new RuntimeException(getTaskPrefix() + "invalid state for terminate");
             }
 
             if (isTimedOut) {
-                throw new RuntimeException(taskPrefix + "terminate for timed out task");
+                throw new RuntimeException(getTaskPrefix() + "terminate for timed out task");
             }
 
             TaskReaper.getReaper().remove(this);
@@ -605,7 +610,7 @@ public class TaskImpl implements Task {
             }
 
             out.println("!!!TASK TIME OUT!!!");
-            System.out.printf("%s TASK TIME OUT%n", taskPrefix);
+            System.out.printf("%s TASK TIME OUT%n", getTaskPrefix());
             out.flush();
             createThreadDumps();
             // we timed out before the process managed to complete so kill it
@@ -625,7 +630,7 @@ public class TaskImpl implements Task {
         int i = jps.indexOf(' ');
         String pid = i > 0 ? jps.substring(0, i) : null;
 
-        System.out.printf("%s Creating stack dump for pid %s and cmd %s%n", taskPrefix, pid, jps);
+        System.out.printf("%s Creating stack dump for pid %s and cmd %s%n", getTaskPrefix(), pid, jps);
         if (pid == null)
             return;
 
@@ -646,7 +651,7 @@ public class TaskImpl implements Task {
             }
             os.close();
         } catch (IOException e) {
-            System.out.printf("%s ERROR CREATING THREAD DUMP for %s: %s%n", taskPrefix, jps, e.getMessage());
+            System.out.printf("%s ERROR CREATING THREAD DUMP for %s: %s%n", getTaskPrefix(), jps, e.getMessage());
         }
     }
 
@@ -661,7 +666,7 @@ public class TaskImpl implements Task {
 
             process.destroy();
         } catch (IOException e) {
-            System.out.printf("%s ERROR CREATING THREAD DUMPS: %s%n", taskPrefix, e.getMessage());
+            System.out.printf("%s ERROR CREATING THREAD DUMPS: %s%n", getTaskPrefix(), e.getMessage());
         }
     }
 
@@ -729,7 +734,7 @@ public class TaskImpl implements Task {
             if (params[i].startsWith("$(")) {
                 String key = params[i].substring(2, params[i].length() - 1);
                 String value = properties.getProperty(key);
-                Assert.assertNotNull(taskPrefix + "Properties file missing key " + key, value);
+                Assert.assertNotNull(getTaskPrefix() + "Properties file missing key " + key, value);
                 result[i] = value;
             } else {
                 result[i] = params[i];
@@ -743,13 +748,17 @@ public class TaskImpl implements Task {
      * Log the command line to an outout
      */
     private void logCommand(PrintStream out, String prefix, String[] command) {
-        out.printf("%s%s", taskPrefix, prefix);
+        out.printf("%s%s", getTaskPrefix(), prefix);
         for (String commandElement : command) {
             out.print(commandElement);
             out.print(" ");
         }
         out.println();
         out.flush();
+    }
+
+    String getTaskPrefix() {
+        return simpleDateFormat.format(new Date()) + taskPrefix;
     }
 
     /**
@@ -788,11 +797,11 @@ public class TaskImpl implements Task {
                 }
             }
 
-            System.out.printf("%s TaskReader printedReady=%b shutdown=%b%n", taskPrefix, id, printedReady.get(),
+            System.out.printf("%s TaskReader printedReady=%b shutdown=%b%n", getTaskPrefix(), id, printedReady.get(),
                     shutdown.get());
 
             // make sure the test fails of we did not see ready
-            Assert.assertTrue(taskPrefix + "Task never printed ready", printedReady.get());
+            Assert.assertTrue(getTaskPrefix() + "Task never printed ready", printedReady.get());
         }
 
         /**
@@ -808,7 +817,7 @@ public class TaskImpl implements Task {
                 // do nothing
             }
 
-            Assert.assertTrue(taskPrefix + "Task did not finish cleanly", isFinishedCleanly.get());
+            Assert.assertTrue(getTaskPrefix() + "Task did not finish cleanly", isFinishedCleanly.get());
         }
 
         /**
@@ -817,8 +826,8 @@ public class TaskImpl implements Task {
          * output line.
          */
         public void checkPassFail() {
-            Assert.assertFalse(taskPrefix + "printed Failed.", printedFailed);
-            Assert.assertTrue(taskPrefix + " did not print Passed.", printedPassed);
+            Assert.assertFalse(getTaskPrefix() + "printed Failed.", printedFailed);
+            Assert.assertTrue(getTaskPrefix() + " did not print Passed.", printedPassed);
         }
 
         /**
@@ -871,8 +880,9 @@ public class TaskImpl implements Task {
                 if (shutdown.get()) {
                     return;
                 }
-                out.printf("%s TaskReaderThread : exception before shutdown %s%n", taskPrefix, e.getMessage());
-                System.out.printf("%s TaskReaderThread : exception before shutdown %s%n", taskPrefix, e.getMessage());
+                out.printf("%s TaskReaderThread : exception before shutdown %s%n", getTaskPrefix(), e.getMessage());
+                System.out.printf("%s TaskReaderThread : exception before shutdown %s%n", getTaskPrefix(),
+                        e.getMessage());
                 e.printStackTrace(out);
             } finally {
                 try {
@@ -927,7 +937,8 @@ public class TaskImpl implements Task {
                 if (shutdown.get()) {
                     return;
                 }
-                out.printf("%s TaskErrorReaderThread : exception before shutdown %s%n", taskPrefix, e.getMessage());
+                out.printf("%s TaskErrorReaderThread : exception before shutdown %s%n", getTaskPrefix(),
+                        e.getMessage());
                 e.printStackTrace(out);
             } finally {
                 try {

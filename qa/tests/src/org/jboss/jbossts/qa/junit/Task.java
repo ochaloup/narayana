@@ -27,7 +27,7 @@ package org.jboss.jbossts.qa.junit;
  */
 public interface Task {
     public enum TaskType {
-        EXPECT_PASS_FAIL, EXPECT_READY
+        EXPECT_PASS_FAIL, EXPECT_READY, EXPECT_READY_PASS_FAIL
     }
 
     /**
