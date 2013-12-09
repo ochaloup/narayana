@@ -293,10 +293,6 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
     }
 
     public int getStatus() throws javax.transaction.SystemException {
-        if (jtaLogger.logger.isTraceEnabled()) {
-            jtaLogger.logger.trace("TransactionImple.getStatus");
-        }
-
         int status = javax.transaction.Status.STATUS_NO_TRANSACTION;
 
         if (_theTransaction != null) {
