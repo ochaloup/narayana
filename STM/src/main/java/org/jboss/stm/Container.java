@@ -42,20 +42,31 @@ import com.arjuna.ats.arjuna.common.Uid;
  * @author marklittle
  */
 
-/*
- * Could provide a container that works on any classes without annotations. The
- * rules would have to be more restrictive:
- * 
- * (i) all operations are assumed to modify the state (therefore write lock).
- * (ii) all state is saved and restored.
- * 
- * Or use a setter/getter pattern to provide flexibility around (i).
- */
-
 public class Container<T> {
+    /**
+     * The TYPE of the objects created by this instance.
+     * 
+     * RECOVERABLE cannot be shared between address spaces and cannot tolerate
+     * crash failures. PERSISTENT can be shared between address spaces (though
+     * don't have to be) and can tolerate crash failures.
+     * 
+     * @author marklittle
+     */
+
     public enum TYPE {
         RECOVERABLE, PERSISTENT
     };
+
+    /**
+     * The sharing MODEL of the objects created by this instance.
+     * 
+     * SHARED means the instance may be used within multiple processes. It must
+     * be PERSISTENT too. EXCLUSIVE means that the instance will only be used
+     * within a single process. It can be PERSISTENT or RECOVERABLE.
+     * 
+     * @author marklittle
+     */
+
     public enum MODEL {
         SHARED, EXCLUSIVE
     };
@@ -68,16 +79,34 @@ public class Container<T> {
         this(new Uid().stringForm(), TYPE.RECOVERABLE);
     }
 
+    /**
+     * Create a container (system assigned name) of the specified type. Objects
+     * will be EXCLUSIVE.
+     * 
+     * @param type
+     *            the type of objects created.
+     */
+
     public Container(final TYPE type) {
         this(new Uid().stringForm(), type);
     }
+
+    /**
+     * Create a container (system assigned name) of the specified type and
+     * model.
+     * 
+     * @param type
+     *            the TYPE of objects.
+     * @param model
+     *            the MODEL of the objects.
+     */
 
     public Container(final TYPE type, final MODEL model) {
         this(new Uid().stringForm(), type, model);
     }
 
     /**
-     * Create a named container.
+     * Create a named container. Objects will be RECOVERABLE and EXCLUSIVE.
      * 
      * @param name
      *            the name (should be unique, but this is not enforced).
@@ -87,12 +116,32 @@ public class Container<T> {
         this(name, TYPE.RECOVERABLE);
     }
 
+    /**
+     * Create a named container. Objects will be EXCLUSIVE.
+     * 
+     * @param name
+     *            the name (should be unique, but this is not enforced).
+     * @param type
+     *            the TYPE of objects.
+     */
+
     public Container(final String name, final TYPE type) {
         if (type == TYPE.RECOVERABLE)
             _theContainer = new RecoverableContainer<T>(name);
         else
             _theContainer = new PersistentContainer<T>(name);
     }
+
+    /**
+     * Create a named container.
+     * 
+     * @param name
+     *            the name (should be unique, but this is not enforced).
+     * @param type
+     *            the TYPE of objects.
+     * @param model
+     *            the MODEL of objects.
+     */
 
     public Container(final String name, final TYPE type, final MODEL model) {
         int theModel = (model == MODEL.SHARED ? ObjectModel.MULTIPLE : ObjectModel.SINGLE);
@@ -117,11 +166,26 @@ public class Container<T> {
         return _theContainer.name();
     }
 
+    /**
+     * @return the TYPE of objects created by this instance.
+     */
+
     public final TYPE type() {
         if (_theContainer.objectType() == ObjectType.RECOVERABLE)
             return TYPE.RECOVERABLE;
         else
             return TYPE.PERSISTENT;
+    }
+
+    /**
+     * @return the MODEL of the objects created by this instance.
+     */
+
+    public final MODEL model() {
+        if (_theContainer.objectModel() == ObjectModel.MULTIPLE)
+            return MODEL.SHARED;
+        else
+            return MODEL.EXCLUSIVE;
     }
 
     /**
@@ -145,10 +209,9 @@ public class Container<T> {
     }
 
     /**
-     * Given an identified for an existing object, create another handle. This
-     * is particularly useful when using pessimistic concurrency control and we
-     * need one object instance per thread to ensure that state is safely
-     * managed.
+     * Given an existing object, create another handle. This is particularly
+     * useful when using pessimistic concurrency control and we need one object
+     * instance per thread to ensure that state is safely managed.
      * 
      * @param member
      *            the instance of type T that you want to be made transactional
@@ -193,7 +256,7 @@ public class Container<T> {
     }
 
     /**
-     * Get the unique name for the instance.
+     * @return the unique name for the instance.
      */
 
     public Uid getIdentifier(T proxy) {
@@ -201,8 +264,7 @@ public class Container<T> {
     }
 
     /*
-     * Only one of these should ever be non-null.
+     * The actual container (recoverable or persistent).
      */
-
     private RecoverableContainer<T> _theContainer;
 }
