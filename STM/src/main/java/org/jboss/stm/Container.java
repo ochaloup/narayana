@@ -72,6 +72,10 @@ public class Container<T> {
         this(new Uid().stringForm(), type);
     }
 
+    public Container(final TYPE type, final MODEL model) {
+        this(new Uid().stringForm(), type, model);
+    }
+
     /**
      * Create a named container.
      * 
@@ -149,14 +153,12 @@ public class Container<T> {
      * @param member
      *            the instance of type T that you want to be made transactional
      *            and persistent.
-     * @param id
-     *            the Uid of the object.
-     * @return a handle into the transactional memory that the application
-     *         should use to manipulate the object.
+     * @param proxy
+     *            the instance you want to copy.
      */
 
-    public synchronized T clone(T instance, T proxy) {
-        if (instance == null)
+    public synchronized T clone(T member, T proxy) {
+        if (member == null)
             throw new InvalidParameterException();
 
         /*
@@ -167,7 +169,35 @@ public class Container<T> {
         if (_theContainer.isPessimistic(proxy))
             return proxy;
         else
-            return _theContainer.enlist(instance, _theContainer.getUidForHandle(proxy));
+            return _theContainer.enlist(member, _theContainer.getUidForHandle(proxy));
+    }
+
+    /**
+     * Given an identified for an existing object, create another handle. This
+     * is particularly useful when using pessimistic concurrency control and we
+     * need one object instance per thread to ensure that state is safely
+     * managed.
+     * 
+     * @param member
+     *            the instance of type T that you want to be made transactional
+     *            and persistent.
+     * @param id
+     *            the Uid of the object.
+     */
+
+    public synchronized T clone(T member, Uid id) {
+        if (member == null)
+            throw new InvalidParameterException();
+
+        return _theContainer.enlist(member, id);
+    }
+
+    /**
+     * Get the unique name for the instance.
+     */
+
+    public Uid getUidForHandle(T proxy) {
+        return _theContainer.getUidForHandle(proxy);
     }
 
     /*
