@@ -89,6 +89,10 @@ public class EchoClient extends Verticle {
                      * uncomment the Uid line below and replace the Uid in
                      * quotes with the Uid you have selected. Uncomment the
                      * other obj1 creation line and comment out the original.
+                     *
+                     * If you want to see how this might work then just go with
+                     * the example state in the ObjectStore shipped as part of
+                     * this example and uncomment the lines.
                      */
 
                     /*
