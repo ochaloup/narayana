@@ -24,7 +24,9 @@ package org.jboss.stm.annotations;
 import java.lang.annotation.*;
 
 /**
- * Specifies that pessimistic concurrency control should be used.
+ * Specifies that pessimistic concurrency control should be used. This means
+ * that a read or write operation may block or be rejected if another user is
+ * manipulating the same object in a conflicting manner.
  * 
  * @author marklittle
  *
