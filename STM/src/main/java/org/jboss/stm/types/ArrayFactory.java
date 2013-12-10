@@ -27,8 +27,7 @@ import org.jboss.stm.internal.types.AtomicArrayImpl;
 // TODO maybe pull all of this into a separate jar
 
 public class ArrayFactory<E> {
-    @SuppressWarnings("unchecked")
-    public static ArrayFactory instance() {
+    public static ArrayFactory<?> instance() {
         return _theFactory;
     }
 
@@ -42,6 +41,5 @@ public class ArrayFactory<E> {
 
     private RecoverableContainer<AtomicArray<E>> _afContainer = new RecoverableContainer<AtomicArray<E>>();
 
-    @SuppressWarnings("unchecked")
-    private static final ArrayFactory _theFactory = new ArrayFactory();
+    private static final ArrayFactory<?> _theFactory = new ArrayFactory<Object>();
 }
