@@ -27,6 +27,7 @@ import java.util.HashMap;
 
 import org.jboss.stm.LockException;
 import org.jboss.stm.TransactionException;
+import org.jboss.stm.annotations.NestedTopLevel;
 import org.jboss.stm.annotations.Optimistic;
 import org.jboss.stm.annotations.Retry;
 import org.jboss.stm.annotations.Timeout;
@@ -41,6 +42,7 @@ import org.jboss.stm.internal.proxy.OptimisticLockManagerProxy;
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.ObjectType;
+import com.arjuna.ats.arjuna.TopLevelAction;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
@@ -190,15 +192,27 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                 break;
             }
 
+            if (c.getAnnotation(NestedTopLevel.class) != null) {
+                _nestedTopLevel = true;
+
+                break;
+            }
+
             c = c.getSuperclass();
         }
 
-        if (!_nestedTransactions) {
+        if (!_nestedTransactions || !_nestedTopLevel) {
             Class<?>[] interfaces = obj.getClass().getInterfaces();
 
             for (Class<?> i : interfaces) {
                 if (i.getAnnotation(Nested.class) != null) {
                     _nestedTransactions = true;
+
+                    break;
+                }
+
+                if (i.getAnnotation(NestedTopLevel.class) != null) {
+                    _nestedTopLevel = true;
 
                     break;
                 }
@@ -234,6 +248,12 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                     act = new AtomicAction();
 
                     act.begin();
+                } else {
+                    if (_nestedTopLevel) {
+                        act = new TopLevelAction();
+
+                        act.begin();
+                    }
                 }
 
                 try {
@@ -363,6 +383,7 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
     private Method[] _methods;
     private HashMap<Method, InvocationHandler<T>.LockInformation> _cachedMethods = new HashMap<Method, InvocationHandler<T>.LockInformation>();
     private boolean _nestedTransactions = false; // todo change default?
+    private boolean _nestedTopLevel = false;
     private boolean _optimistic = false;
 
     private static StoreManager _storeManager = null;
