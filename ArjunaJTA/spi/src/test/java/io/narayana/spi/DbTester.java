@@ -47,7 +47,7 @@ public class DbTester {
 
     public DbTester(boolean clearTables) throws SQLException, InitializationException {
         Map<String, DbProps> dbConfigs = new DbProps().getConfig(TransactionServiceFactory.DB_PROPERTIES_NAME);
-        connections = new HashMap<>();
+        connections = new HashMap<String, Connection>();
 
         for (DbProps props : dbConfigs.values())
             connections.put(props.getBinding(), getDataSource(props.getBinding()).getConnection());
@@ -55,7 +55,7 @@ public class DbTester {
         createTables(clearTables);
         fault = System.getProperty("spitest.fault", "");
 
-        counts = new HashMap<>(connections.size());
+        counts = new HashMap<String, Integer>(connections.size());
 
         for (Map.Entry<String, Connection> entry : connections.entrySet())
             counts.put(entry.getKey(), countRows(entry.getValue(), "CEYLONKV"));
@@ -76,7 +76,7 @@ public class DbTester {
          * enlisted into any transaction after h2 and if fault injection is
          * required then the dummy resource is enlisted before postresql
          */
-        SortedSet<String> keys = new TreeSet<>(connections.keySet());
+        SortedSet<String> keys = new TreeSet<String>(connections.keySet());
 
         if ("XA_RBROLLBACK".equalsIgnoreCase(fault)) {
             // the first participant will throw a rollback exception during the
@@ -130,6 +130,7 @@ public class DbTester {
 
         for (Connection connection : connections.values()) {
             Statement statement = connection.createStatement();
+
             try {
                 statement.executeUpdate(sql);
             } catch (SQLException e) {
