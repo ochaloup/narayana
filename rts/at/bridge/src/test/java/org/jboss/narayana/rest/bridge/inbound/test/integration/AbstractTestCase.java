@@ -118,8 +118,8 @@ public abstract class AbstractTestCase {
     }
 
     protected void startContainer(final String vmArguments) {
+        clearObjectStore();
         if (!containerController.isStarted(CONTAINER_NAME)) {
-            clearObjectStore();
             if (vmArguments == null) {
                 containerController.start(CONTAINER_NAME);
             } else {
@@ -143,10 +143,15 @@ public abstract class AbstractTestCase {
     }
 
     protected void stopContainer() {
-        deployer.undeploy(DEPLOYMENT_NAME);
-        containerController.stop(CONTAINER_NAME);
-        containerController.kill(CONTAINER_NAME);
-        clearObjectStore();
+        try {
+            deployer.undeploy(DEPLOYMENT_NAME);
+            containerController.stop(CONTAINER_NAME);
+            containerController.kill(CONTAINER_NAME);
+        } catch (final Throwable t) {
+            // ignore
+        } finally {
+            clearObjectStore();
+        }
     }
 
     protected void clearObjectStore() {
