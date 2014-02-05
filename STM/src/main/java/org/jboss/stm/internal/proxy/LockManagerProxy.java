@@ -121,10 +121,12 @@ public class LockManagerProxy<T> extends LockManager {
                             if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))) {
                                 /*
                                  * DO NOT try to save final values, since we
-                                 * cannot restore them anyway!
+                                 * cannot restore them anyway! Also stay away
+                                 * from transients!
                                  */
 
-                                if (!((afield.getModifiers() & Modifier.FINAL) == Modifier.FINAL)) {
+                                if (!((afield.getModifiers() & Modifier.FINAL) == Modifier.FINAL)
+                                        && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
                                     _fields.add(afield);
                                 }
                             }
@@ -196,11 +198,14 @@ public class LockManagerProxy<T> extends LockManager {
 
                             if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))) {
                                 /*
-                                 * DO NOT try to restore final values!
+                                 * DO NOT try to restore final values! Or
+                                 * transients!
                                  */
 
-                                if (!((afield.getModifiers() & Modifier.FINAL) == Modifier.FINAL))
+                                if (!((afield.getModifiers() & Modifier.FINAL) == Modifier.FINAL)
+                                        && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
                                     _fields.add(afield);
+                                }
                             }
                         }
                     } catch (final Throwable ex) {
