@@ -89,7 +89,7 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean {
 
     private int asyncCommitPoolSize = 10;
 
-    private int orphanSafetyInterval = 10000;
+    private int orphanSafetyInterval = 20000;
 
     /**
      * Returns true if subtransactions are allowed. Warning: subtransactions are
