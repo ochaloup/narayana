@@ -32,6 +32,7 @@
 package com.arjuna.ats.internal.jta.transaction.arjunacore;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.internal.arjuna.abstractrecords.LastResourceRecord;
+import com.arjuna.ats.internal.jta.resources.ExceptionDeferrer;
 import com.arjuna.ats.internal.jta.resources.arjunacore.CommitMarkableResourceRecord;
 import com.arjuna.ats.internal.jta.resources.arjunacore.SynchronizationImple;
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAOnePhaseResource;
@@ -199,9 +201,9 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
                 case ActionStatus.COMMITTING : // in case of async commit
                     break;
                 case ActionStatus.H_MIXED :
-                    throw new javax.transaction.HeuristicMixedException();
+                    throw addSuppressedThrowables(new javax.transaction.HeuristicMixedException());
                 case ActionStatus.H_HAZARD :
-                    throw new javax.transaction.HeuristicMixedException();
+                    throw addSuppressedThrowables(new javax.transaction.HeuristicMixedException());
                 case ActionStatus.H_ROLLBACK :
                 case ActionStatus.ABORTED :
                     RollbackException rollbackException = new RollbackException(
@@ -209,12 +211,21 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
                     if (_theTransaction.getDeferredThrowable() != null) {
                         rollbackException.initCause(_theTransaction.getDeferredThrowable());
                     }
-                    throw rollbackException;
+                    throw addSuppressedThrowables(rollbackException);
                 default :
                     throw new IllegalStateException(jtaLogger.i18NLogger.get_transaction_arjunacore_invalidstate());
             }
         } else
             throw new IllegalStateException(jtaLogger.i18NLogger.get_transaction_arjunacore_inactive());
+    }
+
+    <T extends Exception> T addSuppressedThrowables(T e) {
+        if (_exceptionDeferrers != null)
+            for (ExceptionDeferrer exceptionDeferrer : _exceptionDeferrers)
+                if (exceptionDeferrer.getDeferredThrowables() != null)
+                    for (Throwable throwable : exceptionDeferrer.getDeferredThrowables())
+                        e.addSuppressed(throwable);
+        return e;
     }
 
     public void rollback()
@@ -714,6 +725,10 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
      * @return
      */
     private AbstractRecord createRecord(XAResource xaRes, Object[] params, Xid xid) {
+
+        if (_exceptionDeferrers == null)
+            _exceptionDeferrers = new ArrayList<>();
+
         if ((xaRes instanceof LastResourceCommitOptimisation) || ((LAST_RESOURCE_OPTIMISATION_INTERFACE != null)
                 && LAST_RESOURCE_OPTIMISATION_INTERFACE.isInstance(xaRes))) {
             if (xaRes instanceof ConnectableResource) {
@@ -728,9 +743,14 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
                     }
                 }
             }
-            return new LastResourceRecord(new XAOnePhaseResource(xaRes, xid, params));
+            XAOnePhaseResource resource = new XAOnePhaseResource(xaRes, xid, params);
+            LastResourceRecord record = new LastResourceRecord(resource);
+            _exceptionDeferrers.add(resource);
+            return record;
         } else {
-            return new XAResourceRecord(this, xaRes, xid, params);
+            XAResourceRecord xaResourceRecord = new XAResourceRecord(this, xaRes, xid, params);
+            _exceptionDeferrers.add(xaResourceRecord);
+            return xaResourceRecord;
         }
     }
 
@@ -1440,6 +1460,8 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
     private Map _txLocalResources;
 
     private Throwable _rollbackOnlyCallerStacktrace;
+
+    private List<ExceptionDeferrer> _exceptionDeferrers;
 
     private static final boolean XA_TRANSACTION_TIMEOUT_ENABLED = jtaPropertyManager.getJTAEnvironmentBean()
             .isXaTransactionTimeoutEnabled();
