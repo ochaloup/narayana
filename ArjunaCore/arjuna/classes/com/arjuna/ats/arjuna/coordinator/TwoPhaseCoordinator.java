@@ -257,6 +257,16 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable {
         return "/StateManager/BasicAction/AtomicAction/TwoPhaseCoordinator";
     }
 
+    /**
+     * Get any Throwable that was caught during commit processing but not
+     * directly rethrown.
+     * 
+     * @return the Throwable, if any
+     */
+    public Throwable getDeferredThrowable() {
+        return _deferredThrowable;
+    }
+
     protected TwoPhaseCoordinator(int at) {
         super(at);
     }
@@ -559,6 +569,7 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable {
     private boolean executingInterposedSynchs = false;
     private SynchronizationRecord _currentRecord; // the most recently processed
                                                     // Synchronization.
+    private Throwable _deferredThrowable;
 
     private Object _syncLock = new Object();
 

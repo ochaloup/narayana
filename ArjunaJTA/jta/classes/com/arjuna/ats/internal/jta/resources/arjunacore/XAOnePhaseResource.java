@@ -42,7 +42,6 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import com.arjuna.ats.arjuna.coordinator.ExceptionDeferrer;
 import com.arjuna.ats.arjuna.coordinator.OnePhaseResource;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
@@ -60,7 +59,7 @@ import com.arjuna.ats.jta.xa.XidImple;
  * @version $Id$
  * @since ATS 4.1
  */
-public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
+public class XAOnePhaseResource implements OnePhaseResource {
     /**
      * The one phase XA resource.
      */
@@ -73,10 +72,6 @@ public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
      * The transaction identified.
      */
     private Xid xid;
-    /**
-     * Any XAException that occurs.
-     */
-    Throwable deferredException;
 
     /**
      * Default constructor for deserialising resource.
@@ -119,8 +114,6 @@ public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
             xaResource.commit(xid, true);
             return TwoPhaseOutcome.FINISH_OK;
         } catch (final XAException xae) {
-            this.deferredException = xae;
-
             if (jtaLogger.logger.isTraceEnabled()) {
                 jtaLogger.logger.trace("XAOnePhaseResource.commit(" + xid + ") " + xae.getMessage());
             }
@@ -200,7 +193,6 @@ public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
             xaResource.rollback(xid);
             return TwoPhaseOutcome.FINISH_OK;
         } catch (final XAException xae) {
-            this.deferredException = xae;
             jtaLogger.i18NLogger
                     .warn_resources_arjunacore_XAOnePhaseResource_rollbackexception(XAHelper.xidToString(xid), xae);
         } catch (final Throwable ex) {
@@ -307,10 +299,5 @@ public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
     private static IOException generateUnpackError(final Exception ex) {
         final String message = jtaLogger.i18NLogger.get_resources_arjunacore_XAOnePhaseResource_unpack();
         return new IOException(message, ex);
-    }
-
-    @Override
-    public Throwable getDeferredThrowable() {
-        return this.deferredException;
     }
 }
