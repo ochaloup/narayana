@@ -86,6 +86,8 @@ public class RecordType {
 
     public static final int USER_DEF_FIRST9 = 10;
 
+    public static final int COMMITMARKABLERESOURCE = 50;
+
     /**
      * The values are used by the system records.
      */
@@ -178,6 +180,9 @@ public class RecordType {
     @SuppressWarnings("unchecked")
     public static Class typeToClass(int rt) {
         switch (rt) {
+            case RecordType.COMMITMARKABLERESOURCE :
+                return RecordTypeManager.manager().getClass(RecordType.COMMITMARKABLERESOURCE);
+
             case RecordType.LASTRESOURCE :
                 return LastResourceRecord.class;
 
