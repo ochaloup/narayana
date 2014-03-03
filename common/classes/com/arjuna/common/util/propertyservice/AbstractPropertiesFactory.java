@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import com.arjuna.common.logging.commonLogger;
 import com.arjuna.common.util.ConfigurationInfo;
 
 /*
@@ -91,7 +92,7 @@ public abstract class AbstractPropertiesFactory {
             // classpath.
             URL url = AbstractPropertiesFactory.class.getResource("/default-" + propertyFileName);
             if (url == null) {
-                throw new RuntimeException("missing property file " + propertyFileName);
+                commonLogger.i18NLogger.warn_could_not_find_config_file(url);
             } else {
                 propertiesSourceUri = url.toString();
             }
@@ -102,7 +103,9 @@ public abstract class AbstractPropertiesFactory {
         Properties properties = null;
 
         try {
-            properties = loadFromFile(propertiesSourceUri);
+            if (propertiesSourceUri != null) {
+                properties = loadFromFile(propertiesSourceUri);
+            }
             properties = applySystemProperties(properties);
 
         } catch (Exception e) {
