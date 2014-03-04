@@ -239,6 +239,8 @@ public class ObjStoreBrowserTest {
              * off the heuristic list and back onto the prepared list
              */
             rd.synchronousScan();
+            Thread.sleep(1000); // odd without the delay running under Jacoco
+                                // fails
         }
 
         /*

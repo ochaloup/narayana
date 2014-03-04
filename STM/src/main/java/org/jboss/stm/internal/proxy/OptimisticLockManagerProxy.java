@@ -24,6 +24,7 @@ package org.jboss.stm.internal.proxy;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import org.jboss.stm.InvalidAnnotationException;
@@ -124,8 +125,8 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                     try {
                         for (Field afield : fields) {
                             // ignore if flagged with @NotState
-
-                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))) {
+                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))
+                                    && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
                                 _fields.add(afield);
                             }
                         }
@@ -196,7 +197,8 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                         for (Field afield : fields) {
                             // ignore if flagged with @NotState
 
-                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))) {
+                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))
+                                    && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
                                 _fields.add(afield);
                             }
                         }
