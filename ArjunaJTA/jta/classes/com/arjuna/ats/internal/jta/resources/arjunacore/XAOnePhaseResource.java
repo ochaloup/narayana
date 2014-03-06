@@ -44,12 +44,12 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import com.arjuna.ats.arjuna.coordinator.ExceptionDeferrer;
 import com.arjuna.ats.arjuna.coordinator.OnePhaseResource;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.arjuna.common.ClassloadingUtility;
-import com.arjuna.ats.internal.jta.resources.ExceptionDeferrer;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.utils.XAHelper;
 import com.arjuna.ats.jta.xa.RecoverableXAConnection;
@@ -318,7 +318,9 @@ public class XAOnePhaseResource implements OnePhaseResource, ExceptionDeferrer {
     }
 
     @Override
-    public List<Throwable> getDeferredThrowables() {
-        return this.deferredExceptions;
+    public void getDeferredThrowables(List<Throwable> list) {
+        if (deferredExceptions != null)
+            list.addAll(deferredExceptions);
     }
+
 }
