@@ -1176,7 +1176,7 @@ public class BasicAction extends StateManager {
             AbstractRecord current = failedList.listHead;
             while (current != null) {
                 addDeferredThrowables(current, deferredThrowables);
-                current = failedList.getNext(current);
+                current = failedList.peekNext(current);
             }
         }
 
@@ -1184,7 +1184,7 @@ public class BasicAction extends StateManager {
             AbstractRecord current = heuristicList.listHead;
             while (current != null) {
                 addDeferredThrowables(current, deferredThrowables);
-                current = heuristicList.getNext(current);
+                current = heuristicList.peekNext(current);
             }
         }
 
