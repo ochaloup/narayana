@@ -41,6 +41,7 @@ import java.util.Set;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.xa.XidImple;
 
@@ -49,6 +50,8 @@ public class RecoveryXids {
     public RecoveryXids(XAResource xares) {
         _xares = xares;
         _lastValidated = System.currentTimeMillis();
+        if (tsLogger.logger.isTraceEnabled())
+            tsLogger.logger.trace("RecoveryXids new recoveryXids " + xares + " " + _lastValidated);
     }
 
     public boolean equals(Object obj) {
@@ -77,6 +80,9 @@ public class RecoveryXids {
                 XidImple xidImple = new XidImple(xid);
                 if (!_whenFirstSeen.containsKey(xidImple)) {
                     _whenFirstSeen.put(xidImple, currentTime);
+                    if (tsLogger.logger.isTraceEnabled())
+                        tsLogger.logger.trace("RecoveryXids _whenFirstSeen put nextScan " + _xares + " " + currentTime
+                                + " === " + xidImple);
                 }
                 _whenLastSeen.put(xidImple, currentTime);
             }
@@ -88,6 +94,9 @@ public class RecoveryXids {
             if (_whenLastSeen.get(candidate) != currentTime) {
                 // seen it previously but it's gone now so we can forget it:
                 _whenFirstSeen.remove(candidate);
+                if (tsLogger.logger.isTraceEnabled())
+                    tsLogger.logger.trace("RecoveryXids _whenFirstSeen remove nextScan" + _xares + " " + currentTime
+                            + " === " + candidate);
                 _whenLastSeen.remove(candidate);
             }
         }
@@ -113,7 +122,13 @@ public class RecoveryXids {
         for (Map.Entry<XidImple, Long> entry : _whenFirstSeen.entrySet()) {
             if (entry.getValue() + safetyIntervalMillis <= currentTime) {
                 oldEnoughXids.add(entry.getKey());
+                if (tsLogger.logger.isTraceEnabled())
+                    tsLogger.logger.trace("RecoveryXids _whenFirstSeen toRecover yes " + _xares + " " + entry.getValue()
+                            + " === " + currentTime);
             }
+            if (tsLogger.logger.isTraceEnabled())
+                tsLogger.logger.trace("RecoveryXids _whenFirstSeen toRecover no " + _xares + " " + entry.getValue()
+                        + " === " + currentTime);
         }
 
         return oldEnoughXids.toArray(new Xid[oldEnoughXids.size()]);
@@ -149,6 +164,9 @@ public class RecoveryXids {
                 : 2 * safetyIntervalMillis);
         long diff = now - threshold;
         boolean result = diff > 0;
+        if (tsLogger.logger.isTraceEnabled())
+            tsLogger.logger
+                    .trace("RecoveryXids isStale Check " + _xares + " " + _lastValidated + " " + now + " " + result);
         return result;
     }
 
@@ -157,6 +175,9 @@ public class RecoveryXids {
 
         if (_whenFirstSeen.containsKey(xidImple)) {
             _whenFirstSeen.remove(xidImple);
+            if (tsLogger.logger.isTraceEnabled())
+                tsLogger.logger.trace(
+                        "RecoveryXids _whenFirstSeen remove remove " + _xares + " " + _lastValidated + " " + xidImple);
             _whenLastSeen.remove(xidImple);
             return true;
         } else {
@@ -183,6 +204,8 @@ public class RecoveryXids {
                 if (contains(xids[i])) {
                     _xares = xaResource;
                     _lastValidated = System.currentTimeMillis();
+                    if (tsLogger.logger.isTraceEnabled())
+                        tsLogger.logger.trace("RecoveryXids updateIfEquivalentRM1 " + _xares + " " + _lastValidated);
                     return true;
                 }
             }
@@ -193,6 +216,8 @@ public class RecoveryXids {
         if (isSameRM(xaResource)) {
             _xares = xaResource;
             _lastValidated = System.currentTimeMillis();
+            if (tsLogger.logger.isTraceEnabled())
+                tsLogger.logger.trace("RecoveryXids updateIfEquivalentRM2 " + _xares + " " + _lastValidated);
             return true;
         }
 
