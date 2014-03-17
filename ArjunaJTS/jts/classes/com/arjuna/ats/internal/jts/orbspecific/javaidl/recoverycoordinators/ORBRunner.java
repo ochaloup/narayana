@@ -55,6 +55,8 @@ public class ORBRunner extends Thread {
                 JavaIdlRCServiceInit._orb.shutdown();
         } catch (Exception ex) {
         }
+
+        // JavaIdlRCServiceInit.orbRunnerCompleted();
     }
 
 }

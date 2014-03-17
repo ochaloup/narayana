@@ -32,13 +32,18 @@
 package com.hp.mwtests.ts.jts.remote.hammer;
 
 import com.arjuna.ats.internal.jts.ORBManager;
-import com.arjuna.orbportability.*;
+import com.arjuna.orbportability.OA;
+import com.arjuna.orbportability.ORB;
+import com.arjuna.orbportability.ORBInfo;
+import com.arjuna.orbportability.RootOA;
 import io.narayana.perf.PerformanceTester;
 import io.narayana.perf.Result;
 
 public class PerfHammer {
     public static void main(String[] args) throws Exception {
         String gridReference = args[0];
+        int threadCount = args.length > 1 ? Integer.parseInt(args[1]) : 10;
+        int numberOfCalls = args.length > 2 ? Integer.parseInt(args[2]) : 100000;
 
         ORB myORB = ORB.getInstance("test");
         RootOA myOA = OA.getRootOA(myORB);
@@ -49,9 +54,9 @@ public class PerfHammer {
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        PerformanceTester tester = new PerformanceTester(10, 10);
+        PerformanceTester tester = new PerformanceTester();
         GridWorker worker = new GridWorker(myORB, gridReference);
-        Result opts = new Result(10, 100);
+        Result opts = new Result(threadCount, numberOfCalls);
 
         try {
             tester.measureThroughput(worker, opts);

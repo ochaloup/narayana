@@ -77,12 +77,18 @@ public class TransactionManagerGetStatusDifferenceDemonstrator {
 
         try {
             if (mode.equals("jts")) {
+                String orbClassName = System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName");
+
+                System.out.printf("%s: orbClassName=%s%n", this.getClass().getName(), orbClassName);
+
                 if ("com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"
-                        .equals(System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName"))) {
+                        .equals(orbClassName)
+                        || "com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1"
+                                .equals(orbClassName)) {
                     assertTrue("Status: " + getStatusSync.getTransactionManagerGetStatus(),
                             getStatusSync.getTransactionManagerGetStatus() == Status.STATUS_COMMITTED);
-
                 } else {
+                    // com.arjuna.orbportability.internal.orbspecific.jacorb.orb.implementations.jacorb_2_0
                     assertTrue("Status: " + getStatusSync.getTransactionManagerGetStatus(),
                             getStatusSync.getTransactionManagerGetStatus() == Status.STATUS_NO_TRANSACTION);
                 }

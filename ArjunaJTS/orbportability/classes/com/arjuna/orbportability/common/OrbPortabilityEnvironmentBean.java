@@ -52,6 +52,8 @@ public class OrbPortabilityEnvironmentBean implements OrbPortabilityEnvironmentB
 
     // alternative:
     // com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4
+    // alternative:
+    // com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1
     private volatile String orbImpleClassName = "com.arjuna.orbportability.internal.orbspecific.jacorb.orb.implementations.jacorb_2_0";
     private volatile Class<? extends ORBImple> orbImpleClass = null;
 

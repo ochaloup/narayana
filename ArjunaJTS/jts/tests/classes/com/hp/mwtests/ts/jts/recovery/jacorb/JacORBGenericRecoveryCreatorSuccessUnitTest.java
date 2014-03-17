@@ -29,7 +29,7 @@
  * $Id: xidcheck.java 2342 2006-03-30 13:06:17Z  $
  */
 
-package com.hp.mwtests.ts.jts.recovery;
+package com.hp.mwtests.ts.jts.recovery.jacorb;
 
 import org.junit.After;
 import org.junit.Test;
