@@ -140,12 +140,21 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
      * For recovery
      */
     public CommitMarkableResourceRecord() {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace("CommitMarkableResourceRecord.CommitMarkableResourceRecord (), record id=" + order());
+        }
+
         tableName = null;
     }
 
     public CommitMarkableResourceRecord(TransactionImple tx, ConnectableResource xaResource, final Xid xid,
             BasicAction basicAction) throws IllegalStateException, RollbackException, SystemException {
         super(new Uid(), null, ObjectType.ANDPERSISTENT);
+
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace("CommitMarkableResourceRecord.CommitMarkableResourceRecord ( " + tx + ", "
+                    + xaResource + ", " + xid + ", " + basicAction + " ), record id=" + order());
+        }
 
         this.connectableResource = xaResource;
         XAResourceWrapper xaResourceWrapper = ((XAResourceWrapper) xaResource);
@@ -342,6 +351,11 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
      * mode, we do not need to persist this information.
      */
     public int topLevelPrepare() {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger
+                    .trace("CommitMarkableResourceRecord.topLevelPrepare for " + this + ", record id=" + order());
+        }
+
         try {
             preparedConnection = (Connection) connectableResource.getConnection();
 
@@ -377,6 +391,10 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
     }
 
     public int topLevelAbort() {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace("CommitMarkableResourceRecord.topLevelAbort for " + this + ", record id=" + order());
+        }
+
         try {
             try {
                 // This can never be null as it can only ever be called before
@@ -407,10 +425,19 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
     }
 
     public int topLevelCommit() {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace("CommitMarkableResourceRecord.topLevelCommit for " + this + ", record id=" + order());
+        }
+
         return commit(false);
     }
 
     public int topLevelOnePhaseCommit() {
+        if (tsLogger.logger.isTraceEnabled()) {
+            tsLogger.logger.trace(
+                    "CommitMarkableResourceRecord.topLevelOnePhaseCommit for " + this + ", record id=" + order());
+        }
+
         return commit(true);
     }
 
