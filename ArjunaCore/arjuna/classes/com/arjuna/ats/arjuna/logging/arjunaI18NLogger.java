@@ -1557,6 +1557,14 @@ public interface arjunaI18NLogger {
     @LogMessage(level = WARN)
     public void warn_hornetqobjectstore_remove_state_exception(@Cause() Throwable arg0);
 
+    @Message(id = 12378, value = "ReaperElement appears to be wedged: {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void wedged_reaperelement(String arg0);
+
+    @Message(id = 12379, value = "ExpiredTransactionScanner - {0} is assumed complete and will be moved.", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_recovery_ExpiredTransactionStatusManagerScanner_6(Uid arg0);
+
     /*
      * Allocate new messages directly above this notice. - id: use the next id
      * number in numeric sequence. Don't reuse ids. The first two digits of the
@@ -1569,7 +1577,4 @@ public interface arjunaI18NLogger {
      * <level>_
      */
 
-    @Message(id = 12378, value = "ReaperElement appears to be wedged: {0}", format = MESSAGE_FORMAT)
-    @LogMessage(level = WARN)
-    public void wedged_reaperelement(String arg0);
 }
