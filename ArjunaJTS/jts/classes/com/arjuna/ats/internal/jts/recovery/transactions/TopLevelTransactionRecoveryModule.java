@@ -54,13 +54,6 @@ public class TopLevelTransactionRecoveryModule extends TransactionRecoveryModule
             _transactionType = ArjunaTransactionImple.typeName();
     }
 
-    public void finalize() throws Throwable {
-        super.finalize();
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("TopLevelTransactionRecoveryModule destoryed");
-        }
-    }
-
     /**
      * This is called periodically by the RecoveryManager
      */

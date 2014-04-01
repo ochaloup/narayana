@@ -153,8 +153,6 @@ public class LockManager extends StateManager {
         }
 
         mutex = null;
-
-        super.finalize();
     }
 
     /**

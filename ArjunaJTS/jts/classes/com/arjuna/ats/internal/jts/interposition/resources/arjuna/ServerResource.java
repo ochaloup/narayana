@@ -43,7 +43,7 @@ import com.arjuna.ats.jts.logging.jtsLogger;
 
 /**
  * The base class from which interposed resources derive.
- *
+ * 
  * @author Mark Little (mark@arjuna.com)
  * @version $Id: ServerResource.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
@@ -61,8 +61,6 @@ public class ServerResource {
         }
 
         tidyup();
-        // should always call parent finalize method
-        super.finalize();
     }
 
     /*
@@ -253,11 +251,16 @@ public class ServerResource {
     }
 
     protected ServerControl _theControl;
+
     protected final List<ServerNestedAction> _children = Collections
             .synchronizedList(new LinkedList<ServerNestedAction>());
+
     protected Uid _theUid;
+
     protected ServerResource _parent;
+
     protected boolean _valid;
+
     protected boolean _destroyed;
 
 }

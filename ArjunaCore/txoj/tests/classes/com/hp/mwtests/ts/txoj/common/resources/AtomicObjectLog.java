@@ -99,7 +99,6 @@ public class AtomicObjectLog extends LockManager {
 
     public void finalize() throws Throwable {
         super.terminate();
-        super.finalize();
     }
 
     public AppendLogTransaction getTransaction() {

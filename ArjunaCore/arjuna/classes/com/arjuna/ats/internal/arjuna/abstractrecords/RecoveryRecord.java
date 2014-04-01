@@ -61,13 +61,6 @@ public class RecoveryRecord extends AbstractRecord {
         actionHandle = BasicAction.Current();
     }
 
-    public void finalize() throws Throwable {
-        if (tsLogger.logger.isDebugEnabled()) {
-            tsLogger.logger.debug("RecoveryRecord.finalize() for " + order() + " type " + type());
-        }
-        super.finalize();
-    }
-
     public int typeIs() {
         return RecordType.RECOVERY;
     }
