@@ -103,7 +103,9 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable {
 
         int outcome = super.Abort();
 
-        afterCompletion(outcome);
+        if (outcome == ActionStatus.ABORTED) {
+            afterCompletion(outcome);
+        }
 
         return outcome;
     }
