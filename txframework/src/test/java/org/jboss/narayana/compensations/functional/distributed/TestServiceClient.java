@@ -47,13 +47,13 @@ public class TestServiceClient implements TestService {
     }
 
     @Override
-    @Compensatable
+    @Compensatable(distributed = true)
     public void saveData(Boolean throwException) {
         testService.saveData(throwException);
     }
 
     @Override
-    @Compensatable
+    @Compensatable(distributed = true)
     public void saveDataCancelOnFailure(Boolean throwException) {
         testService.saveDataCancelOnFailure(throwException);
     }

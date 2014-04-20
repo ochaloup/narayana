@@ -24,10 +24,7 @@ package org.jboss.narayana.compensations.functional.distributed;
 
 import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mw.wst11.UserBusinessActivityFactory;
-import com.arjuna.wst.SystemException;
 import com.arjuna.wst.TransactionRolledBackException;
-import com.arjuna.wst.UnknownTransactionException;
-import com.arjuna.wst.WrongStateException;
 import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -35,16 +32,9 @@ import org.jboss.jbossts.xts.bytemanSupport.BMScript;
 import org.jboss.jbossts.xts.bytemanSupport.participantCompletion.ParticipantCompletionCoordinatorRules;
 import org.jboss.narayana.common.URLUtils;
 import org.jboss.narayana.compensations.functional.common.DummyCompensationHandler1;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Close;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Compensate;
-import org.jboss.narayana.txframework.api.annotation.lifecycle.ba.ConfirmCompleted;
-import org.jboss.narayana.txframework.functional.common.EventLog;
-import org.jboss.narayana.txframework.functional.common.ServiceCommand;
-import org.jboss.narayana.txframework.functional.common.SomeApplicationException;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -54,20 +44,20 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
+import javax.inject.Inject;
 
 @RunWith(Arquillian.class)
-public class DistributedTest {
+public class DistributedTestRemote {
 
     UserBusinessActivity uba;
+
+    @Inject
     TestService client;
 
     @Deployment()
     public static JavaArchive createTestArchive() {
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
-                .addPackages(false, DistributedTest.class.getPackage())
+                .addPackages(true, DistributedTestRemote.class.getPackage())
                 .addPackage(DummyCompensationHandler1.class.getPackage())
                 .addClass(ParticipantCompletionCoordinatorRules.class).addClass(URLUtils.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
@@ -91,7 +81,6 @@ public class DistributedTest {
     public void setupTest() throws Exception {
 
         uba = UserBusinessActivityFactory.userBusinessActivity();
-        client = new TestServiceClient();
     }
 
     @After
@@ -108,7 +97,6 @@ public class DistributedTest {
 
         client.saveData(false);
 
-        Assert.assertEquals(true, client.wasTransactionLoggedHandlerInvoked());
         Assert.assertEquals(true, client.wasTransactionConfirmedHandlerInvoked());
         Assert.assertEquals(false, client.wasCompensationHandlerInvoked());
 
@@ -123,7 +111,6 @@ public class DistributedTest {
         client.saveData(false);
         uba.cancel();
 
-        Assert.assertEquals(true, client.wasTransactionLoggedHandlerInvoked());
         Assert.assertEquals(false, client.wasTransactionConfirmedHandlerInvoked());
         Assert.assertEquals(true, client.wasCompensationHandlerInvoked());
     }
@@ -141,7 +128,6 @@ public class DistributedTest {
 
         uba.cancel();
 
-        Assert.assertEquals(false, client.wasTransactionLoggedHandlerInvoked());
         Assert.assertEquals(false, client.wasTransactionConfirmedHandlerInvoked());
         Assert.assertEquals(false, client.wasCompensationHandlerInvoked());
     }
@@ -165,7 +151,6 @@ public class DistributedTest {
             // Expected
         }
 
-        Assert.assertEquals(false, client.wasTransactionLoggedHandlerInvoked());
         Assert.assertEquals(false, client.wasTransactionConfirmedHandlerInvoked());
         Assert.assertEquals(false, client.wasCompensationHandlerInvoked());
     }

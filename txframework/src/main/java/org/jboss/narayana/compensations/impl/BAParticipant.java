@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.compensations.functional.compensationScoped;
+package org.jboss.narayana.compensations.impl;
 
-import org.jboss.narayana.compensations.api.Compensatable;
-import org.jboss.narayana.compensations.api.TxCompensate;
-import org.jboss.narayana.compensations.api.TxConfirm;
-import org.jboss.narayana.compensations.api.TxLogged;
-import org.jboss.narayana.compensations.functional.common.MyRuntimeException;
+import com.arjuna.wst.BusinessAgreementWithParticipantCompletionParticipant;
+import com.arjuna.wst.FaultedException;
+import com.arjuna.wst.SystemException;
+import com.arjuna.wst.WrongStateException;
+import com.arjuna.wst11.ConfirmCompletedParticipant;
+import org.jboss.narayana.compensations.impl.BeanManagerUtil;
+import org.jboss.narayana.compensations.impl.CompensationContext;
+import org.jboss.narayana.txframework.impl.TXDataMapImpl;
 
-import javax.inject.Inject;
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.Map;
 
 /**
- * @author paul.robinson@redhat.com 24/04/2013
+ * @author paul.robinson@redhat.com 22/03/2013
  */
-public class Service {
+public interface BAParticipant {
 
-    @Inject
-    DataPojo myData;
+    public void confirmCompleted(boolean confirmed);
 
-    @Compensatable
-    @TxCompensate(MyCompensationHandler.class)
-    @TxLogged(MyTransactionLoggedHandler.class)
-    @TxConfirm(MyConfirmationHandler.class)
-    public void doWork(String setValue) throws MyRuntimeException {
-        myData.setData(setValue);
-    }
+    public void close() throws Exception;
+
+    public void cancel() throws Exception;
+
+    public void compensate() throws Exception;
 
 }
