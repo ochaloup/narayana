@@ -284,26 +284,32 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
                     InputObjectState state = recoveryStore.read_committed(currentUid, ATOMIC_ACTION_TYPE);
                     if (state != null) {
                         if (!recoveryStore.remove_committed(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE)) {
-                            tsLogger.logger.error(
+                            tsLogger.logger.debug(
                                     "Could not remove a: " + CONNECTABLE_ATOMIC_ACTION_TYPE + " uid: " + currentUid);
                         }
                     } else {
-                        RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
-                                CONNECTABLE_ATOMIC_ACTION_TYPE, currentUid);
+                        state = recoveryStore.read_committed(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE);
+                        // TX may have been in progress and cleaned up by now
+                        if (state != null) {
+                            RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
+                                    CONNECTABLE_ATOMIC_ACTION_TYPE, currentUid, state);
 
-                        if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
-                            String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
-                            // Check if the resource manager is online yet
-                            if (queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
+                            if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
+                                String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
+                                // Check if the resource manager is online yet
+                                if (queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
 
-                                // If it is remove the CRR and move it back and
-                                // let
-                                // the
-                                // next stage update it
-                                moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
+                                    // If it is remove the CRR and move it back
+                                    // and
+                                    // let
+                                    // the
+                                    // next stage update it
+                                    moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
+                                }
                             }
                         }
                     }
+
                     currentUid = transactionUidEnum.iterate();
                 }
             } catch (ObjectStoreException | IOException ex) {
@@ -330,24 +336,28 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
                     if (!isTransactionInMidFlight(
                             transactionStatusConnectionMgr.getTransactionStatus(ATOMIC_ACTION_TYPE, currentUid))) {
 
-                        // Try to load it is a BasicAction that has a
-                        // ConnectedResourceRecord
-                        RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(ATOMIC_ACTION_TYPE,
-                                currentUid);
-                        // Check if it did have a ConnectedResourceRecord
-                        if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
-                            String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
-                            // If it did, check if the resource manager was
-                            // online
-                            if (!queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
-                                // If the resource manager wasn't online, move
-                                // it
-                                moveRecord(currentUid, ATOMIC_ACTION_TYPE, CONNECTABLE_ATOMIC_ACTION_TYPE);
-                            } else {
-                                // Update the completed outcome for the 1PC
-                                // resource
-                                rcaa.updateCommitMarkableResourceRecord(
-                                        wasCommitted(commitMarkableResourceJndiName, rcaa.getXid()));
+                        InputObjectState state = recoveryStore.read_committed(currentUid, ATOMIC_ACTION_TYPE);
+                        if (state != null) {
+                            // Try to load it is a BasicAction that has a
+                            // ConnectedResourceRecord
+                            RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(ATOMIC_ACTION_TYPE,
+                                    currentUid, state);
+                            // Check if it did have a ConnectedResourceRecord
+                            if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
+                                String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
+                                // If it did, check if the resource manager was
+                                // online
+                                if (!queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
+                                    // If the resource manager wasn't online,
+                                    // move
+                                    // it
+                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE, CONNECTABLE_ATOMIC_ACTION_TYPE);
+                                } else {
+                                    // Update the completed outcome for the 1PC
+                                    // resource
+                                    rcaa.updateCommitMarkableResourceRecord(
+                                            wasCommitted(commitMarkableResourceJndiName, rcaa.getXid()));
+                                }
                             }
                         }
                     }
