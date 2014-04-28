@@ -69,7 +69,8 @@ public class ActivityHandleImple implements ActivityHandle {
                 return true;
             else {
                 if (obj instanceof ActivityHandleImple) {
-                    if (_theActivity.equals(obj))
+                    ActivityImple compare = ((ActivityHandleImple) obj).getActivity();
+                    if (_theActivity.equals(compare))
                         return true;
                 }
             }
