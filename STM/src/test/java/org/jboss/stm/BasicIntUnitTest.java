@@ -58,7 +58,6 @@ public class BasicIntUnitTest extends TestCase {
         public int get() throws Exception;
     }
 
-    @Transactional
     public class ExampleSTM implements Atomic {
         @ReadLock
         public int get() throws Exception {

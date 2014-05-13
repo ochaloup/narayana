@@ -56,16 +56,12 @@ import junit.framework.TestCase;
 public class TransactionalTypesUnitTest extends TestCase {
     @Transactional
     public interface Identifier {
-        @ReadLock
         public String name();
     }
 
     @Transactional
     public interface Counter {
-        @WriteLock
         public void increment();
-
-        @ReadLock
         public int count();
     }
 

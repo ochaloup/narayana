@@ -58,10 +58,7 @@ public class NestedTopLevelUnitTest extends TestCase {
     @Transactional
     @NestedTopLevel
     public interface Counter {
-        @WriteLock
         public void increment();
-
-        @ReadLock
         public int count();
     }
 

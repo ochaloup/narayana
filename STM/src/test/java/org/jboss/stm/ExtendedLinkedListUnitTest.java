@@ -65,7 +65,6 @@ public class ExtendedLinkedListUnitTest extends TestCase {
         public String nodeName();
     }
 
-    @Transactional
     public class NodeImple implements Node {
         public NodeImple(String name) {
             _nodeName = name;

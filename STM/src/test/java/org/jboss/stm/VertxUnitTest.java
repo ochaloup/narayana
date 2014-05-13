@@ -52,7 +52,6 @@ class DummyVerticle {
         public int value();
     }
 
-    @Transactional
     public class SampleLockable implements Sample {
         public SampleLockable(int init) {
             _isState = init;

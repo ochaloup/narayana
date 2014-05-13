@@ -51,7 +51,6 @@ public class HammerUnitTest extends TestCase {
         public int value();
     }
 
-    @Transactional
     public class SampleLockable implements Sample {
         public SampleLockable(int init) {
             _isState = init;
