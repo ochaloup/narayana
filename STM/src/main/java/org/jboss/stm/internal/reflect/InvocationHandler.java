@@ -27,6 +27,7 @@ import java.util.HashMap;
 
 import org.jboss.stm.LockException;
 import org.jboss.stm.TransactionException;
+import org.jboss.stm.annotations.LockFree;
 import org.jboss.stm.annotations.NestedTopLevel;
 import org.jboss.stm.annotations.Optimistic;
 import org.jboss.stm.annotations.Retry;
@@ -240,9 +241,18 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
         if (_txObject == null)
             throw new LockException("Transactional object is null!");
 
+        AtomicAction currentTx = null;
+
         synchronized (_txObject) {
             synchronized (_theObject) {
                 AtomicAction act = null;
+
+                /*
+                 * We could maybe be a bit more intelligent here and not create
+                 * any nested transaction if TransactionFree is set, but there's
+                 * very little overhead in creating the transaction and not
+                 * using it.
+                 */
 
                 if (_nestedTransactions) {
                     act = new AtomicAction();
@@ -274,6 +284,7 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
 
                         int lockType = -1;
                         boolean lockFree = false;
+                        boolean transactionFree = false;
 
                         if (cachedLock == null) {
                             for (Method mt : _methods) {
@@ -304,37 +315,50 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                                     lockType = LockMode.WRITE;
                                 else {
                                     if (theMethod.isAnnotationPresent(TransactionFree.class))
-                                        lockFree = true;
+                                        transactionFree = true;
+                                    else {
+                                        if (theMethod.isAnnotationPresent(LockFree.class))
+                                            lockFree = true;
+                                    }
                                 }
                             }
 
-                            int timeout = LockManager.defaultSleepTime;
-                            int retry = LockManager.defaultRetry;
+                            // if TransactionFree then suspend any transactions
+                            // and don't do locking
 
-                            if (theMethod.isAnnotationPresent(Timeout.class))
-                                timeout = theMethod.getAnnotation(Timeout.class).period();
+                            if (!lockFree && !transactionFree) {
+                                int timeout = LockManager.defaultSleepTime;
+                                int retry = LockManager.defaultRetry;
 
-                            if (theMethod.isAnnotationPresent(Retry.class))
-                                retry = theMethod.getAnnotation(Retry.class).count();
+                                if (theMethod.isAnnotationPresent(Timeout.class))
+                                    timeout = theMethod.getAnnotation(Timeout.class).period();
 
-                            if ((lockType == -1) && (!lockFree)) // default to
-                                                                    // WRITE
-                                lockType = LockMode.WRITE;
+                                if (theMethod.isAnnotationPresent(Retry.class))
+                                    retry = theMethod.getAnnotation(Retry.class).count();
 
-                            cachedLock = new LockInformation(lockType, timeout, retry);
-                            _cachedMethods.put(method, cachedLock);
+                                if (lockType == -1) // default to WRITE
+                                    lockType = LockMode.WRITE;
+
+                                cachedLock = new LockInformation(lockType, timeout, retry);
+                                _cachedMethods.put(method, cachedLock);
+                            } else {
+                                if (transactionFree)
+                                    currentTx = AtomicAction.suspend();
+                            }
                         }
 
                         // TODO type specific concurrency control (define Lock
                         // class in annotation?)
 
-                        int result = _txObject.setlock(new Lock(cachedLock._lockType), cachedLock._retry,
-                                cachedLock._timeout);
+                        if (!lockFree && !transactionFree) {
+                            int result = _txObject.setlock(new Lock(cachedLock._lockType), cachedLock._retry,
+                                    cachedLock._timeout);
 
-                        if (result != LockResult.GRANTED) {
-                            throw new LockException(Thread.currentThread() + " could not set "
-                                    + LockMode.stringForm(cachedLock._lockType) + " lock. Got: "
-                                    + LockResult.stringForm(result));
+                            if (result != LockResult.GRANTED) {
+                                throw new LockException(Thread.currentThread() + " could not set "
+                                        + LockMode.stringForm(cachedLock._lockType) + " lock. Got: "
+                                        + LockResult.stringForm(result));
+                            }
                         }
                     }
 
@@ -343,9 +367,16 @@ public class InvocationHandler<T> implements java.lang.reflect.InvocationHandler
                     if (act != null) {
                         int status = act.commit();
 
-                        if ((status != ActionStatus.COMMITTED) && (status != ActionStatus.COMMITTING))
+                        if ((status != ActionStatus.COMMITTED) && (status != ActionStatus.COMMITTING)) {
+                            if (currentTx != null)
+                                AtomicAction.resume(currentTx);
+
                             throw new TransactionException("Failed to commit container transaction!", status);
+                        }
                     }
+
+                    if (currentTx != null)
+                        AtomicAction.resume(currentTx);
                 }
             }
         }
