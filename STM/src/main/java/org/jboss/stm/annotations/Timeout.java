@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * immediately cause the operation to fail and the application can do something
  * else. If instead the developer wants the system to retry getting the lock
  * before returning, then this annotation defines the time between each retry
- * attemp.
+ * attempt. This is milliseconds.
  * 
  * @author marklittle
  */
