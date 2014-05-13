@@ -86,7 +86,7 @@ public class LockManager extends StateManager {
 
     /**
      * The default timeout value which will be used by setlock if no other value
-     * is given.
+     * is given. Milliseconds.
      * 
      * @see #setlock
      */
@@ -303,6 +303,8 @@ public class LockManager extends StateManager {
      * on the current object. If lock cannot be set, then the lock attempt is
      * retried retry times before giving up and returning an error. This gives a
      * simple handle on deadlock.
+     * 
+     * sleepTime is milliseconds.
      * 
      * @return <code>LockResult</code> indicating outcome.
      */
