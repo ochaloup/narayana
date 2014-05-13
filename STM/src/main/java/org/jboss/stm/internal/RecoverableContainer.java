@@ -318,7 +318,9 @@ public class RecoverableContainer<T> {
     }
 
     public final boolean isPessimistic(Object member) {
-        Class<?> c = member.getClass().getSuperclass();
+        // TODO change to use isAnnotationPresent?
+
+        Class<?> c = member.getClass();
 
         while (c != null) {
             if (c.getAnnotation(Optimistic.class) != null) {
@@ -343,7 +345,7 @@ public class RecoverableContainer<T> {
         if ((member instanceof LockManager) || (member instanceof StateManager))
             throw new IllegalArgumentException("Object type not supported by this transactional container!");
 
-        Class<?> c = member.getClass().getSuperclass();
+        Class<?> c = member.getClass();
 
         while (c != null) {
             if (c.getAnnotation(Transactional.class) != null) {
