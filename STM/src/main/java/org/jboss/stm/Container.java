@@ -245,7 +245,7 @@ public class Container<T> {
 
     /**
      * Given an identified for an existing object, create another handle. This
-     * is particularly useful when using pessimistic concurrency control and we
+     * is particularly useful when using optimistic concurrency control and we
      * need one object instance per thread to ensure that state is safely
      * managed.
      * 
