@@ -22,6 +22,7 @@
 package org.jboss.stm;
 
 import java.security.InvalidParameterException;
+import java.util.WeakHashMap;
 
 import org.jboss.stm.internal.PersistentContainer;
 import org.jboss.stm.internal.RecoverableContainer;
@@ -150,13 +151,16 @@ public class Container<T> {
     public Container(final String name, final TYPE type, final MODEL model) {
         int theModel = (model == MODEL.SHARED ? ObjectModel.MULTIPLE : ObjectModel.SINGLE);
 
-        if (type == TYPE.RECOVERABLE)
+        if (type == TYPE.RECOVERABLE) {
+            if (model != MODEL.EXCLUSIVE)
+                throw new InvalidParameterException("Object must be EXCLUSIVE!");
+
             _theContainer = new RecoverableContainer<T>(name); // NOTE currently
                                                                 // ObjectModel
                                                                 // data not
                                                                 // exposed for
                                                                 // RecoverableContainers
-        else
+        } else
             _theContainer = new PersistentContainer<T>(name, theModel);
     }
 
@@ -273,9 +277,18 @@ public class Container<T> {
         return _theContainer.getUidForHandle(proxy);
     }
 
+    // TODO
+
+    public static final Container<?> getContainer(Object proxy) {
+        return null;
+    }
+
     /*
      * The actual container (recoverable or persistent).
      */
 
     private RecoverableContainer<T> _theContainer;
+
+    // private static final WeakHashMap<Container<?>, Container<?>> _containers
+    // = new WeakHashMap<Container<?>, Container<?>>();
 }
