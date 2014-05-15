@@ -50,6 +50,11 @@ import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.Link;
 import org.jboss.resteasy.spi.LinkHeader;
 
+// spdy support
+import com.squareup.okhttp.OkHttpClient;
+import java.security.KeyStore;
+import javax.net.ssl.*;
+
 /**
  * Various utilities for sending HTTP messages
  */
@@ -60,6 +65,7 @@ public class TxSupport {
      * context root
      */
     public static final String TX_CONTEXT = System.getProperty("rest.tx.context.path", "/rest-tx");
+    public static final boolean useSpdy = Boolean.getBoolean("rts.usespdy");
     /**
      * Transaction Coordinator resource path
      */
@@ -90,6 +96,7 @@ public class TxSupport {
     private String contentType = null;
     private String txnMgr;
     private int readTimeout = DEFAULT_READ_TIMEOUT;
+    private OkHttpClient spdyClient;
 
     public static void setTxnMgrUrl(String txnMgrUrl) {
         TXN_MGR_URL = txnMgrUrl;
@@ -97,6 +104,8 @@ public class TxSupport {
     public TxSupport(String txnMgr, int readTimeout) {
         this.txnMgr = txnMgr;
         this.readTimeout = readTimeout;
+        if (useSpdy)
+            this.spdyClient = initClient();
     }
 
     public TxSupport(String txnMgr) {
@@ -575,7 +584,10 @@ public class TxSupport {
         if (connection != null)
             connection.disconnect();
 
-        connection = (HttpURLConnection) new URL(url).openConnection();
+        if (useSpdy)
+            connection = spdyClient.open(new URL(url));
+        else
+            connection = (HttpURLConnection) new URL(url).openConnection();
 
         connection.setRequestMethod(method);
 
@@ -826,5 +838,46 @@ public class TxSupport {
             return (TransactionManagerElement) o;
 
         return (TransactionManagerElement) ((JAXBElement) o).getValue();
+    }
+
+    private static OkHttpClient initClient() {
+        try {
+            OkHttpClient okHttpClient = new OkHttpClient();
+
+            // sslContext = getSSLContext();
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, null, null);
+            okHttpClient.setSslSocketFactory(sslContext.getSocketFactory());
+
+            return okHttpClient;
+        } catch (Exception e) {
+            throw new AssertionError(); // The system has no TLS. Just give up.
+        }
+    }
+
+    private static SSLContext getSSLContext() throws Exception {
+        String trustStoreFile = System.getProperty("javax.net.ssl.trustStore");
+        String trustStorePswd = System.getProperty("javax.net.ssl.trustStorePassword");
+
+        // Load the key store: change store type if needed
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        FileInputStream fis = new FileInputStream(trustStoreFile);
+
+        try {
+            ks.load(fis, trustStorePswd.toCharArray());
+        } finally {
+            if (fis != null) {
+                fis.close();
+            }
+        }
+
+        // Get the default Key Manager
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(ks, trustStorePswd.toCharArray());
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kmf.getKeyManagers(), null, null);
+
+        return sslContext;
     }
 }
