@@ -35,9 +35,10 @@ import java.util.EmptyStackException;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
+
 /**
- * This class maintains a mapping between a thread and its notion of the current
- * transaction. Essentially this is a stack of transactions.
+ * This class maintains a mapping between a thread and its notion of the current transaction. Essentially this is a stack of
+ * transactions.
  * 
  * @author Mark Little (mark@arjuna.com)
  * @version $Id: ThreadActionData.java 2342 2006-03-30 13:06:17Z $
@@ -65,9 +66,8 @@ public class ThreadActionData {
     }
 
     /**
-     * By setting the register flag accordingly, information about the thread
-     * may not be propagated to the action, i.e., only the thread's notion of
-     * current changes.
+     * By setting the register flag accordingly, information about the thread may not be propagated to the action, i.e., only
+     * the thread's notion of current changes.
      */
 
     public static void pushAction(TransactionImpl a, boolean register) {
@@ -135,8 +135,7 @@ public class ThreadActionData {
     }
 
     /**
-     * By setting the unregister flag accordingly, information about the thread
-     * is not removed from the action.
+     * By setting the unregister flag accordingly, information about the thread is not removed from the action.
      */
 
     public static TransactionImpl popAction(String threadId, boolean unregister) throws EmptyStackException {
@@ -210,29 +209,25 @@ public class ThreadActionData {
     }
 
     /**
-     * Add a per thread setup object to the global list. This should only happen
-     * before the transaction service really begins, or you risk having some
-     * threads see one view of the list that is different to other threads.
+     * Add a per thread setup object to the global list. This should only happen before the transaction service really begins,
+     * or you risk having some threads see one view of the list that is different to other threads.
      * 
-     * @param s
-     *            the setup to add.
+     * @param s the setup to add.
      */
     /*
-     * XXX NOT USED public static void addSetup (ThreadSetup s) { synchronized
-     * (_threadSetups) { _threadSetups.add(s); } }
+     * XXX NOT USED public static void addSetup (ThreadSetup s) { synchronized (_threadSetups) { _threadSetups.add(s); } }
      */
     /**
-     * Remove a per thread setup object to the global list. This should only
-     * happen after the transaction service really ends, or you risk having some
-     * threads see one view of the list that is different to other threads.
+     * Remove a per thread setup object to the global list. This should only happen after the transaction service really ends,
+     * or you risk having some threads see one view of the list that is different to other threads.
      * 
      */
     /*
-     * XXX NOT USED public static boolean removeSetup (ThreadSetup s) {
-     * synchronized (_threadSetups) { return _threadSetups.remove(s); } }
+     * XXX NOT USED public static boolean removeSetup (ThreadSetup s) { synchronized (_threadSetups) { return
+     * _threadSetups.remove(s); } }
      * 
-     * private static void setup () { for (int i = 0; i < _threadSetups.size();
-     * i++) { ThreadSetup s = (ThreadSetup) _threadSetups.get(i);
+     * private static void setup () { for (int i = 0; i < _threadSetups.size(); i++) { ThreadSetup s = (ThreadSetup)
+     * _threadSetups.get(i);
      * 
      * if (s != null) s.setup(); } }
      * 

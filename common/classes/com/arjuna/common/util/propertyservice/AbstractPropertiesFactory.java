@@ -44,8 +44,7 @@ import com.arjuna.common.util.ConfigurationInfo;
  */
 
 /**
- * This class loads properties according to the file location, substitution and
- * override rules described in the docs.
+ * This class loads properties according to the file location, substitution and override rules described in the docs.
  *
  * @author Richard A. Begg (richard.begg@arjuna.com)
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
@@ -54,15 +53,12 @@ public abstract class AbstractPropertiesFactory {
     private volatile Properties defaultProperties = null;
 
     /**
-     * Returns the systems default properties, as read from the configuration
-     * file.
-     * 
+     * Returns the systems default properties, as read from the configuration file.
      * @return the configuration Properties
      */
     public Properties getDefaultProperties() {
-        if (defaultProperties == null) {
-            // TODO: pick and document new standard for global config file name
-            // property. For now use 'common' module value.
+        if(defaultProperties == null) {
+            // TODO: pick and document new standard for global config file name property. For now use 'common' module value.
             initDefaultProperties("com.arjuna.ats.arjuna.common.propertiesFile");
         }
 
@@ -72,32 +68,31 @@ public abstract class AbstractPropertiesFactory {
     /**
      * Returns the config properties read from a specified location.
      *
-     * @param propertyFileName
-     *            the file name. If relative, this is located using the
-     *            FileLocator algorithm.
+     * @param propertyFileName the file name. If relative, this is located using the FileLocator algorithm.
      * @return the Properties loaded from the specified source.
      */
     public Properties getPropertiesFromFile(String propertyFileName, ClassLoader classLoader) {
         String propertiesSourceUri = null;
-        try {
-            // This is the point where the search path is applied - user.dir
-            // (pwd), user.home, java.home, classpath
-            propertiesSourceUri = com.arjuna.common.util.propertyservice.FileLocator.locateFile(propertyFileName,
-                    classLoader);
-        } catch (FileNotFoundException fileNotFoundException) {
+        try
+        {
+            // This is the point where the search path is applied - user.dir (pwd), user.home, java.home, classpath
+            propertiesSourceUri = com.arjuna.common.util.propertyservice.FileLocator.locateFile(propertyFileName, classLoader);
+        }
+        catch(FileNotFoundException fileNotFoundException)
+        {
             // try falling back to a default file built into the .jar
-            // Note the default- prefix on the name, to avoid finding it from
-            // the .jar at the previous stage
-            // in cases where the .jar comes before the etc dir on the
-            // classpath.
-            URL url = AbstractPropertiesFactory.class.getResource("/default-" + propertyFileName);
-            if (url == null) {
+            // Note the default- prefix on the name, to avoid finding it from the .jar at the previous stage
+            // in cases where the .jar comes before the etc dir on the classpath.
+            URL url = AbstractPropertiesFactory.class.getResource("/default-"+propertyFileName);
+            if(url == null) {
                 commonLogger.i18NLogger.warn_could_not_find_config_file(url);
             } else {
                 propertiesSourceUri = url.toString();
             }
-        } catch (IOException e) {
-            throw new RuntimeException("invalid property file " + propertiesSourceUri, e);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("invalid property file "+propertiesSourceUri, e);
         }
 
         Properties properties = null;
@@ -108,8 +103,8 @@ public abstract class AbstractPropertiesFactory {
             }
             properties = applySystemProperties(properties);
 
-        } catch (Exception e) {
-            throw new RuntimeException("unable to load properties from " + propertiesSourceUri, e);
+        } catch(Exception e) {
+            throw new RuntimeException("unable to load properties from "+propertiesSourceUri, e);
         }
 
         return properties;
@@ -124,16 +119,15 @@ public abstract class AbstractPropertiesFactory {
     private Properties applySystemProperties(Properties inputProperties) {
         Properties outputProperties = new Properties(inputProperties);
         Enumeration enumeration = System.getProperties().propertyNames();
-        while (enumeration.hasMoreElements()) {
-            String key = (String) enumeration.nextElement();
+        while(enumeration.hasMoreElements()) {
+            String key = (String)enumeration.nextElement();
             outputProperties.setProperty(key, System.getProperty(key));
         }
         return outputProperties;
     }
 
     /**
-     * Standard java.util.Properties xml format, with JBossAS style substitution
-     * post-processing.
+     * Standard java.util.Properties xml format, with JBossAS style substitution post-processing.
      *
      * @param uri
      * @return
@@ -144,7 +138,7 @@ public abstract class AbstractPropertiesFactory {
         Properties inputProperties = new Properties();
         Properties outputProperties = new Properties();
 
-        if (new File(uri).exists()) {
+        if( new File(uri).exists() ) {
             inputStream = new FileInputStream(uri);
         } else {
             // it's probably a file embedded in a .jar
@@ -152,14 +146,15 @@ public abstract class AbstractPropertiesFactory {
         }
 
         try {
-            loadFromXML(inputProperties, inputStream);
+            loadFromXML(inputProperties,inputStream);
         } finally {
             inputStream.close();
         }
 
+
         Enumeration namesEnumeration = inputProperties.propertyNames();
-        while (namesEnumeration.hasMoreElements()) {
-            String propertyName = (String) namesEnumeration.nextElement();
+        while(namesEnumeration.hasMoreElements()) {
+            String propertyName = (String)namesEnumeration.nextElement();
             String propertyValue = inputProperties.getProperty(propertyName);
 
             propertyValue = propertyValue.trim();
@@ -174,34 +169,26 @@ public abstract class AbstractPropertiesFactory {
     }
 
     private synchronized void initDefaultProperties(String fileNamePropertyKey) {
-        if (defaultProperties != null) {
+        if(defaultProperties != null) {
             return;
         }
 
-        // This is where the properties loading takes place. The algorithm is as
-        // follows:
+        // This is where the properties loading takes place. The algorithm is as follows:
 
-        // If the specified fileNamePropertyKey exists as a key is the system
-        // properties, take the value of that property as
-        // the location of the module's properties file. This allows file
-        // location to be overriden easily.
+        // If the specified fileNamePropertyKey exists as a key is the system properties, take the value of that property as
+        // the location of the module's properties file. This allows file location to be overriden easily.
         String propertyFileName = System.getProperty(fileNamePropertyKey);
 
-        // If the system property is not set, try to load the build time
-        // properties. Build time properties
-        // are not the module properties! These are optional and so loading may
-        // fail. That's not considered an error.
-        // If the properties file name is defined by the build time properties,
-        // use that.
-        // (In JBossTS it mostly does exist - the build scripts put build time
-        // properties into the .jars manifest file.)
+        // If the system property is not set, try to load the build time properties. Build time properties
+        // are not the module properties! These are optional and so loading may fail. That's not considered an error.
+        // If the properties file name is defined by the build time properties, use that.
+        // (In JBossTS it mostly does exist - the build scripts put build time properties into the .jars manifest file.)
         if (propertyFileName == null) {
             propertyFileName = ConfigurationInfo.getPropertiesFile();
         }
 
-        // Bail out if it has not been possible to get a file name by either of
-        // these method.
-        if (propertyFileName == null) {
+        // Bail out if it has not been possible to get a file name by either of these method.
+        if(propertyFileName == null) {
             throw new RuntimeException("Unable to resolve property file name");
         }
 

@@ -27,41 +27,57 @@ import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
  * terms of the registrar, but internally we map to one of these methods.
  */
 
-public class TransactionManagerImple extends TransactionManager {
-    public TransactionManagerImple() {
+public class TransactionManagerImple extends TransactionManager
+{
+    public TransactionManagerImple()
+    {
     }
 
-    public void enlistForDurableTwoPhase(Durable2PCParticipant tpp, String id)
-            throws WrongStateException, UnknownTransactionException, SystemException {
-        try {
+    public void enlistForDurableTwoPhase (Durable2PCParticipant tpp, String id)
+            throws WrongStateException, UnknownTransactionException, SystemException
+    {
+        try
+        {
             final W3CEndpointReference participant = getParticipant(id, isCurrentContextSecure());
-            final W3CEndpointReference coordinator = registerParticipant(participant,
-                    AtomicTransactionConstants.WSAT_SUB_PROTOCOL_DURABLE_2PC);
+            final W3CEndpointReference coordinator = registerParticipant(participant, AtomicTransactionConstants.WSAT_SUB_PROTOCOL_DURABLE_2PC);
 
-            ParticipantProcessor.getProcessor().activateParticipant(new ParticipantEngine(tpp, id, coordinator), id);
-        } catch (com.arjuna.wsc.InvalidProtocolException ex) {
+            ParticipantProcessor.getProcessor().activateParticipant(new ParticipantEngine(tpp, id, coordinator), id) ;
+        }
+        catch (com.arjuna.wsc.InvalidProtocolException ex)
+        {
             throw new SystemException(ex.toString());
-        } catch (com.arjuna.wsc.InvalidStateException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidStateException ex)
+        {
             throw new WrongStateException();
-        } catch (com.arjuna.wsc.CannotRegisterException ex) {
+        }
+        catch (com.arjuna.wsc.CannotRegisterException ex)
+        {
             // cause could actually be no activity or already registered
             throw new UnknownTransactionException();
         }
     }
 
-    public void enlistForVolatileTwoPhase(Volatile2PCParticipant tpp, String id)
-            throws WrongStateException, UnknownTransactionException, SystemException {
-        try {
+    public void enlistForVolatileTwoPhase (Volatile2PCParticipant tpp, String id)
+            throws WrongStateException, UnknownTransactionException, SystemException
+    {
+        try
+        {
             final W3CEndpointReference participant = getParticipant(id, isCurrentContextSecure());
-            final W3CEndpointReference coordinator = registerParticipant(participant,
-                    AtomicTransactionConstants.WSAT_SUB_PROTOCOL_VOLATILE_2PC);
+            final W3CEndpointReference coordinator = registerParticipant(participant, AtomicTransactionConstants.WSAT_SUB_PROTOCOL_VOLATILE_2PC);
 
-            ParticipantProcessor.getProcessor().activateParticipant(new ParticipantEngine(tpp, id, coordinator), id);
-        } catch (com.arjuna.wsc.InvalidProtocolException ex) {
+            ParticipantProcessor.getProcessor().activateParticipant(new ParticipantEngine(tpp, id, coordinator), id) ;
+        }
+        catch (com.arjuna.wsc.InvalidProtocolException ex)
+        {
             throw new SystemException(ex.toString());
-        } catch (com.arjuna.wsc.InvalidStateException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidStateException ex)
+        {
             throw new WrongStateException();
-        } catch (com.arjuna.wsc.CannotRegisterException ex) {
+        }
+        catch (com.arjuna.wsc.CannotRegisterException ex)
+        {
             // cause could actually be no activity or already registered
             ex.printStackTrace();
 
@@ -77,25 +93,32 @@ public class TransactionManagerImple extends TransactionManager {
      *
      */
 
-    public int replay() throws SystemException {
-        throw new SystemException(wstxLogger.i18NLogger.get_mwlabs_wst_at_remote_Transaction11ManagerImple_1());
+    public int replay () throws SystemException
+    {
+        throw new SystemException(
+                wstxLogger.i18NLogger.get_mwlabs_wst_at_remote_Transaction11ManagerImple_1());
     }
 
-    public TxContext suspend() throws SystemException {
+    public TxContext suspend () throws SystemException
+    {
         return _ctxManager.suspend();
     }
 
     // resume overwrites. Should we check first a la JTA?
 
-    public void resume(TxContext tx) throws UnknownTransactionException, SystemException {
+    public void resume (TxContext tx) throws UnknownTransactionException,
+            SystemException
+    {
         _ctxManager.resume(tx);
     }
 
-    public TxContext currentTransaction() throws SystemException {
+    public TxContext currentTransaction () throws SystemException
+    {
         return _ctxManager.currentTransaction();
     }
 
-    private boolean isCurrentContextSecure() throws SystemException {
+    private boolean isCurrentContextSecure()  throws SystemException
+    {
         TxContextImple currentTx = (TxContextImple) _ctxManager.currentTransaction();
         if (currentTx != null) {
             return currentTx.isSecure();
@@ -103,12 +126,12 @@ public class TransactionManagerImple extends TransactionManager {
         return false;
     }
 
-    final W3CEndpointReference getParticipant(final String id, final boolean isSecure) {
+    final W3CEndpointReference getParticipant(final String id, final boolean isSecure)
+    {
         final QName serviceName = AtomicTransactionConstants.PARTICIPANT_SERVICE_QNAME;
         final QName endpointName = AtomicTransactionConstants.PARTICIPANT_PORT_QNAME;
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-        final String address = serviceRegistry.getServiceURI(AtomicTransactionConstants.PARTICIPANT_SERVICE_NAME,
-                isSecure);
+        final String address = serviceRegistry.getServiceURI(AtomicTransactionConstants.PARTICIPANT_SERVICE_NAME, isSecure);
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
         builder.serviceName(serviceName);
         builder.endpointName(endpointName);
@@ -117,36 +140,52 @@ public class TransactionManagerImple extends TransactionManager {
         return builder.build();
     }
 
-    final W3CEndpointReference registerParticipant(final W3CEndpointReference participant, final String protocol)
-            throws InvalidProtocolException, InvalidStateException, CannotRegisterException, SystemException {
+    final W3CEndpointReference registerParticipant (final W3CEndpointReference participant, final String protocol)
+            throws InvalidProtocolException, InvalidStateException, CannotRegisterException, SystemException
+    {
         TxContextImple currentTx = null;
 
-        try {
+        try
+        {
             currentTx = (TxContextImple) _ctxManager.suspend();
 
             if (currentTx == null)
                 throw new CannotRegisterException();
 
-            final CoordinationContextType coordinationContext = currentTx.context().getCoordinationContext();
-            final String messageId = MessageId.getMessageId();
+            final CoordinationContextType coordinationContext = currentTx.context().getCoordinationContext() ;
+            final String messageId = MessageId.getMessageId() ;
 
-            return com.arjuna.wsc11.RegistrationCoordinator.register(coordinationContext, messageId, participant,
-                    protocol);
-        } catch (final SoapFault sf) {
+            return com.arjuna.wsc11.RegistrationCoordinator.register(coordinationContext, messageId, participant, protocol) ;
+        }
+        catch (final SoapFault sf)
+        {
             throw new SystemException(sf.getMessage());
-        } catch (final CannotRegisterException cre) {
-            throw cre;
-        } catch (final InvalidStateException ise) {
-            throw ise;
-        } catch (final InvalidProtocolException ipe) {
-            throw ipe;
-        } catch (final Exception ex) {
+        }
+        catch (final CannotRegisterException cre)
+        {
+            throw cre ;
+        }
+        catch (final InvalidStateException ise)
+        {
+            throw ise ;
+        }
+        catch (final InvalidProtocolException ipe)
+        {
+            throw ipe ;
+        }
+        catch (final Exception ex)
+        {
             throw new SystemException(ex.toString());
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (currentTx != null)
                     _ctxManager.resume(currentTx);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.printStackTrace();
             }
         }

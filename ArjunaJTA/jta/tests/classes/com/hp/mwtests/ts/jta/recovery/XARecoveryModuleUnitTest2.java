@@ -73,7 +73,8 @@ public class XARecoveryModuleUnitTest2 {
             }
 
             @Override
-            public boolean setTransactionTimeout(int seconds) throws XAException {
+            public boolean setTransactionTimeout(int seconds)
+                    throws XAException {
                 // TODO Auto-generated method stub
                 return false;
             }
@@ -88,16 +89,19 @@ public class XARecoveryModuleUnitTest2 {
         // Ensure that we can recover the test xar
         ArrayList<String> r = new ArrayList<String>();
         r.add(XARXARRMSyncerXARecovery.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(r);
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setXaResourceRecoveryClassNames(r);
 
         // Ensure we can detect orphans
         ArrayList<String> filters = new ArrayList<String>();
         filters.add(JTATransactionLogXAResourceOrphanFilter.class.getName());
         filters.add(JTANodeNameXAResourceOrphanFilter.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceOrphanFilterClassNames(filters);
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setXaResourceOrphanFilterClassNames(filters);
 
         // Ensure we will handle orphans
-        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Arrays.asList(new String[]{"*"}));
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(
+                Arrays.asList(new String[] { "*" }));
 
         // Create the recovery module
         XARecoveryModule xarm = new XARecoveryModule();

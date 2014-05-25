@@ -39,71 +39,73 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.*;
 
 /**
  * The Activation Coordinator processor.
- * 
  * @author kevin
  */
-public class ActivationCoordinatorProcessorImpl extends ActivationCoordinatorProcessor {
+public class ActivationCoordinatorProcessorImpl extends ActivationCoordinatorProcessor
+{
     /**
      * Create the coordination context.
-     * 
-     * @param createCoordinationContext
-     *            The create coordination context request.
-     * @param map
-     *            The addressing context.
+     * @param createCoordinationContext The create coordination context request.
+     * @param map The addressing context.
      */
-    public CreateCoordinationContextResponseType createCoordinationContext(
-            final CreateCoordinationContextType createCoordinationContext, final MAP map, final boolean isSecure) {
-        final ContextFactoryMapper contextFactoryMapper = ContextFactoryMapper.getMapper();
-        try {
-            final String coordinationType = createCoordinationContext.getCoordinationType();
-            final ContextFactory contextFactory = contextFactoryMapper.getContextFactory(coordinationType);
-
-            if (contextFactory != null) {
-                final CoordinationContext coordinationContext;
-                try {
-                    final Expires expiresElement = createCoordinationContext.getExpires();
-                    final Long expires = (expiresElement == null ? null : new Long(expiresElement.getValue()));
-
-                    coordinationContext = contextFactory.create(coordinationType, expires,
-                            createCoordinationContext.getCurrentContext(), isSecure);
-                    final CreateCoordinationContextResponseType response = new CreateCoordinationContextResponseType();
-                    response.setCoordinationContext(coordinationContext);
+    public CreateCoordinationContextResponseType
+        createCoordinationContext(final CreateCoordinationContextType createCoordinationContext,
+                                  final MAP map,
+                                  final boolean isSecure)
+    {
+        final ContextFactoryMapper contextFactoryMapper = ContextFactoryMapper.getMapper() ;
+        try
+        {
+            final String coordinationType = createCoordinationContext.getCoordinationType() ;
+            final ContextFactory contextFactory = contextFactoryMapper.getContextFactory(coordinationType) ;
+            
+            if (contextFactory != null)
+            {
+                final CoordinationContext coordinationContext ;
+                try
+                {
+                    final Expires expiresElement = createCoordinationContext.getExpires() ;
+                    final Long expires = (expiresElement == null ? null : new Long(expiresElement.getValue())) ;
+                    
+                    coordinationContext = contextFactory.create(coordinationType, expires, createCoordinationContext.getCurrentContext(), isSecure) ;
+                    final CreateCoordinationContextResponseType response = new CreateCoordinationContextResponseType() ;
+                    response.setCoordinationContext(coordinationContext) ;
                     return response;
-                } catch (final InvalidCreateParametersException invalidCreateParametersException) {
+                }
+                catch (final InvalidCreateParametersException invalidCreateParametersException)
+                {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
-                            CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME);
-                    soapFault.addDetail()
-                            .addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME)
-                            .addTextNode(
-                                    WSCLogger.i18NLogger.get_wsc11_messaging_ActivationCoordinatorProcessorImpl_1());
-                    throw new SOAPFaultException(soapFault);
-                } catch (final Throwable th) {
-                    if (WSCLogger.logger.isTraceEnabled()) {
-                        WSCLogger.logger.tracev("Unexpected exception thrown from create:", th);
-                    }
-                    SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
-                            CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME);
-                    soapFault.addDetail()
-                            .addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME)
-                            .addTextNode(th.getMessage());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME);
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_ActivationCoordinatorProcessorImpl_1());
                     throw new SOAPFaultException(soapFault);
                 }
-            } else {
-                if (WSCLogger.logger.isTraceEnabled()) {
-                    WSCLogger.logger.tracev("CreateCoordinationContext called for unknown coordination type: {0}",
-                            new Object[]{coordinationType});
+                catch (final Throwable th)
+                {
+                    if (WSCLogger.logger.isTraceEnabled())
+                    {
+                        WSCLogger.logger.tracev("Unexpected exception thrown from create:", th) ;
+                    }
+                    SOAPFactory factory = SOAPFactory.newInstance();
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME) ;
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME).addTextNode(th.getMessage());
+                    throw new SOAPFaultException(soapFault);
+                }
+            }
+            else
+            {
+                if (WSCLogger.logger.isTraceEnabled())
+                {
+                    WSCLogger.logger.tracev("CreateCoordinationContext called for unknown coordination type: {0}", new Object[] {coordinationType}) ;
                 }
 
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
-                        CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME);
-                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME)
-                        .addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_ActivationCoordinatorProcessorImpl_1());
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME) ;
+                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_ActivationCoordinatorProcessorImpl_1());
                 throw new SOAPFaultException(soapFault);
             }
-        } catch (SOAPException se) {
+        }
+        catch (SOAPException se)
+        {
             se.printStackTrace(System.err);
             throw new ProtocolException(se);
         }

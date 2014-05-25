@@ -33,11 +33,11 @@ package com.arjuna.orbportability.internal.orbspecific.versions;
 import com.arjuna.orbportability.ORBData;
 import com.arjuna.orbportability.ORBType;
 
-public class ibmorb_7_1 implements ORBData {
-    public String getORBdata() {
-        // the lib/orb.idl refers to V2.3 - not sure about the ibmorb jars
-        // though
-        return "<orb-data><name>" + ORBType.ibmorb
-                + "</name><version><major>7</major><minor>2</minor></version><corba-version><major>2</major><minor>3</minor></corba-version></orb-data>";
+public class ibmorb_7_1 implements ORBData
+{
+    public String getORBdata()
+    {
+        // the lib/orb.idl refers to V2.3 - not sure about the ibmorb jars though
+        return "<orb-data><name>" + ORBType.ibmorb+"</name><version><major>7</major><minor>2</minor></version><corba-version><major>2</major><minor>3</minor></corba-version></orb-data>";
     }
 }

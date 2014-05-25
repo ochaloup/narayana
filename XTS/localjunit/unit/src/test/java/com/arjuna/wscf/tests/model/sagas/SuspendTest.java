@@ -24,29 +24,36 @@ public class SuspendTest {
     }
 
     @Test
-    public void testSuspend() throws Exception {
+    public void testSuspend()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("Sagas11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ActivityHierarchy hier = ua.suspend();
 
-            System.out.println("Suspended: " + hier + "\n");
+            System.out.println("Suspended: "+hier+"\n");
 
             if (ua.currentActivity() != null) {
                 WSCF11TestUtils.cleanup(ua);
                 fail("Hierarchy still active.");
             }
-        } catch (NoCoordinatorException ex) {
+        }
+        catch (NoCoordinatorException ex)
+        {
             // why is it ok to get here?
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

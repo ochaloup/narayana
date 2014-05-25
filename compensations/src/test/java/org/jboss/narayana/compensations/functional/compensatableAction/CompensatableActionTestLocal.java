@@ -53,8 +53,7 @@ public class CompensatableActionTestLocal {
     @Deployment
     public static WebArchive createTestArchive() {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-                .addClasses(DummyData.class, CompensatableActionTestLocal.class,
-                        ParticipantCompletionCoordinatorRules.class)
+                .addClasses(DummyData.class, CompensatableActionTestLocal.class, ParticipantCompletionCoordinatorRules.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
 
         return archive;
@@ -90,10 +89,9 @@ public class CompensatableActionTestLocal {
             compensatableAction
                     .addWork(workCounter::increment, compensationsCounter::increment, confirmationsCounter::increment)
                     .addWork(workCounter::increment, (CompensationHandler) compensationsCounter::increment)
-                    .addWork(workCounter::increment, (ConfirmationHandler) confirmationsCounter::increment)
-                    .addWork(() -> {
-                        throw new RuntimeException("Test");
-                    }, compensationsCounter::increment, confirmationsCounter::increment).execute();
+                    .addWork(workCounter::increment, (ConfirmationHandler) confirmationsCounter::increment).addWork(() -> {
+                throw new RuntimeException("Test");
+            }, compensationsCounter::increment, confirmationsCounter::increment).execute();
             fail("RuntimeException expected");
         } catch (RuntimeException e) {
             // Expected

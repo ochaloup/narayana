@@ -53,14 +53,18 @@ public class XAResourceCheckForSingleEndCall {
 
         ORB myORB = ORB.getInstance("test");
         RootOA myOA = OA.getRootOA(myORB);
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
-                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        jtaPropertyManager
+                .getJTAEnvironmentBean()
+                .setTransactionManagerClassName(
+                        com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class
+                                .getName());
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.begin();
 

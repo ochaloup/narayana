@@ -307,13 +307,11 @@ public class RunServer {
     }
 
     public void tpadvertiseTestRollbackOnlyTprecvTPEVDISCONIMMService() throws ConnectionException {
-        this.server.tpadvertise(getServiceNameTestRollbackOnly2(),
-                RollbackOnlyTprecvTPEVDISCONIMMService.class.getName());
+        this.server.tpadvertise(getServiceNameTestRollbackOnly2(), RollbackOnlyTprecvTPEVDISCONIMMService.class.getName());
     }
 
     public void tpadvertiseTestRollbackOnlyTprecvTPEVSVCFAILService() throws ConnectionException {
-        this.server.tpadvertise(getServiceNameTestRollbackOnly2(),
-                RollbackOnlyTprecvTPEVSVCFAILService.class.getName());
+        this.server.tpadvertise(getServiceNameTestRollbackOnly2(), RollbackOnlyTprecvTPEVSVCFAILService.class.getName());
     }
 
     public void tpadvertiseTestRollbackOnlyNoTpreturnService() throws ConnectionException {

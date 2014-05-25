@@ -35,29 +35,35 @@ import java.util.Properties;
  * $Id: ORBInterface.java,v 1.3 2003/07/11 12:24:57 jcoleman Exp $
  */
 
-public class ORBInterface {
+public class ORBInterface
+{
     private final static String ORB_NAME = "ats-qa-orb";
 
     private static ORB _orb = null;
 
-    public static void initORB(String[] params, Properties props) {
+    public static void initORB(String[] params, Properties props)
+    {
         _orb = ORB.getInstance(ORB_NAME);
         _orb.initORB(params, props);
     }
 
-    public static ORB getORB() {
+    public static ORB getORB()
+    {
         return _orb;
     }
 
-    public static org.omg.CORBA.ORB orb() {
+    public static org.omg.CORBA.ORB orb()
+    {
         return _orb.orb();
     }
 
-    public static void run() {
+    public static void run()
+    {
         _orb.orb().run();
     }
 
-    public static void shutdownORB() {
+    public static void shutdownORB()
+    {
         _orb.shutdown();
     }
 }

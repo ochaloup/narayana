@@ -39,12 +39,14 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.jts.utils.TxStoreLog;
 
-public class TxStoreLogUnitTest {
+public class TxStoreLogUnitTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         TxStoreLog log = new TxStoreLog();
         InputObjectState is = new InputObjectState();
-
-        assertTrue(TxStoreLog.getTransactions(is));
+        
+        assertTrue(TxStoreLog.getTransactions(is));  
     }
 }

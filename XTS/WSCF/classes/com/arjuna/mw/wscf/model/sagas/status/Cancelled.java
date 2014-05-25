@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Cancelled implements Status {
+public class Cancelled implements Status
+{
 
-    public static Cancelled instance() {
-        return _instance;
+    public static Cancelled instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.sagas.status.Cancelled";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.sagas.status.Cancelled";
-    }
-
-    private Cancelled() {
+    private Cancelled ()
+    {
     }
 
     private static final Cancelled _instance = new Cancelled();
-
+    
 }

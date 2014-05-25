@@ -31,26 +31,28 @@ import com.arjuna.wst11.messaging.*;
 
 /**
  * Initialise the transaction coordinator services.
- * 
  * @author kevin
  */
-public class WSTCoordinatorInitialisation {
+public class WSTCoordinatorInitialisation
+{
     /**
      * The context has been initialized.
      */
-    public static void startup() {
-        CompletionCoordinatorProcessor.setProcessor(new CompletionCoordinatorProcessorImpl());
-        CompletionCoordinatorRPCProcessor.setProcessor(new CompletionCoordinatorRPCProcessorImpl());
-        CoordinatorProcessor.setProcessor(new CoordinatorProcessorImpl());
-        TerminationCoordinatorProcessor.setProcessor(new TerminationCoordinatorProcessorImpl());
-        TerminationCoordinatorRPCProcessor.setProcessor(new TerminationCoordinatorRPCProcessorImpl());
-        CoordinatorCompletionCoordinatorProcessor.setProcessor(new CoordinatorCompletionCoordinatorProcessorImpl());
-        ParticipantCompletionCoordinatorProcessor.setProcessor(new ParticipantCompletionCoordinatorProcessorImpl());
+    public static void startup()
+    {
+        CompletionCoordinatorProcessor.setProcessor(new CompletionCoordinatorProcessorImpl()) ;
+        CompletionCoordinatorRPCProcessor.setProcessor(new CompletionCoordinatorRPCProcessorImpl()) ;
+        CoordinatorProcessor.setProcessor(new CoordinatorProcessorImpl()) ;
+        TerminationCoordinatorProcessor.setProcessor(new TerminationCoordinatorProcessorImpl()) ;
+        TerminationCoordinatorRPCProcessor.setProcessor(new TerminationCoordinatorRPCProcessorImpl()) ;
+        CoordinatorCompletionCoordinatorProcessor.setProcessor(new CoordinatorCompletionCoordinatorProcessorImpl()) ;
+        ParticipantCompletionCoordinatorProcessor.setProcessor(new ParticipantCompletionCoordinatorProcessorImpl()) ;
     }
 
     /**
      * The context is about to be destroyed.
      */
-    public static void shutdown() {
+    public static void shutdown()
+    {
     }
 }

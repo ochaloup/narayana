@@ -34,7 +34,8 @@ package com.arjuna.mw.wst.common;
 /**
  */
 
-public interface Environment {
+public interface Environment
+{
 
     public static final String COORDINATOR_URL = "org.jboss.jbossts.xts.coordinatorURL";
     public static final String COORDINATOR_SCHEME = "org.jboss.jbossts.xts.coordinator.scheme";

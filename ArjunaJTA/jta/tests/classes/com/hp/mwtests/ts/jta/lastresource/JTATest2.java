@@ -47,15 +47,13 @@ import static org.junit.Assert.fail;
 
 public class JTATest2 {
     /**
-     * Test the following scenario: 2 XA resources, one makes no changes during
-     * prepare (ie returns XA_RDONLY), and the other is a LRCO resource (so is
-     * processed after normal XA resources) which throws
-     * XAException.XA_RBROLLBACK during prepare.
+     * Test the following scenario:
+     * 2 XA resources, one makes no changes during prepare (ie returns XA_RDONLY),
+     * and the other is a LRCO resource (so is processed after normal XA resources) which
+     * throws XAException.XA_RBROLLBACK during prepare.
      *
-     * The expected outcome is that the transaction throws a RollbackException.
-     * Furthermore this exception should contain a suppressed throwable
-     * corresponding to the XAException thrown by the LRCO resource.
-     * 
+     * The expected outcome is that the transaction throws a RollbackException. Furthermore this exception should
+     * contain a suppressed throwable corresponding to the XAException thrown by the LRCO resource.
      * @throws Exception
      */
     @Test
@@ -63,8 +61,8 @@ public class JTATest2 {
         doTest(XAException.XA_RBROLLBACK);
     }
 
-    private void doTest(final int errorCode) throws IllegalStateException, RollbackException, SystemException,
-            NotSupportedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+    private void doTest(final int errorCode) throws IllegalStateException, RollbackException, SystemException, NotSupportedException, SecurityException, HeuristicMixedException,
+            HeuristicRollbackException {
 
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
@@ -75,8 +73,7 @@ public class JTATest2 {
         assertTrue(theTransaction.enlistResource(new LastResourceCommitOptimisation() {
 
             @Override
-            public void start(Xid arg0, int arg1) throws XAException {
-            }
+            public void start(Xid arg0, int arg1) throws XAException {}
 
             @Override
             public boolean setTransactionTimeout(int arg0) throws XAException {
@@ -84,8 +81,7 @@ public class JTATest2 {
             }
 
             @Override
-            public void rollback(Xid arg0) throws XAException {
-            }
+            public void rollback(Xid arg0) throws XAException {}
 
             @Override
             public Xid[] recover(int arg0) throws XAException {
@@ -113,8 +109,7 @@ public class JTATest2 {
             }
 
             @Override
-            public void end(Xid arg0, int arg1) throws XAException {
-            }
+            public void end(Xid arg0, int arg1) throws XAException {}
 
             @Override
             public void commit(Xid arg0, boolean arg1) throws XAException {
@@ -182,16 +177,15 @@ public class JTATest2 {
             tm.commit();
             fail("Commit should have thrown a rollback exception");
         } catch (RollbackException re) {
-            // check that the exception contains the XAException from the XA
-            // resource that rolled back
+            // check that the exception contains the XAException from the XA resource that rolled back
             assertTrue("Expected a deferred exception", re.getSuppressed().length > 0);
 
             Throwable t = re.getSuppressed()[0];
 
             assertTrue("Expected a deferred XAException", t instanceof XAException);
 
-            assertEquals("Expected a deferred rollback exception", XAException.XA_RBROLLBACK,
-                    ((XAException) t).errorCode);
+            assertEquals("Expected a deferred rollback exception",
+                    XAException.XA_RBROLLBACK, ((XAException)t).errorCode);
         }
     }
 }

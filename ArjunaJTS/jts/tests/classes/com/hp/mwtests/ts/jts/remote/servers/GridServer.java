@@ -37,8 +37,10 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.grid_i;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-public class GridServer {
-    public static void main(String[] args) throws Exception {
+public class GridServer
+{
+    public static void main(String[] args) throws Exception
+    {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -48,14 +50,17 @@ public class GridServer {
         grid_i myGrid = new grid_i(100, 100);
         Services serv = new Services(myORB);
 
-        try {
+        try
+        {
             TestUtility.registerService(gridReference, myORB.orb().object_to_string(myGrid.getReference()));
 
             System.out.println("Ready");
 
             myOA.run();
-        } catch (Exception e) {
-            TestUtility.fail("**GridServer caught exception: " + e);
+        }
+        catch (Exception e)
+        {
+            TestUtility.fail("**GridServer caught exception: "+e);
         }
 
         myOA.shutdownObject(myGrid);

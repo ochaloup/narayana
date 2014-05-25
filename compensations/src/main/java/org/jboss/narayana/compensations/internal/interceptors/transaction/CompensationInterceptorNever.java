@@ -46,18 +46,15 @@ public class CompensationInterceptorNever extends CompensationInterceptorBase {
      *
      * @param ic
      * @return
-     * @throws TransactionalException
-     *             if there is an active transaction.
-     * @throws Exception
-     *             if request has failed.
+     * @throws TransactionalException if there is an active transaction.
+     * @throws Exception if request has failed.
      */
     @AroundInvoke
     public Object intercept(final InvocationContext ic) throws Exception {
 
         BAController baController = BAControllerFactory.getInstance();
         if (baController.isBARunning()) {
-            throw new TransactionalException("Transaction is not allowed for invocation",
-                    new InvalidTransactionException());
+            throw new TransactionalException("Transaction is not allowed for invocation", new InvalidTransactionException());
         }
 
         return invokeInNoTx(ic);

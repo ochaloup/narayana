@@ -83,8 +83,7 @@ public class CompensationContextState {
     /**
      * Used during recovery.
      *
-     * @param deserializerHelper
-     *            Helper to deserialize resources.
+     * @param deserializerHelper Helper to deserialize resources.
      */
     public CompensationContextState(DeserializerHelper deserializerHelper) {
         Objects.requireNonNull(deserializerHelper, "Deserializer helper cannot be null");
@@ -92,13 +91,9 @@ public class CompensationContextState {
     }
 
     /**
-     * @param id
-     *            Uid of the compensation context. It is used to persist this
-     *            record to the object store.
-     * @param transactionId
-     *            String id of the transaction to which this context belongs.
-     * @param deserializerHelper
-     *            Helper to deserialize resources.
+     * @param id Uid of the compensation context. It is used to persist this record to the object store.
+     * @param transactionId String id of the transaction to which this context belongs.
+     * @param deserializerHelper Helper to deserialize resources.
      */
     public CompensationContextState(Uid id, String transactionId, DeserializerHelper deserializerHelper) {
         Objects.requireNonNull(id, "Id cannot be null");
@@ -130,8 +125,7 @@ public class CompensationContextState {
     /**
      * Get resource registered to this context.
      *
-     * @param id
-     *            String id of the resource.
+     * @param id String id of the resource.
      * @return Resource object if it was found, or {@code null} if it wasn't.
      */
     public Object getResource(String id) {
@@ -139,14 +133,12 @@ public class CompensationContextState {
         return resources.get(id);
     }
 
-    /**
-     * Registers resource with this context.
-     *
-     * @param id
-     *            String id of the resource.
-     * @param resource
-     *            Object of the resource.
-     */
+     /**
+      * Registers resource with this context.
+      *
+      * @param id String id of the resource.
+      * @param resource Object of the resource.
+      */
     public void addResource(String id, Object resource) {
         Objects.requireNonNull(id, "Id cannot be null");
         Objects.requireNonNull(resource, "Resource cannot be null");
@@ -156,8 +148,7 @@ public class CompensationContextState {
     /**
      * Removes resource from this context.
      *
-     * @param id
-     *            String id of the resource.
+     * @param id String id of the resource.
      */
     public void removeResource(String id) {
         Objects.requireNonNull(id, "Id cannot be null");
@@ -167,8 +158,7 @@ public class CompensationContextState {
     /**
      * Attaches participant which depends on this context.
      *
-     * @param id
-     *            String participant id.
+     * @param id String participant id.
      */
     public void attachParticipant(String id) {
         Objects.requireNonNull(id, "Id cannot be null");
@@ -176,11 +166,9 @@ public class CompensationContextState {
     }
 
     /**
-     * Detaches participant which was dependant on this context. Once the last
-     * participant is detached, context is removed.
+     * Detaches participant which was dependant on this context. Once the last participant is detached, context is removed.
      * 
-     * @param id
-     *            String participant id
+     * @param id String participant id
      */
     public void detachParticipant(String id) {
         Objects.requireNonNull(id, "Id cannot be null");
@@ -189,7 +177,6 @@ public class CompensationContextState {
 
     /**
      * Checks if this state has any participants attached to it.
-     * 
      * @return
      */
     public boolean hasAttachedParticipants() {
@@ -197,11 +184,9 @@ public class CompensationContextState {
     }
 
     /**
-     * Persists context to the object store. If record already exists, it is
-     * overridden.
+     * Persists context to the object store. If record already exists, it is overridden.
      *
-     * @param state
-     *            Output object state to persist data.
+     * @param state Output object state to persist data.
      * @return true on success and false on failure.
      */
     public boolean persist(OutputObjectState state) {
@@ -222,8 +207,7 @@ public class CompensationContextState {
     /**
      * Restores context from the object store.
      *
-     * @param state
-     *            Input object state to read data from.
+     * @param state Input object state to read data from.
      * @return true on success and false on failure.
      */
     public boolean restore(InputObjectState state) {
@@ -277,15 +261,11 @@ public class CompensationContextState {
     }
 
     /**
-     * For each resource persist its id, class name, and its instance serialized
-     * to a byte array.
+     * For each resource persist its id, class name, and its instance serialized to a byte array.
      * 
-     * @param state
-     *            output state to persist resources to.
-     * @param resources
-     *            resources to persist.
-     * @throws IOException
-     *             if failure occurred when serializing resource.
+     * @param state output state to persist resources to.
+     * @param resources resources to persist.
+     * @throws IOException if failure occurred when serializing resource.
      */
     private void persistResources(OutputObjectState state, Map<String, Object> resources) throws IOException {
         state.packInt(resources.size());
@@ -303,15 +283,12 @@ public class CompensationContextState {
     /**
      * Deserialize resources from the {@link InputObjectState}.
      * 
-     * We need to use client's class loader to deserialize resources. Therefore,
-     * we're using {@link DeserializerHelper} to try to deserialize resources
-     * with deserializers registered by the client.
+     * We need to use client's class loader to deserialize resources. Therefore, we're using {@link DeserializerHelper} to try
+     * to deserialize resources with deserializers registered by the client.
      * 
-     * @param state
-     *            state to deserialize resources from.
+     * @param state state to deserialize resources from.
      * @return map of deserialized resources.
-     * @throws IOException
-     *             if at least one of the resource couldn't be deserialized.
+     * @throws IOException if at least one of the resource couldn't be deserialized.
      */
     private Map<String, Object> restoreResources(InputObjectState state) throws IOException {
         int count = state.unpackInt();
@@ -321,8 +298,8 @@ public class CompensationContextState {
             String className = state.unpackString();
             try (ByteArrayInputStream byteStream = new ByteArrayInputStream(state.unpackBytes());
                     ObjectInputStream objectStream = new ObjectInputStream(byteStream)) {
-                Object resource = deserializerHelper.deserialize(objectStream, className, Object.class).orElseThrow(
-                        () -> new IOException("Failed to read a resource " + key + " of class " + className));
+                Object resource = deserializerHelper.deserialize(objectStream, className, Object.class)
+                        .orElseThrow(() -> new IOException("Failed to read a resource " + key + " of class " + className));
                 resources.put(key, resource);
             }
         }
@@ -332,12 +309,9 @@ public class CompensationContextState {
     /**
      * Persist all participant ids.
      *
-     * @param state
-     *            state to persist participant ids to.
-     * @param participants
-     *            set of participant ids.
-     * @throws IOException
-     *             if failure occurred when persisting participant id.
+     * @param state state to persist participant ids to.
+     * @param participants set of participant ids.
+     * @throws IOException if failure occurred when persisting participant id.
      */
     private void persistParticipants(OutputObjectState state, Set<String> participants) throws IOException {
         state.packInt(participants.size());
@@ -349,11 +323,9 @@ public class CompensationContextState {
     /**
      * Deserialize participant ids.
      *
-     * @param state
-     *            state to deserialize participant ids from.
+     * @param state state to deserialize participant ids from.
      * @return set of participant ids.
-     * @throws IOException
-     *             if failure occurred when deserializing participant id.
+     * @throws IOException if failure occurred when deserializing participant id.
      */
     private Set<String> restoreParticipants(InputObjectState state) throws IOException {
         int count = state.unpackInt();

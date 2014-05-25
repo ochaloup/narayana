@@ -33,8 +33,10 @@ package com.hp.mwtests.ts.txoj.recovery;
 
 import com.arjuna.ats.internal.txoj.recovery.TORecoveryModule;
 
-public class DummyTOModule extends TORecoveryModule {
-    public void intialise() {
+public class DummyTOModule extends TORecoveryModule
+{
+    public void intialise ()
+    {
         super.initialise();
     }
 }

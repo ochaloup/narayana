@@ -38,23 +38,28 @@ import com.arjuna.mw.wsas.exceptions.WSASException;
  * Some coordination protocols may allow this, whilst others will not.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: DuplicateParticipantException.java,v 1.1 2002/12/19 10:44:02
- *          nmcl Exp $
+ * @version $Id: DuplicateParticipantException.java,v 1.1 2002/12/19 10:44:02 nmcl Exp $
  * @since 1.0.
  */
 
-public class DuplicateParticipantException extends WSASException {
+public class DuplicateParticipantException extends WSASException
+{
 
-    public DuplicateParticipantException() {
-        super();
+    public DuplicateParticipantException ()
+    {
+    super();
     }
 
-    public DuplicateParticipantException(String s) {
-        super(s);
+    public DuplicateParticipantException (String s)
+    {
+    super(s);
     }
 
-    public DuplicateParticipantException(String s, int errorcode) {
-        super(s, errorcode);
+    public DuplicateParticipantException (String s, int errorcode)
+    {
+    super(s, errorcode);
     }
-
+    
 }
+
+

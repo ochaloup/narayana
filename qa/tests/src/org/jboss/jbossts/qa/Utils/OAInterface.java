@@ -36,33 +36,42 @@ import org.omg.PortableServer.Servant;
  * $Id: OAInterface.java,v 1.3 2003/07/11 12:25:13 jcoleman Exp $
  */
 
-public class OAInterface {
+public class OAInterface
+{
     private static OA _oa;
 
-    public static void initializeOA() throws InvalidName, SystemException {
+    public static void initializeOA() throws InvalidName, SystemException
+    {
         _oa = OA.getRootOA(ORBInterface.getORB());
         _oa.initPOA();
     }
 
-    public static void initOA() {
+    public static void initOA()
+    {
         _oa = OA.getRootOA(ORBInterface.getORB());
 
-        try {
+        try
+        {
             _oa.initPOA();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Failed to initialise OA: " + e);
         }
     }
 
-    public static void objectIsReady(Servant s) {
+    public static void objectIsReady(Servant s)
+    {
         _oa.objectIsReady(s);
     }
 
-    public static org.omg.CORBA.Object corbaReference(Servant obj) {
+    public static org.omg.CORBA.Object corbaReference(Servant obj)
+    {
         return _oa.corbaReference(obj);
     }
 
-    public static void shutdownOA() {
+    public static void shutdownOA()
+    {
         _oa.destroy();
     }
 }

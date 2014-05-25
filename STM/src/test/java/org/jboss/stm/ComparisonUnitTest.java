@@ -50,36 +50,44 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class ComparisonUnitTest extends TestCase {
+public class ComparisonUnitTest extends TestCase
+{
 
-    public class AtomicObject extends LockManager {
-        public AtomicObject() {
+    public class AtomicObject extends LockManager
+    {
+        public AtomicObject()
+        {
             super();
-
+            
             state = 0;
 
             AtomicAction A = new AtomicAction();
 
             A.begin();
 
-            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
+            {
                 if (A.commit() == ActionStatus.COMMITTED)
                     System.out.println("Created persistent object " + get_uid());
                 else
                     System.out.println("Action.commit error.");
-            } else {
+            }
+            else
+            {
                 A.abort();
 
                 System.out.println("setlock error.");
             }
         }
-
-        public void incr(int value) throws Exception {
+  
+        public void incr (int value) throws Exception
+        {
             AtomicAction A = new AtomicAction();
 
             A.begin();
 
-            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
+            {
                 state += value;
 
                 if (A.commit() != ActionStatus.COMMITTED)
@@ -93,12 +101,14 @@ public class ComparisonUnitTest extends TestCase {
             throw new Exception("Write lock error.");
         }
 
-        public void set(int value) throws Exception {
+        public void set (int value) throws Exception
+        {
             AtomicAction A = new AtomicAction();
 
             A.begin();
 
-            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
+            {
                 state = value;
 
                 if (A.commit() != ActionStatus.COMMITTED)
@@ -112,13 +122,15 @@ public class ComparisonUnitTest extends TestCase {
             throw new Exception("Write lock error.");
         }
 
-        public int get() throws Exception {
+        public int get () throws Exception
+        {
             AtomicAction A = new AtomicAction();
             int value = -1;
 
             A.begin();
 
-            if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED) {
+            if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED)
+            {
                 value = state;
 
                 if (A.commit() == ActionStatus.COMMITTED)
@@ -132,65 +144,79 @@ public class ComparisonUnitTest extends TestCase {
             throw new Exception("Read lock error.");
         }
 
-        public boolean save_state(OutputObjectState os, int ot) {
+        public boolean save_state (OutputObjectState os, int ot)
+        {
             boolean result = super.save_state(os, ot);
 
             if (!result)
                 return false;
 
-            try {
+            try
+            {
                 os.packInt(state);
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 result = false;
             }
 
             return result;
         }
 
-        public boolean restore_state(InputObjectState os, int ot) {
+        public boolean restore_state (InputObjectState os, int ot)
+        {
             boolean result = super.restore_state(os, ot);
 
             if (!result)
                 return false;
 
-            try {
+            try
+            {
                 state = os.unpackInt();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 result = false;
             }
 
             return result;
         }
 
-        public String type() {
+        public String type ()
+        {
             return "/StateManager/LockManager/AtomicObject";
         }
 
         private int state;
     }
-
+    
     @Transactional
-    public interface Atomic {
-        public void incr(int value) throws Exception;
-
-        public void set(int value) throws Exception;
-
-        public int get() throws Exception;
+    public interface Atomic
+    {
+        public void incr (int value) throws Exception;
+        
+        public void set (int value) throws Exception;
+        
+        public int get () throws Exception;
     }
-
-    public class ExampleSTM implements Atomic {
+    
+    public class ExampleSTM implements Atomic
+    {   
         @ReadLock
-        public int get() throws Exception {
+        public int get () throws Exception
+        {
             return state;
         }
 
         @WriteLock
-        public void set(int value) throws Exception {
+        public void set (int value) throws Exception
+        {
             state = value;
         }
-
+        
         @WriteLock
-        public void incr(int value) throws Exception {
+        public void incr (int value) throws Exception
+        {
             state += value;
         }
 
@@ -198,61 +224,66 @@ public class ComparisonUnitTest extends TestCase {
         private int state;
     }
 
-    public void testAtomicObject() throws Exception {
+    public void testAtomicObject () throws Exception
+    {
         AtomicObject obj = new AtomicObject();
         AtomicAction a = new AtomicAction();
-
+        
         a.begin();
-
+        
         obj.set(1234);
-
+        
         a.commit();
-
+        
         assertEquals(obj.get(), 1234);
-
+        
         a = new AtomicAction();
-
+        
         a.begin();
-
+        
         obj.incr(1);
-
+        
         a.abort();
-
+        
         assertEquals(obj.get(), 1234);
     }
-
-    public void testExampleSTM() throws Exception {
+    
+    public void testExampleSTM () throws Exception
+    {
         RecoverableContainer<Atomic> theContainer = new RecoverableContainer<Atomic>();
         ExampleSTM basic = new ExampleSTM();
         boolean success = true;
         Atomic obj = null;
-
-        try {
+        
+        try
+        {
             obj = theContainer.enlist(basic);
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
             ex.printStackTrace();
-
+            
             success = false;
         }
-
+        
         assertTrue(success);
-
+        
         AtomicAction a = new AtomicAction();
-
+        
         a.begin();
-
+        
         obj.set(1234);
-
+        
         a.commit();
 
         assertEquals(obj.get(), 1234);
-
+        
         a = new AtomicAction();
 
         a.begin();
 
         obj.incr(1);
-
+        
         a.abort();
 
         assertEquals(obj.get(), 1234);

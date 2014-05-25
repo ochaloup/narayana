@@ -41,14 +41,17 @@ import com.arjuna.mw.wscf.protocols.ProtocolManager;
 
 // TODO we need a separate instance for WSTX
 
-public class ProtocolRegistry {
+public class ProtocolRegistry
+{
 
-    public static ProtocolManager sharedManager() {
-        return _shared;
+    public static ProtocolManager sharedManager ()
+    {
+    return _shared;
     }
 
-    public static ProtocolManager createManager() {
-        return new ProtocolManager();
+    public static ProtocolManager createManager ()
+    {
+    return new ProtocolManager();
     }
 
     private static ProtocolManager _shared = new ProtocolManager();

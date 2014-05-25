@@ -58,127 +58,157 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 /**
- * This is the interface that the core exposes in order to allow different types
- * of participants to be enrolled. The messaging layer continues to work in
- * terms of the registrar, but internally we map to one of these methods.
+ * This is the interface that the core exposes in order to allow different
+ * types of participants to be enrolled. The messaging layer continues to
+ * work in terms of the registrar, but internally we map to one of these
+ * methods.
  */
 
-public class BusinessActivityManagerImple extends BusinessActivityManager {
-    public BusinessActivityManagerImple() {
+public class BusinessActivityManagerImple extends BusinessActivityManager
+{
+    public BusinessActivityManagerImple()
+    {
     }
 
-    public BAParticipantManager enlistForBusinessAgreementWithParticipantCompletion(
-            BusinessAgreementWithParticipantCompletionParticipant bap, String id)
-            throws WrongStateException, UnknownTransactionException, SystemException {
+    public BAParticipantManager enlistForBusinessAgreementWithParticipantCompletion (BusinessAgreementWithParticipantCompletionParticipant bap, String id)
+        throws WrongStateException, UnknownTransactionException, SystemException
+    {
         final QName service = BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_QNAME;
         final QName endpoint = BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_PORT_QNAME;
-        try {
-            boolean isSecure = ((TxContextImple) currentTransaction()).isSecure();
+        try
+        {
+            boolean isSecure = ((TxContextImple)currentTransaction()).isSecure();
             final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-            final String address = serviceRegistry
-                    .getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, isSecure);
-            final W3CEndpointReference participant = getParticipant(service, endpoint, address, id);
-            W3CEndpointReference baPMEndpoint = registerParticipant(participant,
-                    BusinessActivityConstants.WSBA_SUB_PROTOCOL_PARTICIPANT_COMPLETION);
-            final ParticipantCompletionParticipantEngine engine = new ParticipantCompletionParticipantEngine(id,
-                    baPMEndpoint, bap);
-            ParticipantCompletionParticipantProcessor.getProcessor().activateParticipant(engine, id);
+            final String address = serviceRegistry.getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, isSecure);
+            final W3CEndpointReference participant = getParticipant(service, endpoint, address, id) ;
+            W3CEndpointReference baPMEndpoint = registerParticipant(participant, BusinessActivityConstants.WSBA_SUB_PROTOCOL_PARTICIPANT_COMPLETION);
+            final ParticipantCompletionParticipantEngine engine = new ParticipantCompletionParticipantEngine(id, baPMEndpoint, bap) ;
+            ParticipantCompletionParticipantProcessor.getProcessor().activateParticipant(engine, id) ;
 
             return new BAParticipantCompletionParticipantManagerStub(engine);
-        } catch (com.arjuna.wsc.InvalidProtocolException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidProtocolException ex)
+        {
             throw new SystemException(ex.toString());
-        } catch (com.arjuna.wsc.InvalidStateException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidStateException ex)
+        {
             throw new WrongStateException();
-        } catch (com.arjuna.wsc.CannotRegisterException ex) {
+        }
+        catch (com.arjuna.wsc.CannotRegisterException ex)
+        {
             throw new UnknownTransactionException();
-        } catch (Throwable ex) {
+        }
+        catch (Throwable ex)
+        {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
         }
     }
 
-    public com.arjuna.wst11.BAParticipantManager enlistForBusinessAgreementWithCoordinatorCompletion(
-            BusinessAgreementWithCoordinatorCompletionParticipant bawcp, String id)
-            throws WrongStateException, UnknownTransactionException, SystemException {
+    public com.arjuna.wst11.BAParticipantManager enlistForBusinessAgreementWithCoordinatorCompletion (BusinessAgreementWithCoordinatorCompletionParticipant bawcp, String id)
+            throws WrongStateException, UnknownTransactionException, SystemException
+    {
         final QName service = BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_SERVICE_QNAME;
         final QName endpoint = BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_PORT_QNAME;
-        boolean isSecure = ((TxContextImple) currentTransaction()).isSecure();
-        try {
+        boolean isSecure = ((TxContextImple)currentTransaction()).isSecure();
+        try
+        {
             final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-            final String address = serviceRegistry
-                    .getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_SERVICE_NAME, isSecure);
-            final W3CEndpointReference participant = getParticipant(service, endpoint, address, id);
-            W3CEndpointReference baPMEndpoint = registerParticipant(participant,
-                    BusinessActivityConstants.WSBA_SUB_PROTOCOL_COORDINATOR_COMPLETION);
-            final CoordinatorCompletionParticipantEngine engine = new CoordinatorCompletionParticipantEngine(id,
-                    baPMEndpoint, bawcp);
-            CoordinatorCompletionParticipantProcessor.getProcessor().activateParticipant(engine, id);
+            final String address = serviceRegistry.getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_SERVICE_NAME, isSecure);
+            final W3CEndpointReference participant = getParticipant(service, endpoint, address, id) ;
+            W3CEndpointReference baPMEndpoint = registerParticipant(participant, BusinessActivityConstants.WSBA_SUB_PROTOCOL_COORDINATOR_COMPLETION);
+            final CoordinatorCompletionParticipantEngine engine = new CoordinatorCompletionParticipantEngine(id, baPMEndpoint, bawcp) ;
+            CoordinatorCompletionParticipantProcessor.getProcessor().activateParticipant(engine, id) ;
 
             return new BACoordinatorCompletionParticipantManagerStub(engine);
-        } catch (com.arjuna.wsc.InvalidProtocolException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidProtocolException ex)
+        {
             throw new SystemException(ex.toString());
-        } catch (com.arjuna.wsc.InvalidStateException ex) {
+        }
+        catch (com.arjuna.wsc.InvalidStateException ex)
+        {
             throw new WrongStateException();
-        } catch (com.arjuna.wsc.CannotRegisterException ex) {
+        }
+        catch (com.arjuna.wsc.CannotRegisterException ex)
+        {
             ex.printStackTrace();
 
             throw new UnknownTransactionException();
-        } catch (Throwable ex) {
+        }
+        catch (Throwable ex)
+        {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
         }
     }
 
-    public TxContext suspend() throws SystemException {
+    public TxContext suspend () throws SystemException
+    {
         return _ctxManager.suspend();
     }
 
     // resume overwrites. Should we check first a la JTA?
 
-    public void resume(TxContext tx) throws UnknownTransactionException, SystemException {
+    public void resume (TxContext tx) throws UnknownTransactionException, SystemException
+    {
         _ctxManager.resume(tx);
     }
 
-    public TxContext currentTransaction() throws SystemException {
+    public TxContext currentTransaction () throws SystemException
+    {
         return _ctxManager.currentTransaction();
     }
 
-    private final W3CEndpointReference registerParticipant(final W3CEndpointReference participant,
-            final String protocol) throws com.arjuna.wsc.InvalidProtocolException, com.arjuna.wsc.InvalidStateException,
-            com.arjuna.wsc.CannotRegisterException, SystemException {
+    private final W3CEndpointReference registerParticipant(final W3CEndpointReference participant, final String protocol)
+        throws com.arjuna.wsc.InvalidProtocolException, com.arjuna.wsc.InvalidStateException, com.arjuna.wsc.CannotRegisterException, SystemException
+    {
         TxContextImple currentTx = null;
 
-        try {
+        try
+        {
             currentTx = (TxContextImple) _ctxManager.currentTransaction();
 
             if (currentTx == null)
                 throw new com.arjuna.wsc.NoActivityException();
 
-            final CoordinationContextType coordinationContext = currentTx.context().getCoordinationContext();
-            final String messageId = MessageId.getMessageId();
-            return RegistrationCoordinator.register(coordinationContext, messageId, participant, protocol);
-        } catch (final SoapFault sf) {
+            final CoordinationContextType coordinationContext = currentTx.context().getCoordinationContext() ;
+            final String messageId = MessageId.getMessageId() ;
+            return RegistrationCoordinator.register(coordinationContext, messageId, participant, protocol) ;
+        }
+        catch (final SoapFault sf)
+        {
             throw new SystemException(sf.getMessage());
-        } catch (CannotRegisterException ex) {
+        }
+        catch (CannotRegisterException ex)
+        {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (currentTx != null)
                     _ctxManager.resume(currentTx);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.printStackTrace();
             }
         }
     }
 
-    private W3CEndpointReference getParticipant(final QName service, final QName endpoint, final String address,
-            final String id) {
+    private W3CEndpointReference getParticipant(final QName service, final QName endpoint, final String address, final String id)
+    {
         final W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
         builder.serviceName(service);
         builder.endpointName(endpoint);

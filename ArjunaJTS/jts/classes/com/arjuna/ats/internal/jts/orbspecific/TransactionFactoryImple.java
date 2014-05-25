@@ -90,13 +90,16 @@ import com.arjuna.ats.jts.utils.Utility;
  * everything's ok.
  * 
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: TransactionFactoryImple.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: TransactionFactoryImple.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
-public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryPOA {
+public class TransactionFactoryImple extends
+        com.arjuna.ArjunaOTS.ArjunaFactoryPOA
+{
 
-    public TransactionFactoryImple() {
+    public TransactionFactoryImple ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("TransactionFactoryImple::TransactionFactoryImple ()");
         }
@@ -104,20 +107,23 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
         _factoryRef = getReference();
     }
 
-    public TransactionFactoryImple(String name) {
+    public TransactionFactoryImple (String name)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::TransactionFactoryImple ( " + name + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::TransactionFactoryImple ( "
+                    + name + " )");
         }
 
         _factoryRef = getReference();
     }
 
-    public final synchronized TransactionFactory getReference() {
-        if (_factoryRef == null) {
+    public final synchronized TransactionFactory getReference ()
+    {
+        if (_factoryRef == null)
+        {
             ORBManager.getPOA().objectIsReady(this);
 
-            _factoryRef = org.omg.CosTransactions.TransactionFactoryHelper
-                    .narrow(ORBManager.getPOA().corbaReference(this));
+            _factoryRef = org.omg.CosTransactions.TransactionFactoryHelper.narrow(ORBManager.getPOA().corbaReference(this));
         }
 
         return _factoryRef;
@@ -127,9 +133,11 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * Assume that a value of 0 at the client means the same at the server!
      */
 
-    public Control create(int time_out) throws SystemException {
+    public Control create (int time_out) throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::create ( " + time_out + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::create ( "
+                    + time_out + " )");
         }
 
         ControlImple tranControl = createLocal(time_out);
@@ -143,19 +151,24 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * use the create method of the factory.
      */
 
-    public ControlImple createLocal(int time_out) throws SystemException {
+    public ControlImple createLocal (int time_out) throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::createLocal ( " + time_out + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::createLocal ( "
+                    + time_out + " )");
         }
 
-        try {
-            ControlImple tranControl = new ControlImple((Control) null, (ArjunaTransactionImple) null);
+        try
+        {
+            ControlImple tranControl = new ControlImple((Control) null,
+                    (ArjunaTransactionImple) null);
             int theTimeout = time_out;
 
             if (theTimeout == 0)
                 theTimeout = TxControl.getDefaultTimeout();
 
-            if (theTimeout > 0) {
+            if (theTimeout > 0)
+            {
                 /*
                  * Currently we do not remove controls from the list once they
                  * have terminated. We should to save time and space!
@@ -167,7 +180,9 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
             }
 
             return tranControl;
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             /*
              * Rather than try again after running gc simply return and let the
              * user deal with it. May help with memory!
@@ -185,7 +200,9 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * made when it checks the hierarchy.
      */
 
-    public ControlImple recreateLocal(PropagationContext ctx) throws SystemException {
+    public ControlImple recreateLocal (PropagationContext ctx)
+            throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("TransactionFactoryImple::recreateLocal ()");
         }
@@ -213,7 +230,8 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
         return creators.recreateLocal(ctx, ctx.current.otid.formatID);
     }
 
-    public Control recreate(PropagationContext ctx) throws SystemException {
+    public Control recreate (PropagationContext ctx) throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("TransactionFactoryImple::recreate ()");
         }
@@ -226,31 +244,45 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * work the factory does.
      */
 
-    public static Control create_subtransaction(Control control, ArjunaTransactionImple parent) {
+    public static Control create_subtransaction (Control control, ArjunaTransactionImple parent)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::create_subtransaction ( " + control + ", "
-                    + ((parent != null) ? parent.get_uid() : Uid.nullUid()) + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::create_subtransaction ( "
+                    + control
+                    + ", "
+                    + ((parent != null) ? parent.get_uid() : Uid.nullUid())
+                    + " )");
         }
 
-        try {
+        try
+        {
             ControlImple subTranControl = new ControlImple(control, parent);
 
             return subTranControl.getControl();
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             System.gc();
 
             throw new NO_MEMORY(0, CompletionStatus.COMPLETED_NO);
         }
     }
 
-    public static Control createProxy(Coordinator coordinator, Terminator terminator) {
+    public static Control createProxy (Coordinator coordinator, Terminator terminator)
+    {
         return TransactionFactoryImple.createProxy(coordinator, terminator, null);
     }
 
-    public static Control createProxy(Coordinator coordinator, Terminator terminator, Control parentControl) {
+    public static Control createProxy (Coordinator coordinator, Terminator terminator, Control parentControl)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::createProxy ( " + coordinator + ", " + terminator + ", "
-                    + parentControl + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::createProxy ( "
+                    + coordinator
+                    + ", "
+                    + terminator
+                    + ", "
+                    + parentControl
+                    + " )");
         }
 
         /*
@@ -268,23 +300,29 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
         UidCoordinator uidCoord = Helper.getUidCoordinator(coordinator);
         Uid theUid = null;
 
-        if (uidCoord != null) {
-            try {
+        if (uidCoord != null)
+        {
+            try
+            {
                 theUid = Helper.getUid(uidCoord);
 
                 /*
                  * allServerControls contains only the proxy implementations.
                  */
 
-                if (ServerControl.allServerControls != null) {
-                    synchronized (ServerControl.allServerControls) {
+                if (ServerControl.allServerControls != null)
+                {
+                    synchronized (ServerControl.allServerControls)
+                    {
                         ControlImple c = (ControlImple) ServerControl.allServerControls.get(theUid);
 
                         if (c != null)
                             return c.getControl();
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 /*
                  * Not a JBoss transaction, so allocate any Uid.
                  */
@@ -293,17 +331,21 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
             }
 
             uidCoord = null;
-        } else
+        }
+        else
             theUid = new Uid();
 
-        ControlImple proxy = new ControlImple(coordinator, terminator, parentControl, theUid);
+        ControlImple proxy = new ControlImple(coordinator, terminator,
+                parentControl, theUid);
 
         return proxy.getControl();
     }
 
-    public static Control createPropagatedControl(Coordinator coord) {
+    public static Control createPropagatedControl (Coordinator coord)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("TransactionFactoryImple::createPropagatedControl ( " + coord + " )");
+            jtsLogger.logger.trace("TransactionFactoryImple::createPropagatedControl ( "
+                    + coord + " )");
         }
 
         ControlImple proxyControl = new ControlImple(coord, null);
@@ -325,15 +367,17 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.
      */
 
-    public org.omg.CosTransactions.otid_t[] numberOfTransactions(com.arjuna.ArjunaOTS.TransactionType t)
-            throws Inactive, NoTransaction, SystemException {
-        switch (t.value()) {
-            case com.arjuna.ArjunaOTS.TransactionType._TransactionTypeActive :
-                return activeTransactions();
-            case com.arjuna.ArjunaOTS.TransactionType._TransactionTypeUnresolved :
-                return unresolvedTransactions();
-            default :
-                throw new BAD_OPERATION();
+    public org.omg.CosTransactions.otid_t[] numberOfTransactions (com.arjuna.ArjunaOTS.TransactionType t)
+            throws Inactive, NoTransaction, SystemException
+    {
+        switch (t.value())
+        {
+        case com.arjuna.ArjunaOTS.TransactionType._TransactionTypeActive:
+            return activeTransactions();
+        case com.arjuna.ArjunaOTS.TransactionType._TransactionTypeUnresolved:
+            return unresolvedTransactions();
+        default:
+            throw new BAD_OPERATION();
         }
     }
 
@@ -341,31 +385,40 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @return the list of child transactions.
      */
 
-    public org.omg.CosTransactions.otid_t[] getChildTransactions(otid_t parent)
-            throws Inactive, NoTransaction, SystemException {
+    public org.omg.CosTransactions.otid_t[] getChildTransactions (otid_t parent)
+            throws Inactive, NoTransaction, SystemException
+    {
         Uid u = Utility.otidToUid(parent);
         org.omg.CosTransactions.otid_t[] ctx = null;
 
         if (u == null)
-            throw new BAD_PARAM("otid_t " + jtsLogger.i18NLogger.get_orbspecific_otiderror());
-        else {
+            throw new BAD_PARAM(
+                    "otid_t "
+                            + jtsLogger.i18NLogger.get_orbspecific_otiderror());
+        else
+        {
             BasicAction act = ActionManager.manager().get(u);
 
             if (act == null)
                 throw new NoTransaction();
-            else {
-                if (act.status() == ActionStatus.RUNNING) {
+            else
+            {
+                if (act.status() == ActionStatus.RUNNING)
+                {
                     Object[] children = act.childTransactions();
                     int size = ((children == null) ? 0 : children.length);
 
-                    if (size > 0) {
+                    if (size > 0)
+                    {
                         ctx = new org.omg.CosTransactions.otid_t[size];
 
-                        for (int i = 0; i < size; i++) {
+                        for (int i = 0; i < size; i++)
+                        {
                             ctx[i] = Utility.uidToOtid((Uid) children[i]);
                         }
                     }
-                } else
+                }
+                else
                     throw new Inactive();
             }
         }
@@ -379,11 +432,15 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public org.omg.CosTransactions.Status getCurrentStatus(otid_t txid) throws SystemException {
+    public org.omg.CosTransactions.Status getCurrentStatus (otid_t txid)
+            throws SystemException
+    {
         Uid u = Utility.otidToUid(txid);
 
         if (u == null)
-            throw new BAD_PARAM("otid_t " + jtsLogger.i18NLogger.get_orbspecific_otiderror());
+            throw new BAD_PARAM(
+                    "otid_t "
+                            + jtsLogger.i18NLogger.get_orbspecific_otiderror());
         else
             return getCurrentStatus(u);
     }
@@ -394,20 +451,26 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.
      */
 
-    public org.omg.CosTransactions.Status getCurrentStatus(Uid u) throws SystemException {
+    public org.omg.CosTransactions.Status getCurrentStatus (Uid u)
+            throws SystemException
+    {
         if (!u.valid())
             throw new BAD_PARAM();
-        else {
-            try {
+        else
+        {
+            try
+            {
                 ControlImple ctx = null;
 
-                synchronized (ControlImple.allControls) {
+                synchronized (ControlImple.allControls)
+                {
                     ctx = (ControlImple) ControlImple.allControls.get(u);
                 }
 
                 if (ctx != null)
                     return ctx.getImplHandle().get_status();
-                else {
+                else
+                {
                     /*
                      * If there is a persistent representation for this
                      * transaction, then return that status. Otherwise check
@@ -417,15 +480,18 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
                     org.omg.CosTransactions.Status s = getOSStatus(u);
 
                     if ((s == org.omg.CosTransactions.Status.StatusUnknown)
-                            || (s == org.omg.CosTransactions.Status.StatusNoTransaction)) {
+                            || (s == org.omg.CosTransactions.Status.StatusNoTransaction))
+                    {
                         return ServerFactory.getCurrentStatus(u); // check it's
-                                                                    // not a
-                                                                    // server
-                                                                    // transaction
-                    } else
+                                                                  // not a
+                                                                  // server
+                                                                  // transaction
+                    }
+                    else
                         return s;
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 jtsLogger.i18NLogger.warn_orbspecific_tficaught("TransactionFactoryImple.getCurrentStatus", u, e);
 
                 return Status.StatusUnknown;
@@ -440,11 +506,15 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public org.omg.CosTransactions.Status getStatus(otid_t txid) throws NoTransaction, SystemException {
+    public org.omg.CosTransactions.Status getStatus (otid_t txid)
+            throws NoTransaction, SystemException
+    {
         Uid u = Utility.otidToUid(txid);
 
         if (u == null)
-            throw new BAD_PARAM("otid_t " + jtsLogger.i18NLogger.get_orbspecific_otiderror());
+            throw new BAD_PARAM(
+                    "otid_t "
+                            + jtsLogger.i18NLogger.get_orbspecific_otiderror());
         else
             return getStatus(u);
     }
@@ -456,14 +526,20 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.
      */
 
-    public org.omg.CosTransactions.Status getStatus(Uid u) throws NoTransaction, SystemException {
+    public org.omg.CosTransactions.Status getStatus (Uid u)
+            throws NoTransaction, SystemException
+    {
         org.omg.CosTransactions.Status s = org.omg.CosTransactions.Status.StatusUnknown;
 
-        try {
+        try
+        {
             s = getCurrentStatus(u);
-        } catch (SystemException e2) {
+        }
+        catch (SystemException e2)
+        {
             throw e2;
-        } catch (Exception e3) {
+        }
+        catch (Exception e3) {
             jtsLogger.i18NLogger.warn_orbspecific_tficaught("TransactionFactoryImple.getStatus", u, e3);
 
             return Status.StatusUnknown;
@@ -475,9 +551,11 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
          */
 
         if ((s == org.omg.CosTransactions.Status.StatusUnknown)
-                || (s == org.omg.CosTransactions.Status.StatusNoTransaction)) {
+                || (s == org.omg.CosTransactions.Status.StatusNoTransaction))
+        {
             return getOSStatus(u);
-        } else
+        }
+        else
             return s;
     }
 
@@ -486,17 +564,21 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.1.
      */
 
-    public org.omg.CosTransactions.Status getOSStatus(Uid u) throws NoTransaction, SystemException {
+    public org.omg.CosTransactions.Status getOSStatus (Uid u)
+            throws NoTransaction, SystemException
+    {
         org.omg.CosTransactions.Status s = org.omg.CosTransactions.Status.StatusUnknown;
 
         if (!u.valid())
             throw new BAD_PARAM();
-        else {
+        else
+        {
             // if here then it is not active, so look in the object store
 
             RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
 
-            try {
+            try
+            {
                 /*
                  * Do we need to search server transactions too? Possibly not,
                  * since an interposed coordinator can never always say with
@@ -505,31 +587,32 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
 
                 int status = recoveryStore.currentState(u, ArjunaTransactionImple.typeName());
 
-                switch (status) {
-                    case StateStatus.OS_UNKNOWN :
-                        final Status heuristicStatus = getHeuristicStatus(u, recoveryStore);
-
-                        if (org.omg.CosTransactions.Status.StatusNoTransaction.equals(heuristicStatus)
-                                || org.omg.CosTransactions.Status.StatusUnknown.equals(heuristicStatus)) {
-
-                            // means no state present, so check if server
-                            // transaction
-                            return ServerFactory.getOSStatus(u);
-                        }
-
-                        return heuristicStatus;
-                    case StateStatus.OS_COMMITTED :
-                        return org.omg.CosTransactions.Status.StatusCommitted;
-                    case StateStatus.OS_UNCOMMITTED :
-                        return org.omg.CosTransactions.Status.StatusPrepared;
-                    case StateStatus.OS_HIDDEN :
-                    case StateStatus.OS_COMMITTED_HIDDEN :
-                    case StateStatus.OS_UNCOMMITTED_HIDDEN :
-                        return org.omg.CosTransactions.Status.StatusPrepared;
-                    default :
-                        return ServerFactory.getStatus(u);
+                switch (status)
+                {
+                case StateStatus.OS_UNKNOWN:
+                    final Status heuristicStatus = getHeuristicStatus(u, recoveryStore);
+                    
+                    if (org.omg.CosTransactions.Status.StatusNoTransaction.equals(heuristicStatus)
+                            || org.omg.CosTransactions.Status.StatusUnknown.equals(heuristicStatus)) {
+                        
+                        // means no state present, so check if server transaction
+                        return ServerFactory.getOSStatus(u);
+                    }
+                    
+                    return heuristicStatus;
+                case StateStatus.OS_COMMITTED:
+                    return org.omg.CosTransactions.Status.StatusCommitted;
+                case StateStatus.OS_UNCOMMITTED:
+                    return org.omg.CosTransactions.Status.StatusPrepared;
+                case StateStatus.OS_HIDDEN:
+                case StateStatus.OS_COMMITTED_HIDDEN:
+                case StateStatus.OS_UNCOMMITTED_HIDDEN:
+                    return org.omg.CosTransactions.Status.StatusPrepared;
+                default:
+                    return ServerFactory.getStatus(u);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 jtsLogger.i18NLogger.warn_orbspecific_tficaught("TransactionFactoryImple.getStatus", u, e);
 
                 return Status.StatusUnknown;
@@ -543,22 +626,20 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.
      */
 
-    public GlobalTransactionInfo getGlobalInfo() throws SystemException {
+    public GlobalTransactionInfo getGlobalInfo () throws SystemException
+    {
         GlobalTransactionInfo info = new GlobalTransactionInfo();
 
-        info.totalNumberOfTransactions = (int) com.arjuna.ats.arjuna.coordinator.TxStats.getInstance()
-                .getNumberOfTransactions();
-        info.numberOfCommittedTransactions = (int) com.arjuna.ats.arjuna.coordinator.TxStats.getInstance()
-                .getNumberOfCommittedTransactions();
-        info.numberOfAbortedTransactions = (int) com.arjuna.ats.arjuna.coordinator.TxStats.getInstance()
-                .getNumberOfAbortedTransactions();
+        info.totalNumberOfTransactions = (int)com.arjuna.ats.arjuna.coordinator.TxStats.getInstance().getNumberOfTransactions();
+        info.numberOfCommittedTransactions = (int)com.arjuna.ats.arjuna.coordinator.TxStats.getInstance().getNumberOfCommittedTransactions();
+        info.numberOfAbortedTransactions = (int)com.arjuna.ats.arjuna.coordinator.TxStats.getInstance().getNumberOfAbortedTransactions();
 
         if (info.totalNumberOfTransactions > 0)
             info.averageLifetime = (float) (TransactionReaper.transactionLifetime() / info.totalNumberOfTransactions);
         else
             info.averageLifetime = (float) 0.0;
 
-        info.numberOfHeuristics = (int) com.arjuna.ats.arjuna.coordinator.TxStats.getInstance().getNumberOfHeuristics();
+        info.numberOfHeuristics = (int)com.arjuna.ats.arjuna.coordinator.TxStats.getInstance().getNumberOfHeuristics();
 
         TransactionReaper reaper = TransactionReaper.transactionReaper();
 
@@ -577,12 +658,15 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public TransactionInfo getTransactionInfo(otid_t txid)
-            throws org.omg.CosTransactions.NoTransaction, SystemException {
+    public TransactionInfo getTransactionInfo (otid_t txid)
+            throws org.omg.CosTransactions.NoTransaction, SystemException
+    {
         Uid u = Utility.otidToUid(txid);
 
         if (u == null)
-            throw new BAD_PARAM("otid_t " + jtsLogger.i18NLogger.get_orbspecific_otiderror());
+            throw new BAD_PARAM(
+                    "otid_t "
+                            + jtsLogger.i18NLogger.get_orbspecific_otiderror());
         else
             return getTransactionInfo(u);
     }
@@ -592,15 +676,21 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public TransactionInfo getTransactionInfo(Uid u) throws org.omg.CosTransactions.NoTransaction, SystemException {
+    public TransactionInfo getTransactionInfo (Uid u)
+            throws org.omg.CosTransactions.NoTransaction, SystemException
+    {
         if (!u.valid())
-            throw new BAD_PARAM(jtsLogger.i18NLogger.get_orbspecific_invaliduid() + " " + u);
-        else {
-            try {
-                synchronized (ControlImple.allControls) {
+            throw new BAD_PARAM( jtsLogger.i18NLogger.get_orbspecific_invaliduid()+ " " + u);
+        else
+        {
+            try
+            {
+                synchronized (ControlImple.allControls)
+                {
                     ControlImple ctx = (ControlImple) ControlImple.allControls.get(u);
 
-                    if (ctx != null) {
+                    if (ctx != null)
+                    {
                         TransactionInfo info = new TransactionInfo();
 
                         info.currentDepth = ctx.getImplHandle().getHierarchy().depth();
@@ -612,12 +702,17 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
                         info.numberOfThreads = ctx.getImplHandle().activeThreads();
 
                         return info;
-                    } else
+                    }
+                    else
                         throw new NoTransaction();
                 }
-            } catch (NoTransaction ex) {
+            }
+            catch (NoTransaction ex)
+            {
                 throw ex;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
                 throw new UNKNOWN();
@@ -630,12 +725,15 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public org.omg.CosTransactions.Control getTransaction(otid_t txid)
-            throws org.omg.CosTransactions.NoTransaction, SystemException {
+    public org.omg.CosTransactions.Control getTransaction (otid_t txid)
+            throws org.omg.CosTransactions.NoTransaction, SystemException
+    {
         Uid u = Utility.otidToUid(txid);
 
         if (u == null)
-            throw new BAD_PARAM("otid_t " + jtsLogger.i18NLogger.get_orbspecific_otiderror());
+            throw new BAD_PARAM(
+                    "otid_t "
+                            + jtsLogger.i18NLogger.get_orbspecific_otiderror());
         else
             return getTransaction(u);
     }
@@ -645,13 +743,17 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
      * @since JTS 2.1.2.
      */
 
-    public org.omg.CosTransactions.Control getTransaction(Uid u)
-            throws org.omg.CosTransactions.NoTransaction, SystemException {
+    public org.omg.CosTransactions.Control getTransaction (Uid u)
+            throws org.omg.CosTransactions.NoTransaction, SystemException
+    {
         if (!u.valid())
             throw new BAD_PARAM();
-        else {
-            try {
-                synchronized (ControlImple.allControls) {
+        else
+        {
+            try
+            {
+                synchronized (ControlImple.allControls)
+                {
                     ControlImple ctx = (ControlImple) ControlImple.allControls.get(u);
 
                     if (ctx != null)
@@ -660,9 +762,13 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
                         throw new NoTransaction();
                 }
 
-            } catch (NoTransaction ex) {
+            }
+            catch (NoTransaction ex)
+            {
                 throw ex;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
                 throw new UNKNOWN();
@@ -670,29 +776,34 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
         }
     }
 
-    private final org.omg.CosTransactions.otid_t[] activeTransactions()
-            throws Inactive, NoTransaction, SystemException {
+    private final org.omg.CosTransactions.otid_t[] activeTransactions ()
+            throws Inactive, NoTransaction, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("TransactionFactoryImple::activeTransactions ()");
         }
 
         if (ControlImple.allControls == null)
             throw new Inactive();
-        else {
-            synchronized (ControlImple.allControls) {
+        else
+        {
+            synchronized (ControlImple.allControls)
+            {
                 if (ControlImple.allControls.size() == 0)
                     throw new NoTransaction();
-                else {
-                    org.omg.CosTransactions.otid_t[] ids = new org.omg.CosTransactions.otid_t[ControlImple.allControls
-                            .size()];
+                else
+                {
+                    org.omg.CosTransactions.otid_t[] ids = new org.omg.CosTransactions.otid_t[ControlImple.allControls.size()];
 
                     Enumeration iter = ControlImple.allControls.elements();
                     int i = 0;
 
-                    while (iter.hasMoreElements()) {
+                    while (iter.hasMoreElements())
+                    {
                         ControlImple cont = (ControlImple) iter.nextElement();
 
-                        if (cont != null) {
+                        if (cont != null)
+                        {
                             ids[i] = Utility.uidToOtid(cont.get_uid().stringForm());
                             i++;
                         }
@@ -704,30 +815,38 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
         }
     }
 
-    private final org.omg.CosTransactions.otid_t[] unresolvedTransactions()
-            throws Inactive, NoTransaction, SystemException {
+    private final org.omg.CosTransactions.otid_t[] unresolvedTransactions ()
+            throws Inactive, NoTransaction, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("TransactionFactoryImple::terminatedTransactions ()");
         }
 
         InputObjectState uids = new InputObjectState();
 
-        if (!TxStoreLog.getTransactions(uids, StateStatus.OS_COMMITTED_HIDDEN)) {
+        if (!TxStoreLog.getTransactions(uids, StateStatus.OS_COMMITTED_HIDDEN))
+        {
             throw new NoTransaction();
-        } else {
+        }
+        else
+        {
             Uid theUid = null;
             int count = 0;
             boolean finished = false;
 
-            while (!finished) {
-                try {
+            while (!finished)
+            {
+                try
+                {
                     theUid = UidHelper.unpackFrom(uids);
 
                     if (theUid.equals(Uid.nullUid()))
                         finished = true;
                     else
                         count++;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     finished = true;
                 }
             }
@@ -736,36 +855,41 @@ public class TransactionFactoryImple extends com.arjuna.ArjunaOTS.ArjunaFactoryP
 
             uids.reread();
 
-            for (int i = 0; i < count; i++) {
-                try {
+            for (int i = 0; i < count; i++)
+            {
+                try
+                {
                     theUid = UidHelper.unpackFrom(uids);
 
                     ids[i] = Utility.uidToOtid(theUid.stringForm());
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                 }
             }
 
             return ids;
         }
     }
-
+    
     private org.omg.CosTransactions.Status getHeuristicStatus(final Uid uid, final RecoveryStore recoveryStore)
-            throws ObjectStoreException {
+            throws ObjectStoreException
+    {
         final int status = recoveryStore.currentState(uid, AssumedCompleteHeuristicTransaction.typeName());
-
+        
         switch (status) {
-            case StateStatus.OS_UNKNOWN :
-                return org.omg.CosTransactions.Status.StatusNoTransaction;
-            case StateStatus.OS_COMMITTED :
-                return org.omg.CosTransactions.Status.StatusCommitted;
-            case StateStatus.OS_UNCOMMITTED :
-                return org.omg.CosTransactions.Status.StatusPrepared;
-            case StateStatus.OS_HIDDEN :
-            case StateStatus.OS_COMMITTED_HIDDEN :
-            case StateStatus.OS_UNCOMMITTED_HIDDEN :
-                return org.omg.CosTransactions.Status.StatusPrepared;
-            default :
-                return org.omg.CosTransactions.Status.StatusUnknown;
+        case StateStatus.OS_UNKNOWN:
+            return org.omg.CosTransactions.Status.StatusNoTransaction;
+        case StateStatus.OS_COMMITTED:
+            return org.omg.CosTransactions.Status.StatusCommitted;
+        case StateStatus.OS_UNCOMMITTED:
+            return org.omg.CosTransactions.Status.StatusPrepared;
+        case StateStatus.OS_HIDDEN:
+        case StateStatus.OS_COMMITTED_HIDDEN:
+        case StateStatus.OS_UNCOMMITTED_HIDDEN:
+            return org.omg.CosTransactions.Status.StatusPrepared;
+        default:
+            return org.omg.CosTransactions.Status.StatusUnknown;
         }
     }
 

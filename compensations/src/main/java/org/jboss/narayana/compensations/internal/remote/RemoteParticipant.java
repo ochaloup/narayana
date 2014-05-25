@@ -43,12 +43,8 @@ import org.jboss.narayana.compensations.internal.recovery.DeserializerHelper;
  * @author paul.robinson@redhat.com
  * @author gytis@redhat.com
  */
-public class RemoteParticipant
-        implements
-            BAParticipant,
-            BusinessAgreementWithParticipantCompletionParticipant,
-            ConfirmCompletedParticipant,
-            PersistableBAParticipant {
+public class RemoteParticipant implements BAParticipant, BusinessAgreementWithParticipantCompletionParticipant,
+        ConfirmCompletedParticipant, PersistableBAParticipant {
 
     private static final Logger LOGGER = Logger.getLogger(RemoteParticipant.class);
 
@@ -60,9 +56,8 @@ public class RemoteParticipant
     }
 
     public RemoteParticipant(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
-            TransactionLoggedHandler transactionLoggedHandler, CurrentTransaction currentTransaction,
-            String participantId, CompensationContextStateManager compensationContextStateManager,
-            DeserializerHelper deserializerHelper) {
+            TransactionLoggedHandler transactionLoggedHandler, CurrentTransaction currentTransaction, String participantId,
+            CompensationContextStateManager compensationContextStateManager, DeserializerHelper deserializerHelper) {
 
         participant = new ParticipantImpl(compensationHandler, confirmationHandler, transactionLoggedHandler,
                 currentTransaction.getId(), participantId, compensationContextStateManager, deserializerHelper);
@@ -80,7 +75,7 @@ public class RemoteParticipant
 
     @Override
     public void cancel() throws FaultedException, WrongStateException, SystemException {
-        // TODO: Do nothing?
+        //TODO: Do nothing?
     }
 
     @Override
@@ -90,7 +85,7 @@ public class RemoteParticipant
 
     @Override
     public String status() throws SystemException {
-        // TODO: what to do here?
+        //TODO: what to do here?
         return null;
     }
 

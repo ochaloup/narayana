@@ -23,35 +23,43 @@ public class SuspendResumeTest {
     }
 
     @Test
-    public void testSuspendResume() throws Exception {
+    public void testSuspendResume()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("Sagas11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ActivityHierarchy hier = ua.suspend();
 
-            System.out.println("Suspended: " + hier + "\n");
+            System.out.println("Suspended: "+hier+"\n");
 
-            if (ua.currentActivity() != null) {
+            if (ua.currentActivity() != null)
+            {
                 WSCF11TestUtils.cleanup(ua);
                 fail("Hierarchy still active");
-            } else {
+            }
+            else
+            {
                 ua.resume(hier);
 
-                System.out.println("Resumed: " + hier + "\n");
+                System.out.println("Resumed: "+hier+"\n");
 
                 ua.cancel();
 
                 System.out.println("Cancelled");
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

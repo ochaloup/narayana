@@ -18,8 +18,7 @@
 package org.jboss.narayana.blacktie.jatmibroker.core.tx;
 
 /**
- * The TransactionException is used throughout the Jatmibroker library to report
- * issues to the client.
+ * The TransactionException is used throughout the Jatmibroker library to report issues to the client.
  */
 public class TransactionException extends Exception {
     /**
@@ -30,10 +29,8 @@ public class TransactionException extends Exception {
     /**
      * Report a root cause.
      * 
-     * @param msg
-     *            The message to include
-     * @param cause
-     *            The root cause of the exception
+     * @param msg The message to include
+     * @param cause The root cause of the exception
      */
     public TransactionException(String msg, Throwable cause) {
         super(msg, cause);
@@ -42,8 +39,7 @@ public class TransactionException extends Exception {
     /**
      * The TransactionException that doesn't need the root cause.
      * 
-     * @param msg
-     *            The message to include
+     * @param msg The message to include
      */
     public TransactionException(String msg) {
         super(msg);

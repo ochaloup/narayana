@@ -59,8 +59,7 @@ public final class BlacktieSubsystemExtension implements Extension {
 
     protected static final PathElement SUBSYSTEM_PATH = PathElement.pathElement(SUBSYSTEM, SUBSYSTEM_NAME);
 
-    private static final String RESOURCE_NAME = BlacktieSubsystemExtension.class.getPackage().getName()
-            + ".LocalDescriptions";
+    private static final String RESOURCE_NAME = BlacktieSubsystemExtension.class.getPackage().getName() + ".LocalDescriptions";
 
     /**
      * The parser used for parsing our subsystem
@@ -69,17 +68,15 @@ public final class BlacktieSubsystemExtension implements Extension {
 
     static StandardResourceDescriptionResolver getResourceDescriptionResolver(final String keyPrefix) {
         String prefix = SUBSYSTEM_NAME + (keyPrefix == null ? "" : "." + keyPrefix);
-        return new StandardResourceDescriptionResolver(prefix, RESOURCE_NAME,
-                BlacktieSubsystemExtension.class.getClassLoader(), true, false);
+        return new StandardResourceDescriptionResolver(prefix, RESOURCE_NAME, BlacktieSubsystemExtension.class.getClassLoader(),
+                true, false);
     }
 
     @Override
     public void initialize(ExtensionContext context) {
         final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, CURRENT_MODEL_VERSION);
-        final ManagementResourceRegistration registration = subsystem
-                .registerSubsystemModel(BlacktieSubsystemDefinition.INSTANCE);
-        registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION,
-                GenericSubsystemDescribeHandler.INSTANCE);
+        final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(BlacktieSubsystemDefinition.INSTANCE);
+        registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
 
         subsystem.registerXMLElementWriter(parser);
     }

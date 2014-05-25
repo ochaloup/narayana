@@ -47,15 +47,11 @@ import org.wildfly.extension.blacktie.logging.BlacktieLogger;
  * @author <a href="mailto:zfeng@redhat.com">Amos Feng</a>
  *
  */
-final class BlacktieSubsystemParser
-        implements
-            XMLStreamConstants,
-            XMLElementReader<List<ModelNode>>,
-            XMLElementWriter<SubsystemMarshallingContext> {
+final class BlacktieSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>,
+XMLElementWriter<SubsystemMarshallingContext> {
 
     @Override
-    public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext context)
-            throws XMLStreamException {
+    public void writeContent(XMLExtendedStreamWriter writer, SubsystemMarshallingContext context) throws XMLStreamException {
         if (BlacktieLogger.ROOT_LOGGER.isTraceEnabled()) {
             BlacktieLogger.ROOT_LOGGER.trace("BlacktieSubsystemParser.writeContent");
         }
@@ -81,8 +77,7 @@ final class BlacktieSubsystemParser
         if (reader.getAttributeCount() > 0) {
             throw ParseUtils.unexpectedAttribute(reader, 0);
         }
-        final ModelNode subsystem = Util.getEmptyOperation(ADD,
-                PathAddress.pathAddress(BlacktieSubsystemExtension.SUBSYSTEM_PATH).toModelNode());
+        final ModelNode subsystem = Util.getEmptyOperation(ADD, PathAddress.pathAddress(BlacktieSubsystemExtension.SUBSYSTEM_PATH).toModelNode());
         list.add(subsystem);
 
         // elements
@@ -104,8 +99,7 @@ final class BlacktieSubsystemParser
 
     }
 
-    private void parseStompConnectElement(XMLExtendedStreamReader reader, ModelNode subsystem)
-            throws XMLStreamException {
+    private void parseStompConnectElement(XMLExtendedStreamReader reader, ModelNode subsystem) throws XMLStreamException {
         final int count = reader.getAttributeCount();
 
         for (int i = 0; i < count; i++) {
@@ -115,16 +109,16 @@ final class BlacktieSubsystemParser
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
 
             switch (attribute) {
-                case CONNECTION_FACTORYNAME :
+                case CONNECTION_FACTORYNAME:
                     BlacktieSubsystemDefinition.CONNECTION_FACTORYNAME.parseAndSetParameter(value, subsystem, reader);
                     break;
-                case SOCKET_BINDING :
+                case SOCKET_BINDING:
                     BlacktieSubsystemDefinition.SOCKET_BINDING.parseAndSetParameter(value, subsystem, reader);
                     break;
-                case MQ_SERVER :
+                case MQ_SERVER:
                     BlacktieSubsystemDefinition.MQ_SERVER.parseAndSetParameter(value, subsystem, reader);
                     break;
-                default :
+                default:
                     throw ParseUtils.unexpectedAttribute(reader, i);
             }
         }

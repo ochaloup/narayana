@@ -27,15 +27,17 @@ import com.arjuna.wsc11.messaging.RegistrationCoordinatorProcessorImpl;
 
 /**
  * Initialise the coordination services.
- * 
  * @author kevin
  */
-public class CoordinationInitialisation {
-    public static void startup() {
-        ActivationCoordinatorProcessor.setCoordinator(new ActivationCoordinatorProcessorImpl());
-        RegistrationCoordinatorProcessor.setCoordinator(new RegistrationCoordinatorProcessorImpl());
+public class CoordinationInitialisation
+{
+    public static void startup()
+    {
+        ActivationCoordinatorProcessor.setCoordinator(new ActivationCoordinatorProcessorImpl()) ;
+        RegistrationCoordinatorProcessor.setCoordinator(new RegistrationCoordinatorProcessorImpl()) ;
     }
 
-    public static void shutdown() {
+    public static void shutdown()
+    {
     }
 }

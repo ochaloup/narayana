@@ -24,18 +24,22 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import org.jboss.jbossts.qa.ArjunaCore.StateManager.impl.TXBasicStateRecord;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class Worker002 extends Thread {
-    public Worker002(int iterations, int resources) {
+public class Worker002 extends Thread
+{
+    public Worker002(int iterations, int resources)
+    {
         this(iterations, resources, 1);
     }
 
-    public Worker002(int iterations, int resources, int id) {
+    public Worker002(int iterations, int resources, int id)
+    {
         mMaxIteration = iterations;
         mNumberOfResources = resources;
 
-        // set up abstract records
+        //set up abstract records
         mStatetRecordList = new TXBasicStateRecord[mNumberOfResources];
-        for (int i = 0; i < mNumberOfResources; i++) {
+        for (int i = 0; i < mNumberOfResources; i++)
+        {
             mStatetRecordList[i] = new TXBasicStateRecord();
         }
         mId = id;
@@ -44,36 +48,45 @@ public class Worker002 extends Thread {
     /**
      * The main method of the class that will perform the work.
      */
-    public void run() {
-        try {
+    public void run()
+    {
+        try
+        {
             AtomicAction a = new AtomicAction();
-            // start transaction
+            //start transaction
             a.begin();
-            for (int j = 0; j < mNumberOfResources; j++) {
-                for (int i = 0; i < mMaxIteration; i++) {
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
+                for (int i = 0; i < mMaxIteration; i++)
+                {
                     mStatetRecordList[j].increase();
                 }
             }
-            // comit transaction
+            //comit transaction
             a.commit();
 
-            // start new AtomicAction
+            //start new AtomicAction
             AtomicAction b = new AtomicAction();
             b.begin();
-            for (int j = 0; j < mNumberOfResources; j++) {
-                for (int i = 0; i < mMaxIteration; i++) {
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
+                for (int i = 0; i < mMaxIteration; i++)
+                {
                     mStatetRecordList[j].increase();
                 }
             }
-            // abort transaction
+            //abort transaction
             b.abort();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             mCorrect = false;
             qautil.debug("exception in worker002: ", e);
         }
     }
 
-    public boolean isCorrect() {
+    public boolean isCorrect()
+    {
         return mCorrect;
     }
 

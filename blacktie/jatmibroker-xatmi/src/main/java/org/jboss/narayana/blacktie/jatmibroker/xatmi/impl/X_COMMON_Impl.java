@@ -26,8 +26,8 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.ConnectionException;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.X_COMMON;
 
 /**
- * The X_COMMON buffer type supports a subset of the types provided by the
- * X_C_TYPE buffer in order to support more language portable data exchange.
+ * The X_COMMON buffer type supports a subset of the types provided by the X_C_TYPE buffer in order to support more language
+ * portable data exchange.
  */
 public class X_COMMON_Impl extends BufferImpl implements X_COMMON {
 
@@ -37,8 +37,7 @@ public class X_COMMON_Impl extends BufferImpl implements X_COMMON {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list of types supported by X_COMMON, short, long, byte and arrays of
-     * these types.
+     * The list of types supported by X_COMMON, short, long, byte and arrays of these types.
      */
     private static List<Class> types = new ArrayList<Class>();
 
@@ -46,22 +45,17 @@ public class X_COMMON_Impl extends BufferImpl implements X_COMMON {
      * Populate the list of supported types
      */
     static {
-        Class[] x_commonType = new Class[]{short.class, long.class, byte.class, short[].class, long[].class,
-                byte[].class};
+        Class[] x_commonType = new Class[] { short.class, long.class, byte.class, short[].class, long[].class, byte[].class };
         for (int i = 0; i < x_commonType.length; i++) {
             types.add(x_commonType[i]);
         }
     }
 
     /**
-     * The constructor is hidden as a <code>Connection</code> should be used to
-     * allocate the object. ConnectionImpl#tpalloc(String, String)
+     * The constructor is hidden as a <code>Connection</code> should be used to allocate the object. ConnectionImpl#tpalloc(String, String)
      * 
-     * @param subtype
-     *            The subtype of the buffer, must be registered in the
-     *            configuration
-     * @throws ConnectionException
-     *             In case the buffer cannot be created.
+     * @param subtype The subtype of the buffer, must be registered in the configuration
+     * @throws ConnectionException In case the buffer cannot be created.
      * @throws ConfigurationException
      */
     public X_COMMON_Impl(String subtype) throws ConnectionException, ConfigurationException {
@@ -71,11 +65,9 @@ public class X_COMMON_Impl extends BufferImpl implements X_COMMON {
     /**
      * Get the short value identified by the key.
      * 
-     * @param key
-     *            The key to use
+     * @param key The key to use
      * @return The short value
-     * @throws ConnectionException
-     *             In case the key is not part of the structure.
+     * @throws ConnectionException In case the key is not part of the structure.
      */
     public short getShort(String key) throws ConnectionException {
         return ((Short) getAttributeValue(key, short.class)).shortValue();
@@ -84,12 +76,9 @@ public class X_COMMON_Impl extends BufferImpl implements X_COMMON {
     /**
      * Set the short value
      * 
-     * @param key
-     *            The value to set
-     * @param value
-     *            The value to use
-     * @throws ConnectionException
-     *             In case the key is unknown.
+     * @param key The value to set
+     * @param value The value to use
+     * @throws ConnectionException In case the key is unknown.
      */
     public void setShort(String key, short value) throws ConnectionException {
         setAttributeValue(key, short.class, value);

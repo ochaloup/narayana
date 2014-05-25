@@ -107,6 +107,7 @@ public class TestCommitMarkableResourceFailAfterCommitOrphan extends TestCommitM
         }
     };
 
+
     @Test
     @BMScript("commitMarkableResourceFailAfterCommit")
     public void test() throws Exception {
@@ -159,11 +160,13 @@ public class TestCommitMarkableResourceFailAfterCommitOrphan extends TestCommitM
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    cmrResource = new JDBCConnectableResource(localJDBCConnection);
+                    cmrResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(cmrResource);
                     tm.getTransaction().enlistResource(xaResource);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
 
                     tm.commit();
                 } catch (ExecuteException t) {
@@ -185,8 +188,7 @@ public class TestCommitMarkableResourceFailAfterCommitOrphan extends TestCommitM
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
 
-        // Testing that we can find a AAC but that it won't be ignored in orphan
-        // detection so need CMRRM run
+        // Testing that we can find a AAC but that it won't be ignored in orphan detection so need CMRRM run
         commitMarkableResourceRecoveryModule.periodicWorkFirstPass();
         XAResourceOrphanFilter.Vote vote = new JTATransactionLogXAResourceOrphanFilter().checkXid(preparedXid);
         assertTrue(vote == XAResourceOrphanFilter.Vote.LEAVE_ALONE);

@@ -27,8 +27,7 @@ import javax.transaction.Synchronization;
 import java.util.EnumSet;
 
 public class TxListener implements Synchronization, TransactionListener {
-    volatile int assoc = 0; // we don't get a listener callback for the initial
-                            // association
+    volatile int assoc = 0; // we don't get a listener callback for the initial association
     volatile boolean closed = false;
     volatile int acCalled = 0;
     TransactionListenerRegistry registry;
@@ -47,8 +46,7 @@ public class TxListener implements Synchronization, TransactionListener {
     public void afterCompletion(int status) {
         acCalled++;
         if (assoc == 0) {
-            closed = true; // safe to close because the app thread has finished
-                            // with the txn
+            closed = true; // safe to close because the app thread has finished with the txn
         }
     }
 
@@ -91,8 +89,7 @@ public class TxListener implements Synchronization, TransactionListener {
     }
 
     /**
-     * @return true if the txn has been disassociated and the AC has been called
-     *         just once
+     * @return true if the txn has been disassociated and the AC has been called just once
      */
     public boolean shouldDisassoc() {
         return assoc == 0 && singleCallAC();

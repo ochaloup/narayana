@@ -37,8 +37,8 @@ public abstract class ParticipantInterceptor {
     /**
      * Request has handler to be enlisted to the transaction.
      * 
-     * After request processing transaction coordinator must be notified about
-     * the participant completion or exist from the transaction.
+     * After request processing transaction coordinator must be notified about the participant completion or exist from the
+     * transaction.
      *
      * @param ic
      * @return
@@ -55,6 +55,7 @@ public abstract class ParticipantInterceptor {
 
         Object result;
         try {
+
 
             result = ic.proceed();
             participantManager.completed();

@@ -20,14 +20,14 @@ import java.io.IOException;
 
 /**
  * The Client side of the Completion Coordinator.
- * 
  * @author kevin
  */
-public class CompletionCoordinatorClient {
+public class CompletionCoordinatorClient
+{
     /**
      * The client singleton.
      */
-    private static final CompletionCoordinatorClient CLIENT = new CompletionCoordinatorClient();
+    private static final CompletionCoordinatorClient CLIENT = new CompletionCoordinatorClient() ;
 
     /**
      * The commit action.
@@ -41,20 +41,21 @@ public class CompletionCoordinatorClient {
     /**
      * The completion initiator URI for replies.
      */
-    private MAPEndpoint completionInitiator;
+    private MAPEndpoint completionInitiator ;
 
     /**
      * The completion initiator URI for secure replies.
      */
-    private MAPEndpoint secureCompletionInitiator;
+    private MAPEndpoint secureCompletionInitiator ;
 
     /**
      * Construct the completion coordinator client.
      */
-    private CompletionCoordinatorClient() {
+    private CompletionCoordinatorClient()
+    {
         final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
-        commitAction = AtomicTransactionConstants.WSAT_ACTION_COMMIT;
-        rollbackAction = AtomicTransactionConstants.WSAT_ACTION_ROLLBACK;
+            commitAction = AtomicTransactionConstants.WSAT_ACTION_COMMIT;
+            rollbackAction = AtomicTransactionConstants.WSAT_ACTION_ROLLBACK;
         // final HandlerRegistry handlerRegistry = new HandlerRegistry() ;
 
         // Add WS-Addressing
@@ -63,28 +64,24 @@ public class CompletionCoordinatorClient {
         // ClientPolicy.register(handlerRegistry) ;
 
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-        final String completionInitiatorURIString = serviceRegistry
-                .getServiceURI(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, false);
-        final String secureCompletionInitiatorURIString = serviceRegistry
-                .getServiceURI(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, true);
+        final String completionInitiatorURIString =
+                serviceRegistry.getServiceURI(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, false) ;
+        final String secureCompletionInitiatorURIString =
+                serviceRegistry.getServiceURI(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, true) ;
         completionInitiator = builder.newEndpoint(completionInitiatorURIString);
         secureCompletionInitiator = builder.newEndpoint(secureCompletionInitiatorURIString);
     }
 
     /**
      * Send a commit request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCommit(final W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         MAPEndpoint initiator = getCompletionInitiator(endpoint);
         AddressingHelper.installFromFaultTo(map, initiator, identifier);
         CompletionCoordinatorPortType port = getPort(endpoint, map, commitAction);
@@ -95,35 +92,29 @@ public class CompletionCoordinatorClient {
 
     /**
      * Send a rollback request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendRollback(final W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         MAPEndpoint initiator = getCompletionInitiator(endpoint);
         AddressingHelper.installFromFaultTo(map, initiator, identifier);
         CompletionCoordinatorPortType port = getPort(endpoint, map, rollbackAction);
         Notification rollback = new Notification();
-
+                
         port.rollbackOperation(rollback);
     }
 
     /**
-     * return a completion initiator endpoint appropriate to the type of
-     * completion coordinator
-     * 
+     * return a completion initiator endpoint appropriate to the type of completion coordinator
      * @param participant
-     * @return either the secure terminaton participant endpoint or the
-     *         non-secure endpoint
+     * @return either the secure terminaton participant endpoint or the non-secure endpoint
      */
-    MAPEndpoint getCompletionInitiator(W3CEndpointReference participant) {
+    MAPEndpoint getCompletionInitiator(W3CEndpointReference participant)
+    {
         NativeEndpointReference nativeRef = EndpointHelper.transform(NativeEndpointReference.class, participant);
         String address = nativeRef.getAddress();
         if (address.startsWith("https")) {
@@ -135,25 +126,25 @@ public class CompletionCoordinatorClient {
 
     /**
      * Get the Completion Coordinator client singleton.
-     * 
      * @return The Completion Coordinator client singleton.
      */
-    public static CompletionCoordinatorClient getClient() {
+    public static CompletionCoordinatorClient getClient()
+    {
         return CLIENT;
     }
 
     /**
-     * obtain a port from the completion coordinator endpoint configured with
-     * the instance identifier handler and the supplied addressing properties
-     * supplemented with the given action
-     * 
+     * obtain a port from the completion coordinator endpoint configured with the instance identifier handler and the supplied
+     * addressing properties supplemented with the given action
      * @param endpoint
      * @param map
      * @param action
      * @return
      */
-    private CompletionCoordinatorPortType getPort(final W3CEndpointReference endpoint, final MAP map,
-            final String action) {
+    private CompletionCoordinatorPortType getPort(final W3CEndpointReference endpoint,
+                                                  final MAP map,
+                                                  final String action)
+    {
         AddressingHelper.installNoneReplyTo(map);
         return WSATClient.getCompletionCoordinatorPort(endpoint, action, map);
     }

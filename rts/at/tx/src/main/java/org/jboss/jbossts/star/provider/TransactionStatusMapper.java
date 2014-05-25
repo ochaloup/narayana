@@ -18,7 +18,7 @@
  * (C) 2010
  * @author JBoss Inc.
  */
-package org.jboss.jbossts.star.provider;
+ package org.jboss.jbossts.star.provider;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -30,8 +30,10 @@ import org.jboss.resteasy.util.HttpResponseCodes;
  * map transaction status exceptions
  */
 @Provider
-public class TransactionStatusMapper implements ExceptionMapper<TransactionStatusException> {
-    public Response toResponse(TransactionStatusException exception) {
-        return Response.status(HttpResponseCodes.SC_CONFLICT).build();
-    }
+public class TransactionStatusMapper implements ExceptionMapper<TransactionStatusException>
+{
+   public Response toResponse(TransactionStatusException exception)
+   {
+      return Response.status(HttpResponseCodes.SC_CONFLICT).build();
+   }
 }

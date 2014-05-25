@@ -32,37 +32,34 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import com.arjuna.webservices11.wscoor.CoordinationConstants;
 
 /**
- * The class is used to perform WS-Transaction context insertion and extraction
- * for application level SOAP messages using JaxWS. This is the client side
- * version.
+ * The class is used to perform WS-Transaction context insertion
+ * and extraction for application level SOAP messages using JaxWS.
+ * This is the client side version.
  */
-public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor
-        implements
-            SOAPHandler<SOAPMessageContext> {
+public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor implements SOAPHandler<SOAPMessageContext>
+{
     /**
-     * Process a message. Determines if it is inbound or outbound and dispatches
-     * accordingly.
+     * Process a message. Determines if it is inbound or outbound and dispatches accordingly.
      *
      * @param msgContext
      * @return true
      */
-    public boolean handleMessage(SOAPMessageContext msgContext) {
+    public boolean handleMessage(SOAPMessageContext msgContext)
+    {
         return handleMessage(msgContext, true);
     }
 
     /**
-     * Process a message. Determines if it is inbound or outbound and dispatches
-     * accordingly.
+     * Process a message. Determines if it is inbound or outbound and dispatches accordingly.
      *
      * @param msgContext
      * @param mustUnderstand
      * @return true
      */
     public boolean handleMessage(SOAPMessageContext msgContext, boolean mustUnderstand) {
-        Boolean outbound = (Boolean) msgContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+        Boolean outbound = (Boolean)msgContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
         if (outbound == null)
-            throw new IllegalStateException(
-                    "Cannot obtain required property: " + MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            throw new IllegalStateException("Cannot obtain required property: " + MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
         return outbound ? handleOutbound(msgContext, mustUnderstand) : handleInbound(msgContext);
     }
@@ -73,24 +70,26 @@ public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor
      * @param messageContext
      * @return true
      */
-    public boolean handleFault(SOAPMessageContext messageContext) {
-        final SOAPMessageContext soapMessageContext = (SOAPMessageContext) messageContext;
-        final SOAPMessage soapMessage = soapMessageContext.getMessage();
+    public boolean handleFault(SOAPMessageContext messageContext)
+    {
+        final SOAPMessageContext soapMessageContext = (SOAPMessageContext)messageContext ;
+        final SOAPMessage soapMessage = soapMessageContext.getMessage() ;
 
         resumeTransaction(soapMessage);
         return true;
     }
 
-    public void close(MessageContext messageContext) {
+    public void close(MessageContext messageContext)
+    {
     }
 
     /**
      * Gets the header blocks that can be processed by this Handler instance.
      */
-    public Set<QName> getHeaders() {
+    public Set<QName> getHeaders()
+    {
         Set<QName> headerSet = new HashSet<QName>();
-        headerSet.add(new QName(CoordinationConstants.WSCOOR_NAMESPACE,
-                CoordinationConstants.WSCOOR_ELEMENT_COORDINATION_CONTEXT));
+        headerSet.add(new QName(CoordinationConstants.WSCOOR_NAMESPACE, CoordinationConstants.WSCOOR_ELEMENT_COORDINATION_CONTEXT));
 
         return headerSet;
     }
@@ -99,21 +98,22 @@ public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor
      * Sets the header blocks that can be processed by this Handler instance.
      * Note: this impl ignores this function's args as the values are hardcoded.
      */
-    public void setHeaders(Set headers) {
+    public void setHeaders(Set headers)
+    {
     }
 
     /**
-     * Tidy up the Transaction/Thread association before control is returned to
-     * the user.
+     * Tidy up the Transaction/Thread association before control is returned to the user.
      *
      * @param messageContext
      * @return true
      */
-    protected boolean handleInbound(SOAPMessageContext messageContext) {
-        final SOAPMessage soapMessage = messageContext.getMessage();
+    protected boolean handleInbound(SOAPMessageContext messageContext)
+    {
+        final SOAPMessage soapMessage = messageContext.getMessage() ;
 
         resumeTransaction(soapMessage);
-        return true;
+        return true ;
     }
 
     /**
@@ -123,8 +123,9 @@ public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor
      * @param mustUnderstand
      * @return true
      */
-    protected boolean handleOutbound(SOAPMessageContext messageContext, boolean mustUnderstand) {
-        final SOAPMessage soapMessage = messageContext.getMessage();
+    protected boolean handleOutbound(SOAPMessageContext messageContext, boolean mustUnderstand)
+    {
+        final SOAPMessage soapMessage = messageContext.getMessage() ;
 
         return handleOutboundMessage(soapMessage, mustUnderstand);
     }

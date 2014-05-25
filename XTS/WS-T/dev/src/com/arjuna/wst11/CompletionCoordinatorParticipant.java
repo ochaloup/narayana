@@ -5,6 +5,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 /**
  */
 
-public interface CompletionCoordinatorParticipant extends com.arjuna.wst.CompletionCoordinatorParticipant {
+public interface CompletionCoordinatorParticipant extends com.arjuna.wst.CompletionCoordinatorParticipant
+{
     public W3CEndpointReference getParticipant();
 }

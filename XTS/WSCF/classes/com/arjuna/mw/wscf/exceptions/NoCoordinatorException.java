@@ -37,23 +37,28 @@ import com.arjuna.mw.wsas.exceptions.SystemException;
  * There is no coordinator associated with the target.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: NoCoordinatorException.java,v 1.1 2002/12/17 11:36:38 nmcl Exp
- *          $
+ * @version $Id: NoCoordinatorException.java,v 1.1 2002/12/17 11:36:38 nmcl Exp $
  * @since 1.0.
  */
 
-public class NoCoordinatorException extends SystemException {
+public class NoCoordinatorException extends SystemException
+{
 
-    public NoCoordinatorException() {
-        super();
+    public NoCoordinatorException ()
+    {
+    super();
     }
 
-    public NoCoordinatorException(String s) {
-        super(s);
+    public NoCoordinatorException (String s)
+    {
+    super(s);
     }
 
-    public NoCoordinatorException(String s, int errorcode) {
-        super(s, errorcode);
+    public NoCoordinatorException (String s, int errorcode)
+    {
+    super(s, errorcode);
     }
-
+    
 }
+
+

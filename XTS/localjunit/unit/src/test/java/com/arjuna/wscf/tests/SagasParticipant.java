@@ -43,27 +43,28 @@ import com.arjuna.mw.wscf.model.sagas.participants.ParticipantWithComplete;
 
 /**
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: TwoPhaseParticipant.java,v 1.3 2005/01/15 21:21:06 kconner Exp
- *          $
+ * @version $Id: TwoPhaseParticipant.java,v 1.3 2005/01/15 21:21:06 kconner Exp $
  * @since 1.0.
  */
 
-public class SagasParticipant implements ParticipantWithComplete {
-    public SagasParticipant(String id) {
-        _id = id;
+public class SagasParticipant implements ParticipantWithComplete
+{
+    public SagasParticipant(String id)
+    {
+    _id = id;
     }
 
     public void close() throws InvalidParticipantException, WrongStateException, SystemException {
         System.out.println("SagasParticipant.close");
     }
 
-    public void cancel()
-            throws InvalidParticipantException, InvalidParticipantException, WrongStateException, SystemException {
+    public void cancel () throws InvalidParticipantException, InvalidParticipantException, WrongStateException, SystemException
+    {
         System.out.println("SagasParticipant.cancel");
     }
 
-    public void compensate()
-            throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException {
+    public void compensate() throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException
+    {
         System.out.println("SagasParticipant.compensate");
     }
 
@@ -74,26 +75,29 @@ public class SagasParticipant implements ParticipantWithComplete {
     public void complete() throws InvalidParticipantException, WrongStateException, SystemException {
         System.out.println("SagasParticipant.complete");
     }
-    public String id() throws SystemException {
-        return _id;
+    public String id () throws SystemException
+    {
+    return _id;
     }
 
-    public boolean save_state(OutputObjectState os) {
+    public boolean save_state(OutputObjectState os)
+    {
         try {
             os.packString(_id);
         } catch (IOException ioe) {
             return false;
         }
-        return true;
+        return true ;
     }
 
-    public boolean restore_state(InputObjectState os) {
+    public boolean restore_state(InputObjectState os)
+    {
         try {
             _id = os.unpackString();
         } catch (IOException e) {
             return false;
         }
-        return true;
+        return true ;
     }
 
     private String _id;

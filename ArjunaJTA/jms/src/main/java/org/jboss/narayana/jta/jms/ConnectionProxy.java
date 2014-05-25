@@ -48,10 +48,8 @@ public class ConnectionProxy implements Connection {
     private final TransactionHelper transactionHelper;
 
     /**
-     * @param xaConnection
-     *            XA connection which needs to be proxied.
-     * @param transactionHelper
-     *            utility to make transaction resources registration easier.
+     * @param xaConnection XA connection which needs to be proxied.
+     * @param transactionHelper utility to make transaction resources registration easier.
      */
     public ConnectionProxy(XAConnection xaConnection, TransactionHelper transactionHelper) {
         this.xaConnection = xaConnection;
@@ -59,9 +57,8 @@ public class ConnectionProxy implements Connection {
     }
 
     /**
-     * Simply create a session with an XA connection if there is no active
-     * transaction. Or create a proxied session and register it with an active
-     * transaction.
+     * Simply create a session with an XA connection if there is no active transaction. Or create a proxied session and register
+     * it with an active transaction.
      *
      * @see SessionProxy
      * @see Connection#createSession(boolean, int)
@@ -76,13 +73,10 @@ public class ConnectionProxy implements Connection {
     }
 
     /**
-     * Simply close the proxied connection if there is no active transaction. Or
-     * register a {@link ConnectionClosingSynchronization} if active transaction
-     * exists.
+     * Simply close the proxied connection if there is no active transaction. Or register a
+     * {@link ConnectionClosingSynchronization} if active transaction exists.
      * 
-     * @throws JMSException
-     *             if transaction status check, synchronization registration, or
-     *             connection closing has failed.
+     * @throws JMSException if transaction status check, synchronization registration, or connection closing has failed.
      */
     @Override
     public void close() throws JMSException {
@@ -171,8 +165,7 @@ public class ConnectionProxy implements Connection {
     /**
      * Delegate to {@link #xaConnection}
      *
-     * @see Connection#createConnectionConsumer(Destination, String,
-     *      ServerSessionPool, int)
+     * @see Connection#createConnectionConsumer(Destination, String, ServerSessionPool, int)
      */
     @Override
     public ConnectionConsumer createConnectionConsumer(Destination destination, String messageSelector,
@@ -183,27 +176,21 @@ public class ConnectionProxy implements Connection {
     /**
      * Delegate to {@link #xaConnection}.
      *
-     * @see Connection#createDurableConnectionConsumer(Topic, String, String,
-     *      ServerSessionPool, int)
+     * @see Connection#createDurableConnectionConsumer(Topic, String, String, ServerSessionPool, int)
      */
     @Override
-    public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName,
-            String messageSelector, ServerSessionPool sessionPool, int maxMessages) throws JMSException {
-        return xaConnection.createDurableConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool,
-                maxMessages);
+    public ConnectionConsumer createDurableConnectionConsumer(Topic topic, String subscriptionName, String messageSelector,
+            ServerSessionPool sessionPool, int maxMessages) throws JMSException {
+        return xaConnection.createDurableConnectionConsumer(topic, subscriptionName, messageSelector, sessionPool, maxMessages);
     }
 
     /**
-     * Create a proxied XA session and enlist its XA resource to the
-     * transaction.
+     * Create a proxied XA session and enlist its XA resource to the transaction.
      * <p>
-     * If session's XA resource cannot be enlisted to the transaction, session
-     * is closed.
+     * If session's XA resource cannot be enlisted to the transaction, session is closed.
      *
      * @return XA session wrapped with {@link SessionProxy}.
-     * @throws JMSException
-     *             if failure occurred creating XA session or registering its XA
-     *             resource.
+     * @throws JMSException if failure occurred creating XA session or registering its XA resource.
      */
     private Session createAndRegisterSession() throws JMSException {
         XASession xaSession = xaConnection.createXASession();

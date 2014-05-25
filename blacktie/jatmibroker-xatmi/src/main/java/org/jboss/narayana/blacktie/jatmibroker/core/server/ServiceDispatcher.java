@@ -32,8 +32,7 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.Service;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.TPSVCINFO;
 
 /**
- * This is the compatriot to the MDBBlacktieService found in the xatmi.mdb
- * package. It is a wrapper for user services.
+ * This is the compatriot to the MDBBlacktieService found in the xatmi.mdb package. It is a wrapper for user services.
  */
 public class ServiceDispatcher extends BlackTieService implements Runnable {
     private static final Logger log = LogManager.getLogger(ServiceDispatcher.class);
@@ -46,8 +45,7 @@ public class ServiceDispatcher extends BlackTieService implements Runnable {
     private String threadName;
     private boolean closed;
 
-    ServiceDispatcher(String serviceName, Service callback, Receiver receiver, int index)
-            throws ConfigurationException {
+    ServiceDispatcher(String serviceName, Service callback, Receiver receiver, int index) throws ConfigurationException {
         super(serviceName);
         this.serviceName = serviceName;
         this.callback = callback;

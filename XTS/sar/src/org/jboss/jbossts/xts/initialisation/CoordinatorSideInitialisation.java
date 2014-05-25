@@ -16,8 +16,10 @@ import com.arjuna.wst11.messaging.deploy.WSTCoordinatorInitialisation;
 /**
  * A class used to perform all 1.1 coordinator side initialisation
  */
-public class CoordinatorSideInitialisation implements XTSInitialisation {
-    public void startup() throws Exception {
+public class CoordinatorSideInitialisation implements XTSInitialisation
+{
+    public void startup() throws Exception
+    {
         // run WS-C initialisation code
 
         ActivationCoordinatorInitialisation.startup();
@@ -38,13 +40,14 @@ public class CoordinatorSideInitialisation implements XTSInitialisation {
         WSTCoordinatorInitialisation.startup();
 
         // run WSCF startup code
-
+        
         WSCFInitialisation.startup();
 
         // there is no WSTX coordinator startup
     }
 
-    public void shutdown() throws Exception {
+    public void shutdown() throws Exception
+    {
         // there is no WSTX coordinator shutdown
 
         // run WSCF shutdown code

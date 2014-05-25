@@ -31,15 +31,17 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import java.util.Hashtable;
 
 /**
- * An implementation of UserTransaction which employs an RPC MEP based
- * completion protocol specific to JBoss to complete the transaction. This
- * implementation allows the client to be deployed without the need to expose
- * any service endpoints.
+ * An implementation of UserTransaction which employs an RPC MEP based completion protocol specific to
+ * JBoss to complete the transaction. This implementation allows the client to be deployed without the
+ * need to expose any service endpoints.
  */
-public class UserTransactionStandaloneImple extends UserTransaction {
+public class UserTransactionStandaloneImple extends UserTransaction
+{
 
-    public UserTransactionStandaloneImple() {
-        try {
+    public UserTransactionStandaloneImple()
+    {
+        try
+        {
             _activationCoordinatorService = XTSPropertyManager.getWSCEnvironmentBean().getCoordinatorURL11();
 
             /*
@@ -48,19 +50,19 @@ public class UserTransactionStandaloneImple extends UserTransaction {
              * implementation.
              */
 
-            if (_activationCoordinatorService == null) {
-                final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance()
-                        .getServiceRegistry();
-                _activationCoordinatorService = serviceRegistry
-                        .getServiceURI(CoordinationConstants.ACTIVATION_SERVICE_NAME);
+            if (_activationCoordinatorService == null)
+            {
+                final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+                _activationCoordinatorService = serviceRegistry.getServiceURI(CoordinationConstants.ACTIVATION_SERVICE_NAME) ;
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             // TODO
 
             ex.printStackTrace();
         }
-        // this implementation cannot provide support for subordinate
-        // transactions
+        // this implementation cannot provide support for subordinate transactions
         _userSubordinateTransaction = null;
     }
 
@@ -68,12 +70,15 @@ public class UserTransactionStandaloneImple extends UserTransaction {
         return _userSubordinateTransaction;
     }
 
-    public void begin() throws WrongStateException, SystemException {
+    public void begin () throws WrongStateException, SystemException
+    {
         begin(0);
     }
 
-    public void begin(int timeout) throws WrongStateException, SystemException {
-        try {
+    public void begin (int timeout) throws WrongStateException, SystemException
+    {
+        try
+        {
             if (_ctxManager.currentTransaction() != null)
                 throw new WrongStateException();
 
@@ -82,77 +87,103 @@ public class UserTransactionStandaloneImple extends UserTransaction {
             _ctxManager.resume(new TxContextImple(ctx));
 
             enlistCompletionParticipants();
-        } catch (InvalidCreateParametersException ex) {
+        }
+        catch (InvalidCreateParametersException ex)
+        {
             tidyup();
 
             throw new SystemException(ex.toString());
-        } catch (UnknownTransactionException ex) {
+        }
+        catch (UnknownTransactionException ex)
+        {
             tidyup();
 
             throw new SystemException(ex.toString());
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             tidyup();
 
             throw ex;
         }
     }
 
-    public void commit() throws TransactionRolledBackException, UnknownTransactionException, SecurityException,
-            SystemException, WrongStateException {
-        try {
+    public void commit () throws TransactionRolledBackException,
+            UnknownTransactionException, SecurityException, SystemException, WrongStateException
+    {
+        try
+        {
             commitWithoutAck();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             throw ex;
-        } finally {
+        }
+        finally
+        {
             tidyup();
         }
     }
 
-    public void rollback() throws UnknownTransactionException, SecurityException, SystemException, WrongStateException {
-        try {
+    public void rollback () throws UnknownTransactionException, SecurityException, SystemException, WrongStateException
+    {
+        try
+        {
             abortWithoutAck();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             throw ex;
-        } finally {
+        }
+        finally
+        {
             tidyup();
         }
     }
 
-    public String transactionIdentifier() {
-        try {
+    public String transactionIdentifier ()
+    {
+        try
+        {
             return _ctxManager.currentTransaction().toString();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             return "Unknown";
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             return "Unknown";
         }
     }
 
-    public String toString() {
+    public String toString ()
+    {
         return transactionIdentifier();
     }
 
     /**
-     * method provided for the benefit of UserSubordinateTransactionImple to
-     * allow it to begin a subordinate transaction which requires an existing
-     * context to be installed on the thread before it will start and instal la
-     * new transaction
+     * method provided for the benefit of UserSubordinateTransactionImple to allow it
+     * to begin a subordinate transaction which requires an existing context to be
+     * installed on the thread before it will start and instal la new transaction
      *
      * @param timeout
      * @throws com.arjuna.wst.WrongStateException
      * @throws com.arjuna.wst.SystemException
      */
-    public void beginSubordinate(int timeout) throws WrongStateException, SystemException {
+    public void beginSubordinate(int timeout) throws WrongStateException, SystemException
+    {
         throw new SystemException("UserTransactionStandaloneImple does not support subordinate transactions");
     }
 
     /*
-     * enlist the client for the completiopn protocol so it can commit or ro0ll
-     * back the transaction
+     * enlist the client for the completiopn protocol so it can commit or ro0ll back the transaction
      */
 
-    private final void enlistCompletionParticipants()
-            throws WrongStateException, UnknownTransactionException, SystemException {
+    private final void enlistCompletionParticipants ()
+            throws WrongStateException, UnknownTransactionException,
+            SystemException
+    {
         TransactionManagerImple tm = (TransactionManagerImple) TransactionManager.getTransactionManager();
 
         final TxContextImple currentTx = (TxContextImple) tm.currentTransaction();
@@ -162,16 +193,22 @@ public class UserTransactionStandaloneImple extends UserTransaction {
         final String id = currentTx.identifier();
         W3CEndpointReference completionCoordinator = null;
 
-        try {
-            completionCoordinator = tm.registerParticipant(null,
-                    AtomicTransactionConstants.WSAT_SUB_PROTOCOL_COMPLETION_RPC);
-        } catch (InvalidProtocolException ex) {
+        try
+        {
+            completionCoordinator = tm.registerParticipant(null, AtomicTransactionConstants.WSAT_SUB_PROTOCOL_COMPLETION_RPC);
+        }
+        catch (InvalidProtocolException ex)
+        {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
-        } catch (InvalidStateException ex) {
+        }
+        catch (InvalidStateException ex)
+        {
             throw new WrongStateException();
-        } catch (CannotRegisterException ex) {
+        }
+        catch (CannotRegisterException ex)
+        {
             // cause could actually be no activity or already registered
             throw new UnknownTransactionException();
         }
@@ -180,16 +217,14 @@ public class UserTransactionStandaloneImple extends UserTransaction {
     }
 
     /**
-     * fetch the coordination context type stashed in the current AT context
-     * implememtation and use it to construct an instance of the coordination
-     * context extension type we need to send down the wire to the activation
-     * coordinator
-     * 
-     * @param current
-     *            the current AT context implememtation
+     * fetch the coordination context type stashed in the current AT context implememtation
+     * and use it to construct an instance of the coordination context extension type we need to
+     * send down the wire to the activation coordinator
+     * @param current the current AT context implememtation
      * @return an instance of the coordination context extension type
      */
-    private CoordinationContext getContext(TxContextImple current) {
+    private CoordinationContext getContext(TxContextImple current)
+    {
         CoordinationContextType contextType = getContextType(current);
         CoordinationContext context = new CoordinationContext();
         context.setCoordinationType(contextType.getCoordinationType());
@@ -201,52 +236,61 @@ public class UserTransactionStandaloneImple extends UserTransaction {
     }
 
     /**
-     * fetch the coordination context type stashed in the current AT context
-     * implememtation
-     * 
-     * @param current
-     *            the current AT context implememtation
-     * @return the coordination context type stashed in the current AT context
-     *         implememtation
+     * fetch the coordination context type stashed in the current AT context implememtation
+     * @param current the current AT context implememtation
+     * @return the coordination context type stashed in the current AT context implememtation
      */
-    private CoordinationContextType getContextType(TxContextImple current) {
-        ContextImple contextImple = (ContextImple) current.context();
+    private CoordinationContextType getContextType(TxContextImple current)
+    {
+        ContextImple contextImple = (ContextImple)current.context();
         return contextImple.getCoordinationContext();
     }
 
     protected final Context startTransaction(int timeout, TxContextImple current)
-            throws InvalidCreateParametersException, SystemException {
-        try {
-            // TODO: tricks for per app _activationCoordinatorService config,
-            // perhaps:
-            // InputStream inputStream =
-            // Thread.currentThread().getContextClassLoader().getResourceAsStream("/foo.properties");
+            throws InvalidCreateParametersException,
+            SystemException
+    {
+        try
+        {
+            // TODO: tricks for per app _activationCoordinatorService config, perhaps:
+            //InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("/foo.properties");
 
-            final Long expires = (timeout > 0 ? new Long(timeout) : null);
-            final String messageId = MessageId.getMessageId();
+
+            final Long expires = (timeout > 0 ? new Long(timeout) : null) ;
+            final String messageId = MessageId.getMessageId() ;
             final CoordinationContext currentContext = (current != null ? getContext(current) : null);
             final CoordinationContextType coordinationContext = ActivationCoordinator.createCoordinationContext(
-                    _activationCoordinatorService, messageId, AtomicTransactionConstants.WSAT_PROTOCOL, expires,
-                    currentContext);
-            if (coordinationContext == null) {
-                throw new SystemException(wstxLogger.i18NLogger.get_mwlabs_wst_at_remote_UserTransaction11Imple__2());
+                    _activationCoordinatorService, messageId, AtomicTransactionConstants.WSAT_PROTOCOL, expires, currentContext) ;
+            if (coordinationContext == null)
+            {
+                throw new SystemException(
+                        wstxLogger.i18NLogger.get_mwlabs_wst_at_remote_UserTransaction11Imple__2());
             }
-            return new ContextImple(coordinationContext);
-        } catch (final InvalidCreateParametersException icpe) {
-            throw icpe;
-        } catch (final SoapFault sf) {
-            throw new SystemException(sf.getMessage());
-        } catch (final Exception ex) {
+            return new ContextImple(coordinationContext) ;
+        }
+        catch (final InvalidCreateParametersException icpe)
+        {
+            throw icpe ;
+        }
+        catch (final SoapFault sf)
+        {
+            throw new SystemException(sf.getMessage()) ;
+        }
+        catch (final Exception ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
 
-    private final void commitWithoutAck() throws TransactionRolledBackException, UnknownTransactionException,
-            SecurityException, SystemException, WrongStateException {
+    private final void commitWithoutAck ()
+            throws TransactionRolledBackException, UnknownTransactionException,
+            SecurityException, SystemException, WrongStateException
+    {
         TxContextImple ctx = null;
         String id = null;
 
-        try {
+        try
+        {
             ctx = (TxContextImple) _ctxManager.suspend();
             if (ctx == null) {
                 throw new WrongStateException();
@@ -254,17 +298,14 @@ public class UserTransactionStandaloneImple extends UserTransaction {
             id = ctx.identifier();
 
             /*
-             * By default the completionParticipantURL won't be set for an
-             * interposed (imported) bridged transaction. This is fine, because
-             * you shouldn't be able to commit that transaction from a node in
-             * the tree, only from the root. So, we can prevent commit or
-             * rollback at this stage. The alternative would be to setup the
-             * completionParticipantURL and throw the exception from the remote
-             * coordinator side (see enlistCompletionParticipants for how to do
-             * this).
+             * By default the completionParticipantURL won't be set for an interposed (imported)
+             * bridged transaction. This is fine, because you shouldn't be able to commit that
+             * transaction from a node in the tree, only from the root. So, we can prevent commit
+             * or rollback at this stage. The alternative would be to setup the completionParticipantURL
+             * and throw the exception from the remote coordinator side (see enlistCompletionParticipants
+             * for how to do this).
              *
-             * The same applies for an interposed subordinate transaction
-             * created via beginSubordinate.
+             * The same applies for an interposed subordinate transaction created via beginSubordinate.
              */
 
             final W3CEndpointReference completionCoordinator = (W3CEndpointReference) _completionCoordinators.get(id);
@@ -275,25 +316,42 @@ public class UserTransactionStandaloneImple extends UserTransaction {
             CompletionRPCStub completionStub = new CompletionRPCStub(id, completionCoordinator);
 
             completionStub.commit();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             throw ex;
-        } catch (TransactionRolledBackException ex) {
+        }
+        catch (TransactionRolledBackException ex)
+        {
             throw ex;
-        } catch (UnknownTransactionException ex) {
+        }
+        catch (UnknownTransactionException ex)
+        {
             throw ex;
-        } catch (SecurityException ex) {
+        }
+        catch (SecurityException ex)
+        {
             throw ex;
-        } catch (WrongStateException ex) {
+        }
+        catch (WrongStateException ex)
+        {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (ctx != null)
                     _ctxManager.resume(ctx);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.printStackTrace();
             }
 
@@ -302,12 +360,14 @@ public class UserTransactionStandaloneImple extends UserTransaction {
         }
     }
 
-    private final void abortWithoutAck()
-            throws UnknownTransactionException, SecurityException, SystemException, WrongStateException {
+    private final void abortWithoutAck () throws UnknownTransactionException, SecurityException,
+            SystemException, WrongStateException
+    {
         TxContextImple ctx = null;
         String id = null;
 
-        try {
+        try
+        {
             ctx = (TxContextImple) _ctxManager.suspend();
             if (ctx == null) {
                 throw new WrongStateException();
@@ -315,17 +375,14 @@ public class UserTransactionStandaloneImple extends UserTransaction {
             id = ctx.identifier();
 
             /*
-             * By default the completionParticipantURL won't be set for an
-             * interposed (imported) bridged transaction. This is fine, because
-             * you shouldn't be able to commit that transaction from a node in
-             * the tree, only from the root. So, we can prevent commit or
-             * rollback at this stage. The alternative would be to setup the
-             * completionParticipantURL and throw the exception from the remote
-             * coordinator side (see enlistCompletionParticipants for how to do
-             * this).
+             * By default the completionParticipantURL won't be set for an interposed (imported)
+             * bridged transaction. This is fine, because you shouldn't be able to commit that
+             * transaction from a node in the tree, only from the root. So, we can prevent commit
+             * or rollback at this stage. The alternative would be to setup the completionParticipantURL
+             * and throw the exception from the remote coordinator side (see enlistCompletionParticipants
+             * for how to do this).
              *
-             * The same applies for an interposed subordinate transaction
-             * created via beginSubordinate.
+             * The same applies for an interposed subordinate transaction created via beginSubordinate.
              */
 
             W3CEndpointReference completionCoordinator = (W3CEndpointReference) _completionCoordinators.get(id);
@@ -336,21 +393,36 @@ public class UserTransactionStandaloneImple extends UserTransaction {
             CompletionRPCStub completionStub = new CompletionRPCStub(id, completionCoordinator);
 
             completionStub.rollback();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             throw ex;
-        } catch (UnknownTransactionException ex) {
+        }
+        catch (UnknownTransactionException ex)
+        {
             throw ex;
-        } catch (SecurityException ex) {
+        }
+        catch (SecurityException ex)
+        {
             throw ex;
-        } catch (WrongStateException ex) {
+        }
+        catch (WrongStateException ex)
+        {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SystemException(ex.toString());
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (ctx != null)
                     _ctxManager.resume(ctx);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.printStackTrace();
             }
 
@@ -359,10 +431,14 @@ public class UserTransactionStandaloneImple extends UserTransaction {
         }
     }
 
-    protected final void tidyup() {
-        try {
+    protected final void tidyup ()
+    {
+        try
+        {
             _ctxManager.suspend();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
         }
     }

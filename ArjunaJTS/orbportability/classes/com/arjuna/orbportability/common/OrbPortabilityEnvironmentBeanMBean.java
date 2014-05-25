@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A JMX MBean interface containing assorted configuration for the Orb
- * Portability layer.
+ * A JMX MBean interface containing assorted configuration for the Orb Portability layer.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface OrbPortabilityEnvironmentBeanMBean {
+public interface OrbPortabilityEnvironmentBeanMBean
+{
     String getInitialReferencesRoot();
 
     String getInitialReferencesFile();

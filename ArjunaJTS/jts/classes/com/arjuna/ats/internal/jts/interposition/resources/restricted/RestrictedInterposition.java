@@ -48,12 +48,16 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.restricte
 import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.restricted.ServerRestrictedTopLevelAction;
 import com.arjuna.ats.jts.utils.Utility;
 
-public class RestrictedInterposition extends Interposition {
+public class RestrictedInterposition extends Interposition
+{
 
-    public RestrictedInterposition() {
+    public RestrictedInterposition()
+    {
     }
 
-    public static ControlImple create(PropagationContext context) throws SystemException {
+    public static ControlImple create (PropagationContext context)
+            throws SystemException
+    {
         if (__list != null)
             return __list.setupHierarchy(context);
         else
@@ -67,7 +71,9 @@ public class RestrictedInterposition extends Interposition {
      * finished hierarchies.
      */
 
-    public synchronized ControlImple setupHierarchy(PropagationContext context) throws SystemException {
+    public synchronized ControlImple setupHierarchy (PropagationContext context)
+            throws SystemException
+    {
         ControlImple controlPtr = null;
         Uid theUid = null;
         ServerTopLevelAction proxyAction = null;
@@ -75,18 +81,22 @@ public class RestrictedInterposition extends Interposition {
         if (context.parents.length == 0)
             theUid = Utility.otidToUid(context.current.otid);
         else
-            theUid = Utility.otidToUid(context.parents[context.parents.length - 1].otid);
+            theUid = Utility
+                    .otidToUid(context.parents[context.parents.length - 1].otid);
 
         proxyAction = super.present(theUid);
 
-        if (proxyAction == null) {
+        if (proxyAction == null)
+        {
             /*
              * Create a new proxyAction element and return the "current"
              * transaction.
              */
 
             controlPtr = createHierarchy(context, theUid);
-        } else {
+        }
+        else
+        {
             /*
              * Check hierarchy of existing element.
              */
@@ -97,7 +107,9 @@ public class RestrictedInterposition extends Interposition {
         return controlPtr;
     }
 
-    protected synchronized ControlImple createHierarchy(PropagationContext ctx, Uid tlUid) throws SystemException {
+    protected synchronized ControlImple createHierarchy (
+            PropagationContext ctx, Uid tlUid) throws SystemException
+    {
         /*
          * Start at the parent and work our way down to "current". The current
          * transaction is not in the IDL sequence, but sent as separate field of
@@ -116,29 +128,37 @@ public class RestrictedInterposition extends Interposition {
          * transaction.
          */
 
-        if (depth == 0) {
+        if (depth == 0)
+        {
             tmpCoord = ctx.current.coord;
             tmpTerm = ctx.current.term;
-        } else {
+        }
+        else
+        {
             tmpCoord = ctx.parents[depth - 1].coord;
             tmpTerm = ctx.parents[depth - 1].term;
         }
 
-        ServerControl control = ServerFactory.create_transaction(tlUid, null, null, tmpCoord, tmpTerm, ctx.timeout);
+        ServerControl control = ServerFactory.create_transaction(tlUid, null,
+                null, tmpCoord, tmpTerm, ctx.timeout);
 
         tlAction = new ServerRestrictedTopLevelAction(control);
 
-        if (!tlAction.valid()) {
+        if (!tlAction.valid())
+        {
             /*
              * Just deal with current transaction. Others must have been
              * registered successfully, and will be deal with automatically when
              * the parent transaction terminates.
              */
 
-            try {
+            try
+            {
                 tlAction.rollback();
                 tlAction = null;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
 
             throw new TRANSACTION_ROLLEDBACK();
@@ -157,26 +177,32 @@ public class RestrictedInterposition extends Interposition {
 
             ServerRestrictedNestedAction nestedAction = null;
 
-            for (int i = depth - 2; i >= 0; i--) {
+            for (int i = depth - 2; i >= 0; i--)
+            {
                 tmpCoord = ctx.parents[i].coord;
                 tmpTerm = ctx.parents[i].term;
 
-                control = ServerFactory.create_subtransaction(Utility.otidToUid(ctx.parents[i].otid), tmpCoord, tmpTerm,
+                control = ServerFactory.create_subtransaction(Utility
+                        .otidToUid(ctx.parents[i].otid), tmpCoord, tmpTerm,
                         control);
 
                 nestedAction = new ServerRestrictedNestedAction(control);
 
-                if (!nestedAction.valid()) {
+                if (!nestedAction.valid())
+                {
                     /*
                      * Just deal with current transaction. Others must have been
                      * registered successfully, and will be deal with
                      * automatically when the parent transaction terminates.
                      */
 
-                    try {
+                    try
+                    {
                         nestedAction.rollback();
                         nestedAction = null;
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                     }
 
                     throw new TRANSACTION_ROLLEDBACK();
@@ -197,21 +223,25 @@ public class RestrictedInterposition extends Interposition {
             tmpCoord = ctx.current.coord;
             tmpTerm = ctx.current.term;
 
-            control = ServerFactory.create_subtransaction(Utility.otidToUid(ctx.current.otid), tmpCoord, tmpTerm,
-                    control);
+            control = ServerFactory.create_subtransaction(Utility
+                    .otidToUid(ctx.current.otid), tmpCoord, tmpTerm, control);
             nestedAction = new ServerRestrictedNestedAction(control);
 
-            if (!nestedAction.valid()) {
+            if (!nestedAction.valid())
+            {
                 /*
                  * Just deal with current transaction. Others must have been
                  * registered successfully, and will be deal with automatically
                  * when the parent transaction terminates.
                  */
 
-                try {
+                try
+                {
                     nestedAction.rollback();
                     nestedAction = null;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                 }
 
                 throw new TRANSACTION_ROLLEDBACK();
@@ -229,17 +259,19 @@ public class RestrictedInterposition extends Interposition {
      * actions.
      */
 
-    protected synchronized ControlImple checkHierarchy(ServerTopLevelAction hier, PropagationContext context)
-            throws SystemException {
+    protected synchronized ControlImple checkHierarchy (
+            ServerTopLevelAction hier, PropagationContext context)
+            throws SystemException
+    {
         ServerRestrictedTopLevelAction tlAction = (ServerRestrictedTopLevelAction) hier;
         ServerControl control = tlAction.control(); // top-level's control
         int depth = context.parents.length;
         int differenceIndex = -1; // index of the new transactions in the
-                                    // hierarchy
-        ServerRestrictedNestedAction nestedAction = tlAction.child(); // top-level
-                                                                        // 's
-                                                                        // nested
-                                                                        // action
+                                  // hierarchy
+        ServerRestrictedNestedAction nestedAction = tlAction.child(); //top-level
+                                                                      // 's
+                                                                      // nested
+                                                                      // action
 
         /*
          * Abort any old actions before we check whether we need to create
@@ -248,20 +280,24 @@ public class RestrictedInterposition extends Interposition {
          * does not include the current transaction!
          */
 
-        if (depth == 0) {
+        if (depth == 0)
+        {
             /*
              * If there are no transactions in the sent hierarchy then current
              * is the only nested transaction. So, abort the rest of our local
              * hierarchy.
              */
 
-            if (nestedAction != null) {
+            if (nestedAction != null)
+            {
                 tlAction.abortChild(nestedAction); // automatically removed from
-                                                    // resource list
+                                                   // resource list
                 nestedAction = null;
                 control = tlAction.deepestControl();
             }
-        } else {
+        }
+        else
+        {
             /*
              * Start at -2 and work our way down the hierarchy. We use -2 since
              * the length gives us the number of elements, which is 0 to n-1,
@@ -269,8 +305,11 @@ public class RestrictedInterposition extends Interposition {
              * dealt with to get this far.
              */
 
-            for (int i = depth - 2; (i >= 0) && (nestedAction != null); i--) {
-                if (nestedAction.get_uid().equals(Utility.otidToUid(context.parents[i].otid))) {
+            for (int i = depth - 2; (i >= 0) && (nestedAction != null); i--)
+            {
+                if (nestedAction.get_uid().equals(
+                        Utility.otidToUid(context.parents[i].otid)))
+                {
                     /*
                      * nestedActionalways points to the next transaction in the
                      * hierarchy when we leave this loop.
@@ -278,11 +317,14 @@ public class RestrictedInterposition extends Interposition {
 
                     nestedAction = nestedAction.child();
 
-                    if ((nestedAction == null) && (i > 0)) {
+                    if ((nestedAction == null) && (i > 0))
+                    {
                         differenceIndex = i - 1;
                         control = tlAction.deepestControl();
                     }
-                } else {
+                }
+                else
+                {
                     /*
                      * Uids not equal, so abort. No need to continue down the
                      * hierarchy, as aborting from this point will implicitly
@@ -290,7 +332,7 @@ public class RestrictedInterposition extends Interposition {
                      */
 
                     differenceIndex = i; // remember for later so that we can
-                                            // add new actions.
+                                         // add new actions.
 
                     tlAction.abortChild(nestedAction);
                     nestedAction = null;
@@ -305,29 +347,36 @@ public class RestrictedInterposition extends Interposition {
              * current)? If so, add it now.
              */
 
-            if (differenceIndex != -1) {
+            if (differenceIndex != -1)
+            {
                 Coordinator tmpCoord;
                 Terminator tmpTerm;
 
-                for (int j = differenceIndex; j >= 0; j--) {
+                for (int j = differenceIndex; j >= 0; j--)
+                {
                     tmpCoord = context.parents[j].coord;
                     tmpTerm = context.parents[j].term;
 
-                    control = ServerFactory.create_subtransaction(Utility.otidToUid(context.parents[j].otid), tmpCoord,
+                    control = ServerFactory.create_subtransaction(Utility
+                            .otidToUid(context.parents[j].otid), tmpCoord,
                             tmpTerm, control);
                     nestedAction = new ServerRestrictedNestedAction(control);
 
-                    if (!nestedAction.valid()) {
+                    if (!nestedAction.valid())
+                    {
                         /*
                          * Just deal with current transaction. Others must have
                          * been registered successfully, and will be deal with
                          * automatically when the parent transaction terminates.
                          */
 
-                        try {
+                        try
+                        {
                             nestedAction.rollback(); // does dispose as well!
                             nestedAction = null;
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                         }
 
                         throw new TRANSACTION_ROLLEDBACK();
@@ -337,8 +386,11 @@ public class RestrictedInterposition extends Interposition {
                 }
 
                 nestedAction = null;
-            } else {
-                if (nestedAction != null) {
+            }
+            else
+            {
+                if (nestedAction != null)
+                {
                     /*
                      * If current transaction has a child then we should abort
                      * it, since it does not exist in the hierarchy we have just
@@ -347,7 +399,8 @@ public class RestrictedInterposition extends Interposition {
 
                     nestedAction = nestedAction.child();
 
-                    if (nestedAction != null) {
+                    if (nestedAction != null)
+                    {
                         tlAction.abortChild(nestedAction);
                         nestedAction = null;
                         control = tlAction.deepestControl();
@@ -365,7 +418,8 @@ public class RestrictedInterposition extends Interposition {
          * have a new current.
          */
 
-        if (differenceIndex == -1) {
+        if (differenceIndex == -1)
+        {
             /*
              * Now determine whether we have to create any new nested actions.
              */
@@ -376,62 +430,77 @@ public class RestrictedInterposition extends Interposition {
              * Get hold of our local notion of current.
              */
 
-            if (nestedAction == null) {
+            if (nestedAction == null)
+            {
                 nestedAction = tlAction.child();
 
-                if (nestedAction != null) {
+                if (nestedAction != null)
+                {
                     while (nestedAction.child() != null)
                         nestedAction = nestedAction.child();
 
                     currentUid = nestedAction.get_uid();
-                } else
+                }
+                else
                     currentUid = tlAction.get_uid();
-            } else
+            }
+            else
                 currentUid = nestedAction.get_uid();
 
             /*
              * Is our notion of the current transaction the same as that sent?
              */
 
-            if (currentUid.notEquals(sentCurrent)) {
+            if (currentUid.notEquals(sentCurrent))
+            {
                 newCurrent = true;
             }
-        } else
+        }
+        else
             newCurrent = true;
 
-        if (newCurrent) {
-            if (depth == 1) {
+        if (newCurrent)
+        {
+            if (depth == 1)
+            {
                 /*
                  * Old current is gone.
                  */
 
                 nestedAction = tlAction.child();
 
-                if (nestedAction != null) {
+                if (nestedAction != null)
+                {
                     tlAction.abortChild(nestedAction);
                     nestedAction = null;
                 }
 
                 control = (ServerControl) tlAction.control();
-            } else
+            }
+            else
                 control = tlAction.deepestControl();
 
             TransIdentity currentID = context.current;
 
-            control = ServerFactory.create_subtransaction(sentCurrent, currentID.coord, currentID.term, control);
+            control = ServerFactory.create_subtransaction(sentCurrent,
+                    currentID.coord, currentID.term, control);
             nestedAction = new ServerRestrictedNestedAction(control);
 
-            if (!nestedAction.valid()) {
+            if (!nestedAction.valid())
+            {
                 /*
                  * Just deal with current transaction. Others must have been
                  * registered successfully, and will be deal with automatically
                  * when the parent transaction terminates.
                  */
 
-                try {
+                try
+                {
                     nestedAction.rollback(); // does dispose as well!
                     nestedAction = null;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                 }
 
                 throw new TRANSACTION_ROLLEDBACK();

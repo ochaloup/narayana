@@ -41,9 +41,11 @@ import com.arjuna.ats.arjuna.ObjectModel;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.hp.mwtests.ts.arjuna.resources.BasicObject;
 
-public class BasicTest {
+public class BasicTest
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         AtomicAction A = new AtomicAction();
         BasicObject bo = new BasicObject();
 
@@ -52,36 +54,37 @@ public class BasicTest {
         bo.set(2);
 
         A.commit();
-
+        
         assertTrue(bo.getStore() != null);
         assertTrue(bo.getStoreRoot() != null);
-
+        
         assertEquals(bo.getObjectModel(), ObjectModel.SINGLE);
     }
 
     @Test
-    public void testNested() throws Exception {
+    public void testNested () throws Exception
+    {
         AtomicAction A = new AtomicAction();
-        AtomicAction B = new AtomicAction();
+        AtomicAction B = new AtomicAction();      
         BasicObject bo = new BasicObject();
         Uid u = bo.get_uid();
-
+        
         A.begin();
         B.begin();
-
+        
         bo.set(2);
 
         B.commit();
         A.commit();
 
         bo = new BasicObject(u);
-
+        
         A = new AtomicAction();
-
+        
         A.begin();
-
+        
         assertEquals(bo.get(), 2);
-
+        
         A.commit();
     }
 }

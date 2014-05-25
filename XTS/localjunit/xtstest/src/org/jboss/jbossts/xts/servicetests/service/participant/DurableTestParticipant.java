@@ -8,38 +8,43 @@ import java.io.Serializable;
  * A scriptable durable participant for use by the XTSServiceTest service.
  */
 
-public class DurableTestParticipant extends ScriptedTestParticipant implements Durable2PCParticipant, Serializable {
+public class DurableTestParticipant
+        extends ScriptedTestParticipant
+        implements Durable2PCParticipant, Serializable
+{
     // constructor for recovery only
-    protected DurableTestParticipant() {
+    protected DurableTestParticipant()
+    {
     }
 
-    public DurableTestParticipant(String id) {
+    public DurableTestParticipant(String id)
+    {
         super(id);
     }
 
-    public Vote prepare() throws WrongStateException, SystemException {
-        for (String s : commands) {
-            if (s.equals("prepare")) {
-                commands.remove(s);
-                return new Prepared();
-            } else if (s.equals("prepareReadOnly")) {
-                commands.remove(s);
-                return new ReadOnly();
-            } else if (s.equals("prepareAbort")) {
-                commands.remove(s);
-                return new Aborted();
-            } else if (s.equals("prepareWrongStateException")) {
-                commands.remove(s);
-                throw new WrongStateException("DurableTestParticipant  prepare : " + id);
-            } else if (s.equals("prepareSystemException")) {
-                commands.remove(s);
-                throw new SystemException("DurableTestParticipant prepare : " + id);
-            }
-        }
+   public Vote prepare() throws WrongStateException, SystemException {
+       for (String s : commands) {
+           if (s.equals("prepare")) {
+               commands.remove(s);
+               return new Prepared();
+           } else if (s.equals("prepareReadOnly")) {
+               commands.remove(s);
+               return new ReadOnly();
+           } else if (s.equals("prepareAbort")) {
+               commands.remove(s);
+               return new Aborted();
+           } else if (s.equals("prepareWrongStateException")) {
+               commands.remove(s);
+               throw new WrongStateException("DurableTestParticipant  prepare : " + id);
+           } else if (s.equals("prepareSystemException")) {
+               commands.remove(s);
+               throw new SystemException("DurableTestParticipant prepare : " + id);
+           }
+       }
 
-        // default behaviour is just to prepare
+       // default behaviour is just to prepare
 
-        return new Prepared();
+       return new Prepared();
     }
 
     public void commit() throws WrongStateException, SystemException {

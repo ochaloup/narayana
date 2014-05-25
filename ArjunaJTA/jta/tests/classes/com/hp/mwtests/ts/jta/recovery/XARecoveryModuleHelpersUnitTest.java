@@ -44,11 +44,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 @RunWith(BMUnitRunner.class)
-public class XARecoveryModuleHelpersUnitTest {
+public class XARecoveryModuleHelpersUnitTest
+{
     /**
-     * Test that recovery helpers that are not in use can be removed after pass
-     * 1
-     * 
+     * Test that recovery helpers that are not in use can be removed after pass 1
      * @throws Exception
      */
     @Test
@@ -57,9 +56,7 @@ public class XARecoveryModuleHelpersUnitTest {
     }
 
     /**
-     * Test that recovery helpers that are in use can only be removed after pass
-     * 2 completes
-     * 
+     * Test that recovery helpers that are in use can only be removed after pass 2 completes
      * @throws Exception
      */
     @Test
@@ -68,9 +65,8 @@ public class XARecoveryModuleHelpersUnitTest {
     }
 
     /**
-     * Test that recovery helpers can be added and removed during recovery pass
-     * 2 (and not have to wait until pass 2 is complete)
-     * 
+     * Test that recovery helpers can be added and removed during recovery pass 2
+     * (and not have to wait until pass 2 is complete)
      * @throws Exception
      */
     @BMScript("recovery-helper")
@@ -95,14 +91,10 @@ public class XARecoveryModuleHelpersUnitTest {
             public String call() throws Exception {
                 final XAResourceRecoveryHelper xaResourceRecoveryHelper = new XAResourceRecoveryHelper() {
                     @Override
-                    public boolean initialise(String p) throws Exception {
-                        return true;
-                    }
+                    public boolean initialise(String p) throws Exception { return true; }
 
                     @Override
-                    public XAResource[] getXAResources() throws Exception {
-                        return new XAResource[0];
-                    }
+                    public XAResource[] getXAResources() throws Exception { return new XAResource[0]; }
                 };
 
                 return addHelper(xaRecoveryModule, xaResourceRecoveryHelper, 3);
@@ -113,8 +105,7 @@ public class XARecoveryModuleHelpersUnitTest {
         assertNull(errMsg, errMsg);
     }
 
-    private String addHelper(XARecoveryModule xaRecoveryModule, XAResourceRecoveryHelper xaResourceRecoveryHelper,
-            int expectedState) {
+    private String addHelper(XARecoveryModule xaRecoveryModule, XAResourceRecoveryHelper xaResourceRecoveryHelper, int expectedState) {
         if (getScanState(xaRecoveryModule) != expectedState)
             return "Wrong state for addHelper in pass 2a";
 
@@ -143,21 +134,15 @@ public class XARecoveryModuleHelpersUnitTest {
                 if (!somethingToRecover)
                     return new Xid[0];
 
-                return new Xid[]{new Xid() {
+                return new Xid[] {new Xid() {
                     @Override
-                    public int getFormatId() {
-                        return 0;
-                    }
+                    public int getFormatId() { return 0; }
 
                     @Override
-                    public byte[] getGlobalTransactionId() {
-                        return new byte[0];
-                    }
+                    public byte[] getGlobalTransactionId() { return new byte[0]; }
 
                     @Override
-                    public byte[] getBranchQualifier() {
-                        return new byte[0];
-                    }
+                    public byte[] getBranchQualifier() { return new byte[0]; }
                 }};
             }
         };
@@ -170,35 +155,31 @@ public class XARecoveryModuleHelpersUnitTest {
 
             @Override
             public XAResource[] getXAResources() throws Exception {
-                System.out.printf("getXAResources sleep (%d)%n", System.currentTimeMillis() - millis);
+                System.out.printf("getXAResources sleep (%d)%n",System.currentTimeMillis() - millis);
                 Thread.sleep(xAResourcesSleepMillis);
-                System.out.printf("getXAResources return (%d)%n", System.currentTimeMillis() - millis);
-                return new XAResource[]{testXAResource};
+                System.out.printf("getXAResources return (%d)%n",System.currentTimeMillis() - millis);
+                return new XAResource[] {testXAResource};
             }
         };
 
         final XAResourceRecoveryHelper xaResourceRecoveryHelper2 = new XAResourceRecoveryHelper() {
             @Override
-            public boolean initialise(String p) throws Exception {
-                return true;
-            }
+            public boolean initialise(String p) throws Exception { return true; }
 
             @Override
-            public XAResource[] getXAResources() throws Exception {
-                return new XAResource[0];
-            }
+            public XAResource[] getXAResources() throws Exception { return new XAResource[0]; }
         };
 
         /*
-         * Remove helpers in the background whilst recovery is running to check
-         * that they are removed when the scanner is in the correct state. The
-         * sleep time param is tuned to ensure that the add/remove recovery
-         * helper operation occurs during pass 1.
+         * Remove helpers in the background whilst recovery is running to check that they are removed when
+         * the scanner is in the correct state.
+         * The sleep time param is tuned to ensure that the add/remove recovery helper operation occurs
+         * during pass 1.
          */
-        XAHelperRemover remover = new XAHelperRemover(xaResourceRecoveryHelper, xaRecoveryModule,
-                xAResourcesSleepMillis / 2, false);
-        XAHelperRemover remover2 = new XAHelperRemover(xaResourceRecoveryHelper2, xaRecoveryModule,
-                xAResourcesSleepMillis / 2, true);
+        XAHelperRemover remover = new XAHelperRemover(
+                xaResourceRecoveryHelper, xaRecoveryModule, xAResourcesSleepMillis / 2, false);
+        XAHelperRemover remover2 = new XAHelperRemover(
+                xaResourceRecoveryHelper2, xaRecoveryModule, xAResourcesSleepMillis / 2, true);
 
         xaRecoveryModule.addXAResourceRecoveryHelper(xaResourceRecoveryHelper);
         remover.start();
@@ -213,7 +194,7 @@ public class XARecoveryModuleHelpersUnitTest {
 
         System.out.printf("Finished pass 2 (%d)%n", System.currentTimeMillis() - millis);
 
-        // wait for helper removal threads to finish
+        // wait for helper removal threads to finish 
         try {
             remover.join();
             remover2.join();
@@ -256,8 +237,9 @@ public class XARecoveryModuleHelpersUnitTest {
             return removeState;
         }
 
-        private XAHelperRemover(XAResourceRecoveryHelper helper, XARecoveryModule xaRecoveryModule,
-                long xAResourcesSleepMillis, boolean add) {
+        private XAHelperRemover(XAResourceRecoveryHelper helper,
+                                XARecoveryModule xaRecoveryModule,
+                                long xAResourcesSleepMillis, boolean add) {
             this.helper = helper;
             this.xaRecoveryModule = xaRecoveryModule;
             this.xAResourcesSleepMillis = xAResourcesSleepMillis;

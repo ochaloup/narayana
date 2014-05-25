@@ -37,8 +37,7 @@ import org.junit.runner.RunWith;
 import java.net.URL;
 
 /**
- * Basic (i.e. non-crashrec) test cases for the outbound side of the transaction
- * bridge.
+ * Basic (i.e. non-crashrec) test cases for the outbound side of the transaction bridge.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-05
  * @author Ivo Studensky (istudens@redhat.com)
@@ -59,6 +58,7 @@ public class OutboundBasicTests extends AbstractBasicTests {
         return getOutboundClientArchive();
     }
 
+
     @ArquillianResource
     private ContainerController controller;
 
@@ -75,8 +75,7 @@ public class OutboundBasicTests extends AbstractBasicTests {
         instrumentedTestVolatileParticipant = instrumentor.instrumentClass(TestVolatileParticipant.class);
         instrumentedTestDurableParticipant = instrumentor.instrumentClass(TestDurableParticipant.class);
 
-        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing",
-                "$0.enlistVolatileParticipant(1), $0.enlistDurableParticipant(1)");
+        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing", "$0.enlistVolatileParticipant(1), $0.enlistDurableParticipant(1)");
     }
 
     @After
@@ -86,6 +85,7 @@ public class OutboundBasicTests extends AbstractBasicTests {
         // shut down the appserver
         controller.stop(CONTAINER);
     }
+
 
     @Test
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)

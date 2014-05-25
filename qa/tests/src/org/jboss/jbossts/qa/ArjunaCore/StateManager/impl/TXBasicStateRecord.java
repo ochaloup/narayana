@@ -32,8 +32,10 @@ import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 /**
  * Simple record used to test AtomicAction
  */
-public class TXBasicStateRecord extends StateManager {
-    public TXBasicStateRecord() {
+public class TXBasicStateRecord extends StateManager
+{
+    public TXBasicStateRecord()
+    {
         super();
         qautil.qadebug("starting construction");
         activate();
@@ -42,7 +44,8 @@ public class TXBasicStateRecord extends StateManager {
         qautil.qadebug("ending construction");
     }
 
-    public TXBasicStateRecord(int id) {
+    public TXBasicStateRecord(int id)
+    {
         super(ObjectType.ANDPERSISTENT);
         qautil.qadebug("starting construction");
         activate();
@@ -52,7 +55,8 @@ public class TXBasicStateRecord extends StateManager {
         qautil.qadebug("ending construction");
     }
 
-    public TXBasicStateRecord(Uid oldId) {
+    public TXBasicStateRecord(Uid oldId)
+    {
         super(oldId, ObjectType.ANDPERSISTENT);
         qautil.qadebug("starting construction");
         activate();
@@ -60,31 +64,36 @@ public class TXBasicStateRecord extends StateManager {
         qautil.qadebug("ending construction");
     }
 
-    public int typeIs() {
+    public int typeIs()
+    {
         return RecordType.USER_DEF_FIRST0;
     }
 
     /**
-     * We will start a subtrancastion during the increase to see what effet this
-     * has.
+     * We will start a subtrancastion during the increase to see what effet this has.
      */
-    public void increase() {
+    public void increase()
+    {
         qautil.qadebug("start increase");
         AtomicAction a = new AtomicAction();
-        try {
+        try
+        {
             a.begin();
             activate();
             modified();
             mValue++;
             a.commit();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             a.abort();
             qautil.debug("exception in increase method ", e);
         }
         qautil.qadebug("end increase");
     }
 
-    public int getValue() {
+    public int getValue()
+    {
         AtomicAction a = new AtomicAction();
         a.begin();
         activate();
@@ -96,39 +105,49 @@ public class TXBasicStateRecord extends StateManager {
     /**
      * Override method to indicate we want this object to be saved.
      */
-    public boolean doSave() {
+    public boolean doSave()
+    {
         return true;
     }
 
-    public boolean save_state(OutputObjectState objectState, int objectType) {
+    public boolean save_state(OutputObjectState objectState, int objectType)
+    {
         super.save_state(objectState, objectType);
         qautil.qadebug("save state called when value = " + mValue);
-        try {
+        try
+        {
             objectState.packInt(mValue);
             return true;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             qautil.debug("TXBasicAbstractRecord.save_state: ", exception);
             return false;
         }
     }
 
     /**
-     * As this is an abstract record restore state does not function as a ait
-     * object but will be used by the crash recovery engine.
+     * As this is an abstract record restore state does not function as a ait object
+     * but will be used by the crash recovery engine.
      */
-    public boolean restore_state(InputObjectState objectState, int objectType) {
+    public boolean restore_state(InputObjectState objectState, int objectType)
+    {
         super.restore_state(objectState, objectType);
         qautil.qadebug("restore state called");
-        try {
+        try
+        {
             mValue = objectState.unpackInt();
             return true;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             qautil.debug("TXBasicAbstractRecord.restore_state: ", exception);
             return false;
         }
     }
 
-    public String type() {
+    public String type()
+    {
         return "/StateManager/TXBasicStateRecord";
     }
 
@@ -136,3 +155,4 @@ public class TXBasicStateRecord extends StateManager {
     private boolean mDebug = false;
     private int mId = 0;
 }
+

@@ -51,16 +51,14 @@ public class TestResourceRecovery implements XAResourceRecovery {
                     try {
                         resources.add(new TestResource(nodeName, currentFile));
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException (e);
                     }
-                    System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName
-                            + ") Added TestResource: " + currentFile.getName());
+                    System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName + ") Added TestResource: " + currentFile.getName());
                 }
             }
         }
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName
-                + ") returning list of TestResources of length: " + resources.size());
-        return resources.toArray(new XAResource[]{});
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName + ") returning list of TestResources of length: " + resources.size());
+        return resources.toArray(new XAResource[] {});
     }
 
 }

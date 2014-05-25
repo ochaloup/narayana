@@ -24,8 +24,9 @@ import java.util.List;
 
 //@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "coordinator")
-@XmlType(propOrder = {"status", "created", "timeout", "txnURI", "terminatorURI", "durableParticipantEnlistmentURI",
-        "volatileParticipantEnlistmentURI", "twoPhaseAware", "twoPhaseUnaware", "volatileParticipants"})
+@XmlType(propOrder = { "status", "created", "timeout", "txnURI", "terminatorURI",
+        "durableParticipantEnlistmentURI", "volatileParticipantEnlistmentURI", "twoPhaseAware", "twoPhaseUnaware",
+        "volatileParticipants"})
 public class CoordinatorElement {
     private TransactionStatusElement status;
     private Date created;

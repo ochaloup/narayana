@@ -68,15 +68,17 @@ import com.arjuna.mw.wsas.exceptions.*;
  * It is very similar to the OTS Current and JTA UserTransaction.
  * 
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: CoordinatorServiceImple.java,v 1.8 2005/05/19 12:13:38 nmcl Exp
- *          $
+ * @version $Id: CoordinatorServiceImple.java,v 1.8 2005/05/19 12:13:38 nmcl Exp $
  * @since 1.0.
  * 
  */
 
-public class CoordinatorServiceImple implements UserCoordinator, CoordinatorManager {
+public class CoordinatorServiceImple implements UserCoordinator,
+        CoordinatorManager
+{
 
-    public CoordinatorServiceImple() {
+    public CoordinatorServiceImple ()
+    {
         super();
 
         _coordManager = new CoordinatorControl();
@@ -94,7 +96,8 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown in any other situation.
      */
 
-    public void begin(String serviceType) throws WrongStateException, SystemException {
+    public void begin (String serviceType) throws WrongStateException, SystemException
+    {
         UserActivityFactory.userActivity().start(serviceType);
     }
 
@@ -117,8 +120,9 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown in any other situation.
      */
 
-    public void begin(String serviceType, int timeout)
-            throws WrongStateException, InvalidTimeoutException, SystemException {
+    public void begin (String serviceType, int timeout) throws WrongStateException,
+            InvalidTimeoutException, SystemException
+    {
         UserActivityFactory.userActivity().start(serviceType, timeout);
     }
 
@@ -141,10 +145,14 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if some other error occurred.
      */
 
-    public void confirm() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorCancelledException, HeuristicMixedException, HeuristicHazardException,
-            NoPermissionException, SystemException {
-        try {
+    public void confirm () throws InvalidActivityException,
+            WrongStateException, ProtocolViolationException,
+            NoCoordinatorException, CoordinatorCancelledException,
+            HeuristicMixedException, HeuristicHazardException,
+            NoPermissionException, SystemException
+    {
+        try
+        {
             Outcome res = UserActivityFactory.userActivity().end(Success.instance());
 
             /*
@@ -153,37 +161,47 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
              * What happens if the coordinator has already been terminated?
              */
 
-            if (res != null) {
+            if (res != null)
+            {
                 // TODO properly! One HLS service per activity.
 
-                if (res instanceof CoordinationOutcome) {
+                if (res instanceof CoordinationOutcome)
+                {
                     CoordinationOutcome co = (CoordinationOutcome) res;
-
-                    switch (co.result()) {
-                        case TwoPhaseResult.FINISH_OK :
-                        case TwoPhaseResult.CONFIRMED :
-                        case TwoPhaseResult.HEURISTIC_CONFIRM :
-                            break;
-                        case TwoPhaseResult.CANCELLED :
-                        case TwoPhaseResult.HEURISTIC_CANCEL :
-                            throw new CoordinatorCancelledException();
-                        case TwoPhaseResult.HEURISTIC_MIXED :
-                            throw new HeuristicMixedException();
-                        case TwoPhaseResult.FINISH_ERROR :
-                            throw new WrongStateException();
-                        case TwoPhaseResult.HEURISTIC_HAZARD :
-                        default :
-                            throw new HeuristicHazardException();
+                    
+                    switch (co.result())
+                    {
+                    case TwoPhaseResult.FINISH_OK:
+                    case TwoPhaseResult.CONFIRMED:
+                    case TwoPhaseResult.HEURISTIC_CONFIRM:
+                        break;
+                    case TwoPhaseResult.CANCELLED:
+                    case TwoPhaseResult.HEURISTIC_CANCEL:
+                        throw new CoordinatorCancelledException();
+                    case TwoPhaseResult.HEURISTIC_MIXED:
+                        throw new HeuristicMixedException();
+                    case TwoPhaseResult.FINISH_ERROR:
+                        throw new WrongStateException();
+                    case TwoPhaseResult.HEURISTIC_HAZARD:
+                    default:
+                        throw new HeuristicHazardException();
                     }
-                } else
+                }
+                else
                     throw new HeuristicHazardException(
                             wscfLogger.i18NLogger.get_model_twophase_arjunacore_CoordinatorServiceImple_1());
             }
-        } catch (NoActivityException ex) {
+        }
+        catch (NoActivityException ex)
+        {
             throw new NoCoordinatorException();
-        } catch (ActiveChildException ex) {
+        }
+        catch (ActiveChildException ex)
+        {
             // ?? assume the coordination protocol will cancel children anyway.
-        } catch (HeuristicHazardException ex) {
+        }
+        catch (HeuristicHazardException ex)
+        {
             throw ex;
         }
     }
@@ -208,41 +226,54 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if some other error occurred.
      */
 
-    public void cancel() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorConfirmedException, HeuristicMixedException, HeuristicHazardException,
-            NoPermissionException, SystemException {
-        try {
+    public void cancel () throws InvalidActivityException, WrongStateException,
+            ProtocolViolationException, NoCoordinatorException,
+            CoordinatorConfirmedException, HeuristicMixedException,
+            HeuristicHazardException, NoPermissionException, SystemException
+    {
+        try
+        {
             Outcome res = UserActivityFactory.userActivity().end(Failure.instance());
 
-            if (res != null) {
-                if (res instanceof CoordinationOutcome) {
+            if (res != null)
+            {
+                if (res instanceof CoordinationOutcome)
+                {
                     CoordinationOutcome co = (CoordinationOutcome) res;
 
-                    switch (co.result()) {
-                        case TwoPhaseResult.CONFIRMED :
-                        case TwoPhaseResult.HEURISTIC_CONFIRM :
-                            throw new CoordinatorConfirmedException();
-                        case TwoPhaseResult.FINISH_OK :
-                        case TwoPhaseResult.CANCELLED :
-                        case TwoPhaseResult.HEURISTIC_CANCEL :
-                            break;
-                        case TwoPhaseResult.HEURISTIC_MIXED :
-                            throw new HeuristicMixedException();
-                        case TwoPhaseResult.FINISH_ERROR :
-                            throw new WrongStateException();
-                        case TwoPhaseResult.HEURISTIC_HAZARD :
-                        default :
-                            throw new HeuristicHazardException();
+                    switch (co.result())
+                    {
+                    case TwoPhaseResult.CONFIRMED:
+                    case TwoPhaseResult.HEURISTIC_CONFIRM:
+                        throw new CoordinatorConfirmedException();
+                    case TwoPhaseResult.FINISH_OK:
+                    case TwoPhaseResult.CANCELLED:
+                    case TwoPhaseResult.HEURISTIC_CANCEL:
+                        break;
+                    case TwoPhaseResult.HEURISTIC_MIXED:
+                        throw new HeuristicMixedException();
+                    case TwoPhaseResult.FINISH_ERROR:
+                        throw new WrongStateException();
+                    case TwoPhaseResult.HEURISTIC_HAZARD:
+                    default:
+                        throw new HeuristicHazardException();
                     }
-                } else
+                }
+                else
                     throw new HeuristicHazardException(
                             wscfLogger.i18NLogger.get_model_twophase_arjunacore_CoordinatorServiceImple_1());
             }
-        } catch (NoActivityException ex) {
+        }
+        catch (NoActivityException ex)
+        {
             throw new NoCoordinatorException();
-        } catch (ActiveChildException ex) {
+        }
+        catch (ActiveChildException ex)
+        {
             // ?? assume the coordination protocol will cancel children anyway.
-        } catch (HeuristicHazardException ex) {
+        }
+        catch (HeuristicHazardException ex)
+        {
             throw ex;
         }
     }
@@ -257,10 +288,15 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void setCancelOnly() throws NoCoordinatorException, WrongStateException, SystemException {
-        try {
+    public void setCancelOnly () throws NoCoordinatorException,
+            WrongStateException, SystemException
+    {
+        try
+        {
             UserActivityFactory.userActivity().setCompletionStatus(FailureOnly.instance());
-        } catch (NoActivityException ex) {
+        }
+        catch (NoActivityException ex)
+        {
             throw new NoCoordinatorException();
         }
     }
@@ -275,7 +311,8 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *         timeout has been provided.
      */
 
-    public int getTimeout() throws SystemException {
+    public int getTimeout () throws SystemException
+    {
         return UserActivityFactory.userActivity().getTimeout();
     }
 
@@ -298,7 +335,9 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void setTimeout(int timeout) throws InvalidTimeoutException, SystemException {
+    public void setTimeout (int timeout) throws InvalidTimeoutException,
+            SystemException
+    {
         UserActivityFactory.userActivity().setTimeout(timeout);
     }
 
@@ -312,7 +351,8 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status() throws SystemException {
+    public com.arjuna.mw.wsas.status.Status status () throws SystemException
+    {
         ActivityImple curr = current();
 
         if (curr == null)
@@ -333,7 +373,8 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *         otherwise.
      */
 
-    public ActivityHierarchy suspend() throws SystemException {
+    public ActivityHierarchy suspend () throws SystemException
+    {
         return UserActivityFactory.userActivity().suspend();
     }
 
@@ -354,7 +395,9 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void resume(ActivityHierarchy tx) throws InvalidActivityException, SystemException {
+    public void resume (ActivityHierarchy tx) throws InvalidActivityException,
+            SystemException
+    {
         UserActivityFactory.userActivity().resume(tx);
     }
 
@@ -378,8 +421,10 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void enlistParticipant(Participant act) throws WrongStateException, DuplicateParticipantException,
-            InvalidParticipantException, NoCoordinatorException, SystemException {
+    public void enlistParticipant (Participant act) throws WrongStateException,
+            DuplicateParticipantException, InvalidParticipantException,
+            NoCoordinatorException, SystemException
+    {
         _coordManager.enlistParticipant(act);
     }
 
@@ -397,8 +442,10 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void delistParticipant(Participant act)
-            throws InvalidParticipantException, NoCoordinatorException, WrongStateException, SystemException {
+    public void delistParticipant (Participant act)
+            throws InvalidParticipantException, NoCoordinatorException,
+            WrongStateException, SystemException
+    {
         _coordManager.delistParticipant(act);
     }
 
@@ -422,9 +469,11 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void enlistSynchronization(Synchronization act)
-            throws WrongStateException, DuplicateSynchronizationException, InvalidSynchronizationException,
-            NoCoordinatorException, SystemException {
+    public void enlistSynchronization (Synchronization act)
+            throws WrongStateException, DuplicateSynchronizationException,
+            InvalidSynchronizationException, NoCoordinatorException,
+            SystemException
+    {
         _coordManager.enlistSynchronization(act);
     }
 
@@ -442,8 +491,10 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void delistSynchronization(Synchronization act)
-            throws InvalidSynchronizationException, NoCoordinatorException, WrongStateException, SystemException {
+    public void delistSynchronization (Synchronization act)
+            throws InvalidSynchronizationException, NoCoordinatorException,
+            WrongStateException, SystemException
+    {
         _coordManager.delistSynchronization(act);
     }
 
@@ -465,13 +516,18 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void participantRolledback(String participantId)
-            throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException {
+    public void participantRolledback (String participantId)
+            throws NoActivityException, InvalidParticipantException,
+            WrongStateException, SystemException
+    {
         _coordManager.participantRolledBack(participantId);
 
-        try {
+        try
+        {
             setCancelOnly();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
@@ -491,8 +547,10 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any other error occurs.
      */
 
-    public void participantReadOnly(String participantId)
-            throws NoActivityException, InvalidParticipantException, SystemException {
+    public void participantReadOnly (String participantId)
+            throws NoActivityException, InvalidParticipantException,
+            SystemException
+    {
         _coordManager.participantReadOnly(participantId);
     }
 
@@ -504,7 +562,8 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      *                Thrown if any error occurs.
      */
 
-    public ActivityHierarchy currentActivity() throws SystemException {
+    public ActivityHierarchy currentActivity () throws SystemException
+    {
         return UserActivityFactory.userActivity().currentActivity();
     }
 
@@ -512,7 +571,9 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      * @return the unique coordinator identifier.
      */
 
-    public CoordinatorId identifier() throws NoActivityException, SystemException {
+    public CoordinatorId identifier () throws NoActivityException,
+            SystemException
+    {
         ActivityImple curr = current();
 
         if (curr == null)
@@ -521,16 +582,19 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
         return _coordManager.identifier();
     }
 
-    public final ActivityImple current() {
+    public final ActivityImple current ()
+    {
         UserActivityImple imple = (UserActivityImple) UserActivityFactory.userActivity();
 
         return imple.current();
     }
-
-    public final CoordinatorControl coordinatorControl() {
+    
+    public final CoordinatorControl coordinatorControl ()
+    {
         return _coordManager;
     }
 
     private CoordinatorControl _coordManager;
 
 }
+

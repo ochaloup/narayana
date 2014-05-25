@@ -40,12 +40,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlists multipleparticipants with instructions to
- * prepare and commit without error then gets one of them to exit before closing
+ * Starts a transaction and enlists  multipleparticipants with instructions to prepare and commit
+ * without error then gets one of them to exit before closing
  */
-public class MultiParticipantParticipantCompletionParticipantCloseAndExitTest extends XTSServiceTestBase
-        implements
-            XTSServiceTest {
+public class MultiParticipantParticipantCompletionParticipantCloseAndExitTest extends XTSServiceTestBase implements XTSServiceTest
+{
     public void run() {
 
         // wait a while so the service has time to start

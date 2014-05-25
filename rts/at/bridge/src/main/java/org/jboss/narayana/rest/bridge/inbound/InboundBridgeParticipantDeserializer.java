@@ -51,8 +51,7 @@ public class InboundBridgeParticipantDeserializer implements ParticipantDeserial
 
         if (object instanceof Participant) {
             if (LOG.isTraceEnabled()) {
-                LOG.trace(
-                        "InboundBridgeParticipantDeserializer.deserialize: participant was successfully deserialized.");
+                LOG.trace("InboundBridgeParticipantDeserializer.deserialize: participant was successfully deserialized.");
             }
 
             return (Participant) object;

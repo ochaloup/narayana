@@ -20,13 +20,13 @@ public final class ParticipantInformation {
     private String status;
 
     public ParticipantInformation(final String id, final String applicationId, final String recoveryURL,
-            final Participant participant) {
+              final Participant participant) {
 
         this(id, applicationId, recoveryURL, participant, null);
     }
 
     public ParticipantInformation(final String id, final String applicationId, final String recoveryURL,
-            final Participant participant, final String status) {
+              final Participant participant, final String status) {
 
         this.id = id;
         this.applicationId = applicationId;
@@ -62,7 +62,7 @@ public final class ParticipantInformation {
     @Override
     public String toString() {
         return "<ParticipantInformation: id=" + id + ", applicationId=" + applicationId + ", recoveryURL=" + recoveryURL
-                + ", participant=" + participant + ", status=" + status + ">";
+                + ", participant=" + participant + ", status=" + status+ ">";
     }
 
 }

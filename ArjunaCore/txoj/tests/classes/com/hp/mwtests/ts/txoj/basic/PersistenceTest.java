@@ -49,33 +49,37 @@ import com.arjuna.ats.internal.arjuna.objectstore.ShadowingStore;
 import com.arjuna.ats.internal.arjuna.objectstore.TwoPhaseVolatileStore;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class PersistenceTest {
+public class PersistenceTest
+{
     @Test
-    public void test() throws Throwable {
+    public void test () throws Throwable
+    {
         ParticipantStore store = StoreManager.getParticipantStore();
         OutputObjectState state = new OutputObjectState();
         Uid u = new Uid();
 
-        assertTrue(store.write_committed(u, "/StateManager/LockManager/foo", state));
+        assertTrue(store.write_committed(u, "/StateManager/LockManager/foo",
+                state));
 
-        InputObjectState inputState = store.read_committed(u, "/StateManager/LockManager/foo");
+        InputObjectState inputState = store.read_committed(u,
+                "/StateManager/LockManager/foo");
 
         assertNotNull(inputState);
         store.stop();
     }
-
+    
     @Test
-    public void testAtomicObject() throws Throwable {
-        // StoreManager sm = new StoreManager(null, new
-        // TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()), null);
+    public void testAtomicObject () throws Throwable
+    {
+        //StoreManager sm = new StoreManager(null, new TwoPhaseVolatileStore(new ObjectStoreEnvironmentBean()), null);
 
         AtomicObject obj1 = new AtomicObject(ObjectModel.MULTIPLE);
-
+        
         obj1.set(50);
-
+        
         AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
-
-        // assertTrue(obj1.getStore().getClass().getName().equals(TwoPhaseVolatileStore.class.getName()));
+       
+//        assertTrue(obj1.getStore().getClass().getName().equals(TwoPhaseVolatileStore.class.getName()));
 
         obj1.set(101);
 

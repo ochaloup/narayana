@@ -31,12 +31,10 @@ import org.jboss.narayana.txframework.impl.handlers.ParticipantRegistrationExcep
 
 import java.util.Map;
 
-public class WSBACoordinatorCompletionParticipant extends WSBAParticipantCompletionParticipant
-        implements
-            BusinessAgreementWithCoordinatorCompletionParticipant {
+public class WSBACoordinatorCompletionParticipant extends WSBAParticipantCompletionParticipant implements
+        BusinessAgreementWithCoordinatorCompletionParticipant {
 
-    public WSBACoordinatorCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap)
-            throws ParticipantRegistrationException {
+    public WSBACoordinatorCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap) throws ParticipantRegistrationException {
 
         super(serviceInvocationMeta, txDataMap);
 

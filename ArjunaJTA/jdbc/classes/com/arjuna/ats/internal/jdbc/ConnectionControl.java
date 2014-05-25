@@ -35,18 +35,19 @@ import javax.transaction.Transaction;
 
 import com.arjuna.ats.internal.jdbc.drivers.modifiers.ConnectionModifier;
 
-interface ConnectionControl {
+interface ConnectionControl
+{
 
-    public String user();
-    public String password();
+    public String user ();
+    public String password ();
 
-    public String url();
-    public String dynamicClass();
+    public String url ();
+    public String dynamicClass ();
 
-    public String dataSourceName();
+    public String dataSourceName ();
 
-    public Transaction transaction();
+    public Transaction transaction ();
 
-    public void setModifier(ConnectionModifier cm);
-
+    public void setModifier (ConnectionModifier cm);
+    
 }

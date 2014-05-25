@@ -37,8 +37,10 @@ import com.arjuna.ats.jta.xa.XidImple;
 
 import java.util.Vector;
 
-public class Test02 {
-    public static void main(String[] args) {
+public class Test02
+{
+    public static void main(String[] args)
+    {
         Vector xaRecoveryNodes = new Vector();
         boolean passed = false;
         Uid bogusNodeName = new Uid();
@@ -55,13 +57,17 @@ public class Test02 {
         System.err.println("XA node name: " + nodeName);
         System.err.println("Xid to recover: " + xid);
 
-        if (!xaRecoveryNodes.contains(nodeName)) {
+        if (!xaRecoveryNodes.contains(nodeName))
+        {
             passed = true;
         }
 
-        if (passed) {
+        if (passed)
+        {
             System.err.println("Passed.");
-        } else {
+        }
+        else
+        {
             System.err.println("Failed.");
         }
     }

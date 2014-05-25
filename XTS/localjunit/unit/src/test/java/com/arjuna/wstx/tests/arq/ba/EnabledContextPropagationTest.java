@@ -61,10 +61,9 @@ public final class EnabledContextPropagationTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return WarDeployment
-                .getDeployment(TestService.class, TestServiceImple.class, TestServiceClient.class, TestServiceBA.class,
-                        TestServiceBAImple.class, TestServiceBAClient.class, WSTXFeature.class)
-                .addAsResource("context-handlers.xml");
+        return WarDeployment.getDeployment(TestService.class, TestServiceImple.class,
+                TestServiceClient.class, TestServiceBA.class, TestServiceBAImple.class, TestServiceBAClient.class,
+                WSTXFeature.class).addAsResource("context-handlers.xml");
     }
 
     @After
@@ -107,8 +106,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without BA context, WSTXFeature, and with
-     * enabled WSTX handler.
+     * Tests service invocation without BA context, WSTXFeature, and with enabled WSTX handler.
      *
      * No coordination calls are expected.
      */
@@ -122,8 +120,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the BA-unaware service without BA context,
-     * WSTXFeature, and with enabled WSTX handler.
+     * Tests invocation to the BA-unaware service without BA context, WSTXFeature, and with enabled WSTX handler.
      *
      * No coordination calls are expected.
      */
@@ -169,8 +166,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without BA context but with enabled WSTXFeature
-     * and with enabled WSTX handler.
+     * Tests service invocation without BA context but with enabled WSTXFeature and with enabled WSTX handler.
      *
      * No coordination calls are expected.
      */
@@ -184,8 +180,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the BA-unaware service without BA context but with
-     * enabled WSTXFeature and with enabled WSTX handler.
+     * Tests invocation to the BA-unaware service without BA context but with enabled WSTXFeature and with enabled WSTX handler.
      *
      * SOAPFaultException is expected.
      */
@@ -199,8 +194,7 @@ public final class EnabledContextPropagationTest {
             client.increment();
             throw new RuntimeException("SOAPFaultException was expected");
         } catch (SOAPFaultException e) {
-            // TODO for some reason <code>@Test(expected =
-            // SOAPFaultException.class)</code> did not work.
+            // TODO for some reason <code>@Test(expected = SOAPFaultException.class)</code> did not work.
         }
     }
 
@@ -237,8 +231,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without BA context but with disabled WSTXFeature
-     * and with enabled WSTX handler.
+     * Tests service invocation without BA context but with disabled WSTXFeature and with enabled WSTX handler.
      *
      * No coordination calls are expected.
      */
@@ -252,8 +245,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the BA-unaware service without BA context but with
-     * disabled WSTXFeature and with enabled WSTX handler.
+     * Tests invocation to the BA-unaware service without BA context but with disabled WSTXFeature and with enabled WSTX
+     * handler.
      *
      * No coordination calls are expected.
      */
@@ -267,8 +260,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers
-     * JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
      *
      * "complete", "confirmCompleted", and "close" calls are expected.
      *
@@ -286,8 +278,7 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers
-     * JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
      *
      * "cancel" call is expected.
      *

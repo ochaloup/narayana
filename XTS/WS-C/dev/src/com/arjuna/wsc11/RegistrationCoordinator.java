@@ -20,65 +20,65 @@ import java.security.PrivilegedAction;
 
 /**
  * Wrapper around low level Registration Coordinator messaging.
- * 
  * @author kevin
  */
-public class RegistrationCoordinator {
+public class RegistrationCoordinator
+{
     /**
      * Register the participant in the protocol.
-     * 
-     * @param coordinationContext
-     *            The current coordination context
-     * @param messageID
-     *            The messageID to use.
-     * @param participantProtocolService
-     *            The participant protocol service.
-     * @param protocolIdentifier
-     *            The protocol identifier.
+     * @param coordinationContext The current coordination context
+     * @param messageID The messageID to use.
+     * @param participantProtocolService The participant protocol service.
+     * @param protocolIdentifier The protocol identifier.
      * @return The endpoint reference of the coordinator protocol service.
-     * @throws com.arjuna.wsc.InvalidProtocolException
-     *             If the protocol is unsupported.
-     * @throws com.arjuna.wsc.InvalidStateException
-     *             If the state is invalid
-     * @throws com.arjuna.webservices.SoapFault
-     *             for errors during processing.
+     * @throws com.arjuna.wsc.InvalidProtocolException If the protocol is unsupported.
+     * @throws com.arjuna.wsc.InvalidStateException If the state is invalid
+     * @throws com.arjuna.webservices.SoapFault for errors during processing.
      */
     public static W3CEndpointReference register(final CoordinationContextType coordinationContext,
-            final String messageID, final W3CEndpointReference participantProtocolService,
-            final String protocolIdentifier)
-            throws CannotRegisterException, InvalidProtocolException, InvalidStateException, SoapFault {
-        final W3CEndpointReference endpointReference = coordinationContext.getRegistrationService();
+        final String messageID, final W3CEndpointReference participantProtocolService,
+        final String protocolIdentifier)
+        throws CannotRegisterException, InvalidProtocolException,
+            InvalidStateException, SoapFault
+    {
+        final W3CEndpointReference endpointReference = coordinationContext.getRegistrationService() ;
 
-        try {
+        try
+        {
             final RegisterType registerType = new RegisterType();
             registerType.setProtocolIdentifier(protocolIdentifier);
             registerType.setParticipantProtocolService(participantProtocolService);
-            final RegistrationPortType port = WSCOORClient.getRegistrationPort(endpointReference,
-                    CoordinationConstants.WSCOOR_ACTION_REGISTER, messageID);
+            final RegistrationPortType port = WSCOORClient.getRegistrationPort(endpointReference, CoordinationConstants.WSCOOR_ACTION_REGISTER, messageID);
             final RegisterResponseType response = registerOperation(port, registerType);
             return response.getCoordinatorProtocolService();
         } catch (SOAPFaultException sfe) {
-            final SOAPFault soapFault = sfe.getFault();
-            final QName subcode = soapFault.getFaultCodeAsQName();
-            if (CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME.equals(subcode)) {
+            final SOAPFault soapFault = sfe.getFault() ;
+            final QName subcode = soapFault.getFaultCodeAsQName() ;
+            if (CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME.equals(subcode))
+            {
                 Detail detail = soapFault.getDetail();
                 String message = (detail != null ? detail.getTextContent() : soapFault.getFaultString());
-                throw new CannotRegisterException(message);
-            } else if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME.equals(subcode)) {
+                throw new CannotRegisterException(message) ;
+            }
+            else if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME.equals(subcode))
+            {
                 Detail detail = soapFault.getDetail();
                 String message = (detail != null ? detail.getTextContent() : soapFault.getFaultString());
-                throw new InvalidProtocolException(message);
-            } else if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME.equals(subcode)) {
+                throw new InvalidProtocolException(message) ;
+            }
+            else if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME.equals(subcode))
+            {
                 Detail detail = soapFault.getDetail();
                 String message = (detail != null ? detail.getTextContent() : soapFault.getFaultString());
-                throw new InvalidStateException(message);
+                throw new InvalidStateException(message) ;
             }
             throw SoapFault11.create(sfe);
         }
     }
 
     private static RegisterResponseType registerOperation(final RegistrationPortType port,
-            final RegisterType registerType) {
+            final RegisterType registerType)
+    {
         if (System.getSecurityManager() == null) {
             return port.registerOperation(registerType);
         }

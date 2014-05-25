@@ -43,13 +43,17 @@ import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
  * @author mcl
  */
 
-public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transaction.arjunacore.AtomicAction {
+public class SubordinateAtomicAction extends
+        com.arjuna.ats.internal.jta.transaction.arjunacore.AtomicAction
+{
 
-    public SubordinateAtomicAction() {
+    public SubordinateAtomicAction ()
+    {
         this(AtomicAction.NO_TIMEOUT);
     }
 
-    public SubordinateAtomicAction(int timeout) {
+    public SubordinateAtomicAction (int timeout)
+    {
         super();
 
         start();
@@ -67,7 +71,8 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public int commit() {
+    public int commit ()
+    {
         return commit(true);
     }
 
@@ -81,7 +86,8 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public int commit(boolean report_heuristics) {
+    public int commit (boolean report_heuristics)
+    {
         return ActionStatus.INVALID;
     }
 
@@ -94,7 +100,8 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public int abort() {
+    public int abort ()
+    {
         return ActionStatus.INVALID;
     }
 
@@ -108,38 +115,38 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
      *         logs in the transaction object store.
      */
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction";
     }
 
-    public int doPrepare() {
+    public int doPrepare ()
+    {
         int status = super.status();
-
-        // JBTM-927 it is possible this transaction has been aborted by the
-        // TransactionReaper
+        
+        // JBTM-927 it is possible this transaction has been aborted by the TransactionReaper
         if (status == ActionStatus.ABORTED) {
             return TwoPhaseOutcome.PREPARE_NOTOK;
         }
 
-        // In JTA spec, beforeCompletions are run on commit attempts only, not
-        // rollbacks.
-        // We attempt to mimic that here, even though we are outside the scope
-        // of the spec.
-        // note it's not perfect- async timeout/rollback means there is a race
-        // condition in which we
-        // can still call beforeCompletion on rollbacks, but that's not too bad
-        // as skipping it is really
-        // just an optimization anyhow. JBTM-429
-        if (!(status == ActionStatus.ABORT_ONLY || status == ActionStatus.ABORTING) && doBeforeCompletion()) {
+        // In JTA spec, beforeCompletions are run on commit attempts only, not rollbacks.
+        // We attempt to mimic that here, even though we are outside the scope of the spec.
+        // note it's not perfect- async timeout/rollback means there is a race condition in which we
+        // can still call beforeCompletion on rollbacks, but that's not too bad as skipping it is really
+        // just an optimization anyhow.  JBTM-429
+        if ( !(status == ActionStatus.ABORT_ONLY || status == ActionStatus.ABORTING) && doBeforeCompletion())
+        {
             int outcome = super.prepare(true);
-            if (outcome == TwoPhaseOutcome.PREPARE_READONLY) {
+            if(outcome == TwoPhaseOutcome.PREPARE_READONLY) {
                 // we won't get called again, so we need to clean up
                 // and run the afterCompletions before returning.
                 doCommit();
             }
 
             return outcome;
-        } else {
+        }
+        else
+        {
             super.phase2Abort(true);
             super.afterCompletion(Status.STATUS_ROLLEDBACK);
 
@@ -147,32 +154,34 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
         }
     }
 
-    public int doCommit() {
+    public int doCommit ()
+    {
         super.phase2Commit(true);
 
         int toReturn;
 
-        switch (super.getHeuristicDecision()) {
-            case TwoPhaseOutcome.PREPARE_OK :
-            case TwoPhaseOutcome.FINISH_OK :
-                if (super.failedList != null && super.failedList.size() > 0) {
-                    return ActionStatus.COMMITTING;
-                }
-                toReturn = super.status();
-                break;
-            case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
-                toReturn = ActionStatus.H_ROLLBACK;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_COMMIT :
-                toReturn = ActionStatus.H_COMMIT;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_MIXED :
-                toReturn = ActionStatus.H_MIXED;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_HAZARD :
-            default :
-                toReturn = ActionStatus.H_HAZARD;
-                break;
+        switch (super.getHeuristicDecision())
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+        case TwoPhaseOutcome.FINISH_OK:
+            if (super.failedList != null && super.failedList.size() > 0) {
+                return ActionStatus.COMMITTING;
+            }
+            toReturn = super.status();
+            break;
+        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
+            toReturn = ActionStatus.H_ROLLBACK;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_COMMIT:
+            toReturn = ActionStatus.H_COMMIT;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_MIXED:
+            toReturn = ActionStatus.H_MIXED;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_HAZARD:
+        default:
+            toReturn = ActionStatus.H_HAZARD;
+            break;
         }
 
         super.afterCompletion(toReturn);
@@ -182,29 +191,31 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
         return toReturn;
     }
 
-    public int doRollback() {
+    public int doRollback ()
+    {
         super.phase2Abort(true);
 
         int toReturn;
 
-        switch (super.getHeuristicDecision()) {
-            case TwoPhaseOutcome.PREPARE_OK :
-            case TwoPhaseOutcome.FINISH_OK :
-                toReturn = super.status();
-                break;
-            case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
-                toReturn = ActionStatus.H_ROLLBACK;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_COMMIT :
-                toReturn = ActionStatus.H_COMMIT;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_MIXED :
-                toReturn = ActionStatus.H_MIXED;
-                break;
-            case TwoPhaseOutcome.HEURISTIC_HAZARD :
-            default :
-                toReturn = ActionStatus.H_HAZARD;
-                break;
+        switch (super.getHeuristicDecision())
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+        case TwoPhaseOutcome.FINISH_OK:
+            toReturn = super.status();
+            break;
+        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
+            toReturn = ActionStatus.H_ROLLBACK;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_COMMIT:
+            toReturn = ActionStatus.H_COMMIT;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_MIXED:
+            toReturn = ActionStatus.H_MIXED;
+            break;
+        case TwoPhaseOutcome.HEURISTIC_HAZARD:
+        default:
+            toReturn = ActionStatus.H_HAZARD;
+            break;
         }
 
         super.afterCompletion(toReturn);
@@ -214,59 +225,62 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
         return toReturn;
     }
 
-    public int doOnePhaseCommit() {
+    public int doOnePhaseCommit ()
+    {
         int status = super.status();
-
-        // In JTA spec, beforeCompletions are run on commit attempts only, not
-        // rollbacks.
-        // We attempt to mimic that here, even though we are outside the scope
-        // of the spec.
-        // note it's not perfect- async timeout/rollback means there is a race
-        // condition in which we
-        // can still call beforeCompletion on rollbacks, but that's not too bad
-        // as skipping it is really
+        
+        // In JTA spec, beforeCompletions are run on commit attempts only, not rollbacks.
+        // We attempt to mimic that here, even though we are outside the scope of the spec.
+        // note it's not perfect- async timeout/rollback means there is a race condition in which we
+        // can still call beforeCompletion on rollbacks, but that's not too bad as skipping it is really
         // just an optimization anyhow. JBTM-429
 
-        if (status == ActionStatus.ABORT_ONLY || doBeforeCompletion()) {
+        if (status == ActionStatus.ABORT_ONLY || doBeforeCompletion())
+        {
             status = super.End(true);
-        } else {
+        }
+        else
+        {
             status = ActionStatus.ABORTED;
         }
 
         afterCompletion(status);
 
         TransactionReaper.transactionReaper().remove(this);
-
+        
         return status;
     }
 
     /**
      * @deprecated Only called via tests
      */
-    public void doForget() {
+    public void doForget ()
+    {
         super.forgetHeuristics();
     }
 
-    public boolean doBeforeCompletion() {
+    public boolean doBeforeCompletion ()
+    {
         // should not need synchronizing at this level
-
-        if (!_doneBefore) {
+        
+        if (!_doneBefore)
+        {
             _beforeOutcome = super.beforeCompletion();
-
+            
             _doneBefore = true;
         }
-
+        
         return _beforeOutcome;
     }
-
+    
     /**
      * For crash recovery purposes.
      *
-     * @param actId
-     *            the identifier to recover.
+     * @param actId the identifier to recover.
      */
 
-    protected SubordinateAtomicAction(Uid actId) {
+    protected SubordinateAtomicAction (Uid actId)
+    {
         super(actId);
     }
 
@@ -275,26 +289,28 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
      * transaction if it's the one currently associated with the thread. We
      * override this here.
      *
-     * @return <code>false</code> to indicate that this transaction can only be
-     *         terminated by the right thread.
+     * @return <code>false</code> to indicate that this transaction can only
+     *         be terminated by the right thread.
      */
 
-    protected boolean checkForCurrent() {
+    protected boolean checkForCurrent ()
+    {
         return false;
     }
 
-    public boolean activated() {
+    public boolean activated ()
+    {
         return true;
     }
-
+    
     /*
      * We have these here because it's possible that synchronizations aren't
-     * called explicitly either side of commit/rollback due to JCA API not
-     * supporting them directly. We do though and in which case it's possible
-     * that they can be driven through two routes and we don't want to get into
-     * a mess due to that.
+     * called explicitly either side of commit/rollback due to JCA API not supporting
+     * them directly. We do though and in which case it's possible that they
+     * can be driven through two routes and we don't want to get into a mess
+     * due to that.
      */
-
+    
     private boolean _doneBefore = false;
     private boolean _beforeOutcome = false;
 }

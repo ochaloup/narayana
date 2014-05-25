@@ -60,7 +60,8 @@ import com.arjuna.ats.internal.arjuna.abstractrecords.RecoveryRecord;
  * @since JTS 1.0.
  */
 
-public class RecordType {
+public class RecordType
+{
     /**
      * The following values are provided for user-defined records that should
      * have operations invoked BEFORE the system records.
@@ -178,106 +179,134 @@ public class RecordType {
      */
 
     @SuppressWarnings("unchecked")
-    public static Class typeToClass(int rt) {
-        switch (rt) {
-            case RecordType.COMMITMARKABLERESOURCE :
-                return RecordTypeManager.manager().getClass(RecordType.COMMITMARKABLERESOURCE);
+    public static Class typeToClass (int rt)
+    {
+        switch (rt)
+        {
+        case RecordType.COMMITMARKABLERESOURCE:
+            return RecordTypeManager.manager().getClass(RecordType.COMMITMARKABLERESOURCE);
 
-            case RecordType.LASTRESOURCE :
-                return LastResourceRecord.class;
+        case RecordType.LASTRESOURCE:
+            return LastResourceRecord.class;
 
-            case RecordType.USER_DEF_FIRST0 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST0);
-            case RecordType.USER_DEF_FIRST1 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST1);
-            case RecordType.USER_DEF_FIRST2 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST2);
-            case RecordType.USER_DEF_FIRST3 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST3);
-            case RecordType.USER_DEF_FIRST4 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST4);
-            case RecordType.USER_DEF_FIRST5 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST5);
-            case RecordType.USER_DEF_FIRST6 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST6);
-            case RecordType.USER_DEF_FIRST7 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST7);
-            case RecordType.USER_DEF_FIRST8 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST8);
-            case RecordType.USER_DEF_FIRST9 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_FIRST9);
+        case RecordType.USER_DEF_FIRST0:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST0);
+        case RecordType.USER_DEF_FIRST1:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST1);
+        case RecordType.USER_DEF_FIRST2:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST2);
+        case RecordType.USER_DEF_FIRST3:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST3);
+        case RecordType.USER_DEF_FIRST4:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST4);
+        case RecordType.USER_DEF_FIRST5:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST5);
+        case RecordType.USER_DEF_FIRST6:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST6);
+        case RecordType.USER_DEF_FIRST7:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST7);
+        case RecordType.USER_DEF_FIRST8:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST8);
+        case RecordType.USER_DEF_FIRST9:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_FIRST9);
 
-            case RecordType.LOCK :
-                RecordTypeManager.manager().getClass(RecordType.LOCK);
-            case RecordType.RECOVERY :
-                return RecoveryRecord.class;
-            case RecordType.PERSISTENCE :
-                return PersistenceRecord.class;
-            case RecordType.TXLOG_PERSISTENCE :
-                return TxLogWritePersistenceRecord.class;
-            case RecordType.CADAVER :
-                return CadaverRecord.class;
-            case RecordType.DISPOSE :
-                return DisposeRecord.class;
-            case RecordType.ACTIVATION :
-                return ActivationRecord.class;
+        case RecordType.LOCK:
+            RecordTypeManager.manager().getClass(
+                    RecordType.LOCK);
+        case RecordType.RECOVERY:
+            return RecoveryRecord.class;
+        case RecordType.PERSISTENCE:
+            return PersistenceRecord.class;
+        case RecordType.TXLOG_PERSISTENCE:
+            return TxLogWritePersistenceRecord.class;
+        case RecordType.CADAVER:
+            return CadaverRecord.class;
+        case RecordType.DISPOSE:
+            return DisposeRecord.class;
+        case RecordType.ACTIVATION:
+            return ActivationRecord.class;
 
-            case RecordType.OTS_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.OTS_RECORD);
-            case RecordType.OTS_ABSTRACTRECORD :
-                return RecordTypeManager.manager().getClass(RecordType.OTS_ABSTRACTRECORD);
-            case RecordType.REPLICATION :
-                return RecordTypeManager.manager().getClass(RecordType.REPLICATION);
-            case RecordType.NAMING :
-                return RecordTypeManager.manager().getClass(RecordType.NAMING);
-            case RecordType.RPCCALL :
-                return RecordTypeManager.manager().getClass(RecordType.RPCCALL);
-            case RecordType.RPCINITIATE :
-                return RecordTypeManager.manager().getClass(RecordType.RPCINITIATE);
-            case RecordType.RPCTERMINATE :
-                return RecordTypeManager.manager().getClass(RecordType.RPCTERMINATE);
-            case RecordType.RPCCADAVER :
-                return RecordTypeManager.manager().getClass(RecordType.RPCCADAVER);
-            case RecordType.XTS_WSAT_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.XTS_WSAT_RECORD);
-            case RecordType.XTS_WSBA_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.XTS_WSBA_RECORD);
-            case RecordType.RESTAT_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.RESTAT_RECORD);
-            case RecordType.JTA_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.JTA_RECORD);
-            case RecordType.JTAX_RECORD :
-                return RecordTypeManager.manager().getClass(RecordType.JTAX_RECORD);
+        case RecordType.OTS_RECORD:
+            return RecordTypeManager.manager().getClass(RecordType.OTS_RECORD);
+        case RecordType.OTS_ABSTRACTRECORD:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.OTS_ABSTRACTRECORD);
+        case RecordType.REPLICATION:
+            return RecordTypeManager.manager().getClass(RecordType.REPLICATION);
+        case RecordType.NAMING:
+            return RecordTypeManager.manager().getClass(RecordType.NAMING);
+        case RecordType.RPCCALL:
+            return RecordTypeManager.manager().getClass(RecordType.RPCCALL);
+        case RecordType.RPCINITIATE:
+            return RecordTypeManager.manager().getClass(RecordType.RPCINITIATE);
+        case RecordType.RPCTERMINATE:
+            return RecordTypeManager.manager()
+                    .getClass(RecordType.RPCTERMINATE);
+        case RecordType.RPCCADAVER:
+            return RecordTypeManager.manager().getClass(RecordType.RPCCADAVER);
+        case RecordType.XTS_WSAT_RECORD:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.XTS_WSAT_RECORD);
+        case RecordType.XTS_WSBA_RECORD:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.XTS_WSBA_RECORD);
+        case RecordType.RESTAT_RECORD:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.RESTAT_RECORD);
+        case RecordType.JTA_RECORD:
+            return RecordTypeManager.manager().getClass(RecordType.JTA_RECORD);
+        case RecordType.JTAX_RECORD:
+            return RecordTypeManager.manager().getClass(RecordType.JTAX_RECORD);
 
-            case RecordType.USER_DEF_LAST0 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST0);
-            case RecordType.USER_DEF_LAST1 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST1);
-            case RecordType.USER_DEF_LAST2 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST2);
-            case RecordType.USER_DEF_LAST3 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST3);
-            case RecordType.USER_DEF_LAST4 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST4);
-            case RecordType.USER_DEF_LAST5 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST5);
-            case RecordType.USER_DEF_LAST6 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST6);
-            case RecordType.USER_DEF_LAST7 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST7);
-            case RecordType.USER_DEF_LAST8 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST8);
-            case RecordType.USER_DEF_LAST9 :
-                return RecordTypeManager.manager().getClass(RecordType.USER_DEF_LAST9);
+        case RecordType.USER_DEF_LAST0:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST0);
+        case RecordType.USER_DEF_LAST1:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST1);
+        case RecordType.USER_DEF_LAST2:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST2);
+        case RecordType.USER_DEF_LAST3:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST3);
+        case RecordType.USER_DEF_LAST4:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST4);
+        case RecordType.USER_DEF_LAST5:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST5);
+        case RecordType.USER_DEF_LAST6:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST6);
+        case RecordType.USER_DEF_LAST7:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST7);
+        case RecordType.USER_DEF_LAST8:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST8);
+        case RecordType.USER_DEF_LAST9:
+            return RecordTypeManager.manager().getClass(
+                    RecordType.USER_DEF_LAST9);
 
-            case RecordType.UNTYPED :
-                return AbstractRecord.class;
+        case RecordType.UNTYPED:
+            return AbstractRecord.class;
 
-            case RecordType.NONE_RECORD :
-                return null;
+        case RecordType.NONE_RECORD:
+            return null;
 
-            default :
-                return null;
+        default:
+            return null;
         }
     }
 
@@ -286,7 +315,8 @@ public class RecordType {
      */
 
     @SuppressWarnings("unchecked")
-    public static int classToType(Class cn) {
+    public static int classToType (Class cn)
+    {
         if (LastResourceRecord.class.equals(cn))
             return LASTRESOURCE;
 
@@ -300,7 +330,7 @@ public class RecordType {
             return CADAVER;
         else if (DisposeRecord.class.equals(cn))
             return DISPOSE;
-
+        
         else
             return RecordTypeManager.manager().getType(cn);
     }
@@ -309,7 +339,8 @@ public class RecordType {
      * Print a human-readable version of the lock type.
      */
 
-    public static void print(PrintWriter strm, int rt) {
+    public static void print (PrintWriter strm, int rt)
+    {
         strm.print(typeToClass(rt));
         strm.flush();
     }

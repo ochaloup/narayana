@@ -47,14 +47,18 @@ package org.jboss.jbossts.qa.SupportTests01Impls;
  * $Id: SupportTestXAResourceEnlistDelist.java,v 1.2 2003/06/26 11:45:06 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.SupportTests01.*;
 
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAResource;
 
-public class SupportTestXAResourceEnlistDelist implements ServiceOperations {
-    public void test() throws InvocationException {
-        try {
+public class SupportTestXAResourceEnlistDelist implements ServiceOperations
+{
+    public void test() throws InvocationException
+    {
+        try
+        {
             // Get a reference to the transaction manager
             javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
@@ -81,12 +85,15 @@ public class SupportTestXAResourceEnlistDelist implements ServiceOperations {
 
             _correct &= (resource.getLastCalled() == DummyXAResource.CommitLastCalled);
             System.err.println("Finish Trace: " + resource.getLastCalledString());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new InvocationException();
         }
     }
 
-    public boolean isCorrect() throws InvocationException {
+    public boolean isCorrect() throws InvocationException
+    {
         return (_correct);
     }
 

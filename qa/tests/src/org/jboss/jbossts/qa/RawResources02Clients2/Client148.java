@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.RawResources02Clients2;
  * $Id: Client148.java,v 1.3 2003/07/07 13:43:35 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.RawResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client148 {
-    public static void main(String[] args) {
-        try {
+public class Client148
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -99,7 +103,8 @@ public class Client148 {
             OTS.current().commit(true);
 
             correct = correct && service1.is_correct() && service2.is_correct();
-            if (!correct) {
+            if (!correct)
+            {
                 System.err.println("service1.is_correct() or service2.is_correct() returned false");
             }
 
@@ -110,19 +115,26 @@ public class Client148 {
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTracePrepareCommit);
 
             System.out.println("Failed");
-        } catch (org.omg.CORBA.TRANSACTION_ROLLEDBACK exception) {
+        }
+        catch (org.omg.CORBA.TRANSACTION_ROLLEDBACK exception)
+        {
             exception.printStackTrace(System.err);
             System.out.println("Passed");
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client001.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client001.main: " + exception);
             exception.printStackTrace(System.err);
         }

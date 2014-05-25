@@ -46,24 +46,25 @@ import java.util.HashMap;
  * The factory to return the specific CoordinatorManager implementation.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: CoordinatorManagerFactory.java,v 1.8 2005/05/19 12:13:25 nmcl
- *          Exp $
+ * @version $Id: CoordinatorManagerFactory.java,v 1.8 2005/05/19 12:13:25 nmcl Exp $
  * @since 1.0.
  */
 
-public class CoordinatorManagerFactory {
+public class CoordinatorManagerFactory
+{
 
     /**
-     * @exception com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException
-     *                Thrown if the default protocol is not available.
+     * @exception com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException Thrown if the default
+     * protocol is not available.
      *
      * @return the CoordinatorManager implementation to use. The default
-     *         coordination protocol is used (two-phase commit) with its
-     *         associated implementation.
+     * coordination protocol is used (two-phase commit) with its
+     * associated implementation.
      *
      */
 
-    public static CoordinatorManager coordinatorManager() throws ProtocolNotRegisteredException, SystemException {
+    public static CoordinatorManager coordinatorManager () throws ProtocolNotRegisteredException, SystemException
+    {
         return coordinatorManager("TwoPhase11HLS");
     }
 
@@ -71,29 +72,31 @@ public class CoordinatorManagerFactory {
      * Obtain a reference to a coordinator that implements the specified
      * protocol.
      *
-     * @param protocol
-     *            The XML definition of the type of coordination protocol
-     *            required.
+     * @param protocol The XML definition of the type of
+     * coordination protocol required.
      *
-     * @exception com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException
-     *                Thrown if the requested protocol is not available.
+     * @exception com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException Thrown if the requested
+     * protocol is not available.
      *
      * @return the CoordinatorManager implementation to use.
      */
 
     /*
-     * Have the type specified in XML. More data may be specified, which can be
-     * passed to the implementation in the same way ObjectName was.
+     * Have the type specified in XML. More data may be specified, which
+     * can be passed to the implementation in the same way ObjectName was.
      */
 
-    public static CoordinatorManager coordinatorManager(String protocol)
-            throws ProtocolNotRegisteredException, SystemException {
-        try {
+    public static CoordinatorManager coordinatorManager (String protocol) throws ProtocolNotRegisteredException, SystemException
+    {
+        try
+        {
             TwoPhaseHLS coordHLS;
-            synchronized (_implementations) {
+            synchronized (_implementations)
+            {
                 coordHLS = (TwoPhaseHLS) _implementations.get(protocol);
 
-                if (coordHLS == null) {
+                if (coordHLS == null)
+                {
                     coordHLS = (TwoPhaseHLS) _protocolManager.getProtocolImplementation(protocol);
 
                     _implementations.put(protocol, coordHLS);
@@ -101,14 +104,18 @@ public class CoordinatorManagerFactory {
 
                 return coordHLS.coordinatorManager();
             }
-        } catch (ProtocolNotRegisteredException ex) {
+        }
+        catch (ProtocolNotRegisteredException ex)
+        {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
 
     private static ProtocolManager _protocolManager = ProtocolRegistry.sharedManager();
-    private static HashMap _implementations = new HashMap();
+    private static HashMap         _implementations = new HashMap();
 
 }

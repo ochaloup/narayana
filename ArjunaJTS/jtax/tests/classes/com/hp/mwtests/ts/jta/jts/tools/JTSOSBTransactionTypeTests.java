@@ -40,17 +40,14 @@ import com.arjuna.ats.internal.jts.recovery.transactions.RecoveredTransaction;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
+@Deprecated // in order to provide a better separation between public and internal classes.
 public class JTSOSBTransactionTypeTests extends JTSOSBTestBase {
     @Test
     public void testArjunaTransactionImpleWrapper() throws MBeanException {
-        // We need to set the transaction type as a thread local to work around
-        // an issue in BasicAction constructor
+        // We need to set the transaction type as a thread local to work around an issue in BasicAction constructor
         // calling overridable methods before the object is fully constructed
         UidWrapper.setRecordWrapperTypeName(ArjunaTransactionImpleWrapper.typeName());
         assertBeanWasCreated(new ArjunaTransactionImpleWrapper(new Uid()));
@@ -84,9 +81,7 @@ public class JTSOSBTransactionTypeTests extends JTSOSBTestBase {
         assertBeanWasCreated(new RecoveringServerTransaction(new Uid()));
     }
 
-    private static class RecoveringServerTransaction
-            extends
-                com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction {
+    private static class RecoveringServerTransaction extends com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction {
         protected RecoveringServerTransaction(Uid recoveringActUid) {
             super(recoveringActUid);
         }

@@ -46,11 +46,13 @@ import javax.inject.Inject;
 
 public abstract class BasicTest {
 
+
     @Inject
     SingleService singleService;
 
     @Inject
     MultiService multiService;
+
 
     @Before
     public void resetParticipants() {
@@ -72,6 +74,7 @@ public abstract class BasicTest {
 
         }
     }
+
 
     @Test
     public void testSimple() throws Exception {
@@ -107,7 +110,7 @@ public abstract class BasicTest {
             multiService.testsMulti(true);
             Assert.fail();
         } catch (MyRuntimeException e) {
-            // expected
+            //expected
         }
 
         Assert.assertEquals(true, DummyCompensationHandler1.getCalled());
@@ -143,7 +146,7 @@ public abstract class BasicTest {
             multiService.testAlternative(true);
             Assert.fail();
         } catch (MyRuntimeException e) {
-            // expected
+            //expected
         }
 
         Assert.assertEquals(true, DummyCompensationHandler1.getCalled());
@@ -155,6 +158,7 @@ public abstract class BasicTest {
         Assert.assertEquals(true, DummyCompensationHandler3.getCalled());
         Assert.assertEquals(false, DummyConfirmationHandler3.getCalled());
     }
+
 
     @Test
     public void testNoTransaction() throws Exception {

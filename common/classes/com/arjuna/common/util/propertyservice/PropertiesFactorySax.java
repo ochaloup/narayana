@@ -32,6 +32,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+
 /**
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
@@ -40,9 +41,8 @@ import org.xml.sax.XMLReader;
 public final class PropertiesFactorySax extends AbstractPropertiesFactory {
 
     /**
-     * Reads XML provided in <code>is</code> input stream and looks for property
-     * entries. All properties are placed to the properties container
-     * <code>p</code>.
+     * Reads XML provided in <code>is</code> input stream and looks for property entries.
+     * All properties are placed to the properties container <code>p</code>.
      *
      * Allways returns null and puts all properties to the <code>p</code>.
      */

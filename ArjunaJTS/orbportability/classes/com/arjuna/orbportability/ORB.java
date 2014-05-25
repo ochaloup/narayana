@@ -59,13 +59,16 @@ import com.arjuna.orbportability.orb.PreShutdown;
  * @since JTS 1.0.
  */
 
-public class ORB {
+public class ORB
+{
     /**
      * Initialise the default ORB.
      */
 
-    public synchronized void initORB() throws SystemException {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void initORB () throws SystemException
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::initORB ()");
         }
 
@@ -75,18 +78,22 @@ public class ORB {
          * make sense?
          */
 
-        if (!_orb.initialised()) {
+        if (!_orb.initialised())
+        {
             // null op - just skip it loadProperties(null);
 
             /**
              * Perform pre-initialisation classes for all ORBs
              */
-            PreInitLoader preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS), this);
+            PreInitLoader preInit = new PreInitLoader(
+                    PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+                    this);
 
             /**
              * Perform pre-initialisation classes for this ORB only
              */
-            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(
+                    ORB_INITIALISER_NS, _orbName), this);
             preInit = null;
 
             parseProperties(null, false);
@@ -98,13 +105,16 @@ public class ORB {
             /**
              * Perform post-initialisation classes for all ORBs
              */
-            PostInitLoader postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+            PostInitLoader postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
                     this);
 
             /**
              * Perform post-initialisation classes for this ORB only
              */
-            postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS,
+                            _orbName), this);
             postInit = null;
         }
     }
@@ -113,23 +123,30 @@ public class ORB {
      * Initialise the ORB.
      */
 
-    public synchronized void initORB(Applet a, Properties p) throws SystemException {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void initORB (Applet a, Properties p)
+            throws SystemException
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::initORB (Applet, Properties)");
         }
 
-        if (!_orb.initialised()) {
+        if (!_orb.initialised())
+        {
             loadProperties(p);
 
             /**
              * Perform pre-initialisation classes for all ORBs
              */
-            PreInitLoader preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS), this);
+            PreInitLoader preInit = new PreInitLoader(
+                    PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+                    this);
 
             /**
              * Perform pre-initialisation classes for this ORB only
              */
-            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(
+                    ORB_INITIALISER_NS, _orbName), this);
             preInit = null;
 
             parseProperties(null, false);
@@ -141,13 +158,16 @@ public class ORB {
             /**
              * Perform post-initialisation classes for all ORBs
              */
-            PostInitLoader postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+            PostInitLoader postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
                     this);
 
             /**
              * Perform post-initialisation classes for this ORB only
              */
-            postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS,
+                            _orbName), this);
             postInit = null;
         }
     }
@@ -156,23 +176,30 @@ public class ORB {
      * Initialise the ORB.
      */
 
-    public synchronized void initORB(String[] s, Properties p) throws SystemException {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void initORB (String[] s, Properties p)
+            throws SystemException
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::initORB (String[], Properties)");
         }
 
-        if (!_orb.initialised()) {
+        if (!_orb.initialised())
+        {
             loadProperties(p);
 
             /**
              * Perform pre-initialisation classes for all ORBs
              */
-            PreInitLoader preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS), this);
+            PreInitLoader preInit = new PreInitLoader(
+                    PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+                    this);
 
             /**
              * Perform pre-initialisation classes for this ORB only
              */
-            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            preInit = new PreInitLoader(PreInitLoader.generateORBPropertyName(
+                    ORB_INITIALISER_NS, _orbName), this);
             preInit = null;
 
             parseProperties(s, false);
@@ -184,19 +211,24 @@ public class ORB {
             /**
              * Perform post-initialisation classes for all ORBs
              */
-            PostInitLoader postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+            PostInitLoader postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS),
                     this);
 
             /**
              * Perform post-initialisation classes for this ORB only
              */
-            postInit = new PostInitLoader(PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            postInit = new PostInitLoader(
+                    PostInitLoader.generateORBPropertyName(ORB_INITIALISER_NS,
+                            _orbName), this);
             postInit = null;
         }
     }
 
-    public synchronized boolean addAttribute(Attribute p) {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized boolean addAttribute (Attribute p)
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::addAttribute (" + p + ")");
         }
 
@@ -214,24 +246,25 @@ public class ORB {
     /**
      * Shutdown the ORB asynchronously.
      */
-
-    public synchronized void shutdown() {
+    
+    public synchronized void shutdown ()
+    {
         shutdown(false);
     }
-
+    
     /**
      * Shutdown the ORB. Define whether this should be sync or async.
      */
 
-    public synchronized void shutdown(boolean waitForCompletion) {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void shutdown (boolean waitForCompletion)
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::shutdown ()");
         }
 
-        // Ensure destroy is called on the root OA so that any pre/post destroy
-        // hooks get called
-        // Normally we expect whoever called shutdown to have done this however
-        // destroy is
+        // Ensure destroy is called on the root OA so that any pre/post destroy hooks get called
+        // Normally we expect whoever called shutdown to have done this however destroy is
         // safe to call multiple times
         OA.getRootOA(this).destroy();
 
@@ -239,15 +272,20 @@ public class ORB {
          * Do the cleanups first!
          */
 
-        if (!_preORBShutdown.isEmpty()) {
+        if (!_preORBShutdown.isEmpty())
+        {
             Enumeration elements = _preORBShutdown.elements();
 
-            while (elements.hasMoreElements()) {
+            while (elements.hasMoreElements())
+            {
                 PreShutdown c = (PreShutdown) elements.nextElement();
 
-                if (c != null) {
-                    if (opLogger.logger.isTraceEnabled()) {
-                        opLogger.logger.trace("ORB - pre-orb shutdown on " + c.name());
+                if (c != null)
+                {
+                    if (opLogger.logger.isTraceEnabled())
+                    {
+                        opLogger.logger.trace("ORB - pre-orb shutdown on "
+                                + c.name());
                     }
 
                     c.work();
@@ -261,15 +299,20 @@ public class ORB {
         if (_orb.initialised())
             _orb.shutdown(waitForCompletion);
 
-        if (!_postORBShutdown.isEmpty()) {
+        if (!_postORBShutdown.isEmpty())
+        {
             Enumeration elements = _postORBShutdown.elements();
 
-            while (elements.hasMoreElements()) {
+            while (elements.hasMoreElements())
+            {
                 PostShutdown c = (PostShutdown) elements.nextElement();
 
-                if (c != null) {
-                    if (opLogger.logger.isTraceEnabled()) {
-                        opLogger.logger.trace("ORB - post-orb shutdown on " + c.name());
+                if (c != null)
+                {
+                    if (opLogger.logger.isTraceEnabled())
+                    {
+                        opLogger.logger.trace("ORB - post-orb shutdown on "
+                                + c.name());
                     }
 
                     c.work();
@@ -279,111 +322,144 @@ public class ORB {
 
             // _postORBShutdown.clear();
         }
-        _orbMap.remove(_orbName);
-        if (_orbShutdownListener != null) {
-            _orbShutdownListener.orbShutdown();
-        }
+    _orbMap.remove(_orbName);
+    if (_orbShutdownListener != null) {
+        _orbShutdownListener.orbShutdown();
+    }
     }
 
     /**
      * Obtain a reference to the current ORB.
      */
 
-    public synchronized org.omg.CORBA.ORB orb() {
+    public synchronized org.omg.CORBA.ORB orb ()
+    {
         return _orb.orb();
     }
 
-    public synchronized boolean setOrb(org.omg.CORBA.ORB theORB) {
-        if (!_orb.initialised()) {
+    public synchronized boolean setOrb (org.omg.CORBA.ORB theORB)
+    {
+        if (!_orb.initialised())
+        {
             _orb.orb(theORB);
 
             /** Perform post-set operations configured for all ORBs **/
-            new PostSetLoader(PostSetLoader.generateORBPropertyName(ORB_INITIALISER_NS), this);
+            new PostSetLoader(
+                    PostSetLoader.generateORBPropertyName(ORB_INITIALISER_NS),
+                    this);
 
             /**
              * Perform post-set operations for this ORB only
              */
-            new PostSetLoader(PostSetLoader.generateORBPropertyName(ORB_INITIALISER_NS, _orbName), this);
+            new PostSetLoader(PostSetLoader.generateORBPropertyName(
+                    ORB_INITIALISER_NS, _orbName), this);
 
             return true;
-        } else
+        }
+        else
             return false;
     }
 
-    public synchronized void addPreShutdown(PreShutdown c) {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void addPreShutdown (PreShutdown c)
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::addPreShutdown (" + c + ")");
         }
 
         _preORBShutdown.put(c, c);
     }
 
-    public synchronized void addPostShutdown(PostShutdown c) {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void addPostShutdown (PostShutdown c)
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::addPostShutdown (" + c + ")");
         }
 
         _postORBShutdown.put(c, c);
     }
 
-    public synchronized void destroy() throws SystemException {
-        if (opLogger.logger.isTraceEnabled()) {
+    public synchronized void destroy () throws SystemException
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
             opLogger.logger.trace("ORB::destroyORB ()");
         }
 
         _orb.destroy();
     }
 
-    protected ORB(String orbName) {
+    protected ORB(String orbName)
+    {
         _orbName = orbName;
     }
 
-    private void loadProperties(Properties p) {
+    private void loadProperties (Properties p)
+    {
         /**
          * If properties were passed in and the map contains data
          */
-        if ((p != null) && (!p.isEmpty())) {
+        if ((p != null) && (!p.isEmpty()))
+        {
             /**
              * For each property passed in the initialiser only set those which
              * are intended for post or pre initialisation routines
              */
             Enumeration properties = p.keys();
-            while (properties.hasMoreElements()) {
+            while (properties.hasMoreElements())
+            {
                 String o = (String) properties.nextElement();
 
-                if (PreInitLoader.isPreInitProperty(o) || PostInitLoader.isPostInitProperty(o)) {
-                    if (opLogger.logger.isTraceEnabled()) {
-                        opLogger.logger.trace("Adding property '" + o + "' to the ORB portability properties");
+                if (PreInitLoader.isPreInitProperty(o)
+                        || PostInitLoader.isPostInitProperty(o))
+                {
+                    if (opLogger.logger.isTraceEnabled())
+                    {
+                        opLogger.logger.trace("Adding property '" + o
+                                + "' to the ORB portability properties");
                     }
 
-                    synchronized (ORB.class) {
-                        Map<String, String> globalProperties = opPropertyManager.getOrbPortabilityEnvironmentBean()
+                    synchronized (ORB.class)
+                    {
+                        Map<String, String> globalProperties = opPropertyManager
+                                .getOrbPortabilityEnvironmentBean()
                                 .getOrbInitializationProperties();
                         globalProperties.put(o, p.getProperty(o));
                         opPropertyManager.getOrbPortabilityEnvironmentBean()
-                                .setOrbInitializationProperties(globalProperties);
+                                .setOrbInitializationProperties(
+                                        globalProperties);
                     }
                 }
             }
         }
     }
 
-    private void parseProperties(String[] params, boolean postInit) {
-        if (opLogger.logger.isTraceEnabled()) {
-            opLogger.logger.trace("ORB::parseProperties (String[], " + postInit + ")");
+    private void parseProperties (String[] params, boolean postInit)
+    {
+        if (opLogger.logger.isTraceEnabled())
+        {
+            opLogger.logger.trace("ORB::parseProperties (String[], " + postInit
+                    + ")");
         }
 
-        Hashtable work = ((postInit) ? _postORBInitProperty : _preORBInitProperty);
+        Hashtable work = ((postInit) ? _postORBInitProperty
+                : _preORBInitProperty);
 
-        if (!work.isEmpty()) {
+        if (!work.isEmpty())
+        {
             Enumeration elements = work.elements();
 
-            while (elements.hasMoreElements()) {
+            while (elements.hasMoreElements())
+            {
                 Attribute p = (Attribute) elements.nextElement();
 
-                if (p != null) {
-                    if (opLogger.logger.isTraceEnabled()) {
-                        opLogger.logger.trace("Attribute " + p + " initialising.");
+                if (p != null)
+                {
+                    if (opLogger.logger.isTraceEnabled())
+                    {
+                        opLogger.logger.trace("Attribute " + p
+                                + " initialising.");
                     }
 
                     p.initialise(params);
@@ -403,14 +479,16 @@ public class ORB {
      *            The name of the ORB instance to retrieve.
      * @return The ORB instance refered to by the name given.
      */
-    public synchronized static ORB getInstance(String uniqueId) {
+    public synchronized static ORB getInstance (String uniqueId)
+    {
         /**
          * Try and find this ORB in the hashmap first if its not there then
          * create one and add it
          */
         ORB orb = (ORB) _orbMap.get(uniqueId);
 
-        if (orb == null) {
+        if (orb == null)
+        {
             orb = new ORB(uniqueId);
 
             _orbMap.put(uniqueId, orb);
@@ -419,13 +497,14 @@ public class ORB {
         return (orb);
     }
 
-    String getName() {
+    String getName ()
+    {
         return (_orbName);
     }
 
-    public void setORBShutdownListener(ORBShutdownListener orbShutdownListener) {
-        _orbShutdownListener = orbShutdownListener;
-    }
+public void setORBShutdownListener(ORBShutdownListener orbShutdownListener) {
+    _orbShutdownListener = orbShutdownListener;
+}
 
     com.arjuna.orbportability.orb.core.ORB _orb = new com.arjuna.orbportability.orb.core.ORB();
 
@@ -439,9 +518,9 @@ public class ORB {
 
     private String _orbName = null;
 
-    private ORBShutdownListener _orbShutdownListener;
+private ORBShutdownListener _orbShutdownListener;
 
-    private volatile static HashMap _orbMap = new HashMap();
+private volatile static HashMap     _orbMap = new HashMap();
 
     static final String ORB_INITIALISER_NS = "com.arjuna.orbportability.orb";
 

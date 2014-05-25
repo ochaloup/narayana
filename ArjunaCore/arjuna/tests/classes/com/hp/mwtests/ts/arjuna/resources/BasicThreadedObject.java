@@ -35,14 +35,17 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 
-public class BasicThreadedObject extends Thread {
+public class BasicThreadedObject extends Thread
+{
 
-    public BasicThreadedObject(boolean start) {
+    public BasicThreadedObject(boolean start)
+    {
         startAction = start;
         uid = new Uid();
     }
 
-    public void run() {
+    public void run()
+    {
         if (startAction) {
             BasicThreadedObject.A = new AtomicAction();
 
@@ -71,7 +74,8 @@ public class BasicThreadedObject extends Thread {
             BasicThreadedObject.O.incr(4);
 
             Thread.yield();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
         }
 
         if (startAction) {

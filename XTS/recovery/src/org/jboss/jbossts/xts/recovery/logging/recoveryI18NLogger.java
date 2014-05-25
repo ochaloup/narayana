@@ -34,58 +34,47 @@ import static org.jboss.logging.annotations.Message.Format.*;
 public interface recoveryI18NLogger {
 
     /*
-     * Message IDs are unique and non-recyclable. Don't change the purpose of
-     * existing messages. (tweak the message text or params for clarification if
-     * you like). Allocate new messages by following instructions at the bottom
-     * of the file.
+        Message IDs are unique and non-recyclable.
+        Don't change the purpose of existing messages.
+          (tweak the message text or params for clarification if you like).
+        Allocate new messages by following instructions at the bottom of the file.
      */
 
-    // @Message(id = 46001, value = "RecoveryATCoordinator.replayPhase2:
-    // Unexpected status: {0}", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_coordinator_at_RecoveryATCoordinator_2(String arg0);
+//    @Message(id = 46001, value = "RecoveryATCoordinator.replayPhase2: Unexpected status: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_coordinator_at_RecoveryATCoordinator_2(String arg0);
 
     @Message(id = 46002, value = "RecoveryATCoordinator.replayPhase2 transaction {0} not activated, unable to replay phase 2 commit", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_coordinator_at_RecoveryATCoordinator_4(Uid arg0);
 
-    // @Message(id = 46003, value =
-    // "RecoverySubordinateATCoordinator.replayPhase2: Unexpected status: {0}",
-    // format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_coordinator_at_RecoverySubordinateATCoordinator_2(String
-    // arg0);
+//    @Message(id = 46003, value = "RecoverySubordinateATCoordinator.replayPhase2: Unexpected status: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_coordinator_at_RecoverySubordinateATCoordinator_2(String arg0);
 
     @Message(id = 46004, value = "RecoverySubordinateATCoordinator.replayPhase2 transaction {0} not activated, unable to replay phase 2 commit", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_coordinator_at_RecoverySubordinateATCoordinator_4(Uid arg0);
 
-    // @Message(id = 46005, value =
-    // "RecoverBASubordinateCoordinator.replayPhase2: Unexpected status: {0}",
-    // format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_coordinator_ba_RecoverBASubordinateCoordinator_2(String
-    // arg0);
+//    @Message(id = 46005, value = "RecoverBASubordinateCoordinator.replayPhase2: Unexpected status: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_coordinator_ba_RecoverBASubordinateCoordinator_2(String arg0);
 
     @Message(id = 46006, value = "RecoverBASubordinateCoordinator.replayPhase2 transaction {0} not activated, unable to replay phase 2 commit", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_coordinator_ba_RecoverBASubordinateCoordinator_4(Uid arg0);
 
-    // @Message(id = 46007, value = "RecoveryBACoordinator.replayPhase2:
-    // Unexpected status: {0}", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_coordinator_ba_RecoveryBACoordinator_2(String arg0);
+//    @Message(id = 46007, value = "RecoveryBACoordinator.replayPhase2: Unexpected status: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_coordinator_ba_RecoveryBACoordinator_2(String arg0);
 
     @Message(id = 46008, value = "RecoveryBACoordinator.replayPhase2 transaction {0} not activated, unable to replay phase 2 commit", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_coordinator_ba_RecoveryBACoordinator_4(Uid arg0);
 
-    // @Message(id = 46009, value =
-    // "RecoverBASubordinateCoordinator.replayPhase2 recovering {0} ActionStatus
-    // is {1}", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_coordinator_ba_RecoverySubordinateBACoordinator_1(String
-    // arg0, String arg1);
+//    @Message(id = 46009, value = "RecoverBASubordinateCoordinator.replayPhase2 recovering {0} ActionStatus is {1}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_coordinator_ba_RecoverySubordinateBACoordinator_1(String arg0, String arg1);
 
     @Message(id = 46010, value = "RecoveryManagerStatusModule: Object store exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -264,15 +253,15 @@ public interface recoveryI18NLogger {
     public void error_recovery_participant_ParticipantRecoveryInitialisation_4(String arg0, @Cause() Throwable arg1);
 
     /*
-     * Allocate new messages directly above this notice. - id: use the next id
-     * number in numeric sequence. Don't reuse ids. The first two digits of the
-     * id(XXyyy) denote the module all message in this file should have the same
-     * prefix. - value: default (English) version of the log message. - level:
-     * according to severity semantics defined at
-     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
-     * i18n. Everything else MUST be i18n. By convention methods with String
-     * return type have prefix get_, all others are log methods and have prefix
-     * <level>_
+        Allocate new messages directly above this notice.
+          - id: use the next id number in numeric sequence. Don't reuse ids.
+          The first two digits of the id(XXyyy) denote the module
+            all message in this file should have the same prefix.
+          - value: default (English) version of the log message.
+          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
+          Debug and trace don't get i18n. Everything else MUST be i18n.
+          By convention methods with String return type have prefix get_,
+            all others are log methods and have prefix <level>_
      */
 
 }

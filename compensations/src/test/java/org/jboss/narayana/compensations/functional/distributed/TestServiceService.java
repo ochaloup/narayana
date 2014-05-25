@@ -37,11 +37,13 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
+
 /**
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
 @Stateless
-@WebService(serviceName = "TestServiceService", portName = "TestServiceService", name = "TestService", targetNamespace = "http://www.jboss.com/functional/compensations/distributed/")
+@WebService(serviceName = "TestServiceService", portName = "TestServiceService",
+        name = "TestService", targetNamespace = "http://www.jboss.com/functional/compensations/distributed/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public class TestServiceService implements TestService {
 

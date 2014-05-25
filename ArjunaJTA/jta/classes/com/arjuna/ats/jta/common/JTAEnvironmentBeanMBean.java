@@ -27,7 +27,8 @@ import java.util.List;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface JTAEnvironmentBeanMBean {
+public interface JTAEnvironmentBeanMBean
+{
     boolean isSupportSubtransactions();
 
     String getTransactionManagerClassName();

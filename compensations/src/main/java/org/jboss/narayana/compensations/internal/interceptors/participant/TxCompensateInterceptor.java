@@ -43,8 +43,7 @@ import java.lang.reflect.Method;
 public class TxCompensateInterceptor extends ParticipantInterceptor {
 
     /**
-     * This request has a compensation handler attached which has be be enlisted
-     * to the transaction.
+     * This request has a compensation handler attached which has be be enlisted to the transaction.
      *
      * @param ic
      * @return

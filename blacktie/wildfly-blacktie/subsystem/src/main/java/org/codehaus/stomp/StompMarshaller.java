@@ -30,12 +30,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Implements marshalling and unmarsalling the
- * <a href="http://stomp.codehaus.org/">Stomp</a> protocol.
+ * Implements marshalling and unmarsalling the <a href="http://stomp.codehaus.org/">Stomp</a> protocol.
  */
 public class StompMarshaller {
-    private static final byte[] NO_DATA = new byte[]{};
-    private static final byte[] END_OF_FRAME = new byte[]{0, '\n'};
+    private static final byte[] NO_DATA = new byte[] {};
+    private static final byte[] END_OF_FRAME = new byte[] { 0, '\n' };
     private static final int MAX_COMMAND_LENGTH = 1024;
     private static final int MAX_HEADER_LENGTH = 1024 * 10;
     private static final int MAX_HEADERS = 1000;
@@ -148,9 +147,8 @@ public class StompMarshaller {
                 in.readFully(data);
 
                 if (in.readByte() != 0) {
-                    throw new ProtocolException(
-                            Stomp.Headers.CONTENT_LENGTH + " bytes were read and " + "there was no trailing null byte",
-                            true);
+                    throw new ProtocolException(Stomp.Headers.CONTENT_LENGTH + " bytes were read and "
+                            + "there was no trailing null byte", true);
                 }
             } else {
 

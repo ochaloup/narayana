@@ -40,14 +40,17 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-public class JDBCAccess implements com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess {
+public class JDBCAccess implements com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess
+{
     private static final String dbProp = "org.jboss.jbossts.qa.Utils.JDBCAccess";
 
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException
+    {
         String dbName = System.getProperty(dbProp, "OBJECTSTORE_DB");
         System.err.println("Using JDBC store against profile: " + dbName);
         Properties prop = new Properties();
-        try {
+        try
+        {
             prop.setProperty("user", JDBCProfileStore.databaseUser(dbName));
             prop.setProperty("password", JDBCProfileStore.databasePassword(dbName));
             Class driverClass = Class.forName(JDBCProfileStore.driver(dbName, 0));
@@ -55,12 +58,15 @@ public class JDBCAccess implements com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAc
             Connection conn = DriverManager.getConnection(JDBCProfileStore.databaseURL(dbName), prop);
             conn.setAutoCommit(false);
             return conn;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             throw new SQLException(e.getMessage());
         }
     }
 
-    public void initialise(StringTokenizer objName) {
+    public void initialise(StringTokenizer objName)
+    {
     }
 }

@@ -100,29 +100,30 @@ public class Activator implements BundleActivator, ManagedService, Runnable {
             throw new IllegalStateException(e);
         }
         // Find all embedded jars
-        Collection<String> resources = bundleContext.getBundle().adapt(BundleWiring.class).listResources("/", "*.jar",
-                BundleWiring.LISTRESOURCES_LOCAL);
+        Collection<String> resources = bundleContext.getBundle().adapt(BundleWiring.class)
+                .listResources("/", "*.jar", BundleWiring.LISTRESOURCES_LOCAL);
         for (String resource : resources) {
             urls.add(bundleContext.getBundle().getResource(resource));
         }
         // Create the classloader
-        return new URLClassLoader(urls.toArray(new URL[urls.size()]), new ClassLoader(getClass().getClassLoader()) {
-            @Override
-            protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                // We forbid to load the server from the parent
-                if (name.startsWith(INTERN_PACKAGE)) {
-                    throw new ClassNotFoundException(name);
-                }
-                return super.loadClass(name, resolve);
-            }
-        });
+        return new URLClassLoader(urls.toArray(new URL[urls.size()]),
+                new ClassLoader(getClass().getClassLoader()) {
+                    @Override
+                    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                        // We forbid to load the server from the parent
+                        if (name.startsWith(INTERN_PACKAGE)) {
+                            throw new ClassNotFoundException(name);
+                        }
+                        return super.loadClass(name, resolve);
+                    }
+                });
     }
 
     protected void doStart() throws Exception {
         ClassLoader classLoader = createClassLoader();
         Class<?> osgiServerClass = classLoader.loadClass(SERVER_CLASS);
-        service = osgiServerClass.getConstructor(BundleContext.class, Dictionary.class).newInstance(bundleContext,
-                configuration);
+        service = osgiServerClass.getConstructor(BundleContext.class, Dictionary.class)
+                .newInstance(bundleContext, configuration);
         service.getClass().getMethod("start").invoke(service);
     }
 

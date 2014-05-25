@@ -48,32 +48,34 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * Create a persistent entry in the ActionStore to allow the RecoveryManager to
  * know which ArjunaFactory is in which JVM.
  *
- * (relies on the fact (true for 2.1) that any ArjunaFactory can be used to find
- * the status of any transaction.
+ * (relies on the fact (true for 2.1) that any ArjunaFactory can be used to 
+ * find the status of any transaction.
  *
  * Identifying uid is the processUid
  */
 
-public class FactoryContactItem {
+public class FactoryContactItem 
+{
     private static final String _pseudoTypeName = "/Recovery/FactoryContact";
-    private static final int version = 1;
+    private static final int    version = 1;
 
     private static FactoryContactItem _theSingularItem = null;
 
-    private Date _creationTime = null;
-    private Date _aliveTime = null;
-    private Date _deadTime = null;
+    private Date        _creationTime = null;
+    private Date        _aliveTime = null;
+    private Date        _deadTime = null;
     // if this is null, the parent process is known to be deceased
-    private ArjunaFactory _factory = null;
-    private Uid _uid = null;
+    private ArjunaFactory    _factory = null;
+    private Uid        _uid = null;
 
     /**
-     * create the contact item for the factory in this address space and persist
-     * it
+     * create the contact item for the factory in this address space
+     * and persist it
      *
      * Used in the original transaction-initiating process
      */
-    static boolean createAndSave(ArjunaFactory factory) {
+    static boolean createAndSave(ArjunaFactory factory)
+    {
         if (_theSingularItem == null) {
             _theSingularItem = new FactoryContactItem(factory);
             return _theSingularItem.saveMe();
@@ -83,75 +85,87 @@ public class FactoryContactItem {
         }
     }
 
+
     /**
-     * construct the item known by this uid from the ObjectStore (assuming it is
-     * there - otherwise return null)
+     * construct the item known by this uid from the ObjectStore (assuming
+     * it is there - otherwise return null)
      *
      * Used in the RecoveryManager
      */
 
-    static FactoryContactItem recreate(Uid uid) {
+    static FactoryContactItem recreate (Uid uid)
+    {
         FactoryContactItem theItem = new FactoryContactItem(uid);
 
-        if (theItem.restoreMe()) {
+        if (theItem.restoreMe())
+        {
             return theItem;
         } else {
             return null;
         }
     }
 
-    /*
-     * provide information for other classes (and ourselves) in this package
+    /*  provide information for other classes (and ourselves) in this package
      */
-    static RecoveryStore getStore() {
+    static RecoveryStore getStore()
+    {
         return StoreManager.getRecoveryStore();
     }
 
-    static String getTypeName() {
+
+    static String getTypeName()
+    {
         return _pseudoTypeName;
     }
+
 
     /**
      * accessor
      */
-    ArjunaFactory getFactory() {
+    ArjunaFactory getFactory()
+    {
         return _factory;
     }
 
     /**
      * accessor
      */
-    Date getCreationTime() {
+    Date getCreationTime()
+    {
         return _creationTime;
     }
 
     /**
-     * accessor - returns null if contact has not be successfully used this run
-     * of RecoveryManager
+     * accessor - returns null if contact has not be successfully used
+     *     this run of RecoveryManager
      */
-    Date getAliveTime() {
+    Date getAliveTime()
+    {
         return _aliveTime;
     }
 
     /**
      * accessor - returns null if contact has not failed at some time in the
-     * past (persists)
+     *      past (persists)
      */
-    Date getDeadTime() {
+    Date getDeadTime()
+    {
         return _deadTime;
     }
 
     /**
      * accessor
      */
-    Uid getUid() {
+    Uid getUid()
+    {
         return _uid;
     }
 
     /**
      * the address space this contact item points to has gone away
      */
-    void markAsDead() {
+    void markAsDead()
+    {
         // ignore if done previously
         if (_factory != null) {
             // the ior won't work any more, so forget it
@@ -165,41 +179,45 @@ public class FactoryContactItem {
      * the address space this contact item points to has just been contacted
      * this information is NOT persisted
      */
-    void markAsAlive() {
+    void markAsAlive()
+    {
         _aliveTime = new Date();
     }
 
     /**
-     * Constructor used in normal JBoss Transaction service application to
-     * identify the (or an) ArjunaFactory in this process
+     *  Constructor used in normal JBoss Transaction service application to
+     *  identify the (or an) ArjunaFactory in this process
      */
 
-    private FactoryContactItem(ArjunaFactory factory) {
+    private FactoryContactItem(ArjunaFactory factory)
+    {
         if (jtsLogger.logger.isDebugEnabled()) {
             jtsLogger.logger.debug("FactoryContactItem(factory)");
         }
         // the Uid of this object is the Uid of the process that creates it by
         // this constructor.
-        // full class name needed to disambiguate from java.text.Utility
-        _uid = com.arjuna.ats.arjuna.utils.Utility.getProcessUid();
+        //  full class name needed to disambiguate from java.text.Utility
+        _uid   = com.arjuna.ats.arjuna.utils.Utility.getProcessUid();
         _factory = factory;
         _creationTime = new Date();
     }
 
     /**
-     * Constructor used in RecoveryManager to restore a contact item from the
+     * Constructor used in RecoveryManager to restore a contact item from the 
      * the object store
      */
 
-    private FactoryContactItem(Uid uid) {
+    private FactoryContactItem(Uid uid)
+    {
         _uid = new Uid(uid);
     }
 
     /**
-     * Although FactoryContactItem is not derived from StateManager, this method
-     * has the equivalent signature and purpose (but different access)
+     * Although FactoryContactItem is not derived from StateManager, this
+     * method has the equivalent signature and purpose (but different access)
      */
-    private boolean save_state(OutputObjectState objstate) {
+    private boolean save_state (OutputObjectState objstate)
+    {
         // convert the information
         try {
 
@@ -215,9 +233,11 @@ public class FactoryContactItem {
                 objstate.packLong(_deadTime.getTime());
             }
             return true;
-        } catch (java.io.IOException ex) {
+        }
+        catch (java.io.IOException ex) {
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_1(ex);
-        } catch (Exception exp) {
+        }
+        catch (Exception exp) {
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_1(exp);
         }
 
@@ -225,10 +245,11 @@ public class FactoryContactItem {
     }
 
     /**
-     * Although FactoryContactItem is not derived from StateManager, this method
-     * has the equivalent signature and purpose (but different access)
+     * Although FactoryContactItem is not derived from StateManager, this
+     * method has the equivalent signature and purpose (but different access)
      */
-    private boolean restore_state(InputObjectState objstate) {
+    private boolean restore_state (InputObjectState objstate)
+    {
         // convert the information
         try {
             int oldversion = objstate.unpackInt();
@@ -238,14 +259,15 @@ public class FactoryContactItem {
             long oldtime = objstate.unpackLong();
             _creationTime = new Date(oldtime);
             String iorAsString = objstate.unpackString();
-            if (iorAsString.length() > 1) {
+            if (iorAsString.length() > 1)
+            {
                 org.omg.CORBA.Object corbject = ORBManager.getORB().orb().string_to_object(iorAsString);
                 /****
-                 * org.omg.CORBA.Object corbject; if (
-                 * ORBManager.isInitialised() ) corbject =
-                 * ORBManager.getORB().orb().string_to_object(iorAsString); else
-                 * corbject =
-                 * RecoveryORBManager.getORB().orb().string_to_object(iorAsString);
+        org.omg.CORBA.Object corbject;
+        if ( ORBManager.isInitialised() )
+        corbject = ORBManager.getORB().orb().string_to_object(iorAsString);
+        else 
+        corbject = RecoveryORBManager.getORB().orb().string_to_object(iorAsString);
                  ***/
 
                 _factory = ArjunaFactoryHelper.narrow(corbject);
@@ -260,16 +282,19 @@ public class FactoryContactItem {
             }
             _aliveTime = null;
             return true;
-        } catch (java.io.IOException ex) {
+        }
+        catch (java.io.IOException ex) {
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_4(ex);
-        } catch (Exception exp) {
+        }
+        catch (Exception exp) {
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_4(exp);
         }
 
         return false;
     }
 
-    private boolean saveMe() {
+    private boolean saveMe ()
+    {
         try {
             OutputObjectState objstate = new OutputObjectState();
             if (save_state(objstate)) {
@@ -284,11 +309,12 @@ public class FactoryContactItem {
         return false;
     }
 
-    private boolean restoreMe() {
+    private boolean restoreMe()
+    {
         try {
             InputObjectState objstate = getStore().read_committed(_uid, _pseudoTypeName);
 
-            if (objstate == null) // not in object store any more
+            if (objstate == null)  // not in object store any more
                 return false;
 
             if (restore_state(objstate)) {
@@ -296,8 +322,7 @@ public class FactoryContactItem {
             }
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_5();
         } catch (ObjectStoreException exo) {
-            // this shouldn't happen, because we shouldn't be looking for a
-            // factory
+            // this shouldn't happen, because we shouldn't be looking for a factory
             // that was never recorded
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_6();
         }
@@ -307,16 +332,20 @@ public class FactoryContactItem {
     /*
      * Not used by recovery currently.
      */
-
-    private static boolean removeMe(Uid uid) {
+    
+    private static boolean removeMe(Uid uid)
+    {
         try {
             return getStore().remove_committed(uid, _pseudoTypeName);
         } catch (ObjectStoreException exo) {
-            // this shouldn't happen, because we shouldn't be looking for a
-            // factory
+            // this shouldn't happen, because we shouldn't be looking for a factory
             // that was never recorded
             jtsLogger.i18NLogger.warn_recovery_contact_FactoryContactItem_7(exo);
         }
         return false;
     }
 }
+
+
+
+

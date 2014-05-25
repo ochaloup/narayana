@@ -28,10 +28,13 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 import com.arjuna.ats.jts.OTSManager;
 
-public class OnePhaseTrx extends PerformanceTest {
-    protected void work() throws Exception {
-        try {
-            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
+public class OnePhaseTrx extends PerformanceTest
+{
+    protected void work() throws Exception
+    {
+        try
+        {
+            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
             OA oa = OA.getRootOA(orb);
 
             String ref1 = getServiceConfig(0);
@@ -46,8 +49,10 @@ public class OnePhaseTrx extends PerformanceTest {
                 OTSManager.get_current().commit(true);
             else
                 OTSManager.get_current().rollback();
-        } catch (Exception e) {
-            System.err.println("Unexpected exception: " + e);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Unexpected exception: "+e);
             e.printStackTrace(System.err);
         }
 

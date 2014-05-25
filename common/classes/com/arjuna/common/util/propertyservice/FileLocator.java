@@ -36,24 +36,27 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 
 /**
- * The FileLocator class provides a common method for locating files. If not
- * passed an absolute filename (starting with the string "abs://"), it searches
- * for the file in the order: in the directory specified by the system property
- * user.dir in the directory specified by the system property user.home in the
- * directory specified by the system property java.home using the getResource()
- * method
+ * The FileLocator class provides a common method for locating files.
+ * If not passed an absolute filename (starting with the string "abs://"),
+ * it searches for the file in the order:
+ *   in the directory specified by the system property user.dir
+ *   in the directory specified by the system property user.home
+ *   in the directory specified by the system property java.home
+ *   using the getResource() method
  *
  * @author Julian Coleman
- * @version $Id: FileLocator.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: FileLocator.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 3.0.
  */
 
-class FileLocator {
+class FileLocator
+{
     /**
-     * Locate the specific file. Return the file path or uri (if a resource
-     * within an archive on the classpath) or throw FileNotFoundExcpetion.
+     * Locate the specific file.
+     * Return the file path or uri (if a resource within an archive on the classpath) or throw FileNotFoundExcpetion.
      */
-    static String locateFile(String findFile, ClassLoader classLoader) throws FileNotFoundException {
+    static String locateFile (String findFile, ClassLoader classLoader) throws FileNotFoundException
+    {
         URL url;
         String fullPathName;
 
@@ -61,7 +64,7 @@ class FileLocator {
             throw new FileNotFoundException("locateFile: null file name");
 
         String testAbsolutePath = new File(findFile).getAbsolutePath();
-        if (testAbsolutePath.equals(findFile)) {
+        if(testAbsolutePath.equals(findFile)) {
             return testAbsolutePath;
         }
 
@@ -81,7 +84,8 @@ class FileLocator {
      * Search for a file using the properties: user.dir, user.home, java.home
      * Returns absolute path name or null.
      */
-    private static synchronized String locateByProperty(String findFile) {
+    private static synchronized String locateByProperty(String findFile)
+    {
         String fullPathName = null;
         String dir = null;
         File f = null;
@@ -89,7 +93,8 @@ class FileLocator {
         if (findFile == null)
             return null;
 
-        try {
+        try
+        {
             // System.err.println("Searching in user.dir for: " + findFile);
 
             dir = System.getProperty("user.dir");
@@ -97,7 +102,8 @@ class FileLocator {
                 fullPathName = dir + File.separatorChar + findFile;
                 f = new File(fullPathName);
             }
-            if (f != null && f.exists()) {
+            if (f != null && f.exists())
+            {
                 // System.err.println("Found in user.dir");
                 return fullPathName;
             }
@@ -107,7 +113,8 @@ class FileLocator {
                 fullPathName = dir + File.separatorChar + findFile;
                 f = new File(fullPathName);
             }
-            if (f != null && f.exists()) {
+            if (f != null && f.exists())
+            {
                 // System.err.println("Found in user.home");
                 return fullPathName;
             }
@@ -117,11 +124,14 @@ class FileLocator {
                 fullPathName = dir + File.separatorChar + findFile;
                 f = new File(fullPathName);
             }
-            if (f != null && f.exists()) {
+            if (f != null && f.exists())
+            {
                 // System.err.println("Found in java.home");
                 return fullPathName;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return null;
         }
         return null;
@@ -131,9 +141,11 @@ class FileLocator {
      * Search for a file using the properties: user.dir, user.home, java.home
      * Returns URL or null.
      */
-    private static URL locateByResource(String findFile, ClassLoader classLoader) {
+    private static URL locateByResource(String findFile, ClassLoader classLoader)
+    {
         URL url = classLoader.getResource(findFile);
-        if (url == null) {
+        if (url == null)
+        {
             url = FileLocator.class.getResource("/" + findFile);
         }
         // System.err.println("Search succeeded via getResource()");
@@ -141,12 +153,14 @@ class FileLocator {
     }
 
     /*
-     * Check the file separator to see if we're on a Windows platform.
-     *
-     * @return boolean True if the platform is Windows, false otherwise.
-     */
-    private static boolean platformIsWindows() {
-        if (File.separatorChar == '\\') {
+    * Check the file separator to see if we're on a Windows platform.
+    *
+    * @return    boolean True if the platform is Windows, false otherwise.
+    */
+    private static boolean platformIsWindows()
+    {
+        if(File.separatorChar == '\\')
+        {
             return true;
         }
         return false;
@@ -156,3 +170,4 @@ class FileLocator {
     private static final String pct20 = "%20";
     private static final int pct20len = 3;
 }
+

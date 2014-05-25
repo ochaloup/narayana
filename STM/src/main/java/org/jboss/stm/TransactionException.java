@@ -29,18 +29,21 @@ package org.jboss.stm;
  *
  */
 
-public class TransactionException extends RuntimeException {
-    public TransactionException(String reason, int status) {
+public class TransactionException extends RuntimeException
+{
+    public TransactionException (String reason, int status)
+    {
         super(reason);
-
+        
         _status = status;
     }
-
-    public final int getStatus() {
+    
+    public final int getStatus ()
+    {
         return _status;
     }
-
+    
     private int _status;
-
+    
     private static final long serialVersionUID = 1L;
 }

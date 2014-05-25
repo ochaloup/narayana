@@ -55,9 +55,11 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.AtomicResource;
 import com.hp.mwtests.ts.jts.orbspecific.resources.heuristic;
 import com.hp.mwtests.ts.jts.utils.ResourceTrace;
 
-public class HeuristicTest {
+public class HeuristicTest
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         boolean shouldCommit = true;
         boolean heuristicPrepare = false;
 
@@ -67,11 +69,12 @@ public class HeuristicTest {
         RootOA myOA = null;
         heuristic hImpl = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -89,7 +92,7 @@ public class HeuristicTest {
 
             Control myControl = current.get_control();
 
-            assertNotNull(myControl);
+            assertNotNull( myControl );
 
             System.out.println("getting coordinator");
 
@@ -99,25 +102,36 @@ public class HeuristicTest {
 
             System.out.println("registering resources.");
 
-            try {
+            try
+            {
                 coord.register_resource(heuristicObject);
                 coord.register_resource(atomicObject);
-            } catch (Exception ex) {
-                fail("Failed to register resources: " + ex);
+            }
+            catch (Exception ex)
+            {
+                fail("Failed to register resources: "+ex);
                 ex.printStackTrace(System.err);
             }
 
             System.out.println("committing top-level transaction.");
 
             current.commit(true);
-        } catch (TRANSACTION_ROLLEDBACK e1) {
+        }
+        catch (TRANSACTION_ROLLEDBACK  e1)
+        {
             System.out.println("\nTransaction RolledBack exception");
-        } catch (HeuristicMixed e2) {
+        }
+        catch (HeuristicMixed e2)
+        {
             System.out.println("\nTransaction HeuristicMixed exception");
-        } catch (HeuristicHazard e3) {
+        }
+        catch (HeuristicHazard e3)
+        {
             System.out.println("\nTransaction HeuristicHazard exception");
-        } catch (Exception e4) {
-            fail("Caught unexpected exception: " + e4);
+        }
+        catch (Exception e4)
+        {
+            fail("Caught unexpected exception: "+e4);
             e4.printStackTrace(System.err);
         }
 
@@ -125,39 +139,53 @@ public class HeuristicTest {
 
         org.omg.CosTransactions.Status status = Status.StatusUnknown;
 
-        try {
-            if (coord != null) {
+        try
+        {
+            if (coord != null)
+            {
                 status = coord.get_status();
 
                 coord = null;
-            } else {
+            }
+            else
+            {
                 fail("\nCould not determine action status.");
             }
-        } catch (SystemException ex1) {
+        }
+        catch (SystemException ex1)
+        {
             // assume invalid reference - tx may have been garbage collected
-        } catch (Exception e5) {
-            fail("Caught unexpected exception:" + e5);
+        }
+        catch (Exception e5)
+        {
+            fail("Caught unexpected exception:" +e5);
             e5.printStackTrace(System.err);
         }
 
-        System.out.println("\nFinal action status: " + Utility.stringStatus(status));
+        System.out.println("\nFinal action status: "+Utility.stringStatus(status));
 
         System.out.println("Test completed successfully.");
 
         ResourceTrace trace = hImpl.getTrace();
 
-        if ((!heuristicPrepare) && (shouldCommit)
-                && (trace.getTrace() == ResourceTrace.ResourceTracePrepareCommitHeurisiticRollbackForget)) {
-            // assertSuccess();
-        } else {
-            if ((!heuristicPrepare) && (!shouldCommit)
-                    && (trace.getTrace() == ResourceTrace.ResourceTracePrepareRollback)) {
-                // assertSuccess();
-            } else {
-                if ((heuristicPrepare) && (shouldCommit)
-                        && (trace.getTrace() == ResourceTrace.ResourceTracePrepareHeuristicHazardForget)) {
-                    // assertSuccess();
-                } else {
+        if ( (!heuristicPrepare) && (shouldCommit) && (trace.getTrace() == ResourceTrace.ResourceTracePrepareCommitHeurisiticRollbackForget) )
+        {
+            //assertSuccess();
+        }
+        else
+        {
+            if ( (!heuristicPrepare) && (!shouldCommit) && (trace.getTrace() == ResourceTrace.ResourceTracePrepareRollback) )
+            {
+                //assertSuccess();
+            }
+            else
+            {
+                if ( (heuristicPrepare) && (shouldCommit) && (trace.getTrace() == ResourceTrace.ResourceTracePrepareHeuristicHazardForget) )
+                {
+                    //assertSuccess();
+                }
+                else
+                {
                     fail();
                 }
             }
@@ -167,3 +195,4 @@ public class HeuristicTest {
         myORB.shutdown();
     }
 }
+

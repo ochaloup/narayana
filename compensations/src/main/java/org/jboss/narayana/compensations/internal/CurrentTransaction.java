@@ -22,12 +22,12 @@
 
 package org.jboss.narayana.compensations.internal;
 
+
 /**
  * A common interface to pass around current transaction information.
  * 
- * Because underline implementations have different ways of passing transaction
- * information around, having a wrapper makes the compensation framework code a
- * bit cleaner.
+ * Because underline implementations have different ways of passing transaction information around, having a wrapper makes the
+ * compensation framework code a bit cleaner.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -50,8 +50,9 @@ public interface CurrentTransaction {
     /**
      * Get underlying compensating transaction object.
      *
-     * @return
+     * @return 
      */
     Object getDelegate();
 
 }
+

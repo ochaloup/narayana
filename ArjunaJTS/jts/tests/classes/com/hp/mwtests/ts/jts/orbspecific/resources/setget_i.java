@@ -50,125 +50,150 @@ import com.arjuna.ats.jts.ExplicitInterposition;
 import com.hp.mwtests.ts.jts.TestModule.SetGet;
 import com.hp.mwtests.ts.jts.TestModule.SetGetHelper;
 
-public class setget_i extends com.hp.mwtests.ts.jts.TestModule.SetGetPOA {
 
-    public setget_i() {
-        ORBManager.getPOA().objectIsReady(this);
+public class setget_i extends com.hp.mwtests.ts.jts.TestModule.SetGetPOA
+{
 
-        value = 0;
+    public setget_i ()
+    {
+    ORBManager.getPOA().objectIsReady(this);
+    
+    value = 0;
 
-        ref = SetGetHelper.narrow(ORBManager.getPOA().corbaReference(this));
+    ref = SetGetHelper.narrow(ORBManager.getPOA().corbaReference(this));
     }
 
-    public setget_i(String name) {
-        ORBManager.getPOA().objectIsReady(this, name.getBytes());
+    public setget_i (String name)
+    {
+    ORBManager.getPOA().objectIsReady(this, name.getBytes());
 
-        value = 0;
+    value = 0;
 
-        ref = SetGetHelper.narrow(ORBManager.getPOA().corbaReference(this));
+    ref = SetGetHelper.narrow(ORBManager.getPOA().corbaReference(this));
     }
 
-    public SetGet getReference() {
-        return ref;
+    public SetGet getReference ()
+    {
+    return ref;
     }
 
-    public void set(short n, Control control) throws SystemException {
-        System.out.println("setget_i.set " + n);
+    public void set (short n, Control control) throws SystemException
+    {
+    System.out.println("setget_i.set "+n);
 
-        try {
-            if (control != null) {
-                ExplicitInterposition manager = new ExplicitInterposition();
+    try
+    {
+        if (control != null)
+        {
+        ExplicitInterposition manager = new ExplicitInterposition();
+        
+        manager.registerTransaction(control);
 
-                manager.registerTransaction(control);
+        System.out.println("setget_i.set - managed to set up interposition hierarchy");
+    
+        CurrentImple current = OTSImpleManager.current();
+        Control cont = current.get_control();
 
-                System.out.println("setget_i.set - managed to set up interposition hierarchy");
+        if (cont == null)
+            System.err.println("setget_i.set error - current returned no control!");
+        else
+        {
+            System.out.println("setget_i.set - current returned a control!");
 
-                CurrentImple current = OTSImpleManager.current();
-                Control cont = current.get_control();
-
-                if (cont == null)
-                    System.err.println("setget_i.set error - current returned no control!");
-                else {
-                    System.out.println("setget_i.set - current returned a control!");
-
-                    cont = null;
-                }
-
-                System.out.println("setget_i.set - beginning nested action");
-
-                current.begin();
-
-                cont = current.get_control();
-
-                if (cont != null) {
-                    Coordinator coord = cont.get_coordinator();
-
-                    System.out.println("setget_i.set - registering self");
-
-                    coord.register_resource(ref);
-
-                    coord = null;
-                    cont = null;
-                } else
-                    System.err.println("setget_i.set - current did not return control after begin!");
-
-                value = n;
-
-                System.out.println("setget_i.set - committing nested action");
-
-                current.commit(true);
-
-                manager.unregisterTransaction();
-
-                manager = null;
-            } else
-                System.err.println("setget_i::set error - no control!");
-        } catch (InterpositionFailed ex) {
-            System.err.println("setget_i.set - error in setting up hierarchy");
-
-            throw new UNKNOWN();
-        } catch (Throwable e) {
-            System.err.println("setget_i::set - caught exception: " + e);
+            cont = null;
         }
+        
+        System.out.println("setget_i.set - beginning nested action");
 
-        System.out.println("setget_i.set - finished");
+        current.begin();
+
+        cont = current.get_control();
+
+        if (cont != null)
+        {
+            Coordinator coord = cont.get_coordinator();
+
+            System.out.println("setget_i.set - registering self");
+        
+            coord.register_resource(ref);
+
+            coord = null;
+            cont = null;
+        }
+        else
+            System.err.println("setget_i.set - current did not return control after begin!");
+        
+        value = n;
+        
+        System.out.println("setget_i.set - committing nested action");
+    
+        current.commit(true);
+
+        manager.unregisterTransaction();
+
+        manager = null;
+        }
+        else
+        System.err.println("setget_i::set error - no control!");
+    }
+    catch (InterpositionFailed ex)
+    {
+        System.err.println("setget_i.set - error in setting up hierarchy");
+
+        throw new UNKNOWN();
+    }
+    catch (Throwable e)
+    {
+        System.err.println("setget_i::set - caught exception: "+e);
     }
 
-    public short get(Control p) throws SystemException {
-        return value;
+    System.out.println("setget_i.set - finished");
     }
 
-    public void commit_subtransaction(Coordinator parent) throws SystemException {
-        System.out.println("SETGET_I : COMMIT_SUBTRANSACTION");
+    public short get (Control p) throws SystemException
+    {
+    return value;
     }
 
-    public void rollback_subtransaction() throws SystemException {
-        System.out.println("SETGET_I : ROLLBACK_SUBTRANSACTION");
+    public void commit_subtransaction (Coordinator parent) throws SystemException
+    {
+    System.out.println("SETGET_I : COMMIT_SUBTRANSACTION");
     }
 
-    public org.omg.CosTransactions.Vote prepare() throws SystemException {
-        System.out.println("SETGET_I : PREPARE");
-
-        return Vote.VoteCommit;
+    public void rollback_subtransaction () throws SystemException
+    {
+    System.out.println("SETGET_I : ROLLBACK_SUBTRANSACTION");
     }
 
-    public void rollback() throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
-        System.out.println("SETGET_I : ROLLBACK");
+    public org.omg.CosTransactions.Vote prepare () throws SystemException
+    {
+    System.out.println("SETGET_I : PREPARE");
+    
+    return Vote.VoteCommit;
     }
 
-    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
-        System.out.println("SETGET_I : COMMIT");
+    public void rollback () throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard
+    {
+    System.out.println("SETGET_I : ROLLBACK");
     }
 
-    public void forget() throws SystemException {
-        System.out.println("SETGET_I : FORGET");
+    public void commit () throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
+    System.out.println("SETGET_I : COMMIT");
     }
 
-    public void commit_one_phase() throws SystemException, HeuristicHazard {
-        System.out.println("SETGET_I : COMMIT_ONE_PHASE");
+    public void forget () throws SystemException
+    {
+    System.out.println("SETGET_I : FORGET");
+    }
+
+    public void commit_one_phase () throws SystemException, HeuristicHazard
+    {
+    System.out.println("SETGET_I : COMMIT_ONE_PHASE");
     }
 
     private short value;
     private SetGet ref;
-
+ 
 }
+

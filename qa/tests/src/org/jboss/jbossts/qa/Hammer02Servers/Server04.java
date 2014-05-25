@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.Hammer02Servers;
  * $Id: Server04.java,v 1.2 2003/06/26 11:44:02 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Hammer02.*;
 import org.jboss.jbossts.qa.Hammer02Impls.AITMatrixImpl04;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server04 {
-    public static void main(String args[]) {
-        try {
+public class Server04
+{
+    public static void main(String args[])
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -79,8 +83,11 @@ public class Server04 {
             System.out.println("Ready");
 
             ORBInterface.run();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Server04.main: " + exception);
         }
     }
 }
+

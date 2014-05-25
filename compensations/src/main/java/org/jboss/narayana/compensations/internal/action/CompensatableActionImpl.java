@@ -73,17 +73,13 @@ public class CompensatableActionImpl implements CompensatableAction {
     /**
      * Execute all registered compensatable actions.
      * 
-     * For each compensatable action enlist it's handlers to the transaction and
-     * then move on to execute the action.
+     * For each compensatable action enlist it's handlers to the transaction and then move on to execute the action.
      * 
-     * If the action was successful notify coordinator about the completion. Or
-     * about the exit if it wasn't successful. {@link RuntimeException} thrown
-     * by action execution indicates a failure which makes handler participants
-     * to exit the transaction (this is based on the same logic implemented by
-     * {@link ParticipantInterceptor}).
+     * If the action was successful notify coordinator about the completion. Or about the exit if it wasn't successful.
+     * {@link RuntimeException} thrown by action execution indicates a failure which makes handler participants to exit the
+     * transaction (this is based on the same logic implemented by {@link ParticipantInterceptor}).
      * 
-     * @throws EnlistException
-     *             if enlistment of handler participants has failed.
+     * @throws EnlistException if enlistment of handler participants has failed.
      */
     @Override
     @Compensatable
@@ -93,8 +89,7 @@ public class CompensatableActionImpl implements CompensatableAction {
             try {
                 workInfo.compensatableWork.execute();
             } catch (RuntimeException e) {
-                exit(managers); // Following the behaviour of
-                                // ParticipantInterceptor.
+                exit(managers); // Following the behaviour of ParticipantInterceptor.
                 throw e;
             }
             complete(managers);
@@ -104,16 +99,12 @@ public class CompensatableActionImpl implements CompensatableAction {
     }
 
     /**
-     * Enlist each available handler as a separate participant to the
-     * transaction (compensations framework interceptors enlist separate
-     * participant for each handler, so using the same login in here).
+     * Enlist each available handler as a separate participant to the transaction (compensations framework interceptors enlist
+     * separate participant for each handler, so using the same login in here).
      * 
-     * @param workInfo
-     *            container with handlers to be enlisted.
-     * @return set of participant managers to notify coordinator about
-     *         participant state.
-     * @throws EnlistException
-     *             if participant enlistment failed.
+     * @param workInfo container with handlers to be enlisted.
+     * @return set of participant managers to notify coordinator about participant state.
+     * @throws EnlistException if participant enlistment failed.
      */
     private Set<ParticipantManager> enlistHandlers(WorkInfo workInfo) throws EnlistException {
         Set<ParticipantManager> managers = new HashSet<>();
@@ -143,8 +134,7 @@ public class CompensatableActionImpl implements CompensatableAction {
     /**
      * Notify each manager about the participant's completion.
      *
-     * @param managers
-     *            set of participant managers.
+     * @param managers set of participant managers.
      */
     private void complete(Set<ParticipantManager> managers) {
         managers.forEach(pm -> {
@@ -159,8 +149,7 @@ public class CompensatableActionImpl implements CompensatableAction {
     /**
      * Notify each manager about participant's exist.
      *
-     * @param managers
-     *            set of participant managers.
+     * @param managers set of participant managers.
      */
     private void exit(Set<ParticipantManager> managers) {
         managers.forEach(pm -> {
@@ -173,8 +162,7 @@ public class CompensatableActionImpl implements CompensatableAction {
     }
 
     /**
-     * Compensatable work and handlers container to keep method declarations
-     * cleaner.
+     * Compensatable work and handlers container to keep method declarations cleaner.
      */
     private static class WorkInfo {
 

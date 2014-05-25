@@ -46,14 +46,14 @@ import java.io.IOException;
 
 /**
  * The Client side of the Participant Completion Coordinator.
- * 
  * @author kevin
  */
-public class ParticipantCompletionCoordinatorClient {
+public class ParticipantCompletionCoordinatorClient
+{
     /**
      * The client singleton.
      */
-    private static final ParticipantCompletionCoordinatorClient CLIENT = new ParticipantCompletionCoordinatorClient();
+    private static final ParticipantCompletionCoordinatorClient CLIENT = new ParticipantCompletionCoordinatorClient() ;
 
     /**
      * The completed action.
@@ -105,7 +105,8 @@ public class ParticipantCompletionCoordinatorClient {
     /**
      * Construct the participant completion coordinator client.
      */
-    private ParticipantCompletionCoordinatorClient() {
+    private ParticipantCompletionCoordinatorClient()
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + " constructor");
         }
@@ -122,28 +123,24 @@ public class ParticipantCompletionCoordinatorClient {
         statusAction = BusinessActivityConstants.WSBA_ACTION_STATUS;
 
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-        final String participantCompletionParticipantURIString = serviceRegistry
-                .getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, false);
-        final String secureParticipantCompletionParticipantURIString = serviceRegistry
-                .getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, true);
+        final String participantCompletionParticipantURIString =
+                serviceRegistry.getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, false) ;
+        final String secureParticipantCompletionParticipantURIString =
+                serviceRegistry.getServiceURI(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, true) ;
         participantCompletionParticipant = builder.newEndpoint(participantCompletionParticipantURIString);
         secureParticipantCompletionParticipant = builder.newEndpoint(secureParticipantCompletionParticipantURIString);
     }
 
     /**
      * Send a completed request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCompleted(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendCompleted");
         }
@@ -159,18 +156,15 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a fault request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendFail(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier,
-            final QName exceptionIdentifier) throws SoapFault, IOException {
+        final QName exceptionIdentifier)
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendFail");
         }
@@ -187,18 +181,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a compensated request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCompensated(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendCompensated");
         }
@@ -214,18 +204,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a closed request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendClosed(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendClosed");
         }
@@ -241,18 +227,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a cancelled request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCancelled(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendCancelled");
         }
@@ -268,18 +250,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send an exit request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendExit(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendExit");
         }
@@ -295,18 +273,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a cannot complete request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCannotComplete(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendCannotComplete");
         }
@@ -322,18 +296,14 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a get status request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendGetStatus(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault, IOException {
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendGetStatus");
         }
@@ -349,18 +319,15 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Send a status request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendStatus(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier,
-            final QName state) throws SoapFault, IOException {
+        final QName state)
+        throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendStatus");
         }
@@ -375,20 +342,17 @@ public class ParticipantCompletionCoordinatorClient {
         port.statusOperation(status);
     }
 
+
     /**
      * send a soap fault
-     * 
-     * @param soapFault
-     *            the fault to be sent
-     * @param participant
-     *            the endpoint to send the fault to
-     * @param map
-     *            addressing context to be used to send the fault
-     * @param faultAction
-     *            the action to associate with the message
+     * @param soapFault the fault to be sent
+     * @param participant the endpoint to send the fault to
+     * @param map addressing context to be used to send the fault
+     * @param faultAction the action to associate with the message
      */
     public void sendSoapFault(SoapFault11 soapFault, W3CEndpointReference participant, MAP map, String faultAction)
-            throws SoapFault, IOException {
+            throws SoapFault, IOException
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".sendSoapFault");
         }
@@ -397,16 +361,16 @@ public class ParticipantCompletionCoordinatorClient {
         map.setAction(faultAction);
         BusinessAgreementWithParticipantCompletionCoordinatorPortType port;
         port = getPort(participant, map, faultAction);
-        Fault fault = ((SoapFault11) soapFault).toFault();
+        Fault fault = ((SoapFault11)soapFault).toFault();
         port.soapFault(fault);
     }
     /**
      * return a participant endpoint appropriate to the type of coordinator
-     * 
      * @param endpoint
      * @return either the secure participant endpoint or the non-secure endpoint
      */
-    MAPEndpoint getParticipant(W3CEndpointReference endpoint, MAP map) {
+    MAPEndpoint getParticipant(W3CEndpointReference endpoint, MAP map)
+    {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".getParticipant");
         }
@@ -428,25 +392,24 @@ public class ParticipantCompletionCoordinatorClient {
 
     /**
      * Get the Completion Coordinator client singleton.
-     * 
      * @return The Completion Coordinator client singleton.
      */
-    public static ParticipantCompletionCoordinatorClient getClient() {
+    public static ParticipantCompletionCoordinatorClient getClient()
+    {
         return CLIENT;
     }
 
     /**
-     * obtain a port from the coordinator endpoint configured with the instance
-     * identifier handler and the supplied addressing properties supplemented
-     * with the given action
-     * 
+     * obtain a port from the coordinator endpoint configured with the instance identifier handler and the supplied
+     * addressing properties supplemented with the given action
      * @param participant
      * @param map
      * @param action
      * @return
      */
-    private BusinessAgreementWithParticipantCompletionCoordinatorPortType getPort(
-            final W3CEndpointReference participant, final MAP map, final String action) {
+    private BusinessAgreementWithParticipantCompletionCoordinatorPortType
+    getPort(final W3CEndpointReference participant, final MAP map, final String action)
+    {
         AddressingHelper.installNoneReplyTo(map);
         if (participant != null) {
             return WSBAClient.getParticipantCompletionCoordinatorPort(participant, action, map);

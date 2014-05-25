@@ -32,19 +32,26 @@
 
 package com.arjuna.ats.internal.jts.orbspecific.ibmorb.recoverycoordinators;
 
-public class ORBRunner extends Thread {
+public class ORBRunner extends Thread
+{
 
-    public ORBRunner() {
+    public ORBRunner ()
+    {
         setDaemon(true);
 
         start();
     }
 
-    public void run() {
-        try {
+    public void run()
+    {
+        try
+        {
             JavaIdlRCServiceInit._orb.orb().run();
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             e.printStackTrace();
         }
     }
 }
+

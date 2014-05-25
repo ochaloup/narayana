@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.PerfProfile01Clients;
  * $Id: Client_ExplicitObject_NoTran_TranRollbackNullOper.java,v 1.2 2003/06/26 11:44:18 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.PerfProfile01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -64,9 +65,12 @@ import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
 import java.util.Date;
 
-public class Client_ExplicitObject_NoTran_TranRollbackNullOper {
-    public static void main(String[] args) {
-        try {
+public class Client_ExplicitObject_NoTran_TranRollbackNullOper
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -74,14 +78,14 @@ public class Client_ExplicitObject_NoTran_TranRollbackNullOper {
             int numberOfCalls = Integer.parseInt(args[args.length - 2]);
             String explicitObjectIOR = ServerIORStore.loadIOR(args[args.length - 1]);
 
-            ExplicitObject explicitObject = ExplicitObjectHelper
-                    .narrow(ORBInterface.orb().string_to_object(explicitObjectIOR));
+            ExplicitObject explicitObject = ExplicitObjectHelper.narrow(ORBInterface.orb().string_to_object(explicitObjectIOR));
 
             boolean correct = true;
 
             Date start = new Date();
 
-            for (int index = 0; index < numberOfCalls; index++) {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 explicitObject.tran_rollback_nulloper(null);
             }
 
@@ -92,24 +96,31 @@ public class Client_ExplicitObject_NoTran_TranRollbackNullOper {
             System.err.println("Operation duration       : " + operationDuration + "ms");
             System.err.println("Test duration            : " + (end.getTime() - start.getTime()) + "ms");
 
-            correct = PerformanceProfileStore.checkPerformance(prefix + "_ExplicitObject_NoTran_TranRollbackNullOper",
-                    operationDuration);
+            correct = PerformanceProfileStore.checkPerformance(prefix + "_ExplicitObject_NoTran_TranRollbackNullOper", operationDuration);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client_ExplicitObject_NoTran_TranRollbackNullOper.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client_ExplicitObject_NoTran_TranRollbackNullOper.main: " + exception);
             exception.printStackTrace(System.err);
         }

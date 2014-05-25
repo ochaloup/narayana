@@ -56,14 +56,18 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients1;
  * $Id: Client04a.java,v 1.2 2003/06/26 11:43:30 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery05.CheckBehavior;
 import org.jboss.jbossts.qa.CrashRecovery05.ResourceTrace;
 
-public class Client04a {
-    public static void main(String[] args) {
+public class Client04a
+{
+    public static void main(String[] args)
+    {
         ClientAfterCrash afterCrash = new ClientAfterCrash(Client04a.class.getSimpleName());
 
-        try {
+        try
+        {
             afterCrash.initOrb(args);
 
             CheckBehavior[] checkBehaviors = new CheckBehavior[1];
@@ -82,9 +86,12 @@ public class Client04a {
             afterCrash.checkResourceTrace(ResourceTrace.ResourceTraceRollback);
 
             afterCrash.reportStatus();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             afterCrash.reportException(exception);
-        } finally {
+        }
+        finally {
             afterCrash.shutdownOrb();
         }
     }

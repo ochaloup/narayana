@@ -57,8 +57,7 @@ public final class InboundBridgeManager {
         inboundBridges = new ConcurrentHashMap<Xid, InboundBridge>();
         transactionXids = new ConcurrentHashMap<String, Xid>();
 
-        ParticipantsManagerFactory.getInstance().registerDeserializer(APPLICATION_ID,
-                new InboundBridgeParticipantDeserializer());
+        ParticipantsManagerFactory.getInstance().registerDeserializer(APPLICATION_ID, new InboundBridgeParticipantDeserializer());
     }
 
     public synchronized boolean addInboundBridge(final InboundBridge inboundBridge) {
@@ -79,8 +78,7 @@ public final class InboundBridgeManager {
 
         if (existingInboundBridge != null) {
             if (LOG.isTraceEnabled()) {
-                LOG.trace(
-                        "InboundBridgeManager.addInboundBridge: another bridge uses this xid " + existingInboundBridge);
+                LOG.trace("InboundBridgeManager.addInboundBridge: another bridge uses this xid " + existingInboundBridge);
             }
 
             // Another bridge has the same Xid.

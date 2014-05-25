@@ -53,7 +53,7 @@ public class XARRTwo implements XAResourceRecoveryHelper {
 
     @Override
     public XAResource[] getXAResources() {
-        return resources.toArray(new XAResource[]{});
+        return resources.toArray(new XAResource[] {});
     }
 
     @Override

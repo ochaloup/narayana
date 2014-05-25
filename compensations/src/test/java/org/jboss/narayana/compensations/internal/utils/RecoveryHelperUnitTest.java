@@ -192,8 +192,7 @@ public class RecoveryHelperUnitTest {
 
     @Test
     public void writeRecordShouldCallExceptionConsumer() throws ObjectStoreException {
-        when(recoveryStore.write_committed(anyObject(), anyString(), anyObject()))
-                .thenThrow(new ObjectStoreException("test"));
+        when(recoveryStore.write_committed(anyObject(), anyString(), anyObject())).thenThrow(new ObjectStoreException("test"));
         assertFalse(getRecoveryHelper().writeRecord(new OutputObjectState(), exceptionConsumer));
         verify(exceptionConsumer, times(1)).accept(anyObject());
     }

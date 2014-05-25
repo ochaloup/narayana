@@ -37,8 +37,10 @@ import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-public class Outcome01 {
-    public static void main(String[] args) {
+public class Outcome01
+{
+    public static void main(String[] args)
+    {
         String resultsFile = args[0];
         boolean recoveryPassedExpected = "yes".equalsIgnoreCase(args[1]);
 
@@ -46,30 +48,40 @@ public class Outcome01 {
         boolean foundRecoveryPassed = false;
         boolean foundPassed = false;
 
-        try {
+        try
+        {
             CrashRecoveryDelays.awaitRecoveryCR12();
+
 
             FileReader fr = new FileReader(resultsFile);
             BufferedReader br = new BufferedReader(fr);
             String line;
 
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 System.err.println("Read: " + line);
-                if ("Passed".equals(line)) {
+                if ("Passed".equals(line))
+                {
                     foundPassed = true;
                 }
-                if ("Recovery Passed".equals(line)) {
+                if ("Recovery Passed".equals(line))
+                {
                     foundRecoveryPassed = true;
                 }
             }
             br.close();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
         }
 
         passed = recoveryPassedExpected ? foundRecoveryPassed : foundPassed;
-        if (passed) {
+        if (passed)
+        {
             System.out.println("Passed");
-        } else {
+        }
+        else
+        {
             System.out.println("Failed");
         }
     }

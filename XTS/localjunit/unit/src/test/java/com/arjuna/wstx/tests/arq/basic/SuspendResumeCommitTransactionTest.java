@@ -20,7 +20,9 @@ public class SuspendResumeCommitTransactionTest {
     }
 
     @Test
-    public void testSuspendResumeCommitTransaction() throws Exception {
+    public void testSuspendResumeCommitTransaction()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
 
@@ -28,12 +30,12 @@ public class SuspendResumeCommitTransactionTest {
 
         TxContext ctx = tm.suspend();
 
-        System.out.println("Suspended: " + ctx);
+        System.out.println("Suspended: "+ctx);
 
         tm.resume(ctx);
 
         System.out.println("\nResumed");
 
         ut.commit();
-    }
+            }
 }

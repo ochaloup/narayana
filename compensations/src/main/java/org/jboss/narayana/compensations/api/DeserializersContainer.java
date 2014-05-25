@@ -23,8 +23,7 @@
 package org.jboss.narayana.compensations.api;
 
 /**
- * A container holding deserializers of all applications using compensations
- * framework.
+ * A container holding deserializers of all applications using compensations framework.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -33,8 +32,7 @@ public interface DeserializersContainer {
     /**
      * Add deserializer to the container.
      *
-     * @param deserializer
-     *            a deserializer to be added to the container.
+     * @param deserializer a deserializer to be added to the container.
      */
     void addDeserializer(Deserializer deserializer);
 

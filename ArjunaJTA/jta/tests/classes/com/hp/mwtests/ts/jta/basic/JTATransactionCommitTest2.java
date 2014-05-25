@@ -41,9 +41,11 @@ import org.junit.Test;
  * $Id: JTATransactionCommitTest2.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class JTATransactionCommitTest2 {
+public class JTATransactionCommitTest2
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
@@ -58,9 +60,10 @@ public class JTATransactionCommitTest2 {
             tm.begin();
 
             fail("Begin call completed successfully - this shouldn't have happened");
-        } catch (NotSupportedException e) {
-            System.out
-                    .println("NotSupportedException \"" + e.getMessage() + "\" occurred this is expected and correct");
+        }
+        catch (NotSupportedException e)
+        {
+            System.out.println("NotSupportedException \""+e.getMessage()+"\" occurred this is expected and correct");
         }
     }
 }

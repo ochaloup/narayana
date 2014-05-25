@@ -58,6 +58,7 @@ package org.jboss.jbossts.qa.CrashRecovery09Cleanups;
  * $Id: Cleanup01.java,v 1.2 2003/06/26 11:43:42 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery09.*;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
 
@@ -65,13 +66,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
-public class Cleanup01 {
-    public static void main(String[] args) {
-        try {
+public class Cleanup01
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++) {
+            for (int index = 0; index < numberOfDrivers; index++)
+            {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -88,8 +93,19 @@ public class Cleanup01 {
 
             statement.close();
             connection.close();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Cleanup01.main: " + exception);
         }
     }
 }
+
+
+
+
+
+
+
+
+

@@ -37,8 +37,7 @@ public class ConnectionClosingSynchronization implements Synchronization {
     private final Connection connection;
 
     /**
-     * @param connection
-     *            connection to be closed.
+     * @param connection connection to be closed.
      */
     public ConnectionClosingSynchronization(Connection connection) {
         this.connection = connection;

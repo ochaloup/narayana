@@ -86,14 +86,10 @@ public class ParticipantImplUnitTest {
     private DeserializerHelper deserializerHelper;
 
     @Mock
-    private OutputObjectState outputObjectState; // This doesn't work as
-                                                    // expected, but it's good
-                                                    // to test IOException
+    private OutputObjectState outputObjectState; // This doesn't work as expected, but it's good to test IOException
 
     @Mock
-    private InputObjectState inputObjectState; // This doesn't work as expected,
-                                                // but it's good to test
-                                                // IOException
+    private InputObjectState inputObjectState;  // This doesn't work as expected, but it's good to test IOException
 
     private String testTransactionId = new Uid().toString();
 
@@ -210,11 +206,11 @@ public class ParticipantImplUnitTest {
         ParticipantImpl participant = new ParticipantImpl(compensationContextStateManager, deserializerHelper);
         assertFalse(participant.restoreState(inputObjectState));
     }
-
-    private ParticipantImpl getParticipantImpl(CompensationHandler compensationHandler,
-            ConfirmationHandler confirmationHandler, TransactionLoggedHandler transactionLoggedHandler) {
-        return new ParticipantImpl(compensationHandler, confirmationHandler, transactionLoggedHandler,
-                testTransactionId, testParticipantId, compensationContextStateManager, deserializerHelper);
+    
+    private ParticipantImpl getParticipantImpl(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
+            TransactionLoggedHandler transactionLoggedHandler) {
+        return new ParticipantImpl(compensationHandler, confirmationHandler, transactionLoggedHandler, testTransactionId,
+                testParticipantId, compensationContextStateManager, deserializerHelper);
     }
 
     private interface SerializableCompensationHandler extends CompensationHandler, Serializable {

@@ -31,17 +31,21 @@
 
 package com.hp.mwtests.ts.jts.exceptions;
 
-public class TestException extends Exception {
 
-    public TestException() {
-        super();
+public class TestException extends Exception
+{
+
+    public TestException ()
+    {
+    super();
     }
 
-    public TestException(String s) {
-        super(s);
+    public TestException (String s)
+    {
+    super(s);
     }
 
     public TestException(Exception e) {
-        super(e);
+        super (e);
     }
 }

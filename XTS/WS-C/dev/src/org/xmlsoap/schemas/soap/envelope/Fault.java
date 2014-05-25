@@ -8,17 +8,15 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
+
 /**
  * 
- * Fault reporting structure
+ *         Fault reporting structure
+ *       
  * 
+ * <p>Java class for Fault complex type.
  * 
- * <p>
- * Java class for Fault complex type.
- * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="Fault">
@@ -38,7 +36,12 @@ import javax.xml.namespace.QName;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Fault", propOrder = {"faultcode", "faultstring", "faultactor", "detail"})
+@XmlType(name = "Fault", propOrder = {
+    "faultcode",
+    "faultstring",
+    "faultactor",
+    "detail"
+})
 public class Fault {
 
     @XmlElement(required = true)
@@ -52,8 +55,10 @@ public class Fault {
     /**
      * Gets the value of the faultcode property.
      * 
-     * @return possible object is {@link QName }
-     * 
+     * @return
+     *     possible object is
+     *     {@link QName }
+     *     
      */
     public QName getFaultcode() {
         return faultcode;
@@ -63,8 +68,9 @@ public class Fault {
      * Sets the value of the faultcode property.
      * 
      * @param value
-     *            allowed object is {@link QName }
-     * 
+     *     allowed object is
+     *     {@link QName }
+     *     
      */
     public void setFaultcode(QName value) {
         this.faultcode = value;
@@ -73,8 +79,10 @@ public class Fault {
     /**
      * Gets the value of the faultstring property.
      * 
-     * @return possible object is {@link String }
-     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getFaultstring() {
         return faultstring;
@@ -84,8 +92,9 @@ public class Fault {
      * Sets the value of the faultstring property.
      * 
      * @param value
-     *            allowed object is {@link String }
-     * 
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setFaultstring(String value) {
         this.faultstring = value;
@@ -94,8 +103,10 @@ public class Fault {
     /**
      * Gets the value of the faultactor property.
      * 
-     * @return possible object is {@link String }
-     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getFaultactor() {
         return faultactor;
@@ -105,8 +116,9 @@ public class Fault {
      * Sets the value of the faultactor property.
      * 
      * @param value
-     *            allowed object is {@link String }
-     * 
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setFaultactor(String value) {
         this.faultactor = value;
@@ -115,8 +127,10 @@ public class Fault {
     /**
      * Gets the value of the detail property.
      * 
-     * @return possible object is {@link Detail }
-     * 
+     * @return
+     *     possible object is
+     *     {@link Detail }
+     *     
      */
     public Detail getDetail() {
         return detail;
@@ -126,8 +140,9 @@ public class Fault {
      * Sets the value of the detail property.
      * 
      * @param value
-     *            allowed object is {@link Detail }
-     * 
+     *     allowed object is
+     *     {@link Detail }
+     *     
      */
     public void setDetail(Detail value) {
         this.detail = value;

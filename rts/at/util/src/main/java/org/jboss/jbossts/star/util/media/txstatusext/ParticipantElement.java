@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
-@XmlType(propOrder = {"created", "status", "recoveryURI", "resourceURI"})
+@XmlType(propOrder = { "created", "status", "recoveryURI", "resourceURI"})
 public class ParticipantElement {
     Date created;
     TransactionStatusElement status;

@@ -37,16 +37,20 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.jta.recovery.XARecoveryResource;
 import com.arjuna.ats.jta.recovery.XARecoveryResourceManager;
 
-public class XARecoveryResourceManagerImple implements XARecoveryResourceManager {
-    public XARecoveryResource getResource(Uid uid) {
-        return new XARecoveryResourceImple(uid);
+public class XARecoveryResourceManagerImple implements XARecoveryResourceManager
+{
+    public XARecoveryResource getResource (Uid uid)
+    {
+    return new XARecoveryResourceImple(uid);
+    }
+    
+    public XARecoveryResource getResource (Uid uid, XAResource res)
+    {
+    return new XARecoveryResourceImple(uid, res);
     }
 
-    public XARecoveryResource getResource(Uid uid, XAResource res) {
-        return new XARecoveryResourceImple(uid, res);
-    }
-
-    public String type() {
-        return XARecoveryResourceImple.typeName();
+    public String type ()
+    {
+    return XARecoveryResourceImple.typeName();
     }
 }

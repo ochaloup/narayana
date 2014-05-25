@@ -38,10 +38,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlist several participants for the same web service
- * with instructions to prepare and commit without error
+ * Starts a transaction and enlist several participants for the same web service with instructions to
+ * prepare and commit without error
  */
-public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest {
+public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest
+{
     public void run() {
 
         try {
@@ -61,6 +62,7 @@ public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase imp
         addDefaultBinding("service1", serviceURL1);
 
         UserTransaction tx = UserTransactionFactory.userTransaction();
+
 
         // start the transaction
 

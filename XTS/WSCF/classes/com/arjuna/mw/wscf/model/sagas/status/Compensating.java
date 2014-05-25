@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Compensating implements Status {
+public class Compensating implements Status
+{
 
-    public static Compensating instance() {
-        return _instance;
+    public static Compensating instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.sagas.status.Compensating";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.sagas.status.Compensating";
-    }
-
-    private Compensating() {
+    private Compensating ()
+    {
     }
 
     private static final Compensating _instance = new Compensating();
-
+    
 }

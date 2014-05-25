@@ -69,12 +69,16 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client08.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.*;
 
-public class Client08 {
-    public static void main(String[] args) {
-        try {
+public class Client08
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -90,17 +94,21 @@ public class Client08 {
             float serverIncreaseThreshold;
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2])) {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2]))
+            {
                 clientIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultClientIncreaseThreshold());
-            } else // Use passed threshold
+            }
+            else // Use passed threshold
             {
                 clientIncreaseThreshold = Float.parseFloat(args[args.length - 2]);
             }
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1])) {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1]))
+            {
                 serverIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultServerIncreaseThreshold());
-            } else // Use passed threshold
+            }
+            else // Use passed threshold
             {
                 serverIncreaseThreshold = Float.parseFloat(args[args.length - 1]);
             }
@@ -112,7 +120,8 @@ public class Client08 {
             int server1Memory0 = pinger.getMemory();
             int server2Memory0 = ponger.getMemory();
 
-            for (int index = 0; index < numberOfCalls; index++) {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 pinger.hit(index, ponger, pinger);
             }
 
@@ -128,31 +137,35 @@ public class Client08 {
             System.err.println("Server memory increase threshold : " + (float) (100.0 * serverIncreaseThreshold) + "%");
 
             System.err.println("Client   percentage memory increase: " + (float) (100.0 * clientMemoryIncrease) + "%");
-            System.err
-                    .println("Client   memory increase per call  : " + (clientMemory1 - clientMemory0) / numberOfCalls);
+            System.err.println("Client   memory increase per call  : " + (clientMemory1 - clientMemory0) / numberOfCalls);
             System.err.println("Server 1 percentage memory increase: " + (float) (100.0 * server1MemoryIncrease) + "%");
-            System.err.println(
-                    "Server 1 memory increase per call  : " + (server1Memory1 - server1Memory0) / numberOfCalls);
+            System.err.println("Server 1 memory increase per call  : " + (server1Memory1 - server1Memory0) / numberOfCalls);
             System.err.println("Server 2 percentage memory increase: " + (float) (100.0 * server2MemoryIncrease) + "%");
-            System.err.println(
-                    "Server 2 memory increase per call  : " + (server2Memory1 - server2Memory0) / numberOfCalls);
+            System.err.println("Server 2 memory increase per call  : " + (server2Memory1 - server2Memory0) / numberOfCalls);
 
-            if ((clientMemoryIncrease < clientIncreaseThreshold) && (server1MemoryIncrease < serverIncreaseThreshold)
-                    && (server2MemoryIncrease < serverIncreaseThreshold)) {
+            if ((clientMemoryIncrease < clientIncreaseThreshold) && (server1MemoryIncrease < serverIncreaseThreshold) && (server2MemoryIncrease < serverIncreaseThreshold))
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client08.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client08.main: " + exception);
             exception.printStackTrace(System.err);
         }

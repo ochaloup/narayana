@@ -59,7 +59,8 @@ import org.jboss.tm.JBossXATerminator;
  * @author mcl
  */
 
-public class XATerminator extends XATerminatorImple implements JBossXATerminator {
+public class XATerminator extends XATerminatorImple implements JBossXATerminator
+{
     private static final Xid[] NO_XIDS = new Xid[0];
 
     /**
@@ -81,24 +82,30 @@ public class XATerminator extends XATerminatorImple implements JBossXATerminator
      *
      */
 
-    public void registerWork(Work work, Xid xid, long timeout) throws WorkCompletedException {
-        try {
+    public void registerWork (Work work, Xid xid, long timeout)
+            throws WorkCompletedException
+    {
+        try
+        {
             /*
              * Remember to convert timeout to seconds.
              */
 
-            Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid, (int) timeout / 1000);
+            Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid, (int) timeout/1000);
 
-            switch (tx.getStatus()) {
-                case Status.STATUS_NO_TRANSACTION :
-                case Status.STATUS_UNKNOWN :
-                    throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_inactive(),
-                            WorkException.TX_RECREATE_FAILED);
-                case Status.STATUS_ACTIVE :
-                    break;
-                default :
-                    throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_completing(),
-                            WorkException.TX_CONCURRENT_WORK_DISALLOWED);
+            switch (tx.getStatus())
+            {
+            case Status.STATUS_NO_TRANSACTION:
+            case Status.STATUS_UNKNOWN:
+                throw new WorkCompletedException(
+                        jbossatxLogger.i18NLogger.get_jta_jca_inactive(),
+                        WorkException.TX_RECREATE_FAILED);
+            case Status.STATUS_ACTIVE:
+                break;
+            default:
+                throw new WorkCompletedException(
+                        jbossatxLogger.i18NLogger.get_jta_jca_completing(),
+                        WorkException.TX_CONCURRENT_WORK_DISALLOWED);
             }
 
             TxWorkManager.addWork(work, tx);
@@ -115,14 +122,22 @@ public class XATerminator extends XATerminatorImple implements JBossXATerminator
              */
 
             tx.registerSynchronization(new WorkSynchronization(tx));
-        } catch (WorkCompletedException ex) {
+        }
+        catch (WorkCompletedException ex)
+        {
             throw ex;
-        } catch (XAException ex) {
+        }
+        catch (XAException ex)
+        {
             throw new WorkCompletedException(ex);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
 
-            throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_unknown(), WorkException.INTERNAL);
+            throw new WorkCompletedException(
+                    jbossatxLogger.i18NLogger.get_jta_jca_unknown(),
+                    WorkException.INTERNAL);
         }
     }
 
@@ -132,78 +147,93 @@ public class XATerminator extends XATerminatorImple implements JBossXATerminator
      * likewise, i.e., we don't do a register if it hasn't, but we will throw an
      * exception (which is more than JBoss does).
      *
-     * @param work
-     *            the Work to start
-     * @param xid
-     *            the transaction to associate with the current thread.
+     * @param work the Work to start
+     * @param xid the transaction to associate with the current thread.
      *
-     * @throws WorkCompletedException
-     *             thrown if there are any errors.
+     * @throws WorkCompletedException thrown if there are any errors.
      */
 
-    public void startWork(Work work, Xid xid) throws WorkCompletedException {
-        try {
+    public void startWork (Work work, Xid xid) throws WorkCompletedException
+    {
+        try
+        {
             Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
             // JBoss doesn't seem to use the work parameter!
 
-            if (!TxWorkManager.getWork(tx).equals(work)) {
+            if (!TxWorkManager.getWork(tx).equals(work))
+            {
                 throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_unknownwork(),
                         WorkException.INTERNAL);
             }
 
             TransactionManager.transactionManager().resume(tx);
-        } catch (XAException ex) {
+        }
+        catch (XAException ex)
+        {
             throw new WorkCompletedException(ex);
-        } catch (InvalidTransactionException ex) {
-            throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_inactive(),
+        }
+        catch (InvalidTransactionException ex)
+        {
+            throw new WorkCompletedException(
+                    jbossatxLogger.i18NLogger.get_jta_jca_inactive(),
                     WorkException.TX_RECREATE_FAILED);
-        } catch (SystemException ex) {
-            throw new WorkCompletedException(jbossatxLogger.i18NLogger.get_jta_jca_unknown(), WorkException.INTERNAL);
+        }
+        catch (SystemException ex)
+        {
+            throw new WorkCompletedException(
+                    jbossatxLogger.i18NLogger.get_jta_jca_unknown(),
+                    WorkException.INTERNAL);
         }
     }
 
     /**
-     * Disassociate the thread from the transaction and remove the work from the
-     * transaction pool of workers. This assumes that the invoking thread is the
-     * one doing the work.
+     * Disassociate the thread from the transaction and remove the
+     * work from the transaction pool of workers. This assumes that
+     * the invoking thread is the one doing the work.
      *
-     * @param work
-     *            the Work unit to remove.
-     * @param xid
-     *            the transaction to remove the work from.
+     * @param work the Work unit to remove.
+     * @param xid the transaction to remove the work from.
      */
 
-    public void endWork(Work work, Xid xid) {
-        try {
+    public void endWork (Work work, Xid xid)
+    {
+        try
+        {
             Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
             TransactionManager.transactionManager().suspend();
 
             TxWorkManager.removeWork(work, tx);
-        } catch (XAException xaException) {
+        }
+        catch (XAException xaException)
+        {
             throw new RuntimeException(xaException);
-        } catch (SystemException systemException) {
+        }
+        catch (SystemException systemException)
+        {
             throw new RuntimeException(systemException);
         }
     }
 
     /**
-     * Remove the associated work from the transaction. Do not do any
-     * thread-to-transaction disassociation.
+     * Remove the associated work from the transaction. Do not do
+     * any thread-to-transaction disassociation.
      *
-     * @param work
-     *            the unit of work to remove.
-     * @param xid
-     *            the transaction from which it should be disassociated.
+     * @param work the unit of work to remove.
+     * @param xid the transaction from which it should be disassociated.
      */
 
-    public void cancelWork(Work work, Xid xid) {
-        try {
+    public void cancelWork (Work work, Xid xid)
+    {
+        try
+        {
             Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
             TxWorkManager.removeWork(work, tx);
-        } catch (XAException xaException) {
+        }
+        catch (XAException xaException)
+        {
             throw new RuntimeException(xaException);
         }
     }

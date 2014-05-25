@@ -54,37 +54,40 @@ import com.arjuna.ats.jta.xa.XidImple;
  * should be assigned to at most one resource.
  */
 
-public class ServerTransaction
-        extends
-            com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction {
+public class ServerTransaction extends com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction
+{
 
-    public ServerTransaction(Uid actUid, Xid xid) {
+    public ServerTransaction (Uid actUid, Xid xid)
+    {
         super(actUid, null);
-
+        
         // convert to internal format (makes saving/restoring easier)
-
+        
         _theXid = new XidImple(xid);
     }
 
-    public ServerTransaction(Uid actId) {
+    public ServerTransaction (Uid actId)
+    {
         super(actId);
-
-        if (!activate()) // if this fails we'll retry recovery periodically.\
+        
+        if (!activate())  // if this fails we'll retry recovery periodically.\
         {
-            _theXid = null; // should be the case anyway if activate fails, but
-                            // ...
+            _theXid = null; // should be the case anyway if activate fails, but ...
         }
     }
-
-    public final Xid getXid() {
+    
+    public final Xid getXid ()
+    {
         return _theXid;
     }
-
-    public String type() {
+    
+    public String type ()
+    {
         return getType();
     }
-
-    public static final String getType() {
+    
+    public static final String getType ()
+    {
         return "/StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/ServerTransaction/JCA";
     }
 
@@ -93,37 +96,46 @@ public class ServerTransaction
      * coordinator reference, so save it away.
      */
 
-    public boolean save_state(OutputObjectState os, int ot) {
-        try {
+    public boolean save_state (OutputObjectState os, int ot)
+    {
+        try
+        {
             if (_theXid != null) {
                 os.packBoolean(true);
                 _theXid.packInto(os);
             } else {
                 os.packBoolean(false);
             }
-
+            
             return super.save_state(os, ot);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
 
         return false;
     }
 
-    public boolean restore_state(InputObjectState os, int ot) {
-        try {
+    public boolean restore_state (InputObjectState os, int ot)
+    {
+        try
+        {
             _theXid = null;
-
+            
             boolean haveXid = os.unpackBoolean();
 
-            if (haveXid) {
+            if (haveXid)
+            {
                 _theXid = new XidImple();
-
+                
                 _theXid.unpackFrom(os);
             }
-
+            
             return super.restore_state(os, ot);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             ex.printStackTrace();
         }
 
@@ -131,5 +143,5 @@ public class ServerTransaction
     }
 
     private XidImple _theXid;
-
+    
 }

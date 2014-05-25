@@ -28,10 +28,13 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 import com.arjuna.ats.jts.OTSManager;
 
-public class TwoPhaseTrx extends PerformanceTest {
-    protected void work() throws Exception {
-        try {
-            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
+public class TwoPhaseTrx extends PerformanceTest
+{
+    protected void work() throws Exception
+    {
+        try
+        {
+            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
             OA oa = OA.getRootOA(orb);
 
             String ref1 = getServiceConfig(0);
@@ -47,15 +50,21 @@ public class TwoPhaseTrx extends PerformanceTest {
             PerfTestInterface d2 = (PerfTestInterface) PerfTestInterfaceHelper.narrow(obj2);
             d2.work();
 
-            if (isParameterDefined("-commit")) {
+
+            if (isParameterDefined("-commit"))
+            {
                 // top level commit
                 OTSManager.get_current().commit(true);
-            } else {
+            }
+            else
+            {
                 // top level rollback
                 OTSManager.get_current().rollback();
             }
-        } catch (Exception e) {
-            System.err.println("Unexpected Exception: " + e);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Unexpected Exception: "+e);
             e.printStackTrace(System.err);
         }
     }

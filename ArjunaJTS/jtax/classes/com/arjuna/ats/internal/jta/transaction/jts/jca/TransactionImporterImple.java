@@ -45,22 +45,23 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporte
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
 import org.jboss.tm.TransactionImportResult;
 
-public class TransactionImporterImple implements TransactionImporter {
-
+public class TransactionImporterImple implements TransactionImporter
+{
+    
     /**
-     * Create a subordinate transaction associated with the global transaction
-     * inflow. No timeout is associated with the transaction.
+     * Create a subordinate transaction associated with the
+     * global transaction inflow. No timeout is associated with the
+     * transaction.
      * 
-     * @param xid
-     *            the global transaction.
+     * @param xid the global transaction.
      * 
      * @return the subordinate transaction.
      * 
-     * @throws XAException
-     *             thrown if there are any errors.
+     * @throws XAException thrown if there are any errors.
      */
-
-    public SubordinateTransaction importTransaction(Xid xid) throws XAException {
+    
+    public SubordinateTransaction importTransaction (Xid xid) throws XAException
+    {
         return (SubordinateTransaction) importRemoteTransaction(xid, 0).getTransaction();
     }
 
@@ -70,55 +71,52 @@ public class TransactionImporterImple implements TransactionImporter {
     }
 
     /**
-     * Create a subordinate transaction associated with the global transaction
-     * inflow and having a specified timeout.
+     * Create a subordinate transaction associated with the
+     * global transaction inflow and having a specified timeout.
      * 
-     * @param xid
-     *            the global transaction.
-     * @param timeout
-     *            the timeout associated with the global transaction.
+     * @param xid the global transaction.
+     * @param timeout the timeout associated with the global transaction.
      * 
      * @return the subordinate transaction.
      * 
-     * @throws XAException
-     *             thrown if there are any errors.
+     * @throws XAException thrown if there are any errors.
      */
-
-    public TransactionImportResult importRemoteTransaction(Xid xid, int timeout) throws XAException {
+    
+    public TransactionImportResult importRemoteTransaction(Xid xid, int timeout) throws XAException
+    {
         if (xid == null)
             throw new IllegalArgumentException();
 
         return addImportedTransaction(null, new SubordinateXidImple(xid), xid, timeout);
     }
 
-    public SubordinateTransaction recoverTransaction(Uid actId) throws XAException {
+    public SubordinateTransaction recoverTransaction (Uid actId) throws XAException
+    {
         if (actId == null)
             throw new IllegalArgumentException();
-
+        
         TransactionImple recovered = new TransactionImple(actId);
-
+        
         if (recovered.baseXid() == null)
             throw new IllegalArgumentException();
 
-        return (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0)
-                .getTransaction();
+        return (SubordinateTransaction) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
     }
-
+    
     /**
-     * Get the subordinate (imported) transaction associated with the global
-     * transaction.
+     * Get the subordinate (imported) transaction associated with the
+     * global transaction.
      * 
-     * @param xid
-     *            the global transaction.
+     * @param xid the global transaction.
      * 
-     * @return the subordinate transaction or <code>null</code> if there is
-     *         none.
+     * @return the subordinate transaction or <code>null</code> if there
+     * is none.
      * 
-     * @throws XAException
-     *             thrown if there are any errors.
+     * @throws XAException thrown if there are any errors.
      */
-
-    public SubordinateTransaction getImportedTransaction(Xid xid) throws XAException {
+    
+    public SubordinateTransaction getImportedTransaction (Xid xid) throws XAException
+    {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -127,12 +125,10 @@ public class TransactionImporterImple implements TransactionImporter {
 
         if (tx == null) {
             /*
-             * Remark: if holder != null and holder.get() == null then the
-             * setter is about to import the transaction but has not yet updated
-             * the holder. We implement the getter (the thing that is trying to
-             * terminate the imported transaction) as though the imported
-             * transaction only becomes observable when it has been fully
-             * imported.
+             * Remark: if holder != null and holder.get() == null then the setter is about to
+             * import the transaction but has not yet updated the holder. We implement the getter
+             * (the thing that is trying to terminate the imported transaction) as though the imported
+             * transaction only becomes observable when it has been fully imported.
              */
             return null;
         }
@@ -146,37 +142,37 @@ public class TransactionImporterImple implements TransactionImporter {
             throw new XAException(XAException.XA_RBROLLBACK);
         }
 
-        if (tx.baseXid() == null) {
+        if (tx.baseXid() == null)
+        {
             /*
-             * Try recovery again. If it fails we'll throw a RETRY to the caller
-             * who should try again later.
+             * Try recovery again. If it fails we'll throw a RETRY to the caller who
+             * should try again later.
              */
             tx.recover();
 
             return tx;
-        } else
+        }
+        else
             return tx;
     }
 
     /**
      * Remove the subordinate (imported) transaction.
      * 
-     * @param xid
-     *            the global transaction.
+     * @param xid the global transaction.
      * 
-     * @throws XAException
-     *             thrown if there are any errors.
+     * @throws XAException thrown if there are any errors.
      */
-
-    public void removeImportedTransaction(Xid xid) throws XAException {
+    
+    public void removeImportedTransaction (Xid xid) throws XAException
+    {
         if (xid == null)
             throw new IllegalArgumentException();
 
         AtomicReference<SubordinateTransaction> remove = _transactions.remove(new SubordinateXidImple(xid));
         if (remove != null) {
             synchronized (remove) {
-                com.arjuna.ats.internal.jta.transaction.jts.TransactionImple transactionImple = (com.arjuna.ats.internal.jta.transaction.jts.TransactionImple) remove
-                        .get();
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionImple transactionImple = (com.arjuna.ats.internal.jta.transaction.jts.TransactionImple) remove.get();
                 while (transactionImple == null) {
                     try {
                         remove.wait();
@@ -194,19 +190,15 @@ public class TransactionImporterImple implements TransactionImporter {
     /**
      * This can be used for newly imported transactions or recovered ones.
      *
-     * @param recoveredTransaction
-     *            If this is recovery
-     * @param xid
-     *            if this is import
+     * @param recoveredTransaction If this is recovery
+     * @param xid if this is import
      * @param timeout
      * @return
      */
-    private TransactionImportResult addImportedTransaction(TransactionImple recoveredTransaction, Xid mapKey, Xid xid,
-            int timeout) {
+    private TransactionImportResult addImportedTransaction(TransactionImple recoveredTransaction, Xid mapKey, Xid xid, int timeout) {
         boolean isNew = false;
         SubordinateXidImple importedXid = new SubordinateXidImple(mapKey);
-        // We need to store the imported transaction in a volatile field holder
-        // so that it can be shared between threads
+        // We need to store the imported transaction in a volatile field holder so that it can be shared between threads
         AtomicReference<SubordinateTransaction> holder = new AtomicReference<>();
         AtomicReference<SubordinateTransaction> existing;
 
@@ -216,9 +208,8 @@ public class TransactionImporterImple implements TransactionImporter {
 
         SubordinateTransaction txn = holder.get();
 
-        // Should only be called by the recovery system - this will replace the
-        // Transaction with one from disk
-        if (recoveredTransaction != null) {
+        // Should only be called by the recovery system - this will replace the Transaction with one from disk
+        if (recoveredTransaction!= null) {
             synchronized (holder) {
                 // now it's safe to add the imported transaction to the holder
                 recoveredTransaction.recordTransaction();
@@ -229,8 +220,7 @@ public class TransactionImporterImple implements TransactionImporter {
         }
 
         if (txn == null) {
-            // retry the get under a lock - this double check idiom is safe
-            // because AtomicReference is effectively
+            // retry the get under a lock - this double check idiom is safe because AtomicReference is effectively
             // a volatile so can be concurrently accessed by multiple threads
             synchronized (holder) {
                 txn = holder.get();

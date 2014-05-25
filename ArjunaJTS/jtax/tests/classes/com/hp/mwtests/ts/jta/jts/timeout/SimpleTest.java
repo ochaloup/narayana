@@ -40,23 +40,25 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class SimpleTest {
+public class SimpleTest
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+
+        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
         boolean passed = false;
 
         transactionManager.setTransactionTimeout(3);
@@ -67,7 +69,9 @@ public class SimpleTest {
 
         try {
             transactionManager.commit();
-        } catch (final javax.transaction.RollbackException ex) {
+        }
+        catch (final javax.transaction.RollbackException ex)
+        {
             passed = true;
         }
 

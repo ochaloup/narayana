@@ -38,19 +38,21 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransac
 import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
 
-public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jts.subordinate.TransactionImple
-        implements
-            SubordinateTransaction {
+public class TransactionImple extends
+        com.arjuna.ats.internal.jta.transaction.jts.subordinate.TransactionImple implements SubordinateTransaction
+{
 
     /**
      * Create a new transaction with the specified timeout.
      */
 
-    public TransactionImple(int timeout) {
+    public TransactionImple (int timeout)
+    {
         this(timeout, null);
     }
-
-    public TransactionImple(int timeout, Xid importedXid) {
+    
+    public TransactionImple (int timeout, Xid importedXid)
+    {
         super(new SubordinateAtomicTransaction(new Uid(), importedXid, timeout));
 
         TransactionImple.putTransaction(this);
@@ -59,28 +61,30 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
     /**
      * For crash recovery purposes.
      * 
-     * @param actId
-     *            the transaction to recover.
+     * @param actId the transaction to recover.
      */
-
-    public TransactionImple(Uid actId) {
+    
+    public TransactionImple (Uid actId)
+    {
         super(new SubordinateAtomicTransaction(actId));
     }
-
+    
     /**
      * Only to be used by crash recovery. Should not be called directly by any
      * other classes.
      */
-
-    public final void recordTransaction() {
+    
+    public final void recordTransaction ()
+    {
         TransactionImple.putTransaction(this);
     }
-
+    
     /**
      * Overloads Object.equals()
      */
 
-    public boolean equals(Object obj) {
+    public boolean equals (Object obj)
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.equals");
         }
@@ -91,30 +95,35 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
         if (obj == this)
             return true;
 
-        if (obj instanceof TransactionImple) {
+        if (obj instanceof TransactionImple)
+        {
             return super.equals(obj);
         }
 
         return false;
     }
 
-    public String toString() {
+    public String toString ()
+    {
         if (super._theTransaction == null)
             return "TransactionImple < jca-subordinate, NoTransaction >";
-        else {
-            return "TransactionImple < jca-subordinate, " + super._theTransaction + " >";
+        else
+        {
+            return "TransactionImple < jca-subordinate, "
+                    + super._theTransaction + " >";
         }
     }
 
     /**
-     * If this is an imported transaction (via JCA) then this will be the Xid we
-     * are pretending to be. Otherwise, it will be null.
+     * If this is an imported transaction (via JCA) then this will be the Xid
+     * we are pretending to be. Otherwise, it will be null.
      * 
      * @return null if we are a local transaction, a valid Xid if we have been
-     *         imported.
+     * imported.
      */
-
-    public Xid baseXid() {
+    
+    public Xid baseXid ()
+    {
         return ((SubordinateAtomicTransaction) _theTransaction).getXid();
     }
 
@@ -129,9 +138,9 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
             implHandle.activate();
         }
     }
-
+    
     public boolean activated() {
         return true; // TODO: more sensible implementation.
     }
-
+    
 }

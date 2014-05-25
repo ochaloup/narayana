@@ -38,70 +38,84 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
-public class EmptyObjectStore {
-    public static void main(String[] args) {
+public class EmptyObjectStore
+{
+    public static void main(String[] args)
+    {
         Setup orbClass = null;
 
-        try {
+        try
+        {
             boolean needOrb = true;
 
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-local")) {
+            for (int i = 0; i < args.length; i++)
+            {
+                if (args[i].equals("-local"))
+                {
                     needOrb = false;
                 }
             }
 
-            if (needOrb) {
-                Class c = Thread.currentThread().getContextClassLoader()
-                        .loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
+            if (needOrb)
+            {
+                Class c = Thread.currentThread().getContextClassLoader().loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
 
                 orbClass = (Setup) c.newInstance();
 
                 orbClass.start(args);
             }
 
-            ObjectStoreEnvironmentBean storeEnvBean = BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class,
-                    null);
+            ObjectStoreEnvironmentBean storeEnvBean = BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, null);
 
-            if (storeEnvBean.getObjectStoreType() != null && storeEnvBean.getObjectStoreType().contains("JDBCStore")) {
+            if (storeEnvBean.getObjectStoreType() != null && storeEnvBean.getObjectStoreType().contains("JDBCStore"))
+            {
                 // ensure that all relevant JDBC store tables are cleared
                 BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "stateStore").setDropTable(true);
-                BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "communicationStore")
-                        .setDropTable(true);
+                BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "communicationStore").setDropTable(true);
 
                 storeEnvBean.setDropTable(true);
 
-                // the first get on a store initializes it (which, for a JDBC
-                // store, includes table reinitialization)
+                // the first get on a store initializes it (which, for a JDBC store, includes table reinitialization)
                 StoreManager.getParticipantStore();
                 StoreManager.getRecoveryStore();
                 StoreManager.getCommunicationStore();
                 StoreManager.getTxOJStore();
-            } else {
+            }
+            else
+            {
                 String objectStoreDirName = arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir();
 
                 System.out.println("Emptying " + objectStoreDirName);
 
-                if (objectStoreDirName != null) {
+                if (objectStoreDirName != null)
+                {
                     File objectStoreDir = new File(objectStoreDirName);
 
                     removeContents(objectStoreDir);
-                } else {
+                }
+                else
+                {
                     System.err.println("Unable to find the ObjectStore root.");
                     System.out.println("Failed");
                 }
             }
             emptyPIDStore();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("EmptyObjectStore.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
-            if (orbClass != null) {
+        try
+        {
+            if (orbClass != null)
+            {
                 orbClass.stop();
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("EmptyObjectStore.main: " + exception);
             exception.printStackTrace(System.err);
         }
@@ -109,19 +123,29 @@ public class EmptyObjectStore {
         System.out.println("Passed");
     }
 
-    public static void removeContents(File directory) {
-        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
-                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
-                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
+    public static void removeContents(File directory)
+    {
+        if ((directory != null) &&
+                directory.isDirectory() &&
+                (!directory.getName().equals("")) &&
+                (!directory.getName().equals("/")) &&
+                (!directory.getName().equals("\\")) &&
+                (!directory.getName().equals(".")) &&
+                (!directory.getName().equals("..")))
+        {
             File[] contents = directory.listFiles();
 
-            for (int index = 0; index < contents.length; index++) {
-                if (contents[index].isDirectory()) {
+            for (int index = 0; index < contents.length; index++)
+            {
+                if (contents[index].isDirectory())
+                {
                     removeContents(contents[index]);
 
-                    // System.err.println("Deleted: " + contents[index]);
+                    //System.err.println("Deleted: " + contents[index]);
                     contents[index].delete();
-                } else {
+                }
+                else
+                {
                     System.err.println("Deleted: " + contents[index]);
                     contents[index].delete();
                 }
@@ -129,7 +153,8 @@ public class EmptyObjectStore {
         }
     }
 
-    public static void emptyPIDStore() {
+    public static void emptyPIDStore()
+    {
         // Do nothing
     }
 }

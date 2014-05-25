@@ -41,19 +41,16 @@ import static org.junit.Assert.assertTrue;
 public class TransactionImporterUnitTest {
 
     @Test
-    public void testDifferentInstanceFromRecovery() throws XAException, RollbackException, SystemException,
-            HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException {
+    public void testDifferentInstanceFromRecovery() throws XAException, RollbackException, SystemException, HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException {
         Uid uid = new Uid();
         XidImple xid = new XidImple(uid);
 
-        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter()
-                .importTransaction(xid);
+        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
         Uid subordinateTransactionUid = subordinateTransaction.get_uid();
         Xid subordinateTransactionXid = subordinateTransaction.baseXid();
 
-        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter()
-                .getImportedTransaction(subordinateTransactionXid);
-        assertTrue(subordinateTransaction == importedTransaction);
+        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
+        assertTrue (subordinateTransaction == importedTransaction);
         subordinateTransaction.enlistResource(new XAResource() {
 
             @Override
@@ -109,14 +106,11 @@ public class TransactionImporterUnitTest {
         subordinateTransaction.doPrepare();
 
         Implementations.initialise();
-        SubordinateTransaction subordinateTransaction1 = SubordinationManager.getTransactionImporter()
-                .recoverTransaction(subordinateTransactionUid);
+        SubordinateTransaction subordinateTransaction1 = SubordinationManager.getTransactionImporter().recoverTransaction(subordinateTransactionUid);
         assertTrue(subordinateTransaction != subordinateTransaction1);
-        SubordinateTransaction importedTransaction1 = SubordinationManager.getTransactionImporter()
-                .getImportedTransaction(subordinateTransactionXid);
+        SubordinateTransaction importedTransaction1 = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
         assertTrue(importedTransaction != importedTransaction1);
-        SubordinateTransaction importedTransaction2 = SubordinationManager.getTransactionImporter()
-                .getImportedTransaction(subordinateTransactionXid);
+        SubordinateTransaction importedTransaction2 = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
         assertTrue(importedTransaction1 == importedTransaction2);
         importedTransaction2.doCommit();
     }

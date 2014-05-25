@@ -40,24 +40,24 @@ import static org.junit.Assert.fail;
 /**
  * JTAX version of the Subordinate transaction tests.
  */
-public class SubordinateTestCase extends com.hp.mwtests.ts.jta.subordinate.SubordinateTestCase {
-    // we mostly reuse the JTA version of the test class, but need to ensure
-    // correct config, orb init
+public class SubordinateTestCase extends com.hp.mwtests.ts.jta.subordinate.SubordinateTestCase
+{
+    // we mostly reuse the JTA version of the test class, but need to ensure correct config, orb init
     // and use of the appropriate tx impl class:
-
-    private ORB orb;
-    private RootOA oa;
+    
+    private ORB orb ;
+    private RootOA oa ;
 
     @Before
-    public void setUp() throws Exception {
-        // System.setProperty("com.arjuna.ats.jta.jtaTMImplementation",
-        // "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple");
-        // System.setProperty("com.arjuna.ats.jta.jtaUTImplementation",
-        // "com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple");
-
+    public void setUp()
+        throws Exception
+    {
+//        System.setProperty("com.arjuna.ats.jta.jtaTMImplementation", "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple");
+//        System.setProperty("com.arjuna.ats.jta.jtaUTImplementation", "com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple");
+        
         orb = ORB.getInstance("test");
         oa = OA.getRootOA(orb);
-
+        
         orb.initORB(new String[0], null);
         oa.initOA();
 
@@ -72,35 +72,39 @@ public class SubordinateTestCase extends com.hp.mwtests.ts.jta.subordinate.Subor
     }
 
     @After
-    public void tearDown() throws Exception {
-        if (oa != null) {
+    public void tearDown()
+        throws Exception
+    {
+        if (oa != null)
+        {
             oa.destroy();
         }
-        if (orb != null) {
+        if (orb != null)
+        {
             orb.shutdown();
         }
-        // System.clearProperty("com.arjuna.ats.jta.jtaTMImplementation");
-        // System.clearProperty("com.arjuna.ats.jta.jtaUTImplementation");
+//        System.clearProperty("com.arjuna.ats.jta.jtaTMImplementation");
+//        System.clearProperty("com.arjuna.ats.jta.jtaUTImplementation");
     }
 
     @Test
-    public void testPrepareRollback() throws Exception {
+    public void testPrepareRollback() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         assertEquals(TwoPhaseOutcome.PREPARE_READONLY, tm.doPrepare());
         try {
             tm.doRollback();
             fail("TransactionImple stub can't be sure why the transaction was committed it shouldn't massage");
         } catch (HeuristicMixedException e) {
-            // TransactionImple stub can't be sure why the transaction was
-            // committed it shouldn't massage
-            // - this DOES NOT match doPhase2Abort in ServerTransaction which
-            // allows a massage
+            // TransactionImple stub can't be sure why the transaction was committed it shouldn't massage
+            //  - this DOES NOT match doPhase2Abort in ServerTransaction which allows a massage
         }
     }
 
     @Override
     public SubordinateTransaction createTransaction() {
-        return new TransactionImple(0); // implicit begin
+            return new TransactionImple(0); // implicit begin
     }
-
+    
+    
 }

@@ -34,7 +34,7 @@ import org.omg.CosTransactions.NoTransaction;
 class GridWorker implements Worker {
     ORB myORB;
     String gridReference;
-    grid gridVar = null; // pointer the grid object that will be used.
+    grid gridVar = null;  // pointer the grid object that will be used.
     CurrentImple current;
     int initialValue = -1;
     int finalValue = -1;
@@ -52,8 +52,8 @@ class GridWorker implements Worker {
             h = gridVar.height();
             w = gridVar.width();
 
-        } catch (Exception sysEx) {
-            TestUtility.fail("failed to bind to grid: " + sysEx);
+        }  catch (Exception sysEx) {
+            TestUtility.fail("failed to bind to grid: "+sysEx);
             sysEx.printStackTrace(System.err);
             throw sysEx;
         }

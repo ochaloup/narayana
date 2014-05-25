@@ -55,27 +55,31 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * This is a top-level action proxy.
  */
 
-public class ServerRestrictedTopLevelAction extends ServerTopLevelAction {
+public class ServerRestrictedTopLevelAction extends ServerTopLevelAction
+{
 
-    public ServerRestrictedTopLevelAction(ServerControl myControl) {
-        super(myControl);
+public ServerRestrictedTopLevelAction (ServerControl myControl)
+    {
+    super(myControl);
 
-        if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerRestrictedTopLevelAction::ServerRestrictedTopLevelAction ( "
-                    + ((myControl != null) ? myControl.get_uid() : Uid.nullUid()) + " )");
-        }
+    if (jtsLogger.logger.isTraceEnabled()) {
+        jtsLogger.logger.trace("ServerRestrictedTopLevelAction::ServerRestrictedTopLevelAction ( " +
+                ((myControl != null) ? myControl.get_uid() : Uid.nullUid()) + " )");
+    }
     }
 
-    public final synchronized ServerControl deepestControl() {
-        ServerRestrictedNestedAction myChild = child();
+public final synchronized ServerControl deepestControl ()
+    {
+    ServerRestrictedNestedAction myChild = child();
 
-        if (myChild != null)
-            return myChild.deepestControl();
-        else
-            return control();
+    if (myChild != null)
+        return myChild.deepestControl();
+    else
+        return control();
     }
 
-    public final synchronized ServerRestrictedNestedAction child() {
+    public final synchronized ServerRestrictedNestedAction child ()
+    {
         ServerRestrictedNestedAction toReturn = null;
         List<ServerNestedAction> children = getChildren();
 
@@ -84,9 +88,10 @@ public class ServerRestrictedTopLevelAction extends ServerTopLevelAction {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_restricted_contxfound_3(
                     "ServerRestrictedTopLevelAction.child", Integer.toString(children.size()));
 
-            throw new TxError(jtsLogger.i18NLogger
-                    .get_orbspecific_interposition_resources_restricted_contx_4(Integer.toString(children.size())));
-        } else {
+            throw new TxError(jtsLogger.i18NLogger.get_orbspecific_interposition_resources_restricted_contx_4(Integer.toString(children.size())));
+        }
+        else
+        {
             if (children.size() == 1)
                 toReturn = (ServerRestrictedNestedAction) children.remove(0);
         }
@@ -94,8 +99,11 @@ public class ServerRestrictedTopLevelAction extends ServerTopLevelAction {
         return toReturn;
     }
 
-    public String type() {
-        return "/Resources/Arjuna/ServerTopLevelAction/ServerRestrictedTopLevelAction";
+public String type ()
+    {
+    return "/Resources/Arjuna/ServerTopLevelAction/ServerRestrictedTopLevelAction";
     }
 
 }
+
+

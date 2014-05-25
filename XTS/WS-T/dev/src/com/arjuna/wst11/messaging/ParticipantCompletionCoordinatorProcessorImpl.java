@@ -41,424 +41,453 @@ import org.jboss.jbossts.xts.recovery.participant.ba.XTSBARecoveryManager;
 
 /**
  * The Participant Completion Coordinator processor.
- * 
  * @author kevin
  */
-public class ParticipantCompletionCoordinatorProcessorImpl extends ParticipantCompletionCoordinatorProcessor {
+public class ParticipantCompletionCoordinatorProcessorImpl extends ParticipantCompletionCoordinatorProcessor
+{
     /**
      * The activated object processor.
      */
-    private final ActivatedObjectProcessor activatedObjectProcessor = new ActivatedObjectProcessor();
+    private final ActivatedObjectProcessor activatedObjectProcessor = new ActivatedObjectProcessor() ;
 
     /**
      * Activate the coordinator.
-     * 
-     * @param coordinator
-     *            The coordinator.
-     * @param identifier
-     *            The identifier.
+     * @param coordinator The coordinator.
+     * @param identifier The identifier.
      */
-    public void activateCoordinator(final ParticipantCompletionCoordinatorInboundEvents coordinator,
-            final String identifier) {
-        activatedObjectProcessor.activateObject(coordinator, identifier);
+    public void activateCoordinator(final ParticipantCompletionCoordinatorInboundEvents coordinator, final String identifier)
+    {
+        activatedObjectProcessor.activateObject(coordinator, identifier) ;
     }
 
     /**
      * Deactivate the coordinator.
-     * 
-     * @param coordinator
-     *            The coordinator.
+     * @param coordinator The coordinator.
      */
-    public void deactivateCoordinator(final ParticipantCompletionCoordinatorInboundEvents coordinator) {
-        activatedObjectProcessor.deactivateObject(coordinator);
+    public void deactivateCoordinator(final ParticipantCompletionCoordinatorInboundEvents coordinator)
+    {
+        activatedObjectProcessor.deactivateObject(coordinator) ;
     }
 
     /**
      * Locate a coordinator by name.
-     * 
-     * @param identifier
-     *            The name of the coordinator.
+     * @param identifier The name of the coordinator.
      */
-    public ParticipantCompletionCoordinatorInboundEvents getCoordinator(final String identifier) {
-        return (ParticipantCompletionCoordinatorInboundEvents) activatedObjectProcessor.getObject(identifier);
+    public ParticipantCompletionCoordinatorInboundEvents getCoordinator(final String  identifier)
+    {
+        return (ParticipantCompletionCoordinatorInboundEvents)activatedObjectProcessor.getObject(identifier);
     }
 
     /**
      * Get the coordinator with the specified identifier.
-     * 
-     * @param instanceIdentifier
-     *            The coordinator identifier.
+     * @param instanceIdentifier The coordinator identifier.
      * @return The coordinator or null if not known.
      */
-    private ParticipantCompletionCoordinatorInboundEvents getCoordinator(final InstanceIdentifier instanceIdentifier) {
-        final String identifier = (instanceIdentifier != null ? instanceIdentifier.getInstanceIdentifier() : null);
-        return (ParticipantCompletionCoordinatorInboundEvents) activatedObjectProcessor.getObject(identifier);
+    private ParticipantCompletionCoordinatorInboundEvents getCoordinator(final InstanceIdentifier instanceIdentifier)
+    {
+        final String identifier = (instanceIdentifier != null ? instanceIdentifier.getInstanceIdentifier() : null) ;
+        return (ParticipantCompletionCoordinatorInboundEvents)activatedObjectProcessor.getObject(identifier) ;
     }
 
     /**
      * Cancelled.
-     * 
-     * @param cancelled
-     *            The cancelled notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param cancelled The cancelled notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void cancelled(final NotificationType cancelled, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void cancelled(final NotificationType cancelled, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.cancelled(cancelled, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from cancelled:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.cancelled(cancelled, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from cancelled:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
-            WSTLogger.logger.tracev("Cancelled called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
+            WSTLogger.logger.tracev("Cancelled called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
         }
     }
 
     /**
      * Closed.
-     * 
-     * @param closed
-     *            The closed notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param closed The closed notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void closed(final NotificationType closed, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void closed(final NotificationType closed, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.closed(closed, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from closed:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.closed(closed, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from closed:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
-            WSTLogger.logger.tracev("Closed called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
+            WSTLogger.logger.tracev("Closed called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
         }
     }
 
     /**
      * Compensated.
-     * 
-     * @param compensated
-     *            The compensated notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param compensated The compensated notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void compensated(final NotificationType compensated, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void compensated(final NotificationType compensated, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.compensated(compensated, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from compensated:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.compensated(compensated, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from compensated:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
-            WSTLogger.logger.tracev("Compensated called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
+            WSTLogger.logger.tracev("Compensated called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
         }
     }
 
     /**
      * Completed.
-     * 
-     * @param completed
-     *            The completed notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param completed The completed notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void completed(final NotificationType completed, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void completed(final NotificationType completed, final MAP map,
+        final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.completed(completed, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from completed:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.completed(completed, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from completed:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
             if (areRecoveryLogEntriesAccountedFor()) {
                 // this is a resend for a lost participant
-                WSTLogger.logger.tracev("Completed called on unknown coordinator: {0}",
-                        new Object[]{instanceIdentifier});
+                WSTLogger.logger.tracev("Completed called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
             } else {
                 // this may be a resend for a participant still pending recovery
-                WSTLogger.logger.tracev(
-                        "Ignoring completed called on unidentified coordinator until recovery pass is complete: {0}",
-                        new Object[]{instanceIdentifier});
+                WSTLogger.logger.tracev("Ignoring completed called on unidentified coordinator until recovery pass is complete: {0}", new Object[] {instanceIdentifier}) ;
             }
         }
     }
 
     /**
      * Completed.
-     * 
-     * @param cannotComplete
-     *            The cannot complete notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param cannotComplete The cannot complete notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
     public void cannotComplete(final NotificationType cannotComplete, final MAP map,
-            final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+        final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.cannotComplete(cannotComplete, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from completed:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.cannotComplete(cannotComplete, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from completed:", th) ;
                 }
             }
         } else {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Completed called on unknown coordinator: {0}",
-                        new Object[]{instanceIdentifier});
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Completed called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
             }
 
-            sendNotCompleted(map, arjunaContext);
+            sendNotCompleted(map, arjunaContext) ;
         }
     }
 
     /**
      * Exit.
-     * 
-     * @param exit
-     *            The exit notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param exit The exit notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void exit(final NotificationType exit, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void exit(final NotificationType exit, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.exit(exit, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from exit:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.exit(exit, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from exit:", th) ;
                 }
             }
         } else {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Exit called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Exit called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
             }
-            sendExited(map, arjunaContext);
+            sendExited(map, arjunaContext) ;
         }
     }
 
     /**
      * Fail.
-     * 
-     * @param fail
-     *            The fail notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param fail The fail notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void fail(final ExceptionType fail, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void fail(final ExceptionType fail, final MAP map,
+        final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.fail(fail, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from fail:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.fail(fail, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from fail:", th) ;
                 }
             }
         } else if (areRecoveryLogEntriesAccountedFor()) {
-            // we can respond with a failed as the participant is not pending
-            // recovery
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Fail called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+            // we can respond with a failed as the participant is not pending recovery
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Fail called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
             }
-            sendFailed(map, arjunaContext);
+            sendFailed(map, arjunaContext) ;
         } else {
-            // we must delay responding until we can be sure there is no
-            // participant pending recovery
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev(
-                        "Ignoring fail called on unidentified coordinator until recovery pass is complete: {0}",
-                        new Object[]{instanceIdentifier});
+            // we must delay responding until we can be sure there is no participant pending recovery
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Ignoring fail called on unidentified coordinator until recovery pass is complete: {0}", new Object[] {instanceIdentifier}) ;
             }
         }
     }
 
     /**
      * Get Status.
-     * 
-     * @param getStatus
-     *            The get status notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param getStatus The get status notification.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void getStatus(final NotificationType getStatus, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void getStatus(final NotificationType getStatus, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.getStatus(getStatus, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from getStatus:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.getStatus(getStatus, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from getStatus:", th) ;
                 }
             }
-        } else if (!areRecoveryLogEntriesAccountedFor()) {
-            // drop the request until we have ensured that there is no recovered
-            // coordinator for this id
+        }
+        else if (!areRecoveryLogEntriesAccountedFor())
+        {
+            // drop the request until we have ensured that there is no recovered coordinator for this id
 
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev(
-                        "GetStatus dropped for unknown coordinator completion participant {0} while waiting on recovery scan",
-                        new Object[]{instanceIdentifier});
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("GetStatus dropped for unknown coordinator completion participant {0} while waiting on recovery scan", new Object[] {instanceIdentifier}) ;
             }
-        } else {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("GetStatus called on unknown coordinator: {0}",
-                        new Object[]{instanceIdentifier});
+        }
+        else
+        {
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("GetStatus called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
             }
-
+            
             // send an invalid state fault
 
             final String messageId = MessageId.getMessageId();
-            final MAP faultMAP = AddressingHelper.createFaultContext(map, messageId);
-            try {
-                final SoapFault11 soapFault = new SoapFault11(SoapFaultType.FAULT_SENDER,
-                        CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME, WSTLogger.i18NLogger
-                                .get_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_4());
+            final MAP faultMAP = AddressingHelper.createFaultContext(map, messageId) ;
+            try
+            {
+                final SoapFault11 soapFault = new SoapFault11(SoapFaultType.FAULT_SENDER, CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME,
+                        WSTLogger.i18NLogger.get_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_4()) ;
                 AddressingHelper.installNoneReplyTo(faultMAP);
-                ParticipantCompletionParticipantClient.getClient().sendSoapFault(soapFault, null, faultMAP,
-                        getFaultAction());
-            } catch (final Throwable th) {
-                WSTLogger.i18NLogger.info_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(
-                        instanceIdentifier.toString(), th);
+                ParticipantCompletionParticipantClient.getClient().sendSoapFault(soapFault, null, faultMAP, getFaultAction());
+            }
+            catch (final Throwable th)
+            {
+                WSTLogger.i18NLogger.info_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(instanceIdentifier.toString(), th);
             }
         }
     }
 
-    private static String getFaultAction() {
+    private static String getFaultAction()
+    {
         return CoordinationConstants.WSCOOR_ACTION_FAULT;
     }
 
     /**
      * Status.
-     * 
-     * @param status
-     *            The status.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param status The status.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void status(final StatusType status, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void status(final StatusType status, final MAP map, final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.status(status, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from status:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.status(status, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from status:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
-            WSTLogger.logger.tracev("Status called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
+            WSTLogger.logger.tracev("Status called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
         }
     }
 
     /**
      * SOAP fault.
-     * 
-     * @param soapFault
-     *            The SOAP fault.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param soapFault The SOAP fault.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext) {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier);
+    public void soapFault(final SoapFault soapFault, final MAP map,
+        final ArjunaContext arjunaContext)
+    {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
+        final ParticipantCompletionCoordinatorInboundEvents coordinator = getCoordinator(instanceIdentifier) ;
 
-        if (coordinator != null) {
-            try {
-                coordinator.soapFault(soapFault, map, arjunaContext);
-            } catch (final Throwable th) {
-                if (WSTLogger.logger.isTraceEnabled()) {
-                    WSTLogger.logger.tracev("Unexpected exception thrown from soapFault:", th);
+        if (coordinator != null)
+        {
+            try
+            {
+                coordinator.soapFault(soapFault, map, arjunaContext) ;
+            }
+            catch (final Throwable th)
+            {
+                if (WSTLogger.logger.isTraceEnabled())
+                {
+                    WSTLogger.logger.tracev("Unexpected exception thrown from soapFault:", th) ;
                 }
             }
-        } else if (WSTLogger.logger.isTraceEnabled()) {
-            WSTLogger.logger.tracev("SoapFault called on unknown coordinator: {0}", new Object[]{instanceIdentifier});
+        }
+        else if (WSTLogger.logger.isTraceEnabled())
+        {
+            WSTLogger.logger.tracev("SoapFault called on unknown coordinator: {0}", new Object[] {instanceIdentifier}) ;
         }
     }
 
     /**
      * Send an exited message.
      *
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    private void sendExited(final MAP map, final ArjunaContext arjunaContext) {
+    private void sendExited(final MAP map, final ArjunaContext arjunaContext)
+    {
         // KEV add check for recovery
-        final String messageId = MessageId.getMessageId();
-        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId);
-        try {
-            // supply null endpoint so that addressing properties are used to
-            // deliver message
-            ParticipantCompletionParticipantClient.getClient().sendExited(null, responseMAP,
-                    arjunaContext.getInstanceIdentifier());
-        } catch (final Throwable th) {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception while sending Exited", th);
+        final String messageId = MessageId.getMessageId() ;
+        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId) ;
+        try
+        {
+            // supply null endpoint so that addressing properties are used to deliver message
+            ParticipantCompletionParticipantClient.getClient().sendExited(null, responseMAP, arjunaContext.getInstanceIdentifier()) ;
+        }
+        catch (final Throwable th)
+        {
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Unexpected exception while sending Exited", th) ;
             }
         }
     }
@@ -466,24 +495,25 @@ public class ParticipantCompletionCoordinatorProcessorImpl extends ParticipantCo
     /**
      * Send a failed message.
      *
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    private void sendFailed(final MAP map, final ArjunaContext arjunaContext) {
+    private void sendFailed(final MAP map, final ArjunaContext arjunaContext)
+    {
         // KEV add check for recovery
-        final String messageId = MessageId.getMessageId();
-        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId);
-        try {
-            // supply null endpoint so that addressing properties are used to
-            // deliver message
-            ParticipantCompletionParticipantClient.getClient().sendFailed(null, responseMAP,
-                    arjunaContext.getInstanceIdentifier());
-        } catch (final Throwable th) {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception while sending Failed", th);
+        final String messageId = MessageId.getMessageId() ;
+        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId) ;
+        try
+        {
+            // supply null endpoint so that addressing properties are used to deliver message
+            ParticipantCompletionParticipantClient.getClient().sendFailed(null, responseMAP, arjunaContext.getInstanceIdentifier()) ;
+        }
+        catch (final Throwable th)
+        {
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Unexpected exception while sending Failed", th) ;
             }
         }
     }
@@ -491,24 +521,25 @@ public class ParticipantCompletionCoordinatorProcessorImpl extends ParticipantCo
     /**
      * Send a not completed message.
      *
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      *
      */
-    private void sendNotCompleted(final MAP map, final ArjunaContext arjunaContext) {
+    private void sendNotCompleted(final MAP map, final ArjunaContext arjunaContext)
+    {
         // KEV add check for recovery
-        final String messageId = MessageId.getMessageId();
-        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId);
-        try {
-            // supply null endpoint so that addressing properties are used to
-            // deliver message
-            ParticipantCompletionParticipantClient.getClient().sendNotCompleted(null, responseMAP,
-                    arjunaContext.getInstanceIdentifier());;
-        } catch (final Throwable th) {
-            if (WSTLogger.logger.isTraceEnabled()) {
-                WSTLogger.logger.tracev("Unexpected exception while sending NotCompleted", th);
+        final String messageId = MessageId.getMessageId() ;
+        final MAP responseMAP = AddressingHelper.createOneWayResponseContext(map, messageId) ;
+        try
+        {
+            // supply null endpoint so that addressing properties are used to deliver message
+            ParticipantCompletionParticipantClient.getClient().sendNotCompleted(null, responseMAP, arjunaContext.getInstanceIdentifier()); ;
+        }
+        catch (final Throwable th)
+        {
+            if (WSTLogger.logger.isTraceEnabled())
+            {
+                WSTLogger.logger.tracev("Unexpected exception while sending NotCompleted", th) ;
             }
         }
     }
@@ -516,12 +547,12 @@ public class ParticipantCompletionCoordinatorProcessorImpl extends ParticipantCo
     /**
      * Tests if there may be unknown coordinator entries in the recovery log.
      *
-     * @return false if there may be unknown coordinator entries in the recovery
-     *         log.
+     * @return false if there may be unknown coordinator entries in the recovery log.
      */
 
-    private static boolean areRecoveryLogEntriesAccountedFor() {
-        return (XTSBARecoveryManager.getRecoveryManager().isCoordinatorRecoveryStarted()
-                && XTSBARecoveryManager.getRecoveryManager().isSubordinateCoordinatorRecoveryStarted());
+    private static boolean areRecoveryLogEntriesAccountedFor()
+    {
+        return (XTSBARecoveryManager.getRecoveryManager().isCoordinatorRecoveryStarted() &&
+                XTSBARecoveryManager.getRecoveryManager().isSubordinateCoordinatorRecoveryStarted());
     }
 }

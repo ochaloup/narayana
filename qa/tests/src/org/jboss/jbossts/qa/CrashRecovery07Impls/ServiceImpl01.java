@@ -58,6 +58,7 @@ package org.jboss.jbossts.qa.CrashRecovery07Impls;
  * $Id: ServiceImpl01.java,v 1.2 2003/06/26 11:43:40 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery07.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
@@ -66,27 +67,33 @@ import org.omg.CosTransactions.Resource;
 import org.omg.CosTransactions.ResourceHelper;
 import org.omg.CosTransactions.ResourcePOATie;
 
-public class ServiceImpl01 implements ServiceOperations {
-    public ServiceImpl01(int objectNumber) {
+public class ServiceImpl01 implements ServiceOperations
+{
+    public ServiceImpl01(int objectNumber)
+    {
         _objectNumber = objectNumber;
     }
 
-    public void setup_oper(int number_of_resources) {
+    public void setup_oper(int number_of_resources)
+    {
         _resourceImpl = new ResourceImpl01[number_of_resources];
         _resource = new Resource[number_of_resources];
         _recoveryCoordinator = new RecoveryCoordinator[number_of_resources];
 
-        for (int index = 0; index < number_of_resources; index++) {
-            try {
+        for (int index = 0; index < number_of_resources; index++)
+        {
+            try
+            {
                 _resourceImpl[index] = new ResourceImpl01(_objectNumber, index);
                 ResourcePOATie servant = new ResourcePOATie(_resourceImpl[index]);
 
                 OAInterface.objectIsReady(servant);
                 _resource[index] = ResourceHelper.narrow(OAInterface.corbaReference(servant));
 
-                _recoveryCoordinator[index] = OTS.current().get_control().get_coordinator()
-                        .register_resource(_resource[index]);
-            } catch (Exception exception) {
+                _recoveryCoordinator[index] = OTS.current().get_control().get_coordinator().register_resource(_resource[index]);
+            }
+            catch (Exception exception)
+            {
                 System.err.println("ServiceImpl01.setup_oper: " + exception);
                 exception.printStackTrace(System.err);
                 _isCorrect = false;
@@ -94,21 +101,23 @@ public class ServiceImpl01 implements ServiceOperations {
         }
     }
 
-    public boolean is_correct() {
+    public boolean is_correct()
+    {
         System.err.println("ServiceImpl01.is_correct: " + _isCorrect);
 
         return _isCorrect;
     }
 
-    public ResourceTrace get_resource_trace(int resource_number) {
+    public ResourceTrace get_resource_trace(int resource_number)
+    {
         ResourceTrace resourceTrace = ResourceTrace.ResourceTraceUnknown;
 
-        if ((resource_number >= 0) && (resource_number < _resourceImpl.length)) {
+        if ((resource_number >= 0) && (resource_number < _resourceImpl.length))
+        {
             resourceTrace = _resourceImpl[resource_number].getTrace();
         }
 
-        System.err.println(
-                "ServiceImpl01.get_resource_trace [O" + _objectNumber + ".R" + resource_number + "]: " + resourceTrace);
+        System.err.println("ServiceImpl01.get_resource_trace [O" + _objectNumber + ".R" + resource_number + "]: " + resourceTrace);
 
         return resourceTrace;
     }

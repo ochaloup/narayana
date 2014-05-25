@@ -45,8 +45,8 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.Subord
 public class InboundBridgeRecoveryModule implements RecoveryModule {
 
     /**
-     * Recovered instances of inbound bridge. After second pass every bridge
-     * with active REST-AT are passed to inbound bridge manager.
+     * Recovered instances of inbound bridge. After second pass every bridge with active REST-AT are passed to inbound bridge
+     * manager.
      */
     private static final Set<InboundBridge> recoveredBridges = new HashSet<InboundBridge>();
 
@@ -58,8 +58,7 @@ public class InboundBridgeRecoveryModule implements RecoveryModule {
     private Set<Uid> firstPassUids;
 
     /**
-     * Adds recovered bridge to recovered bridges map. This method is called by
-     * InboundBridge.readObject method during recovery.
+     * Adds recovered bridge to recovered bridges map. This method is called by InboundBridge.readObject method during recovery.
      *
      * @param bridge
      */
@@ -72,8 +71,7 @@ public class InboundBridgeRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Called by the RecoveryManager at start up, and then
-     * PERIODIC_RECOVERY_PERIOD seconds after the completion, for all
+     * Called by the RecoveryManager at start up, and then PERIODIC_RECOVERY_PERIOD seconds after the completion, for all
      * RecoveryModules, of the second pass
      */
     @Override
@@ -86,8 +84,7 @@ public class InboundBridgeRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Called by the RecoveryManager RECOVERY_BACKOFF_PERIOD seconds after the
-     * completion of the first pass
+     * Called by the RecoveryManager RECOVERY_BACKOFF_PERIOD seconds after the completion of the first pass
      */
     @Override
     public void periodicWorkSecondPass() {
@@ -113,8 +110,8 @@ public class InboundBridgeRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Returns UIDs of JTA subordinate transactions with format id specified in
-     * inbound bridge class which were found in transaction log.
+     * Returns UIDs of JTA subordinate transactions with format id specified in inbound bridge class which were found in
+     * transaction log.
      *
      * @return Set<Uid>
      */

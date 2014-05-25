@@ -7,10 +7,11 @@ import org.jboss.jbossts.xts.recovery.participant.ParticipantRecoveryInitialisat
 /**
  * A class used to perform all 1.0 initialisation
  */
-public class XTS10Initialisation implements XTSInitialisation {
-    public void startup() throws Exception {
-        // the XTS 1.0 code still uses listeners so we have to alow the sequence
-        // of callbacks to execute by
+public class XTS10Initialisation implements XTSInitialisation
+{
+    public void startup() throws Exception
+    {
+        // the XTS 1.0 code still uses listeners so we have to alow the sequence of callbacks to execute by
         // opening the latch.
 
         Sequencer.unlatch();
@@ -22,7 +23,8 @@ public class XTS10Initialisation implements XTSInitialisation {
         ParticipantRecoveryInitialisation.startup();
     }
 
-    public void shutdown() throws Exception {
+    public void shutdown() throws Exception
+    {
         // we just need to ensure that recovery modules are shut down
 
         ParticipantRecoveryInitialisation.startup();

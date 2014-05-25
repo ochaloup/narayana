@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.CrashRecovery09Servers;
  * $Id: AITServer03.java,v 1.2 2003/06/26 11:43:44 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery09.*;
 import org.jboss.jbossts.qa.CrashRecovery09Impls.AITServiceImpl01;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -63,9 +64,12 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ObjectUidStore;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class AITServer03 {
-    public static void main(String args[]) {
-        try {
+public class AITServer03
+{
+    public static void main(String args[])
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -89,9 +93,12 @@ public class AITServer03 {
             System.out.println("Ready");
 
             ORBInterface.run();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("AITServer03.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
+

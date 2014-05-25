@@ -66,9 +66,9 @@ import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 import com.arjuna.ats.jta.xa.XAModifier;
 
 /**
- * A transactional JDBC connection. This wraps the real connection and registers
- * it with the transaction at appropriate times to ensure that all worked
- * performed by it may be committed or rolled back.
+ * A transactional JDBC connection. This wraps the real connection and
+ * registers it with the transaction at appropriate times to ensure that all
+ * worked performed by it may be committed or rolled back.
  *
  * Once a connection is used within a transaction, that instance is bound to
  * that transaction for the duration. It can be used by any number of threads,
@@ -83,9 +83,11 @@ import com.arjuna.ats.jta.xa.XAModifier;
  * @since JTS 2.0.
  */
 
-public class ConnectionImple implements Connection {
+public class ConnectionImple implements Connection
+{
 
-    public ConnectionImple(String dbName, Properties info) throws SQLException {
+    public ConnectionImple(String dbName, Properties info) throws SQLException
+    {
         if (jdbcLogger.logger.isTraceEnabled()) {
             jdbcLogger.logger.trace("ConnectionImple.ConnectionImple ( " + dbName + " )");
         }
@@ -95,21 +97,28 @@ public class ConnectionImple implements Connection {
         String dynamic = null;
         Object xaDataSource = null;
 
-        if (info != null) {
+        if (info != null)
+        {
             user = info.getProperty(TransactionalDriver.userName);
             passwd = info.getProperty(TransactionalDriver.password);
             dynamic = info.getProperty(TransactionalDriver.dynamicClass);
             xaDataSource = info.get(TransactionalDriver.XADataSource);
         }
 
-        if (xaDataSource != null) {
-            _transactionalDriverXAConnectionConnection = new ProvidedXADataSourceConnection(dbName, user, passwd,
-                    (XADataSource) xaDataSource, this);
-        } else if ((dynamic == null) || (dynamic.equals(""))) {
-            _transactionalDriverXAConnectionConnection = new IndirectRecoverableConnection(dbName, user, passwd, this);
-        } else {
-            _transactionalDriverXAConnectionConnection = new DirectRecoverableConnection(dbName, user, passwd, dynamic,
-                    this);
+        if (xaDataSource != null)
+        {
+            _transactionalDriverXAConnectionConnection = new ProvidedXADataSourceConnection(dbName, user,
+                    passwd, (XADataSource) xaDataSource, this);    
+        }
+        else if ((dynamic == null) || (dynamic.equals("")))
+        {
+            _transactionalDriverXAConnectionConnection = new IndirectRecoverableConnection(dbName,
+                    user, passwd, this);
+        }
+        else
+        {
+            _transactionalDriverXAConnectionConnection = new DirectRecoverableConnection(dbName, user,
+                    passwd, dynamic, this);
         }
 
         /*
@@ -120,25 +129,34 @@ public class ConnectionImple implements Connection {
         _theConnection = null;
     }
 
-    public ConnectionImple(String dbName, String user, String passwd) throws SQLException {
+    public ConnectionImple(String dbName, String user, String passwd)
+            throws SQLException
+    {
         this(dbName, user, passwd, null, null);
     }
 
-    public ConnectionImple(String dbName, String user, String passwd, String dynamic, Object xaDataSource)
-            throws SQLException {
+    public ConnectionImple(String dbName, String user, String passwd,
+            String dynamic, Object xaDataSource) throws SQLException
+    {
         if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("ConnectionImple.ConnectionImple ( " + dbName + ", " + user + ", " + passwd + ", "
-                    + dynamic + " )");
+            jdbcLogger.logger.trace("ConnectionImple.ConnectionImple ( " + dbName + ", " + user
+                    + ", " + passwd + ", " + dynamic + " )");
         }
 
-        if (xaDataSource != null) {
-            _transactionalDriverXAConnectionConnection = new ProvidedXADataSourceConnection(dbName, user, passwd,
-                    (XADataSource) xaDataSource, this);
-        } else if ((dynamic == null) || (dynamic.equals(""))) {
-            _transactionalDriverXAConnectionConnection = new IndirectRecoverableConnection(dbName, user, passwd, this);
-        } else {
-            _transactionalDriverXAConnectionConnection = new DirectRecoverableConnection(dbName, user, passwd, dynamic,
-                    this);
+        if (xaDataSource != null)
+        {
+            _transactionalDriverXAConnectionConnection = new ProvidedXADataSourceConnection(dbName, user,
+                    passwd, (XADataSource) xaDataSource, this);    
+        }
+        else if ((dynamic == null) || (dynamic.equals("")))
+        {
+            _transactionalDriverXAConnectionConnection = new IndirectRecoverableConnection(dbName,
+                    user, passwd, this);
+        }
+        else
+        {
+            _transactionalDriverXAConnectionConnection = new DirectRecoverableConnection(dbName, user,
+                    passwd, dynamic, this);
         }
 
         /*
@@ -149,7 +167,8 @@ public class ConnectionImple implements Connection {
         _theConnection = null;
     }
 
-    public Statement createStatement() throws SQLException {
+    public Statement createStatement() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -157,7 +176,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createStatement();
     }
 
-    public Statement createStatement(int rs, int rc) throws SQLException {
+    public Statement createStatement(int rs, int rc) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -165,7 +185,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createStatement(rs, rc);
     }
 
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public PreparedStatement prepareStatement(String sql) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -173,7 +194,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareStatement(sql);
     }
 
-    public PreparedStatement prepareStatement(String sql, int rs, int rc) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int rs, int rc)
+            throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -181,7 +204,8 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareStatement(sql, rs, rc);
     }
 
-    public CallableStatement prepareCall(String sql) throws SQLException {
+    public CallableStatement prepareCall(String sql) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -189,7 +213,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareCall(sql);
     }
 
-    public CallableStatement prepareCall(String sql, int rs, int rc) throws SQLException {
+    public CallableStatement prepareCall(String sql, int rs, int rc)
+            throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -197,7 +223,8 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareCall(sql, rs, rc);
     }
 
-    public String nativeSQL(String sql) throws SQLException {
+    public String nativeSQL(String sql) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -205,62 +232,79 @@ public class ConnectionImple implements Connection {
         return getConnection().nativeSQL(sql);
     }
 
-    public Map getTypeMap() throws SQLException {
+    public Map getTypeMap() throws SQLException
+    {
         return getConnection().getTypeMap();
     }
 
-    /*
-     * public void setTypeMap(Map map) throws SQLException {
-     * getConnection().setTypeMap(map); }
-     */
+/*
+    public void setTypeMap(Map map) throws SQLException
+    {
+        getConnection().setTypeMap(map);
+    }
+*/
     /**
      * Not allowed if within a transaction.
      */
 
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        if (transactionRunning()) {
+    public void setAutoCommit(boolean autoCommit) throws SQLException
+    {
+        if (transactionRunning())
+        {
             if (autoCommit)
                 throw new SQLException(jdbcLogger.i18NLogger.get_autocommit());
-        } else {
+        }
+        else
+        {
             getConnection().setAutoCommit(autoCommit);
         }
     }
 
-    public boolean getAutoCommit() throws SQLException {
+    public boolean getAutoCommit() throws SQLException
+    {
         return getConnection().getAutoCommit();
     }
 
-    public void commit() throws SQLException {
+    public void commit() throws SQLException
+    {
         /*
          * If there is a transaction running, then it cannot be terminated via
          * the driver - the user must go through current.
          */
 
-        if (transactionRunning()) {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_commiterror());
-        } else
+        }
+        else
             getConnection().commit();
     }
 
-    public void rollback() throws SQLException {
-        if (transactionRunning()) {
+    public void rollback() throws SQLException
+    {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_aborterror());
-        } else
+        }
+        else
             getConnection().rollback();
     }
 
     /*
      * This needs to be reworked in light of experience and requirements.
      */
-    public void close() throws SQLException {
+    public void close() throws SQLException
+    {
         boolean delayClose = false;
 
-        try {
+        try
+        {
             /*
              * Delist resource if within a transaction.
              */
 
-            javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+            javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+            .transactionManager();
             javax.transaction.Transaction tx = tm.getTransaction();
 
             /*
@@ -269,14 +313,16 @@ public class ConnectionImple implements Connection {
              * connection is enlisted with!
              */
 
-            if (tx != null) {
-                if (_transactionalDriverXAConnectionConnection.validTransaction(tx)) {
+            if (tx != null)
+            {
+                if (_transactionalDriverXAConnectionConnection.validTransaction(tx))
+                {
                     XAResource xares = _transactionalDriverXAConnectionConnection.getResource();
 
-                    if ((tx.getStatus() == Status.STATUS_ACTIVE && !tx.delistResource(xares, XAResource.TMSUCCESS))
-                            || (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK
-                                    && !tx.delistResource(xares, XAResource.TMFAIL)))
-                        throw new SQLException(jdbcLogger.i18NLogger.get_delisterror());
+                    if ((tx.getStatus() == Status.STATUS_ACTIVE && !tx.delistResource(xares, XAResource.TMSUCCESS)) ||
+                            (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK && !tx.delistResource(xares, XAResource.TMFAIL)))
+                        throw new SQLException(
+                                jdbcLogger.i18NLogger.get_delisterror());
 
                     if (tx.getStatus() == Status.STATUS_ACTIVE) {
                         getModifier();
@@ -284,25 +330,22 @@ public class ConnectionImple implements Connection {
                         if (_theModifier == null) {
                             jdbcLogger.i18NLogger.info_closingconnectionnull(_theConnection.toString());
 
-                            // no indication about connections, so assume close
-                            // immediately
+                            // no indication about connections, so assume close immediately
 
-                            /*
-                             * Don't return just yet. Drop through bottom of
-                             * these clauses and close _theConnection and
-                             * _recoveryConnection.
-                             * 
-                             * delayClose is false at this point.
-                             * 
-                             * JBTM-789.
-                             */
+                        /*
+                         * Don't return just yet. Drop through bottom of these clauses and
+                         * close _theConnection and _recoveryConnection.
+                         * 
+                         * delayClose is false at this point.
+                         * 
+                         * JBTM-789.
+                         */
                         } else {
                             if (((ConnectionModifier) _theModifier).supportsMultipleConnections()) {
-                                /*
-                                 * We can't close the connection until the
-                                 * transaction has terminated, so register a
-                                 * Synchronization here.
-                                 */
+                            /*
+                             * We can't close the connection until the transaction has
+                             * terminated, so register a Synchronization here.
+                             */
 
                                 jdbcLogger.i18NLogger.debug_closingconnection(_theConnection.toString());
 
@@ -310,18 +353,26 @@ public class ConnectionImple implements Connection {
                             }
                         }
 
-                        if (delayClose) {
+                        if (delayClose)
+                        {
                             tx.registerSynchronization(new ConnectionSynchronization(this));
                         }
                     }
-                } else
+                }
+                else
                     throw new SQLException(jdbcLogger.i18NLogger.get_closeerrorinvalidtx(tx.toString()));
             }
-        } catch (IllegalStateException ex) {
+        }
+        catch (IllegalStateException ex)
+        {
             // transaction not running, so ignore.
-        } catch (SQLException sqle) {
+        }
+        catch (SQLException sqle)
+        {
             throw sqle;
-        } catch (Exception e1) {
+        }
+        catch (Exception e1)
+        {
             SQLException sqlException = new SQLException(jdbcLogger.i18NLogger.get_closeerror());
             sqlException.initCause(e1);
             throw sqlException;
@@ -347,7 +398,8 @@ public class ConnectionImple implements Connection {
         }
     }
 
-    public boolean isClosed() throws SQLException {
+    public boolean isClosed() throws SQLException
+    {
         /*
          * A connection may appear closed to a thread if another thread has
          * bound it to a different transaction.
@@ -356,13 +408,13 @@ public class ConnectionImple implements Connection {
         if (_transactionalDriverXAConnectionConnection == null)
             return true; // closeImpl was explicitly called
         else if (_theConnection == null)
-            return false; // not opened yet. // TODO why don't we return true
-                            // here
+            return false; // not opened yet. // TODO why don't we return true here
         else
             return _theConnection.isClosed();
     }
 
-    public DatabaseMetaData getMetaData() throws SQLException {
+    public DatabaseMetaData getMetaData() throws SQLException
+    {
         return getConnection().getMetaData();
     }
 
@@ -371,18 +423,23 @@ public class ConnectionImple implements Connection {
      * transaction!
      */
 
-    public void setReadOnly(boolean ro) throws SQLException {
-        if (!_transactionalDriverXAConnectionConnection.inuse()) {
+    public void setReadOnly(boolean ro) throws SQLException
+    {
+        if (!_transactionalDriverXAConnectionConnection.inuse())
+        {
             getConnection().setReadOnly(ro);
-        } else
+        }
+        else
             throw new SQLException(jdbcLogger.i18NLogger.get_setreadonly());
     }
 
-    public boolean isReadOnly() throws SQLException {
+    public boolean isReadOnly() throws SQLException
+    {
         return getConnection().isReadOnly();
     }
 
-    public void setCatalog(String cat) throws SQLException {
+    public void setCatalog(String cat) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -390,7 +447,8 @@ public class ConnectionImple implements Connection {
         getConnection().setCatalog(cat);
     }
 
-    public String getCatalog() throws SQLException {
+    public String getCatalog() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -398,28 +456,30 @@ public class ConnectionImple implements Connection {
         return getConnection().getCatalog();
     }
 
-    public void setTransactionIsolation(int iso) throws SQLException {
+    public void setTransactionIsolation(int iso) throws SQLException
+    {
         checkTransaction();
 
         /*
          * if (iso != Connection.TRANSACTION_SERIALIZABLE) throw new
-         * SQLException(jdbcLogger.loggerI18N.getString.getString(
-         * "com.arjuna.ats.internal.jdbc.stateerror")+
-         * "Connection.TRANSACTION_SERIALIZABLE");
+         * SQLException(jdbcLogger.loggerI18N.getString.getString("com.arjuna.ats.internal.jdbc.stateerror")+"Connection.TRANSACTION_SERIALIZABLE");
          */
 
         getConnection().setTransactionIsolation(iso);
     }
 
-    public int getTransactionIsolation() throws SQLException {
+    public int getTransactionIsolation() throws SQLException
+    {
         return getConnection().getTransactionIsolation();
     }
 
-    public SQLWarning getWarnings() throws SQLException {
+    public SQLWarning getWarnings() throws SQLException
+    {
         return getConnection().getWarnings();
     }
 
-    public void clearWarnings() throws SQLException {
+    public void clearWarnings() throws SQLException
+    {
         getConnection().clearWarnings();
     }
 
@@ -428,7 +488,8 @@ public class ConnectionImple implements Connection {
      *         not be used by anything other than Arjuna.
      */
 
-    public final RecoverableXAConnection recoveryConnection() {
+    public final RecoverableXAConnection recoveryConnection()
+    {
         if (_transactionalDriverXAConnectionConnection instanceof RecoverableXAConnection) {
             return (RecoverableXAConnection) _transactionalDriverXAConnectionConnection;
         } else {
@@ -441,11 +502,13 @@ public class ConnectionImple implements Connection {
      * JDBC 3.0 section
      */
 
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException
+    {
         getConnection().setTypeMap(map);
     }
 
-    public void setHoldability(int holdability) throws SQLException {
+    public void setHoldability(int holdability) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -453,50 +516,66 @@ public class ConnectionImple implements Connection {
         getConnection().setHoldability(holdability);
     }
 
-    public int getHoldability() throws SQLException {
+    public int getHoldability() throws SQLException
+    {
         return getConnection().getHoldability();
     }
 
-    public Savepoint setSavepoint() throws SQLException {
-        if (transactionRunning()) {
+    public Savepoint setSavepoint() throws SQLException
+    {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_setsavepointerror());
-        } else {
+        }
+        else
+        {
             return getConnection().setSavepoint();
         }
     }
 
-    public Savepoint setSavepoint(String name) throws SQLException {
-        if (transactionRunning()) {
+    public Savepoint setSavepoint(String name) throws SQLException
+    {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_setsavepointerror());
-        } else {
+        }
+        else
+        {
             return getConnection().setSavepoint(name);
         }
     }
 
-    // The JDBC 3.0 spec (section 12.4) prohibits calling setSavepoint indide an
-    // XA tx.
-    // It does not explicitly disallow calling rollback(savepoint) or
-    // releaseSavepoint(savepoint)
+    // The JDBC 3.0 spec (section 12.4) prohibits calling setSavepoint indide an XA tx.
+    // It does not explicitly disallow calling rollback(savepoint) or releaseSavepoint(savepoint)
     // but allowing them does not make a whole lot of sense, so we don't:
 
-    public void rollback(Savepoint savepoint) throws SQLException {
-        if (transactionRunning()) {
+    public void rollback(Savepoint savepoint) throws SQLException
+    {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_rollbacksavepointerror());
-        } else {
+        }
+        else
+        {
             getConnection().rollback(savepoint);
         }
     }
 
-    public void releaseSavepoint(Savepoint savepoint) throws SQLException {
-        if (transactionRunning()) {
+    public void releaseSavepoint(Savepoint savepoint) throws SQLException
+    {
+        if (transactionRunning())
+        {
             throw new SQLException(jdbcLogger.i18NLogger.get_releasesavepointerror());
-        } else {
+        }
+        else
+        {
             getConnection().releaseSavepoint(savepoint);
         }
     }
 
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-            throws SQLException {
+    public Statement createStatement(int resultSetType, int resultSetConcurrency,
+                                     int resultSetHoldability) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -504,8 +583,9 @@ public class ConnectionImple implements Connection {
         return getConnection().createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int resultSetType,
+                                              int resultSetConcurrency, int resultSetHoldability) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -513,8 +593,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency,
-            int resultSetHoldability) throws SQLException {
+    public CallableStatement prepareCall(String sql, int resultSetType,
+                                         int resultSetConcurrency, int resultSetHoldability) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -522,7 +603,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
+            throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -530,7 +613,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareStatement(sql, autoGeneratedKeys);
     }
 
-    public PreparedStatement prepareStatement(String sql, int columnIndexes[]) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int columnIndexes[])
+            throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -538,7 +623,9 @@ public class ConnectionImple implements Connection {
         return getConnection().prepareStatement(sql, columnIndexes);
     }
 
-    public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, String columnNames[])
+            throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -551,12 +638,14 @@ public class ConnectionImple implements Connection {
      * *******************************************************************
      */
 
+
     /*
      * ******************************************************************* *
      * JDBC 4.0 method section.
      */
 
-    public Clob createClob() throws SQLException {
+    public Clob createClob() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -564,7 +653,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createClob();
     }
 
-    public Blob createBlob() throws SQLException {
+    public Blob createBlob() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -572,7 +662,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createBlob();
     }
 
-    public NClob createNClob() throws SQLException {
+    public NClob createNClob() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -580,7 +671,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createNClob();
     }
 
-    public SQLXML createSQLXML() throws SQLException {
+    public SQLXML createSQLXML() throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -588,7 +680,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createSQLXML();
     }
 
-    public boolean isValid(int timeout) throws SQLException {
+    public boolean isValid(int timeout) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -596,31 +689,42 @@ public class ConnectionImple implements Connection {
         return getConnection().isValid(timeout);
     }
 
-    public String getClientInfo(String name) throws SQLException {
+    public String getClientInfo(String name) throws SQLException
+    {
         return getConnection().getClientInfo(name);
     }
 
-    public Properties getClientInfo() throws SQLException {
+    public Properties getClientInfo() throws SQLException
+    {
         return getConnection().getClientInfo();
     }
 
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-        try {
+    public void setClientInfo(String name, String value) throws SQLClientInfoException
+    {
+        try
+        {
             getConnection().setClientInfo(name, value);
-        } catch (SQLException e) {
+        }
+        catch(SQLException e)
+        {
             throw new SQLClientInfoException("setClientInfo : getConnection failed", null, e);
         }
     }
 
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        try {
+    public void setClientInfo(Properties properties) throws SQLClientInfoException
+    {
+        try
+        {
             getConnection().setClientInfo(properties);
-        } catch (SQLException e) {
+        }
+        catch(SQLException e)
+        {
             throw new SQLClientInfoException("setClientInfo : getConnection failed", null, e);
         }
     }
 
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+    public Array createArrayOf(String typeName, Object[] elements) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -628,7 +732,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createArrayOf(typeName, elements);
     }
 
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+    public Struct createStruct(String typeName, Object[] attributes) throws SQLException
+    {
         checkTransaction();
 
         registerDatabase();
@@ -636,7 +741,8 @@ public class ConnectionImple implements Connection {
         return getConnection().createStruct(typeName, attributes);
     }
 
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <T> T unwrap(Class<T> iface) throws SQLException
+    {
         if (iface != null) {
             if (iface.isInstance(this)) {
                 return (T) this;
@@ -645,7 +751,7 @@ public class ConnectionImple implements Connection {
                 if (conn != null) {
                     if (iface.isInstance(conn)) {
                         return (T) conn;
-                    } else if (conn.isWrapperFor(iface)) {
+                    } else if(conn.isWrapperFor(iface)) {
                         return conn.unwrap(iface);
                     }
                 }
@@ -654,7 +760,8 @@ public class ConnectionImple implements Connection {
         return null;
     }
 
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    public boolean isWrapperFor(Class<?> iface) throws SQLException
+    {
         if (iface != null) {
             if (iface.isInstance(this)) {
                 return true;
@@ -682,28 +789,33 @@ public class ConnectionImple implements Connection {
      * Java 7 method section.
      */
 
-    // @Override
-    public void setSchema(String schema) throws SQLException {
+    //@Override
+    public void setSchema(String schema) throws SQLException
+    {
         throw new SQLException();
     }
 
-    // @Override
-    public String getSchema() throws SQLException {
+    //@Override
+    public String getSchema() throws SQLException
+    {
         throw new SQLException();
     }
 
-    // @Override
-    public void abort(Executor executor) throws SQLException {
+    //@Override
+    public void abort(Executor executor) throws SQLException
+    {
         throw new SQLException();
     }
 
-    // @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+    //@Override
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException
+    {
         throw new SQLException();
     }
 
-    // @Override
-    public int getNetworkTimeout() throws SQLException {
+    //@Override
+    public int getNetworkTimeout() throws SQLException
+    {
         throw new SQLException();
     }
 
@@ -712,14 +824,19 @@ public class ConnectionImple implements Connection {
      * *******************************************************************
      */
 
+
     /**
      * @return the XAResource associated with the current XAConnection.
      */
 
-    protected final XAResource getXAResource() {
-        try {
+    protected final XAResource getXAResource()
+    {
+        try
+        {
             return _transactionalDriverXAConnectionConnection.getResource();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return null;
         }
     }
@@ -730,31 +847,44 @@ public class ConnectionImple implements Connection {
      * finished with them.
      */
 
-    final void reset() {
-        try {
+    final void reset()
+    {
+        try
+        {
             closeImpl();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
         }
     }
 
-    final java.sql.Connection getConnection() throws SQLException {
+    final java.sql.Connection getConnection() throws SQLException
+    {
         if (_theConnection != null && !_theConnection.isClosed())
             return _theConnection;
 
         XAConnection xaConn = _transactionalDriverXAConnectionConnection.getConnection();
 
-        if (xaConn != null) {
+        if (xaConn != null)
+        {
             _theConnection = xaConn.getConnection();
 
-            try {
+            try
+            {
                 getModifier();
 
-                if (_theModifier != null) {
-                    ((ConnectionModifier) _theModifier).setIsolationLevel(_theConnection, _currentIsolationLevel);
+                if (_theModifier != null)
+                {
+                    ((ConnectionModifier) _theModifier).setIsolationLevel(
+                            _theConnection, _currentIsolationLevel);
                 }
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex)
+            {
                 throw ex;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 jdbcLogger.i18NLogger.warn_isolationlevelfailset("ConnectionImple.getConnection", e);
 
                 SQLException sqlException = new SQLException(jdbcLogger.i18NLogger.get_conniniterror());
@@ -763,22 +893,32 @@ public class ConnectionImple implements Connection {
             }
 
             return _theConnection;
-        } else
+        }
+        else
             return null;
     }
 
-    final ConnectionControl connectionControl() {
+    final ConnectionControl connectionControl()
+    {
         return (ConnectionControl) _transactionalDriverXAConnectionConnection;
     }
 
-    protected final boolean transactionRunning() throws SQLException {
-        try {
-            if (com.arjuna.ats.jta.TransactionManager.transactionManager().getTransaction() != null) {
+    protected final boolean transactionRunning() throws SQLException
+    {
+        try
+        {
+            if (com.arjuna.ats.jta.TransactionManager.transactionManager()
+                    .getTransaction() != null)
+            {
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             SQLException sqlException = new SQLException(e.toString());
             sqlException.initCause(e);
             throw sqlException;
@@ -797,18 +937,22 @@ public class ConnectionImple implements Connection {
      * flush its cache of XAResources though.
      */
 
-    protected final synchronized void registerDatabase() throws SQLException {
+    protected final synchronized void registerDatabase() throws SQLException
+    {
         if (jdbcLogger.logger.isTraceEnabled()) {
             jdbcLogger.logger.trace("ConnectionImple.registerDatabase ()");
         }
 
         Connection theConnection = getConnection();
 
-        if (theConnection != null) {
+        if (theConnection != null)
+        {
             XAResource xares = null;
 
-            try {
-                javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+            try
+            {
+                javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                        .transactionManager();
                 javax.transaction.Transaction tx = tm.getTransaction();
 
                 if (tx == null)
@@ -819,7 +963,7 @@ public class ConnectionImple implements Connection {
                  */
 
                 if (!_transactionalDriverXAConnectionConnection.setTransaction(tx))
-                    throw new SQLException(jdbcLogger.i18NLogger.get_alreadyassociated());
+                    throw new SQLException( jdbcLogger.i18NLogger.get_alreadyassociated() );
 
                 Object[] params;
 
@@ -839,14 +983,19 @@ public class ConnectionImple implements Connection {
 
                 xares = _transactionalDriverXAConnectionConnection.getResource();
 
-                if (!((com.arjuna.ats.jta.transaction.Transaction) tx).enlistResource(xares, params)) {
+                if (!((com.arjuna.ats.jta.transaction.Transaction) tx)
+                        .enlistResource(xares, params))
+                {
                     /*
                      * Failed to enlist, so mark transaction as rollback only.
                      */
 
-                    try {
+                    try
+                    {
                         tx.setRollbackOnly();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         jdbcLogger.i18NLogger.warn_rollbackerror("ConnectionImple.registerDatabase");
 
                         SQLException sqlException = new SQLException(e.toString());
@@ -855,24 +1004,33 @@ public class ConnectionImple implements Connection {
                     }
 
                     throw new SQLException(
-                            "ConnectionImple.registerDatabase - " + jdbcLogger.i18NLogger.get_enlistfailed());
+                            "ConnectionImple.registerDatabase - "
+                                    + jdbcLogger.i18NLogger.get_enlistfailed());
                 }
 
                 params = null;
                 xares = null;
                 tx = null;
                 tm = null;
-            } catch (RollbackException e1) {
+            }
+            catch (RollbackException e1)
+            {
                 SQLException sqlException = new SQLException("ConnectionImple.registerDatabase - " + e1);
                 sqlException.initCause(e1);
                 throw sqlException;
-            } catch (SystemException e2) {
-                SQLException sqlException = new SQLException("ConnectionImple.registerDatabase - " + e2);
+            }
+            catch (SystemException e2)
+            {
+                SQLException sqlException = new SQLException("ConnectionImple.registerDatabase - "+ e2);
                 sqlException.initCause(e2);
                 throw sqlException;
-            } catch (SQLException e3) {
+            }
+            catch (SQLException e3)
+            {
                 throw e3;
-            } catch (Exception e4) {
+            }
+            catch (Exception e4)
+            {
                 SQLException sqlException = new SQLException(e4.toString());
                 sqlException.initCause(e4);
                 throw sqlException;
@@ -880,13 +1038,16 @@ public class ConnectionImple implements Connection {
         }
     }
 
-    protected final void checkTransaction() throws SQLException {
+    protected final void checkTransaction() throws SQLException
+    {
         if (jdbcLogger.logger.isTraceEnabled()) {
             jdbcLogger.logger.trace("ConnectionImple.checkTransaction ()");
         }
 
-        try {
-            javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        try
+        {
+            javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                    .transactionManager();
             javax.transaction.Transaction tx = tm.getTransaction();
 
             if (tx == null)
@@ -900,19 +1061,27 @@ public class ConnectionImple implements Connection {
              */
 
             if (!_transactionalDriverXAConnectionConnection.validTransaction(tx))
-                throw new SQLException(jdbcLogger.i18NLogger.get_alreadyassociatedcheck());
-        } catch (SQLException ex) {
+                throw new SQLException(
+                        jdbcLogger.i18NLogger.get_alreadyassociatedcheck());
+        }
+        catch (SQLException ex)
+        {
             throw ex;
-        } catch (Exception e3) {
+        }
+        catch (Exception e3)
+        {
             SQLException sqlException = new SQLException(jdbcLogger.i18NLogger.get_infoerror());
             sqlException.initCause(e3);
             throw sqlException;
         }
     }
 
-    private final void getModifier() {
-        if (_theModifier == null) {
-            try {
+    private final void getModifier()
+    {
+        if (_theModifier == null)
+        {
+            try
+            {
                 DatabaseMetaData md = _theConnection.getMetaData();
 
                 String name = md.getDriverName();
@@ -923,7 +1092,9 @@ public class ConnectionImple implements Connection {
 
                 ((ConnectionControl) _transactionalDriverXAConnectionConnection)
                         .setModifier((ConnectionModifier) _theModifier);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 jdbcLogger.i18NLogger.warn_getmoderror(ex);
             }
         }

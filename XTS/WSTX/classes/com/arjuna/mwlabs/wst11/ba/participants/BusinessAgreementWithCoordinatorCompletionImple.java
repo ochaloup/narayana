@@ -45,34 +45,50 @@ import com.arjuna.wst11.BAParticipantManager;
  * @since 1.0.
  */
 
-public class BusinessAgreementWithCoordinatorCompletionImple extends BusinessAgreementWithParticipantCompletionImple
-        implements
-            ParticipantWithComplete {
+public class BusinessAgreementWithCoordinatorCompletionImple extends
+        BusinessAgreementWithParticipantCompletionImple implements ParticipantWithComplete
+{
 
     public BusinessAgreementWithCoordinatorCompletionImple(
-            BusinessAgreementWithCoordinatorCompletionParticipant participant, String identifier) {
+            BusinessAgreementWithCoordinatorCompletionParticipant participant,
+            String identifier)
+    {
         super(participant, identifier);
     }
 
-    public BusinessAgreementWithCoordinatorCompletionImple(BAParticipantManager manager,
-            BusinessAgreementWithCoordinatorCompletionParticipant participant, String identifier) {
+    public BusinessAgreementWithCoordinatorCompletionImple(
+            BAParticipantManager manager,
+            BusinessAgreementWithCoordinatorCompletionParticipant participant,
+            String identifier)
+    {
         super(manager, participant, identifier);
     }
 
-    public BusinessAgreementWithCoordinatorCompletionImple() {
+    public BusinessAgreementWithCoordinatorCompletionImple()
+    {
         super();
     }
 
-    public void complete() throws InvalidParticipantException, WrongStateException, SystemException {
-        if (_resource != null) {
-            try {
-                ((BusinessAgreementWithCoordinatorCompletionParticipant) _resource).complete();
-            } catch (com.arjuna.wst.WrongStateException ex) {
+    public void complete () throws InvalidParticipantException,
+            WrongStateException, SystemException
+    {
+        if (_resource != null)
+        {
+            try
+            {
+                ((BusinessAgreementWithCoordinatorCompletionParticipant) _resource)
+                        .complete();
+            }
+            catch (com.arjuna.wst.WrongStateException ex)
+            {
                 throw new WrongStateException(ex.toString());
-            } catch (com.arjuna.wst.SystemException ex) {
+            }
+            catch (com.arjuna.wst.SystemException ex)
+            {
                 throw new SystemException(ex.toString());
             }
-        } else
+        }
+        else
             throw new InvalidParticipantException();
     }
 }

@@ -37,9 +37,8 @@ import java.util.Set;
 /**
  * Recovery module to remove unmanaged compensation context state records.
  * 
- * Normally these records are removed when transaction is completed. However, in
- * case of a system crash and participants being completed by recovery manager,
- * these records must be removed by this module.
+ * Normally these records are removed when transaction is completed. However, in case of a system crash and participants being
+ * completed by recovery manager, these records must be removed by this module.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -73,11 +72,9 @@ public class CompensationContextStateRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Compensation context state without attached participants should be
-     * removed.
+     * Compensation context state without attached participants should be removed.
      *
-     * @param uid
-     *            record uid.
+     * @param uid record uid.
      */
     private void removeState(Uid uid) {
         recoveryHelper.getRecord(uid, e -> LOGGER.warnf(e, "Failed to get record")).ifPresent(record -> {

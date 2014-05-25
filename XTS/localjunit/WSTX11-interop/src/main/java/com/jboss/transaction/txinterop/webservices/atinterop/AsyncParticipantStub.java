@@ -36,538 +36,528 @@ import com.jboss.transaction.txinterop.webservices.atinterop.processors.ATInitia
 /**
  * The participant stub.
  */
-public class AsyncParticipantStub implements ParticipantStub {
+public class AsyncParticipantStub implements ParticipantStub
+{
     /***
      * The participant stub singletong.
      */
-    private static final ParticipantStub PARTICIPANT_STUB = new AsyncParticipantStub();
-
+    private static final ParticipantStub PARTICIPANT_STUB = new AsyncParticipantStub() ;
+    
     /**
      * Get the participant stub singleton.
-     * 
      * @return The participant stub singleton.
      */
-    public static ParticipantStub getParticipantStub() {
-        return PARTICIPANT_STUB;
+    public static ParticipantStub getParticipantStub()
+    {
+        return PARTICIPANT_STUB ;
     }
-
+    
     /**
      * Send a completion commit request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinatorURI
-     *            The coordinator URI.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinatorURI The coordinator URI.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
-    public void completionCommit(final String serviceURI, final String coordinatorURI) throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
-
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendCompletionCommit(map, coordinatorURI);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+    public void completionCommit(final String serviceURI, final String coordinatorURI)
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
+        
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendCompletionCommit(map, coordinatorURI) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a completion rollback request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinatorURI
-     *            The coordinator URI.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinatorURI The coordinator URI.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
-    public void completionRollback(final String serviceURI, final String coordinatorURI) throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+    public void completionRollback(final String serviceURI, final String coordinatorURI)
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendCompletionRollback(map, coordinatorURI);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendCompletionRollback(map, coordinatorURI) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a commit request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void commit(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendCommit(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendCommit(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a rollback request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void rollback(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendRollback(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendRollback(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a phase2Rollback request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void phase2Rollback(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendPhase2Rollback(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendPhase2Rollback(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a readonly request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void readonly(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendReadonly(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendReadonly(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a volatileAndDurable request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void volatileAndDurable(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendVolatileAndDurable(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendVolatileAndDurable(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send an earlyReadonly request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void earlyReadonly(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendEarlyReadonly(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendEarlyReadonly(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a earlyAborted request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void earlyAborted(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendEarlyAborted(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendEarlyAborted(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a replayCommit request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void replayCommit(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendReplayCommit(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendReplayCommit(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a retryPreparedCommit request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void retryPreparedCommit(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendRetryPreparedCommit(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendRetryPreparedCommit(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a retryPreparedAbort request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void retryPreparedAbort(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendRetryPreparedAbort(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendRetryPreparedAbort(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a retryCommit request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void retryCommit(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendRetryCommit(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendRetryCommit(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a preparedAfterTimeout request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void preparedAfterTimeout(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendPreparedAfterTimeout(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendPreparedAfterTimeout(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
 
     /**
      * Send a lostCommitted request.
-     * 
-     * @param serviceURI
-     *            The target service URI.
-     * @param coordinationContext
-     *            The coordination context.
-     * @throws SoapFault
-     *             For any errors.
-     * @throws IOException
-     *             for any transport errors.
+     * @param serviceURI The target service URI.
+     * @param coordinationContext The coordination context.
+     * @throws SoapFault For any errors.
+     * @throws IOException for any transport errors.
      */
     public void lostCommitted(final String serviceURI, final CoordinationContextType coordinationContext)
-            throws SoapFault, IOException {
-        final String messageId = MessageId.getMessageId();
-        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId);
+        throws SoapFault, IOException
+    {
+        final String messageId = MessageId.getMessageId() ;
+        final MAP map = AddressingHelper.createRequestContext(serviceURI, messageId) ;
 
-        final RequestCallback callback = new RequestCallback();
-        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator();
-        initiator.registerCallback(messageId, callback);
-        try {
-            AsyncParticipantClient.getClient().sendLostCommitted(coordinationContext, map);
-            callback.waitUntilTriggered(15000);
-        } finally {
-            initiator.removeCallback(messageId);
+        final RequestCallback callback = new RequestCallback() ;
+        final ATInitiatorProcessor initiator = ATInitiatorProcessor.getInitiator() ;
+        initiator.registerCallback(messageId, callback) ;
+        try
+        {
+            AsyncParticipantClient.getClient().sendLostCommitted(coordinationContext, map) ;
+            callback.waitUntilTriggered(15000) ;
         }
-
-        handleCallback(callback);
+        finally
+        {
+            initiator.removeCallback(messageId) ;
+        }
+        
+        handleCallback(callback) ;
     }
-
+    
     /**
      * Handle the callback.
-     * 
-     * @param callback
-     *            The callback.
-     * @throws SoapFault
-     *             for errors.
+     * @param callback The callback.
+     * @throws SoapFault for errors.
      */
-    private static void handleCallback(final RequestCallback callback) throws SoapFault {
-        if (callback.hasFailed()) {
-            throw new SoapFault11(SoapFaultType.FAULT_RECEIVER, null, "Callback execution failed");
-        } else if (!callback.hasTriggered()) {
-            throw new SoapFault11(SoapFaultType.FAULT_RECEIVER, null, "Callback wasn't triggered");
-        } else if (!callback.isResponse()) {
-            throw callback.getSoapFault();
+    private static void handleCallback(final RequestCallback callback)
+        throws SoapFault
+    {
+        if (callback.hasFailed())
+        {
+            throw new SoapFault11(SoapFaultType.FAULT_RECEIVER, null, "Callback execution failed") ;
+        }
+        else if (!callback.hasTriggered())
+        {
+            throw new SoapFault11(SoapFaultType.FAULT_RECEIVER, null, "Callback wasn't triggered") ;
+        }
+        else if (!callback.isResponse())
+        {
+            throw callback.getSoapFault() ;
         }
     }
-
+    
     /**
      * The request callback class.
      */
-    private static final class RequestCallback extends ATInitiatorCallback {
+    private static final class RequestCallback extends ATInitiatorCallback
+    {
         /**
          * The response flag.
          */
-        private boolean response;
+        private boolean response ;
         /**
          * The SOAP fault response.
          */
-        private SoapFault soapFault;
-
+        private SoapFault soapFault ;
+        
         /**
          * A response.
-         * 
-         * @param map
-         *            The current addressing context.
+         * @param map The current addressing context.
          */
-        public void response(final MAP map) {
-            this.response = true;
+        public void response(final MAP map)
+        {
+            this.response = true ;
         }
 
         /**
          * A SOAP fault response.
-         * 
-         * @param soapFault
-         *            The SOAP fault response.
-         * @param map
-         *            The current addressing context.
+         * @param soapFault The SOAP fault response.
+         * @param map The current addressing context.
          */
-        public void soapFault(final SoapFault soapFault, final MAP map) {
-            this.soapFault = soapFault;
+        public void soapFault(final SoapFault soapFault, final MAP map)
+        {
+            this.soapFault = soapFault ;
         }
-
+        
         /**
          * Was a response received?
-         * 
          * @return true if a response was received, false otherwise.
          */
-        boolean isResponse() {
-            return response;
+        boolean isResponse()
+        {
+            return response ;
         }
-
+        
         /**
          * Get the SOAP fault.
-         * 
          * @return The SOAP fault or null.
          */
-        SoapFault getSoapFault() {
-            return soapFault;
+        SoapFault getSoapFault()
+        {
+            return soapFault ;
         }
     }
 }

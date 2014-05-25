@@ -53,8 +53,8 @@ public abstract class AbstractJTAOverWSATHandler<C extends MessageContext> imple
     private final JaxWSTxOutboundBridgeHandler delegateHandler = new JaxWSTxOutboundBridgeHandler();
 
     /**
-     * Delegates message handling to the JaxWSTxOutboundBridgeHandler if either
-     * JTAOverWSATFeature or default context propagation is enabled.
+     * Delegates message handling to the JaxWSTxOutboundBridgeHandler if either JTAOverWSATFeature or default context
+     * propagation is enabled.
      *
      * @see org.jboss.jbossts.txbridge.outbound.JaxWSTxOutboundBridgeHandler#handleMessage(MessageContext)
      *
@@ -71,8 +71,8 @@ public abstract class AbstractJTAOverWSATHandler<C extends MessageContext> imple
     }
 
     /**
-     * Delegates fault handling to the JaxWSTxOutboundBridgeHandler if either
-     * JTAOverWSATFeature or default context propagation is enabled.
+     * Delegates fault handling to the JaxWSTxOutboundBridgeHandler if either JTAOverWSATFeature or default context propagation
+     * is enabled.
      *
      * @see org.jboss.jbossts.txbridge.outbound.JaxWSTxOutboundBridgeHandler#handleFault(MessageContext)
      *
@@ -128,8 +128,8 @@ public abstract class AbstractJTAOverWSATHandler<C extends MessageContext> imple
 
         if (context instanceof SOAPMessageContext) {
             final SOAPMessageContext soapMessageContext = (SOAPMessageContext) context;
-            final SOAPHeaderElement soapHeaderElement = getHeaderElement(soapMessageContext,
-                    ArjunaConstants.WSARJ_NAMESPACE, ArjunaConstants.WSARJ_ELEMENT_INSTANCE_IDENTIFIER);
+            final SOAPHeaderElement soapHeaderElement = getHeaderElement(soapMessageContext, ArjunaConstants.WSARJ_NAMESPACE,
+                    ArjunaConstants.WSARJ_ELEMENT_INSTANCE_IDENTIFIER);
 
             isWSATContext = soapHeaderElement != null;
         }
@@ -138,17 +138,14 @@ public abstract class AbstractJTAOverWSATHandler<C extends MessageContext> imple
     }
 
     /**
-     * Extracts and returns SOAP header element from the SOAP message context
-     * based on <code>uri</code> and <code>name</code>.
+     * Extracts and returns SOAP header element from the SOAP message context based on <code>uri</code> and <code>name</code>.
      *
      * @param soapMessageContext
      * @param uri
      * @param name
-     * @return SOAP header element if such element existed and <code>null</code>
-     *         if not.
+     * @return SOAP header element if such element existed and <code>null</code> if not.
      */
-    private SOAPHeaderElement getHeaderElement(final SOAPMessageContext soapMessageContext, final String uri,
-            final String name) {
+    private SOAPHeaderElement getHeaderElement(final SOAPMessageContext soapMessageContext, final String uri, final String name) {
         SOAPHeaderElement soapHeaderElement = null;
 
         try {
@@ -166,14 +163,12 @@ public abstract class AbstractJTAOverWSATHandler<C extends MessageContext> imple
     }
 
     /**
-     * Extracts and returns SOAP header element from the SOAP header based on
-     * <code>uri</code> and <code>name</code>.
+     * Extracts and returns SOAP header element from the SOAP header based on <code>uri</code> and <code>name</code>.
      *
      * @param soapHeader
      * @param uri
      * @param name
-     * @return SOAP header element if such element existed and <code>null</code>
-     *         if not.
+     * @return SOAP header element if such element existed and <code>null</code> if not.
      */
     private SOAPHeaderElement getHeaderElement(final SOAPHeader soapHeader, final String uri, final String name)
             throws SOAPException {

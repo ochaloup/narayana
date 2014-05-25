@@ -72,15 +72,15 @@ import org.jboss.tm.TransactionImportResult;
  * @author mcl
  */
 
-public class XATerminatorImple
-        implements
-            javax.resource.spi.XATerminator,
-            XATerminatorExtensions,
-            ExtendedJBossXATerminator {
+public class XATerminatorImple implements javax.resource.spi.XATerminator, XATerminatorExtensions, ExtendedJBossXATerminator
+{
 
-    public void commit(Xid xid, boolean onePhase) throws XAException {
-        try {
-            SubordinateTransaction tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+    public void commit (Xid xid, boolean onePhase) throws XAException
+    {
+        try
+        {
+            SubordinateTransaction tx = SubordinationManager
+                    .getTransactionImporter().getImportedTransaction(xid);
 
             if (tx == null)
                 throw new XAException(XAException.XAER_INVAL);
@@ -89,46 +89,68 @@ public class XATerminatorImple
             {
                 if (onePhase)
                     tx.doOnePhaseCommit();
-                else if (!tx.doCommit()) {
-                    throw new XAException(XAException.XAER_RMFAIL);
-                }
+                else
+                    if (!tx.doCommit()) {
+                        throw new XAException(XAException.XAER_RMFAIL);
+                    }
 
-                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
-            } else
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
+            }
+            else
                 throw new XAException(XAException.XA_RETRY);
-        } catch (RollbackException e) {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        catch (RollbackException e)
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
             XAException xaException = new XAException(XAException.XA_RBROLLBACK);
             xaException.initCause(e);
             throw xaException;
-        } catch (XAException ex) {
+        }
+        catch (XAException ex)
+        {
             // resource hasn't had a chance to recover yet
 
-            if (ex.errorCode != XAException.XA_RETRY) {
-                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+            if (ex.errorCode != XAException.XA_RETRY)
+            {
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
             }
 
             throw ex;
-        } catch (final HeuristicCommitException ex) {
+        }
+        catch (final HeuristicCommitException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURCOM);
             xaException.initCause(ex);
             throw xaException;
-        } catch (HeuristicRollbackException ex) {
+        }
+        catch (HeuristicRollbackException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURRB);
             xaException.initCause(ex);
             throw xaException;
-        } catch (HeuristicMixedException ex) {
+        }
+        catch (HeuristicMixedException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURMIX);
             xaException.initCause(ex);
             throw xaException;
-        } catch (final IllegalStateException ex) {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        catch (final IllegalStateException ex)
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
 
             XAException xaException = new XAException(XAException.XAER_NOTA);
             xaException.initCause(ex);
             throw xaException;
-        } catch (SystemException ex) {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        catch (SystemException ex)
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
 
             XAException xaException = new XAException(XAException.XAER_RMERR);
             xaException.initCause(ex);
@@ -136,59 +158,78 @@ public class XATerminatorImple
         }
     }
 
-    public void forget(Xid xid) throws XAException {
-        try {
-            SubordinateTransaction tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+    public void forget (Xid xid) throws XAException
+    {
+        try
+        {
+            SubordinateTransaction tx = SubordinationManager
+                    .getTransactionImporter().getImportedTransaction(xid);
 
             if (tx == null)
                 throw new XAException(XAException.XAER_INVAL);
 
             tx.doForget();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             XAException xaException = new XAException(XAException.XAER_RMERR);
             xaException.initCause(ex);
             throw xaException;
-        } finally {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        finally
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
         }
     }
 
-    public int prepare(Xid xid) throws XAException {
-        try {
-            SubordinateTransaction tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+    public int prepare (Xid xid) throws XAException
+    {
+        try
+        {
+            SubordinateTransaction tx = SubordinationManager
+                    .getTransactionImporter().getImportedTransaction(xid);
 
             if (tx == null)
                 throw new XAException(XAException.XAER_INVAL);
 
-            switch (tx.doPrepare()) {
-                case TwoPhaseOutcome.PREPARE_READONLY :
-                    SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+            switch (tx.doPrepare())
+            {
+            case TwoPhaseOutcome.PREPARE_READONLY:
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
 
-                    return XAResource.XA_RDONLY;
-                case TwoPhaseOutcome.PREPARE_NOTOK :
-                    try {
-                        rollback(xid);
-                    } catch (final Throwable ex) {
-                        // if we failed to prepare then rollback should not
-                        // fail!
-                    }
+                return XAResource.XA_RDONLY;
+            case TwoPhaseOutcome.PREPARE_NOTOK:
+                try
+                {
+                    rollback(xid);
+                }
+                catch (final Throwable ex)
+                {
+                    // if we failed to prepare then rollback should not fail!
+                }
 
-                    SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
 
-                    throw new XAException(XAException.XA_RBROLLBACK);
-                case TwoPhaseOutcome.PREPARE_OK :
-                    return XAResource.XA_OK;
-                case TwoPhaseOutcome.INVALID_TRANSACTION :
-                    throw new XAException(XAException.XAER_NOTA);
-                default :
-                    throw new XAException(XAException.XA_RBOTHER);
+                throw new XAException(XAException.XA_RBROLLBACK);
+            case TwoPhaseOutcome.PREPARE_OK:
+                return XAResource.XA_OK;
+            case TwoPhaseOutcome.INVALID_TRANSACTION:
+                throw new XAException(XAException.XAER_NOTA);
+            default:
+                throw new XAException(XAException.XA_RBOTHER);
             }
-        } catch (XAException ex) {
+        }
+        catch (XAException ex)
+        {
             throw ex;
         }
     }
 
-    public Xid[] recover(int flag) throws XAException {
+    public Xid[] recover (int flag) throws XAException
+    {
         /*
          * Requires going through the objectstore for the states of imported
          * transactions. Our own crash recovery takes care of transactions
@@ -201,73 +242,89 @@ public class XATerminatorImple
          * imported via CORBA, Web Services etc.
          */
 
-        switch (flag) {
-            case XAResource.TMSTARTRSCAN : // check the object store
-                if (_recoveryStarted)
-                    throw new XAException(XAException.XAER_PROTO);
-                else {
-                    _recoveryStarted = true;
-                    if (XARecoveryModule.getRegisteredXARecoveryModule() != null) {
-                        XARecoveryModule.getRegisteredXARecoveryModule().periodicWorkFirstPass();
-                    }
-                }
-                break;
-            case XAResource.TMENDRSCAN : // null op for us
-                if (_recoveryStarted) {
-                    _recoveryStarted = false;
-                    if (XARecoveryModule.getRegisteredXARecoveryModule() != null) {
-                        XARecoveryModule.getRegisteredXARecoveryModule().periodicWorkSecondPass();
-                    }
-                } else
-                    throw new XAException(XAException.XAER_PROTO);
-                return null;
-            case XAResource.TMNOFLAGS :
-                if (_recoveryStarted)
-                    break;
-            default :
+        switch (flag)
+        {
+        case XAResource.TMSTARTRSCAN: // check the object store
+            if (_recoveryStarted)
                 throw new XAException(XAException.XAER_PROTO);
+            else {
+                _recoveryStarted = true;
+                if (XARecoveryModule.getRegisteredXARecoveryModule() != null) {
+                    XARecoveryModule.getRegisteredXARecoveryModule().periodicWorkFirstPass();
+                }
+            }
+            break;
+        case XAResource.TMENDRSCAN: // null op for us
+            if (_recoveryStarted) {
+                _recoveryStarted = false;
+                if (XARecoveryModule.getRegisteredXARecoveryModule() != null) {
+                    XARecoveryModule.getRegisteredXARecoveryModule().periodicWorkSecondPass();
+                }
+            }
+            else
+                throw new XAException(XAException.XAER_PROTO);
+            return null;
+        case XAResource.TMNOFLAGS:
+            if (_recoveryStarted)
+                break;
+        default:
+            throw new XAException(XAException.XAER_PROTO);
         }
 
         // if we are here, then check the object store
 
         Xid[] indoubt = null;
 
-        try {
+        try
+        {
             RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
             InputObjectState states = new InputObjectState();
 
             // only look in the JCA section of the object store
 
-            if (recoveryStore.allObjUids(ServerTransaction.getType(), states) && (states.notempty())) {
+            if (recoveryStore.allObjUids(ServerTransaction.getType(), states)
+                    && (states.notempty()))
+            {
                 Stack values = new Stack();
                 boolean finished = false;
 
-                do {
+                do
+                {
                     Uid uid = null;
 
-                    try {
+                    try
+                    {
                         uid = UidHelper.unpackFrom(states);
-                    } catch (IOException ex) {
+                    }
+                    catch (IOException ex)
+                    {
                         ex.printStackTrace();
 
                         finished = true;
                     }
 
-                    if (uid.notEquals(Uid.nullUid())) {
-                        Transaction tx = SubordinationManager.getTransactionImporter().recoverTransaction(uid);
+                    if (uid.notEquals(Uid.nullUid()))
+                    {
+                        Transaction tx = SubordinationManager
+                                .getTransactionImporter().recoverTransaction(
+                                        uid);
 
                         values.push(tx);
-                    } else
+                    }
+                    else
                         finished = true;
 
-                } while (!finished);
+                }
+                while (!finished);
 
-                if (values.size() > 0) {
+                if (values.size() > 0)
+                {
                     int index = 0;
 
                     indoubt = new Xid[values.size()];
 
-                    while (!values.empty()) {
+                    while (!values.empty())
+                    {
                         TransactionImple id = (TransactionImple) values.pop();
 
                         indoubt[index] = id.baseXid();
@@ -276,14 +333,17 @@ public class XATerminatorImple
                     }
                 }
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
         }
 
         return indoubt;
     }
 
-    public void rollback(Xid xid) throws XAException {
+    public void rollback (Xid xid) throws XAException
+    {
         // JBTM-927 this can happen if the transaction has been rolled back by
         // the TransactionReaper
         SubordinateTransaction tx = null;
@@ -297,44 +357,64 @@ public class XATerminatorImple
             throw xae;
         }
 
-        try {
+        try
+        {
             if (tx == null)
                 throw new XAException(XAException.XAER_INVAL);
 
-            if (tx.baseXid() != null) {
+            if (tx.baseXid() != null)
+            {
                 tx.doRollback();
 
-                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
-            } else
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
+            }
+            else
                 throw new XAException(XAException.XA_RETRY);
-        } catch (XAException ex) {
+        }
+        catch (XAException ex)
+        {
             // resource hasn't had a chance to recover yet
 
-            if (ex.errorCode != XAException.XA_RETRY) {
-                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+            if (ex.errorCode != XAException.XA_RETRY)
+            {
+                SubordinationManager.getTransactionImporter()
+                        .removeImportedTransaction(xid);
             }
 
             throw ex;
-        } catch (HeuristicCommitException ex) {
+        }
+        catch (HeuristicCommitException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURCOM);
             xaException.initCause(ex);
             throw xaException;
-        } catch (final HeuristicRollbackException ex) {
+        }
+        catch (final HeuristicRollbackException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURRB);
             xaException.initCause(ex);
             throw xaException;
-        } catch (HeuristicMixedException ex) {
+        }
+        catch (HeuristicMixedException ex)
+        {
             XAException xaException = new XAException(XAException.XA_HEURMIX);
             xaException.initCause(ex);
             throw xaException;
-        } catch (final IllegalStateException ex) {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        catch (final IllegalStateException ex)
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
 
             XAException xaException = new XAException(XAException.XAER_NOTA);
             xaException.initCause(ex);
             throw xaException;
-        } catch (SystemException ex) {
-            SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+        }
+        catch (SystemException ex)
+        {
+            SubordinationManager.getTransactionImporter()
+                    .removeImportedTransaction(xid);
 
             XAException xaException = new XAException(XAException.XAER_RMERR);
             xaException.initCause(ex);
@@ -342,19 +422,24 @@ public class XATerminatorImple
         }
     }
 
-    public boolean beforeCompletion(Xid xid) throws javax.transaction.SystemException {
-        try {
-            SubordinateTransaction tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+    public boolean beforeCompletion (Xid xid) throws javax.transaction.SystemException
+    {
+        try
+        {
+            SubordinateTransaction tx = SubordinationManager
+                    .getTransactionImporter().getImportedTransaction(xid);
 
             if (tx == null)
                 throw new UnexpectedConditionException();
 
-            return tx.doBeforeCompletion();
-        } catch (final Exception ex) {
+           return tx.doBeforeCompletion();
+        }
+        catch (final Exception ex)
+        {
             UnexpectedConditionException e = new UnexpectedConditionException();
-
+            
             e.initCause(ex);
-
+            
             throw e;
         }
     }
@@ -367,8 +452,7 @@ public class XATerminatorImple
 
     public Transaction getTransaction(Xid xid) throws XAException {
         // first see if the xid is a root coordinator
-        return com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple
-                .getTransaction(new XidImple(xid).getTransactionUid());
+        return com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
     }
 
     public TransactionImportResult importTransaction(Xid xid, int timeoutIfNew) throws XAException {
@@ -392,14 +476,12 @@ public class XATerminatorImple
         SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
     }
 
-    public Xid[] getXidsToRecoverForParentNode(boolean recoverInFlight, String parentNodeName, int recoveryFlags)
-            throws XAException {
+    public Xid[] getXidsToRecoverForParentNode(boolean recoverInFlight, String parentNodeName, int recoveryFlags) throws XAException {
         final Set<Xid> xidsToRecover = new HashSet<Xid>();
         if (recoverInFlight) {
             final TransactionImporter transactionImporter = SubordinationManager.getTransactionImporter();
             if (transactionImporter instanceof com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple) {
-                final Set<Xid> inFlightXids = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple) transactionImporter)
-                        .getInflightXids(parentNodeName);
+                final Set<Xid> inFlightXids = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple) transactionImporter).getInflightXids(parentNodeName);
                 if (inFlightXids != null) {
                     xidsToRecover.addAll(inFlightXids);
                 }
@@ -407,8 +489,7 @@ public class XATerminatorImple
         }
         final javax.resource.spi.XATerminator xaTerminator = SubordinationManager.getXATerminator();
         if (xaTerminator instanceof com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple) {
-            final Xid[] inDoubtTransactions = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple) xaTerminator)
-                    .doRecover(null, parentNodeName);
+            final Xid[] inDoubtTransactions = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple) xaTerminator).doRecover(null, parentNodeName);
             if (inDoubtTransactions != null) {
                 xidsToRecover.addAll(Arrays.asList(inDoubtTransactions));
             }

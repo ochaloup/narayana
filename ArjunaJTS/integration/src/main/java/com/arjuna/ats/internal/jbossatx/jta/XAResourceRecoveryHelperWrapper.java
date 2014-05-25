@@ -27,42 +27,44 @@ import javax.transaction.xa.XAResource;
 
 /**
  * Simple adaptor class that converts the JBossAS transaction integration SPI
- * version of the recovery interface (org.jboss.tm.XAResourceRecovery) into the
- * ArjunaJTA version (com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper) so
- * it can then be registered with the Recovery system (XARecoveryModule)
+ * version of the recovery interface (org.jboss.tm.XAResourceRecovery) into
+ * the ArjunaJTA version (com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper)
+ * so it can then be registered with the Recovery system (XARecoveryModule)
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class XAResourceRecoveryHelperWrapper implements XAResourceRecoveryHelper {
+public class XAResourceRecoveryHelperWrapper implements XAResourceRecoveryHelper
+{
     private XAResourceRecovery xaResourceRecovery;
 
     public XAResourceRecoveryHelperWrapper(XAResourceRecovery xaResourceRecovery) {
         this.xaResourceRecovery = xaResourceRecovery;
     }
 
-    public boolean initialise(String p) throws Exception {
+    public boolean initialise(String p) throws Exception
+    {
         return true;
     }
 
-    public XAResource[] getXAResources() throws Exception {
+    public XAResource[] getXAResources() throws Exception
+    {
         return xaResourceRecovery.getXAResources();
     }
 
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         XAResourceRecoveryHelperWrapper that = (XAResourceRecoveryHelperWrapper) o;
 
-        if (!xaResourceRecovery.equals(that.xaResourceRecovery))
-            return false;
+        if (!xaResourceRecovery.equals(that.xaResourceRecovery)) return false;
 
         return true;
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return xaResourceRecovery.hashCode();
     }
 }

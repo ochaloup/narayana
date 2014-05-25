@@ -24,19 +24,22 @@ public class SuspendConfirmTest {
     }
 
     @Test
-    public void testSuspendConfirm() throws Exception {
+    public void testSuspendConfirm()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("TwoPhase11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ActivityHierarchy hier = ua.suspend();
 
-            System.out.println("Suspended: " + hier + "\n");
+            System.out.println("Suspended: "+hier+"\n");
 
             if (ua.currentActivity() != null) {
                 WSCF11TestUtils.cleanup(ua);
@@ -44,12 +47,16 @@ public class SuspendConfirmTest {
             }
 
             ua.confirm();
-        } catch (NoCoordinatorException ex) {
+        }
+        catch (NoCoordinatorException ex)
+        {
             // why is it ok to get here?
             WSCF11TestUtils.cleanup(ua);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

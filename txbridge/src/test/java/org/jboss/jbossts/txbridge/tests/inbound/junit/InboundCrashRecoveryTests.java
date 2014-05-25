@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 
 import java.net.URL;
 
+
 /**
  * Crash Recovery test cases for the inbound side of the transaction bridge.
  *
@@ -63,6 +64,7 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         return getInboundClientArchive();
     }
 
+
     @ArquillianResource
     private ContainerController controller;
 
@@ -71,6 +73,7 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
 
     private InstrumentedClass instrumentedTestSynchronization;
     private InstrumentedClass instrumentedTestXAResource;
+
 
     @Before
     public void setUp() throws Exception {
@@ -88,8 +91,7 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentedTestSynchronization = instrumentor.instrumentClass(TestSynchronization.class);
         instrumentedTestXAResource = instrumentor.instrumentClass(TestXAResource.class);
 
-        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing",
-                "$0.enlistSynchronization(1), $0.enlistXAResource(1)");
+        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing", "$0.enlistSynchronization(1), $0.enlistXAResource(1)");
     }
 
     @After
@@ -110,6 +112,7 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentedTestSynchronization = instrumentor.instrumentClass(TestSynchronization.class);
         instrumentedTestXAResource = instrumentor.instrumentClass(TestXAResourceRecovered.class);
     }
+
 
     @Test
     @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)

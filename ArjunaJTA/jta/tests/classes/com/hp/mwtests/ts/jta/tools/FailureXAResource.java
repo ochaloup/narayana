@@ -27,29 +27,31 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FailureXAResource implements XAResource, Serializable {
-    public enum FailLocation {
-        none, prepare, commit, rollback, end, prepare_and_rollback
-    };
-    public enum FailType {
-        normal, timeout, heurcom, nota, inval, proto, rmfail, rollback, XA_RBCOMMFAIL
-    };
+public class FailureXAResource implements XAResource, Serializable
+{
+    public enum FailLocation { none, prepare, commit, rollback, end, prepare_and_rollback };
+    public enum FailType { normal, timeout, heurcom, nota, inval, proto, rmfail, rollback, XA_RBCOMMFAIL };
 
-    public FailureXAResource() {
+    public FailureXAResource()
+    {
         this(FailLocation.none, FailType.normal);
     }
 
-    public FailureXAResource(FailLocation loc) {
+    public FailureXAResource(FailLocation loc)
+    {
         this(loc, FailType.normal);
     }
 
-    public FailureXAResource(FailLocation loc, FailType type) {
+    public FailureXAResource(FailLocation loc, FailType type)
+    {
         _locale = loc;
         _type = type;
     }
 
-    public void commit(Xid id, boolean onePhase) throws XAException {
-        if (_locale == FailLocation.commit) {
+    public void commit(Xid id, boolean onePhase) throws XAException
+    {
+        if (_locale == FailLocation.commit)
+        {
             if (_type == FailType.normal)
                 throw new XAException(XAException.XA_HEURMIX);
 
@@ -75,8 +77,10 @@ public class FailureXAResource implements XAResource, Serializable {
         }
     }
 
-    public void end(Xid xid, int flags) throws XAException {
-        if (_locale == FailLocation.end) {
+    public void end(Xid xid, int flags) throws XAException
+    {
+        if (_locale == FailLocation.end)
+        {
             if (_type == FailType.normal)
                 throw new XAException(XAException.XA_HEURRB);
 
@@ -88,7 +92,8 @@ public class FailureXAResource implements XAResource, Serializable {
         }
     }
 
-    public void forget(Xid xid) throws XAException {
+    public void forget(Xid xid) throws XAException
+    {
         XidInfo info = getXidInfo(xid);
 
         info.forgetCount += 1;
@@ -97,27 +102,33 @@ public class FailureXAResource implements XAResource, Serializable {
             throw new XAException(XAException.XAER_RMERR);
     }
 
-    public int getTransactionTimeout() throws XAException {
+    public int getTransactionTimeout() throws XAException
+    {
         return 0;
     }
 
-    public boolean isSameRM(XAResource xares) throws XAException {
+    public boolean isSameRM(XAResource xares) throws XAException
+    {
         return false;
     }
 
-    public int prepare(Xid xid) throws XAException {
+    public int prepare(Xid xid) throws XAException
+    {
         if ((_locale == FailLocation.prepare) || (_locale == FailLocation.prepare_and_rollback))
             throw new XAException(XAException.XAER_INVAL);
 
         return XA_OK;
     }
 
-    public Xid[] recover(int flag) throws XAException {
+    public Xid[] recover(int flag) throws XAException
+    {
         return null;
     }
 
-    public void rollback(Xid xid) throws XAException {
-        if ((_locale == FailLocation.rollback) || (_locale == FailLocation.prepare_and_rollback)) {
+    public void rollback(Xid xid) throws XAException
+    {
+        if ((_locale == FailLocation.rollback) || (_locale == FailLocation.prepare_and_rollback))
+        {
             if (_type == FailType.normal)
                 throw new XAException(XAException.XA_HEURMIX);
 
@@ -143,11 +154,13 @@ public class FailureXAResource implements XAResource, Serializable {
         }
     }
 
-    public boolean setTransactionTimeout(int seconds) throws XAException {
+    public boolean setTransactionTimeout(int seconds) throws XAException
+    {
         return true;
     }
 
-    public void start(Xid xid, int flags) throws XAException {
+    public void start(Xid xid, int flags) throws XAException
+    {
         this._xid = xid;
     }
 

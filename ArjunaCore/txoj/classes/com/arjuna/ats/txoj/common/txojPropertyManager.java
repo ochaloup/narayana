@@ -39,8 +39,10 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  *
  * @author Richard Begg (richard_begg@hp.com)
  */
-public class txojPropertyManager {
-    public static TxojEnvironmentBean getTxojEnvironmentBean() {
+public class txojPropertyManager
+{
+    public static TxojEnvironmentBean getTxojEnvironmentBean()
+    {
         return BeanPopulator.getDefaultInstance(TxojEnvironmentBean.class);
     }
 }

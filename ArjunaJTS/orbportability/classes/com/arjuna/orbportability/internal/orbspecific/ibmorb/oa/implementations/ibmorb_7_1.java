@@ -39,22 +39,25 @@ import org.omg.PortableServer.POAPackage.InvalidPolicy;
 import com.arjuna.orbportability.internal.orbspecific.oa.implementations.POABase;
 import com.arjuna.orbportability.logging.opLogger;
 
-public class ibmorb_7_1 extends POABase {
+public class ibmorb_7_1 extends POABase
+{
     /**
      * Create a child POA of the root POA.
      */
-    public void createPOA(String adapterName, Policy[] policies)
-            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive, SystemException {
-        if (_poa == null) {
-            opLogger.i18NLogger.warn_internal_orbspecific_oa_implementations("javaidl_1_4.createPOA");
+    public void createPOA(String adapterName,
+              Policy[] policies) throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive, SystemException
+    {
+    if (_poa == null)
+    {
+        opLogger.i18NLogger.warn_internal_orbspecific_oa_implementations("javaidl_1_4.createPOA");
 
-            throw new AdapterInactive();
-        }
+        throw new AdapterInactive();
+    }
 
-        POA childPoa = _poa.create_POA(adapterName, _poa.the_POAManager(), policies);
+    POA childPoa = _poa.create_POA(adapterName, _poa.the_POAManager(), policies);
 
-        childPoa.the_POAManager().activate();
+    childPoa.the_POAManager().activate();
 
-        super._poas.put(adapterName, childPoa);
+    super._poas.put(adapterName, childPoa);
     }
 }

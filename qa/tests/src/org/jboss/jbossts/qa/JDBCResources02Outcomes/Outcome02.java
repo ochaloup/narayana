@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.JDBCResources02Outcomes;
  * $Id: Outcome02.java,v 1.2 2003/06/26 11:44:10 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.JDBCResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -63,9 +64,12 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.StringHolder;
 
-public class Outcome02 {
-    public static void main(String[] args) {
-        try {
+public class Outcome02
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -74,7 +78,8 @@ public class Outcome02 {
 
             boolean correct = true;
 
-            for (int index = 0; correct && (index < 10); index++) {
+            for (int index = 0; correct && (index < 10); index++)
+            {
                 String name = "Name_" + index;
                 String value = "Value_" + (9 - index);
                 StringHolder valueHolder = new StringHolder();
@@ -84,21 +89,29 @@ public class Outcome02 {
                 correct = correct && value.equals(valueHolder.value);
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Outcome02.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Outcome02.main: " + exception);
             exception.printStackTrace(System.err);
         }

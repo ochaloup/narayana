@@ -63,9 +63,7 @@ public class ConnectionImpleTest {
     private XAResource xaResource;
 
     @Mock
-    private DatabaseMetaData databaseMetaData; // Mocking this in order to get
-                                                // rid of NPE from
-                                                // ConnectionImple.getModifier
+    private DatabaseMetaData databaseMetaData; // Mocking this in order to get rid of NPE from ConnectionImple.getModifier
 
     private TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
@@ -119,8 +117,7 @@ public class ConnectionImpleTest {
         connectionToTest.clearWarnings(); // Initialises the connection
         transactionManager.getTransaction().registerSynchronization(new Synchronization() {
             @Override
-            public void beforeCompletion() {
-            }
+            public void beforeCompletion() { }
 
             @Override
             public void afterCompletion(int status) {
@@ -146,10 +143,7 @@ public class ConnectionImpleTest {
     @Test
     public void closeConnectionWithTransaction() throws Exception {
         transactionManager.begin();
-        transactionManager.getTransaction().enlistResource(xaResource); // Normally
-                                                                        // driver
-                                                                        // does
-                                                                        // this
+        transactionManager.getTransaction().enlistResource(xaResource); // Normally driver does this
         ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         connectionToTest.close();
@@ -159,16 +153,12 @@ public class ConnectionImpleTest {
     @Test
     public void closeConnectionInAfterCompletion() throws Exception {
         transactionManager.begin();
-        transactionManager.getTransaction().enlistResource(xaResource); // Normally
-                                                                        // driver
-                                                                        // does
-                                                                        // this
+        transactionManager.getTransaction().enlistResource(xaResource); // Normally driver does this
         ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         transactionManager.getTransaction().registerSynchronization(new Synchronization() {
             @Override
-            public void beforeCompletion() {
-            }
+            public void beforeCompletion() { }
 
             @Override
             public void afterCompletion(int status) {

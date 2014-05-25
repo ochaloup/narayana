@@ -40,9 +40,11 @@ import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 import com.hp.mwtests.ts.txoj.common.resources.RecoverableObject;
 
-public class PerformanceTest1 extends PerformanceTestBase {
+public class PerformanceTest1 extends PerformanceTestBase
+{
     @Test
-    public void recoverableTest() {
+    public void recoverableTest()
+    {
         long iters = 4;
 
         RecoverableObject foo = new RecoverableObject();
@@ -51,7 +53,8 @@ public class PerformanceTest1 extends PerformanceTestBase {
 
         A.begin();
 
-        for (int c = 0; c < iters; c++) {
+        for (int c = 0; c < iters; c++)
+        {
             foo.set(2);
         }
 
@@ -61,7 +64,8 @@ public class PerformanceTest1 extends PerformanceTestBase {
     }
 
     @Test
-    public void persistentTest() {
+    public void persistentTest()
+    {
         long iters = 4;
 
         AtomicObject foo = new AtomicObject();
@@ -71,10 +75,13 @@ public class PerformanceTest1 extends PerformanceTestBase {
         A.begin();
 
         try {
-            for (int c = 0; c < iters; c++) {
+            for (int c = 0; c < iters; c++)
+            {
                 foo.set(2);
             }
-        } catch (TestException e) {
+        }
+        catch (TestException e)
+        {
             fail("AtomicObject exception raised.");
         }
 

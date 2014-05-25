@@ -24,50 +24,66 @@ import org.jboss.jbossts.qa.ArjunaCore.StateManager.impl.TXBasicStateRecord;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class MemoryClient004 extends BaseTestClient {
-    public static void main(String[] args) {
+public class MemoryClient004 extends BaseTestClient
+{
+    public static void main(String[] args)
+    {
         MemoryClient004 test = new MemoryClient004(args);
     }
 
-    private MemoryClient004(String[] args) {
+    private MemoryClient004(String[] args)
+    {
         super(args);
     }
 
-    public void Test() {
-        try {
+    public void Test()
+    {
+        try
+        {
             setNumberOfCalls(3);
             setNumberOfResources(2);
             getClientThreshold(1);
 
             TXBasicStateRecord[] mStateRecordList = new TXBasicStateRecord[mNumberOfResources];
-            // set up abstract records
-            for (int i = 0; i < mNumberOfResources; i++) {
+            //set up abstract records
+            for (int i = 0; i < mNumberOfResources; i++)
+            {
                 mStateRecordList[i] = new TXBasicStateRecord();
             }
 
-            for (int j = 0; j < mNumberOfResources; j++) {
-                for (int i = 0; i < mMaxIteration; i++) {
-                    // start transaction
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
+                for (int i = 0; i < mMaxIteration; i++)
+                {
+                    //start transaction
                     startTx();
                     mStateRecordList[j].increase();
-                    if (i % 2 == 0) {
+                    if (i % 2 == 0)
+                    {
                         commit();
-                    } else {
+                    }
+                    else
+                    {
                         abort();
                     }
                 }
             }
 
-            // get first memory reading.
+            //get first memory reading.
             getFirstReading();
 
-            for (int j = 0; j < mNumberOfResources; j++) {
-                for (int i = 0; i < mMaxIteration; i++) {
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
+                for (int i = 0; i < mMaxIteration; i++)
+                {
                     startTx();
                     mStateRecordList[j].increase();
-                    if (i % 2 == 0) {
+                    if (i % 2 == 0)
+                    {
                         commit();
-                    } else {
+                    }
+                    else
+                    {
                         abort();
                     }
                 }
@@ -76,7 +92,9 @@ public class MemoryClient004 extends BaseTestClient {
             getSecondReading();
 
             qaMemoryAssert();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Fail("Error in MemoryClient004.test() :", e);
         }
     }

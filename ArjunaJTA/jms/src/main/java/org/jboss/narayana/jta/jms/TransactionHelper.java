@@ -26,53 +26,42 @@ import javax.transaction.Synchronization;
 import javax.transaction.xa.XAResource;
 
 /**
- * Utility class to make transaction status checking and resources registration
- * easier.
+ * Utility class to make transaction status checking and resources registration easier.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 public interface TransactionHelper {
 
     /**
-     * Check if transaction is active. If error occurs wrap an original
-     * exception with {@link JMSException}.
+     * Check if transaction is active. If error occurs wrap an original exception with {@link JMSException}.
      *
      * @return whether transaction is active or not.
-     * @throws JMSException
-     *             if error occurred getting transaction status.
+     * @throws JMSException if error occurred getting transaction status.
      */
     boolean isTransactionAvailable() throws JMSException;
 
     /**
-     * Register synchronization with a current transaction. If error occurs wrap
-     * an original exception with {@link JMSException}.
+     * Register synchronization with a current transaction. If error occurs wrap an original exception with
+     * {@link JMSException}.
      * 
-     * @param synchronization
-     *            synchronization to be registered.
-     * @throws JMSException
-     *             if error occurred registering synchronization.
+     * @param synchronization synchronization to be registered.
+     * @throws JMSException if error occurred registering synchronization.
      */
     void registerSynchronization(Synchronization synchronization) throws JMSException;
 
     /**
-     * Enlist XA resource to a current transaction. If error occurs wrap an
-     * original exception with {@link JMSException}.
+     * Enlist XA resource to a current transaction. If error occurs wrap an original exception with {@link JMSException}.
      * 
-     * @param xaResource
-     *            resource to be enlisted.
-     * @throws JMSException
-     *             if error occurred enlisting resource.
+     * @param xaResource resource to be enlisted.
+     * @throws JMSException if error occurred enlisting resource.
      */
     void registerXAResource(XAResource xaResource) throws JMSException;
 
     /**
-     * Delist XA resource from a current transaction. If error occurs wrap an
-     * original exception with {@link JMSException}.
+     * Delist XA resource from a current transaction. If error occurs wrap an original exception with {@link JMSException}.
      * 
-     * @param xaResource
-     *            resource to be delisted.
-     * @throws JMSException
-     *             if error occurred delisting resource.
+     * @param xaResource resource to be delisted.
+     * @throws JMSException if error occurred delisting resource.
      */
     void deregisterXAResource(XAResource xaResource) throws JMSException;
 

@@ -38,8 +38,8 @@ public class VersionTest extends TestCase {
     public void tearDown() {
     }
 
-    public void testVersion() throws IOException, MalformedObjectNameException, NullPointerException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public void testVersion() throws IOException, MalformedObjectNameException, NullPointerException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException {
         log.info("VersionTest::testVersion");
         if (commandHandler.handleCommand("version".split(" ")) != 0) {
             fail("Command was unsuccessful");

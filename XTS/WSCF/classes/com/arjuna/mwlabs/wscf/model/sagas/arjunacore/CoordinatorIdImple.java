@@ -44,30 +44,36 @@ import com.arjuna.mw.wscf.common.CoordinatorId;
  * @since 1.0.
  */
 
-public class CoordinatorIdImple extends Uid implements CoordinatorId {
+public class CoordinatorIdImple extends Uid implements CoordinatorId
+{
 
-    public CoordinatorIdImple() {
-        super();
+    public CoordinatorIdImple ()
+    {
+    super();
 
-        _value = stringForm().getBytes(StandardCharsets.UTF_8);
+    _value = stringForm().getBytes(StandardCharsets.UTF_8);
+    }
+    
+    public CoordinatorIdImple (String id)
+    {
+    super(id);
+
+    _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
 
-    public CoordinatorIdImple(String id) {
-        super(id);
+    public CoordinatorIdImple (Uid id)
+    {
+    super(id);
 
-        _value = stringForm().getBytes(StandardCharsets.UTF_8);
+    _value = stringForm().getBytes();
     }
-
-    public CoordinatorIdImple(Uid id) {
-        super(id);
-
-        _value = stringForm().getBytes();
+    
+    public byte[] value ()
+    {
+    return _value;
     }
-
-    public byte[] value() {
-        return _value;
-    }
-
+    
     private byte[] _value;
-
+    
 }
+

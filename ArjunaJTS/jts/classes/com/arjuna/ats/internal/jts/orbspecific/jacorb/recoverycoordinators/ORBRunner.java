@@ -32,20 +32,27 @@
 
 package com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators;
 
-public class ORBRunner extends Thread {
-
-    public ORBRunner() {
-        setDaemon(true);
-
-        start();
+public class ORBRunner extends Thread
+{
+    
+    public ORBRunner ()
+    {
+    setDaemon(true);
+    
+    start();
     }
 
-    public void run() {
-        try {
-            JacOrbRCServiceInit._orb.orb().run();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        JacOrbRCServiceInit.orbRunnerCompleted();
+    public void run()
+    {
+    try
+    {
+        JacOrbRCServiceInit._orb.orb().run();
+    } 
+    catch (Throwable e)
+    {
+        e.printStackTrace();
+    }
+    JacOrbRCServiceInit.orbRunnerCompleted();
     }
 }
+

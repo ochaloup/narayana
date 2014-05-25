@@ -37,12 +37,16 @@ import org.omg.PortableInterceptor.ORBInitializer;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
 /**
- * This class registers the ClientForwardInterceptor with the ORB.
+ * This class registers the ClientForwardInterceptor 
+ * with the ORB.
  *
  * @author Malik Saheb
  */
 
-public class ClientInitializer extends org.omg.CORBA.LocalObject implements ORBInitializer {
+public class ClientInitializer 
+    extends org.omg.CORBA.LocalObject 
+    implements ORBInitializer
+{
 
     static com.arjuna.orbportability.ORB myORB = null;
 
@@ -50,30 +54,35 @@ public class ClientInitializer extends org.omg.CORBA.LocalObject implements ORBI
     }
 
     /**
-     * This method resolves the NameService and registers the interceptor.
+     * This method resolves the NameService and registers the 
+     * interceptor.
      */
 
-    public void post_init(ORBInitInfo info) {
-        try {
-            // Obtain the Orb reference having requested this initilization
-            org.omg.CORBA.ORB theORB = ((org.jacorb.orb.portableInterceptor.ORBInitInfoImpl) info).getORB();
+    public void post_init(ORBInitInfo info) 
+    {
+        try
+        {
+        // Obtain the Orb reference having requested this initilization
+        org.omg.CORBA.ORB theORB = ((org.jacorb.orb.portableInterceptor.ORBInitInfoImpl)info).getORB();
+        
+        /*
+            NamingContextExt nc = NamingContextExtHelper.narrow
+                (info.resolve_initial_references("NameService"));
+        */
+        
+        org.omg.PortableInterceptor.Current piCurrent = org.omg.PortableInterceptor.CurrentHelper.narrow
+        (info.resolve_initial_references("PICurrent"));
 
-            /*
-             * NamingContextExt nc = NamingContextExtHelper.narrow
-             * (info.resolve_initial_references("NameService"));
-             */
+        int outSlotId = info.allocate_slot_id();
 
-            org.omg.PortableInterceptor.Current piCurrent = org.omg.PortableInterceptor.CurrentHelper
-                    .narrow(info.resolve_initial_references("PICurrent"));
-
-            int outSlotId = info.allocate_slot_id();
-
-            info.add_client_request_interceptor(new ClientForwardInterceptor(theORB, piCurrent, outSlotId));
-        } catch (Exception e) {
+            info.add_client_request_interceptor 
+        (new ClientForwardInterceptor(theORB, piCurrent, outSlotId));
+        }
+        catch (Exception e) {
             jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_ClientInitializer_1(e);
         }
     }
 
-    public void pre_init(ORBInitInfo info) {
+    public void pre_init(ORBInitInfo info) {    
     }
 } // ClientInitializer

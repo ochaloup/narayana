@@ -53,29 +53,30 @@ import com.arjuna.ats.jta.xa.XidImple;
  * @author mcl
  */
 
-public class SubordinateAtomicAction
-        extends
-            com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.SubordinateAtomicAction {
+public class SubordinateAtomicAction extends
+        com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.SubordinateAtomicAction
+{
 
     /**
      * @deprecated This is only used by test code
      */
-    public SubordinateAtomicAction() {
-        super(); // does start for us
+    public SubordinateAtomicAction ()
+    {
+        super();  // does start for us
 
         _activated = true;
         _theXid = new XidImple(Uid.nullUid());
     }
 
-    public SubordinateAtomicAction(Uid actId) {
+    public SubordinateAtomicAction (Uid actId)
+    {
         super(actId);
-
+        
         _activated = activate(); // if this fails, we'll retry later.
     }
 
     /**
-     * Recovery SAA. If the record is removed and peekXidOnly is true then the
-     * Xid will be null.
+     * Recovery SAA. If the record is removed and peekXidOnly is true then the Xid will be null.
      *
      * @param actId
      * @param peekXidOnly
@@ -87,8 +88,7 @@ public class SubordinateAtomicAction
         if (peekXidOnly) {
             InputObjectState os = StoreManager.getParticipantStore().read_committed(objectUid, type());
             if (os == null) {
-                // This will have been logged by the ObjectStore during
-                // ShadowingStore::read_state as an INFO if there was no content
+                // This will have been logged by the ObjectStore during ShadowingStore::read_state as an INFO if there was no content
                 return;
             }
             unpackHeader(os, new Header());
@@ -104,10 +104,11 @@ public class SubordinateAtomicAction
             _activated = activate();
         }
     }
-
-    public SubordinateAtomicAction(int timeout, Xid xid) {
+    
+    public SubordinateAtomicAction (int timeout, Xid xid)
+    {
         super(timeout); // implicit start (done in base class)
-
+        
         if (xid != null && xid.getFormatId() == XATxConverter.FORMAT_ID) {
             XidImple toImport = new XidImple(xid);
             XID toCheck = toImport.getXID();
@@ -120,10 +121,10 @@ public class SubordinateAtomicAction
         } else {
             _theXid = new XidImple(xid);
         }
-
+        
         _activated = true;
     }
-
+    
     /**
      * The type of the class is used to locate the state of the transaction log
      * in the object store.
@@ -134,11 +135,13 @@ public class SubordinateAtomicAction
      *         logs in the transaction object store.
      */
 
-    public String type() {
+    public String type ()
+    {
         return getType();
     }
 
-    public static final String getType() {
+    public static final String getType ()
+    {
         return "/StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA";
     }
 
@@ -147,57 +150,70 @@ public class SubordinateAtomicAction
      *
      * @return
      */
-    public final Xid getXid() {
+    public final Xid getXid ()
+    {
         // could be null if activation failed.
-
+        
         return _theXid;
     }
-
+    
     public String getParentNodeName() {
         return _parentNodeName;
     }
 
-    public boolean save_state(OutputObjectState os, int t) {
-        try {
+    public boolean save_state (OutputObjectState os, int t)
+    {
+        try
+        {
             // pack the header first for the benefit of the tooling
             packHeader(os, new Header(get_uid(), Utility.getProcessUid()));
 
-            if (_theXid != null) {
+            if (_theXid != null)
+            {
                 os.packBoolean(true);
 
                 ((XidImple) _theXid).packInto(os);
                 os.packString(_parentNodeName);
-            } else
+            }
+            else
                 os.packBoolean(false);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             return false;
         }
 
         return super.save_state(os, t);
     }
-
-    public boolean restore_state(InputObjectState os, int t) {
+    
+    public boolean restore_state (InputObjectState os, int t)
+    {
         _theXid = null;
-
-        try {
+        
+        try
+        {
             unpackHeader(os, new Header());
 
             boolean haveXid = os.unpackBoolean();
-
-            if (haveXid) {
+            
+            if (haveXid)
+            {
                 _theXid = new XidImple();
-
+                
                 ((XidImple) _theXid).unpackFrom(os);
                 _parentNodeName = os.unpackString();
             }
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             return false;
         }
-
+        
         return super.restore_state(os, t);
     }
 
-    public boolean activated() {
+    public boolean activated ()
+    {
         return _activated;
     }
 

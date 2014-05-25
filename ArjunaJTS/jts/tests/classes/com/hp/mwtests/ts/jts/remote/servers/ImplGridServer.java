@@ -37,8 +37,10 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.trangrid_i;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-public class ImplGridServer {
-    public static void main(String[] args) throws Exception {
+public class ImplGridServer
+{
+    public static void main(String[] args) throws Exception
+    {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -48,14 +50,17 @@ public class ImplGridServer {
         trangrid_i gridI = new trangrid_i((short) 100, (short) 100);
         Services serv = new Services(myORB);
 
-        try {
+        try
+        {
             TestUtility.registerService(refFile, myORB.orb().object_to_string(gridI.getReference()));
 
             System.out.println("Ready");
 
             myOA.run();
-        } catch (Exception e) {
-            TestUtility.fail("ImplGrid server caught exception: " + e);
+        }
+        catch (Exception e)
+        {
+            TestUtility.fail("ImplGrid server caught exception: "+e);
         }
 
         myOA.shutdownObject(gridI);
@@ -63,3 +68,4 @@ public class ImplGridServer {
         System.out.println("**ImplGrid server exiting**");
     }
 }
+

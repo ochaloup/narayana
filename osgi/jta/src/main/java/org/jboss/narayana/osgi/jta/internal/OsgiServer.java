@@ -79,7 +79,7 @@ public class OsgiServer implements ServiceTrackerCustomizer<XAResourceRecovery, 
     public void doStart() throws Exception {
         Properties properties = PropertiesFactory.getDefaultProperties();
         if (configuration != null) {
-            for (Enumeration<String> keyEnum = configuration.keys(); keyEnum.hasMoreElements();) {
+            for (Enumeration<String> keyEnum = configuration.keys(); keyEnum.hasMoreElements(); ) {
                 String key = keyEnum.nextElement();
                 String val = configuration.get(key).toString();
                 properties.put(key, val);
@@ -112,13 +112,13 @@ public class OsgiServer implements ServiceTrackerCustomizer<XAResourceRecovery, 
         objStoreBrowserService.start();
 
         register(TransactionManager.class, transactionManagerService.getTransactionManager());
-        register(TransactionSynchronizationRegistry.class,
-                transactionManagerService.getTransactionSynchronizationRegistry());
+        register(TransactionSynchronizationRegistry.class, transactionManagerService.getTransactionSynchronizationRegistry());
         register(UserTransaction.class, transactionManagerService.getUserTransaction());
         register(ObjStoreBrowserService.class, objStoreBrowserService);
 
         try {
-            registrations.add(PlatformTransactionManagerImple.register(bundleContext,
+            registrations.add(PlatformTransactionManagerImple.register(
+                    bundleContext,
                     (OsgiTransactionManager) transactionManagerService.getTransactionManager()));
         } catch (Throwable t) {
             // Ignore, this is most certainly spring-tx which is not available

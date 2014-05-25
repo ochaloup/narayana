@@ -44,13 +44,15 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 
-public class ActivationRecord extends AbstractRecord {
+public class ActivationRecord extends AbstractRecord
+{
 
     /*
      * This constructor is used to create a new instance of an ActivationRecord.
      */
 
-    public ActivationRecord(int st, StateManager sm, BasicAction action) {
+    public ActivationRecord(int st, StateManager sm, BasicAction action)
+    {
         super(sm.get_uid(), sm.type(), ObjectType.ANDPERSISTENT);
 
         objectAddr = sm;
@@ -58,19 +60,23 @@ public class ActivationRecord extends AbstractRecord {
         state = st;
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("ActivationRecord::ActivationRecord(" + state + ", " + sm.get_uid() + ")");
+            tsLogger.logger.trace("ActivationRecord::ActivationRecord(" + state + ", "
+                    + sm.get_uid() + ")");
         }
     }
 
-    public int typeIs() {
+    public int typeIs ()
+    {
         return RecordType.ACTIVATION;
     }
 
-    public Object value() {
+    public Object value ()
+    {
         return (Object) new Integer(state);
     }
 
-    public void setValue(Object v) {
+    public void setValue (Object v)
+    {
         tsLogger.i18NLogger.warn_ActivationRecord_1();
     }
 
@@ -79,7 +85,8 @@ public class ActivationRecord extends AbstractRecord {
      * passing it the saved ObjectStatus.
      */
 
-    public int nestedAbort() {
+    public int nestedAbort ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::nestedAbort() for " + order());
         }
@@ -87,8 +94,7 @@ public class ActivationRecord extends AbstractRecord {
         int outcome = TwoPhaseOutcome.FINISH_ERROR;
 
         if ((objectAddr != null) && (actionHandle != null))
-            outcome = (StateManagerFriend.forgetAction(objectAddr, actionHandle, false, RecordType.ACTIVATION)
-                    ? TwoPhaseOutcome.FINISH_OK
+            outcome = (StateManagerFriend.forgetAction(objectAddr, actionHandle, false, RecordType.ACTIVATION) ? TwoPhaseOutcome.FINISH_OK
                     : TwoPhaseOutcome.FINISH_ERROR);
 
         return outcome;
@@ -101,7 +107,8 @@ public class ActivationRecord extends AbstractRecord {
      * actually be called.
      */
 
-    public int nestedCommit() {
+    public int nestedCommit ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::nestedCommit() for " + order());
         }
@@ -109,22 +116,25 @@ public class ActivationRecord extends AbstractRecord {
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedPrepare() {
+    public int nestedPrepare ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::nestedPrepare() for " + order());
         }
 
-        if ((objectAddr != null) && (actionHandle != null)) {
+        if ((objectAddr != null) && (actionHandle != null))
+        {
             int state = objectAddr.status();
-
-            if (StateManagerFriend.forgetAction(objectAddr, actionHandle, true, RecordType.ACTIVATION)) {
+            
+            if (StateManagerFriend.forgetAction(objectAddr, actionHandle, true, RecordType.ACTIVATION))
+            {              
                 actionHandle = actionHandle.parent();
-
+                
                 if (StateManagerFriend.rememberAction(objectAddr, actionHandle, RecordType.ACTIVATION, state))
                     return TwoPhaseOutcome.PREPARE_READONLY;
             }
         }
-
+        
         return TwoPhaseOutcome.FINISH_ERROR;
     }
 
@@ -132,7 +142,8 @@ public class ActivationRecord extends AbstractRecord {
      * topLevelAbort for Activation records is exactly like a nested abort.
      */
 
-    public int topLevelAbort() {
+    public int topLevelAbort ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::topLevelAbort() for " + order());
         }
@@ -145,21 +156,23 @@ public class ActivationRecord extends AbstractRecord {
      * ensure the object is forgotten by the object.
      */
 
-    public int topLevelCommit() {
+    public int topLevelCommit ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::topLevelCommit() for " + order());
         }
 
-        if ((objectAddr != null) && (actionHandle != null)) {
-            return (StateManagerFriend.forgetAction(objectAddr, actionHandle, true, RecordType.ACTIVATION)
-                    ? TwoPhaseOutcome.FINISH_OK
+        if ((objectAddr != null) && (actionHandle != null))
+        {
+            return (StateManagerFriend.forgetAction(objectAddr, actionHandle, true, RecordType.ACTIVATION) ? TwoPhaseOutcome.FINISH_OK
                     : TwoPhaseOutcome.FINISH_ERROR);
         }
 
         return TwoPhaseOutcome.FINISH_ERROR;
     }
 
-    public int topLevelPrepare() {
+    public int topLevelPrepare ()
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("ActivationRecord::topLevelPrepare() for " + order());
         }
@@ -175,29 +188,35 @@ public class ActivationRecord extends AbstractRecord {
      * of the top level 2PC.
      */
 
-    public boolean restore_state(InputObjectState os, int v) {
+    public boolean restore_state (InputObjectState os, int v)
+    {
         tsLogger.i18NLogger.warn_ActivationRecord_2(type(), order());
 
         return false;
     }
 
-    public boolean save_state(OutputObjectState os, ObjectType v) {
+    public boolean save_state (OutputObjectState os, ObjectType v)
+    {
         return true;
     }
 
-    public void print(PrintWriter strm) {
+    public void print (PrintWriter strm)
+    {
         super.print(strm);
         strm.println("ActivationRecord with state:\n" + state);
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/AbstractRecord/ActivationRecord";
     }
 
-    public void merge(AbstractRecord a) {
+    public void merge (AbstractRecord a)
+    {
     }
 
-    public void alter(AbstractRecord a) {
+    public void alter (AbstractRecord a)
+    {
     }
 
     /*
@@ -210,23 +229,28 @@ public class ActivationRecord extends AbstractRecord {
      * old
      */
 
-    public boolean shouldAdd(AbstractRecord a) {
+    public boolean shouldAdd (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldAlter(AbstractRecord a) {
+    public boolean shouldAlter (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldMerge(AbstractRecord a) {
+    public boolean shouldMerge (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldReplace(AbstractRecord a) {
+    public boolean shouldReplace (AbstractRecord a)
+    {
         return false;
     }
 
-    public ActivationRecord() {
+    public ActivationRecord()
+    {
         super();
 
         objectAddr = null;

@@ -35,47 +35,58 @@ import javax.transaction.xa.Xid;
  * $Id: ExampleXAResource.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class ExampleXAResource implements javax.transaction.xa.XAResource {
+public class ExampleXAResource implements javax.transaction.xa.XAResource
+{
     private int _timeout = 0;
 
-    public void commit(Xid xid, boolean b) throws XAException {
+    public void commit(Xid xid, boolean b) throws XAException
+    {
         System.out.println("XAResource.commit");
     }
 
-    public void end(Xid xid, int i) throws XAException {
+    public void end(Xid xid, int i) throws XAException
+    {
         System.out.println("XAResource.end");
     }
 
-    public void forget(Xid xid) throws XAException {
+    public void forget(Xid xid) throws XAException
+    {
     }
 
-    public int getTransactionTimeout() throws XAException {
+    public int getTransactionTimeout() throws XAException
+    {
         return _timeout;
     }
 
-    public boolean isSameRM(XAResource xaResource) throws XAException {
+    public boolean isSameRM(XAResource xaResource) throws XAException
+    {
         return false;
     }
 
-    public int prepare(Xid xid) throws XAException {
+    public int prepare(Xid xid) throws XAException
+    {
         System.out.println("XAResource.prepare");
         return XA_OK;
     }
 
-    public Xid[] recover(int i) throws XAException {
+    public Xid[] recover(int i) throws XAException
+    {
         return null;
     }
 
-    public void rollback(Xid xid) throws XAException {
+    public void rollback(Xid xid) throws XAException
+    {
         System.out.println("XAResource.rollback");
     }
 
-    public boolean setTransactionTimeout(int i) throws XAException {
+    public boolean setTransactionTimeout(int i) throws XAException
+    {
         _timeout = i;
         return true;
     }
 
-    public void start(Xid xid, int i) throws XAException {
+    public void start(Xid xid, int i) throws XAException
+    {
         System.out.println("XAResource.start");
     }
 }

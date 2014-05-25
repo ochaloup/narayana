@@ -30,7 +30,8 @@ import java.lang.annotation.*;
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Inherited
-public @interface ReadLock {
+public @interface ReadLock
+{
 }

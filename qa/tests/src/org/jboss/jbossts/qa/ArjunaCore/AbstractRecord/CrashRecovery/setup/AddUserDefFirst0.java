@@ -26,19 +26,24 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 
 import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.CrashRecovery.impl.BasicAbstractRecord;
 
-class UserDefFirst0Map implements RecordTypeMap {
+class UserDefFirst0Map implements RecordTypeMap
+{
     @SuppressWarnings("unchecked")
-    public Class getRecordClass() {
+    public Class getRecordClass ()
+    {
         return BasicAbstractRecord.class;
     }
-
-    public int getType() {
+    
+    public int getType ()
+    {
         return RecordType.USER_DEF_FIRST0;
     }
 }
 
-public class AddUserDefFirst0 {
-    public AddUserDefFirst0() {
+public class AddUserDefFirst0
+{
+    public AddUserDefFirst0()
+    {
         RecordTypeManager.manager().add(new UserDefFirst0Map());
     }
 }

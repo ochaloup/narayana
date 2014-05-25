@@ -36,8 +36,7 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
 /**
- * Create a server instance reading the configuration for the server defined by
- * the name.
+ * Create a server instance reading the configuration for the server defined by the name.
  */
 public class BlackTieServer {
     /**
@@ -67,17 +66,14 @@ public class BlackTieServer {
     /**
      * Initialize the server
      * 
-     * @param serverName
-     *            The name of the server
-     * @throws ConfigurationException
-     *             If the server does not exist
-     * @throws ConnectionException
-     *             If the server cannot connect to the infrastructure configured
+     * @param serverName The name of the server
+     * @throws ConfigurationException If the server does not exist
+     * @throws ConnectionException If the server cannot connect to the infrastructure configured
      */
     public BlackTieServer(String serverName) throws ConfigurationException, ConnectionException {
         ORB orb = com.arjuna.orbportability.ORB.getInstance("ClientSide");
         RootOA oa = com.arjuna.orbportability.OA.getRootOA(orb);
-        orb.initORB(new String[]{}, null);
+        orb.initORB(new String[] {}, null);
 
         try {
             oa.initOA();
@@ -109,10 +105,8 @@ public class BlackTieServer {
     /**
      * Advertise a blacktie service with the specified name
      * 
-     * @param serviceName
-     *            The name of the service
-     * @throws ConnectionException
-     *             If the service cannot be advertised
+     * @param serviceName The name of the service
+     * @throws ConnectionException If the service cannot be advertised
      */
     public void tpadvertise(String serviceName, String serviceClassName) throws ConnectionException {
         int min = Math.min(Connection.XATMI_SERVICE_NAME_LENGTH, serviceName.length());
@@ -128,8 +122,7 @@ public class BlackTieServer {
             } catch (ConnectionException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new ConnectionException(Connection.TPESYSTEM,
-                        "Could not create service factory for: " + serviceName, t);
+                throw new ConnectionException(Connection.TPESYSTEM, "Could not create service factory for: " + serviceName, t);
             }
         } else if (!serviceData.getServiceClassName().equals(serviceClassName)) {
             throw new ConnectionException(Connection.TPEMATCH, "Service already registered");
@@ -141,10 +134,8 @@ public class BlackTieServer {
     /**
      * Unadvertise the service by name.
      * 
-     * @param serviceName
-     *            The name of the service to unadverise.
-     * @throws ConnectionException
-     *             If the service cannot be unadvertised.
+     * @param serviceName The name of the service to unadverise.
+     * @throws ConnectionException If the service cannot be unadvertised.
      */
     public void tpunadvertise(String serviceName) throws ConnectionException {
         serviceName = serviceName.substring(0, Math.min(Connection.XATMI_SERVICE_NAME_LENGTH, serviceName.length()));
@@ -158,8 +149,7 @@ public class BlackTieServer {
     /**
      * Shutdown the server
      * 
-     * @throws ConnectionException
-     *             If one of the services cannot disconnect
+     * @throws ConnectionException If one of the services cannot disconnect
      */
     public void shutdown() throws ConnectionException {
         log.debug("Close server called: " + serverName);

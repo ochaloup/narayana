@@ -35,11 +35,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
+
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
 @RunWith(Arquillian.class)
 public class CompensationScopedTestRemote extends CompensationScopedTest {
+
 
     @Deployment
     public static JavaArchive createTestArchive() {
@@ -51,6 +53,7 @@ public class CompensationScopedTestRemote extends CompensationScopedTest {
 
         return archive;
     }
+
 
     @BeforeClass()
     public static void submitBytemanScript() throws Exception {

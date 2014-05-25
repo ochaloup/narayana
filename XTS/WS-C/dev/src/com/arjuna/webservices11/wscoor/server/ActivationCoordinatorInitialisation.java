@@ -28,11 +28,12 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Activation Coordinator service
- * 
  * @author kevin
  */
-public class ActivationCoordinatorInitialisation {
-    public static void startup() {
+public class ActivationCoordinatorInitialisation
+{
+    public static void startup()
+    {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -42,6 +43,7 @@ public class ActivationCoordinatorInitialisation {
         if (serviceURLPath == null) {
             serviceURLPath = "/ws-c11";
         }
+
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -55,15 +57,16 @@ public class ActivationCoordinatorInitialisation {
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" + bindAddress + ":" + bindPort + serviceURLPath;
+        final String baseUri = "http://" +  bindAddress + ":" + bindPort + serviceURLPath;
         final String uri = baseUri + "/ActivationService";
         final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + serviceURLPath;
         final String secureUri = secureBaseUri + "/ActivationService";
 
-        serviceRegistry.registerServiceProvider(CoordinationConstants.ACTIVATION_SERVICE_NAME, uri);
-        serviceRegistry.registerSecureServiceProvider(CoordinationConstants.ACTIVATION_SERVICE_NAME, secureUri);
+        serviceRegistry.registerServiceProvider(CoordinationConstants.ACTIVATION_SERVICE_NAME, uri) ;
+        serviceRegistry.registerSecureServiceProvider(CoordinationConstants.ACTIVATION_SERVICE_NAME, secureUri) ;
     }
 
-    public static void shutdown() {
+    public static void shutdown()
+    {
     }
 }

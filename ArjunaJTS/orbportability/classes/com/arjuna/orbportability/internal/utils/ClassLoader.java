@@ -33,31 +33,35 @@ package com.arjuna.orbportability.internal.utils;
 
 import java.util.Hashtable;
 
-class ClassLoader extends java.lang.ClassLoader {
+class ClassLoader extends java.lang.ClassLoader
+{
 
-    public ClassLoader() {
-        loadedClasses = new Hashtable();
+public ClassLoader ()
+    {
+    loadedClasses = new Hashtable();
+    }
+    
+protected Class loadClass (String className, boolean resolve) throws ClassNotFoundException
+    {
+    Class c = (Class) loadedClasses.get(className);
+
+    if (c == null)
+    {
+        c = findSystemClass(className);
+
+        // put it into hash table for later.
+        
+        loadedClasses.put(className, c);
     }
 
-    protected Class loadClass(String className, boolean resolve) throws ClassNotFoundException {
-        Class c = (Class) loadedClasses.get(className);
+    // c must be set to get here!
+    
+    if (resolve)
+        resolveClass(c);
 
-        if (c == null) {
-            c = findSystemClass(className);
-
-            // put it into hash table for later.
-
-            loadedClasses.put(className, c);
-        }
-
-        // c must be set to get here!
-
-        if (resolve)
-            resolveClass(c);
-
-        return c;
+    return c;
     }
-
-    private Hashtable loadedClasses;
-
+    
+private Hashtable loadedClasses;
+    
 }

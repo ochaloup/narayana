@@ -35,88 +35,106 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.exceptions.FatalError;
 
-public class UidUnitTest {
+public class UidUnitTest
+{
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         long[] dummy = {0, 0};
-
+        
         Uid u = new Uid(dummy, 0, 0, 0);
-
+        
         assertTrue(u.lessThan(Uid.maxUid()));
         assertTrue(u.getHexPid() != null);
-
+        
         u.print(new PrintStream("foo"));
     }
-
+    
     @Test
-    public void testInvalid() throws Exception {
+    public void testInvalid () throws Exception
+    {
         Uid u = null;
-
-        try {
+        
+        try
+        {
             u = new Uid(null, 0, 0, 0);
-
+            
             fail();
-        } catch (final FatalError ex) {
         }
+        catch (final FatalError ex)
+        {
+        }   
 
-        try {
+        try
+        {
             u = new Uid("hello world", false);
-
+            
             fail();
-        } catch (final FatalError ex) {
+        }
+        catch (final FatalError ex)
+        {
         }
 
-        try {
+        try
+        {
             u = new Uid((String) null);
-
+            
             fail();
-        } catch (final IllegalArgumentException ex) {
         }
-
-        try {
+        catch (final IllegalArgumentException ex)
+        {
+        }
+        
+        try
+        {
             u = new Uid((byte[]) null);
-
+            
             fail();
-        } catch (final IllegalArgumentException ex) {
         }
-
+        catch (final IllegalArgumentException ex)
+        {
+        }
+        
         byte[] b = {0, 0};
         u = new Uid(b);
-
+        
         assertEquals(u.valid(), false);
     }
-
+    
     @Test
-    public void testComparisons() throws Exception {
+    public void testComparisons () throws Exception
+    {
         Uid u = new Uid();
 
         assertEquals(u.equals(new Object()), false);
         assertTrue(u.notEquals(null));
         assertEquals(u.notEquals(u), false);
-
+        
         assertEquals(u.lessThan(null), false);
         assertEquals(u.greaterThan(null), false);
         assertEquals(u.greaterThan(u), false);
     }
-
+    
     @Test
-    public void testSerialization() throws Exception {
+    public void testSerialization () throws Exception
+    {
         Uid u1 = new Uid();
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(bs);
-
+        
         os.writeObject(u1);
-
+        
         ByteArrayInputStream bis = new ByteArrayInputStream(bs.toByteArray());
         ObjectInputStream is = new ObjectInputStream(bis);
-
+        
         Uid u2 = (Uid) is.readObject();
-
+        
         assertTrue(u1.equals(u2));
     }
 
     @Test
-    public void testMaxMinUid() throws Exception {
+    public void testMaxMinUid () throws Exception
+    {
         Uid minUid = Uid.minUid();
         Uid uid = new Uid();
         Uid maxUid = Uid.maxUid();

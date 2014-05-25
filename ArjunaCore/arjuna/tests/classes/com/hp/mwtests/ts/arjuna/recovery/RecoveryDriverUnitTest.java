@@ -30,43 +30,52 @@ import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryDriver;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 
-public class RecoveryDriverUnitTest {
+public class RecoveryDriverUnitTest
+{
     @Before
-    public void enableSocketBasedRecovery() {
+    public void enableSocketBasedRecovery()
+    {
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryListener(true);
     }
 
     @Test
-    public void testInvalid() throws Exception {
+    public void testInvalid () throws Exception
+    {
         RecoveryDriver rd = new RecoveryDriver(0, "foobar");
-
-        try {
+        
+        try
+        {
             rd.asynchronousScan();
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
-        try {
+        catch (final Exception ex)
+        {
+        }
+        
+        try
+        {
             rd.synchronousScan();
-
+            
             fail();
-        } catch (final Exception ex) {
+        }
+        catch (final Exception ex)
+        {
         }
     }
-
+    
     @Test
-    public void testValid() throws Exception {
+    public void testValid () throws Exception
+    {
         recoveryPropertyManager.getRecoveryEnvironmentBean().setPeriodicRecoveryPeriod(1);
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
 
-        RecoveryManager rm = RecoveryManager.manager();
-
+        RecoveryManager rm = RecoveryManager.manager();       
+        
         rm.scan(null);
-
-        RecoveryDriver rd = new RecoveryDriver(RecoveryManager.getRecoveryManagerPort(),
-                recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryAddress(), 100000);
-
+        
+        RecoveryDriver rd = new RecoveryDriver(RecoveryManager.getRecoveryManagerPort(), recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryAddress(), 100000);
+        
         assertTrue(rd.asynchronousScan());
         assertTrue(rd.synchronousScan());
     }

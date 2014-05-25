@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators;
 
+
 import org.omg.CosTransactions.RecoveryCoordinator;
 import org.omg.IOP.ServiceContext;
 import org.omg.PortableInterceptor.ForwardRequest;
@@ -40,59 +41,75 @@ import java.nio.charset.StandardCharsets;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
 /**
- * This interceptor looks for the content of the Service Context field and
- * extract the data that contains information identifying the transaction and
- * the process Id.
+ * This interceptor looks for the content of the Service Context field and extract the data that 
+ * contains information identifying the transaction and the process Id.
  *
  * @author Malik Saheb
  *
  */
 
-public class ServerRecoveryInterceptor extends org.omg.CORBA.LocalObject implements ServerRequestInterceptor {
+public class ServerRecoveryInterceptor
+    extends org.omg.CORBA.LocalObject 
+    implements ServerRequestInterceptor
+{
     private RecoveryCoordinator reco = null;
     private boolean in_loop = false;
     private org.omg.CORBA.ORB _ourOrb = null;
-
+    
     ServiceContext RCctx = null;
     int RecoveryContextId = 100001;
 
     byte[] RCobjectId;
 
-    public ServerRecoveryInterceptor(org.omg.CORBA.ORB orb) {
-        org.omg.CORBA.Object obj = null;
-        _ourOrb = orb;
+    public ServerRecoveryInterceptor(org.omg.CORBA.ORB orb)
+    {
+    org.omg.CORBA.Object obj = null ;
+    _ourOrb = orb;
     }
 
-    public void receive_request_service_contexts(ServerRequestInfo ri) throws ForwardRequest {
+  public void receive_request_service_contexts (ServerRequestInfo ri)
+        throws ForwardRequest
+    {
         ServiceContext context;
         org.omg.CORBA.Any any;
-
-        try {
-            context = ri.get_request_service_context(RecoveryContextId);
-            String objectIdString = new String(context.context_data, StandardCharsets.UTF_8);
-            JacOrbRCDefaultServant.RCObjectId = context.context_data;
-        } catch (Exception ex) {
+        
+        try
+        {
+            context = ri.get_request_service_context (RecoveryContextId);
+        String objectIdString = new String(context.context_data, StandardCharsets.UTF_8);
+        JacOrbRCDefaultServant.RCObjectId = context.context_data;
+        }
+        catch (Exception ex) {
             jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_ServerInitializer_1(ex);
         }
     }
 
-    public String name() {
-        return "arjuna.ServerRecoveryInterceptor";
+    public String name ()
+    {
+         return "arjuna.ServerRecoveryInterceptor";
     }
 
-    public void destroy() {
+    public void destroy ()
+    {
     }
 
-    public void receive_request(ServerRequestInfo ri) throws ForwardRequest {
+    public void receive_request (ServerRequestInfo ri)
+        throws ForwardRequest
+    {
     }
 
-    public void send_reply(ServerRequestInfo ri) {
+    public void send_reply (ServerRequestInfo ri)
+    {
     }
 
-    public void send_exception(ServerRequestInfo ri) throws ForwardRequest {
+    public void send_exception (ServerRequestInfo ri)
+        throws ForwardRequest
+    {
     }
 
-    public void send_other(ServerRequestInfo ri) throws ForwardRequest {
+    public void send_other (ServerRequestInfo ri)
+        throws ForwardRequest
+    {
     }
 
 }

@@ -81,20 +81,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class XATerminatorImpleUnitTest extends TestBase {
+public class XATerminatorImpleUnitTest extends TestBase
+{
     private Xid failedResourceXid;
 
     @Test
-    public void testXARMERR() throws Exception {
+    public void testXARMERR () throws Exception {
         Uid uid = new Uid();
         XidImple xid = new XidImple(uid);
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
 
         SubordinateTransaction subordinateTransaction = imp.importTransaction(xid);
-        // This is required because it JTS records are stored with a dynamic
-        // _savingUid
-        // Normally they are recovered using XATerminator but for this test I
-        // would like to stick to testing
+        // This is required because it JTS records are stored with a dynamic _savingUid
+        // Normally they are recovered using XATerminator but for this test I would like to stick to testing
         // transaction importer
         Field field = TransactionImple.class.getDeclaredField("_theTransaction");
         field.setAccessible(true);
@@ -167,30 +166,23 @@ public class XATerminatorImpleUnitTest extends TestBase {
         osb.start();
         osb.probe();
 
-        Set<ObjectName> participants = JMXServer.getAgent()
-                .queryNames("jboss.jta:type=ObjectStore,itype="
-                        + com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction
-                                .getType().substring(1)
-                        + ",uid=" + savingUid.stringForm().replaceAll(":", "_") + ",puid=*", null);
+        Set<ObjectName> participants = JMXServer.getAgent().queryNames("jboss.jta:type=ObjectStore,itype=" + com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction.getType().substring(1) +",uid="+savingUid.stringForm().replaceAll(":", "_")+",puid=*", null);
         assertEquals(1, participants.size());
         JMXServer.getAgent().getServer().invoke(participants.iterator().next(), "clearHeuristic", null, null);
         xa.recover(XAResource.TMSTARTRSCAN);
         xa.recover(XAResource.TMENDRSCAN);
 
-        Set<ObjectName> xaResourceRecords = JMXServer.getAgent().queryNames(
-                "jboss.jta:type=ObjectStore,itype=" + XAResourceRecord.typeName().substring(1) + ",uid=*", null);
+
+
+        Set<ObjectName> xaResourceRecords = JMXServer.getAgent().queryNames("jboss.jta:type=ObjectStore,itype=" + XAResourceRecord.typeName().substring(1) +",uid=*", null);
         for (ObjectName xaResourceRecord : xaResourceRecords) {
 
-            Object getGlobalTransactionId = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord,
-                    "GlobalTransactionId");
-            Object getBranchQualifier = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord,
-                    "BranchQualifier");
+            Object getGlobalTransactionId = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord, "GlobalTransactionId");
+            Object getBranchQualifier = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord, "BranchQualifier");
 
-            if (Arrays.equals(failedResourceXid.getGlobalTransactionId(), (byte[]) getGlobalTransactionId)
-                    && Arrays.equals(failedResourceXid.getBranchQualifier(), (byte[]) getBranchQualifier)) {
+            if (Arrays.equals(failedResourceXid.getGlobalTransactionId(), (byte[]) getGlobalTransactionId) && Arrays.equals(failedResourceXid.getBranchQualifier(), (byte[]) getBranchQualifier)) {
 
-                Object getHeuristicValue = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord,
-                        "HeuristicValue");
+                Object getHeuristicValue = JMXServer.getAgent().getServer().getAttribute(xaResourceRecord, "HeuristicValue");
                 assertTrue(getHeuristicValue.equals(new Integer(6)));
                 JMXServer.getAgent().getServer().invoke(xaResourceRecord, "clearHeuristic", null, null);
             }
@@ -205,30 +197,32 @@ public class XATerminatorImpleUnitTest extends TestBase {
 
             @Override
             public XAResource[] getXAResources() throws Exception {
-                return new XAResource[]{new TestXAResource() {
-                    public Xid[] recover(int var) throws XAException {
-                        if (var == XAResource.TMSTARTRSCAN) {
-                            if (failedResourceXid != null) {
-                                return new Xid[]{failedResourceXid};
+                return new XAResource[] {
+                        new TestXAResource()  {
+                            public Xid[] recover(int var) throws XAException {
+                                if (var == XAResource.TMSTARTRSCAN) {
+                                    if (failedResourceXid != null) {
+                                        return new Xid[]{failedResourceXid};
+                                    }
+                                }
+                                return new Xid[0];
+                            }
+                            @Override
+                            public void commit(Xid xid, boolean b) throws XAException {
+                                failedResourceXid = null;
+                            }
+
+                            @Override
+                            public int prepare(Xid xid) throws XAException {
+                                return 0;
+                            }
+
+                            @Override
+                            public void rollback(Xid xid) throws XAException {
+                                fail("Resource was rolled back");
                             }
                         }
-                        return new Xid[0];
-                    }
-                    @Override
-                    public void commit(Xid xid, boolean b) throws XAException {
-                        failedResourceXid = null;
-                    }
-
-                    @Override
-                    public int prepare(Xid xid) throws XAException {
-                        return 0;
-                    }
-
-                    @Override
-                    public void rollback(Xid xid) throws XAException {
-                        fail("Resource was rolled back");
-                    }
-                }};
+                };
             }
         });
         xaRecoveryModule.periodicWorkFirstPass();
@@ -251,7 +245,8 @@ public class XATerminatorImpleUnitTest extends TestBase {
         assertNull(failedResourceXid);
     }
     @Test
-    public void testXARetry() throws Exception {
+    public void testXARetry () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
 
@@ -372,10 +367,13 @@ public class XATerminatorImpleUnitTest extends TestBase {
 
         assertEquals(xa.prepare(xid), XAResource.XA_OK);
 
-        try {
+        try
+        {
             xa.commit(xid, false);
             fail();
-        } catch (final XAException ex) {
+        }
+        catch (final XAException ex)
+        {
             assertTrue(ex.errorCode == ex.XAER_RMFAIL);
         }
         Implementationsx.initialise();
@@ -395,30 +393,32 @@ public class XATerminatorImpleUnitTest extends TestBase {
 
             @Override
             public XAResource[] getXAResources() throws Exception {
-                return new XAResource[]{new TestXAResource() {
-                    public Xid[] recover(int var) throws XAException {
-                        if (var == XAResource.TMSTARTRSCAN) {
-                            if (failedResourceXid != null) {
-                                return new Xid[]{failedResourceXid};
+                return new XAResource[] {
+                        new TestXAResource()  {
+                            public Xid[] recover(int var) throws XAException {
+                                if (var == XAResource.TMSTARTRSCAN) {
+                                    if (failedResourceXid != null) {
+                                        return new Xid[]{failedResourceXid};
+                                    }
+                                }
+                                return new Xid[0];
+                            }
+                            @Override
+                            public void commit(Xid xid, boolean b) throws XAException {
+                                failedResourceXid = null;
+                            }
+
+                            @Override
+                            public int prepare(Xid xid) throws XAException {
+                                return 0;
+                            }
+
+                            @Override
+                            public void rollback(Xid xid) throws XAException {
+                                fail("Resource was rolled back");
                             }
                         }
-                        return new Xid[0];
-                    }
-                    @Override
-                    public void commit(Xid xid, boolean b) throws XAException {
-                        failedResourceXid = null;
-                    }
-
-                    @Override
-                    public int prepare(Xid xid) throws XAException {
-                        return 0;
-                    }
-
-                    @Override
-                    public void rollback(Xid xid) throws XAException {
-                        fail("Resource was rolled back");
-                    }
-                }};
+                };
             }
         });
         xaRecoveryModule.periodicWorkFirstPass();
@@ -435,148 +435,179 @@ public class XATerminatorImpleUnitTest extends TestBase {
     }
 
     @Test
-    public void testPrepareCommit() throws Exception {
+    public void testPrepareCommit () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
-
+        
         assertTrue(xa.beforeCompletion(xid));
-
+        
         assertEquals(xa.prepare(xid), XAResource.XA_RDONLY);
-
-        try {
+        
+        try
+        {
             xa.commit(xid, false);
-
+            
             fail();
-        } catch (final XAException ex) {
         }
-
+        catch (final XAException ex)
+        {
+        }
+        
         imp.importTransaction(xid);
-
+        
         xa.commit(xid, true);
     }
-
+    
     @Test
-    public void testOnePhaseCommit() throws Exception {
+    public void testOnePhaseCommit () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
 
         xa.commit(xid, true);
     }
-
+    
     @Test
-    public void testPrepareAbort() throws Exception {
+    public void testPrepareAbort () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
-
+        
         assertEquals(xa.prepare(xid), XAResource.XA_RDONLY);
-
-        try {
+        
+        try
+        {
             xa.rollback(xid);
-        } catch (final XAException ex) {
+        }
+        catch (final XAException ex)
+        {
         }
     }
-
+    
     @Test
-    public void testAbort() throws Exception {
+    public void testAbort () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
 
         xa.rollback(xid);
     }
-
+    
     @Test
-    public void testForget() throws Exception {
+    public void testForget () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
 
         xa.forget(xid);
     }
-
+    
     @Test
-    public void testRecover() throws Exception {
+    public void testRecover () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
-
+        
         imp.importTransaction(xid);
-
+        
         XATerminatorImple xa = new XATerminatorImple();
 
         xa.recover(XAResource.TMSTARTRSCAN);
-
-        try {
+        
+        try
+        {
             xa.recover(XAResource.TMSTARTRSCAN);
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
+        catch (final Exception ex)
+        {
+        }
+        
         xa.recover(XAResource.TMENDRSCAN);
     }
-
+    
     @Test
-    public void testNull() throws Exception {
+    public void testNull () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
-        TransactionImporter imp = SubordinationManager.getTransactionImporter();
+        TransactionImporter imp = SubordinationManager.getTransactionImporter();    
         XATerminatorImple xa = new XATerminatorImple();
 
-        try {
+        try
+        {
             xa.beforeCompletion(xid);
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
-        try {
+        catch (final Exception ex)
+        {
+        }
+        
+        try
+        {
             xa.prepare(xid);
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
-        try {
+        catch (final Exception ex)
+        {
+        }
+        
+        try
+        {
             xa.commit(xid, false);
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
-        try {
+        catch (final Exception ex)
+        {
+        }
+        
+        try
+        {
             xa.commit(xid, true);
-
+            
             fail();
-        } catch (final Exception ex) {
         }
-
-        try {
+        catch (final Exception ex)
+        {
+        }
+        
+        try
+        {
             xa.rollback(xid);
-
+            
             fail();
-        } catch (final Exception ex) {
+        }
+        catch (final Exception ex)
+        {
         }
     }
 
     @Test
-    public void testConcurrentImport() throws Exception {
+    public void testConcurrentImport () throws Exception {
         AtomicInteger completionCount = new AtomicInteger(0);
         XidImple xid = new XidImple(new Uid());
 
@@ -610,11 +641,10 @@ public class XATerminatorImpleUnitTest extends TestBase {
     }
 
     /*
-     * import a transaction asynchronously to maximise the opportunity for
-     * concurrency errors in TransactionImporterImple
+     * import a transaction asynchronously to maximise the opportunity for concurrency errors in TransactionImporterImple
      */
-    private CompletableFuture<SubordinateTransaction> doAsync(final AtomicInteger completionCount,
-            final CyclicBarrier gate, final boolean wait, ExecutorService executor, final XidImple xid) {
+    private CompletableFuture<SubordinateTransaction> doAsync(
+            final AtomicInteger completionCount, final CyclicBarrier gate, final boolean wait, ExecutorService executor, final XidImple xid) {
         return CompletableFuture.supplyAsync(new Supplier<SubordinateTransaction>() {
             @Override
             public SubordinateTransaction get() {
@@ -635,7 +665,7 @@ public class XATerminatorImpleUnitTest extends TestBase {
     }
 
     @Test
-    public void testImportMultipleTx() throws XAException, RollbackException, SystemException {
+    public void testImportMultipleTx () throws XAException, RollbackException, SystemException {
         Implementations.initialise();
         Implementationsx.initialise();
 
@@ -663,18 +693,14 @@ public class XATerminatorImpleUnitTest extends TestBase {
         assertTrue(Arrays.binarySearch(xids, xid, new Comparator<Xid>() {
             @Override
             public int compare(Xid o1, Xid o2) {
-                if (((XidImple) o1).equals(o2)) {
+                if (((XidImple)o1).equals(o2)) {
                     return 0;
                 } else {
                     return -1;
                 }
             }
         }) != -1);
-        xa.rollback(xid); // Will throw a heuristic. The doRollback should be
-                            // allowed but when we realise that the XAR1 is
-                            // commited it shouldn't be allowed. Maybe we should
-                            // also not shutdown the first XAR or maybe we need
-                            // to rely on bottom up.
+        xa.rollback(xid); // Will throw a heuristic. The doRollback should be allowed but when we realise that the XAR1 is commited it shouldn't be allowed. Maybe we should also not shutdown the first XAR or maybe we need to rely on bottom up.
         assertTrue(xar2.rollbackCalled());
         xa.recover(XAResource.TMENDRSCAN);
 
@@ -726,7 +752,7 @@ public class XATerminatorImpleUnitTest extends TestBase {
             return new Xid[0];
         }
 
-        public boolean rollbackCalled() {
+        public boolean rollbackCalled()  {
             return rollbackCalled;
         }
 

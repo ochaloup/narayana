@@ -16,14 +16,17 @@ public class StartEndTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                WSASTestUtils.class);
     }
 
     @Test
-    public void testStartEnd() throws Exception {
+    public void testStartEnd()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
         ua.start("dummy");
 
         ua.end();
-    }
+            }
 }

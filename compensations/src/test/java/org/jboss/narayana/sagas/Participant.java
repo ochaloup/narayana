@@ -25,14 +25,12 @@ public class Participant implements ParticipantWithComplete {
         System.out.println("SagasParticipant.close");
     }
 
-    public void cancel()
-            throws InvalidParticipantException, InvalidParticipantException, WrongStateException, SystemException {
+    public void cancel() throws InvalidParticipantException, InvalidParticipantException, WrongStateException, SystemException {
 
         System.out.println("SagasParticipant.cancel");
     }
 
-    public void compensate()
-            throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException {
+    public void compensate() throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException {
 
         System.out.println("SagasParticipant.compensate");
     }

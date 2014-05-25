@@ -43,8 +43,10 @@ import com.hp.mwtests.ts.jts.TestModule.stack;
 import com.hp.mwtests.ts.jts.TestModule.stackHelper;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 
-public class ImplicitArjunaClient {
-    public static void main(String[] args) throws Exception {
+public class ImplicitArjunaClient
+{
+    public static void main(String[] args) throws Exception
+    {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -52,16 +54,20 @@ public class ImplicitArjunaClient {
         String refFile = args[0];
         CurrentImple current = OTSImpleManager.current();
 
-        stack stackVar = null; // pointer the grid object that will be used.
+        stack stackVar = null;   // pointer the grid object that will be used.
 
-        try {
+        try
+        {
             current.begin();
 
-            try {
+            try
+            {
                 Services serv = new Services(myORB);
 
                 stackVar = stackHelper.narrow(myORB.orb().string_to_object(TestUtility.getService(refFile)));
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace(System.err);
                 TestUtility.fail(e.toString());
             }
@@ -73,20 +79,24 @@ public class ImplicitArjunaClient {
             System.out.println("pushing 2 onto stack");
 
             stackVar.push(2);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace(System.err);
             TestUtility.fail(e.toString());
         }
 
-        try {
+        try
+        {
             current.commit(false);
 
             current.begin();
 
             IntHolder val = new IntHolder(-1);
 
-            if (stackVar.pop(val) == 0) {
-                System.out.println("popped top of stack " + val.value);
+            if (stackVar.pop(val) == 0)
+            {
+                System.out.println("popped top of stack "+val.value);
 
                 current.begin();
 
@@ -98,18 +108,22 @@ public class ImplicitArjunaClient {
 
                 stackVar.pop(val);
 
-                System.out.println("popped top of stack is " + val.value);
+                System.out.println("popped top of stack is "+val.value);
 
                 current.commit(false);
 
                 TestUtility.assertEquals(1, val.value);
 
-            } else {
+            }
+            else
+            {
                 TestUtility.fail("Error getting stack value.");
 
                 current.rollback();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace(System.err);
             TestUtility.fail(e.toString());
         }
@@ -120,3 +134,4 @@ public class ImplicitArjunaClient {
         System.out.println("Passed");
     }
 }
+

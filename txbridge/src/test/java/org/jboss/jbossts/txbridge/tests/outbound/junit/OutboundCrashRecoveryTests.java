@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 
 import java.net.URL;
 
+
 /**
  * Crash Recovery test cases for the outbound side of the transaction bridge.
  *
@@ -61,6 +62,7 @@ public class OutboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         return getOutboundClientArchive();
     }
 
+
     @ArquillianResource
     private ContainerController controller;
 
@@ -69,6 +71,7 @@ public class OutboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
 
     private InstrumentedClass instrumentedTestVolatileParticipant;
     private InstrumentedClass instrumentedTestDurableParticipant;
+
 
     @Before
     public void setUp() throws Exception {
@@ -85,8 +88,7 @@ public class OutboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentor.setRedirectedSubmissionsFile(null);
         instrumentationOnServerReboot();
 
-        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing",
-                "$0.enlistVolatileParticipant(1), $0.enlistDurableParticipant(1)");
+        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing", "$0.enlistVolatileParticipant(1), $0.enlistDurableParticipant(1)");
     }
 
     @After
@@ -170,8 +172,7 @@ public class OutboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentedTestDurableParticipant.assertMethodNotCalled("commit");
     }
 
-    // this one requires <property name="commitOnePhase">false</property> on
-    // CoordinatorEnvironmentBean
+    // this one requires <property name="commitOnePhase">false</property> on CoordinatorEnvironmentBean
     @Test
     @Ignore
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)

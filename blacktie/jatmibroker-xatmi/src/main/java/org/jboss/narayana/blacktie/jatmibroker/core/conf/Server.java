@@ -54,8 +54,7 @@ public class Server {
         while (iterator.hasNext()) {
             Machine next = iterator.next();
             log.debug("Checking against: " + next.getHostname() + " or ip: " + next.getIpAddress());
-            if (hostname.equals(next.getHostname()) || ipAddress.equals(next.getIpAddress())
-                    || loopbackAddress.equals(next.getIpAddress())) {
+            if (hostname.equals(next.getHostname()) || ipAddress.equals(next.getIpAddress()) || loopbackAddress.equals(next.getIpAddress())) {
                 toReturn.add(next);
             }
         }

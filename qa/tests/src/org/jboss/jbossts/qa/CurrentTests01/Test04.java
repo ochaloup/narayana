@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.CurrentTests01;
  * $Id: Test04.java,v 1.2 2003/06/26 11:43:52 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.omg.CosTransactions.Current;
 import org.omg.CosTransactions.NoTransaction;
 
-public class Test04 {
-    public static void main(String[] args) {
-        try {
+public class Test04
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -72,27 +76,38 @@ public class Test04 {
 
             Current current = OTS.get_current();
 
-            try {
+            try
+            {
                 current.rollback_only();
                 correct = false;
-            } catch (NoTransaction noTransaction) {
+            }
+            catch (NoTransaction noTransaction)
+            {
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Test04.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Test04.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -180,8 +180,7 @@ public class CompensationContextStateUnitTest {
     }
 
     /**
-     * Restore action should succeed because deserializer helper will simulate
-     * an existing deserializer.
+     * Restore action should succeed because deserializer helper will simulate an existing deserializer.
      */
     @Test
     public void shouldPersistAndRestore() throws IOException, ObjectStoreException {

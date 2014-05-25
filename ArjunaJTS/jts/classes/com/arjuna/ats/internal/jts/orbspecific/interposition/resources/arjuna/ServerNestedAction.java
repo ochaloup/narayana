@@ -61,26 +61,30 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * creates and manipulates transactions. This is a nested action proxy.
  */
 
-public class ServerNestedAction extends ServerResource
-        implements
-            org.omg.CosTransactions.SubtransactionAwareResourceOperations {
+public class ServerNestedAction extends ServerResource implements
+        org.omg.CosTransactions.SubtransactionAwareResourceOperations
+{
 
     /**
      * Create local transactions with same ids as remote.
      */
 
-    public ServerNestedAction(ServerControl myControl) {
+    public ServerNestedAction(ServerControl myControl)
+    {
         super(myControl);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerNestedAction::ServerNestedAction ( " + _theUid + " )");
+            jtsLogger.logger.trace("ServerNestedAction::ServerNestedAction ( " + _theUid
+                    + " )");
         }
 
         _theResource = null;
         _resourceRef = null;
 
-        if (_theControl != null) {
-            _theResource = new org.omg.CosTransactions.SubtransactionAwareResourcePOATie(this);
+        if (_theControl != null)
+        {
+            _theResource = new org.omg.CosTransactions.SubtransactionAwareResourcePOATie(
+                    this);
 
             ORBManager.getPOA().objectIsReady(_theResource);
 
@@ -109,7 +113,9 @@ public class ServerNestedAction extends ServerResource
         }
     }
 
-    public void commit_subtransaction(Coordinator parent) throws SystemException {
+    public void commit_subtransaction (Coordinator parent)
+            throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerNestedAction::commit_subtransaction : " + _theUid);
         }
@@ -118,15 +124,18 @@ public class ServerNestedAction extends ServerResource
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_nullcontrol_1(
                     "ServerNestedAction.commit_subtransaction");
 
-            throw new INVALID_TRANSACTION(ExceptionCodes.SERVERAA_NO_CONTROL, CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.SERVERAA_NO_CONTROL,
+                    CompletionStatus.COMPLETED_NO);
         }
 
-        if (_theControl.isWrapper()) {
+        if (_theControl.isWrapper())
+        {
             destroyResource();
             return;
         }
 
-        ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
+        ServerTransaction theTransaction = (ServerTransaction) _theControl
+                .getImplHandle();
 
         // ThreadActionData.pushAction(theTransaction);
 
@@ -139,19 +148,23 @@ public class ServerNestedAction extends ServerResource
          * We should not get exceptions here.
          */
 
-        try {
+        try
+        {
             theTransaction.commit(false);
-        } catch (TRANSACTION_ROLLEDBACK e1) {
+        }
+        catch (TRANSACTION_ROLLEDBACK e1) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e1);
 
             throw e1;
-        } catch (INVALID_TRANSACTION e5) {
+        }
+        catch (INVALID_TRANSACTION e5) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e5);
 
             throw e5;
-        } catch (HeuristicMixed e2) {
+        }
+        catch (HeuristicMixed e2) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e2);
 
@@ -159,29 +172,37 @@ public class ServerNestedAction extends ServerResource
              * Can't rethrow heuristic exceptions for subtransactions!
              */
 
-            throw new BAD_OPERATION(ExceptionCodes.HEURISTIC_COMMIT, CompletionStatus.COMPLETED_MAYBE);
-        } catch (HeuristicHazard e3) {
+            throw new BAD_OPERATION(ExceptionCodes.HEURISTIC_COMMIT,
+                    CompletionStatus.COMPLETED_MAYBE);
+        }
+        catch (HeuristicHazard e3) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e3);
 
-            throw new BAD_OPERATION(ExceptionCodes.HEURISTIC_COMMIT, CompletionStatus.COMPLETED_MAYBE);
-        } catch (SystemException e4) {
+            throw new BAD_OPERATION(ExceptionCodes.HEURISTIC_COMMIT,
+                    CompletionStatus.COMPLETED_MAYBE);
+        }
+        catch (SystemException e4) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e4);
 
             throw e4;
-        } catch (Exception e5) {
+        }
+        catch (Exception e5) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                     "ServerNestedAction.commit_subtransaction", e5);
 
             throw new UNKNOWN(e5.toString());
-        } finally {
+        }
+        finally
+        {
             ThreadActionData.popAction();
             destroyResource();
         }
     }
 
-    public void rollback_subtransaction() throws SystemException {
+    public void rollback_subtransaction () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerNestedAction::rollback_subtransaction : " + _theUid);
         }
@@ -190,28 +211,38 @@ public class ServerNestedAction extends ServerResource
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_nullcontrol_2(
                     "ServerNestedAction.rollback_subtransaction");
 
-            throw new INVALID_TRANSACTION(ExceptionCodes.SERVERAA_NO_CONTROL, CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.SERVERAA_NO_CONTROL,
+                    CompletionStatus.COMPLETED_NO);
         }
 
-        if (_theControl.isWrapper()) {
+        if (_theControl.isWrapper())
+        {
             destroyResource();
             return;
         }
 
-        ServerTransaction theTransaction = (ServerTransaction) _theControl.getImplHandle();
+        ServerTransaction theTransaction = (ServerTransaction) _theControl
+                .getImplHandle();
 
         // ThreadActionData.pushAction(theTransaction);
 
-        try {
+        try
+        {
             if (!valid())
                 theTransaction.doPhase2Abort();
             else
                 theTransaction.rollback();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             throw e;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new UNKNOWN(ex.toString());
-        } finally {
+        }
+        finally
+        {
             ThreadActionData.popAction();
             destroyResource();
         }
@@ -221,27 +252,38 @@ public class ServerNestedAction extends ServerResource
      * These methods should never be called.
      */
 
-    public org.omg.CosTransactions.Vote prepare() throws SystemException, HeuristicMixed, HeuristicHazard {
-        throw new BAD_OPERATION(ExceptionCodes.SERVERAA_PREPARE, CompletionStatus.COMPLETED_NO);
+    public org.omg.CosTransactions.Vote prepare () throws SystemException,
+            HeuristicMixed, HeuristicHazard
+    {
+        throw new BAD_OPERATION(ExceptionCodes.SERVERAA_PREPARE,
+                CompletionStatus.COMPLETED_NO);
     }
 
-    public void rollback() throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
+    public void rollback () throws SystemException, HeuristicCommit,
+            HeuristicMixed, HeuristicHazard
+    {
     }
 
-    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+    public void commit () throws SystemException, NotPrepared,
+            HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
     }
 
-    public void forget() throws SystemException {
+    public void forget () throws SystemException
+    {
     }
 
-    public void commit_one_phase() throws HeuristicHazard, SystemException {
+    public void commit_one_phase () throws HeuristicHazard, SystemException
+    {
     }
 
-    public SubtransactionAwareResource theResource() {
+    public SubtransactionAwareResource theResource ()
+    {
         return _resourceRef;
     }
 
-    protected ServerNestedAction() {
+    protected ServerNestedAction()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerNestedAction::ServerNestedAction ()");
         }
@@ -250,11 +292,14 @@ public class ServerNestedAction extends ServerResource
         _resourceRef = null;
     }
 
-    protected final synchronized void destroyResource() {
-        if (!_destroyed) {
+    protected final synchronized void destroyResource ()
+    {
+        if (!_destroyed)
+        {
             _destroyed = true;
 
-            if (_parent != null) {
+            if (_parent != null)
+            {
                 /*
                  * Now try to garbage collect this resource. Since it was
                  * registered as a subtranaware resource it won't get called
@@ -262,12 +307,13 @@ public class ServerNestedAction extends ServerResource
                  */
 
                 if (!_parent.removeChild(this)) {
-                    jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_childerror(get_uid(),
-                            _parent.get_uid());
+                    jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_childerror(
+                            get_uid(), _parent.get_uid());
                 }
             }
 
-            if (_theResource != null) {
+            if (_theResource != null)
+            {
                 ORBManager.getPOA().shutdownObject(_theResource);
                 _theResource = null;
             }
@@ -276,26 +322,33 @@ public class ServerNestedAction extends ServerResource
         tidyup();
     }
 
-    protected boolean registerSubTran(Coordinator theCoordinator) {
+    protected boolean registerSubTran (Coordinator theCoordinator)
+    {
         boolean result = false;
 
-        if (theCoordinator != null) {
-            try {
+        if (theCoordinator != null)
+        {
+            try
+            {
                 theCoordinator.register_subtran_aware(_resourceRef);
                 result = true;
-            } catch (Inactive e) {
-                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
-                        "ServerNestedAction.registerSubTran", e);
-            } catch (NotSubtransaction e) {
-                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
-                        "ServerNestedAction.registerSubTran", e);
-            } catch (SystemException e) {
+            }
+            catch (Inactive e) {
                 jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
                         "ServerNestedAction.registerSubTran", e);
             }
-        } else {
-            jtsLogger.i18NLogger
-                    .warn_orbspecific_interposition_resources_arjuna_nullcoord("ServerNestedAction.registerSubTran");
+            catch (NotSubtransaction e) {
+                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
+                        "ServerNestedAction.registerSubTran", e);
+            }
+            catch (SystemException e) {
+                jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_generror_2(
+                        "ServerNestedAction.registerSubTran", e);
+            }
+        }
+        else {
+            jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_arjuna_nullcoord(
+                    "ServerNestedAction.registerSubTran");
         }
 
         return result;

@@ -43,19 +43,21 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.txoj.LockResult;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class LockManagerUnitTest {
+public class LockManagerUnitTest
+{
     @Test
-    public void test() throws Throwable {
+    public void test () throws Throwable
+    {
         AtomicObject obj = new AtomicObject();
 
         obj = new AtomicObject();
-
+        
         assertTrue(obj.releaselock(new Uid()));
         assertEquals(obj.setlock(null), LockResult.REFUSED);
-
+        
         obj.print(new PrintWriter(new ByteArrayOutputStream()));
         obj.printState(new PrintWriter(new ByteArrayOutputStream()));
-
+        
         assertEquals(new DummyLockManager().type(), "StateManager/LockManager");
     }
 }

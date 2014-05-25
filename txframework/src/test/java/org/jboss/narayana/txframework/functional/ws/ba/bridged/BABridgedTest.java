@@ -53,8 +53,10 @@ public class BABridgedTest {
     public static JavaArchive createTestArchive() {
 
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
-                .addPackages(false, BABridgedTest.class.getPackage()).addPackage(EventLog.class.getPackage())
-                .addClass(URLUtils.class).addAsManifestResource("persistence.xml")
+                .addPackages(false, BABridgedTest.class.getPackage())
+                .addPackage(EventLog.class.getPackage())
+                .addClass(URLUtils.class)
+                .addAsManifestResource("persistence.xml")
                 .addClass(ParticipantCompletionCoordinatorRules.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
 
@@ -63,10 +65,12 @@ public class BABridgedTest {
         String ManifestMF = "Manifest-Version: 1.0\n"
                 + "Dependencies: org.jboss.xts, org.jboss.narayana.txframework services\n";
 
+
         archive.setManifest(new StringAsset(ManifestMF));
 
         return archive;
     }
+
 
     @BeforeClass()
     public static void submitBytemanScript() throws Exception {

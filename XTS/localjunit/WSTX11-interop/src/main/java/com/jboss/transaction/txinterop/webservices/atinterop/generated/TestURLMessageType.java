@@ -26,13 +26,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+
 /**
- * <p>
- * Java class for TestURLMessageType complex type.
+ * <p>Java class for TestURLMessageType complex type.
  * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="TestURLMessageType">
@@ -49,7 +47,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TestURLMessageType", propOrder = {"url"})
+@XmlType(name = "TestURLMessageType", propOrder = {
+    "url"
+})
 public class TestURLMessageType {
 
     @XmlElement(name = "URL", required = true)
@@ -58,8 +58,10 @@ public class TestURLMessageType {
     /**
      * Gets the value of the url property.
      * 
-     * @return possible object is {@link String }
-     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
     public String getURL() {
         return url;
@@ -69,8 +71,9 @@ public class TestURLMessageType {
      * Sets the value of the url property.
      * 
      * @param value
-     *            allowed object is {@link String }
-     * 
+     *     allowed object is
+     *     {@link String }
+     *     
      */
     public void setURL(String value) {
         this.url = value;

@@ -26,8 +26,8 @@ public class RestATManagementResource {
     @GET
     @Path(PARTICIPANTS_URL_SEGMENT)
     public String getAllParticipantsInformation() {
-        final Map<String, ParticipantInformation> participantsInformation = ParticipantsContainer.getInstance()
-                .getAllParticipantsInformation();
+        final Map<String, ParticipantInformation> participantsInformation =
+                ParticipantsContainer.getInstance().getAllParticipantsInformation();
 
         return participantsInformationToJSON(participantsInformation).toString();
     }

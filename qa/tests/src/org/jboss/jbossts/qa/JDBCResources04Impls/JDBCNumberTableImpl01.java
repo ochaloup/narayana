@@ -39,16 +39,19 @@ import java.sql.*;
 import java.util.Hashtable;
 import java.util.Properties;
 
-public class JDBCNumberTableImpl01 implements NumberTableOperations {
-    public JDBCNumberTableImpl01(String databaseURL, String databaseUser, String databasePassword,
-            String databaseDynamicClass, int timeout) throws InvocationException {
+public class JDBCNumberTableImpl01 implements NumberTableOperations
+{
+    public JDBCNumberTableImpl01(String databaseURL, String databaseUser, String databasePassword, String databaseDynamicClass, int timeout)
+            throws InvocationException
+    {
         _dbUser = databaseUser;
         _databaseURL = databaseURL;
         _databasePassword = databasePassword;
         _databaseDynamicClass = databaseDynamicClass;
         _databaseTimeout = timeout;
 
-        if (databaseDynamicClass != null) {
+        if (databaseDynamicClass != null)
+        {
             _databaseProperties = new Properties();
 
             _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -56,247 +59,336 @@ public class JDBCNumberTableImpl01 implements NumberTableOperations {
             _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
         }
 
-        try {
+        try
+        {
             Connection connection = getConnection();
             Runtime.getRuntime().addShutdownHook(new JDBC01ShutdownThread());
             DatabaseMetaData dbmd = connection.getMetaData();
-            if (dbmd.getDatabaseProductName().startsWith("Microsoft")) {
+            if (dbmd.getDatabaseProductName().startsWith("Microsoft"))
+            {
                 System.err.println("SQLServer message");
                 _useTimeout = true;
-            } else if (dbmd.getDatabaseProductName().equals("DBMS:cloudscape")) {
+            }
+            else if (dbmd.getDatabaseProductName().equals("DBMS:cloudscape"))
+            {
                 System.err.println("setting CLOUD message");
             }
 
             connection.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("JDBCNumberTableImpl01.JDBCNumberTableImpl01: " + e);
             throw new InvocationException();
         }
     }
 
-    public void get(String name, IntHolder value, Control ctrl) throws InvocationException {
+    public void get(String name, IntHolder value, Control ctrl)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
 
-        try {
+        try
+        {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
             interposition.registerTransaction(ctrl);
 
-            try {
+            try
+            {
                 System.err.println("-- get called --");
                 connection = getConnection();
                 statement = getConnection().createStatement();
 
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
                 System.err.println("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
-                resultSet = statement
-                        .executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
+                resultSet = statement.executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
                 resultSet.next();
                 value.value = resultSet.getInt("Value");
-                if (resultSet.next()) {
+                if (resultSet.next())
+                {
                     throw new Exception();
                 }
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, connection);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl01.get: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } catch (Error error) {
+            }
+            catch (Error error)
+            {
                 System.err.println("JDBCNumberTableImpl01.get: " + error);
                 throw new InvocationException();
-            } finally {
-                try {
-                    if (resultSet != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (resultSet != null)
+                    {
                         resultSet.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
-                try {
-                    if (statement != null) {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
-                try {
+                try
+                {
                     interposition.unregisterTransaction();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-        } catch (InvocationException invocationException) {
+        }
+        catch (InvocationException invocationException)
+        {
             throw invocationException;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCNumberTableImpl01.get: " + exception);
             throw new InvocationException();
         }
     }
 
-    public void set(String name, int value, Control ctrl) throws InvocationException {
+    public void set(String name, int value, Control ctrl)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
 
-        try {
+        try
+        {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
             interposition.registerTransaction(ctrl);
 
-            try {
+            try
+            {
                 connection = getConnection();
                 statement = getConnection().createStatement();
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
-                System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = \'" + value + "\' WHERE Name = \'"
-                        + name + "\'");
-                statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = \'" + value
-                        + "\' WHERE Name = \'" + name + "\'");
+                System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = \'" + value + "\' WHERE Name = \'" + name + "\'");
+                statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = \'" + value + "\' WHERE Name = \'" + name + "\'");
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, connection);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl01.set: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } catch (Error error) {
+            }
+            catch (Error error)
+            {
                 System.err.println("JDBCNumberTableImpl01.set: " + error);
                 throw new InvocationException();
-            } finally {
-                try {
-                    if (statement != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
-                try {
+                try
+                {
                     interposition.unregisterTransaction();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-        } catch (InvocationException invocationException) {
+        }
+        catch (InvocationException invocationException)
+        {
             throw invocationException;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCNumberTableImpl01.set: " + exception);
             throw new InvocationException(Reason.ReasonUnknown);
         }
     }
 
-    public void increase(String name, Control ctrl) throws InvocationException {
+    public void increase(String name, Control ctrl)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
 
-        try {
+        try
+        {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
             interposition.registerTransaction(ctrl);
 
-            try {
+            try
+            {
                 System.err.println("-- increase --");
 
                 connection = getConnection();
                 statement = getConnection().createStatement();
 
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
-                System.err.println(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
-                statement.executeUpdate(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+                System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+                statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, connection);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl01.increase: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } catch (Error error) {
+            }
+            catch (Error error)
+            {
                 System.err.println("JDBCNumberTableImpl01.increase: " + error);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } finally {
-                try {
-                    if (statement != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
-                try {
+                try
+                {
                     interposition.unregisterTransaction();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-        } catch (InvocationException invocationException) {
+        }
+        catch (InvocationException invocationException)
+        {
             throw invocationException;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCNumberTableImpl01.increase: " + exception);
             throw new InvocationException(Reason.ReasonUnknown);
         }
     }
 
-    private Connection getConnection() throws Exception {
-        if ("true".equals(System.getProperty("qa.debug"))) {
+    private Connection getConnection()
+            throws Exception
+    {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
+        try
+        {
             javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
             javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
             Connection conn = (Connection) _connections.get(tx);
 
-            if (conn == null) {
+            if (conn == null)
+            {
                 System.err.println("**creating connection");
 
-                if (_databaseProperties != null) {
+                if (_databaseProperties != null)
+                {
                     conn = DriverManager.getConnection(_databaseURL, _databaseProperties);
-                } else {
+                }
+                else
+                {
                     conn = DriverManager.getConnection(_databaseURL, _dbUser, _databasePassword);
                 }
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("conn = " + conn);
                 System.err.println("Database URL = " + _databaseURL);
             }
             System.err.println("returning " + conn + " for " + tx);
 
             return conn;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SQLException(ex.toString());
         }
     }
@@ -311,19 +403,25 @@ public class JDBCNumberTableImpl01 implements NumberTableOperations {
     private boolean _useTimeout = false;
 
     /*
-     * We can't guarantee that finalize() will be called, so we have a thread
-     * that will close the database connection.
-     */
-    private class JDBC01ShutdownThread extends Thread {
-        public void run() {
+         * We can't guarantee that finalize() will be called,
+         * so we have a thread that will close the database connection.
+         */
+    private class JDBC01ShutdownThread extends Thread
+    {
+        public void run()
+        {
             System.err.println("JDBCNumberTableImpl01.JDBC01ShutdownThread: running");
-            try {
+            try
+            {
                 java.util.Enumeration connections = _connections.elements();
-                while (connections.hasMoreElements()) {
+                while (connections.hasMoreElements())
+                {
                     ((Connection) connections.nextElement()).close();
                 }
                 connections = null;
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl01.JDBC01ShutdownThread: " + exception);
                 exception.printStackTrace(System.err);
             }

@@ -16,31 +16,37 @@ import com.arjuna.wsas.tests.arq.WarDeployment;
 
 @RunWith(Arquillian.class)
 public class SuspendTest {
-
+    
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                WSASTestUtils.class);
     }
-
+    
     @Test
-    public void testSuspend() throws Exception {
+    public void testSuspend()
+            throws Exception
+    {
         UserActivity ua = UserActivityFactory.userActivity();
 
-        try {
-            ua.start("dummy");
-
-            System.out.println("Started: " + ua.activityName());
-
-            ActivityHierarchy ctx = ua.suspend();
-
-            System.out.println("\nSuspended: " + ctx);
-
-            if (ua.currentActivity() != null) {
-                fail("Current activity should be null " + ua.currentActivity());
-            }
-        } catch (Exception ex) {
-            WSASTestUtils.cleanup(ua);
-            throw ex;
+    try
+    {
+        ua.start("dummy");
+        
+        System.out.println("Started: "+ua.activityName());
+        
+        ActivityHierarchy ctx = ua.suspend();
+        
+        System.out.println("\nSuspended: "+ctx);
+        
+        if (ua.currentActivity() != null) {
+            fail("Current activity should be null " + ua.currentActivity());
         }
+    }
+    catch (Exception ex)
+    {
+        WSASTestUtils.cleanup(ua);
+        throw ex;
+    }
     }
 }

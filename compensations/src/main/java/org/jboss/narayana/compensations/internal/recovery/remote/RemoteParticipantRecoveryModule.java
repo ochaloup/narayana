@@ -35,8 +35,7 @@ import org.jboss.narayana.compensations.internal.remote.RemoteParticipant;
 import java.io.ObjectInputStream;
 
 /**
- * XTS business activity recovery module to recreate {@link RemoteParticipant}
- * objects.
+ * XTS business activity recovery module to recreate {@link RemoteParticipant} objects.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -45,15 +44,12 @@ public class RemoteParticipantRecoveryModule implements XTSBARecoveryModule {
     private static final Logger LOGGER = Logger.getLogger(RemoteParticipantRecoveryModule.class);
 
     /**
-     * Only this recreation method is implemented because RemoteParticipant is
-     * not serializable and is participant completion participant.
+     * Only this recreation method is implemented because RemoteParticipant is not serializable and is participant completion
+     * participant.
      * 
-     * @param id
-     *            the id used when the participant was created
-     * @param recoveryState
-     *            a byte array returned form the original participant via a call
-     *            to method getRecoveryState of interface
-     *            PersistableBAParticipant
+     * @param id the id used when the participant was created
+     * @param recoveryState a byte array returned form the original participant via a call to method getRecoveryState of
+     *        interface PersistableBAParticipant
      * @return
      * @throws Exception
      */

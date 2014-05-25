@@ -48,7 +48,7 @@ public class DataTxLoggedHandler implements TransactionLoggedHandler {
                     dataAvailable = true;
                 }
             } catch (Exception e) {
-                // unavailable
+                //unavailable
             }
         }
     }

@@ -46,12 +46,15 @@ import com.arjuna.ats.txoj.LockMode;
 import com.arjuna.ats.txoj.LockResult;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 
-public class AtomicObject extends LockManager {
-    public AtomicObject() {
+public class AtomicObject extends LockManager
+{
+    public AtomicObject()
+    {
         this(ObjectModel.SINGLE);
     }
 
-    public AtomicObject(int om) {
+    public AtomicObject(int om)
+    {
         super(ObjectType.ANDPERSISTENT, om);
 
         state = 0;
@@ -60,12 +63,15 @@ public class AtomicObject extends LockManager {
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
+        {
             if (A.commit() == ActionStatus.COMMITTED)
                 System.out.println("Created persistent object " + get_uid());
             else
                 System.out.println("Action.commit error.");
-        } else {
+        }
+        else
+        {
             A.abort();
 
             System.out.println("setlock error.");
@@ -77,11 +83,13 @@ public class AtomicObject extends LockManager {
             printDebug = true;
     }
 
-    public AtomicObject(Uid u) {
+    public AtomicObject(Uid u)
+    {
         this(u, ObjectModel.SINGLE);
     }
 
-    public AtomicObject(Uid u, int om) {
+    public AtomicObject(Uid u, int om)
+    {
         super(u, ObjectType.ANDPERSISTENT, om);
 
         state = -1;
@@ -90,10 +98,13 @@ public class AtomicObject extends LockManager {
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED)
+        {
             System.out.println("Recreated object " + u);
             A.commit();
-        } else {
+        }
+        else
+        {
             System.out.println("Error recreating object " + u);
             A.abort();
         }
@@ -104,31 +115,38 @@ public class AtomicObject extends LockManager {
             printDebug = true;
     }
 
-    public int getRetry() {
+    public int getRetry ()
+    {
         return retry;
     }
-
-    public void setRetry(int t) {
+    
+    public void setRetry (int t)
+    {
         retry = t;
     }
-
-    public void terminate() {
+    
+    public void terminate ()
+    {
         super.terminate();
     }
-
-    public void incr(int value) throws TestException {
+    
+    public void incr (int value) throws TestException
+    {
         AtomicAction A = new AtomicAction();
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.WRITE), retry) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.WRITE), retry) == LockResult.GRANTED)
+        {
             state += value;
 
             if (A.commit() != ActionStatus.COMMITTED)
                 throw new TestException("Action commit error.");
             else
                 return;
-        } else {
+        }
+        else
+        {
             if (printDebug)
                 System.out.println("Error - could not set write lock.");
         }
@@ -138,19 +156,23 @@ public class AtomicObject extends LockManager {
         throw new TestException("Write lock error.");
     }
 
-    public void set(int value) throws TestException {
+    public void set (int value) throws TestException
+    {
         AtomicAction A = new AtomicAction();
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.WRITE), retry) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.WRITE), retry) == LockResult.GRANTED)
+        {
             state = value;
 
             if (A.commit() != ActionStatus.COMMITTED)
                 throw new TestException("Action commit error.");
             else
                 return;
-        } else {
+        }
+        else
+        {
             if (printDebug)
                 System.out.println("Error - could not set write lock.");
         }
@@ -160,20 +182,24 @@ public class AtomicObject extends LockManager {
         throw new TestException("Write lock error.");
     }
 
-    public int get() throws TestException {
+    public int get () throws TestException
+    {
         AtomicAction A = new AtomicAction();
         int value = -1;
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.READ), retry) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.READ), retry) == LockResult.GRANTED)
+        {
             value = state;
 
             if (A.commit() == ActionStatus.COMMITTED)
                 return value;
             else
                 throw new TestException("Action commit error.");
-        } else {
+        }
+        else
+        {
             if (printDebug)
                 System.out.println("Error - could not set read lock.");
         }
@@ -183,37 +209,46 @@ public class AtomicObject extends LockManager {
         throw new TestException("Read lock error.");
     }
 
-    public boolean save_state(OutputObjectState os, int ot) {
+    public boolean save_state (OutputObjectState os, int ot)
+    {
         boolean result = super.save_state(os, ot);
 
         if (!result)
             return false;
 
-        try {
+        try
+        {
             os.packInt(state);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             result = false;
         }
 
         return result;
     }
 
-    public boolean restore_state(InputObjectState os, int ot) {
+    public boolean restore_state (InputObjectState os, int ot)
+    {
         boolean result = super.restore_state(os, ot);
 
         if (!result)
             return false;
 
-        try {
+        try
+        {
             state = os.unpackInt();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             result = false;
         }
 
         return result;
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/LockManager/AtomicObject";
     }
 

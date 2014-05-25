@@ -47,80 +47,97 @@ import com.arjuna.orbportability.oa.PreShutdown;
  *
  * @author Richard Begg (richard_begg@hp.com)
  */
-public class RootOA extends OA {
+public class RootOA extends OA
+{
     /**
      * Creates a RootOA class which represents the RootOA of the given ORB
      *
-     * @param The
-     *            ORB to create a root OA for
+     * @param The ORB to create a root OA for
      */
-    RootOA(com.arjuna.orbportability.ORB orb) {
-        super(orb, DEFAULT_ROOT_NAME);
+    RootOA (com.arjuna.orbportability.ORB orb)
+    {
+        super(orb,DEFAULT_ROOT_NAME);
     }
 
     /**
      * Destroy this root POA and all of its children
      */
-    public synchronized void destroy() throws SystemException {
+    public synchronized void destroy () throws SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("OA::destroyRootPOA ()");
         }
 
-        if (_oa.initialised()) {
-            if (!_preOAShutdown.isEmpty()) {
+        if (_oa.initialised())
+        {
+            if (!_preOAShutdown.isEmpty())
+            {
                 Enumeration elements = _preOAShutdown.elements();
 
-                while (elements.hasMoreElements()) {
+                while (elements.hasMoreElements())
+                {
                     PreShutdown c = (PreShutdown) elements.nextElement();
 
-                    if (c != null) {
+                    if (c != null)
+                    {
                         c.work();
                         c = null;
                     }
                 }
 
-                // _preOAShutdown.clear();
+                //        _preOAShutdown.clear();
             }
 
             _oa.destroyRootPOA();
 
-            if (!_postOAShutdown.isEmpty()) {
+            if (!_postOAShutdown.isEmpty())
+            {
                 Enumeration elements = _postOAShutdown.elements();
 
-                while (elements.hasMoreElements()) {
+                while (elements.hasMoreElements())
+                {
                     PostShutdown c = (PostShutdown) elements.nextElement();
 
-                    if (c != null) {
+                    if (c != null)
+                    {
                         c.work();
                         c = null;
                     }
                 }
 
-                // _postOAShutdown.clear();
+                //        _postOAShutdown.clear();
             }
         }
     }
 
-    public org.omg.CORBA.Object corbaReference(Servant obj) {
+public org.omg.CORBA.Object corbaReference (Servant obj)
+    {
         org.omg.CORBA.Object objRef = null;
 
-        try {
+        try
+        {
             objRef = corbaReference(obj, _oa.rootPoa());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             objRef = null;
         }
 
         return objRef;
     }
 
-    public boolean objectIsReady(Servant obj, byte[] id) throws SystemException {
+public boolean objectIsReady (Servant obj, byte[] id) throws SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("RootOA::objectIsReady (Servant, byte[], " + _oaName + ")");
         }
 
-        try {
+        try
+        {
             _oa.rootPoa().activate_object_with_id(id, obj);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             opLogger.i18NLogger.warn_OA_exceptioncaughtforobj("objectIsReady", obj.toString(), e);
 
             return false;
@@ -129,31 +146,38 @@ public class RootOA extends OA {
         return true;
     }
 
-    public boolean objectIsReady(Servant obj) throws SystemException {
+public boolean objectIsReady (Servant obj) throws SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("RootOA::objectIsReady (Servant)");
         }
 
         boolean result = true;
 
-        try {
+        try
+        {
             boolean invalidPOA = false;
 
-            if (_oa.initialised()) {
+            if (_oa.initialised())
+            {
                 _oa.rootPoa().activate_object(obj);
-            } else
+            }
+            else
                 invalidPOA = true;
 
-            if (invalidPOA) {
+            if (invalidPOA)
+            {
                 opLogger.i18NLogger.warn_OA_invalidpoa("objectIsReady", "rootPOA");
 
                 result = false;
             }
 
-            // ??
+        //??
 
             EventManager.getManager().connected(corbaReference(obj));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             opLogger.i18NLogger.warn_OA_exceptioncaughtforobj("objectIsReady", obj.toString(), e);
 
             result = false;
@@ -162,14 +186,16 @@ public class RootOA extends OA {
         return result;
     }
 
-    public boolean shutdownObject(org.omg.CORBA.Object obj) {
+public boolean shutdownObject (org.omg.CORBA.Object obj)
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("RootOA::shutdownObject ()");
         }
 
         boolean result = true;
 
-        try {
+        try
+        {
             EventManager.getManager().disconnected(obj);
 
             boolean invalidPOA = false;
@@ -179,12 +205,15 @@ public class RootOA extends OA {
             else
                 invalidPOA = true;
 
-            if (invalidPOA) {
+            if (invalidPOA)
+            {
                 opLogger.i18NLogger.warn_OA_invalidpoa("objectIsReady", "rootPOA");
 
                 result = false;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             opLogger.i18NLogger.warn_OA_caughtexception("objectIsReady", e);
 
             result = false;
@@ -193,14 +222,16 @@ public class RootOA extends OA {
         return result;
     }
 
-    public boolean shutdownObject(Servant obj) {
+public boolean shutdownObject (Servant obj)
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("RootOA::shutdownObject (Servant)");
         }
 
         boolean result = true;
 
-        try {
+        try
+        {
             boolean invalidPOA = false;
 
             if (_oa.initialised())
@@ -208,18 +239,23 @@ public class RootOA extends OA {
             else
                 invalidPOA = true;
 
-            if (invalidPOA) {
+            if (invalidPOA)
+            {
                 opLogger.i18NLogger.warn_OA_invalidpoa("shutdownObject", "rootPOA");
 
                 result = false;
             }
-        } catch (NullPointerException ex) {
-            /*
-             * Ignore this as it means some other thread/process was sharing the
-             * POA and shut it down itself.
-             */
-        } catch (Exception e) {
-            if (e instanceof OBJECT_NOT_EXIST) {
+        }
+    catch (NullPointerException ex)
+    {
+        /*
+         * Ignore this as it means some other thread/process was sharing
+         * the POA and shut it down itself.
+         */
+    }
+        catch (Exception e)
+        {
+            if(e instanceof OBJECT_NOT_EXIST) {
                 // ignore - probably something else shut down the POA already
             } else {
                 opLogger.i18NLogger.warn_OA_caughtexception("shutdownObject", e);
@@ -231,5 +267,5 @@ public class RootOA extends OA {
         return result;
     }
 
-    public static final String DEFAULT_ROOT_NAME = "RootPOA";
+public static final String DEFAULT_ROOT_NAME = "RootPOA";
 }

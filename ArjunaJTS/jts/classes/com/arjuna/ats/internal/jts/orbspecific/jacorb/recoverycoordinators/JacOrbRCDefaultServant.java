@@ -42,58 +42,64 @@ import com.arjuna.ats.internal.jts.orbspecific.recovery.recoverycoordinators.Gen
 import com.arjuna.ats.internal.jts.orbspecific.recovery.recoverycoordinators.RecoveryCoordinatorId;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
-public class JacOrbRCDefaultServant extends GenericRecoveryCoordinator {
+
+public class JacOrbRCDefaultServant extends GenericRecoveryCoordinator
+{
     private ORB _ourOrb;
 
     static byte[] RCObjectId = null;
-
+     
     /**
      * constructor supplies orb - used only within package
      */
-
-    JacOrbRCDefaultServant(ORB orb) {
-        super(); // ensure id is null
-        _ourOrb = orb;
-
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("JacOrbDefaultServant(orb)");
-        }
-
+     
+    JacOrbRCDefaultServant(ORB orb)
+    {
+    super();    // ensure id is null
+    _ourOrb = orb;
+    
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("JacOrbDefaultServant(orb)");
+    }
+    
+    }
+    
+    public Status replay_completion ( Resource res ) throws SystemException, NotPrepared
+    {
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("JacOrbDefaultServant::replay_completion)");
     }
 
-    public Status replay_completion(Resource res) throws SystemException, NotPrepared {
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("JacOrbDefaultServant::replay_completion)");
-        }
+    try 
+     {
+         //Begin New
+         org.omg.CORBA.Object obj = _ourOrb.resolve_initial_references("POACurrent");
+         org.omg.PortableServer.Current poa_current = org.omg.PortableServer.CurrentHelper.narrow(obj);
+         byte[] objectId = poa_current.get_object_id();
+         //End New
+         
+         String objectIdString = new String(objectId, StandardCharsets.UTF_8);
 
-        try {
-            // Begin New
-            org.omg.CORBA.Object obj = _ourOrb.resolve_initial_references("POACurrent");
-            org.omg.PortableServer.Current poa_current = org.omg.PortableServer.CurrentHelper.narrow(obj);
-            byte[] objectId = poa_current.get_object_id();
-            // End New
+         // convert that to the structured id
+         RecoveryCoordinatorId  recovCoId = RecoveryCoordinatorId.reconstruct(objectIdString);
+         
+         if (jtsLogger.logger.isDebugEnabled()) {
+             jtsLogger.logger.debug("JacOrbDefaultServant replay_completion for Id "+recovCoId);
+         }
+         
+         // and do the real replay
+         return GenericRecoveryCoordinator.replay_completion(recovCoId, res);
+     }
+    /***/
+    catch (NotPrepared exp)
+    {
+        throw exp;
+    }
+    /**/
+    catch (Exception ex) {
+        jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCDefaultServant_3(ex);
 
-            String objectIdString = new String(objectId, StandardCharsets.UTF_8);
-
-            // convert that to the structured id
-            RecoveryCoordinatorId recovCoId = RecoveryCoordinatorId.reconstruct(objectIdString);
-
-            if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("JacOrbDefaultServant replay_completion for Id " + recovCoId);
-            }
-
-            // and do the real replay
-            return GenericRecoveryCoordinator.replay_completion(recovCoId, res);
-        }
-        /***/
-        catch (NotPrepared exp) {
-            throw exp;
-        }
-        /**/
-        catch (Exception ex) {
-            jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCDefaultServant_3(ex);
-
-            return Status.StatusUnknown;
-        }
+        return Status.StatusUnknown;
+    }
     }
 }

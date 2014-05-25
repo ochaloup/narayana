@@ -38,30 +38,34 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.arjuna.Se
 import com.arjuna.ats.jts.exceptions.TxError;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
-public class ServerRestrictedNestedAction extends ServerNestedAction {
+public class ServerRestrictedNestedAction extends ServerNestedAction
+{
 
     /*
      * Create local transactions with same ids as remote.
      */
 
-    public ServerRestrictedNestedAction(ServerControl myControl) {
-        super(myControl);
+public ServerRestrictedNestedAction (ServerControl myControl)
+    {
+    super(myControl);
 
-        if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerRestrictedNestedAction::ServerRestrictedNestedAction ( " + _theUid + " )");
-        }
+    if (jtsLogger.logger.isTraceEnabled()) {
+        jtsLogger.logger.trace("ServerRestrictedNestedAction::ServerRestrictedNestedAction ( " + _theUid + " )");
+    }
     }
 
-    public final synchronized ServerControl deepestControl() {
-        ServerRestrictedNestedAction myChild = child();
+public final synchronized ServerControl deepestControl ()
+    {
+    ServerRestrictedNestedAction myChild = child();
 
-        if (myChild != null)
-            return myChild.deepestControl();
-        else
-            return control();
+    if (myChild != null)
+        return myChild.deepestControl();
+    else
+        return control();
     }
 
-    public final synchronized ServerRestrictedNestedAction child() {
+    public final synchronized ServerRestrictedNestedAction child ()
+    {
         ServerRestrictedNestedAction toReturn = null;
         List<ServerNestedAction> children = getChildren();
 
@@ -71,7 +75,9 @@ public class ServerRestrictedNestedAction extends ServerNestedAction {
                     "ServerRestrictedNestedAction.child", Integer.toString(children.size()));
 
             throw new TxError(jtsLogger.i18NLogger.get_orbspecific_interposition_resources_restricted_contx_1());
-        } else {
+        }
+        else
+        {
             if (children.size() == 1)
                 toReturn = (ServerRestrictedNestedAction) children.remove(0);
         }

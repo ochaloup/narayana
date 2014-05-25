@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class HeuristicMixed implements Status {
+public class HeuristicMixed implements Status
+{
 
-    public static HeuristicMixed instance() {
-        return _instance;
+    public static HeuristicMixed instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.twophase.status.HeuristicMixed";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.twophase.status.HeuristicMixed";
-    }
-
-    private HeuristicMixed() {
+    private HeuristicMixed ()
+    {
     }
 
     private static final HeuristicMixed _instance = new HeuristicMixed();
-
+    
 }

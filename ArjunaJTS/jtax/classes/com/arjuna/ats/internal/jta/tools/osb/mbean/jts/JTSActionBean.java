@@ -36,12 +36,10 @@ import java.util.List;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
+@Deprecated // in order to provide a better separation between public and internal classes.
 public class JTSActionBean extends JTAActionBean {
     // ExtendedResourceRecord does not statically expose its type
     private static String ERRT = "StateManager/AbstractRecord/ExtendedResourceRecord";
@@ -91,19 +89,16 @@ public class JTSActionBean extends JTAActionBean {
     public void register() {
         super.register();
 
-        // for each ExtendedResourceRecord see if there is a corresponding
-        // XARecoveryResource entry in the local store
+        // for each ExtendedResourceRecord see if there is a corresponding XARecoveryResource entry in the local store
         for (LogRecordWrapper participant : getParticipants()) {
             if (participant instanceof XAResourceRecordBean) {
                 // this is an ExtendedResourceRecord
                 XAResourceRecordBean xarrb = (XAResourceRecordBean) participant;
 
-                // see if there is a corresponding JTSXAResourceRecordWrapper
-                // for this participant
+                // see if there is a corresponding JTSXAResourceRecordWrapper for this participant
                 XARecoveryResourceMBean jtsxaResourceRecordWrapper = findJTSXAResourceRecordWrapper(xarrb);
 
-                if (jtsxaResourceRecordWrapper != null
-                        && jtsxaResourceRecordWrapper instanceof JTSXAResourceRecordWrapper)
+                if (jtsxaResourceRecordWrapper != null && jtsxaResourceRecordWrapper instanceof JTSXAResourceRecordWrapper)
                     xarrb.setJtsXAResourceRecord((JTSXAResourceRecordWrapper) jtsxaResourceRecordWrapper);
             }
         }

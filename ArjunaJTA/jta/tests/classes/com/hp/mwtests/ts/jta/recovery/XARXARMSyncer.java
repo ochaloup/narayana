@@ -47,7 +47,7 @@ public class XARXARMSyncer implements XAResource {
     public void rollback(Xid xid) throws XAException {
         if (!xids.remove(xid)) {
             orphanDetected = true;
-            // throw new XAException("unknown xid: " + xid);
+//            throw new XAException("unknown xid: " + xid);
         }
         System.out.println("**rollback " + xid);
     }

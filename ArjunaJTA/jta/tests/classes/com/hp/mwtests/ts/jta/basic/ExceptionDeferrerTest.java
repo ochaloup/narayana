@@ -23,114 +23,149 @@ import com.hp.mwtests.ts.jta.common.TestResource;
  */
 public class ExceptionDeferrerTest {
 
-    @Test
-    public void testCheckDeferredRollbackException() throws Exception {
-        ThreadActionData.purgeActions();
+   @Test
+   public void testCheckDeferredRollbackException () throws Exception
+   {
+       ThreadActionData.purgeActions();
+       
+       TransactionImple tx = new TransactionImple(0);
 
-        TransactionImple tx = new TransactionImple(0);
+       try
+       {
+           tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.rollback));
+       }
+       catch (final RollbackException ex)
+       {
+          fail();
+       }
+       
+       try
+       {
+           tx.commit();
+           
+           fail(); 
+       }
+       catch (final RollbackException ex)
+       {
+          assertEquals(XAException.XA_HEURRB, ((XAException) ex.getSuppressed()[0]).errorCode);
+       }
+   }
+   
+   @Test
+   public void testCheckDeferredHeuristicException () throws Exception
+   {
+       ThreadActionData.purgeActions();
+       
+       TransactionImple tx = new TransactionImple(0);
 
-        try {
-            tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.rollback));
-        } catch (final RollbackException ex) {
-            fail();
-        }
+       try
+       {
+           tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.normal));
+       }
+       catch (final RollbackException ex)
+       {
+          fail();
+       }
+       
+       try
+       {
+           
+           tx.commit();
+           
+           fail(); 
+       }
+       catch (final HeuristicMixedException ex)
+       {
+          assertEquals(XAException.XA_HEURMIX, ((XAException) ex.getSuppressed()[0]).errorCode);
+       }
+   }
+   
+   @Test
+   public void testCheckDeferredHeuristicRollbackFirstResourceFails() throws Exception
+   {
+       ThreadActionData.purgeActions();
+       TxControl.setXANodeName("test");
+       TransactionImple tx = new TransactionImple(500);
 
-        try {
-            tx.commit();
+       try
+       {
+          tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
+          tx.enlistResource(new TestResource());
+       }
+       catch (final RollbackException ex)
+       {
+          fail();
+       }
+       
+       try
+       {
+           tx.commit();
+           
+           fail(); 
+       }
+       catch (final HeuristicMixedException ex)
+       {
+          assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
+       }
+   }
+   
+   @Test
+   public void testCheckDeferredHeuristicRollbackSecondResourceFails() throws Exception
+   {
+       ThreadActionData.purgeActions();
+       TxControl.setXANodeName("test");
+       TransactionImple tx = new TransactionImple(500);
 
-            fail();
-        } catch (final RollbackException ex) {
-            assertEquals(XAException.XA_HEURRB, ((XAException) ex.getSuppressed()[0]).errorCode);
-        }
-    }
+       try
+       {
+          tx.enlistResource(new TestResource());
+          tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
+       }
+       catch (final RollbackException ex)
+       {
+          fail();
+       }
+       
+       try
+       {
+           tx.commit();
+           
+           fail(); 
+       }
+       catch (final HeuristicMixedException ex)
+       {
+          assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
+       }
+   }
+   
+   @Test
+   public void testCheckDeferredHeuristicRollbackSecondOfThreeFails() throws Exception
+   {
+      ThreadActionData.purgeActions();
+      TxControl.setXANodeName("test");
+      TransactionImple tx = new TransactionImple(500);
 
-    @Test
-    public void testCheckDeferredHeuristicException() throws Exception {
-        ThreadActionData.purgeActions();
-
-        TransactionImple tx = new TransactionImple(0);
-
-        try {
-            tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.normal));
-        } catch (final RollbackException ex) {
-            fail();
-        }
-
-        try {
-
-            tx.commit();
-
-            fail();
-        } catch (final HeuristicMixedException ex) {
-            assertEquals(XAException.XA_HEURMIX, ((XAException) ex.getSuppressed()[0]).errorCode);
-        }
-    }
-
-    @Test
-    public void testCheckDeferredHeuristicRollbackFirstResourceFails() throws Exception {
-        ThreadActionData.purgeActions();
-        TxControl.setXANodeName("test");
-        TransactionImple tx = new TransactionImple(500);
-
-        try {
-            tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
-            tx.enlistResource(new TestResource());
-        } catch (final RollbackException ex) {
-            fail();
-        }
-
-        try {
-            tx.commit();
-
-            fail();
-        } catch (final HeuristicMixedException ex) {
-            assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
-        }
-    }
-
-    @Test
-    public void testCheckDeferredHeuristicRollbackSecondResourceFails() throws Exception {
-        ThreadActionData.purgeActions();
-        TxControl.setXANodeName("test");
-        TransactionImple tx = new TransactionImple(500);
-
-        try {
-            tx.enlistResource(new TestResource());
-            tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
-        } catch (final RollbackException ex) {
-            fail();
-        }
-
-        try {
-            tx.commit();
-
-            fail();
-        } catch (final HeuristicMixedException ex) {
-            assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
-        }
-    }
-
-    @Test
-    public void testCheckDeferredHeuristicRollbackSecondOfThreeFails() throws Exception {
-        ThreadActionData.purgeActions();
-        TxControl.setXANodeName("test");
-        TransactionImple tx = new TransactionImple(500);
-
-        try {
-            tx.enlistResource(new TestResource());
-            tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
-            tx.enlistResource(new TestResource());
-        } catch (final RollbackException ex) {
-            fail();
-        }
-
-        try {
-            tx.commit();
-
-            fail();
-        } catch (final HeuristicMixedException ex) {
-            assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
-        }
-    }
+      try
+      {
+         tx.enlistResource(new TestResource());
+         tx.enlistResource(new FailureXAResource(FailLocation.commit, FailType.nota));
+         tx.enlistResource(new TestResource());
+      }
+      catch (final RollbackException ex)
+      {
+         fail();
+      }
+      
+      try
+      {
+          tx.commit();
+          
+          fail(); 
+      }
+      catch (final HeuristicMixedException ex)
+      {
+         assertEquals(XAException.XAER_NOTA, ((XAException) ex.getSuppressed()[0]).errorCode);
+      }
+   }
 
 }

@@ -11,18 +11,20 @@ import com.arjuna.wstx.tests.arq.WarDeployment;
 
 @RunWith(Arquillian.class)
 public class NullRollbackTransactionTest {
-
+    
     @Deployment
     public static WebArchive createDeployment() {
         return WarDeployment.getDeployment();
     }
 
     @Test
-    public void testNullRollbackTransaction() throws Exception {
+    public void testNullRollbackTransaction()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
 
         ut.begin();
 
         ut.rollback();
-    }
+            }
 }

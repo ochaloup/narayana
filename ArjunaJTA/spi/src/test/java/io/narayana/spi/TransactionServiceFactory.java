@@ -44,22 +44,19 @@ public class TransactionServiceFactory {
     private static boolean replacedJndiProperties = false;
 
     /**
-     * Makes the transaction service available by bind various transaction
-     * related object into the default JNDI tree.
-     * 
-     * @param startRecoveryService
-     *            set to true to start the recovery service.
-     * @throws InitializationException
-     *             if no usable InitialContext is available
+     * Makes the transaction service available by bind various transaction related object into the default
+     * JNDI tree.
+     * @param startRecoveryService set to true to start the recovery service.
+     * @throws InitializationException if no usable InitialContext is available
      */
     public static synchronized void start(boolean startRecoveryService) throws InitializationException {
         if (initialized)
             return;
 
         try {
-            initialContext = new InitialContext();
+            initialContext =  new InitialContext();
 
-            replacedJndiProperties = jdbcPropertyManager.getJDBCEnvironmentBean().getJndiProperties().size() == 0;
+            replacedJndiProperties =  jdbcPropertyManager.getJDBCEnvironmentBean().getJndiProperties().size() == 0;
 
             if (replacedJndiProperties)
                 jdbcPropertyManager.getJDBCEnvironmentBean().setJndiProperties(initialContext.getEnvironment());
@@ -92,9 +89,9 @@ public class TransactionServiceFactory {
         });
     }
 
+
     /**
-     * Stop the transaction service. If the recovery manager was started
-     * previously then it to will be stopped.
+     * Stop the transaction service. If the recovery manager was started previously then it to will be stopped.
      */
     public static synchronized void stop() {
         if (!initialized)
@@ -122,12 +119,11 @@ public class TransactionServiceFactory {
 
     private static void startRecoveryService() {
         if (recoveryManager == null) {
-            final RecoveryEnvironmentBean recoveryEnvironmentBean = recoveryPropertyManager
-                    .getRecoveryEnvironmentBean();
+            final RecoveryEnvironmentBean recoveryEnvironmentBean = recoveryPropertyManager.getRecoveryEnvironmentBean();
 
-            recoveryEnvironmentBean.setRecoveryModuleClassNames(
-                    Arrays.asList("com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
-                            "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule"));
+            recoveryEnvironmentBean.setRecoveryModuleClassNames(Arrays.asList(
+                    "com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
+                    "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule"));
 
             RecoveryManager.delayRecoveryManagerThread();
 
@@ -143,8 +139,7 @@ public class TransactionServiceFactory {
             JNDIManager.bindJTAUserTransactionImplementation(initialContext);
             jndiBindings.add(jtaPropertyManager.getJTAEnvironmentBean().getUserTransactionJNDIContext());
             JNDIManager.bindJTATransactionSynchronizationRegistryImplementation(initialContext);
-            jndiBindings
-                    .add(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
+            jndiBindings.add(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
         } catch (NamingException e) {
             if (tsLogger.logger.isInfoEnabled())
                 tsLogger.logger.infof("Unable to bind TM into JNDI: %s", e.getMessage());

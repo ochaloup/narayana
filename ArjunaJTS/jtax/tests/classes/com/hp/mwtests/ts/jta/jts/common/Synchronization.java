@@ -33,14 +33,17 @@ package com.hp.mwtests.ts.jta.jts.common;
 
 import com.arjuna.ats.jta.utils.JTAHelper;
 
-public class Synchronization implements javax.transaction.Synchronization {
+public class Synchronization implements javax.transaction.Synchronization
+{
 
-    public void beforeCompletion() {
-        System.out.println("beforeCompletion called");
+    public void beforeCompletion ()
+    {
+    System.out.println("beforeCompletion called");
     }
 
-    public void afterCompletion(int status) {
-        System.out.println("afterCompletion called: " + JTAHelper.stringForm(status));
+    public void afterCompletion (int status)
+    {
+    System.out.println("afterCompletion called: "+JTAHelper.stringForm(status));
     }
-
+ 
 }

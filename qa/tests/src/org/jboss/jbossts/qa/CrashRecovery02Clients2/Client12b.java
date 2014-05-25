@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.CrashRecovery02Clients2;
  * $Id: Client12b.java,v 1.2 2003/06/26 11:43:20 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -64,19 +65,20 @@ import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 import org.omg.CosTransactions.*;
 
-public class Client12b {
-    public static void main(String[] args) {
-        try {
+public class Client12b
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
-            BeforeCrashService service1 = BeforeCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR1));
+            BeforeCrashService service1 = BeforeCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR1));
 
             String serviceIOR2 = ServerIORStore.loadIOR(args[args.length - 1]);
-            BeforeCrashService service2 = BeforeCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR2));
+            BeforeCrashService service2 = BeforeCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR2));
 
             ResourceBehavior[] resourceBehaviors1 = new ResourceBehavior[1];
             resourceBehaviors1[0] = new ResourceBehavior();
@@ -95,35 +97,48 @@ public class Client12b {
 
             correct = correct && service1.is_correct();
             correct = correct && service2.is_correct();
-
+                        
             /*
-             * Prepare followed by a crash should eventually resolve to a
-             * rollback, but we have no way of communicating that to the root
-             * coordinator or guaranteeing it anyway. So heuristic outcomes are
-             * the only option now.
+             * Prepare followed by a crash should eventually resolve to
+             * a rollback, but we have no way of communicating that to the
+             * root coordinator or guaranteeing it anyway. So heuristic outcomes
+             * are the only option now.
              */
-
-            try {
+            
+            try
+            {
                 OTS.current().commit(false);
-            } catch (final HeuristicHazard ex) {
-            } catch (TRANSACTION_ROLLEDBACK transactionRolledback) {
+            }
+            catch (final HeuristicHazard ex)
+            {
+            }
+            catch (TRANSACTION_ROLLEDBACK transactionRolledback)
+            {
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client12b.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client12b.main: " + exception);
             exception.printStackTrace(System.err);
         }

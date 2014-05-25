@@ -48,31 +48,34 @@ import javax.transaction.xa.Xid;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SubordinateTxUnitTest {
+public class SubordinateTxUnitTest
+{
     @Test
-    public void testTransactionImple() throws Exception {
+    public void testTransactionImple () throws Exception
+    {
         TransactionImple tx = new TransactionImple(new Uid());
         TransactionImple dummy = new TransactionImple(new Uid());
-
+        
         tx.recordTransaction();
-
+        
         assertFalse(tx.equals(dummy));
-
+        
         assertTrue(tx.toString() != null);
-
+        
         tx.recover();
     }
-
+    
     @Test
-    public void testAtomicAction() throws Exception {
+    public void testAtomicAction () throws Exception
+    {
         SubordinateAtomicAction saa1 = new SubordinateAtomicAction();
         SubordinateAtomicAction saa2 = new SubordinateAtomicAction(new Uid());
         OutputObjectState os = new OutputObjectState();
-
+        
         assertTrue(saa1.save_state(os, ObjectType.ANDPERSISTENT));
-
+        
         InputObjectState is = new InputObjectState(os);
-
+        
         assertTrue(saa2.restore_state(is, ObjectType.ANDPERSISTENT));
     }
 
@@ -154,12 +157,6 @@ public class SubordinateTxUnitTest {
 
         saa.doCommit();
         SubordinateAtomicAction saa3 = new SubordinateAtomicAction(saa.get_uid(), true);
-        assertTrue(saa3.getXid() == null); // Since the SAA was committed the
-                                            // transaction log record will have
-                                            // been removed so the xid returned
-                                            // from getXid() should no longer be
-                                            // available and the intention is
-                                            // the SAA creator would disregard
-                                            // this instance
+        assertTrue(saa3.getXid() == null); // Since the SAA was committed the transaction log record will have been removed so the xid returned from getXid() should no longer be available and the intention is the SAA creator would disregard this instance
     }
 }

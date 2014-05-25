@@ -35,49 +35,55 @@ import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.internal.jts.orbspecific.CurrentImple;
 import com.hp.mwtests.ts.jts.utils.Util;
 
-public class ThreadObject3a extends Thread {
+public class ThreadObject3a extends Thread
+{
 
-    public ThreadObject3a(boolean doCommit) {
-        if (doCommit)
-            _threadId = commitThreadId++;
+public ThreadObject3a (boolean doCommit)
+    {
+    if (doCommit)
+        _threadId = commitThreadId++;
+    else
+        _threadId = abortThreadId++;
+    
+    _commit = doCommit;
+    }
+
+public void run ()
+    {
+    CurrentImple current = OTSImpleManager.current();
+
+    try
+    {
+        current.begin();
+
+        Util.indent(_threadId, 0);
+        System.out.println("begin");
+
+        AtomicWorker3.randomOperation(_threadId, 0);
+        AtomicWorker3.randomOperation(_threadId, 0);
+
+        if (_commit)
+        current.commit(false);
         else
-            _threadId = abortThreadId++;
+        current.rollback();
 
-        _commit = doCommit;
+        Util.indent(_threadId, 0);
+
+        if (_commit)
+        System.out.println("end");
+        else
+        System.out.println("abort");
+    }
+    catch (Exception e)
+    {
+        System.err.println(e);
+    }
     }
 
-    public void run() {
-        CurrentImple current = OTSImpleManager.current();
+private int _threadId;
+private boolean _commit;
 
-        try {
-            current.begin();
-
-            Util.indent(_threadId, 0);
-            System.out.println("begin");
-
-            AtomicWorker3.randomOperation(_threadId, 0);
-            AtomicWorker3.randomOperation(_threadId, 0);
-
-            if (_commit)
-                current.commit(false);
-            else
-                current.rollback();
-
-            Util.indent(_threadId, 0);
-
-            if (_commit)
-                System.out.println("end");
-            else
-                System.out.println("abort");
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-    }
-
-    private int _threadId;
-    private boolean _commit;
-
-    private static int commitThreadId = 3;
-    private static int abortThreadId = 3;
-
+private static int commitThreadId = 3;
+private static int abortThreadId = 3;
+    
 };

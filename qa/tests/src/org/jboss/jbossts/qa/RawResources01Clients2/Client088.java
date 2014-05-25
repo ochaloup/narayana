@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.RawResources01Clients2;
  * $Id: Client088.java,v 1.3 2003/07/07 13:43:16 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.RawResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -63,9 +64,12 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CosTransactions.HeuristicHazard;
 
-public class Client088 {
-    public static void main(String[] args) {
-        try {
+public class Client088
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -100,21 +104,24 @@ public class Client088 {
 
             ResourceTrace expectedResourceTrace1 = ResourceTrace.ResourceTracePrepare;
 
-            try {
+            try
+            {
                 System.err.println("commit transaction");
                 OTS.current().commit(true);
                 System.err.println("transaction committed, no HeuristicHazard exception thrown - test failed");
                 System.err.println("Commit succeeded when it shouldn't");
                 correct = false;
-            } catch (HeuristicHazard heuristicHazard) {
-                // No exception used to be thrown, but this has been changed to
-                // HeuristicHazard from TeT 2.2.2.
+            }
+            catch (HeuristicHazard heuristicHazard)
+            {
+                // No exception used to be thrown, but this has been changed to HeuristicHazard from TeT 2.2.2.
                 // MKS 17/06/2002
                 System.err.println("expected HeuristicHazard exception thrown");
             }
 
             correct = correct && service1.is_correct() && service2.is_correct();
-            if (!correct) {
+            if (!correct)
+            {
                 System.err.println("service1.is_correct() or service2.is_correct() returned false");
             }
 
@@ -127,21 +134,29 @@ public class Client088 {
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTracePrepareRollbackForget);
             System.err.println("resourceTrace2 = " + resourceTrace2.value());
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client088.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client088.main: " + exception);
             exception.printStackTrace(System.err);
         }

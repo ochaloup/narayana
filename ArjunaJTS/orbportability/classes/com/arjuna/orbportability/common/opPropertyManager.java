@@ -38,8 +38,10 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  *
  * @author Richard Begg (richard_begg@hp.com)
  */
-public class opPropertyManager {
-    public static OrbPortabilityEnvironmentBean getOrbPortabilityEnvironmentBean() {
+public class opPropertyManager
+{
+    public static OrbPortabilityEnvironmentBean getOrbPortabilityEnvironmentBean()
+    {
         return BeanPopulator.getDefaultInstance(OrbPortabilityEnvironmentBean.class);
     }
 }

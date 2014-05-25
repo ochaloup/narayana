@@ -66,17 +66,18 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
  * existing one, FALSE otherwise.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: AbstractRecord.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: AbstractRecord.java 2342 2006-03-30 13:06:17Z  $
  * @since 1.0.
  */
 
-public abstract class AbstractRecord extends StateManager {
+public abstract class AbstractRecord extends StateManager
+{
 
     /**
      * @return <code>RecordType</code> value.
      */
 
-    public abstract int typeIs();
+    public abstract int typeIs ();
 
     /**
      * If this abstract record caused a heuristic then it should return an
@@ -85,9 +86,9 @@ public abstract class AbstractRecord extends StateManager {
      * @return <code>Object</code> to be used to order.
      */
 
-    public abstract Object value();
+    public abstract Object value ();
 
-    public abstract void setValue(Object o);
+    public abstract void setValue (Object o);
 
     /**
      * Atomic action interface - one operation per two-phase commit state.
@@ -100,7 +101,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int nestedAbort();
+    public abstract int nestedAbort ();
 
     /**
      * A commit of a nested transaction has occurred.
@@ -109,7 +110,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int nestedCommit();
+    public abstract int nestedCommit ();
 
     /**
      * A prepare for a nested transaction has occurred.
@@ -118,7 +119,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int nestedPrepare();
+    public abstract int nestedPrepare ();
 
     /**
      * A rollback of a top-level transaction has occurred.
@@ -127,7 +128,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int topLevelAbort();
+    public abstract int topLevelAbort ();
 
     /**
      * A commit of a top-level transaction has occurred.
@@ -136,7 +137,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int topLevelCommit();
+    public abstract int topLevelCommit ();
 
     /**
      * A prepare for a top-level transaction has occurred.
@@ -145,7 +146,7 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public abstract int topLevelPrepare();
+    public abstract int topLevelPrepare ();
 
     /**
      * Return the Uid of this abstract record so that it can be ordered in the
@@ -162,7 +163,8 @@ public abstract class AbstractRecord extends StateManager {
      * state to save).
      */
 
-    public Uid order() {
+    public Uid order ()
+    {
         return uidOfObject;
     }
 
@@ -174,7 +176,8 @@ public abstract class AbstractRecord extends StateManager {
      * @return <code>String</code> representing type.
      */
 
-    public String getTypeOfObject() {
+    public String getTypeOfObject ()
+    {
         return typeOfObject;
     }
 
@@ -187,7 +190,8 @@ public abstract class AbstractRecord extends StateManager {
      *         <code>false</code> otherwise. The default is <code>false</code>.
      */
 
-    public boolean propagateOnAbort() {
+    public boolean propagateOnAbort ()
+    {
         return false;
     }
 
@@ -200,7 +204,8 @@ public abstract class AbstractRecord extends StateManager {
      *         <code>false</code> otherwise. The default is <code>true</code>.
      */
 
-    public boolean propagateOnCommit() {
+    public boolean propagateOnCommit ()
+    {
         return true;
     }
 
@@ -217,7 +222,8 @@ public abstract class AbstractRecord extends StateManager {
      * @return <code>true</code> if equal, <code>false</code> otherwise.
      */
 
-    public final boolean equals(AbstractRecord ar) {
+    public final boolean equals (AbstractRecord ar)
+    {
         return (useAlternativeOrdering ? typeEquals(ar) : orderEquals(ar));
     }
 
@@ -228,7 +234,8 @@ public abstract class AbstractRecord extends StateManager {
      * @return <code>true</code> if equal, <code>false</code> otherwise.
      */
 
-    public final boolean lessThan(AbstractRecord ar) {
+    public final boolean lessThan (AbstractRecord ar)
+    {
         return (useAlternativeOrdering ? typeLessThan(ar) : orderLessThan(ar));
     }
 
@@ -239,7 +246,8 @@ public abstract class AbstractRecord extends StateManager {
      * @return <code>true</code> if equal, <code>false</code> otherwise.
      */
 
-    public final boolean greaterThan(AbstractRecord ar) {
+    public final boolean greaterThan (AbstractRecord ar)
+    {
         return (useAlternativeOrdering ? typeGreaterThan(ar) : orderGreaterThan(ar));
     }
 
@@ -253,7 +261,8 @@ public abstract class AbstractRecord extends StateManager {
      *         topLevelAbort.
      */
 
-    public int topLevelCleanup() {
+    public int topLevelCleanup ()
+    {
         return topLevelAbort();
     }
 
@@ -267,7 +276,8 @@ public abstract class AbstractRecord extends StateManager {
      *         nestedAbort.
      */
 
-    public int nestedCleanup() {
+    public int nestedCleanup ()
+    {
         return nestedAbort();
     }
 
@@ -281,7 +291,8 @@ public abstract class AbstractRecord extends StateManager {
      *         otherwise. <code>false</code> is the default.
      */
 
-    public boolean doSave() {
+    public boolean doSave ()
+    {
         return false;
     }
 
@@ -289,18 +300,19 @@ public abstract class AbstractRecord extends StateManager {
      * Re-implementation of abstract methods inherited from base class.
      */
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/AbstractRecord";
     }
 
     /**
      * Write information about this specific instance to the specified stream.
      *
-     * @param strm
-     *            the stream on which to output.
+     * @param strm the stream on which to output.
      */
 
-    public void print(PrintWriter strm) {
+    public void print (PrintWriter strm)
+    {
         strm.println("Uid of Managed Object: " + uidOfObject);
         strm.println("Type of Managed Object: " + typeOfObject);
         super.print(strm);
@@ -317,16 +329,21 @@ public abstract class AbstractRecord extends StateManager {
      * If a derived class calls super.save_state then it must be called before
      * packing any other data item.
      *
-     * @return <code>true</code> if successful, <code>false</code> otherwise.
+     * @return <code>true</code> if successful, <code>false</code>
+     *         otherwise.
      */
 
-    public boolean save_state(OutputObjectState os, int i) {
-        try {
+    public boolean save_state (OutputObjectState os, int i)
+    {
+        try
+        {
             UidHelper.packInto(uidOfObject, os);
             os.packString(typeOfObject);
 
             return true;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             return false;
         }
     }
@@ -341,18 +358,23 @@ public abstract class AbstractRecord extends StateManager {
      *
      * Data items must be unpacked in the same order that they were packed.
      *
-     * @return <code>true</code> if successful, <code>false</code> otherwise.
+     * @return <code>true</code> if successful, <code>false</code>
+     *         otherwise.
      */
 
-    public boolean restore_state(InputObjectState os, int i) {
+    public boolean restore_state (InputObjectState os, int i)
+    {
         typeOfObject = null;
 
-        try {
+        try
+        {
             uidOfObject = UidHelper.unpackFrom(os);
             typeOfObject = os.unpackString();
 
             return true;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             return false;
         }
     }
@@ -360,14 +382,15 @@ public abstract class AbstractRecord extends StateManager {
     /**
      * Forget any heuristic outcome which this implementation may have produced.
      *
-     * @return <code>true</code> by default. If <code>false</code> is returned
-     *         then the instance must be remembered by the transaction (in the
-     *         log) in order for recovery to retry later or for a system
+     * @return <code>true</code> by default. If <code>false</code> is
+     *         returned then the instance must be remembered by the transaction
+     *         (in the log) in order for recovery to retry later or for a system
      *         administrator to be able to determine which resources have not
      *         been successfully completed.
      */
 
-    public boolean forgetHeuristic() {
+    public boolean forgetHeuristic ()
+    {
         return true;
     }
 
@@ -378,16 +401,18 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public int nestedOnePhaseCommit() {
+    public int nestedOnePhaseCommit ()
+    {
         int res = nestedPrepare();
 
-        switch (res) {
-            case TwoPhaseOutcome.PREPARE_OK :
-                return nestedCommit();
-            case TwoPhaseOutcome.PREPARE_READONLY :
-                return TwoPhaseOutcome.FINISH_OK;
-            default :
-                return TwoPhaseOutcome.FINISH_ERROR;
+        switch (res)
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+            return nestedCommit();
+        case TwoPhaseOutcome.PREPARE_READONLY:
+            return TwoPhaseOutcome.FINISH_OK;
+        default:
+            return TwoPhaseOutcome.FINISH_ERROR;
         }
     }
 
@@ -398,34 +423,42 @@ public abstract class AbstractRecord extends StateManager {
      * @see com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome
      */
 
-    public int topLevelOnePhaseCommit() {
+    public int topLevelOnePhaseCommit ()
+    {
         int res = topLevelPrepare();
 
-        switch (res) {
-            case TwoPhaseOutcome.PREPARE_OK :
-                return topLevelCommit();
-            case TwoPhaseOutcome.PREPARE_READONLY :
-                return TwoPhaseOutcome.FINISH_OK;
-            case TwoPhaseOutcome.ONE_PHASE_ERROR :
-                return TwoPhaseOutcome.ONE_PHASE_ERROR;
-            default :
-                return TwoPhaseOutcome.FINISH_ERROR;
+        switch (res)
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+            return topLevelCommit();
+        case TwoPhaseOutcome.PREPARE_READONLY:
+            return TwoPhaseOutcome.FINISH_OK;
+        case TwoPhaseOutcome.ONE_PHASE_ERROR:
+            return TwoPhaseOutcome.ONE_PHASE_ERROR;
+        default:
+            return TwoPhaseOutcome.FINISH_ERROR;
         }
     }
 
+    
     @SuppressWarnings("unchecked")
-    public static AbstractRecord create(int type) {
-        try {
-            Class recordClass = RecordType.typeToClass(type);
-
-            return (AbstractRecord) recordClass.newInstance();
-        } catch (final NullPointerException ex) {
+        public static AbstractRecord create (int type)
+    {
+        try
+        {
+                Class recordClass = RecordType.typeToClass(type);
+        
+                return (AbstractRecord) recordClass.newInstance();
+        }
+        catch (final NullPointerException ex) {
             tsLogger.i18NLogger.warn_coordinator_AbstractRecord_npe(Integer.toString(type));
 
             return null;
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
             ex.printStackTrace();
-
+            
             return null;
         }
     }
@@ -433,75 +466,69 @@ public abstract class AbstractRecord extends StateManager {
     /**
      * Merge the current record with the one presented.
      *
-     * @param a
-     *            the record with which to merge.
+     * @param a the record with which to merge.
      */
 
-    public abstract void merge(AbstractRecord a);
+    public abstract void merge (AbstractRecord a);
 
     /**
      * Alter the current record with the one presented.
      *
-     * @param a
-     *            the record with which to alter.
+     * @param a the record with which to alter.
      */
 
-    public abstract void alter(AbstractRecord a);
+    public abstract void alter (AbstractRecord a);
 
     /**
      * Should we add the record presented to the intentions list?
      *
-     * @param a
-     *            The record to try to add.
+     * @param a The record to try to add.
      * @return <code>true</code> if the record should be added,
      *         <code>false</code> otherwise.
      */
 
-    public abstract boolean shouldAdd(AbstractRecord a);
+    public abstract boolean shouldAdd (AbstractRecord a);
 
     /**
      * Should we alter the current record with the one presented?
      *
-     * @param a
-     *            The record to try to alter.
+     * @param a The record to try to alter.
      * @return <code>true</code> if the record should be altered,
      *         <code>false</code> otherwise.
      */
 
-    public abstract boolean shouldAlter(AbstractRecord a);
+    public abstract boolean shouldAlter (AbstractRecord a);
 
     /**
      * Should we merge the current record with the one presented?
      *
-     * @param a
-     *            The record to try to merge.
+     * @param a The record to try to merge.
      * @return <code>true</code> if the record should be merged,
      *         <code>false</code> otherwise.
      */
 
-    public abstract boolean shouldMerge(AbstractRecord a);
+    public abstract boolean shouldMerge (AbstractRecord a);
 
     /**
      * Should we replace the record presented with the current record?
      *
-     * @param a
-     *            The record to try to replace.
+     * @param a The record to try to replace.
      * @return <code>true</code> if the record should be replaced,
      *         <code>false</code> otherwise.
      */
 
-    public abstract boolean shouldReplace(AbstractRecord a);
+    public abstract boolean shouldReplace (AbstractRecord a);
 
     /**
      * The current record is about to replace the one presented. This method is
      * invoked to give the current record a chance to copy information, for
      * example, from the record being replaced.
      *
-     * @param a
-     *            the record that will replace this instance.
+     * @param a the record that will replace this instance.
      */
 
-    public void replace(AbstractRecord a) {
+    public void replace (AbstractRecord a)
+    {
     }
 
     /**
@@ -511,7 +538,8 @@ public abstract class AbstractRecord extends StateManager {
      * @return the previous element in the intentions list, or null.
      */
 
-    protected final AbstractRecord getPrevious() {
+    protected final AbstractRecord getPrevious ()
+    {
         return previous;
     }
 
@@ -519,45 +547,44 @@ public abstract class AbstractRecord extends StateManager {
      * @return the next element in the intentions list, or null.
      */
 
-    protected final AbstractRecord getNext() {
+    protected final AbstractRecord getNext ()
+    {
         return next;
     }
 
     /**
      * Set the previous element in the list to the specified instance.
      *
-     * @param ar
-     *            the instance to become previous.
+     * @param ar the instance to become previous.
      */
 
-    protected final void setPrevious(AbstractRecord ar) {
+    protected final void setPrevious (AbstractRecord ar)
+    {
         previous = ar;
     }
 
     /**
      * Set the next element in the list to the specified instance.
      *
-     * @param ar
-     *            the instance to become next.
+     * @param ar the instance to become next.
      */
 
-    protected final void setNext(AbstractRecord ar) {
+    protected final void setNext (AbstractRecord ar)
+    {
         next = ar;
     }
 
     /**
      * Create a new instance with the specified parameters.
      *
-     * @param storeUid
-     *            the unique id for this instance.
-     * @param objType
-     *            the type of the instance.
-     * @param otype
-     *            the ObjectType of the object.
+     * @param storeUid the unique id for this instance.
+     * @param objType the type of the instance.
+     * @param otype the ObjectType of the object.
      * @see com.arjuna.ats.arjuna.ObjectType
      */
 
-    protected AbstractRecord(Uid storeUid, String objType, int otype) {
+    protected AbstractRecord (Uid storeUid, String objType, int otype)
+    {
         super(otype);
 
         next = null;
@@ -566,18 +593,19 @@ public abstract class AbstractRecord extends StateManager {
         typeOfObject = objType;
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("AbstractRecord::AbstractRecord (" + storeUid + ", " + otype + ")");
+            tsLogger.logger.trace("AbstractRecord::AbstractRecord ("
+                    + storeUid + ", " + otype + ")");
         }
     }
 
     /**
      * Create a new instance with the specified paramaters.
      *
-     * @param storeUid
-     *            the unique id for this instance.
+     * @param storeUid the unique id for this instance.
      */
 
-    protected AbstractRecord(Uid storeUid) {
+    protected AbstractRecord (Uid storeUid)
+    {
         super(storeUid);
 
         next = null;
@@ -586,7 +614,8 @@ public abstract class AbstractRecord extends StateManager {
         typeOfObject = null;
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("AbstractRecord::AbstractRecord (" + storeUid + ")");
+            tsLogger.logger.trace("AbstractRecord::AbstractRecord ("
+                    + storeUid + ")");
         }
     }
 
@@ -595,7 +624,8 @@ public abstract class AbstractRecord extends StateManager {
      * when recreating the prepared list of a server atomic action.
      */
 
-    public AbstractRecord() {
+    public AbstractRecord ()
+    {
         super(Uid.nullUid());
 
         next = null;
@@ -613,27 +643,33 @@ public abstract class AbstractRecord extends StateManager {
      * than grouping them by object (i.e. uid)
      */
 
-    private final boolean typeEquals(AbstractRecord ar) {
+    private final boolean typeEquals (AbstractRecord ar)
+    {
         return ((typeIs() == ar.typeIs()) && (order().equals(ar.order())));
     }
 
-    private final boolean typeLessThan(AbstractRecord ar) {
+    private final boolean typeLessThan (AbstractRecord ar)
+    {
         return ((typeIs() < ar.typeIs()) || ((typeIs() == ar.typeIs()) && (order().lessThan(ar.order()))));
     }
 
-    private final boolean typeGreaterThan(AbstractRecord ar) {
+    private final boolean typeGreaterThan (AbstractRecord ar)
+    {
         return ((typeIs() > ar.typeIs()) || ((typeIs() == ar.typeIs()) && (order().greaterThan(ar.order()))));
     }
 
-    private final boolean orderEquals(AbstractRecord ar) {
+    private final boolean orderEquals (AbstractRecord ar)
+    {
         return ((order().equals(ar.order())) && (typeIs() == ar.typeIs()));
     }
 
-    private final boolean orderLessThan(AbstractRecord ar) {
+    private final boolean orderLessThan (AbstractRecord ar)
+    {
         return ((order().lessThan(ar.order())) || ((order().equals(ar.order())) && (typeIs() < ar.typeIs())));
     }
 
-    private final boolean orderGreaterThan(AbstractRecord ar) {
+    private final boolean orderGreaterThan (AbstractRecord ar)
+    {
         return ((order().greaterThan(ar.order())) || ((order().equals(ar.order())) && (typeIs() > ar.typeIs())));
     }
 
@@ -642,6 +678,5 @@ public abstract class AbstractRecord extends StateManager {
     private Uid uidOfObject;
     private String typeOfObject;
 
-    private static final boolean useAlternativeOrdering = arjPropertyManager.getCoordinatorEnvironmentBean()
-            .isAlternativeRecordOrdering();
+    private static final boolean useAlternativeOrdering = arjPropertyManager.getCoordinatorEnvironmentBean().isAlternativeRecordOrdering();
 }

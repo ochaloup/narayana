@@ -31,18 +31,22 @@
 
 package com.hp.mwtests.ts.txoj.common.exceptions;
 
-public class TestException extends Exception {
+
+public class TestException extends Exception
+{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public TestException() {
+    public TestException()
+    {
         super();
     }
 
-    public TestException(String s) {
+    public TestException(String s)
+    {
         super(s);
     }
 

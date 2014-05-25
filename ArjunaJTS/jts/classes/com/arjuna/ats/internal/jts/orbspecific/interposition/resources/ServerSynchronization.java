@@ -43,9 +43,12 @@ import com.arjuna.ats.jts.exceptions.ExceptionCodes;
 import com.arjuna.ats.jts.logging.jtsLogger;
 import com.arjuna.ats.jts.utils.Utility;
 
-public class ServerSynchronization extends org.omg.CosTransactions.SynchronizationPOA {
+public class ServerSynchronization extends
+        org.omg.CosTransactions.SynchronizationPOA
+{
 
-    public ServerSynchronization(ServerTransaction topLevel) {
+    public ServerSynchronization(ServerTransaction topLevel)
+    {
         ORBManager.getPOA().objectIsReady(this);
 
         _theTransaction = topLevel;
@@ -53,32 +56,46 @@ public class ServerSynchronization extends org.omg.CosTransactions.Synchronizati
                 .narrow(ORBManager.getPOA().corbaReference(this));
     }
 
-    public final Synchronization getSynchronization() {
+    public final Synchronization getSynchronization()
+    {
         return _theSynchronization;
     }
 
-    public void destroy() {
-        try {
+    public void destroy()
+    {
+        try
+        {
             ORBManager.getPOA().shutdownObject(this);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_destroyfailed();
         }
     }
 
-    public void before_completion() throws SystemException {
+    public void before_completion() throws SystemException
+    {
         if (_theTransaction == null)
-            throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION, CompletionStatus.COMPLETED_NO);
-        else {
+            throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION,
+                    CompletionStatus.COMPLETED_NO);
+        else
+        {
             _theTransaction.doBeforeCompletion();
         }
     }
 
-    public void after_completion(org.omg.CosTransactions.Status status) throws SystemException {
-        if (_theTransaction == null) {
+    public void after_completion(org.omg.CosTransactions.Status status)
+            throws SystemException
+    {
+        if (_theTransaction == null)
+        {
             destroy();
 
-            throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION, CompletionStatus.COMPLETED_NO);
-        } else {
+            throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION,
+                    CompletionStatus.COMPLETED_NO);
+        }
+        else
+        {
             /*
              * Check that the given status is the same as our status. It should
              * be!
@@ -86,40 +103,45 @@ public class ServerSynchronization extends org.omg.CosTransactions.Synchronizati
 
             org.omg.CosTransactions.Status myStatus = org.omg.CosTransactions.Status.StatusUnknown;
 
-            try {
+            try
+            {
                 myStatus = _theTransaction.get_status();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 myStatus = org.omg.CosTransactions.Status.StatusUnknown;
             }
 
             if (myStatus != status) {
                 jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_stateerror(
-                        "ServerSynchronization.after_completion", Utility.stringStatus(myStatus),
-                        Utility.stringStatus(status));
+                        "ServerSynchronization.after_completion",
+                        Utility.stringStatus(myStatus), Utility.stringStatus(status));
 
                 /*
-                 * There's nothing much we can do, since the transaction should
-                 * have completed. The best we can hope for it to try to
-                 * rollback our portion of the transaction, but this may result
-                 * in heuristics (which may not be reported to the coordinator,
-                 * since exceptions from after_completion can be ignored in the
-                 * spec.)
-                 */
+                     * There's nothing much we can do, since the transaction should
+                     * have completed. The best we can hope for it to try to
+                     * rollback our portion of the transaction, but this may result
+                     * in heuristics (which may not be reported to the coordinator,
+                     * since exceptions from after_completion can be ignored in the
+                     * spec.)
+                     */
 
                 if (myStatus == Status.StatusActive) {
                     try {
                         _theTransaction.rollback();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                     }
 
                     /*
-                     * Get the local status to pass to our local
-                     * synchronizations.
-                     */
+                          * Get the local status to pass to our local
+                          * synchronizations.
+                          */
 
                     try {
                         status = _theTransaction.get_status();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         status = Status.StatusUnknown;
                     }
                 }

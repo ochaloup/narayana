@@ -47,25 +47,30 @@ import com.arjuna.ats.txoj.exceptions.LockStoreException;
  * @since JTS 1.0.
  */
 
-public abstract class LockStore {
-    public abstract InputObjectState read_state(Uid u, String tName) throws LockStoreException;
+public abstract class LockStore
+{
+    public abstract InputObjectState read_state (Uid u, String tName)
+            throws LockStoreException;
 
     /**
      * Remove the state from the lock store.
      */
 
-    public abstract boolean remove_state(Uid u, String tname);
+    public abstract boolean remove_state (Uid u, String tname);
 
     /**
      * Write the state to the lock store.
      */
 
-    public abstract boolean write_committed(Uid u, String tName, OutputObjectState state);
+    public abstract boolean write_committed (Uid u, String tName,
+            OutputObjectState state);
 
-    protected LockStore() {
+    protected LockStore ()
+    {       
     }
 
-    static {
+    static
+    {
         /*
          * Make sure the possible implementations are in the inventory.
          * Otherwise this is going to be a very short ride!

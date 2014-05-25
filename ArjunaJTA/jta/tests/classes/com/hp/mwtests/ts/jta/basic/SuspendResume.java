@@ -31,11 +31,14 @@
 
 package com.hp.mwtests.ts.jta.basic;
 
+
 import org.junit.Test;
 
-public class SuspendResume {
+public class SuspendResume
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();

@@ -26,11 +26,14 @@
 
 package com.arjuna.wsc;
 
-public class AlreadyRegisteredException extends Exception {
-    public AlreadyRegisteredException() {
+public class AlreadyRegisteredException extends Exception
+{
+    public AlreadyRegisteredException()
+    {
     }
 
-    public AlreadyRegisteredException(String message) {
+    public AlreadyRegisteredException(String message)
+    {
         super(message);
     }
 }

@@ -37,24 +37,29 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.state.InputBuffer;
 import com.arjuna.ats.arjuna.state.OutputBuffer;
 
-public class UidHelper {
-    public static final Uid unpackFrom(InputBuffer buff) throws IOException {
+public class UidHelper
+{
+    public static final Uid unpackFrom (InputBuffer buff) throws IOException
+    {
         if (buff == null)
             throw new IllegalArgumentException();
-
+        
         return new Uid(buff.unpackBytes());
     }
 
-    public static final void packInto(Uid u, OutputBuffer buff) throws IOException {
+    public static final void packInto (Uid u, OutputBuffer buff)
+            throws IOException
+    {
         if ((u == null) || (buff == null))
             throw new IllegalArgumentException();
-
+        
         if (u.valid())
             buff.packBytes(u.getBytes());
         else
             throw new IllegalArgumentException();
     }
 
-    private UidHelper() {
+    private UidHelper()
+    {
     }
 }

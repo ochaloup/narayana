@@ -56,24 +56,26 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients2;
  * $Id: Client01a.java,v 1.2 2003/06/26 11:43:31 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery05.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client01a extends ClientBase {
-    public static void main(String[] args) {
-        try {
+public class Client01a extends ClientBase
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             init(args, null);
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
-            AfterCrashService service1 = AfterCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR1));
+            AfterCrashService service1 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR1));
 
             String serviceIOR2 = ServerIORStore.loadIOR(args[args.length - 1]);
-            AfterCrashService service2 = AfterCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR2));
+            AfterCrashService service2 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR2));
 
             CheckBehavior[] checkBehaviors1 = new CheckBehavior[1];
             checkBehaviors1[0] = new CheckBehavior();
@@ -103,26 +105,27 @@ public class Client01a extends ClientBase {
             correct = updateResult(correct, service1.is_correct());
             correct = updateResult(correct, service2.is_correct());
 
-            CrashRecoveryDelays.awaitReplayCompletionCR05(5); // scale factor
-                                                                // could maybe
-                                                                // be reduced
+            CrashRecoveryDelays.awaitReplayCompletionCR05(5); // scale factor could maybe be reduced
 
             ResourceTrace resourceTrace1 = service1.get_resource_trace(0);
             ResourceTrace resourceTrace2 = service2.get_resource_trace(0);
 
-            System.out.printf("Client01a check: resourceTrace1=%d resourceTrace2=%d%n", resourceTrace1.value(),
-                    resourceTrace2.value());
+            System.out.printf("Client01a check: resourceTrace1=%d resourceTrace2=%d%n", resourceTrace1.value(), resourceTrace2.value());
 
-            correct = updateResult(correct, ((resourceTrace1 == ResourceTrace.ResourceTraceNone)
-                    || (resourceTrace1 == ResourceTrace.ResourceTraceCommit)));
+            correct = updateResult(correct, ((resourceTrace1 == ResourceTrace.ResourceTraceNone) || (resourceTrace1 == ResourceTrace.ResourceTraceCommit)));
             correct = updateResult(correct, (resourceTrace2 == ResourceTrace.ResourceTraceCommit));
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
@@ -130,7 +133,9 @@ public class Client01a extends ClientBase {
 
         try {
             fini();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }

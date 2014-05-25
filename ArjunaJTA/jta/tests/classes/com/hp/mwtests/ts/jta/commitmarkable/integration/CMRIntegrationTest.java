@@ -67,10 +67,14 @@ public class CMRIntegrationTest {
 
     @Deployment
     public static JavaArchive createTestArchive() {
-        return ShrinkWrap.create(JavaArchive.class, "test.jar").addClasses(DummyXAResource.class, Utils.class)
+        return ShrinkWrap
+                .create(JavaArchive.class, "test.jar")
+                .addClasses(DummyXAResource.class, Utils.class)
                 .addPackage("io.narayana.connectableresource")
-                .addAsManifestResource(new StringAsset(DEPENDENCIES), "MANIFEST.MF")
-                .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
+                .addAsManifestResource(new StringAsset(DEPENDENCIES),
+                        "MANIFEST.MF")
+                .addAsManifestResource(EmptyAsset.INSTANCE,
+                        ArchivePaths.create("beans.xml"));
     }
 
     @Resource(mappedName = "java:jboss/datasources/ExampleDS")
@@ -150,18 +154,21 @@ public class CMRIntegrationTest {
 
                     int success = 0;
                     Connection connection = null;
-                    int faultType = Integer
-                            .getInteger("com.hp.mwtests.ts.jta.commitmarkable.integration.CMRIntegrationTest", 0);
+                    int faultType = Integer.getInteger(
+                        "com.hp.mwtests.ts.jta.commitmarkable.integration.CMRIntegrationTest", 0);
 
                     for (int i = 0; i < iterationCount; i++) {
                         try {
                             userTransaction.begin();
-                            tm.getTransaction().enlistResource(new DummyXAResource());
+                            tm.getTransaction().enlistResource(
+                                    new DummyXAResource());
 
                             connection = dataSource.getConnection();
 
-                            Statement createStatement = connection.createStatement();
-                            createStatement.execute("INSERT INTO foo (bar) VALUES (1)");
+                            Statement createStatement = connection
+                                    .createStatement();
+                            createStatement
+                                    .execute("INSERT INTO foo (bar) VALUES (1)");
                             // System.out.printf("XXX txn close%n");
 
                             if (faultType == 1)
@@ -186,7 +193,8 @@ public class CMRIntegrationTest {
                             SQLException nextException = e.getNextException();
                             while (nextException != null) {
                                 nextException.printStackTrace();
-                                nextException = nextException.getNextException();
+                                nextException = nextException
+                                        .getNextException();
                             }
                             Throwable[] suppressed = e.getSuppressed();
                             for (int j = 0; j < suppressed.length; j++) {
@@ -194,12 +202,15 @@ public class CMRIntegrationTest {
                             }
                             try {
                                 userTransaction.rollback();
-                            } catch (IllegalStateException | SecurityException | SystemException e1) {
+                            } catch (IllegalStateException | SecurityException
+                                    | SystemException e1) {
                                 e1.printStackTrace();
                                 fail("Problem with transaction");
                             }
-                        } catch (NotSupportedException | SystemException | IllegalStateException | RollbackException
-                                | SecurityException | HeuristicMixedException | HeuristicRollbackException e) {
+                        } catch (NotSupportedException | SystemException
+                                | IllegalStateException | RollbackException
+                                | SecurityException | HeuristicMixedException
+                                | HeuristicRollbackException e) {
                             e.printStackTrace();
                             fail("Problem with transaction");
                         } finally {
@@ -241,28 +252,34 @@ public class CMRIntegrationTest {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println(new Date() + "  Number of transactions: " + totalExecuted.intValue());
+        System.out.println(new Date() + "  Number of transactions: "
+                + totalExecuted.intValue());
 
         long additionalCleanuptime = 0L; // postRunCleanup(dataSource);
 
         long timeInMillis = (endTime - startTime) + additionalCleanuptime;
         System.out.printf("  Total time millis: %d%n", timeInMillis);
-        System.out.printf("  Average transaction time: %d%n", timeInMillis / totalExecuted.intValue());
-        System.out.printf("  Transactions per second: %d%n",
-                Math.round((totalExecuted.intValue() / (timeInMillis / 1000d))));
+        System.out.printf("  Average transaction time: %d%n", timeInMillis
+                / totalExecuted.intValue());
+        System.out
+                .printf("  Transactions per second: %d%n",
+                        Math.round((totalExecuted.intValue() / (timeInMillis / 1000d))));
 
         checkFooSize(dataSource);
     }
 
-    private void checkSize(String string, Statement statement, int expected) throws SQLException {
-        ResultSet result = statement.executeQuery("select count(*) from " + string);
+    private void checkSize(String string, Statement statement, int expected)
+            throws SQLException {
+        ResultSet result = statement.executeQuery("select count(*) from "
+                + string);
         result.next();
         int actual = result.getInt(1);
         result.close();
         assertEquals(expected, actual);
     }
 
-    public void checkFooSize(DataSource dataSource) throws SQLException, HeuristicRollbackException, RollbackException,
+    public void checkFooSize(DataSource dataSource) throws SQLException,
+            HeuristicRollbackException, RollbackException,
             HeuristicMixedException, SystemException, NotSupportedException {
         userTransaction.begin();
         Connection connection = dataSource.getConnection();
@@ -294,18 +311,22 @@ public class CMRIntegrationTest {
         return null;
     }
 
-    public long postRunCleanup(DataSource dataSource) throws SQLException, ObjectStoreException {
+    public long postRunCleanup(DataSource dataSource) throws SQLException,
+            ObjectStoreException {
 
         Connection connection = dataSource.getConnection();
         CommitMarkableResourceRecordRecoveryModule crrrm = getCRRRM();
 
-        int expectedReapableConnectableResourceRecords = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
-                .isPerformImmediateCleanupOfCommitMarkableResourceBranches() ? 0 : threadCount * iterationCount;
+        int expectedReapableConnectableResourceRecords = BeanPopulator
+                .getDefaultInstance(JTAEnvironmentBean.class)
+                .isPerformImmediateCleanupOfCommitMarkableResourceBranches() ? 0
+                : threadCount * iterationCount;
 
         try {
             Statement statement = connection.createStatement();
 
-            checkSize("xids", statement, expectedReapableConnectableResourceRecords);
+            checkSize("xids", statement,
+                    expectedReapableConnectableResourceRecords);
 
             if (expectedReapableConnectableResourceRecords > 0) {
                 // The recovery module has to perform lookups
@@ -319,8 +340,10 @@ public class CMRIntegrationTest {
                 checkSize("xids", statement, 0);
                 statement.close();
 
-                System.out.println("  Total cleanup time: " + (endTime - startTime) + " Average cleanup time: "
-                        + (endTime - startTime) / expectedReapableConnectableResourceRecords);
+                System.out.println("  Total cleanup time: "
+                        + (endTime - startTime) + " Average cleanup time: "
+                        + (endTime - startTime)
+                        / expectedReapableConnectableResourceRecords);
 
                 return endTime - startTime;
             } else {

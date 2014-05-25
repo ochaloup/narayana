@@ -50,78 +50,98 @@ public class RegistrationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    public void testAlreadyRegisteredProtocolIdentifierException() throws Exception {
-        final String messageId = "testAlreadyRegisteredProtocolIdentifierException";
-        final String protocolIdentifier = TestUtil.ALREADY_REGISTERED_PROTOCOL_IDENTIFIER;
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+    public void testAlreadyRegisteredProtocolIdentifierException()
+            throws Exception
+            {
+        final String messageId = "testAlreadyRegisteredProtocolIdentifierException" ;
+        final String protocolIdentifier = TestUtil.ALREADY_REGISTERED_PROTOCOL_IDENTIFIER ;
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         final CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
         coordinationContext.setIdentifier(identifierInstance);
-        identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        identifierInstance.setValue("identifier") ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try {
-            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier);
-        } catch (final CannotRegisterException cre) {
-        } catch (final Throwable th) {
-            fail("Unexpected exception: " + th);
+        try
+        {
+            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
         }
-    }
+        catch (final CannotRegisterException cre) {}
+        catch (final Throwable th)
+        {
+            fail("Unexpected exception: " + th) ;
+        }
+            }
 
     @Test
-    public void testInvalidProtocolProtocolIdentifierException() throws Exception {
-        final String messageId = "testInvalidProtocolProtocolIdentifierException";
-        final String protocolIdentifier = TestUtil.INVALID_PROTOCOL_PROTOCOL_IDENTIFIER;
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+    public void testInvalidProtocolProtocolIdentifierException()
+            throws Exception
+            {
+        final String messageId = "testInvalidProtocolProtocolIdentifierException" ;
+        final String protocolIdentifier = TestUtil.INVALID_PROTOCOL_PROTOCOL_IDENTIFIER ;
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         final CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
         coordinationContext.setIdentifier(identifierInstance);
-        identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        identifierInstance.setValue("identifier") ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try {
-            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier);
-        } catch (final InvalidProtocolException ipe) {
-        } catch (final Throwable th) {
-            fail("Unexpected exception: " + th);
+        try
+        {
+            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
         }
-    }
+        catch (final InvalidProtocolException ipe) {}
+        catch (final Throwable th)
+        {
+            fail("Unexpected exception: " + th) ;
+        }
+            }
 
     @Test
-    public void testInvalidStateProtocolIdentifierException() throws Exception {
-        final String messageId = "testInvalidStateProtocolIdentifierException";
-        final String protocolIdentifier = TestUtil.INVALID_STATE_PROTOCOL_IDENTIFIER;
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+    public void testInvalidStateProtocolIdentifierException()
+            throws Exception
+            {
+        final String messageId = "testInvalidStateProtocolIdentifierException" ;
+        final String protocolIdentifier = TestUtil.INVALID_STATE_PROTOCOL_IDENTIFIER ;
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         final CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
         coordinationContext.setIdentifier(identifierInstance);
-        identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        identifierInstance.setValue("identifier") ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try {
-            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier);
-        } catch (final InvalidStateException ise) {
-        } catch (final Throwable th) {
-            fail("Unexpected exception: " + th);
+        try
+        {
+            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
         }
-    }
+        catch (final InvalidStateException ise) {}
+        catch (final Throwable th)
+        {
+            fail("Unexpected exception: " + th) ;
+        }
+            }
 
     @Test
-    public void testNoActivityProtocolIdentifierException() throws Exception {
-        final String messageId = "testNoActivityProtocolIdentifierException";
-        final String protocolIdentifier = TestUtil.NO_ACTIVITY_PROTOCOL_IDENTIFIER;
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+    public void testNoActivityProtocolIdentifierException()
+            throws Exception
+            {
+        final String messageId = "testNoActivityProtocolIdentifierException" ;
+        final String protocolIdentifier = TestUtil.NO_ACTIVITY_PROTOCOL_IDENTIFIER ;
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         final CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
         coordinationContext.setIdentifier(identifierInstance);
-        identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        identifierInstance.setValue("identifier") ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try {
-            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier);
-        } catch (final CannotRegisterException nae) {
-        } catch (final Throwable th) {
-            fail("Unexpected exception: " + th);
+        try
+        {
+            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
         }
-    }
+        catch (final CannotRegisterException nae) {}
+        catch (final Throwable th)
+        {
+            fail("Unexpected exception: " + th) ;
+        }
+            }
 }

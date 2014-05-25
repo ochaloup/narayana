@@ -38,10 +38,10 @@ import com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor;
  * A convenience class used to invoke an XTS ServiceTest server.
  */
 
-public class XTSServiceTestClient {
+public class XTSServiceTestClient
+{
     /**
-     * all Clients employ a single service instance from which to clone port
-     * instances
+     * all Clients employ a single service instance from which to clone port instances
      */
     final private static XTSServiceTestService service = new XTSServiceTestService();
 
@@ -51,29 +51,27 @@ public class XTSServiceTestClient {
     private XTSServiceTestPortType port;
 
     /**
-     * create a client which can be used to make repeated invocations of the
-     * test web service methods
+     * create a client which can be used to make repeated invocations of the test web service methods
      */
-    public XTSServiceTestClient() {
+    public XTSServiceTestClient()
+    {
         // create a port and configure it with the WS context handler
         port = service.getXTSServiceTestPortType();
         List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(new JaxWSHeaderContextProcessor());
-        ((BindingProvider) port).getBinding().setHandlerChain(handlerChain);
+        ((BindingProvider)port).getBinding().setHandlerChain(handlerChain);
     }
 
     /**
      * invoke a web service at a specified URL
-     * 
      * @param serverURL
-     * @param commands
-     *            a list of operations to be performed by the web service
-     * @return a list of zero or more results identifying the outcomes of the
-     *         operations
+     * @param commands a list of operations to be performed by the web service
+     * @return a list of zero or more results identifying the outcomes of the operations
      */
-    public synchronized ResultsType serve(String serverURL, CommandsType commands) {
+    public synchronized ResultsType serve(String serverURL, CommandsType commands)
+    {
 
-        Map<String, Object> requestProperties = ((BindingProvider) port).getRequestContext();
+        Map<String, Object> requestProperties = ((BindingProvider)port).getRequestContext();
         requestProperties.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverURL);
 
         CommandsType commandsType = new CommandsType();

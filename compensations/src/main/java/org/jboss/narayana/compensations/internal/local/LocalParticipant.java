@@ -64,8 +64,8 @@ public class LocalParticipant implements BAParticipant, Participant {
     }
 
     public LocalParticipant(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
-            TransactionLoggedHandler transactionLoggedHandler, CurrentTransaction currentTransaction,
-            String participantId, String coordinatorId, CompensationContextStateManager compensationContextStateManager,
+            TransactionLoggedHandler transactionLoggedHandler, CurrentTransaction currentTransaction, String participantId,
+            String coordinatorId, CompensationContextStateManager compensationContextStateManager,
             DeserializerHelper deserializerHelper) {
         this.participantId = participantId;
         this.coordinatorId = coordinatorId;
@@ -79,8 +79,7 @@ public class LocalParticipant implements BAParticipant, Participant {
     }
 
     /**
-     * Tell participant implementation to close and once that's done remove
-     * recovery record.
+     * Tell participant implementation to close and once that's done remove recovery record.
      *
      * @throws InvalidParticipantException
      */
@@ -109,8 +108,7 @@ public class LocalParticipant implements BAParticipant, Participant {
     }
 
     /**
-     * Tell participant implementation to compesate and once that's done remove
-     * recovery record.
+     * Tell participant implementation to compesate and once that's done remove recovery record.
      *
      * @throws CompensateFailedException
      */
@@ -126,7 +124,7 @@ public class LocalParticipant implements BAParticipant, Participant {
 
     @Override
     public void forget() {
-        // TODO: garbage collect if required
+        //TODO: garbage collect if required
     }
 
     @Override
@@ -139,11 +137,9 @@ public class LocalParticipant implements BAParticipant, Participant {
     }
 
     /**
-     * Persist participant and coordinator ids and delegate further persistence
-     * to the participant implementation.
+     * Persist participant and coordinator ids and delegate further persistence to the participant implementation.
      *
-     * @param state
-     *            state to persist participant to.
+     * @param state state to persist participant to.
      * @return if persistence was successful or not.
      */
     @Override
@@ -161,11 +157,9 @@ public class LocalParticipant implements BAParticipant, Participant {
     }
 
     /**
-     * Restore participant and coordinator ids first and then recreate
-     * particiapnt implementation.
+     * Restore participant and coordinator ids first and then recreate particiapnt implementation.
      *
-     * @param state
-     *            state to deserialize participant from.
+     * @param state state to deserialize participant from.
      * @return if deserialization was successful or not.
      */
     @Override

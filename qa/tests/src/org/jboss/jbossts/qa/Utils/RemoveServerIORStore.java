@@ -29,14 +29,20 @@
 
 package org.jboss.jbossts.qa.Utils;
 
-public class RemoveServerIORStore {
-    public static void main(String[] args) {
+public class RemoveServerIORStore
+{
+    public static void main(String[] args)
+    {
         ServerIORStore.remove();
 
-        for (int count = 0; count < args.length; count++) {
-            try {
+        for (int count = 0; count < args.length; count++)
+        {
+            try
+            {
                 ServerIORStore.removeIOR(args[count]);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace(System.err);
             }
         }

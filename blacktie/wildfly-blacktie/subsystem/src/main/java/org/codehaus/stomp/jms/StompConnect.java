@@ -35,9 +35,8 @@ import org.codehaus.stomp.tcp.TcpTransport;
 import org.codehaus.stomp.tcp.TcpTransportServer;
 
 /**
- * This class represents a service which accepts STOMP socket connections and
- * binds them to JMS operations
- *
+ * This class represents a service which accepts STOMP socket connections and binds them to JMS operations
+  *
  * @version $Revision: 53 $
  */
 public class StompConnect {
@@ -99,8 +98,7 @@ public class StompConnect {
     }
 
     /**
-     * Sets the URI string for the hostname/IP address and port to listen on for
-     * STOMP frames
+     * Sets the URI string for the hostname/IP address and port to listen on for STOMP frames
      */
     public void setUri(String uri) {
         this.uri = uri;
@@ -114,8 +112,7 @@ public class StompConnect {
     }
 
     /**
-     * Sets the URI for the hostname/IP address and port to listen on for STOMP
-     * frames
+     * Sets the URI for the hostname/IP address and port to listen on for STOMP frames
      */
     public void setLocation(URI location) {
         this.location = location;
@@ -147,8 +144,7 @@ public class StompConnect {
     }
 
     /**
-     * Allows an initial context to be configured which is used if no explicit
-     * {@link ConnectionFactory} is configured via the
+     * Allows an initial context to be configured which is used if no explicit {@link ConnectionFactory} is configured via the
      * {@link #setConnectionFactory(ConnectionFactory)} method
      */
     public void setInitialContext(InitialContext initialContext) {
@@ -160,9 +156,8 @@ public class StompConnect {
     }
 
     /**
-     * Allows the JNDI name to be configured which is used to perform a JNDI
-     * lookup if no explicit {@link ConnectionFactory} is configured via the
-     * {@link #setConnectionFactory(ConnectionFactory)} method
+     * Allows the JNDI name to be configured which is used to perform a JNDI lookup if no explicit {@link ConnectionFactory} is
+     * configured via the {@link #setConnectionFactory(ConnectionFactory)} method
      */
     public void setXAConnectionFactoryName(String jndiName) {
         this.xaConnectionFactoryName = jndiName;
@@ -173,9 +168,8 @@ public class StompConnect {
     }
 
     /**
-     * Allows the JNDI name to be configured which is used to perform a JNDI
-     * lookup if no explicit {@link ConnectionFactory} is configured via the
-     * {@link #setConnectionFactory(ConnectionFactory)} method
+     * Allows the JNDI name to be configured which is used to perform a JNDI lookup if no explicit {@link ConnectionFactory} is
+     * configured via the {@link #setConnectionFactory(ConnectionFactory)} method
      */
     public void setConnectionFactoryName(String jndiName) {
         this.connectionFactoryName = jndiName;
@@ -191,8 +185,8 @@ public class StompConnect {
     }
 
     /**
-     * Factory method to lazily create a {@link ConnectionFactory} if one is not
-     * explicitly configured. By default lets try looking in JNDI
+     * Factory method to lazily create a {@link ConnectionFactory} if one is not explicitly configured. By default lets try
+     * looking in JNDI
      */
     protected XAConnectionFactory createXAConnectionFactory() throws NamingException {
         String name = getXAConnectionFactoryName();
@@ -205,16 +199,16 @@ public class StompConnect {
         if (value instanceof XAConnectionFactory) {
             return (XAConnectionFactory) value;
         } else {
-            throw new IllegalArgumentException(
-                    "The object in JNDI at name: " + name + " cannot be cast to XAConnectionFactory. "
-                            + "Either a JNDI configuration issue or you have multiple JMS API jars on your classpath. "
-                            + "Actual Object was: " + value);
+            throw new IllegalArgumentException("The object in JNDI at name: " + name
+                    + " cannot be cast to XAConnectionFactory. "
+                    + "Either a JNDI configuration issue or you have multiple JMS API jars on your classpath. "
+                    + "Actual Object was: " + value);
         }
     }
 
     /**
-     * Factory method to lazily create a {@link ConnectionFactory} if one is not
-     * explicitly configured. By default lets try looking in JNDI
+     * Factory method to lazily create a {@link ConnectionFactory} if one is not explicitly configured. By default lets try
+     * looking in JNDI
      */
     protected ConnectionFactory createConnectionFactory() throws NamingException {
         String name = getConnectionFactoryName();
@@ -227,10 +221,9 @@ public class StompConnect {
         if (value instanceof ConnectionFactory) {
             return (ConnectionFactory) value;
         } else {
-            throw new IllegalArgumentException(
-                    "The object in JNDI at name: " + name + " cannot be cast to ConnectionFactory. "
-                            + "Either a JNDI configuration issue or you have multiple JMS API jars on your classpath. "
-                            + "Actual Object was: " + value);
+            throw new IllegalArgumentException("The object in JNDI at name: " + name + " cannot be cast to ConnectionFactory. "
+                    + "Either a JNDI configuration issue or you have multiple JMS API jars on your classpath. "
+                    + "Actual Object was: " + value);
         }
     }
 }

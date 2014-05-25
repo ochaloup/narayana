@@ -32,11 +32,13 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.runner.RunWith;
 
+
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
 @RunWith(Arquillian.class)
 public class CompensationManagerTestLocal extends CompensationManagerTest {
+
 
     @Deployment
     public static WebArchive createTestArchive() {

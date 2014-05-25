@@ -33,10 +33,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Useful class for monitoring a thread and producing a stack dump if it stops
- * making forward progress (after which the thread will no longer be monitored).
- * For a thread to be monitored it should periodically report its progress via
- * an instance of @see TaskProgress.tick
+ * Useful class for monitoring a thread and producing a stack dump if it stops making forward progress
+ * (after which the thread will no longer be monitored). For a thread to be monitored it should periodically
+ * report its progress via an instance of @see TaskProgress.tick
  */
 public enum TaskMonitor {
     /**
@@ -86,20 +85,14 @@ public enum TaskMonitor {
     /**
      * Monitor the progress of a task
      *
-     * @param name
-     *            a name for the task used in the filename of any stack dumps
-     * @param cmdLinePattern
-     *            pattern used to determine which java process should have there
-     *            stacks dumpted
-     * @param progress
-     *            an object that a monnitored thread should periodically update
-     * @param millisBetweenUpdates
-     *            if the job does not make progress within this many
-     *            milliseconds take stack dumps
+     * @param name a name for the task used in the filename of any stack dumps
+     * @param cmdLinePattern pattern used to determine which java process should have there stacks dumpted
+     * @param progress an object that a monnitored thread should periodically update
+     * @param millisBetweenUpdates if the job does not make progress within this many milliseconds take stack dumps
      * @return get the tasks progress back
      */
-    public synchronized TaskProgress monitorProgress(String name, String cmdLinePattern, TaskProgress progress,
-            long millisBetweenUpdates) {
+    public synchronized TaskProgress monitorProgress(String name, String cmdLinePattern,
+                                                     TaskProgress progress, long millisBetweenUpdates) {
         if (maxDumps.intValue() <= 0)
             return null;
 
@@ -113,8 +106,7 @@ public enum TaskMonitor {
             if (progressHandle != null)
                 progressHandle.cancel(false);
 
-            // TODO not a fair algorithm since the task may end up running later
-            // that desired but it does the job for now
+            // TODO not a fair algorithm since the task may end up running later that desired but it does the job for now
             progressHandle = scheduler.scheduleAtFixedRate(progressChecker, millisBetweenUpdates, millisBetweenUpdates,
                     TimeUnit.MILLISECONDS);
         }
@@ -209,12 +201,10 @@ public enum TaskMonitor {
         }
 
         /**
-         * Check that a job is incrementing an atomic integer at least every
-         * millisBetweenUpdates milliseconds. If the integer is less that zero
-         * then the task has completed
+         * Check that a job is incrementing an atomic integer at least every millisBetweenUpdates milliseconds.
+         * If the integer is less that zero then the task has completed
          *
-         * @param currentTimeMillis
-         *            the current time
+         * @param currentTimeMillis the current time
          * @return true if the job is making progress
          */
         boolean isProgressing(long currentTimeMillis) {

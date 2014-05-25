@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client19.java,v 1.2 2003/06/26 11:43:11 rbegg Exp $
  */
 
+
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -64,8 +65,10 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client19 {
-    public static void main(String[] args) {
+public class Client19
+{
+    public static void main(String[] args)
+    {
 
         boolean correct = true;
         int numberOfCalls = 10;
@@ -73,31 +76,40 @@ public class Client19 {
 
         System.err.println("Starting first init");
 
-        try {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in first start: " + exception);
             exception.printStackTrace(System.err);
         }
 
+
         System.err.println("Starting first block");
 
-        try {
+        try
+        {
             String counterIOR = ServerIORStore.loadIOR(args[args.length - 1]);
             counter = CounterHelper.narrow(ORBInterface.orb().string_to_object(counterIOR));
 
-            for (int index = 0; index < numberOfCalls; index++) {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                 atomicTransaction.begin();
 
                 counter.increase(OTS.current().get_control());
 
-                if ((index % 2) == 0) {
+                if ((index % 2) == 0)
+                {
                     atomicTransaction.commit(true);
-                } else {
+                }
+                else
+                {
                     atomicTransaction.rollback();
                 }
             }
@@ -111,12 +123,17 @@ public class Client19 {
 
             atomicTransaction.commit(true);
 
-            if (value.value == (numberOfCalls / 2) && correct) {
+            if (value.value == (numberOfCalls / 2) && correct)
+            {
                 correct = true;
-            } else {
+            }
+            else
+            {
                 correct = false;
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in first block" + exception);
             exception.printStackTrace(System.err);
@@ -124,10 +141,13 @@ public class Client19 {
 
         System.err.println("Starting first shutdown");
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in first shutdown" + exception);
             exception.printStackTrace(System.err);
@@ -135,10 +155,13 @@ public class Client19 {
 
         System.err.println("----Starting second block -------");
 
-        try {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in second start " + exception);
             exception.printStackTrace(System.err);
@@ -146,7 +169,8 @@ public class Client19 {
 
         System.err.println("init done starting second block");
 
-        try {
+        try
+        {
             String counterIOR = ServerIORStore.loadIOR(args[args.length - 1]);
             counter = CounterHelper.narrow(ORBInterface.orb().string_to_object(counterIOR));
 
@@ -154,34 +178,44 @@ public class Client19 {
             atomicTransaction.begin();
             counter.set(0, OTS.current().get_control());
             atomicTransaction.commit(true);
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in set operation " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
-            for (int index = 0; index < numberOfCalls; index++) {
+        try
+        {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                 atomicTransaction.begin();
 
                 counter.increase(OTS.current().get_control());
 
-                if ((index % 2) == 0) {
+                if ((index % 2) == 0)
+                {
                     atomicTransaction.commit(true);
-                } else {
+                }
+                else
+                {
                     atomicTransaction.rollback();
                 }
             }
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in second loop block " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             AtomicTransaction atomicTransaction = new AtomicTransaction();
 
             atomicTransaction.begin();
@@ -191,12 +225,17 @@ public class Client19 {
 
             atomicTransaction.commit(true);
 
-            if (value.value == (numberOfCalls / 2) && correct) {
+            if (value.value == (numberOfCalls / 2) && correct)
+            {
                 correct = true;
-            } else {
+            }
+            else
+            {
                 correct = false;
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("exception in second test " + exception);
             exception.printStackTrace(System.err);
@@ -204,19 +243,25 @@ public class Client19 {
 
         System.err.println("Starting second shutdown");
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             correct = false;
             System.err.println("error in second shutdown" + exception);
             exception.printStackTrace(System.err);
         }
 
         System.err.println("testing result");
-        if (correct) {
+        if (correct)
+        {
             System.out.println("Passed");
-        } else {
+        }
+        else
+        {
             System.out.println("Failed");
         }
     }

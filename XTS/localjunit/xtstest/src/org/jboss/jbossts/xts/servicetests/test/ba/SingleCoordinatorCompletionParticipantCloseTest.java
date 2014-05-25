@@ -40,10 +40,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlists a single participant with instructions to
- * prepare and commit without error
+ * Starts a transaction and enlists a single participant with instructions to prepare and commit
+ * without error
  */
-public class SingleCoordinatorCompletionParticipantCloseTest extends XTSServiceTestBase implements XTSServiceTest {
+public class SingleCoordinatorCompletionParticipantCloseTest extends XTSServiceTestBase implements XTSServiceTest
+{
     public void run() {
 
         // wait a while so the service has time to start

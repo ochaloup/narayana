@@ -92,8 +92,9 @@ public class NBFHandlers extends DefaultHandler {
 
                 while (typeInfo != null) {
                     String typeName = typeInfo.getName();
-                    if (typeName != null && (typeName.equals("long") || typeName.equals("string")
-                            || typeName.equals("integer") || typeName.equals("float") || typeName.endsWith("_type"))) {
+                    if (typeName != null
+                            && (typeName.equals("long") || typeName.equals("string") || typeName.equals("integer")
+                                    || typeName.equals("float") || typeName.endsWith("_type"))) {
 
                         type = typeName;
                         log.debug(qName + " has type of " + type);

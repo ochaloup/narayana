@@ -42,8 +42,8 @@ public class StartupTest extends TestCase {
         }
     }
 
-    public void testStartup() throws IOException, MalformedObjectNameException, NullPointerException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public void testStartup() throws IOException, MalformedObjectNameException, NullPointerException, InstantiationException,
+            IllegalAccessException, ClassNotFoundException {
         log.info("StartupTest::testStartup");
         if (commandHandler.handleCommand("startup".split(" ")) != 0) {
             fail("Command was unsuccessful");

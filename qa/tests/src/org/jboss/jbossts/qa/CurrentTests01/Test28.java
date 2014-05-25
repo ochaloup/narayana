@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.CurrentTests01;
  * $Id: Test28.java,v 1.3 2003/07/14 11:51:15 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
@@ -63,9 +64,12 @@ import org.omg.CosTransactions.Control;
 import org.omg.CosTransactions.Current;
 import org.omg.CosTransactions.InvalidControl;
 
-public class Test28 {
-    public static void main(String[] args) {
-        try {
+public class Test28
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,28 +81,39 @@ public class Test28 {
             Control control = current.get_control();
             current.rollback();
 
-            try {
+            try
+            {
                 current.resume(control);
-            } catch (InvalidControl invalidControl) {
+            }
+            catch (InvalidControl invalidControl)
+            {
                 System.err.println("Failed to resume rolled-back transaction!");
                 correct = false;
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Test28.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Test28.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -34,20 +34,26 @@ import org.junit.Test;
 import com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple;
 import com.hp.mwtests.ts.jta.jts.JTSTestCase;
 
-public class LastResourceDisallowTestCase extends JTSTestCase {
+public class LastResourceDisallowTestCase extends JTSTestCase
+{
     @Test
-    public void testDisallowed() throws SystemException, NotSupportedException, RollbackException {
-        final LastOnePhaseResource firstResource = new LastOnePhaseResource();
-        final LastOnePhaseResource secondResource = new LastOnePhaseResource();
-
-        final TransactionManager tm = new TransactionManagerImple();
-        tm.begin();
-        try {
-            final Transaction tx = tm.getTransaction();
-            assertTrue("First resource enlisted", tx.enlistResource(firstResource));
-            assertFalse("Second resource enlisted", tx.enlistResource(secondResource));
-        } finally {
-            tm.rollback();
+    public void testDisallowed()
+        throws SystemException, NotSupportedException, RollbackException
+    {
+        final LastOnePhaseResource firstResource = new LastOnePhaseResource() ;
+        final LastOnePhaseResource secondResource = new LastOnePhaseResource() ;
+        
+        final TransactionManager tm = new TransactionManagerImple() ;
+        tm.begin() ;
+        try
+        {
+            final Transaction tx = tm.getTransaction() ;
+            assertTrue("First resource enlisted", tx.enlistResource(firstResource)) ;
+            assertFalse("Second resource enlisted", tx.enlistResource(secondResource)) ;
+        }
+        finally
+        {
+            tm.rollback() ;
         }
     }
 }

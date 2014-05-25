@@ -30,19 +30,23 @@
  */
 package org.jboss.jbossts.qa.performance;
 
-public final class XYData {
-    private double _x, _y;
+public final class XYData
+{
+    private double  _x, _y;
 
-    public XYData(double x, double y) {
+    public XYData(double x, double y)
+    {
         _x = x;
         _y = y;
     }
 
-    public double getX() {
+    public double getX()
+    {
         return (_x);
     }
 
-    public double getY() {
+    public double getY()
+    {
         return (_y);
     }
 }

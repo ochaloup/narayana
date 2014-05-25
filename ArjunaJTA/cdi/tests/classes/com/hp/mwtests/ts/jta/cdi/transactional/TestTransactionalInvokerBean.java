@@ -26,9 +26,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 
 /**
- * @author <a href=
- *         "mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz
- *         Krakowiak &lt;tomasz.krakowiak@efish.pl&gt;</a>
+ * @author <a href="mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz Krakowiak
+ *         &lt;tomasz.krakowiak@efish.pl&gt;</a>
  */
 @ApplicationScoped
 public class TestTransactionalInvokerBean {

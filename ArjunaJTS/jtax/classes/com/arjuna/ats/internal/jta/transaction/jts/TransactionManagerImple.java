@@ -52,24 +52,31 @@ import com.arjuna.ats.jts.OTSManager;
  * An implementation of javax.transaction.TransactionManager.
  *
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: TransactionManagerImple.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: TransactionManagerImple.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.2.4.
  */
 
-public class TransactionManagerImple extends BaseTransaction
-        implements
-            javax.transaction.TransactionManager,
-            javax.naming.spi.ObjectFactory {
+public class TransactionManagerImple extends BaseTransaction implements
+        javax.transaction.TransactionManager, javax.naming.spi.ObjectFactory
+{
 
-    public TransactionManagerImple() {
+    public TransactionManagerImple ()
+    {
     }
 
-    public Transaction getTransaction() throws javax.transaction.SystemException {
-        try {
+    public Transaction getTransaction ()
+            throws javax.transaction.SystemException
+    {
+        try
+        {
             return TransactionImple.getTransaction();
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             return null;
-        } catch (TRANSACTION_UNAVAILABLE e) {
+        }
+        catch (TRANSACTION_UNAVAILABLE e)
+        {
             try {
                 Uid uid = OTSImpleManager.systemCurrent().contextManager().getReceivedCoordinatorUid();
                 if (uid != null) {
@@ -81,8 +88,10 @@ public class TransactionManagerImple extends BaseTransaction
                 javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
                 systemException.initCause(e);
                 throw systemException;
-            }
-        } catch (Exception e) {
+            }    
+        }
+        catch (Exception e)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
@@ -93,22 +102,25 @@ public class TransactionManagerImple extends BaseTransaction
      * @return the suspended transaction.
      */
 
-    public Transaction suspend() throws javax.transaction.SystemException {
+    public Transaction suspend () throws javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionManagerImple.suspend");
         }
 
-        try {
+        try
+        {
             TransactionImple tx = TransactionImple.getTransaction();
             Control theControl = OTSManager.get_current().suspend();
 
             return tx;
-        } catch (org.omg.CORBA.TRANSACTION_UNAVAILABLE e) {
+        }
+        catch (org.omg.CORBA.TRANSACTION_UNAVAILABLE e)
+        {
             try {
                 Uid uid = OTSImpleManager.systemCurrent().contextManager().getReceivedCoordinatorUid();
                 if (uid != null) {
-                    OTSImpleManager.systemCurrent().contextManager()
-                            .disassociateContext(OTSManager.getReceivedSlotId());
+                    OTSImpleManager.systemCurrent().contextManager().disassociateContext(OTSManager.getReceivedSlotId());
                     return TransactionImple.getTransactions().get(uid);
                 } else {
                     return null;
@@ -118,7 +130,9 @@ public class TransactionManagerImple extends BaseTransaction
                 systemException.initCause(e);
                 throw systemException;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
@@ -130,8 +144,9 @@ public class TransactionManagerImple extends BaseTransaction
      * cannot call resume.
      */
 
-    public void resume(Transaction which)
-            throws InvalidTransactionException, java.lang.IllegalStateException, javax.transaction.SystemException {
+    public void resume (Transaction which) throws InvalidTransactionException,
+            java.lang.IllegalStateException, javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionManagerImple.resume");
         }
@@ -139,31 +154,38 @@ public class TransactionManagerImple extends BaseTransaction
         super.checkTransactionState();
 
         /*
-         * Need to resume null as the standard says this is the same as suspend
-         * (breaking thread-to-transaction association).
+         * Need to resume null as the standard says this is the
+         * same as suspend (breaking thread-to-transaction association).
          */
 
-        if ((which == null) || (which instanceof TransactionImple)) {
+        if ((which == null) || (which instanceof TransactionImple))
+        {
             TransactionImple theTransaction = (TransactionImple) which;
 
-            try {
+            try
+            {
                 ControlWrapper cont = ((theTransaction == null) ? null : theTransaction.getControlWrapper());
 
                 OTSImpleManager.current().resumeWrapper(cont);
 
                 cont = null;
                 theTransaction = null;
-            } catch (org.omg.CosTransactions.InvalidControl e1) {
+            }
+            catch (org.omg.CosTransactions.InvalidControl e1)
+            {
                 InvalidTransactionException invalidTransactionException = new InvalidTransactionException();
                 invalidTransactionException.initCause(e1);
                 throw invalidTransactionException;
-            } catch (org.omg.CORBA.SystemException e2) {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
-                        e2.toString());
+            }
+            catch (org.omg.CORBA.SystemException e2)
+            {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e2.toString());
                 systemException.initCause(e2);
                 throw systemException;
             }
-        } else {
+        }
+        else
+        {
             throw new InvalidTransactionException();
         }
     }
@@ -178,7 +200,9 @@ public class TransactionManagerImple extends BaseTransaction
      * @return Object
      * @throws Exception
      */
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
+    public Object getObjectInstance (Object obj, Name name, Context nameCtx, Hashtable environment)
+            throws Exception
+    {
         return this;
     }
 }

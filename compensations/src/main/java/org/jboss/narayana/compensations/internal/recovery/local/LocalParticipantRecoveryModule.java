@@ -36,13 +36,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Recovery module responsible for recovering local participants from the
- * scenario when system crash happens after participant has completed (and wrote
- * its recovery record) but before transaction coordinator was told to complete
- * (and before wrote its recovery record).
+ * Recovery module responsible for recovering local participants from the scenario when system crash happens after participant
+ * has completed (and wrote its recovery record) but before transaction coordinator was told to complete (and before wrote its
+ * recovery record).
  * 
- * In remote compensating transaction scenario this functionality is provided by
- * XTS. However, local Sagas implementation doesn't provide it.
+ * In remote compensating transaction scenario this functionality is provided by XTS. However, local Sagas implementation
+ * doesn't provide it.
  * 
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -53,8 +52,7 @@ public class LocalParticipantRecoveryModule implements RecoveryModule {
     private final Set<Uid> firstPassUids = new HashSet<>();
 
     /**
-     * Recovery helper to persist/restore {@link LocalParticipantRecord}
-     * records.
+     * Recovery helper to persist/restore {@link LocalParticipantRecord} records.
      */
     private final RecoveryHelper localParticipantRecoveryHelper = new RecoveryHelper(StoreManager.getRecoveryStore(),
             LocalParticipantRecord.getType());
@@ -81,8 +79,8 @@ public class LocalParticipantRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Participant with the provided uid is compensated unless BACoordinator
-     * record with the transaction id of this participant exists.
+     * Participant with the provided uid is compensated unless BACoordinator record with the transaction id of this participant
+     * exists.
      * 
      * @param uid
      */
@@ -104,10 +102,8 @@ public class LocalParticipantRecoveryModule implements RecoveryModule {
     }
 
     /**
-     * Check if the provided participant should be compensated. Look for the
-     * BACoordinator record with the coordinator id from the participant. If
-     * such record exists, recovery should be done by the
-     * {@link BACoordinatorRecoveryModule}.
+     * Check if the provided participant should be compensated. Look for the BACoordinator record with the coordinator id from
+     * the participant. If such record exists, recovery should be done by the {@link BACoordinatorRecoveryModule}.
      * 
      * @param participantRecord
      * @return
@@ -115,11 +111,10 @@ public class LocalParticipantRecoveryModule implements RecoveryModule {
     private boolean shouldCompensate(LocalParticipantRecord participantRecord) {
         Uid coordinatorId = new Uid(participantRecord.getParticipant().getCoordinatorId());
         try {
-            return !baCoordinatorRecoveryHelper
-                    .getAllUidsWithException(e -> new CompensationsRecoveryException("Ignore")).contains(coordinatorId);
+            return !baCoordinatorRecoveryHelper.getAllUidsWithException(e -> new CompensationsRecoveryException("Ignore"))
+                    .contains(coordinatorId);
         } catch (CompensationsRecoveryException e) {
-            // If failure occurs when getting uids, we shouldn't compensate just
-            // in case BACoordinator record actually exists.
+            // If failure occurs when getting uids, we shouldn't compensate just in case BACoordinator record actually exists.
             return false;
         }
     }

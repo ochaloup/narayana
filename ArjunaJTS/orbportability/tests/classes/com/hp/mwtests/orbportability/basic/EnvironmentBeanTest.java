@@ -29,7 +29,8 @@ import com.arjuna.orbportability.common.OrbPortabilityEnvironmentBean;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest {
+public class EnvironmentBeanTest
+{
     @Test
     public void testOrbPortabilityEnvironmentBean() throws Exception {
         com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(new OrbPortabilityEnvironmentBean());

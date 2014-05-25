@@ -55,161 +55,188 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  * which must remain held until the action ends otherwise serialisability
  * is compromised
  *
- */
+ */ 
 
-public class CadaverLockRecord extends LockRecord {
+public class CadaverLockRecord extends LockRecord
+{
 
-    public CadaverLockRecord(LockStore store, LockManager lm, BasicAction currAct) {
-        super(lm, currAct);
-
-        cadaverLockStore = store;
-        objectTypeName = new String(lm.type());
-
-        if (lm.getObjectModel() == ObjectModel.SINGLE) {
-            doRelease = false;
-        } else
-            doRelease = true;
-
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord(" + store + ", " + lm.get_uid() + ")");
-        }
+    public CadaverLockRecord (LockStore store, LockManager lm, BasicAction currAct)
+    {
+    super(lm, currAct);
+    
+    cadaverLockStore = store;
+    objectTypeName = new String(lm.type());
+    
+    if (lm.getObjectModel() == ObjectModel.SINGLE)
+    {
+        doRelease = false;
     }
+    else
+        doRelease = true;
 
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord("+store+
+                       ", "+lm.get_uid()+")");
+    }
+    }
+    
     /*
      * Public virtual functions. These are all re-implementations of inherited
-     * functions
+     * functions 
      */
-
-    public boolean propagateOnAbort() {
-        return true;
+    
+    public boolean propagateOnAbort ()
+    {
+    return true;
     }
-
+    
     /*
-     * Atomic action controlled functions. These functions create an instance of
-     * CadaverLockManager to handle the lock manipulation that is needed and
+     * Atomic action controlled functions. These functions create an instance
+     * of CadaverLockManager to handle the lock manipulation that is needed and
      * then throw it away when done.
      */
 
-    public int nestedAbort() {
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::nestedAbort() for " + order());
+    public int nestedAbort ()
+    {
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::nestedAbort() for "+order());
+    }
+    
+    if (doRelease)
+    {
+        CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
+
+        if (super.actionHandle == null)
+        {
+            throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_1());
+        }
+        
+        return (manager.releaseAll(super.actionHandle.get_uid()) ? TwoPhaseOutcome.FINISH_OK : TwoPhaseOutcome.FINISH_ERROR);
+    }
+    else
+        return TwoPhaseOutcome.FINISH_OK;
+    }
+
+    public int nestedCommit ()
+    {
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::nestedCommit() for "+order());
+    }
+    
+    if (doRelease)
+    {
+        /*
+         * Need to change the owner of the locks from the current
+         * committing action to its parent. Since no genuine LockManager
+         * exists at this time create one to take care of this.
+         */
+    
+        if (super.actionHandle == null)
+        {
+            throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_2());
+        }
+    
+        CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
+        
+        return (manager.propagate(super.actionHandle.get_uid(), super.actionHandle.parent().get_uid()) ? TwoPhaseOutcome.FINISH_OK : TwoPhaseOutcome.FINISH_ERROR);
+    }
+    else
+        return TwoPhaseOutcome.FINISH_OK;
+    }
+
+    public int topLevelAbort ()
+    {
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::topLevelAbort() for "+order());
+    }
+    
+    if (doRelease)
+    {
+        if (super.actionHandle == null)
+        {
+            throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_3());
         }
 
-        if (doRelease) {
-            CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
+        CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
 
-            if (super.actionHandle == null) {
-                throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_1());
-            }
-
-            return (manager.releaseAll(super.actionHandle.get_uid())
-                    ? TwoPhaseOutcome.FINISH_OK
-                    : TwoPhaseOutcome.FINISH_ERROR);
-        } else
-            return TwoPhaseOutcome.FINISH_OK;
+        return (manager.releaseAll(super.actionHandle.get_uid()) ? TwoPhaseOutcome.FINISH_OK : TwoPhaseOutcome.FINISH_ERROR);
+    }
+    else
+        return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedCommit() {
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::nestedCommit() for " + order());
+    public int topLevelCommit ()
+    {
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::topLevelCommit() for "+order());
+    }
+    
+    if (doRelease)
+    {
+        if (super.actionHandle == null)
+        {
+            throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_4());
         }
 
-        if (doRelease) {
-            /*
-             * Need to change the owner of the locks from the current committing
-             * action to its parent. Since no genuine LockManager exists at this
-             * time create one to take care of this.
-             */
+        CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
 
-            if (super.actionHandle == null) {
-                throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_2());
-            }
-
-            CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
-
-            return (manager.propagate(super.actionHandle.get_uid(), super.actionHandle.parent().get_uid())
-                    ? TwoPhaseOutcome.FINISH_OK
-                    : TwoPhaseOutcome.FINISH_ERROR);
-        } else
-            return TwoPhaseOutcome.FINISH_OK;
+        return (manager.releaseAll(super.actionHandle.get_uid()) ? TwoPhaseOutcome.FINISH_OK : TwoPhaseOutcome.FINISH_ERROR);
+    }
+    else
+        return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelAbort() {
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::topLevelAbort() for " + order());
-        }
-
-        if (doRelease) {
-            if (super.actionHandle == null) {
-                throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_3());
-            }
-
-            CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
-
-            return (manager.releaseAll(super.actionHandle.get_uid())
-                    ? TwoPhaseOutcome.FINISH_OK
-                    : TwoPhaseOutcome.FINISH_ERROR);
-        } else
-            return TwoPhaseOutcome.FINISH_OK;
+    public void print (PrintWriter strm)
+    {
+    strm.println("CadaverLockRecord : ");
+    super.print(strm);
     }
 
-    public int topLevelCommit() {
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::topLevelCommit() for " + order());
-        }
-
-        if (doRelease) {
-            if (super.actionHandle == null) {
-                throw new FatalError(txojLogger.i18NLogger.get_CadaverLockRecord_4());
-            }
-
-            CadaverLockManager manager = new CadaverLockManager(order(), objectTypeName);
-
-            return (manager.releaseAll(super.actionHandle.get_uid())
-                    ? TwoPhaseOutcome.FINISH_OK
-                    : TwoPhaseOutcome.FINISH_ERROR);
-        } else
-            return TwoPhaseOutcome.FINISH_OK;
+    public String type ()
+    {
+    return "/StateManager/AbstractRecord/LockRecord/CadaverLockRecord";
     }
-
-    public void print(PrintWriter strm) {
-        strm.println("CadaverLockRecord : ");
-        super.print(strm);
+    
+    public boolean shouldReplace (AbstractRecord ar)
+    {
+    return (((order().equals(ar.order())) &&
+         ar.typeIs() == RecordType.LOCK ) ? true : false);
     }
-
-    public String type() {
-        return "/StateManager/AbstractRecord/LockRecord/CadaverLockRecord";
-    }
-
-    public boolean shouldReplace(AbstractRecord ar) {
-        return (((order().equals(ar.order())) && ar.typeIs() == RecordType.LOCK) ? true : false);
-    }
-
+    
     /*
-     * Already determined that ar is a LockRecord, otherwise replace would not
-     * have been called. So, get the type from it before it is deleted!
+     * Already determined that ar is a LockRecord, otherwise replace would
+     * not have been called.
+     * So, get the type from it before it is deleted!
      */
+    
+    public void replace (AbstractRecord ar)
+    {
+    LockRecord lr = (LockRecord) ar;
 
-    public void replace(AbstractRecord ar) {
-        LockRecord lr = (LockRecord) ar;
-
-        objectTypeName = lr.lockType();
+    objectTypeName = lr.lockType();
+    }
+    
+    protected CadaverLockRecord ()
+    {
+    super();
+    
+    cadaverLockStore = null;
+    objectTypeName = null;
+    doRelease = false;
+    
+    if (txojLogger.logger.isTraceEnabled())
+    {
+        txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord ()");
+    }
     }
 
-    protected CadaverLockRecord() {
-        super();
-
-        cadaverLockStore = null;
-        objectTypeName = null;
-        doRelease = false;
-
-        if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("CadaverLockRecord::CadaverLockRecord ()");
-        }
-    }
-
-    private LockStore cadaverLockStore;
-    private String objectTypeName;
-    private boolean doRelease;
+    private LockStore   cadaverLockStore;
+    private String      objectTypeName;
+    private boolean     doRelease;
 
 }

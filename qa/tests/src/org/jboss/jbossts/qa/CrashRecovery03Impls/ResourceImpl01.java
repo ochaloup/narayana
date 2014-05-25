@@ -58,26 +58,38 @@ package org.jboss.jbossts.qa.CrashRecovery03Impls;
  * $Id: ResourceImpl01.java,v 1.2 2003/06/26 11:43:25 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery03.*;
 import org.omg.CosTransactions.*;
 
-public class ResourceImpl01 implements ResourceOperations {
-    public ResourceImpl01() {
+public class ResourceImpl01 implements ResourceOperations
+{
+    public ResourceImpl01()
+    {
     }
 
-    public Vote prepare() throws HeuristicMixed, HeuristicHazard {
+    public Vote prepare()
+            throws HeuristicMixed, HeuristicHazard
+    {
         return Vote.VoteCommit;
     }
 
-    public void rollback() throws HeuristicCommit, HeuristicMixed, HeuristicHazard {
+    public void rollback()
+            throws HeuristicCommit, HeuristicMixed, HeuristicHazard
+    {
     }
 
-    public void commit() throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+    public void commit()
+            throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
     }
 
-    public void commit_one_phase() throws HeuristicHazard {
+    public void commit_one_phase()
+            throws HeuristicHazard
+    {
     }
 
-    public void forget() {
+    public void forget()
+    {
     }
 }

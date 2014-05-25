@@ -56,14 +56,18 @@ package org.jboss.jbossts.qa.EnlistDelistEnlist01Clients;
  * $Id: Client01.java,v 1.2 2003/06/26 11:43:55 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.EnlistDelistEnlist01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client01 {
-    public static void main(String[] args) {
-        try {
+public class Client01
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -75,21 +79,29 @@ public class Client01 {
             service.begin_begin();
             correct = service.isCorrect();
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client01.main: " + exception);
             exception.printStackTrace(System.err);
         }

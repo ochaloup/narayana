@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.JDBCResources01Outcomes;
  * $Id: Outcome03.java,v 1.3 2003/10/01 13:20:49 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.JDBCResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.StringHolder;
 
-public class Outcome03 {
-    public static void main(String[] args) {
-        try {
+public class Outcome03
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -76,7 +80,8 @@ public class Outcome03 {
 
             boolean correct = true;
 
-            for (int index = 0; correct && (index < 10); index++) {
+            for (int index = 0; correct && (index < 10); index++)
+            {
                 String name = "Name_" + index;
                 String value = "Value_" + index;
                 StringHolder valueHolder1 = new StringHolder();
@@ -86,25 +91,32 @@ public class Outcome03 {
                 infoTable2.select(name, valueHolder2);
 
                 correct = correct && value.equals(valueHolder1.value) && value.equals(valueHolder2.value);
-                System.err
-                        .println("Name_" + index + " has a value of " + valueHolder1.value + ", " + valueHolder2.value);
+                System.err.println("Name_" + index + " has a value of " + valueHolder1.value + ", " + valueHolder2.value);
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Outcome03.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Outcome03.main: " + exception);
             exception.printStackTrace(System.err);
         }

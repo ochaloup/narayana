@@ -68,77 +68,77 @@ import com.arjuna.mw.wsas.exceptions.*;
  * It is very similar to the OTS Current and JTA UserTransaction.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: CoordinatorServiceImple.java,v 1.5 2005/05/19 12:13:37 nmcl Exp
- *          $
+ * @version $Id: CoordinatorServiceImple.java,v 1.5 2005/05/19 12:13:37 nmcl Exp $
  * @since 1.0.
  *
  */
 
-public class CoordinatorServiceImple implements UserCoordinator, CoordinatorManager {
+public class CoordinatorServiceImple implements UserCoordinator, CoordinatorManager
+{
 
-    public CoordinatorServiceImple() {
-        super();
+    public CoordinatorServiceImple ()
+    {
+    super();
 
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + " constructor");
         }
 
-        _coordManager = new CoordinatorControl();
+    _coordManager = new CoordinatorControl();
     }
 
     /**
-     * Start a new activity. If there is already an activity associated with the
-     * thread then it will be nested. An implementation specific timeout will be
-     * associated with the activity (which may be no timeout).
+     * Start a new activity. If there is already an activity associated
+     * with the thread then it will be nested. An implementation specific
+     * timeout will be associated with the activity (which may be no
+     * timeout).
      *
-     * @exception WrongStateException
-     *                Thrown if the any currently associated activity is in a
-     *                state that does not allow a new activity to be enlisted.
-     * @exception SystemException
-     *                Thrown in any other situation.
+     * @exception WrongStateException Thrown if the any currently associated
+     * activity is in a state that does not allow a new activity to be
+     * enlisted.
+     * @exception SystemException Thrown in any other situation.
      */
 
-    public void begin(String coordinationType) throws WrongStateException, SystemException {
+    public void begin (String coordinationType) throws WrongStateException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".begin. Coordination type: " + coordinationType);
         }
 
-        UserActivityFactory.userActivity().start(coordinationType);
+    UserActivityFactory.userActivity().start(coordinationType);
     }
 
     /**
-     * Start a new activity. If there is already an activity associated with the
-     * thread then it will be nested.
+     * Start a new activity. If there is already an activity associated
+     * with the thread then it will be nested.
      *
-     * @param timeout
-     *            The timeout associated with the activity. If the activity has
-     *            not been terminated by the time this period elapses, then it
-     *            will automatically be terminated.
-     * @exception WrongStateException
-     *                Thrown if the currently associated activity is in a state
-     *                that does not allow a new activity to be enlisted as a
-     *                child.
-     * @exception InvalidTimeoutException
-     *                Thrown if the specified timeout is invalid within the
-     *                current working environment.
-     * @exception SystemException
-     *                Thrown in any other situation.
+     * @param timeout The timeout associated with the activity. If the
+     * activity has not been terminated by the time this period elapses, then
+     * it will automatically be terminated.
+     * @exception WrongStateException Thrown if the currently associated
+     * activity is in a state that does not allow a new activity to be
+     * enlisted as a child.
+     * @exception InvalidTimeoutException Thrown if the specified timeout is
+     * invalid within the current working environment.
+     * @exception SystemException Thrown in any other situation.
      */
 
-    public void begin(String coordinationType, int timeout)
-            throws WrongStateException, InvalidTimeoutException, SystemException {
+    public void begin (String coordinationType, int timeout) throws WrongStateException, InvalidTimeoutException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
-            wscfLogger.logger.trace(getClass().getSimpleName() + ".begin. Coordination type: " + coordinationType
-                    + ", timeout: " + timeout);
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".begin. Coordination type: " + coordinationType + ", timeout: "
+                    + timeout);
         }
 
-        UserActivityFactory.userActivity().start(coordinationType, timeout);
-    }
+    UserActivityFactory.userActivity().start(coordinationType, timeout);
+    }    
+
 
     /**
      * Create a subordinate coordinator via the coordination control.
      */
-    public BACoordinator createSubordinate() throws SystemException {
+    public BACoordinator createSubordinate() throws SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".createSubordinate");
         }
@@ -148,272 +148,274 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
     /**
      * Confirm the activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is a parent activity with
-     *                active children.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed in the status requested.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is a
+     * parent activity with active children.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed in the status requested.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void close() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorCancelledException, NoPermissionException, SystemException {
+    public void close () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, CoordinatorCancelledException, NoPermissionException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".close");
         }
 
-        try {
-            Outcome res = UserActivityFactory.userActivity().end(Success.instance());
+    try
+    {
+        Outcome res = UserActivityFactory.userActivity().end(Success.instance());
 
-            if (wscfLogger.logger.isTraceEnabled()) {
-                wscfLogger.logger.trace(getClass().getSimpleName() + ".close. Outcome: " + res);
+        if (wscfLogger.logger.isTraceEnabled()) {
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".close. Outcome: " + res);
+        }
+
+        /*
+         * TODO
+         *
+         * What happens if the coordinator has already been terminated?
+         */
+
+        if (res != null)
+        {
+        if (res instanceof CoordinationOutcome)
+        {
+            CoordinationOutcome co = (CoordinationOutcome) res;
+            
+            switch (co.result())
+            {
+            case TwoPhaseResult.FINISH_OK:
+            case TwoPhaseResult.CONFIRMED:
+            case TwoPhaseResult.HEURISTIC_CONFIRM:
+            break;
+            case TwoPhaseResult.CANCELLED:
+            case TwoPhaseResult.HEURISTIC_CANCEL:
+            throw new CoordinatorCancelledException();
+            case TwoPhaseResult.HEURISTIC_MIXED:
+            throw new ProtocolViolationException("HeuristicMixed");
+            case TwoPhaseResult.FINISH_ERROR:
+            throw new WrongStateException();
+            case TwoPhaseResult.HEURISTIC_HAZARD:
+            default:
+            throw new ProtocolViolationException("HeuristicHazard");
             }
-
-            /*
-             * TODO
-             *
-             * What happens if the coordinator has already been terminated?
-             */
-
-            if (res != null) {
-                if (res instanceof CoordinationOutcome) {
-                    CoordinationOutcome co = (CoordinationOutcome) res;
-
-                    switch (co.result()) {
-                        case TwoPhaseResult.FINISH_OK :
-                        case TwoPhaseResult.CONFIRMED :
-                        case TwoPhaseResult.HEURISTIC_CONFIRM :
-                            break;
-                        case TwoPhaseResult.CANCELLED :
-                        case TwoPhaseResult.HEURISTIC_CANCEL :
-                            throw new CoordinatorCancelledException();
-                        case TwoPhaseResult.HEURISTIC_MIXED :
-                            throw new ProtocolViolationException("HeuristicMixed");
-                        case TwoPhaseResult.FINISH_ERROR :
-                            throw new WrongStateException();
-                        case TwoPhaseResult.HEURISTIC_HAZARD :
-                        default :
-                            throw new ProtocolViolationException("HeuristicHazard");
-                    }
-                } else
-                    throw new ProtocolViolationException(
-                            wscfLogger.i18NLogger.get_model_sagas_arjunacore_CoordinatorServiceImple_1());
-            }
-        } catch (NoActivityException ex) {
-            throw new NoCoordinatorException();
-        } catch (ActiveChildException ex) {
-            // ?? assume the coordination protocol will cancel children anyway.
+        }
+        else
+            throw new ProtocolViolationException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_CoordinatorServiceImple_1());
         }
     }
-
+    catch (NoActivityException ex)
+    {
+        throw new NoCoordinatorException();
+    }
+    catch (ActiveChildException ex)
+    {
+        // ?? assume the coordination protocol will cancel children anyway.
+    }
+    }
+    
     /**
      * Cancel the activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is a parent activity with
-     *                active children.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed, or is incompatible with the
-     *                completion status provided.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is a
+     * parent activity with active children.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed, or is incompatible with the
+     * completion status provided.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void cancel() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorConfirmedException, NoPermissionException, SystemException {
+    public void cancel () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, CoordinatorConfirmedException, NoPermissionException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".cancel");
         }
 
-        try {
-            Outcome res = UserActivityFactory.userActivity().end(Failure.instance());
+    try
+    {
+        Outcome res = UserActivityFactory.userActivity().end(Failure.instance());
 
-            if (wscfLogger.logger.isTraceEnabled()) {
-                wscfLogger.logger.trace(getClass().getSimpleName() + ".cancel. Outcome: " + res);
-            }
-
-            if (res != null) {
-                if (res instanceof CoordinationOutcome) {
-                    CoordinationOutcome co = (CoordinationOutcome) res;
-
-                    switch (co.result()) {
-                        case TwoPhaseResult.CONFIRMED :
-                        case TwoPhaseResult.HEURISTIC_CONFIRM :
-                            throw new CoordinatorConfirmedException();
-                        case TwoPhaseResult.FINISH_OK :
-                        case TwoPhaseResult.CANCELLED :
-                        case TwoPhaseResult.HEURISTIC_CANCEL :
-                            break;
-                        case TwoPhaseResult.HEURISTIC_MIXED :
-                            throw new ProtocolViolationException("HeuristicMixed");
-                        case TwoPhaseResult.FINISH_ERROR :
-                            throw new WrongStateException();
-                        case TwoPhaseResult.HEURISTIC_HAZARD :
-                        default :
-                            throw new ProtocolViolationException("HeuristicHazard");
-                    }
-                } else
-                    throw new ProtocolViolationException(
-                            wscfLogger.i18NLogger.get_model_sagas_arjunacore_CoordinatorServiceImple_1());
-            }
-        } catch (NoActivityException ex) {
-            throw new NoCoordinatorException();
-        } catch (ActiveChildException ex) {
-            // ?? assume the coordination protocol will cancel children anyway.
+        if (wscfLogger.logger.isTraceEnabled()) {
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".cancel. Outcome: " + res);
         }
+
+        if (res != null)
+        {
+        if (res instanceof CoordinationOutcome)
+        {
+            CoordinationOutcome co = (CoordinationOutcome) res;
+            
+            switch (co.result())
+            {
+            case TwoPhaseResult.CONFIRMED:
+            case TwoPhaseResult.HEURISTIC_CONFIRM:
+            throw new CoordinatorConfirmedException();
+            case TwoPhaseResult.FINISH_OK:
+            case TwoPhaseResult.CANCELLED:
+            case TwoPhaseResult.HEURISTIC_CANCEL:
+            break;
+            case TwoPhaseResult.HEURISTIC_MIXED:
+            throw new ProtocolViolationException("HeuristicMixed");
+            case TwoPhaseResult.FINISH_ERROR:
+            throw new WrongStateException();
+            case TwoPhaseResult.HEURISTIC_HAZARD:
+            default:
+            throw new ProtocolViolationException("HeuristicHazard");
+            }
+        }
+        else
+            throw new ProtocolViolationException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_CoordinatorServiceImple_1());
+        }
+    }
+    catch (NoActivityException ex)
+    {
+        throw new NoCoordinatorException();
+    }
+    catch (ActiveChildException ex)
+    {
+        // ?? assume the coordination protocol will cancel children anyway.
+    }
     }
 
     /**
      * Complete the activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is a parent activity with
-     *                active children.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed, or is incompatible with the
-     *                completion status provided.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is a
+     * parent activity with active children.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed, or is incompatible with the
+     * completion status provided.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void complete() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, NoPermissionException, SystemException {
+    public void complete () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, NoPermissionException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".complete");
         }
 
-        _coordManager.complete();
+    _coordManager.complete();
     }
-
+    
     /**
      * Set the termination status for the current activity to cancel only.
      *
-     * @exception WrongStateException
-     *                Thrown if the completion status is incompatible with the
-     *                current state of the activity.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception WrongStateException Thrown if the completion status is
+     * incompatible with the current state of the activity.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void setCancelOnly() throws NoCoordinatorException, WrongStateException, SystemException {
+    public void setCancelOnly () throws NoCoordinatorException, WrongStateException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".complete");
         }
 
-        try {
-            UserActivityFactory.userActivity().setCompletionStatus(FailureOnly.instance());
-        } catch (NoActivityException ex) {
-            throw new NoCoordinatorException();
-        }
+    try
+    {
+        UserActivityFactory.userActivity().setCompletionStatus(FailureOnly.instance());
     }
+    catch (NoActivityException ex)
+    {
+        throw new NoCoordinatorException();
+    }
+    }    
 
     /**
      * Get the timeout value currently associated with activities.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return the timeout value in seconds, or 0 if no application specified
-     *         timeout has been provided.
+     * timeout has been provided.
      */
 
-    public int getTimeout() throws SystemException {
+    public int getTimeout () throws SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".getTimeout");
         }
 
-        return UserActivityFactory.userActivity().getTimeout();
-    }
+    return UserActivityFactory.userActivity().getTimeout();
+    }    
 
     /**
      * Set the timeout to be associated with all subsequently created
-     * activities. A default value of 0 is automatically associated with each
-     * thread and this means that no application specified timeout is set for
-     * activities.
+     * activities. A default value of 0 is automatically associated with
+     * each thread and this means that no application specified timeout is
+     * set for activities.
      *
-     * @param timeout
-     *            The timeout (in seconds) to associate with all subsequently
-     *            created activities. This value must be 0 or greater.
+     * @param timeout The timeout (in seconds) to associate with all
+     * subsequently created activities. This value must be 0 or greater.
      *
-     * @exception InvalidTimeoutException
-     *                Thrown if the timeout value provided is negative, too
-     *                large, or if timeouts are simply not supported by the
-     *                activity implementation.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception InvalidTimeoutException Thrown if the timeout value provided
+     * is negative, too large, or if timeouts are simply not supported by
+     * the activity implementation.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void setTimeout(int timeout) throws InvalidTimeoutException, SystemException {
+    public void setTimeout (int timeout) throws InvalidTimeoutException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".setTimeout. Timeout: " + timeout);
         }
 
-        UserActivityFactory.userActivity().setTimeout(timeout);
-    }
-
+    UserActivityFactory.userActivity().setTimeout(timeout);
+    }    
+    
     /**
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
-     * @return the status of the current activity. If there is no activity
-     *         associated with the thread then NoActivity will be returned.
+     * @return the status of the current activity. If there is no
+     * activity associated with the thread then NoActivity
+     * will be returned.
      *
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status() throws SystemException {
+    public com.arjuna.mw.wsas.status.Status status () throws SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".status");
         }
 
-        ActivityImple curr = current();
-
-        if (curr == null)
-            return NoActivity.instance();
-
-        return _coordManager.status();
+    ActivityImple curr = current();
+    
+    if (curr == null)
+        return NoActivity.instance();
+    
+    return _coordManager.status();
     }
-
+    
     /**
      * Suspend the current activity from this thread and return the token
      * representing the context, if any, or null otherwise. Once called, the
      * thread will have no activities associated with it.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return the token representing the current context, if any, or null
-     *         otherwise.
+     * otherwise.
      */
 
-    public ActivityHierarchy suspend() throws SystemException {
+    public ActivityHierarchy suspend () throws SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".suspend");
         }
 
-        return UserActivityFactory.userActivity().suspend();
+    return UserActivityFactory.userActivity().suspend();
     }
 
     /**
@@ -422,163 +424,163 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      * activities that it may already be associated with. If the parameter is
      * null then the thread is associated with no activity.
      *
-     * @param tx
-     *            The activity to associate with this thread. This may be null
-     *            in which case the current thread becomes associated with no
-     *            activity.
+     * @param tx The activity to associate with this thread. This
+     * may be null in which case the current thread becomes associated with
+     * no activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the activity handle is invalid in this context.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception InvalidActivityException Thrown if the activity handle
+     * is invalid in this context.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void resume(ActivityHierarchy tx) throws InvalidActivityException, SystemException {
+    public void resume (ActivityHierarchy tx) throws InvalidActivityException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".resume");
         }
 
-        UserActivityFactory.userActivity().resume(tx);
+    UserActivityFactory.userActivity().resume(tx);
     }
 
     /**
-     * Enrol the specified participant with the coordinator associated with the
-     * current thread.
+     * Enrol the specified participant with the coordinator associated with
+     * the current thread.
      *
-     * @param act
-     *            The participant.
+     * @param act The participant.
      *
-     * @exception WrongStateException
-     *                Thrown if the coordinator is not in a state that allows
-     *                participants to be enrolled.
-     * @exception DuplicateParticipantException
-     *                Thrown if the participant has already been enrolled and
-     *                the coordination protocol does not support multiple
-     *                entries.
-     * @exception InvalidParticipantException
-     *                Thrown if the participant is invalid.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception WrongStateException Thrown if the coordinator is not in a
+     * state that allows participants to be enrolled.
+     * @exception DuplicateParticipantException Thrown if the participant has
+     * already been enrolled and the coordination protocol does not support
+     * multiple entries.
+     * @exception InvalidParticipantException Thrown if the participant is invalid.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void enlistParticipant(Participant act) throws WrongStateException, DuplicateParticipantException,
-            InvalidParticipantException, NoCoordinatorException, SystemException {
+    public void enlistParticipant (Participant act) throws WrongStateException, DuplicateParticipantException, InvalidParticipantException, NoCoordinatorException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".enlistParticipant. Participant: " + act);
         }
 
-        _coordManager.enlistParticipant(act);
+    _coordManager.enlistParticipant(act);
     }
 
     /**
      * Remove the specified participant from the coordinator's list.
      *
-     * @exception InvalidParticipantException
-     *                Thrown if the participant is not known of by the
-     *                coordinator.
-     * @exception WrongStateException
-     *                Thrown if the state of the coordinator does not allow the
-     *                participant to be removed (e.g., in a two-phase protocol
-     *                the coordinator is committing.)
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception InvalidParticipantException Thrown if the participant is not known
+     * of by the coordinator.
+     * @exception WrongStateException Thrown if the state of the coordinator
+     * does not allow the participant to be removed (e.g., in a two-phase
+     * protocol the coordinator is committing.)
+     * @exception SystemException Thrown if any other error occurs.
      */
-
-    public void delistParticipant(String participantId)
-            throws InvalidParticipantException, NoCoordinatorException, WrongStateException, SystemException {
+    
+    public void delistParticipant (String participantId) throws InvalidParticipantException, NoCoordinatorException, WrongStateException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
-            wscfLogger.logger
-                    .trace(getClass().getSimpleName() + ".delistParticipant. Participant id: " + participantId);
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".delistParticipant. Participant id: "
+                    + participantId);
         }
 
-        _coordManager.delistParticipant(participantId);
+    _coordManager.delistParticipant(participantId);
     }
 
-    public void participantCompleted(String participantId)
-            throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException {
+    public void participantCompleted (String participantId) throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
-            wscfLogger.logger
-                    .trace(getClass().getSimpleName() + ".participantCompleted. Participant id: " + participantId);
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".participantCompleted. Participant id: "
+                    + participantId);
         }
 
-        _coordManager.participantCompleted(participantId);
+    _coordManager.participantCompleted(participantId);
     }
 
-    public void participantFaulted(String participantId)
-            throws NoActivityException, InvalidParticipantException, SystemException {
+    public void participantFaulted (String participantId) throws NoActivityException, InvalidParticipantException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
-            wscfLogger.logger
-                    .trace(getClass().getSimpleName() + ".participantFaulted. Participant id: " + participantId);
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".participantFaulted. Participant id: "
+                    + participantId);
         }
 
-        _coordManager.participantFaulted(participantId);
+    _coordManager.participantFaulted(participantId);
 
-        try {
-            setCancelOnly();
-        } catch (Exception ex) {
-            throw new SystemException(ex.toString());
-        }
+    try
+    {
+        setCancelOnly();
     }
-
-    public void participantCannotComplete(String participantId)
-            throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException {
+    catch (Exception ex)
+    {
+        throw new SystemException(ex.toString());
+    }
+    }
+    
+    public void participantCannotComplete (String participantId) throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
-            wscfLogger.logger
-                    .trace(getClass().getSimpleName() + ".participantCannotComplete. Participant id: " + participantId);
+            wscfLogger.logger.trace(getClass().getSimpleName() + ".participantCannotComplete. Participant id: "
+                    + participantId);
         }
 
-        _coordManager.participantCannotComplete(participantId);
+    _coordManager.participantCannotComplete(participantId);
 
-        try {
-            setCancelOnly();
-        } catch (Exception ex) {
-            throw new SystemException(ex.toString());
-        }
+    try
+    {
+        setCancelOnly();
+    }
+    catch (Exception ex)
+    {
+        throw new SystemException(ex.toString());
+    }
     }
 
     /**
-     * @return the token representing the current activity context hierarchy, or
-     *         null if there is none associated with the invoking thread.
+     * @return the token representing the current activity context hierarchy,
+     * or null if there is none associated with the invoking thread.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      */
 
-    public ActivityHierarchy currentActivity() throws SystemException {
+    public ActivityHierarchy currentActivity () throws SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".currentActivity");
         }
 
-        return UserActivityFactory.userActivity().currentActivity();
+    return UserActivityFactory.userActivity().currentActivity();
     }
 
     /**
      * @return the unique coordinator identifier.
      */
 
-    public CoordinatorId identifier() throws NoActivityException, SystemException {
+    public CoordinatorId identifier () throws NoActivityException, SystemException
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".identifier");
         }
 
-        ActivityImple curr = current();
+    ActivityImple curr = current();
+    
+    if (curr == null)
+        throw new NoActivityException();
 
-        if (curr == null)
-            throw new NoActivityException();
-
-        return _coordManager.identifier();
+    return _coordManager.identifier();
     }
 
-    public final ActivityImple current() {
+    public final ActivityImple current ()
+    {
         if (wscfLogger.logger.isTraceEnabled()) {
             wscfLogger.logger.trace(getClass().getSimpleName() + ".current");
         }
 
-        UserActivityImple imple = (UserActivityImple) UserActivityFactory.userActivity();
-
-        return imple.current();
+    UserActivityImple imple = (UserActivityImple) UserActivityFactory.userActivity();
+    
+    return imple.current();
     }
 
     private CoordinatorControl _coordManager;
 
 }
+

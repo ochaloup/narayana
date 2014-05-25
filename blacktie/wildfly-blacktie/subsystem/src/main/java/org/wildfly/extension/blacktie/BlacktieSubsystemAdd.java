@@ -52,7 +52,7 @@ final class BlacktieSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-        if (BlacktieLogger.ROOT_LOGGER.isTraceEnabled()) {
+        if(BlacktieLogger.ROOT_LOGGER.isTraceEnabled()) {
             BlacktieLogger.ROOT_LOGGER.trace("BlacktieSubsystemAdd.populateModel");
         }
 
@@ -63,8 +63,8 @@ final class BlacktieSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model)
-            throws OperationFailedException {
-        if (BlacktieLogger.ROOT_LOGGER.isTraceEnabled()) {
+                    throws OperationFailedException {
+        if(BlacktieLogger.ROOT_LOGGER.isTraceEnabled()) {
             BlacktieLogger.ROOT_LOGGER.trace("BlacktieSubsystemAdd.performBoottime");
         }
 
@@ -72,12 +72,12 @@ final class BlacktieSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final String connectionFactoryName = model.get(Attribute.CONNECTION_FACTORYNAME.getLocalName()).asString();
         final String socketBindingName = model.get(Attribute.SOCKET_BINDING.getLocalName()).asString();
-        final String serverName = BlacktieSubsystemDefinition.MQ_SERVER.resolveModelAttribute(context, model)
-                .asString();
+        final String serverName = BlacktieSubsystemDefinition.MQ_SERVER.resolveModelAttribute(context, model).asString();
         final ServiceName activeMQServiceName = MessagingServices.getActiveMQServiceName(serverName);
 
         final StompConnectService stompConnectService = new StompConnectService(connectionFactoryName);
-        final ServiceBuilder<StompConnectService> stompConnectServiceBuilder = context.getServiceTarget()
+        final ServiceBuilder<StompConnectService> stompConnectServiceBuilder = context
+                .getServiceTarget()
                 .addService(BlacktieSubsystemExtension.STOMPCONNECT, stompConnectService)
                 .addDependency(JMSServices.getJmsManagerBaseServiceName(activeMQServiceName))
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(socketBindingName), SocketBinding.class,

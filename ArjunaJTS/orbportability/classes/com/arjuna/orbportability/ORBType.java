@@ -35,29 +35,33 @@ package com.arjuna.orbportability;
  * The various types of ORB that are supported.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ORBType.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ORBType.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 2.0.
  */
 
-public class ORBType {
+public class ORBType
+{
 
     /**
-     * Returns the enumerated value for the orb with the given name. If this ORB
-     * is not known it will return -1.
+     * Returns the enumerated value for the orb with the given name.
+     * If this ORB is not known it will return -1.
      *
-     * @param name
-     *            The name of the ORB to find.
+     * @param name The name of the ORB to find.
      * @return The enumerated value for this ORB.
      */
-    static int getORBEnum(String name) {
-        for (int count = 0; count < ORB_NAME.length; count++) {
-            if (ORB_NAME[count].equals(name)) {
+    static int getORBEnum(String name)
+    {
+        for (int count=0;count<ORB_NAME.length;count++)
+        {
+            if ( ORB_NAME[count].equals( name ) )
+            {
                 return ORB_ENUM[count];
             }
         }
 
         return -1;
     }
+
 
     public static final int ORBIX2000 = 0;
     public static final int HPORB = 2;
@@ -73,6 +77,6 @@ public class ORBType {
     public static final String jacorb = "JACORB";
     public static final String ibmorb = "IBMORB";
 
-    private final static String[] ORB_NAME = {orbix2000, hporb, visibroker, javaidl, ibmorb, jacorb};
-    private final static int[] ORB_ENUM = {ORBIX2000, HPORB, VISIBROKER, JAVAIDL, IBMORB, JACORB};
+    private final static String[]           ORB_NAME = { orbix2000, hporb, visibroker, javaidl, ibmorb, jacorb };
+    private final static int[]              ORB_ENUM = { ORBIX2000, HPORB, VISIBROKER, JAVAIDL, IBMORB, JACORB };
 }

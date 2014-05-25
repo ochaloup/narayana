@@ -47,7 +47,8 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends TestCommitMarkableResourceBase {
+public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends
+        TestCommitMarkableResourceBase {
 
     private JDBCConnectableResource nonXAResource;
     private boolean failed = false;
@@ -58,7 +59,8 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
     @BMScript("commitMarkableResourceFailAfterPrepare")
     public void testFailAfterPrepare() throws Exception {
         final DataSource dataSource = new JdbcDataSource();
-        ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+        ((JdbcDataSource) dataSource)
+                .setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
 
         // Test code
         Utils.createTables(dataSource.getConnection());
@@ -86,7 +88,7 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[]{xaResource, xaResource2};
+                            return new XAResource[] {xaResource, xaResource2};
                         }
                     });
                 }
@@ -107,7 +109,8 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    nonXAResource = new JDBCConnectableResource(localJDBCConnection);
+                    nonXAResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(nonXAResource);
 
                     xaResource = new SimpleXAResource();
@@ -116,7 +119,8 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
                     xaResource2 = new SimpleXAResource2();
                     tm.getTransaction().enlistResource(xaResource2);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
 
                     tm.commit();
                 } catch (ExecuteException t) {
@@ -135,13 +139,15 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
         // This is test code, it allows us to verify that the
         // correct XID was
         // removed
-        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource)
+                .getStartedXid();
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Run the first pass it will load the committed Xids into memory
         manager.scan();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
 
         // Now we need to correctly complete the transaction
         assertFalse(xaResource.wasCommitted());
@@ -154,8 +160,7 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
         } catch (Error error) {
             // This is expected from xaResource2, it is intended to simulate a
             // crash
-            xarm.periodicWorkSecondPass(); // Should clear off the scanning flag
-                                            // only
+            xarm.periodicWorkSecondPass(); // Should clear off the scanning flag only
         }
         if (scanned) {
             fail("Should have failed scan");
@@ -165,7 +170,8 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
         assertFalse(xaResource2.commitCalled());
         assertFalse(xaResource2.rollbackCalled());
 
-        RecoveryManagerImple recoveryManagerImple = new RecoveryManagerImple(false);
+        RecoveryManagerImple recoveryManagerImple = new RecoveryManagerImple(
+                false);
         recoveryManagerImple.scan();
 
         assertFalse(xaResource2.commitCalled());

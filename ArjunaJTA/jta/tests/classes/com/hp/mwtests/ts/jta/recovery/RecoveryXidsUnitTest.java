@@ -44,27 +44,30 @@ import com.arjuna.ats.jta.xa.XidImple;
 import com.hp.mwtests.ts.jta.common.DummyXA;
 import com.hp.mwtests.ts.jta.common.TestResource;
 
-public class RecoveryXidsUnitTest {
+
+public class RecoveryXidsUnitTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         TestResource tr = new TestResource();
         RecoveryXids rxids = new RecoveryXids(tr);
         Xid[] xids = new XidImple[2];
-
+        
         xids[0] = new XidImple(new Uid());
         xids[1] = new XidImple(new Uid());
-
+        
         RecoveryXids dup1 = new RecoveryXids(new DummyXA(false));
         RecoveryXids dup2 = new RecoveryXids(tr);
-
+        
         assertFalse(rxids.equals(dup1));
         assertTrue(rxids.equals(dup2));
-
+        
         rxids.nextScan(xids);
         rxids.nextScan(xids);
-
+        
         xids[1] = new XidImple(new Uid());
-
+        
         rxids.nextScan(xids);
 
         Object[] trans = rxids.toRecover();
@@ -72,22 +75,22 @@ public class RecoveryXidsUnitTest {
 
         try {
             Thread.sleep(20010);
-        } catch (InterruptedException e) {
-        }
+        } catch(InterruptedException e) {}
+
 
         rxids.nextScan(xids); // force cleanup.
         trans = rxids.toRecover();
-
+        
         assertEquals(2, trans.length);
 
-        assertTrue(trans[0].equals(xids[0]) || trans[1].equals(xids[0]));
-        assertTrue(trans[0].equals(xids[1]) || trans[1].equals(xids[1]));
+        assertTrue( trans[0].equals(xids[0]) || trans[1].equals(xids[0]));
+        assertTrue( trans[0].equals(xids[1]) || trans[1].equals(xids[1]));
 
         assertTrue(rxids.contains(xids[0]));
-
+        
         assertFalse(rxids.updateIfEquivalentRM(new TestResource(), null));
         assertTrue(rxids.updateIfEquivalentRM(new TestResource(), xids));
-
+        
         assertFalse(rxids.isSameRM(new TestResource()));
     }
 }

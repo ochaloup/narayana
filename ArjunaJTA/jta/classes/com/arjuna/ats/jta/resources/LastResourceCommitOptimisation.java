@@ -41,5 +41,6 @@ import javax.transaction.xa.XAResource;
  * @version $Id$
  * @since ATS 4.1
  */
-public interface LastResourceCommitOptimisation extends XAResource {
+public interface LastResourceCommitOptimisation extends XAResource
+{
 }

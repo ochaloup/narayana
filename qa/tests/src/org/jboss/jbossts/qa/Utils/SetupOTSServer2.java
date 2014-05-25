@@ -38,16 +38,20 @@ import java.io.IOException;
  * $Id: SetupOTSServer.java,v 1.2 2003/06/26 11:45:07 rbegg Exp $
  */
 
-public class SetupOTSServer2 {
+public class SetupOTSServer2
+{
     public final static String NAME_SERVICE_BIND_NAME_PROPERTY = "ots.server.bindname";
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         String bindName = System.getProperty(NAME_SERVICE_BIND_NAME_PROPERTY);
 
-        if (bindName != null) {
+        if (bindName != null)
+        {
             System.out.println("Looking up OTS Server '" + bindName + "'");
 
-            try {
+            try
+            {
                 String transactionServiceIOR = getService(bindName);
 
                 ORBInterface.initORB(args, null);
@@ -57,21 +61,25 @@ public class SetupOTSServer2 {
 
                 Services services = new Services(ORBInterface.getORB());
 
-                services.registerService(ORBInterface.orb().string_to_object(transactionServiceIOR),
-                        ORBServices.transactionService, transactionFactoryParams);
+                services.registerService(ORBInterface.orb().string_to_object(transactionServiceIOR), ORBServices.transactionService, transactionFactoryParams);
 
                 System.out.println("Ready");
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace(System.err);
                 System.out.println("Failed");
             }
-        } else {
+        }
+        else
+        {
             System.out.println("Bind name '" + NAME_SERVICE_BIND_NAME_PROPERTY + "' not specified");
             System.out.println("Failed");
         }
     }
 
-    public static String getService(String name) throws IOException {
+    public static String getService(String name) throws IOException
+    {
         BufferedReader fin = new BufferedReader(new InputStreamReader(new FileInputStream(name)));
         String returnValue = fin.readLine();
         fin.close();

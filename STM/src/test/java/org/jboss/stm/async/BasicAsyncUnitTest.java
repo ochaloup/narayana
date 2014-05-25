@@ -49,47 +49,54 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class BasicAsyncUnitTest extends TestCase {
-
-    public void testBeginCommit() throws Exception {
+public class BasicAsyncUnitTest extends TestCase
+{
+    
+    public void testBeginCommit () throws Exception
+    {
         Transaction tx = new Transaction();
         Future<Integer> beginResult = tx.begin();
-
-        while (!beginResult.isDone()) {
+        
+        while (!beginResult.isDone())
+        {
             System.out.println("Waiting for transaction begin to complete");
             Thread.sleep(1);
         }
-
+        
         assertTrue(beginResult.get().intValue() == ActionStatus.RUNNING);
-
+        
         Future<Integer> commitResult = tx.commit();
-
-        while (!commitResult.isDone()) {
+        
+        while (!commitResult.isDone())
+        {
             System.out.println("Waiting for transaction commit to complete");
             Thread.sleep(1);
         }
-
+        
         assertTrue(commitResult.get().intValue() == ActionStatus.COMMITTED);
     }
-
-    public void testBeginAbort() throws Exception {
+    
+    public void testBeginAbort () throws Exception
+    {
         Transaction tx = new Transaction();
         Future<Integer> beginResult = tx.begin();
-
-        while (!beginResult.isDone()) {
+        
+        while (!beginResult.isDone())
+        {
             System.out.println("Waiting for transaction begin to complete");
             Thread.sleep(1);
         }
-
+        
         assertTrue(beginResult.get().intValue() == ActionStatus.RUNNING);
-
+        
         Future<Integer> abortResult = tx.abort();
-
-        while (!abortResult.isDone()) {
+        
+        while (!abortResult.isDone())
+        {
             System.out.println("Waiting for transaction abort to complete");
             Thread.sleep(1);
         }
-
+        
         assertTrue(abortResult.get().intValue() == ActionStatus.ABORTED);
     }
 }

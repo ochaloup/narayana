@@ -34,27 +34,34 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple;
 
-public class LastResourceAllowedTestCase {
+public class LastResourceAllowedTestCase
+{
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         arjPropertyManager.getCoreEnvironmentBean().setAllowMultipleLastResources(true);
     }
-
+    
     @Test
-    public void testAllowed() throws SystemException, NotSupportedException, RollbackException {
-        final LastOnePhaseResource firstResource = new LastOnePhaseResource();
-        final LastOnePhaseResource secondResource = new LastOnePhaseResource();
-        final LastOnePhaseResource thirdResource = new LastOnePhaseResource();
-
-        final TransactionManager tm = new TransactionManagerImple();
-        tm.begin();
-        try {
-            final Transaction tx = tm.getTransaction();
-            assertTrue("First resource enlisted", tx.enlistResource(firstResource));
-            assertTrue("Second resource enlisted", tx.enlistResource(secondResource));
-            assertTrue("Third resource enlisted", tx.enlistResource(thirdResource));
-        } finally {
-            tm.rollback();
+    public void testAllowed()
+        throws SystemException, NotSupportedException, RollbackException
+    {
+        final LastOnePhaseResource firstResource = new LastOnePhaseResource() ;
+        final LastOnePhaseResource secondResource = new LastOnePhaseResource() ;
+        final LastOnePhaseResource thirdResource = new LastOnePhaseResource() ;
+        
+        final TransactionManager tm = new TransactionManagerImple() ;
+        tm.begin() ;
+        try
+        {
+            final Transaction tx = tm.getTransaction() ;
+            assertTrue("First resource enlisted", tx.enlistResource(firstResource)) ;
+            assertTrue("Second resource enlisted", tx.enlistResource(secondResource)) ;
+            assertTrue("Third resource enlisted", tx.enlistResource(thirdResource)) ;
+        }
+        finally
+        {
+            tm.rollback() ;
         }
     }
 }

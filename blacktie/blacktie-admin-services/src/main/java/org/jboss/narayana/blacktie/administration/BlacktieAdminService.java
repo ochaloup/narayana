@@ -28,7 +28,7 @@ import org.jboss.narayana.blacktie.administration.core.AdministrationProxy;
  */
 public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     private static final Logger log = LogManager.getLogger(BlacktieAdminService.class);
-    // private QueueReaper reaper;
+    //private QueueReaper reaper;
     private AdministrationProxy administrationProxy;
 
     /**
@@ -36,8 +36,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
      */
     public void start() throws Exception {
         administrationProxy = new AdministrationProxy();
-        // reaper = new QueueReaper(administrationProxy);
-        // reaper.startThread();
+        //reaper = new QueueReaper(administrationProxy);
+        //reaper.startThread();
 
         administrationProxy.onConstruct();
         log.info("Admin Server Started");
@@ -47,11 +47,11 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
      * Stop the service
      */
     public void stop() throws Exception {
-        // reaper.stopThread();
+        //reaper.stopThread();
         administrationProxy.close();
         log.info("Admin Server Stopped");
     }
-
+    
     /**
      * Retrieve the domain name
      */
@@ -97,8 +97,7 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * List the running ids of a specific server
      * 
-     * @param serverName
-     *            The name of the server
+     * @param serverName The name of the server
      */
     public List<Integer> listRunningInstanceIds(String serverName) {
         return administrationProxy.listRunningInstanceIds(serverName);
@@ -114,10 +113,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * List the service status for a service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public String listServiceStatus(String serverName, String serviceName) {
         return administrationProxy.listServiceStatus(serverName, serviceName);
@@ -126,10 +123,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * Advertise a new service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public Boolean advertise(String serverName, String serviceName) {
         return administrationProxy.advertise(serverName, serviceName);
@@ -138,10 +133,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * Unadvertise a new service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public Boolean unadvertise(String serverName, String serviceName) {
         return administrationProxy.unadvertise(serverName, serviceName);
@@ -150,10 +143,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * Shutdown a server
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
+     * @param serverName The name of the server
+     * @param id The id of the server
      */
     public Boolean shutdown(String serverName, int id) {
         return administrationProxy.shutdown(serverName, id);
@@ -162,12 +153,9 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * Get the service counter and restrict it to a certain server, 0 for all.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param id The id of the server
+     * @param serviceName The name of the service
      */
     public long getServiceCounterById(String serverName, int id, String serviceName) {
         return administrationProxy.getServiceCounterById(serverName, id, serviceName);
@@ -176,10 +164,8 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * Get the service counter for the domain.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
 
     public long getServiceCounter(String serverName, String serviceName) {
@@ -194,11 +180,9 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     }
 
     /**
-     * Reload the server (causes the server to update its configuration and
-     * restart.
+     * Reload the server (causes the server to update its configuration and restart.
      * 
-     * @param serverName
-     *            The name of the server
+     * @param serverName The name of the server
      */
     public Boolean reloadServer(String serverName) {
         return administrationProxy.reloadServer(serverName);
@@ -207,12 +191,9 @@ public class BlacktieAdminService implements BlacktieAdminServiceMBean {
     /**
      * List the status of a service giving an optional id, 0 is all servers.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param id The id of the server
+     * @param serviceName The name of the service
      */
     public String listServiceStatusById(String serverName, int id, String serviceName) {
         return administrationProxy.listServiceStatusById(serverName, id, serviceName);

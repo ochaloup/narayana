@@ -32,14 +32,14 @@ package com.arjuna.orbportability.internal.orbspecific.jacorb.orb.implementation
 
 import com.arjuna.orbportability.internal.orbspecific.orb.implementations.ORBBase;
 
-public class jacorb_2_0 extends ORBBase {
-    public jacorb_2_0() {
+public class jacorb_2_0 extends ORBBase
+{
+    public jacorb_2_0 ()
+    {
         System.setProperty("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
         System.setProperty("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
 
-        // it seems nothing ever reads this, so we should be able to get away
-        // without it
-        // opPropertyManager.getPropertyManager().setProperty("com.arjuna.orbportability.internal.defaultBindMechanism",
-        // Services.bindString(Services.CONFIGURATION_FILE));
+        // it seems nothing ever reads this, so we should be able to get away without it
+        // opPropertyManager.getPropertyManager().setProperty("com.arjuna.orbportability.internal.defaultBindMechanism", Services.bindString(Services.CONFIGURATION_FILE));
     }
 }

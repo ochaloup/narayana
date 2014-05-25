@@ -38,8 +38,9 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.Session;
  * TPSVCINFO structure for a service (assuming the service was invoked within
  * the scope of a tpconnect).
  * 
- * It is used to send and retrieve data: ConnectionImpl#tpconnect(String,
- * BufferImpl, int, int) TPSVCINFO_Impl#getSession()
+ * It is used to send and retrieve data: 
+ * ConnectionImpl#tpconnect(String, BufferImpl, int, int)
+ * TPSVCINFO_Impl#getSession()
  */
 public class SessionImpl implements Session {
     /**
@@ -114,7 +115,8 @@ public class SessionImpl implements Session {
      *             In case the receiver cannot be created.
      * @see ConnectionImpl#tpconnect(String, BufferImpl, int, int)
      */
-    SessionImpl(ConnectionImpl connection, String serviceName, Transport transport, int cd) throws ConnectionException {
+    SessionImpl(ConnectionImpl connection, String serviceName,
+            Transport transport, int cd) throws ConnectionException {
         log.debug("Creating a new client session: " + cd);
         this.connection = connection;
         this.transport = transport;
@@ -142,7 +144,8 @@ public class SessionImpl implements Session {
      *             In case the receiver or sender cannot be established.
      * @see ConnectionImpl#createServiceSession(String, int, Object)
      */
-    SessionImpl(ConnectionImpl connection, Transport transport, int cd, Object replyTo) throws ConnectionException {
+    SessionImpl(ConnectionImpl connection, Transport transport, int cd,
+            Object replyTo) throws ConnectionException {
         log.debug("Connecting a client session for the service: " + cd);
         this.connection = connection;
         this.transport = transport;
@@ -203,7 +206,8 @@ public class SessionImpl implements Session {
     public void close() throws ConnectionException {
         log.debug("Closing session: " + cd);
         if (closed) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session already closed");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session already closed");
         }
         if (sender != null) {
             log.debug("Sender closing");
@@ -233,22 +237,27 @@ public class SessionImpl implements Session {
     public int tpsend(Buffer toSend, int flags) throws ConnectionException {
         log.debug("tpsend invoked: " + cd);
         if (closed) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session already closed");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session already closed");
         }
         int toReturn = -1;
 
-        int toCheck = flags & ~(ConnectionImpl.TPRECVONLY | ConnectionImpl.TPNOBLOCK | ConnectionImpl.TPNOTIME
-                | ConnectionImpl.TPSIGRSTRT);
+        int toCheck = flags
+                & ~(ConnectionImpl.TPRECVONLY | ConnectionImpl.TPNOBLOCK
+                        | ConnectionImpl.TPNOTIME | ConnectionImpl.TPSIGRSTRT);
         if (toCheck != 0) {
             log.trace("invalid flags remain: " + toCheck);
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "Invalid flags remain: " + toCheck);
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "Invalid flags remain: " + toCheck);
         }
 
         if (this.lastEvent > -1) {
-            throw new ResponseException(ConnectionImpl.TPEEVENT, "Event existed on descriptor: " + lastEvent, lastEvent,
+            throw new ResponseException(ConnectionImpl.TPEEVENT,
+                    "Event existed on descriptor: " + lastEvent, lastEvent,
                     lastRCode, null);
         } else if (!canSend) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session can't send");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session can't send");
         }
         // Can only send in certain circumstances
         if (sender != null) {
@@ -264,7 +273,8 @@ public class SessionImpl implements Session {
                 len = toSend.getLen();
             }
 
-            sender.send(receiver.getReplyTo(), (short) 0, 0, data, len, cd, flags, 0, type, subtype);
+            sender.send(receiver.getReplyTo(), (short) 0, 0, data, len, cd,
+                    flags, 0, type, subtype);
 
             // Sort out session state
             if ((flags & ConnectionImpl.TPRECVONLY) == ConnectionImpl.TPRECVONLY) {
@@ -274,7 +284,8 @@ public class SessionImpl implements Session {
 
             toReturn = 0;
         } else {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session in receive mode");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session in receive mode");
         }
         return toReturn;
     }
@@ -289,32 +300,38 @@ public class SessionImpl implements Session {
      *             If the message cannot be received or the flags are incorrect
      * @throws ConfigurationException
      */
-    public Buffer tprecv(int flags) throws ConnectionException, ConfigurationException {
+    public Buffer tprecv(int flags) throws ConnectionException,
+    ConfigurationException {
         log.debug("Receiving: " + cd);
         if (closed) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session already closed");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session already closed");
         }
 
-        int toCheck = flags & ~(ConnectionImpl.TPNOCHANGE | ConnectionImpl.TPNOBLOCK | ConnectionImpl.TPNOTIME
-                | ConnectionImpl.TPSIGRSTRT);
+        int toCheck = flags
+                & ~(ConnectionImpl.TPNOCHANGE | ConnectionImpl.TPNOBLOCK
+                        | ConnectionImpl.TPNOTIME | ConnectionImpl.TPSIGRSTRT);
         if (toCheck != 0) {
             log.trace("invalid flags remain: " + toCheck);
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "Invalid flags remain: " + toCheck);
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "Invalid flags remain: " + toCheck);
         }
 
         if (!canRecv) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session can't receive");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session can't receive");
         }
         Message m = receiver.receive(flags);
         // Prepare the outbound channel
-        if (m.replyTo == null || (sender != null && !m.replyTo.equals(sender.getSendTo()))) {
+        if (m.replyTo == null
+                || (sender != null && !m.replyTo.equals(sender.getSendTo()))) {
             log.trace("Send to location has altered");
             sender.close();
             sender = null;
         }
         if (sender == null && m.replyTo != null && !m.replyTo.equals("")) {
             log.trace("Will require a new sender");
-            if (((String) m.replyTo).contains("IOR:")) {
+            if(((String)m.replyTo).contains("IOR:")) {
                 sender = transport.createSender(m.replyTo);
             } else {
                 sender = transport.createSender(receiver);
@@ -325,7 +342,8 @@ public class SessionImpl implements Session {
 
         BufferImpl received = null;
         if (m.type != null && !m.type.equals("")) {
-            received = (BufferImpl) connection.tpalloc(m.type, m.subtype);
+            received = (BufferImpl) connection
+                    .tpalloc(m.type, m.subtype);
             received.deserialize(m.data);
         }
         log.debug("Prepared and ready to launch");
@@ -338,24 +356,30 @@ public class SessionImpl implements Session {
 
         // Check the condition of the response
         if ((m.flags & ConnectionImpl.TPRECVONLY) == ConnectionImpl.TPRECVONLY) {
-            throw new ResponseException(ConnectionImpl.TPEEVENT, "Reporting send only event",
-                    ConnectionImpl.TPEV_SENDONLY, m.rcode, received);
+            throw new ResponseException(ConnectionImpl.TPEEVENT,
+                    "Reporting send only event", ConnectionImpl.TPEV_SENDONLY,
+                    m.rcode, received);
         } else if (m.rval == EventListener.DISCON_CODE) {
             close();
-            throw new ResponseException(ConnectionImpl.TPEEVENT, "Received a disconnect event",
+            throw new ResponseException(ConnectionImpl.TPEEVENT,
+                    "Received a disconnect event",
                     ConnectionImpl.TPEV_DISCONIMM, m.rcode, received);
-        } else if (m.rval == ConnectionImpl.TPSUCCESS || m.rval == ConnectionImpl.TPFAIL) {
+        } else if (m.rval == ConnectionImpl.TPSUCCESS
+                || m.rval == ConnectionImpl.TPFAIL) {
             log.debug("Completed session is being closed: " + cd);
             close();
             if (m.rval == ConnectionImpl.TPSUCCESS) {
-                throw new ResponseException(ConnectionImpl.TPEEVENT, "Service completed successfully event",
+                throw new ResponseException(ConnectionImpl.TPEEVENT,
+                        "Service completed successfully event",
                         ConnectionImpl.TPEV_SVCSUCC, 0, received);
             } else if (m.rcode == ConnectionImpl.TPESVCERR) {
-                throw new ResponseException(ConnectionImpl.TPEEVENT, "Service received an error",
+                throw new ResponseException(ConnectionImpl.TPEEVENT,
+                        "Service received an error",
                         ConnectionImpl.TPEV_SVCERR, m.rcode, received);
             } else {
-                throw new ResponseException(ConnectionImpl.TPEEVENT, "Service received a fail",
-                        ConnectionImpl.TPEV_SVCFAIL, m.rcode, received);
+                throw new ResponseException(ConnectionImpl.TPEEVENT,
+                        "Service received a fail", ConnectionImpl.TPEV_SVCFAIL,
+                        m.rcode, received);
             }
         }
         return received;
@@ -368,7 +392,8 @@ public class SessionImpl implements Session {
     public void tpdiscon() throws ConnectionException {
         log.debug("tpdiscon: " + cd);
         if (closed) {
-            throw new ConnectionException(ConnectionImpl.TPEPROTO, "Session already closed");
+            throw new ConnectionException(ConnectionImpl.TPEPROTO,
+                    "Session already closed");
         }
         if (sender == null) {
             throw new ConnectionException(ConnectionImpl.TPEPROTO,
@@ -378,14 +403,17 @@ public class SessionImpl implements Session {
             try {
                 TransactionImpl.current().rollback_only();
             } catch (TransactionException e) {
-                throw new ConnectionException(ConnectionImpl.TPESYSTEM, "Could not mark transaction for rollback only");
+                throw new ConnectionException(ConnectionImpl.TPESYSTEM,
+                        "Could not mark transaction for rollback only");
             }
         }
         try {
-            sender.send("", EventListener.DISCON_CODE, 0, null, 0, cd, 0, 0, null, null);
+            sender.send("", EventListener.DISCON_CODE, 0, null, 0, cd, 0, 0,
+                    null, null);
         } catch (org.omg.CORBA.OBJECT_NOT_EXIST one) {
             log.warn("The disconnect called failed to notify the remote end");
-            log.debug("The disconnect called failed to notify the remote end", one);
+            log.debug("The disconnect called failed to notify the remote end",
+                    one);
         }
         close();
     }
@@ -426,7 +454,8 @@ public class SessionImpl implements Session {
      *            The last rcode
      */
     private void setLastEvent(long lastEvent, int rcode) {
-        log.debug("Set lastEvent: " + lastEvent + "lastRCode: " + lastRCode + " cd: " + cd);
+        log.debug("Set lastEvent: " + lastEvent + "lastRCode: " + lastRCode
+                + " cd: " + cd);
         this.lastEvent = lastEvent;
         this.lastRCode = rcode;
     }

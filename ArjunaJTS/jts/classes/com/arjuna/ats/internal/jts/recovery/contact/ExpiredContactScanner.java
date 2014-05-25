@@ -43,73 +43,85 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
+
 /**
- * This class is a plug-in module for the recovery manager. This class is
- * responsible for the removing contact items that are too old
+ * This class is a plug-in module for the recovery manager.  This
+ * class is responsible for the removing contact items that are too old
  */
-public class ExpiredContactScanner implements ExpiryScanner {
-    public ExpiredContactScanner() {
+public class ExpiredContactScanner implements ExpiryScanner
+{
+    public ExpiredContactScanner ()
+    {
 
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("ExpiredContactScanner created, with expiry time of " + _expiryTime + " seconds");
-        }
-        _recoveryStore = StoreManager.getRecoveryStore();
-        _itemTypeName = FactoryContactItem.getTypeName();
-
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("ExpiredContactScanner created, with expiry time of "+_expiryTime+" seconds");
+    }
+    _recoveryStore = StoreManager.getRecoveryStore();
+    _itemTypeName = FactoryContactItem.getTypeName();
+    
     }
 
     /**
      * This is called periodically by the RecoveryManager
      */
-    public void scan() {
+    public void scan ()
+    {
 
-        // calculate the time before which items will be removed
-        Date oldestSurviving = new Date(new Date().getTime() - _expiryTime * 1000);
+    // calculate the time before which items will be removed
+    Date oldestSurviving = new Date( new Date().getTime() - _expiryTime * 1000);
 
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("ExpiredContactScanner - scanning to remove items from before "
-                    + _timeFormat.format(oldestSurviving));
-        }
-        try {
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("ExpiredContactScanner - scanning to remove items from before "+_timeFormat.format(oldestSurviving));
+    }
+    try
+    {
 
-            InputObjectState uids = new InputObjectState();
+        InputObjectState uids = new InputObjectState();
+        
+        // find the uids of all the contact items
+        if (_recoveryStore.allObjUids(_itemTypeName, uids))
+        {
+        Uid theUid = null;
 
-            // find the uids of all the contact items
-            if (_recoveryStore.allObjUids(_itemTypeName, uids)) {
-                Uid theUid = null;
+        boolean endOfUids = false;
 
-                boolean endOfUids = false;
+        while (!endOfUids)
+        {
+            // extract a uid
+            theUid = UidHelper.unpackFrom(uids);
 
-                while (!endOfUids) {
-                    // extract a uid
-                    theUid = UidHelper.unpackFrom(uids);
-
-                    if (theUid.equals(Uid.nullUid()))
-                        endOfUids = true;
-                    else {
-                        Uid newUid = new Uid(theUid);
-
-                        FactoryContactItem anItem = FactoryContactItem.recreate(newUid);
-                        if (anItem != null) {
-                            Date timeOfDeath = anItem.getDeadTime();
-                            if (timeOfDeath != null && timeOfDeath.before(oldestSurviving)) {
-                                jtsLogger.i18NLogger.info_recovery_ExpiredContactScanner_3(newUid);
-                                _recoveryStore.remove_committed(newUid, _itemTypeName);
-                            }
-                        }
-                    }
+            if (theUid.equals(Uid.nullUid()))
+            endOfUids = true;
+            else
+            {
+            Uid newUid = new Uid(theUid);
+            
+            FactoryContactItem anItem = FactoryContactItem.recreate(newUid);
+            if (anItem != null) 
+            {
+                Date timeOfDeath = anItem.getDeadTime();
+                if (timeOfDeath != null && timeOfDeath.before(oldestSurviving)) 
+                {
+                    jtsLogger.i18NLogger.info_recovery_ExpiredContactScanner_3(newUid);
+                _recoveryStore.remove_committed(newUid, _itemTypeName);
                 }
             }
-        } catch (Exception e) {
-            // end of uids!
+            }
+        }
         }
     }
-
-    public boolean toBeUsed() {
-        return _expiryTime != 0;
+    catch (Exception e)
+    {
+        // end of uids!
+    }
+    }
+    
+    public boolean toBeUsed()
+    {
+    return _expiryTime != 0;
     }
 
-    private String _itemTypeName;
+    private String     _itemTypeName;
     private RecoveryStore _recoveryStore;
     private static final int _expiryTime = recoveryPropertyManager.getRecoveryEnvironmentBean()
             .getTransactionStatusManagerExpiryTime() * 60 * 60;

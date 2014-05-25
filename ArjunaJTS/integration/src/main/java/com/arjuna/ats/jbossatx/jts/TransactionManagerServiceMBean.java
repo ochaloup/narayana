@@ -42,22 +42,21 @@ import java.net.InetAddress;
  * The MBean interface for the TransactionManager JBoss service.
  *
  * @author Richard A. Begg (richard.begg@arjuna.com)
- * @version $Id: TransactionManagerServiceMBean.java,v 1.5 2005/06/17 10:53:51
- *          kconner Exp $
+ * @version $Id: TransactionManagerServiceMBean.java,v 1.5 2005/06/17 10:53:51 kconner Exp $
  */
-public interface TransactionManagerServiceMBean {
+public interface TransactionManagerServiceMBean
+{
     /**
-     * Set whether the transaction propagation context manager should propagate
-     * a full PropagationContext (JTS) or just a cut-down version (for JTA).
+     * Set whether the transaction propagation context manager should propagate a
+     * full PropagationContext (JTS) or just a cut-down version (for JTA).
      *
      * @param propagateFullContext
      */
     public void setPropagateFullContext(boolean propagateFullContext);
 
     /**
-     * Retrieve whether the transaction propagation context manager should
-     * propagate a full PropagationContext (JTS) or just a cut-down version (for
-     * JTA).
+     * Retrieve whether the transaction propagation context manager should propagate a
+     * full PropagationContext (JTS) or just a cut-down version (for JTA).
      */
     public boolean getPropagateFullContext();
 
@@ -80,7 +79,7 @@ public interface TransactionManagerServiceMBean {
      *
      * @return the XA Terminator
      */
-    public JBossXATerminator getXATerminator();
+    public JBossXATerminator getXATerminator() ;
 
     /**
      * Retrieve a reference to the JTA user transaction manager.
@@ -90,16 +89,15 @@ public interface TransactionManagerServiceMBean {
     public UserTransaction getUserTransaction();
 
     /**
-     * This method has been put in here so that it is compatible with the JBoss
-     * standard Transaction Manager. As we do not support exception formatters
-     * just display a warning for the moment.
+     * This method has been put in here so that it is compatible with the JBoss standard Transaction Manager.
+     * As we do not support exception formatters just display a warning for the moment.
      */
     public void registerXAExceptionFormatter(Class c, XAExceptionFormatter f);
 
     /**
-     * This method has been put in here so that it is compatible with the JBoss
-     * standard Transaction Manager. As we do not support exception formatters
-     * just display a warning for the moment.
+     * This method has been put in here so that it is compatible with the JBoss standard Transaction Manager.
+     * As we do not support exception formatters just display a warning for the moment.
      */
     public void unregisterXAExceptionFormatter(Class c);
 }
+

@@ -47,8 +47,8 @@ public final class JAXBContextUnmarshalAction<T extends EndpointReference> imple
         this.endpointReferenceClass = endpointReferenceClass;
     }
 
-    public static <T extends EndpointReference> JAXBContextUnmarshalAction<T> getInstance(final JAXBContext jaxbContext,
-            final Source source, final Class<T> endpointReferenceClass) {
+    public static <T extends EndpointReference> JAXBContextUnmarshalAction<T> getInstance(
+            final JAXBContext jaxbContext, final Source source, final Class<T> endpointReferenceClass) {
 
         return new JAXBContextUnmarshalAction<>(jaxbContext, source, endpointReferenceClass);
     }

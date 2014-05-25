@@ -59,26 +59,32 @@ package org.jboss.jbossts.qa.JTA01Tests;
  * $Id: Test01.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.Setup;
 
 import javax.transaction.Status;
 
-public class Test01 {
-    public static void main(String[] args) {
+public class Test01
+{
+    public static void main(String[] args)
+    {
         Setup orbClass = null;
 
-        try {
+        try
+        {
             boolean needOrb = true;
 
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-local")) {
+            for (int i = 0; i < args.length; i++)
+            {
+                if (args[i].equals("-local"))
+                {
                     needOrb = false;
                 }
             }
 
-            if (needOrb) {
-                Class c = Thread.currentThread().getContextClassLoader()
-                        .loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
+            if (needOrb)
+            {
+                Class c = Thread.currentThread().getContextClassLoader().loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
 
                 orbClass = (Setup) c.newInstance();
 
@@ -87,54 +93,75 @@ public class Test01 {
 
             boolean correct = true;
 
-            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
-                    .transactionManager();
+            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
-            try {
+            try
+            {
                 transactionManager.commit();
                 correct = false;
-            } catch (IllegalStateException illegalStateException) {
+            }
+            catch (IllegalStateException illegalStateException)
+            {
             }
 
-            try {
+            try
+            {
                 transactionManager.rollback();
                 correct = false;
-            } catch (IllegalStateException illegalStateException) {
+            }
+            catch (IllegalStateException illegalStateException)
+            {
             }
 
-            try {
+            try
+            {
                 transactionManager.setRollbackOnly();
                 correct = false;
-            } catch (IllegalStateException illegalStateException) {
+            }
+            catch (IllegalStateException illegalStateException)
+            {
             }
 
             correct = correct && (transactionManager.getTransaction() == null);
             correct = correct && (transactionManager.suspend() == null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.print("Test01.main: ");
             exception.printStackTrace(System.err);
-        } catch (Error error) {
+        }
+        catch (Error error)
+        {
             System.out.println("Failed");
             System.err.print("Test01.main: ");
             error.printStackTrace(System.err);
         }
 
-        try {
-            if (orbClass != null) {
+        try
+        {
+            if (orbClass != null)
+            {
                 orbClass.stop();
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.print("Test01.main: ");
             exception.printStackTrace(System.err);
-        } catch (Error error) {
+        }
+        catch (Error error)
+        {
             System.err.print("Test01.main: ");
             error.printStackTrace(System.err);
         }

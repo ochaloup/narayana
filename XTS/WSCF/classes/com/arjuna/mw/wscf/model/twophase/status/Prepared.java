@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Prepared implements Status {
+public class Prepared implements Status
+{
 
-    public static Prepared instance() {
-        return _instance;
+    public static Prepared instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.twophase.status.Prepared";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.twophase.status.Prepared";
-    }
-
-    private Prepared() {
+    private Prepared ()
+    {
     }
 
     private static final Prepared _instance = new Prepared();
-
+    
 }

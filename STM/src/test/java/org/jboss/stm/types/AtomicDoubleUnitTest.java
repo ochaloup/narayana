@@ -33,20 +33,22 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class AtomicDoubleUnitTest extends TestCase {
-    public void test() {
+public class AtomicDoubleUnitTest extends TestCase
+{
+    public void test ()
+    {
         AtomicDouble ad = AtomicFactory.instance().createDouble();
-
+        
         assertEquals(ad.get(), (double) 0);
-
+        
         ad.set(1);
-
+        
         assertEquals(ad.get(), (double) 1);
-
+        
         AtomicDouble temp = AtomicFactory.instance().createDouble(667);
-
+        
         assertEquals(temp.get(), (double) 667);
-
+        
         assertEquals(temp.subtract(ad).get(), (double) 666);
     }
 }

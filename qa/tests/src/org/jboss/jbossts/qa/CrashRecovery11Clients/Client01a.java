@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.CrashRecovery11Clients;
  * $Id: Client01a.java,v 1.2 2003/06/26 11:43:49 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery11.*;
 import org.jboss.jbossts.qa.CrashRecovery11Utils.Delays;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -63,9 +64,12 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client01a {
-    public static void main(String[] args) {
-        try {
+public class Client01a
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -85,21 +89,29 @@ public class Client01a {
             //
             correct = correct && (valueHolder.value == 1);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }

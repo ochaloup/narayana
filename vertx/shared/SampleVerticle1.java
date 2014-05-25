@@ -23,43 +23,47 @@ import org.jboss.stm.Container;
 
 public class SampleVerticle1 extends Verticle {
 
-    public void start() {
-        ConcurrentMap<String, String> map = vertx.sharedData().getMap("demo.mymap");
-        Container<Sample> theContainer = new Container<Sample>("Demo", Container.TYPE.PERSISTENT,
-                Container.MODEL.SHARED);
-        String uidName = map.get(ClientVerticle.LEADER);
-        Sample obj1 = theContainer.clone(new SampleLockable(10), new Uid(uidName));
-        AtomicAction A = new AtomicAction();
-        int value = -1;
-        int initialValue = -1;
-        boolean shouldCommit = true;
+  public void start()
+  {
+      ConcurrentMap<String, String> map = vertx.sharedData().getMap("demo.mymap");
+      Container<Sample> theContainer = new Container<Sample>("Demo", Container.TYPE.PERSISTENT, Container.MODEL.SHARED);
+      String uidName = map.get(ClientVerticle.LEADER);
+      Sample obj1 = theContainer.clone(new SampleLockable(10), new Uid(uidName));
+      AtomicAction A = new AtomicAction();
+      int value = -1;
+      int initialValue = -1;
+      boolean shouldCommit = true;
 
-        A.begin();
+      A.begin();
 
-        try {
-            initialValue = obj1.value();
+      try
+      {
+      initialValue = obj1.value();
 
-            obj1.increment();
+      obj1.increment();
 
-            value = obj1.value();
-        } catch (final Throwable ex) {
-            ex.printStackTrace();
+      value = obj1.value();
+      }
+      catch (final Throwable ex)
+      {
+      ex.printStackTrace();
 
-            shouldCommit = false;
-        }
+      shouldCommit = false;
+      }
 
-        if (shouldCommit)
-            A.commit();
-        else {
-            A.abort();
-            value = -1;
-        }
+      if (shouldCommit)
+      A.commit();
+      else
+      {
+      A.abort();
+      value = -1;
+      }
 
-        System.err.println("SampleVerticle1 initialised state with: " + value);
+      System.err.println("SampleVerticle1 initialised state with: "+value);
 
-        if (value == initialValue + 1)
-            System.err.println("SampleVerticle1 SUCCEEDED!");
-        else
-            System.err.println("SampleVerticle1 FAILED!");
-    }
+      if (value == initialValue + 1)
+      System.err.println("SampleVerticle1 SUCCEEDED!");
+      else
+      System.err.println("SampleVerticle1 FAILED!");
+  }
 }

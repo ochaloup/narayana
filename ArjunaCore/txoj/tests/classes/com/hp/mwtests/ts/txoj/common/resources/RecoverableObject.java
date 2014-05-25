@@ -42,33 +42,40 @@ import com.arjuna.ats.txoj.LockManager;
 import com.arjuna.ats.txoj.LockMode;
 import com.arjuna.ats.txoj.LockResult;
 
-public class RecoverableObject extends LockManager {
+public class RecoverableObject extends LockManager
+{
 
-    public RecoverableObject() {
+    public RecoverableObject()
+    {
         AtomicAction A = new AtomicAction();
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
+        {
             state = 0;
 
             if (A.commit() == ActionStatus.COMMITTED)
                 System.out.println("Created recoverable object " + get_uid());
             else
                 System.out.println("Action.commit error.");
-        } else {
+        }
+        else
+        {
             A.abort();
 
             System.out.println("setlock error.");
         }
     }
 
-    public boolean set(int value) {
+    public boolean set (int value)
+    {
         AtomicAction A = new AtomicAction();
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.WRITE)) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.WRITE)) == LockResult.GRANTED)
+        {
             state = value;
 
             if (A.commit() == ActionStatus.COMMITTED)
@@ -82,13 +89,15 @@ public class RecoverableObject extends LockManager {
         return false;
     }
 
-    public int get() {
+    public int get ()
+    {
         AtomicAction A = new AtomicAction();
         int value = -1;
 
         A.begin();
 
-        if (setlock(new Lock(LockMode.READ)) == LockResult.GRANTED) {
+        if (setlock(new Lock(LockMode.READ)) == LockResult.GRANTED)
+        {
             value = state;
 
             if (A.commit() == ActionStatus.COMMITTED)
@@ -102,37 +111,46 @@ public class RecoverableObject extends LockManager {
         return -1;
     }
 
-    public boolean save_state(OutputObjectState os, int ot) {
+    public boolean save_state (OutputObjectState os, int ot)
+    {
         boolean result = super.save_state(os, ot);
 
         if (!result)
             return false;
 
-        try {
+        try
+        {
             os.packInt(state);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             result = false;
         }
 
         return result;
     }
 
-    public boolean restore_state(InputObjectState os, int ot) {
+    public boolean restore_state (InputObjectState os, int ot)
+    {
         boolean result = super.restore_state(os, ot);
 
         if (!result)
             return false;
 
-        try {
+        try
+        {
             state = os.unpackInt();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             result = false;
         }
 
         return result;
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/LockManager/RecoverableObject";
     }
 

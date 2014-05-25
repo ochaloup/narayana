@@ -21,13 +21,15 @@ public class SuspendNullTransactionTest {
     }
 
     @Test
-    public void testSuspendNullTransaction() throws Exception {
+    public void testSuspendNullTransaction()
+            throws Exception
+            {
         TransactionManager ut = TransactionManager.getTransactionManager();
 
         TxContext ctx = ut.suspend();
 
-        System.out.println("Suspended: " + ctx);
+        System.out.println("Suspended: "+ctx);
 
         assertTrue(ctx == null);
-    }
+            }
 }

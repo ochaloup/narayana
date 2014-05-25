@@ -41,65 +41,72 @@ import com.arjuna.ats.jta.xa.XidImple;
  * Some useful utility routines.
  */
 
-public class XAHelper {
+public class XAHelper
+{
 
     /**
      * Print a human-readable version of the XAException.
      */
 
-    public static String printXAErrorCode(XAException e) {
-        if (e == null) {
+    public static String printXAErrorCode (XAException e)
+    {
+        if (e == null)
+        {
             return jtaLogger.i18NLogger.get_utils_nullexception();
-        } else {
-            switch (e.errorCode) {
-                case XAException.XA_RBROLLBACK :
-                    return "XAException.XA_RBROLLBACK";
-                case XAException.XA_RBCOMMFAIL :
-                    return "XAException.XA_RBCOMMFAIL";
-                case XAException.XA_RBDEADLOCK :
-                    return "XAException.XA_RBDEADLOCK";
-                case XAException.XA_RBINTEGRITY :
-                    return "XAException.XA_RBINTEGRITY";
-                case XAException.XA_RBOTHER :
-                    return "XAException.XA_RBOTHER";
-                case XAException.XA_RBPROTO :
-                    return "XAException.XA_RBPROTO";
-                case XAException.XA_RBTIMEOUT :
-                    return "XAException.XA_RBTIMEOUT";
-                case XAException.XA_RBTRANSIENT :
-                    return "XAException.XA_RBTRANSIENT";
-                case XAException.XA_NOMIGRATE :
-                    return "XAException.XA_NOMIGRATE";
-                case XAException.XA_HEURHAZ :
-                    return "XAException.XA_HEURHAZ";
-                case XAException.XA_HEURCOM :
-                    return "XAException.XA_HEURCOM";
-                case XAException.XA_HEURRB :
-                    return "XAException.XA_HEURRB";
-                case XAException.XA_HEURMIX :
-                    return "XAException.XA_HEURMIX";
-                case XAException.XA_RDONLY :
-                    return "XAException.XA_RDONLY";
-                case XAException.XAER_RMERR :
-                    return "XAException.XAER_RMERR";
-                case XAException.XAER_NOTA :
-                    return "XAException.XAER_NOTA";
-                case XAException.XAER_INVAL :
-                    return "XAException.XAER_INVAL";
-                case XAException.XAER_PROTO :
-                    return "XAException.XAER_PROTO";
-                case XAException.XAER_RMFAIL :
-                    return "XAException.XAER_RMFAIL";
-                case XAException.XAER_DUPID :
-                    return "XAException.XAER_DUPID";
-                case XAException.XAER_OUTSIDE :
-                    return "XAException.XAER_OUTSIDE";
-                case XAException.XA_RETRY :
-                    return "XAException.XA_RETRY";
-                case XAException.XAER_ASYNC :
-                    return "XAException.XAER_ASYNC";
-                default :
-                    return jtaLogger.i18NLogger.get_utils_unknownerrorcode() + e.errorCode;
+        }
+        else
+        {
+            switch (e.errorCode)
+            {
+            case XAException.XA_RBROLLBACK:
+                return "XAException.XA_RBROLLBACK";
+            case XAException.XA_RBCOMMFAIL:
+                return "XAException.XA_RBCOMMFAIL";
+            case XAException.XA_RBDEADLOCK:
+                return "XAException.XA_RBDEADLOCK";
+            case XAException.XA_RBINTEGRITY:
+                return "XAException.XA_RBINTEGRITY";
+            case XAException.XA_RBOTHER:
+                return "XAException.XA_RBOTHER";
+            case XAException.XA_RBPROTO:
+                return "XAException.XA_RBPROTO";
+            case XAException.XA_RBTIMEOUT:
+                return "XAException.XA_RBTIMEOUT";
+            case XAException.XA_RBTRANSIENT:
+                return "XAException.XA_RBTRANSIENT";
+            case XAException.XA_NOMIGRATE:
+                return "XAException.XA_NOMIGRATE";
+            case XAException.XA_HEURHAZ:
+                return "XAException.XA_HEURHAZ";
+            case XAException.XA_HEURCOM:
+                return "XAException.XA_HEURCOM";
+            case XAException.XA_HEURRB:
+                return "XAException.XA_HEURRB";
+            case XAException.XA_HEURMIX:
+                return "XAException.XA_HEURMIX";
+            case XAException.XA_RDONLY:
+                return "XAException.XA_RDONLY";
+            case XAException.XAER_RMERR:
+                return "XAException.XAER_RMERR";
+            case XAException.XAER_NOTA:
+                return "XAException.XAER_NOTA";
+            case XAException.XAER_INVAL:
+                return "XAException.XAER_INVAL";
+            case XAException.XAER_PROTO:
+                return "XAException.XAER_PROTO";
+            case XAException.XAER_RMFAIL:
+                return "XAException.XAER_RMFAIL";
+            case XAException.XAER_DUPID:
+                return "XAException.XAER_DUPID";
+            case XAException.XAER_OUTSIDE:
+                return "XAException.XAER_OUTSIDE";
+            case XAException.XA_RETRY:
+                return "XAException.XA_RETRY";
+            case XAException.XAER_ASYNC:
+                return "XAException.XAER_ASYNC";
+            default:
+                return jtaLogger.i18NLogger.get_utils_unknownerrorcode()
+                        + e.errorCode;
             }
         }
     }
@@ -107,46 +114,54 @@ public class XAHelper {
     /**
      * Compares two Xid instances.
      *
-     * @param x1
-     *            first Xid
-     * @param x2
-     *            second Xid
+     * @param x1 first Xid
+     * @param x2 second Xid
      *
      * @return <code>true</code> if the two instances are the same,
      *         <code>false</code> otherwise.
      */
 
-    public static boolean sameXID(Xid x1, Xid x2) {
+    public static boolean sameXID (Xid x1, Xid x2)
+    {
         if (x1 == x2)
             return true;
-        else {
-            if (x1.getFormatId() == x2.getFormatId()) {
+        else
+        {
+            if (x1.getFormatId() == x2.getFormatId())
+            {
                 byte[] gtrid1 = x1.getGlobalTransactionId();
                 byte[] gtrid2 = x2.getGlobalTransactionId();
 
-                if (gtrid1.length == gtrid2.length) {
-                    for (int i = 0; i < gtrid1.length; i++) {
+                if (gtrid1.length == gtrid2.length)
+                {
+                    for (int i = 0; i < gtrid1.length; i++)
+                    {
                         if (gtrid1[i] != gtrid2[i])
                             return false;
                     }
-                } else
+                }
+                else
                     return false;
 
                 byte[] bqual1 = x1.getBranchQualifier();
-                final int bqual1Len = (bqual1 == null ? 0 : bqual1.length);
+                final int bqual1Len = (bqual1 == null ? 0 : bqual1.length) ;
                 byte[] bqual2 = x2.getBranchQualifier();
-                final int bqual2Len = (bqual2 == null ? 0 : bqual2.length);
+                final int bqual2Len = (bqual2 == null ? 0 : bqual2.length) ;
 
-                if (bqual1Len == bqual2Len) {
-                    for (int i = 0; i < bqual1Len; i++) {
+                if (bqual1Len == bqual2Len)
+                {
+                    for (int i = 0; i < bqual1Len; i++)
+                    {
                         if (bqual1[i] != bqual2[i])
                             return false;
                     }
-                } else
+                }
+                else
                     return false;
 
                 return true;
-            } else
+            }
+            else
                 return false;
         }
     }
@@ -154,33 +169,38 @@ public class XAHelper {
     /**
      * Compares two Xid instances at the gtid level only.
      *
-     * @param x1
-     *            first Xid
-     * @param x2
-     *            second Xid
+     * @param x1 first Xid
+     * @param x2 second Xid
      *
      * @return <code>true</code> if the two instances are the same,
      *         <code>false</code> otherwise.
      */
 
-    public static boolean sameTransaction(Xid x1, Xid x2) {
+    public static boolean sameTransaction (Xid x1, Xid x2)
+    {
         if (x1 == x2)
             return true;
-        else {
-            if (x1.getFormatId() == x2.getFormatId()) {
+        else
+        {
+            if (x1.getFormatId() == x2.getFormatId())
+            {
                 byte[] gtrid1 = x1.getGlobalTransactionId();
                 byte[] gtrid2 = x2.getGlobalTransactionId();
 
-                if (gtrid1.length == gtrid2.length) {
-                    for (int i = 0; i < gtrid1.length; i++) {
+                if (gtrid1.length == gtrid2.length)
+                {
+                    for (int i = 0; i < gtrid1.length; i++)
+                    {
                         if (gtrid1[i] != gtrid2[i])
                             return false;
                     }
 
                     return true;
-                } else
+                }
+                else
                     return false;
-            } else
+            }
+            else
                 return false;
         }
     }
@@ -190,22 +210,23 @@ public class XAHelper {
      * OTS_Transaction/xa/XID.toString()
      */
 
-    public static String xidToString(Xid xid) {
-        if (xid instanceof XidImple) {
-            // ensure consistent representation of our native XIDs in the log
-            // output.
+    public static String xidToString (Xid xid)
+    {
+        if(xid instanceof XidImple) {
+            // ensure consistent representation of our native XIDs in the log output.
             return xid.toString();
         }
 
         byte[] gid = xid.getGlobalTransactionId();
         byte[] bqual = xid.getBranchQualifier();
-        String toReturn = "< " + xid.getFormatId() + ", " + gid.length + ", " + bqual.length + ", ";
+        String toReturn = "< " + xid.getFormatId() + ", " + gid.length + ", "
+                + bqual.length + ", ";
 
         for (int i = 0; i < gid.length; i++)
-            toReturn += gid[i];
+        toReturn += gid[i];
 
         for (int j = 0; j < bqual.length; j++)
-            toReturn += bqual[j];
+        toReturn += bqual[j];
 
         toReturn += " >";
 

@@ -69,13 +69,17 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client17.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
+
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.*;
 
-public class Client17 {
-    public static void main(String[] args) {
-        try {
+public class Client17
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -89,17 +93,21 @@ public class Client17 {
             float serverIncreaseThreshold;
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2])) {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2]))
+            {
                 clientIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultClientIncreaseThreshold());
-            } else // Use passed threshold
+            }
+            else // Use passed threshold
             {
                 clientIncreaseThreshold = Float.parseFloat(args[args.length - 2]);
             }
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1])) {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1]))
+            {
                 serverIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultServerIncreaseThreshold());
-            } else // Use passed threshold
+            }
+            else // Use passed threshold
             {
                 serverIncreaseThreshold = Float.parseFloat(args[args.length - 1]);
             }
@@ -115,17 +123,20 @@ public class Client17 {
 
             Worker[] workers = new Worker[numberOfWorkers];
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index] = new Worker(numberOfCalls, counter);
             }
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index].start();
             }
 
             boolean correct = true;
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index].join();
                 correct = correct && workers[index].isCorrect();
                 workers[index] = null;
@@ -142,62 +153,79 @@ public class Client17 {
             System.err.println("Server memory increase threshold : " + (float) (100.0 * serverIncreaseThreshold) + "%");
 
             System.err.println("Client percentage memory increase: " + (float) (100.0 * clientMemoryIncrease) + "%");
-            System.err.println("Client memory increase per call  : "
-                    + (clientMemory1 - clientMemory0) / (numberOfCalls * numberOfWorkers));
+            System.err.println("Client memory increase per call  : " + (clientMemory1 - clientMemory0) / (numberOfCalls * numberOfWorkers));
             System.err.println("Server percentage memory increase: " + (float) (100.0 * serverMemoryIncrease) + "%");
-            System.err.println("Server memory increase per call  : "
-                    + (serverMemory1 - serverMemory0) / (numberOfCalls * numberOfWorkers));
+            System.err.println("Server memory increase per call  : " + (serverMemory1 - serverMemory0) / (numberOfCalls * numberOfWorkers));
 
-            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < serverIncreaseThreshold)) {
+            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < serverIncreaseThreshold))
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client17.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client17.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 
-    private static class Worker extends Thread {
-        public Worker(int numberOfCalls, Counter counter) {
+    private static class Worker extends Thread
+    {
+        public Worker(int numberOfCalls, Counter counter)
+        {
             _numberOfCalls = numberOfCalls;
             _counter = counter;
         }
 
-        public void run() {
-            try {
+        public void run()
+        {
+            try
+            {
                 int index = 0;
-                while (index < _numberOfCalls) {
+                while (index < _numberOfCalls)
+                {
                     AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                     atomicTransaction.begin();
 
-                    try {
+                    try
+                    {
                         _counter.increase();
                         index++;
                         atomicTransaction.commit(true);
-                    } catch (InvocationException invocationException) {
+                    }
+                    catch (InvocationException invocationException)
+                    {
                         atomicTransaction.rollback();
                     }
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("Client17.Worker.run: " + exception);
                 exception.printStackTrace(System.err);
                 _correct = false;
             }
         }
 
-        public boolean isCorrect() {
+        public boolean isCorrect()
+        {
             return _correct;
         }
 

@@ -41,219 +41,256 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
 
-public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
-    public OptimisticLockManagerProxy(T candidate) {
+public class OptimisticLockManagerProxy<T> extends OptimisticLockManager
+{
+    public OptimisticLockManagerProxy (T candidate)
+    {
         super();
-
+        
         _theObject = candidate;
         _container = null;
     }
-
-    public OptimisticLockManagerProxy(T candidate, RecoverableContainer<T> cont) {
+    
+    public OptimisticLockManagerProxy (T candidate, RecoverableContainer<T> cont)
+    {
         super(cont.objectType(), cont.objectModel());
 
         _theObject = candidate;
         _container = cont;
     }
-
-    public OptimisticLockManagerProxy(T candidate, int ot) {
+    
+    public OptimisticLockManagerProxy (T candidate, int ot)
+    {
         super(ot, ObjectModel.SINGLE);
-
+        
         _theObject = candidate;
         _container = null;
     }
-
-    public OptimisticLockManagerProxy(T candidate, int ot, int om, RecoverableContainer<T> cont) {
+      
+    public OptimisticLockManagerProxy (T candidate, int ot, int om, RecoverableContainer<T> cont)
+    {
         super(ot, om);
 
         _theObject = candidate;
         _container = cont;
     }
-
-    public OptimisticLockManagerProxy(T candidate, Uid u) {
+       
+    public OptimisticLockManagerProxy (T candidate, Uid u)
+    {
         super(u, ObjectModel.SINGLE);
-
+        
         _theObject = candidate;
         _container = null;
     }
-
+    
     // if there's a Uid then this is a persistent object
-
-    public OptimisticLockManagerProxy(T candidate, Uid u, RecoverableContainer<T> cont) {
+    
+    public OptimisticLockManagerProxy (T candidate, Uid u, RecoverableContainer<T> cont)
+    {
         this(candidate, u, ObjectModel.SINGLE, cont);
     }
-
-    public OptimisticLockManagerProxy(T candidate, Uid u, int om, RecoverableContainer<T> cont) {
-        super(u, om); // TODO make configurable through annotation
-
+    
+    public OptimisticLockManagerProxy (T candidate, Uid u, int om, RecoverableContainer<T> cont)
+    {
+        super(u, om);  // TODO make configurable through annotation
+        
         _theObject = candidate;
         _container = cont;
     }
-
-    public synchronized boolean save_state(OutputObjectState os, int ot) {
+    
+    public synchronized boolean save_state (OutputObjectState os, int ot)
+    {
         if (!super.save_state(os, ot))
             return false;
 
         boolean res = false;
-
-        try {
+        
+        try
+        {
             /*
              * Priority is for @SaveState and @RestoreState first.
              */
-
-            try {
+            
+            try
+            {
                 res = saveState(os);
-            } catch (final InvalidAnnotationException ex) {
-                ex.printStackTrace(); // TODO logging
-
+            }
+            catch (final InvalidAnnotationException ex)
+            {
+                ex.printStackTrace();  // TODO logging
+                
                 return false;
             }
-
-            if (!res) // no save_state/restore_state
+    
+            if (!res)  // no save_state/restore_state
             {
                 res = true;
-
-                if (_fields == null) {
-                    Field[] fields = _theObject.getClass().getDeclaredFields(); // get
-                                                                                // all
-                                                                                // fields
-                                                                                // including
-                                                                                // private
-
+                
+                if (_fields == null)
+                {
+                    Field[] fields = _theObject.getClass().getDeclaredFields(); // get all fields including private
+                
                     _fields = new ArrayList<Field>();
 
-                    try {
-                        for (Field afield : fields) {
+                    try
+                    {
+                        for (Field afield : fields)
+                        {
                             // ignore if flagged with @NotState
-                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))
-                                    && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
+                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName())) &&
+                                    !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT))
+                            {
                                 _fields.add(afield);
                             }
                         }
-                    } catch (final Throwable ex) {
+                    }
+                    catch (final Throwable ex)
+                    {
                         res = false;
                     }
                 }
-
-                for (int i = 0; (i < _fields.size()) && res; i++) {
+                
+                for (int i = 0; (i < _fields.size()) && res; i++)
+                {
                     Field afield = _fields.get(i);
-
-                    synchronized (afield) {
+                    
+                    synchronized (afield)
+                    {
                         afield.setAccessible(true);
-
+        
                         /*
-                         * TODO check that the user hasn't marked statics,
-                         * finals etc.
+                         * TODO check that the user hasn't marked statics, finals etc.
                          */
-
-                        if (afield.getType().isPrimitive()) {
+        
+                        if (afield.getType().isPrimitive())
+                        {
                             res = packPrimitive(afield, os);
-                        } else
+                        }
+                        else
                             res = packObjectType(afield, os);
-
+        
                         afield.setAccessible(false);
                     }
                 }
             }
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
             res = false;
         }
-
+        
         return res;
     }
-
-    public synchronized boolean restore_state(InputObjectState os, int ot) {
+    
+    public synchronized boolean restore_state (InputObjectState os, int ot)
+    {
         if (!super.restore_state(os, ot))
             return false;
-
+        
         boolean res = false;
-
-        try {
+        
+        try
+        {
             /*
              * Priority is for @SaveState and @RestoreState first.
              */
-
-            try {
+            
+            try
+            {
                 res = restoreState(os);
-            } catch (final InvalidAnnotationException ex) {
-                ex.printStackTrace(); // TODO logging
-
+            }
+            catch (final InvalidAnnotationException ex)
+            {
+                ex.printStackTrace();  // TODO logging
+                
                 return false;
             }
-
-            if (!res) {
+            
+            if (!res)
+            {
                 res = true;
-
-                if (_fields == null) {
-                    Field[] fields = _theObject.getClass().getDeclaredFields(); // get
-                                                                                // all
-                                                                                // fields
-                                                                                // including
-                                                                                // private
-
+                
+                if (_fields == null)
+                {
+                    Field[] fields = _theObject.getClass().getDeclaredFields(); // get all fields including private
+                    
                     _fields = new ArrayList<Field>();
-
-                    try {
-                        for (Field afield : fields) {
+                    
+                    try
+                    {
+                        for (Field afield : fields)
+                        {
                             // ignore if flagged with @NotState
-
-                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName()))
-                                    && !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT)) {
+                            
+                            if (!afield.isAnnotationPresent(NotState.class) && (!THIS_NAME.equals(afield.getName())) &&
+                                    !((afield.getModifiers() & Modifier.TRANSIENT) == Modifier.TRANSIENT))
+                            {
                                 _fields.add(afield);
                             }
                         }
-                    } catch (final Throwable ex) {
+                    }
+                    catch (final Throwable ex)
+                    {
                         ex.printStackTrace();
-
+                        
                         res = false;
                     }
                 }
-
-                for (int i = 0; (i < _fields.size()) && res; i++) {
+                
+                for (int i = 0; (i < _fields.size()) && res; i++)
+                {
                     Field afield = _fields.get(i);
-
-                    synchronized (afield) {
+                    
+                    synchronized (afield)
+                    {
                         afield.setAccessible(true);
-
+                        
                         /*
-                         * TODO check that the user hasn't marked statics,
-                         * finals etc.
+                         * TODO check that the user hasn't marked statics, finals etc.
                          */
-
-                        if (afield.getType().isPrimitive()) {
+                        
+                        if (afield.getType().isPrimitive())
+                        {
                             res = unpackPrimitive(afield, os);
-                        } else
+                        }
+                        else
                             res = unpackObjectType(afield, os);
-
+                        
                         afield.setAccessible(false);
                     }
                 }
             }
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
             ex.printStackTrace();
-
+            
             res = false;
         }
-
+        
         return res;
     }
-
-    public String type() {
-        return "/StateManager/LockManager/OptimisticLockManager/" + _theObject.getClass().getCanonicalName();
+    
+    public String type ()
+    {
+        return "/StateManager/LockManager/OptimisticLockManager/"+_theObject.getClass().getCanonicalName();
     }
-
-    public final RecoverableContainer<T> getContainer() {
-        return _container;
+    
+    public final RecoverableContainer<T> getContainer ()
+    {
+        return _container; 
     }
-
-    private boolean packPrimitive(final Field afield, OutputObjectState os) {
-        try {
+    
+    private boolean packPrimitive (final Field afield, OutputObjectState os)
+    {
+        try
+        {
             /*
              * TODO deal with arrays of primitive types.
              * 
              * Workaround - provide saveState and restoreState annotations.
              */
-
+            
             if (afield.getType().equals(Boolean.TYPE))
                 os.packBoolean(afield.getBoolean(_theObject));
             else if (afield.getType().equals(Byte.TYPE))
@@ -272,17 +309,23 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                 os.packChar(afield.getChar(_theObject));
             else
                 return false;
-        } catch (final IOException ex) {
-            return false;
-        } catch (final Exception ex) {
+        }
+        catch (final IOException ex)
+        {
             return false;
         }
-
+        catch (final Exception ex)
+        {
+            return false;
+        }
+        
         return true;
     }
-
-    private boolean packObjectType(final Field afield, OutputObjectState os) {
-        try {
+    
+    private boolean packObjectType (final Field afield, OutputObjectState os)
+    {
+        try
+        {
             if (afield.getType().equals(Boolean.class))
                 os.packBoolean(((Boolean) afield.get(_theObject)).booleanValue());
             else if (afield.getType().equals(Byte.class))
@@ -305,120 +348,156 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                 return packTransactionalInstance(afield, os);
             else
                 return false;
-        } catch (final Exception ex) {
+        }
+        catch (final Exception ex)
+        {
             ex.printStackTrace();
-
+            
             return false;
         }
-
+        
         return true;
     }
-
+    
     /*
-     * This only works if this type and the types we're packing share the same
-     * container. So we need a way to specify (or determine) the container for
-     * all transactional instances.
+     * This only works if this type and the types we're packing share the same container.
+     * So we need a way to specify (or determine) the container for all transactional
+     * instances.
      */
-
+    
     @SuppressWarnings("unchecked")
-    private boolean packTransactionalInstance(final Field afield, OutputObjectState os) {
+    private boolean packTransactionalInstance (final Field afield, OutputObjectState os)
+    {
         Object ptr = null;
-
-        try {
+        
+        try
+        {
             ptr = afield.get(_theObject);
-
-            if (ptr == null) {
+            
+            if (ptr == null)
+            {
                 os.packBoolean(false);
-            } else {
+            }
+            else
+            {
                 os.packBoolean(true);
                 UidHelper.packInto(_container.getUidForHandle((T) ptr), os);
             }
-        } catch (final ClassCastException ex) {
-            System.err.println("Field " + ptr + " is not a transactional instance!");
-
-            return false;
-        } catch (final Exception ex) {
-            ex.printStackTrace();
-
+        }
+        catch (final ClassCastException ex)
+        {
+            System.err.println("Field "+ptr+" is not a transactional instance!");
+            
             return false;
         }
-
+        catch (final Exception ex)
+        {
+            ex.printStackTrace();
+            
+            return false;
+        }
+        
         return true;
     }
-
-    private boolean saveState(OutputObjectState os) throws InvalidAnnotationException {
+    
+    private boolean saveState (OutputObjectState os) throws InvalidAnnotationException
+    {
         boolean res = false;
-
+        
         checkValidity(_theObject.getClass());
-
-        if (_saveState != null) {
-            try {
+        
+        if (_saveState != null)
+        {
+            try
+            {
                 _saveState.invoke(_theObject, os);
-
+                
                 res = true;
-            } catch (final Throwable ex) {
+            }
+            catch (final Throwable ex)
+            {
                 ex.printStackTrace();
             }
         }
-
+        
         return res;
     }
-
-    private boolean restoreState(InputObjectState os) throws InvalidAnnotationException {
+    
+    private boolean restoreState (InputObjectState os) throws InvalidAnnotationException
+    {
         boolean res = false;
-
+        
         checkValidity(_theObject.getClass());
-
-        if (_restoreState != null) {
-            try {
+        
+        if (_restoreState != null)
+        {
+            try
+            {
                 _restoreState.invoke(_theObject, os);
-
+                
                 res = true;
-            } catch (final Throwable ex) {
+            }
+            catch (final Throwable ex)
+            {
                 ex.printStackTrace();
             }
         }
-
+        
         return res;
     }
-
-    private void checkValidity(Class<?> toCheck) throws InvalidAnnotationException {
+    
+    private void checkValidity (Class<?> toCheck) throws InvalidAnnotationException
+    {
         if (_checkSaveRestore)
             return;
-
-        try {
+        
+        try
+        {
             Method[] methods = toCheck.getDeclaredMethods();
-
-            if (methods != null) {
-                for (Method mt : methods) {
-                    if ((mt.isAnnotationPresent(SaveState.class) && (_saveState == null))) {
+    
+            if (methods != null)
+            {
+                for (Method mt : methods)
+                {
+                    if ((mt.isAnnotationPresent(SaveState.class) && (_saveState == null)))
+                    {
                         _saveState = mt;
                     }
-
-                    if ((mt.isAnnotationPresent(RestoreState.class) && (_restoreState == null))) {
+                    
+                    if ((mt.isAnnotationPresent(RestoreState.class) && (_restoreState == null)))
+                    {
                         _restoreState = mt;
                     }
                 }
             }
-
-            if ((_saveState != null) && (_restoreState != null)) {
+            
+            if ((_saveState != null) && (_restoreState != null))
+            {
                 return;
-            } else {
-                if ((_restoreState == null) && (_saveState == null)) {
+            }
+            else
+            {
+                if ((_restoreState == null) && (_saveState == null))
+                {
                     Class<?> superClass = toCheck.getSuperclass();
-
+    
                     if (superClass != Object.class)
                         checkValidity(superClass);
-                } else
+                }
+                else
                     throw new InvalidAnnotationException("WARNING: both save_state and restore_state are not present!");
             }
-        } finally {
+        }
+        finally
+        {      
             _checkSaveRestore = true;
         }
     }
-
-    private boolean unpackPrimitive(final Field afield, InputObjectState os) {
-        try {
+    
+    private boolean unpackPrimitive (final Field afield, InputObjectState os)
+    {
+        try
+        {
             // TODO arrays
 
             if (afield.getType().equals(Boolean.TYPE))
@@ -439,23 +518,29 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                 afield.setChar(_theObject, os.unpackChar());
             else
                 return false;
-        } catch (final IOException ex) {
+        }
+        catch (final IOException ex)
+        {
             ex.printStackTrace();
-
-            return false;
-        } catch (final Exception ex) {
-            ex.printStackTrace();
-
+            
             return false;
         }
-
+        catch (final Exception ex)
+        {
+            ex.printStackTrace();
+            
+            return false;
+        }
+        
         return true;
     }
-
-    private boolean unpackObjectType(final Field afield, InputObjectState os) {
-        try {
+    
+    private boolean unpackObjectType (final Field afield, InputObjectState os)
+    {
+        try
+        {
             // TODO arrays
-
+            
             if (afield.getType().equals(Boolean.class))
                 afield.set(_theObject, new Boolean(os.unpackBoolean()));
             else if (afield.getType().equals(Byte.class))
@@ -478,58 +563,66 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
                 return unpackTransactionalInstance(afield, os);
             else
                 return false;
-        } catch (final IOException ex) {
+        }
+        catch (final IOException ex)
+        {
             ex.printStackTrace();
-
-            return false;
-        } catch (final Exception ex) {
-            ex.printStackTrace();
-
+            
             return false;
         }
-
+        catch (final Exception ex)
+        {
+            ex.printStackTrace();
+            
+            return false;
+        }
+        
         return true;
     }
-
+    
     /*
-     * This only works if this type and the types we're packing share the same
-     * container. So we need a way to specify (or determine) the container for
-     * all transactional instances.
+     * This only works if this type and the types we're packing share the same container.
+     * So we need a way to specify (or determine) the container for all transactional
+     * instances.
      */
-
-    private boolean unpackTransactionalInstance(final Field afield, InputObjectState os) {
-        try {
+    
+    private boolean unpackTransactionalInstance (final Field afield, InputObjectState os)
+    {
+        try
+        {
             boolean ptr = os.unpackBoolean();
-
+            
             if (!ptr)
                 afield.set(_theObject, null);
-            else {
+            else
+            {
                 Uid u = UidHelper.unpackFrom(os);
-
+                
                 afield.set(_theObject, _container.getHandle(u));
             }
-        } catch (final Exception ex) {
+        }
+        catch (final Exception ex)
+        {
             ex.printStackTrace();
-
+            
             return false;
         }
-
+        
         return true;
     }
-
+    
     // the object we are working on.
-
+    
     private T _theObject;
-
+    
     // the cached methods/fields
-
+    
     private boolean _checkSaveRestore = false;
     private Method _saveState = null;
     private Method _restoreState = null;
     private RecoverableContainer<T> _container = null;
-
+    
     private ArrayList<Field> _fields = null;
-
-    private static final String THIS_NAME = "this$0"; // stop us trying to pack
-                                                        // this!
+    
+    private static final String THIS_NAME = "this$0";  // stop us trying to pack this!
 }

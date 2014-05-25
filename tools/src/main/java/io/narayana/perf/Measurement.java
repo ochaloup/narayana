@@ -30,23 +30,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author <a href="mailto:mmusgrov@redhat.com">M Musgrove</a>
  *
- *         Config and result data for running a work load
- *         (@link{Measurement#measure})
+ * Config and result data for running a work load (@link{Measurement#measure})
  */
 public class Measurement<T> implements Serializable {
     String name;
 
-    int numberOfMeasurements = 1; // if > 1 then an average of each run is taken
-                                    // (after removing outliers)
-    int numberOfCalls; // the total number of iterations used in this
-                        // measurement
-    int numberOfThreads = 1; // the number of threads used to complete the
-                                // measurement
+    int numberOfMeasurements = 1; // if > 1 then an average of each run is taken (after removing outliers)
+    int numberOfCalls; // the total number of iterations used in this measurement
+    int numberOfThreads = 1; // the number of threads used to complete the measurement
     int batchSize = 1; // iterations are executed in batches
-    private long maxTestTime = 0; // terminate measurement if test takes longer
-                                    // than this value
-    private int numberOfWarmupCalls = 0; // number of iterations before starting
-                                            // the measurement
+    private long maxTestTime = 0; // terminate measurement if test takes longer than this value
+    private int numberOfWarmupCalls = 0; //number of iterations before starting the measurement
     private String info;
 
     RegressionChecker config; // holds file based measurment data
@@ -74,8 +68,8 @@ public class Measurement<T> implements Serializable {
     }
 
     public Measurement(long maxTestTime, int numberOfThreads, int numberOfCalls, int batchSize) {
-        this(new Builder("").maxTestTime(maxTestTime).numberOfThreads(numberOfThreads).numberOfCalls(numberOfCalls)
-                .batchSize(batchSize).construct());
+        this(new Builder("").
+             maxTestTime(maxTestTime).numberOfThreads(numberOfThreads).numberOfCalls(numberOfCalls).batchSize(batchSize).construct());
     }
 
     public Measurement(Measurement result) {
@@ -164,7 +158,7 @@ public class Measurement<T> implements Serializable {
         this.totalMillis = totalMillis;
         if (totalMillis != 0) {
             this.one = totalMillis > 0 ? (int) (totalMillis / numberOfCalls) : 0;
-            this.throughput = (1000.0 * numberOfCalls) / totalMillis;
+            this.throughput =  (1000.0 * numberOfCalls) / totalMillis;
         }
     }
 
@@ -189,13 +183,16 @@ public class Measurement<T> implements Serializable {
     }
 
     public String toString() {
-        return String.format("%f calls / second (%d calls in %d ms using %d threads. %d errors)", getThroughput(),
-                getNumberOfCalls(), getTotalMillis(), getNumberOfThreads(), getNumberOfErrors());
+        return String.format("%f calls / second (%d calls in %d ms using %d threads. %d errors)",
+                getThroughput(), getNumberOfCalls(),
+                getTotalMillis(), getNumberOfThreads(),
+                getNumberOfErrors());
     }
 
     public void setInfo(String info) {
         this.info = info;
     }
+
 
     public String getInfo() {
         return info;
@@ -204,13 +201,10 @@ public class Measurement<T> implements Serializable {
     /**
      * Cancel the measurement.
      *
-     * A worker may cancel a measurement by invoking this method on the
-     * Measurement object it was passed in its @see Worker#doWork(T, int,
-     * Measurement) method
-     * 
-     * @param mayInterruptIfRunning
-     *            if false then any running calls to @see Worker#doWork will be
-     *            allowed to finish before the the measurement is cancelled.
+     * A worker may cancel a measurement by invoking this method on the Measurement object it was
+     * passed in its @see Worker#doWork(T, int, Measurement) method
+     * @param mayInterruptIfRunning if false then any running calls to @see Worker#doWork will be allowed to finish
+     *                              before the the measurement is cancelled.
      */
     public void cancel(boolean mayInterruptIfRunning) {
         this.cancelled = true;
@@ -220,15 +214,11 @@ public class Measurement<T> implements Serializable {
     /**
      * Cancel the measurement.
      *
-     * A worker may cancel a measurement by invoking this method on the
-     * Measurement object it was passed in its @see Worker#doWork(T, int,
-     * Measurement) method
-     * 
-     * @param reason
-     *            the reason for the cancelation
-     * @param mayInterruptIfRunning
-     *            if false then any running calls to @see Worker#doWork will be
-     *            allowed to finish before the the measurement is cancelled.
+     * A worker may cancel a measurement by invoking this method on the Measurement object it was
+     * passed in its @see Worker#doWork(T, int, Measurement) method
+     * @param reason the reason for the cancelation
+     * @param mayInterruptIfRunning if false then any running calls to @see Worker#doWork will be allowed to finish
+     *                              before the the measurement is cancelled.
      */
     public void cancel(String reason, boolean mayInterruptIfRunning) {
         this.setInfo(reason);
@@ -261,8 +251,7 @@ public class Measurement<T> implements Serializable {
 
     /**
      *
-     * @return true if the measurement took longer than the maximum test time
-     *         {@link io.narayana.perf.Measurement#getMaxTestTime()}
+     * @return true if the measurement took longer than the maximum test time {@link io.narayana.perf.Measurement#getMaxTestTime()}
      */
     public boolean isTimedOut() {
         return isCancelled() || getTotalMillis() > maxTestTime;
@@ -280,8 +269,7 @@ public class Measurement<T> implements Serializable {
             lifecycle.init();
 
         if (numberOfWarmupCalls > 0) {
-            System.out.printf("Test Warm Up: %s: (%d calls using %d threads)%n", name, numberOfWarmupCalls,
-                    numberOfThreads);
+            System.out.printf("Test Warm Up: %s: (%d calls using %d threads)%n", name, numberOfWarmupCalls, numberOfThreads);
             doWork(workload, new Measurement<T>(maxTestTime, 1, numberOfWarmupCalls, 1));
         }
 
@@ -328,25 +316,22 @@ public class Measurement<T> implements Serializable {
         final AtomicInteger count = new AtomicInteger(opts.getNumberOfBatches());
 
         final Collection<Future<Measurement<T>>> tasks = new ArrayList<Future<Measurement<T>>>();
-        final CyclicBarrier cyclicBarrier = new CyclicBarrier(opts.getNumberOfThreads() + 1); // workers
-                                                                                                // +
-                                                                                                // self
+        final CyclicBarrier cyclicBarrier = new CyclicBarrier(opts.getNumberOfThreads() + 1); // workers + self
 
         totalMillis = 0;
 
         for (int i = 0; i < opts.getNumberOfThreads(); i++)
             tasks.add(executor.submit(new Callable<Measurement<T>>() {
                 public Measurement<T> call() throws Exception {
-                    Measurement<T> res = new Measurement<>(opts.getMaxTestTime(), opts.getNumberOfThreads(),
-                            opts.getNumberOfCalls(), opts.getBatchSize());
+                    Measurement<T> res = new Measurement<>(
+                            opts.getMaxTestTime(), opts.getNumberOfThreads(), opts.getNumberOfCalls(), opts.getBatchSize());
                     int errorCount = 0;
 
                     try {
                         cyclicBarrier.await();
                         long start = System.nanoTime();
 
-                        // all threads are ready - this thread gets more work in
-                        // batch size chunks until there isn't anymore
+                        // all threads are ready - this thread gets more work in batch size chunks until there isn't anymore
                         while (count.decrementAndGet() >= 0) {
                             res.setNumberOfCalls(opts.getBatchSize());
                             // ask the worker to do batchSize units or work
@@ -395,8 +380,7 @@ public class Measurement<T> implements Serializable {
         long start = System.nanoTime();
 
         try {
-            cyclicBarrier.await(); // wait for each thread to arrive at the
-                                    // barrier
+            cyclicBarrier.await(); // wait for each thread to arrive at the barrier
 
             // wait for each thread to finish
             if (opts.getMaxTestTime() > 0)
@@ -406,8 +390,7 @@ public class Measurement<T> implements Serializable {
 
             long tot = System.nanoTime() - start;
 
-            if (tot < 0) // nanoTime is reckoned from an arbitrary origin which
-                            // may be in the future
+            if (tot < 0) // nanoTime is reckoned from an arbitrary origin which may be in the future
                 tot = -tot;
 
             opts.setTotalMillis(tot / 1000000L);
@@ -438,9 +421,7 @@ public class Measurement<T> implements Serializable {
             } catch (CancellationException e) {
                 opts.incrementErrorCount(opts.getBatchSize());
                 opts.setCancelled(true);
-            } catch (ExecutionException e) { // should be a
-                                                // BrokenBarrierException due to
-                                                // a timeout
+            } catch (ExecutionException e) { // should be a BrokenBarrierException due to a timeout
                 System.out.printf("ExecutionException exception: %s%n", e.getMessage());
                 opts.incrementErrorCount(opts.getBatchSize());
                 opts.setCancelled(true);
@@ -487,12 +468,9 @@ public class Measurement<T> implements Serializable {
         }
 
         /**
-         * The number of times to run the measurement. If greater than one then
-         * outliers are discounted and an average is taken of the remaining
-         * runs.
-         * 
-         * @param numberOfMeasurements
-         *            number of measurements
+         * The number of times to run the measurement.
+         * If greater than one then outliers are discounted and an average is taken of the remaining runs.
+         * @param numberOfMeasurements number of measurements
          * @return the builder
          */
         public Builder numberOfMeasurements(int numberOfMeasurements) {
@@ -571,8 +549,8 @@ public class Measurement<T> implements Serializable {
             numberOfBatches = numberOfCalls / batchSize;
 
             if (numberOfBatches < numberOfThreads) {
-                System.err.printf("Too few batches - reducing thread count (%d %d %d)%n", numberOfThreads,
-                        numberOfBatches, numberOfCalls);
+                System.err.printf("Too few batches - reducing thread count (%d %d %d)%n",
+                        numberOfThreads, numberOfBatches, numberOfCalls);
                 numberOfThreads = numberOfBatches;
             }
 

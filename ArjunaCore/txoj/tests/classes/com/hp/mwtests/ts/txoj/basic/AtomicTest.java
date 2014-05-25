@@ -41,44 +41,49 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class AtomicTest {
+public class AtomicTest
+{
     @Test
-    public void run() {
-        AtomicObject foo = new AtomicObject();
-        Uid u = foo.get_uid();
+    public void run()
+    {
+    AtomicObject foo = new AtomicObject();
+    Uid u = foo.get_uid();
 
-        AtomicAction A = new AtomicAction();
+    AtomicAction A = new AtomicAction();
 
-        try {
-            A.begin();
+    try {
+        A.begin();
 
-            foo.set(2);
+        foo.set(2);
 
-            A.commit();
+        A.commit();
 
-            int finalVal = foo.get();
+        int finalVal = foo.get();
 
-            assertEquals(2, finalVal);
+        assertEquals(2, finalVal);
 
-            foo = new AtomicObject(u);
 
-            A = new AtomicAction();
+        foo = new AtomicObject(u);
 
-            A.begin();
+        A = new AtomicAction();
 
-            foo.set(4);
+        A.begin();
 
-            A.commit();
+        foo.set(4);
 
-            finalVal = foo.get();
+        A.commit();
 
-            assertEquals(4, finalVal);
+        finalVal = foo.get();
 
-        } catch (TestException e) {
-            A.abort();
+        assertEquals(4, finalVal);
 
-            fail("AtomicObject exception raised.");
-        }
+    }
+    catch (TestException e)
+    {
+        A.abort();
+
+        fail("AtomicObject exception raised.");
+    }
 
     }
 

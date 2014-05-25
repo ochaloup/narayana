@@ -63,20 +63,23 @@ import com.arjuna.mw.wscf.exceptions.*;
  * 
  */
 
-public class ATCoordinator extends TwoPhaseCoordinator {
+public class ATCoordinator extends TwoPhaseCoordinator
+{
 
     private final static int ROLLEDBACK = 0;
     private final static int READONLY = 1;
 
-    public ATCoordinator() {
+    public ATCoordinator()
+    {
         super();
-
+    
         _theId = new CoordinatorIdImple(get_uid());
     }
 
-    public ATCoordinator(Uid recovery) {
+    public ATCoordinator(Uid recovery)
+    {
         super(recovery);
-
+                
         _theId = new CoordinatorIdImple(get_uid());
     }
 
@@ -101,8 +104,9 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate(CompletionStatus cs)
-            throws WrongStateException, ProtocolViolationException, SystemException {
+    public Outcome coordinate (CompletionStatus cs) throws WrongStateException,
+            ProtocolViolationException, SystemException
+    {
         return null;
     }
 
@@ -110,8 +114,7 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      * Enrol the specified participant with the coordinator associated with the
      * current thread.
      * 
-     * @param act
-     *            The participant.
+     * @param act The participant.
      *
      * @exception WrongStateException
      *                Thrown if the coordinator is not in a state that allows
@@ -126,8 +129,10 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void enlistParticipant(Participant act)
-            throws WrongStateException, DuplicateParticipantException, InvalidParticipantException, SystemException {
+    public void enlistParticipant (Participant act) throws WrongStateException,
+            DuplicateParticipantException, InvalidParticipantException,
+            SystemException
+    {        
         if (act == null)
             throw new InvalidParticipantException();
 
@@ -151,20 +156,22 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void delistParticipant(Participant act)
-            throws InvalidParticipantException, WrongStateException, SystemException {
+    public void delistParticipant (Participant act)
+            throws InvalidParticipantException, WrongStateException,
+            SystemException
+    {
         if (act == null)
             throw new InvalidParticipantException();
         else
-            throw new WrongStateException(wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_1());
+            throw new WrongStateException(
+                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_1());
     }
 
     /**
      * Enrol the specified synchronization with the coordinator associated with
      * the current thread.
      * 
-     * @param act
-     *            The synchronization to add.
+     * @param act The synchronization to add.
      * 
      * @exception WrongStateException
      *                Thrown if the coordinator is not in a state that allows
@@ -179,8 +186,10 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void enlistSynchronization(Synchronization act) throws WrongStateException,
-            DuplicateSynchronizationException, InvalidSynchronizationException, SystemException {
+    public void enlistSynchronization (Synchronization act)
+            throws WrongStateException, DuplicateSynchronizationException,
+            InvalidSynchronizationException, SystemException
+    {
         if (act == null)
             throw new InvalidSynchronizationException();
 
@@ -204,12 +213,15 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void delistSynchronization(Synchronization act)
-            throws InvalidSynchronizationException, WrongStateException, SystemException {
+    public void delistSynchronization (Synchronization act)
+            throws InvalidSynchronizationException, WrongStateException,
+            SystemException
+    {
         if (act == null)
             throw new InvalidSynchronizationException();
         else
-            throw new WrongStateException(wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_1());
+            throw new WrongStateException(
+                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_1());
     }
 
     /**
@@ -220,7 +232,8 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      *         the current coordinator.
      */
 
-    public Qualifier[] qualifiers() throws SystemException {
+    public Qualifier[] qualifiers () throws SystemException
+    {
         return null;
     }
 
@@ -231,14 +244,18 @@ public class ATCoordinator extends TwoPhaseCoordinator {
      * @return The unique identity of the current coordinator.
      */
 
-    public CoordinatorId identifier() throws SystemException {
+    public CoordinatorId identifier () throws SystemException
+    {
         return _theId;
     }
 
-    public synchronized void participantRolledBack(String participantId)
-            throws InvalidParticipantException, WrongStateException, SystemException {
+    public synchronized void participantRolledBack (String participantId)
+            throws InvalidParticipantException, WrongStateException,
+            SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
 
         if (status() == ActionStatus.RUNNING)
             changeParticipantStatus(participantId, ROLLEDBACK);
@@ -246,24 +263,31 @@ public class ATCoordinator extends TwoPhaseCoordinator {
             throw new WrongStateException();
     }
 
-    public synchronized void participantReadOnly(String participantId)
-            throws InvalidParticipantException, SystemException {
+    public synchronized void participantReadOnly (String participantId)
+            throws InvalidParticipantException, SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_2());
 
-        if (status() == ActionStatus.RUNNING) {
+        if (status() == ActionStatus.RUNNING)
+        {
             changeParticipantStatus(participantId, READONLY);
-        } else
-            throw new SystemException(wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_3());
+        }
+        else
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_twophase_arjunacore_ATCoordinator_3());
     }
 
     @Override
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/BasicAction/AtomicAction/TwoPhaseCoordinator/TwoPhase/ATCoordinator";
     }
-
-    private final void changeParticipantStatus(String participantId, int status)
-            throws InvalidParticipantException, SystemException {
+    
+    private final void changeParticipantStatus (String participantId, int status)
+            throws InvalidParticipantException, SystemException
+    {
         /*
          * Transaction is active, so we can look at the pendingList only.
          */
@@ -272,17 +296,22 @@ public class ATCoordinator extends TwoPhaseCoordinator {
         // could come in late
         boolean found = false;
 
-        if (pendingList != null) {
+        if (pendingList != null)
+        {
             RecordListIterator iter = new RecordListIterator(pendingList);
             AbstractRecord absRec = iter.iterate();
 
-            try {
-                while ((absRec != null) && !found) {
-                    if (absRec instanceof ParticipantRecord) {
+            try
+            {
+                while ((absRec != null) && !found)
+                {
+                    if (absRec instanceof ParticipantRecord)
+                    {
                         ParticipantRecord pr = (ParticipantRecord) absRec;
                         Participant participant = (Participant) pr.value();
 
-                        if (participantId.equals(participant.id())) {
+                        if (participantId.equals(participant.id()))
+                        {
                             found = true;
 
                             if (status == READONLY)
@@ -294,7 +323,9 @@ public class ATCoordinator extends TwoPhaseCoordinator {
 
                     absRec = iter.iterate();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw new SystemException(ex.toString());
             }
         }

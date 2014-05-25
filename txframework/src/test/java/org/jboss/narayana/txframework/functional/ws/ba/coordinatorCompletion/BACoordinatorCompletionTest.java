@@ -58,22 +58,27 @@ public class BACoordinatorCompletionTest {
 
     @Deployment()
     public static JavaArchive createTestArchive() {
-        // todo: Does the application developer have to specify the interceptor?
+        //todo: Does the application developer have to specify the interceptor?
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addPackages(false, BACoordinatorCompletionTest.class.getPackage())
-                .addPackage(EventLog.class.getPackage()).addAsManifestResource("persistence.xml")
-                .addClass(ParticipantCompletionCoordinatorRules.class).addClass(URLUtils.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
+                .addPackage(EventLog.class.getPackage())
+                .addAsManifestResource("persistence.xml")
+                .addClass(ParticipantCompletionCoordinatorRules.class)
+                .addClass(URLUtils.class)
+                .addAsManifestResource(EmptyAsset.INSTANCE,
+                        ArchivePaths.create("beans.xml"));
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 
         String ManifestMF = "Manifest-Version: 1.0\n"
                 + "Dependencies: org.jboss.xts, org.jboss.narayana.txframework services\n";
 
+
         archive.setManifest(new StringAsset(ManifestMF));
 
         return archive;
     }
+
 
     UserBusinessActivity uba;
     BACoordinatorCompletion client;
@@ -132,7 +137,7 @@ public class BACoordinatorCompletionTest {
             client.saveData(THROW_APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (SomeApplicationException e) {
-            // Exception expected
+            //Exception expected
         } finally {
             uba.cancel();
         }

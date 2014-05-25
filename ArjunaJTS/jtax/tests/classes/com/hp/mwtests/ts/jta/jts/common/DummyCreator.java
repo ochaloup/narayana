@@ -33,10 +33,12 @@ package com.hp.mwtests.ts.jta.jts.common;
 
 import javax.transaction.xa.XAResource;
 
-public class DummyCreator implements XACreator {
+public class DummyCreator implements XACreator
+{
 
-    public XAResource create(String param, boolean print) {
-        return new DummyXA(print);
+    public XAResource create (String param, boolean print)
+    {
+    return new DummyXA(print);
     }
 
 }

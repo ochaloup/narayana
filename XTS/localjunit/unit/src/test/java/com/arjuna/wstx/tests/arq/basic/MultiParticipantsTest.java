@@ -16,11 +16,14 @@ public class MultiParticipantsTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoDurableParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoDurableParticipant.class);
     }
 
     @Test
-    public void testMultiParticipants() throws Exception {
+    public void testMultiParticipants()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
         DemoDurableParticipant p1 = new DemoDurableParticipant();
@@ -34,14 +37,14 @@ public class MultiParticipantsTest {
             tm.enlistForDurableTwoPhase(p2, p2.identifier());
             tm.enlistForDurableTwoPhase(p3, p3.identifier());
             tm.enlistForDurableTwoPhase(p4, p4.identifier());
-        } catch (Exception eouter) {
+        }  catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
 
         ut.commit();
-    }
+            }
 }

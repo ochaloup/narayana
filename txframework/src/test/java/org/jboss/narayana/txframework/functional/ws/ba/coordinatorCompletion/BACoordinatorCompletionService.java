@@ -49,7 +49,8 @@ import java.lang.annotation.Annotation;
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
 @Stateless
-@WebService(serviceName = "BACoordinatorCompletionService", portName = "BACoordinatorCompletionService", name = "BACoordinatorCompletion", targetNamespace = "http://www.jboss.com/functional/ba/coordinatorcompletion/")
+@WebService(serviceName = "BACoordinatorCompletionService", portName = "BACoordinatorCompletionService",
+        name = "BACoordinatorCompletion", targetNamespace = "http://www.jboss.com/functional/ba/coordinatorcompletion/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @Compensatable(completionType = CompletionType.COORDINATOR)
 public class BACoordinatorCompletionService implements BACoordinatorCompletion {
@@ -62,7 +63,7 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
 
     @WebMethod
     @ServiceRequest
-    // todo: batch up data and only addEvent during confirmCompleted
+    //todo: batch up data and only addEvent during confirmCompleted
     public void saveData(ServiceCommand[] serviceCommands) throws SomeApplicationException {
 
         txDataMap.put("data", "data");
@@ -92,7 +93,7 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
         eventLog.clear();
     }
 
-    // todo: why is this never invoked? Always true for CoordinationCompletion?
+    //todo: why is this never invoked? Always true for CoordinationCompletion?
     @Compensate
     @WebMethod(exclude = true)
     public void compensate() {
@@ -168,7 +169,7 @@ public class BACoordinatorCompletionService implements BACoordinatorCompletion {
     }
 
     private void logEvent(Class<? extends Annotation> event) {
-        // Check data is available
+        //Check data is available
         if (txDataMap == null || txDataMap.get("data") == null) {
             eventLog.addDataUnavailable(event);
         }

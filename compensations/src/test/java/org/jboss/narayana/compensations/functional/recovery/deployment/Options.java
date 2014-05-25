@@ -126,8 +126,8 @@ public class Options {
 
     @Override
     public String toString() {
-        return "Options{" + "isDistributed=" + isDistributed + ", isCompensate=" + isCompensate + ", isTxConfirm="
-                + isTxConfirm + ", isTxCompensate=" + isTxCompensate + ", isCompensatableActionCompensation="
+        return "Options{" + "isDistributed=" + isDistributed + ", isCompensate=" + isCompensate + ", isTxConfirm=" + isTxConfirm
+                + ", isTxCompensate=" + isTxCompensate + ", isCompensatableActionCompensation="
                 + isCompensatableActionCompensation + ", isCompensatableActionConfirmation="
                 + isCompensatableActionConfirmation + ", compensationScopedData='" + compensationScopedData
                 + "', compensatableActionData='" + compensatableActionData + "', testName='" + testName + "'}";

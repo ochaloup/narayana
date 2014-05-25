@@ -58,21 +58,29 @@ package org.jboss.jbossts.qa.CrashRecovery01Impls;
  * $Id: ResourceImpl01.java,v 1.2 2003/06/26 11:43:17 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery01.*;
 import org.omg.CosTransactions.*;
 
-public class ResourceImpl01 implements ResourceOperations {
-    public ResourceImpl01(int objectNumber, int resourceNumber) {
+public class ResourceImpl01 implements ResourceOperations
+{
+    public ResourceImpl01(int objectNumber, int resourceNumber)
+    {
         _objectNumber = objectNumber;
         _resourceNumber = resourceNumber;
     }
 
-    public Vote prepare() throws HeuristicMixed, HeuristicHazard {
+    public Vote prepare()
+            throws HeuristicMixed, HeuristicHazard
+    {
         System.err.print("ResourceImpl01.prepare [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
-        if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
+        if (_resourceTrace == ResourceTrace.ResourceTraceNone)
+        {
             _resourceTrace = ResourceTrace.ResourceTracePrepare;
-        } else {
+        }
+        else
+        {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
@@ -81,53 +89,71 @@ public class ResourceImpl01 implements ResourceOperations {
         return Vote.VoteCommit;
     }
 
-    public void rollback() throws HeuristicCommit, HeuristicMixed, HeuristicHazard {
+    public void rollback()
+            throws HeuristicCommit, HeuristicMixed, HeuristicHazard
+    {
         System.err.print("ResourceImpl01.rollback [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
-        if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
+        if (_resourceTrace == ResourceTrace.ResourceTraceNone)
+        {
             _resourceTrace = ResourceTrace.ResourceTraceRollback;
-        } else {
+        }
+        else
+        {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
         System.err.println("Return");
     }
 
-    public void commit() throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+    public void commit()
+            throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
         System.err.print("ResourceImpl01.commit [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
-        if (_resourceTrace == ResourceTrace.ResourceTracePrepare) {
+        if (_resourceTrace == ResourceTrace.ResourceTracePrepare)
+        {
             _resourceTrace = ResourceTrace.ResourceTracePrepareCommit;
-        } else {
+        }
+        else
+        {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
         System.err.println("Return");
     }
 
-    public void commit_one_phase() throws HeuristicHazard {
+    public void commit_one_phase()
+            throws HeuristicHazard
+    {
         System.err.print("ResourceImpl01.commit_one_phase [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
-        if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
+        if (_resourceTrace == ResourceTrace.ResourceTraceNone)
+        {
             _resourceTrace = ResourceTrace.ResourceTraceCommitOnePhase;
-        } else {
+        }
+        else
+        {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
         System.err.println("Return");
     }
 
-    public void forget() {
+    public void forget()
+    {
         System.err.println("ResourceImpl01.forget [O" + _objectNumber + ".R" + _resourceNumber + "]: Return");
 
         _resourceTrace = ResourceTrace.ResourceTraceUnknown;
     }
 
-    public boolean isCorrect() {
+    public boolean isCorrect()
+    {
         return true;
     }
 
-    public ResourceTrace getTrace() {
+    public ResourceTrace getTrace()
+    {
         return _resourceTrace;
     }
 

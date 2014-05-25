@@ -24,12 +24,15 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.impl.Service01;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class Worker001 extends Thread {
-    public Worker001(int iterations, int resources) {
+public class Worker001 extends Thread
+{
+    public Worker001(int iterations, int resources)
+    {
         this(iterations, resources, 1);
     }
 
-    public Worker001(int iterations, int resources, int id) {
+    public Worker001(int iterations, int resources, int id)
+    {
         mMaxIteration = iterations;
         mNumberOfResources = resources;
 
@@ -40,30 +43,35 @@ public class Worker001 extends Thread {
     /**
      * The main method of the class that will perform the work.
      */
-    public void run() {
-        try {
+    public void run()
+    {
+        try
+        {
             AtomicAction a = new AtomicAction();
-            // start transaction
+            //start transaction
             a.begin();
             mService.setupOper();
             mService.doWork(mMaxIteration);
-            // comit transaction
+            //comit transaction
             a.commit();
 
             mService = new Service01(mNumberOfResources);
-            // start new AtomicAction
+            //start new AtomicAction
             AtomicAction b = new AtomicAction();
             b.begin();
             mService.setupOper();
             mService.doWork(mMaxIteration);
             b.abort();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             mCorrect = false;
             qautil.debug("exception in worker001: ", e);
         }
     }
 
-    public boolean isCorrect() {
+    public boolean isCorrect()
+    {
         return mCorrect;
     }
 

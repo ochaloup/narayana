@@ -15,28 +15,31 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA. User: adinn Date: Oct 7, 2007 Time: 3:14:28 PM To
- * change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA.
+ * User: adinn
+ * Date: Oct 7, 2007
+ * Time: 3:14:28 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class WSCOORClient {
-    // TODO -- do we really need a thread local here or can we just use one
-    // service?
+public class WSCOORClient
+{
+    // TODO -- do we really need a thread local here or can we just use one service?
     /**
-     * thread local which maintains a per thread activation service instance
+     *  thread local which maintains a per thread activation service instance
      */
     private static ThreadLocal<ActivationService> activationService = new ThreadLocal<ActivationService>();
 
     /**
-     * thread local which maintains a per thread activation service instance
+     *  thread local which maintains a per thread activation service instance
      */
     private static ThreadLocal<RegistrationService> registrationService = new ThreadLocal<RegistrationService>();
 
     /**
      * fetch a coordinator activation service unique to the current thread
-     * 
      * @return
      */
-    private static synchronized ActivationService getActivationService() {
+    private static synchronized ActivationService getActivationService()
+    {
         if (activationService.get() == null) {
             activationService.set(PrivilegedServiceFactory.getInstance(ActivationService.class).getService());
         }
@@ -45,58 +48,55 @@ public class WSCOORClient {
 
     /**
      * fetch a coordinator registration service unique to the current thread
-     * 
      * @return
      */
-    private static synchronized RegistrationService getRegistrationService() {
+    private static synchronized RegistrationService getRegistrationService()
+    {
         if (registrationService.get() == null) {
             registrationService.set(PrivilegedServiceFactory.getInstance(RegistrationService.class).getService());
         }
         return registrationService.get();
     }
 
-    public static ActivationPortType getActivationPort(MAP map, String action) {
+    public static ActivationPortType getActivationPort(MAP map, String action)
+    {
         final ActivationService service = getActivationService();
         final ActivationPortType port = PrivilegedServiceHelper.getInstance().getPort(service, ActivationPortType.class,
                 new AddressingFeature(true, true));
-        BindingProvider bindingProvider = (BindingProvider) port;
+        BindingProvider bindingProvider = (BindingProvider)port;
         String to = map.getTo();
         /*
-         * we no longer have to add the JaxWS WSAddressingClientHandler because
-         * we can specify the WSAddressing feature List<Handler>
-         * customHandlerChain = new ArrayList<Handler>();
-         * customHandlerChain.add(new WSAddressingClientHandler());
-         * bindingProvider.getBinding().setHandlerChain(customHandlerChain);
+         * we no longer have to add the JaxWS WSAddressingClientHandler because we can specify the WSAddressing feature
+        List<Handler> customHandlerChain = new ArrayList<Handler>();
+        customHandlerChain.add(new WSAddressingClientHandler());
+        bindingProvider.getBinding().setHandlerChain(customHandlerChain);
          */
 
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
-        AddressingHelper.configureRequestContext(requestContext, map, to, action);
+        AddressingHelper.configureRequestContext(requestContext, map, to,  action);
 
         return port;
     }
 
-    // don't think we ever need this as we get a registration port from the
-    // endpoint ref returned by
+    // don't think we ever need this as we get a registration port from the endpoint ref returned by
     // the activation port request
-    public static RegistrationPortType getRegistrationPort(final W3CEndpointReference endpointReference, String action,
-            String messageID) {
+    public static RegistrationPortType getRegistrationPort(final W3CEndpointReference endpointReference, String action, String messageID)
+    {
         final RegistrationService service = getRegistrationService();
         final RegistrationPortType port = PrivilegedServiceHelper.getInstance().getPort(service, endpointReference,
                 RegistrationPortType.class, new AddressingFeature(true, true));
-        BindingProvider bindingProvider = (BindingProvider) port;
+        BindingProvider bindingProvider = (BindingProvider)port;
         /*
-         * we no longer have to add the JaxWS WSAddressingClientHandler because
-         * we can specify the WSAddressing feature List<Handler>
-         * customHandlerChain = new ArrayList<Handler>();
-         * customHandlerChain.add(new WSAddressingClientHandler());
-         * bindingProvider.getBinding().setHandlerChain(customHandlerChain);
+         * we no longer have to add the JaxWS WSAddressingClientHandler because we can specify the WSAddressing feature
+        List<Handler> customHandlerChain = new ArrayList<Handler>();
+        customHandlerChain.add(new WSAddressingClientHandler());
+        bindingProvider.getBinding().setHandlerChain(customHandlerChain);
          */
 
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
         MAP map = AddressingHelper.outboundMap(requestContext);
         AddressingHelper.installActionMessageID(map, action, messageID);
-        // we should not need to do this but JBossWS does not pick up the value
-        // in the addressing properties
+        // we should not need to do this but JBossWS does not pick up the value in the addressing properties
         AddressingHelper.configureRequestContext(requestContext, map.getTo(), action);
         return port;
     }

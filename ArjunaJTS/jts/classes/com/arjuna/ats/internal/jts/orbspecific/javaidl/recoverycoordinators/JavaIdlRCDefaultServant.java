@@ -41,19 +41,20 @@ import org.omg.CosTransactions.NotPrepared;
 import org.omg.CosTransactions.Resource;
 import org.omg.CosTransactions.Status;
 
-public class JavaIdlRCDefaultServant extends GenericRecoveryCoordinator {
+
+public class JavaIdlRCDefaultServant extends GenericRecoveryCoordinator
+{
     private ORB _ourOrb;
 
     static byte[] RCObjectId = null;
 
     /**
      * constructor supplies orb - used only within package
-     * 
-     * @param orb
-     *            which orb to use
+     * @param orb which orb to use
      */
-    JavaIdlRCDefaultServant(ORB orb) {
-        super(); // ensure id is null
+    JavaIdlRCDefaultServant(ORB orb)
+    {
+        super();    // ensure id is null
         _ourOrb = orb;
 
         if (jtsLogger.logger.isDebugEnabled()) {
@@ -62,24 +63,25 @@ public class JavaIdlRCDefaultServant extends GenericRecoveryCoordinator {
 
     }
 
-    public Status replay_completion(Resource res) throws SystemException, NotPrepared {
+    public Status replay_completion ( Resource res ) throws SystemException, NotPrepared
+    {
         if (jtsLogger.logger.isDebugEnabled()) {
             jtsLogger.logger.debug("JavaIdlRCDefaultServant::replay_completion)");
         }
 
-        try {
-            // Begin New
+        try
+        {
+            //Begin New
             org.omg.CORBA.Object obj = _ourOrb.resolve_initial_references("POACurrent");
             org.omg.PortableServer.Current poa_current = org.omg.PortableServer.CurrentHelper.narrow(obj);
             byte[] objectId = poa_current.get_object_id();
-            // End New
+            //End New
 
             String objectIdString = new String(objectId, StandardCharsets.UTF_8);
             String poaName = poa_current.get_POA().the_name();
 
             if (objectIdString.startsWith(poaName)) {
-                // strip off the POA name prefix from the object name - the
-                // remainder encodes our Uids
+                // strip off the POA name prefix from the object name - the remainder encodes our Uids
                 int index = poaName.length();
 
                 if (objectIdString.length() > index)
@@ -89,17 +91,18 @@ public class JavaIdlRCDefaultServant extends GenericRecoveryCoordinator {
             }
 
             // convert that to the structured id
-            RecoveryCoordinatorId recovCoId = RecoveryCoordinatorId.reconstruct(objectIdString);
+            RecoveryCoordinatorId  recovCoId = RecoveryCoordinatorId.reconstruct(objectIdString);
 
             if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("JavaIdlDefaultServant replay_completion for Id " + recovCoId);
+                jtsLogger.logger.debug("JavaIdlDefaultServant replay_completion for Id "+recovCoId);
             }
 
             // and do the real replay
             return GenericRecoveryCoordinator.replay_completion(recovCoId, res);
         }
         /***/
-        catch (NotPrepared exp) {
+        catch (NotPrepared exp)
+        {
             throw exp;
         }
         /**/

@@ -23,13 +23,10 @@ package com.arjuna.ats.internal.jta.resources.jts.orbspecific;
 import com.arjuna.ArjunaOTS.JTAInterposedSynchronizationOperations;
 
 /**
- * Implementation of the marker interface used to distinguish Synchronizations
- * that should be interposed in the JTA 1.1 TransactionSynchronizationRegistry
- * sense of the term.
+ * Implementation of the marker interface used to distinguish Synchronizations that
+ * should be interposed in the JTA 1.1 TransactionSynchronizationRegistry sense of the term.
  */
-public class JTAInterposedSynchronizationImple extends SynchronizationImple
-        implements
-            JTAInterposedSynchronizationOperations {
+public class JTAInterposedSynchronizationImple extends SynchronizationImple implements JTAInterposedSynchronizationOperations {
 
     public JTAInterposedSynchronizationImple(javax.transaction.Synchronization ptr) {
         super(ptr);

@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Confirmed implements Status {
+public class Confirmed implements Status
+{
 
-    public static Confirmed instance() {
-        return _instance;
+    public static Confirmed instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.twophase.status.Confirmed";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.twophase.status.Confirmed";
-    }
-
-    private Confirmed() {
+    private Confirmed ()
+    {
     }
 
     private static final Confirmed _instance = new Confirmed();
-
+    
 }

@@ -46,30 +46,25 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.mdb.MDBBlacktieService;
 
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/BTR_BTDomainAdmin")}, messageListenerInterface = javax.jms.MessageListener.class)
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/BTR_BTDomainAdmin") }, messageListenerInterface = javax.jms.MessageListener.class)
 /**
- * This is the administration service proxy to allow administration of the
- * servers from XATMI clients.
+ * This is the administration service proxy to allow administration of the servers from XATMI clients.
  */
-public class BlacktieAdminServiceXATMI extends MDBBlacktieService
-        implements
-            javax.jms.MessageListener,
-            BlacktieAdministration {
+public class BlacktieAdminServiceXATMI extends MDBBlacktieService implements javax.jms.MessageListener, BlacktieAdministration {
     private static final Logger log = LogManager.getLogger(BlacktieAdminServiceXATMI.class);
 
     private AdministrationProxy administrationProxy;
 
     /**
-     * Create the proxy, it will forward all requests to the "core" proxy who is
-     * responsible for invoking the individual XATMI services.
+     * Create the proxy, it will forward all requests to the "core" proxy who is responsible for invoking the individual XATMI
+     * services.
      * 
-     * @throws ConfigurationException
-     *             In case the configuration is invalid.
+     * @throws ConfigurationException In case the configuration is invalid.
      * @throws ConnectionException
      */
     public BlacktieAdminServiceXATMI() throws ConfigurationException {
         super("BlacktieAdminServiceXATMI");
-        administrationProxy = new AdministrationProxy();
+        administrationProxy = new AdministrationProxy();     
     }
 
     @PostConstruct
@@ -298,8 +293,7 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * List the running ids of a specific server
      * 
-     * @param serverName
-     *            The name of the server
+     * @param serverName The name of the server
      */
     public List<Integer> listRunningInstanceIds(String serverName) {
         return administrationProxy.listRunningInstanceIds(serverName);
@@ -315,10 +309,8 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * List the service status for a service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public String listServiceStatus(String serverName, String serviceName) {
         return administrationProxy.listServiceStatus(serverName, serviceName);
@@ -327,10 +319,8 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * Advertise a new service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public Boolean advertise(String serverName, String serviceName) {
         return administrationProxy.advertise(serverName, serviceName);
@@ -339,10 +329,8 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * Unadvertise a new service
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
     public Boolean unadvertise(String serverName, String serviceName) {
         return administrationProxy.unadvertise(serverName, serviceName);
@@ -351,10 +339,8 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * Shutdown a server
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
+     * @param serverName The name of the server
+     * @param id The id of the server
      */
     public Boolean shutdown(String serverName, int id) {
         return administrationProxy.shutdown(serverName, id);
@@ -363,12 +349,9 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * Get the service counter and restrict it to a certain server, 0 for all.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param id The id of the server
+     * @param serviceName The name of the service
      */
     public long getServiceCounterById(String serverName, int id, String serviceName) {
         return administrationProxy.getServiceCounterById(serverName, id, serviceName);
@@ -377,10 +360,8 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * Get the service counter for the domain.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param serviceName The name of the service
      */
 
     public long getServiceCounter(String serverName, String serviceName) {
@@ -395,11 +376,9 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     }
 
     /**
-     * Reload the server (causes the server to update its configuration and
-     * restart.
+     * Reload the server (causes the server to update its configuration and restart.
      * 
-     * @param serverName
-     *            The name of the server
+     * @param serverName The name of the server
      */
     public Boolean reloadServer(String serverName) {
         return administrationProxy.reloadServer(serverName);
@@ -408,12 +387,9 @@ public class BlacktieAdminServiceXATMI extends MDBBlacktieService
     /**
      * List the status of a service giving an optional id, 0 is all servers.
      * 
-     * @param serverName
-     *            The name of the server
-     * @param id
-     *            The id of the server
-     * @param serviceName
-     *            The name of the service
+     * @param serverName The name of the server
+     * @param id The id of the server
+     * @param serviceName The name of the service
      */
     public String listServiceStatusById(String serverName, int id, String serviceName) {
         return administrationProxy.listServiceStatusById(serverName, id, serviceName);

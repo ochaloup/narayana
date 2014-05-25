@@ -45,14 +45,17 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.arjuna.objectstore.CacheStore;
 
-class WriterThread extends Thread {
+class WriterThread extends Thread
+{
     private static final String TYPE = "test";
 
-    public WriterThread(ParticipantStore theStore) {
+    public WriterThread(ParticipantStore theStore)
+    {
         participantStore = theStore;
     }
 
-    public void run() {
+    public void run()
+    {
         byte[] data = new byte[1024];
         OutputObjectState state = new OutputObjectState(new Uid(), "type");
         Uid u = new Uid();
@@ -69,7 +72,8 @@ class WriterThread extends Thread {
                     System.err.println("Could not read state.");
             } else
                 System.err.println("Could not write state.");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -79,9 +83,12 @@ class WriterThread extends Thread {
     private ParticipantStore participantStore = null;
 }
 
-public class WriteCachedTest {
+
+public class WriteCachedTest
+{
     @Test
-    public void test() throws ObjectStoreException {
+    public void test() throws ObjectStoreException
+    {
         boolean passed = true;
         String cacheSize = "20480";
         int threads = 10;
@@ -97,7 +104,8 @@ public class WriteCachedTest {
             try {
                 t[i] = new WriterThread(store);
                 t[i].start();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
 
                 passed = false;
@@ -109,7 +117,8 @@ public class WriteCachedTest {
                 t[j].join();
 
                 passed = passed && ((WriterThread) t[j]).passed;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
             }
         }
 
@@ -120,7 +129,8 @@ public class WriteCachedTest {
 
         try {
             store.sync();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
         }
 
         assertTrue(passed);

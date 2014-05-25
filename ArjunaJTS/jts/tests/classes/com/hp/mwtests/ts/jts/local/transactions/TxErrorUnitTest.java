@@ -36,11 +36,13 @@ import org.junit.Test;
 import com.arjuna.ats.jts.exceptions.TxError;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class TxErrorUnitTest extends TestBase {
+public class TxErrorUnitTest extends TestBase
+{
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         TxError tx = new TxError();
-
+        
         tx = new TxError("foobar");
     }
 }

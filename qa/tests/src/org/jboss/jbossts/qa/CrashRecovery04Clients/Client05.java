@@ -56,13 +56,17 @@ package org.jboss.jbossts.qa.CrashRecovery04Clients;
  * $Id: Client05.java,v 1.2 2003/06/26 11:43:26 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery04.*;
 import org.jboss.jbossts.qa.Utils.*;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 
-public class Client05 {
-    public static void main(String[] args) {
-        try {
+public class Client05
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,53 +81,59 @@ public class Client05 {
 
             OTS.current().rollback_only();
 
-            try {
+            try
+            {
                 OTS.current().commit(true);
                 correct = false;
-            } catch (TRANSACTION_ROLLEDBACK transactionRolledBack) {
+            }
+            catch (TRANSACTION_ROLLEDBACK transactionRolledBack)
+            {
             }
 
-            // code changed to cope with recovery manager fix
-            // that makes reply_completion cause resource to rollback even
-            // though
-            // transaction has completed
+//  code changed to cope with recovery manager fix
+//     that makes reply_completion cause resource to rollback even though
+//    transaction has completed
             ResourceTrace resourceTrace = service.get_resource_trace(0);
 
-            // trace should be rollback
+//  trace should be rollback
             correct = correct && (resourceTrace == ResourceTrace.ResourceTraceRollback);
 
-            // check_oper will invoke reply_completion and check the state of
-            // the transaction
+//  check_oper will invoke reply_completion and check the state of the transaction
             correct = correct && service.check_oper();
 
-            // now sleep to let reply completion do its job 1 second should be
-            // more than enough
+// now sleep to let reply completion do its job 1 second should be more than enough
             CrashRecoveryDelays.awaitReplayCompletionCR04();
 
             correct = correct && service.is_correct();
-            // after reply_completion is called the resource will have rollback
-            // called on
-            // it again, changing the ResourceTrace to
-            // ResourceTrace.ResourceTraceUnknown
+//  after reply_completion is called the resource will have rollback called on
+//    it again, changing the ResourceTrace to ResourceTrace.ResourceTraceUnknown
             resourceTrace = service.get_resource_trace(0);
 
             correct = correct && (resourceTrace == ResourceTrace.ResourceTraceUnknown);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
         }

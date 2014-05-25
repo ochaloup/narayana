@@ -44,24 +44,29 @@ import com.arjuna.mw.wsas.common.GlobalId;
  * @since 1.0.
  */
 
-public class GlobalIdImple extends Uid implements GlobalId {
+public class GlobalIdImple extends Uid implements GlobalId
+{
 
-    public GlobalIdImple() {
-        super();
+    public GlobalIdImple ()
+    {
+    super();
 
-        _value = stringForm().getBytes(StandardCharsets.UTF_8);
+    _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
+    
+    public GlobalIdImple (String id)
+    {
+    super(id);
 
-    public GlobalIdImple(String id) {
-        super(id);
-
-        _value = stringForm().getBytes(StandardCharsets.UTF_8);
+    _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
-
-    public byte[] value() {
-        return _value;
+    
+    public byte[] value ()
+    {
+    return _value;
     }
-
+    
     private byte[] _value;
-
+    
 }
+

@@ -34,8 +34,7 @@ public class LocalBAController implements BAController {
     /**
      * Start a new local compensating transaction.
      *
-     * This also creates a new compensation context attached to this
-     * transaction.
+     * This also creates a new compensation context attached to this transaction.
      *
      * @throws Exception
      */
@@ -49,11 +48,10 @@ public class LocalBAController implements BAController {
     /**
      * Close current local compensating transaction.
      *
-     * First compensation context is deactivate, because application shouldn't
-     * access it any more.
+     * First compensation context is deactivate, because application shouldn't access it any more.
      *
-     * Then local transaction manager is told to close the transaction. And once
-     * that's done compensation context of this transaction is destroyed.
+     * Then local transaction manager is told to close the transaction. And once that's done compensation context of this
+     * transaction is destroyed.
      *
      * @throws Exception
      */
@@ -68,11 +66,10 @@ public class LocalBAController implements BAController {
     /**
      * Cancel current local compensating transaction.
      *
-     * First compensation context is deactivate, because application shouldn't
-     * access it any more.
+     * First compensation context is deactivate, because application shouldn't access it any more.
      *
-     * Then local transaction manager is told to cancel the transaction. And
-     * once that's done compensation context of this transaction is destroyed.
+     * Then local transaction manager is told to cancel the transaction. And once that's done compensation context of this
+     * transaction is destroyed.
      *
      * @throws Exception
      */
@@ -112,8 +109,7 @@ public class LocalBAController implements BAController {
     }
 
     /**
-     * Deactivate compensation context and suspend current local compensating
-     * transaction.
+     * Deactivate compensation context and suspend current local compensating transaction.
      *
      * @return suspended transaction information to be used when resuming.
      * @throws Exception
@@ -124,16 +120,11 @@ public class LocalBAController implements BAController {
     }
 
     /**
-     * Resume a local compensating transaction and activate its compensation
-     * context.
+     * Resume a local compensating transaction and activate its compensation context.
      * 
-     * @param currentTransaction
-     *            {@link CurrentTransaction} containing information of the
-     *            transaction to be resumed.
-     * @throws Exception
-     *             if delegate class provided in {@link CurrentTransaction} is
-     *             not of local transaction or failure occurred when resuming
-     *             transaction.
+     * @param currentTransaction {@link CurrentTransaction} containing information of the transaction to be resumed.
+     * @throws Exception if delegate class provided in {@link CurrentTransaction} is not of local transaction or failure
+     *         occurred when resuming transaction.
      */
     public void resume(CurrentTransaction currentTransaction) throws Exception {
         if (currentTransaction.getDelegateClass() != ActivityHierarchy.class) {
@@ -144,8 +135,7 @@ public class LocalBAController implements BAController {
     }
 
     /**
-     * @return information of a currently running local transaction or
-     *         {@code null} if transaction is not running.
+     * @return information of a currently running local transaction or {@code null} if transaction is not running.
      * @throws Exception
      */
     @Override
@@ -176,9 +166,8 @@ public class LocalBAController implements BAController {
         CurrentTransaction transaction = getCurrentTransaction();
         String participantId = new Uid().stringForm();
         String coordinatorId = CoordinatorManagerFactory.coordinatorManager().identifier().toString();
-        LocalParticipant participant = new LocalParticipant(compensationHandler, confirmationHandler,
-                transactionLoggedHandler, transaction, participantId, coordinatorId, compensationContextStateManager,
-                new DeserializerHelper());
+        LocalParticipant participant = new LocalParticipant(compensationHandler, confirmationHandler, transactionLoggedHandler,
+                transaction, participantId, coordinatorId, compensationContextStateManager, new DeserializerHelper());
 
         CoordinatorManagerFactory.coordinatorManager().enlistParticipant(participant);
 

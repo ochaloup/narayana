@@ -23,7 +23,8 @@ public class AddCommonSources extends Task {
     private String includes = ".*";
 
     public void execute() throws BuildException {
-        MavenProject p = (MavenProject) mavenProjectRef.getProject().getReference(mavenProjectRef.getRefId());
+        MavenProject p = (MavenProject) mavenProjectRef.getProject()
+                .getReference(mavenProjectRef.getRefId());
         processResources(p);
     }
 
@@ -52,7 +53,8 @@ public class AddCommonSources extends Task {
                 String resourceRoot = resource.getDirectory();
                 // System.out.println("adding source root: " + outputDir +
                 // " from resource " + resource.toString());
-                unzip(getClass().getResourceAsStream("/cxx.jar"), outputDir, includes);
+                unzip(getClass().getResourceAsStream("/cxx.jar"), outputDir,
+                        includes);
                 // p.addCompileSourceRoot(outputDir);
                 p.addTestCompileSourceRoot(outputDir);
             }
@@ -72,7 +74,8 @@ public class AddCommonSources extends Task {
             while ((ze = zs.getNextEntry()) != null) {
                 String fname = to + '/' + ze.getName();
                 // System.out.println(fname);
-                boolean match = (pattern == null || ze.getName().matches(pattern));
+                boolean match = (pattern == null || ze.getName().matches(
+                        pattern));
 
                 if (ze.isDirectory())
                     new File(fname).mkdirs();
@@ -87,19 +90,23 @@ public class AddCommonSources extends Task {
             zs.close();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Unable to unpack archive: " + e.getMessage());
+            throw new RuntimeException("Unable to unpack archive: "
+                    + e.getMessage());
         }
     }
 
-    private static void readFile(String fname, InputStream is) throws IOException {
+    private static void readFile(String fname, InputStream is)
+            throws IOException {
         File f = new File(fname);
         byte[] buf = new byte[1024];
         int len;
 
-        while ((len = is.read(buf)) > 0);
+        while ((len = is.read(buf)) > 0)
+            ;
     }
 
-    private static File externalizeFile(String fname, InputStream is) throws IOException {
+    private static File externalizeFile(String fname, InputStream is)
+            throws IOException {
         File f = new File(fname);
         OutputStream out = new FileOutputStream(f);
         byte[] buf = new byte[1024];

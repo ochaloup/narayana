@@ -58,12 +58,12 @@ public class ResourceManagerFailureUnitTest {
 
         final Properties initORBProperties = new Properties();
         initORBProperties.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
-        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort",
-                "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
+        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""
+                + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
 
         testORB = ORB.getInstance("test");
         testOA = OA.getRootOA(testORB);
-        testORB.initORB(new String[]{}, initORBProperties);
+        testORB.initORB(new String[] {}, initORBProperties);
         testOA.initOA();
         ORBManager.setORB(testORB);
         ORBManager.setPOA(testOA);

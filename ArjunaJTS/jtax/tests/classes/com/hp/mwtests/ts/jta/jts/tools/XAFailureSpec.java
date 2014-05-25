@@ -35,25 +35,26 @@ import java.io.Serializable;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
-public class XAFailureSpec implements Serializable {
+@Deprecated // in order to provide a better separation between public and internal classes.
+public class XAFailureSpec implements Serializable
+{
     String name;
     XAFailureMode mode;
     XAFailureType type;
     String modeArg;
     int recoveryArg;
 
-    public XAFailureSpec() {
+    public XAFailureSpec()
+    {
         mode = XAFailureMode.NONE;
         type = XAFailureType.NONE;
     }
 
-    public XAFailureSpec(String name, XAFailureMode mode, XAFailureType type, String modeArg, int recoveryArg) {
+    public XAFailureSpec(String name, XAFailureMode mode, XAFailureType type, String modeArg, int recoveryArg)
+    {
         this.name = name;
         this.mode = mode;
         this.type = type;
@@ -61,80 +62,91 @@ public class XAFailureSpec implements Serializable {
         this.recoveryArg = recoveryArg;
     }
 
-    public boolean willTerminateVM() {
+    public boolean willTerminateVM()
+    {
         return mode.willTerminateVM();
     }
 
-    public XAFailureMode getMode() {
+    public XAFailureMode getMode()
+    {
         return mode;
     }
 
-    public XAFailureType getType() {
+    public XAFailureType getType()
+    {
         return type;
     }
 
-    public String getModeArg() {
+    public String getModeArg()
+    {
         return modeArg;
     }
 
-    public int getRecoveryArg() {
+    public int getRecoveryArg()
+    {
         return recoveryArg;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public void setMode(String mode) {
+    public void setMode(String mode)
+    {
         this.mode = XAFailureMode.valueOf(mode);
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
         this.type = XAFailureType.valueOf(type);
     }
 
-    public void setModeArg(String modeArg) {
+    public void setModeArg(String modeArg)
+    {
         this.modeArg = modeArg;
     }
 
-    public void setRecoveryArg(int recoveryArg) {
+    public void setRecoveryArg(int recoveryArg)
+    {
         this.recoveryArg = recoveryArg;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return new StringBuilder().append(mode).append(',').append(type).append(',').append(modeArg).toString();
     }
 
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof XAFailureSpec))
-            return false;
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof XAFailureSpec)) return false;
 
         XAFailureSpec that = (XAFailureSpec) o;
 
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return (name != null ? name.hashCode() : 0);
     }
 
     public static boolean isHeuristic(int exType) {
         switch (exType) {
-            case XAException.XA_HEURCOM :
-            case XAException.XA_HEURHAZ :
-            case XAException.XA_HEURMIX :
-            case XAException.XA_HEURRB :
+            case XAException.XA_HEURCOM:
+            case XAException.XA_HEURHAZ:
+            case XAException.XA_HEURMIX:
+            case XAException.XA_HEURRB:
                 return true;
-            default :
+            default:
                 return false;
         }
     }

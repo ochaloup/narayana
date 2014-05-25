@@ -45,117 +45,135 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
  */
 
 @Transactional
-public class AtomicArrayImpl<E> implements AtomicArray<E> {
+public class AtomicArrayImpl<E> implements AtomicArray<E>
+{
     public static final int DEFAULT_SIZE = 10;
-
-    public AtomicArrayImpl() {
+    
+    public AtomicArrayImpl ()
+    {
         this(DEFAULT_SIZE);
     }
-
-    public AtomicArrayImpl(int size) {
+    
+    public AtomicArrayImpl (int size)
+    {
         _size = size;
         _array = new ArrayList<E>(size);
-
+        
         for (int i = 0; i < _size; i++)
             _array.add(i, null);
     }
-
+    
     @WriteLock
-    public synchronized void empty() {
+    public synchronized void empty ()
+    {
         _array = new ArrayList<E>(_size);
     }
 
     @ReadLock
-    public synchronized E get(int index) {
+    public synchronized E get (int index)
+    {
         return _array.get(index);
     }
 
     @ReadLock
-    public synchronized boolean isEmpty() {
+    public synchronized boolean isEmpty ()
+    {
         return _array.isEmpty();
     }
 
     @WriteLock
-    public synchronized void set(int index, E val) {
+    public synchronized void set (int index, E val)
+    {
         if (basicType(val))
             _array.set(index, val);
-        else {
+        else
+        {   
             if (_container == null)
                 _container = new RecoverableContainer<E>();
-
+            
             _array.set(index, _container.enlist(val));
         }
     }
 
     @ReadLock
-    public synchronized int size() {
+    public synchronized int size ()
+    {
         return _array.size();
     }
-
+   
     @SaveState
-    public void save_state(OutputObjectState os) throws IOException {
+    public void save_state (OutputObjectState os) throws IOException
+    {
         if (_type == null)
             _type = _array.get(0).getClass();
+        
+       os.packInt(_size);
+       
+       for (int i = 0; i < _array.size(); i++)
+       {
+           Object inst = _array.get(i);
 
-        os.packInt(_size);
-
-        for (int i = 0; i < _array.size(); i++) {
-            Object inst = _array.get(i);
-
-            if (_type.equals(Boolean.class))
-                os.packBoolean(((Boolean) inst).booleanValue());
-            else if (_type.equals(Byte.class))
-                os.packByte(((Byte) inst).byteValue());
-            else if (_type.equals(Short.class))
-                os.packShort(((Short) inst).shortValue());
-            else if (_type.equals(Integer.class))
-                os.packInt(((Integer) inst).intValue());
-            else if (_type.equals(Long.class))
-                os.packLong(((Long) inst).longValue());
-            else if (_type.equals(Float.class))
-                os.packFloat(((Float) inst).floatValue());
-            else if (_type.equals(Double.class))
-                os.packDouble(((Double) inst).doubleValue());
-            else if (_type.equals(Character.class))
-                os.packChar(((Character) inst).charValue());
-            else if (_type.equals(String.class))
-                os.packString((String) inst);
-            else {
-                if (inst == null)
-                    os.packBoolean(false);
-                else {
-                    os.packBoolean(true);
-
-                    Uid temp = _container.getUidForHandle(_array.get(i));
-
-                    /*
-                     * Assume transactional object! Responsible for its own
-                     * state, so we only track references.
-                     */
-
-                    try {
-                        UidHelper.packInto(temp, os);
-                    } catch (final Exception ex) {
-                        throw new IOException(ex);
-                    }
-                }
-            }
-        }
+           if (_type.equals(Boolean.class))
+               os.packBoolean(((Boolean) inst).booleanValue());
+           else if (_type.equals(Byte.class))
+               os.packByte(((Byte) inst).byteValue());
+           else if (_type.equals(Short.class))
+               os.packShort(((Short) inst).shortValue());
+           else if (_type.equals(Integer.class))
+               os.packInt(((Integer) inst).intValue());
+           else if (_type.equals(Long.class))
+               os.packLong(((Long) inst).longValue());
+           else if (_type.equals(Float.class))
+               os.packFloat(((Float) inst).floatValue());
+           else if (_type.equals(Double.class))
+               os.packDouble(((Double) inst).doubleValue());
+           else if (_type.equals(Character.class))
+               os.packChar(((Character) inst).charValue());
+           else if (_type.equals(String.class))
+               os.packString((String) inst);
+           else
+           {   
+               if (inst == null)
+                   os.packBoolean(false);
+               else
+               {
+                   os.packBoolean(true);
+                   
+                   Uid temp = _container.getUidForHandle(_array.get(i));
+                   
+                   /*
+                    * Assume transactional object! Responsible for its own state, so we only
+                    * track references.
+                    */
+                   
+                   try
+                   {
+                       UidHelper.packInto(temp, os);
+                   }
+                   catch (final Exception ex)
+                   {
+                       throw new IOException(ex);
+                   }
+               }
+           }
+       }
     }
-
+    
     @SuppressWarnings("unchecked")
     @RestoreState
-    public void restore_state(InputObjectState os) throws IOException {
+    public void restore_state (InputObjectState os) throws IOException
+    {
         _size = os.unpackInt();
         _array = new ArrayList<E>(_size);
-
+        
         for (int i = 0; i < _size; i++)
             _array.add(i, null);
-
+        
         for (int i = 0; i < _size; i++)
             _array.add(i, null);
-
-        for (int i = 0; i < _size; i++) {
+        
+        for (int i = 0; i < _size; i++)
+        {   
             if (_type.equals(Boolean.class))
                 _array.set(i, (E) ((Boolean) os.unpackBoolean()));
             else if (_type.equals(Byte.class))
@@ -174,33 +192,39 @@ public class AtomicArrayImpl<E> implements AtomicArray<E> {
                 _array.set(i, (E) ((Character) os.unpackChar()));
             else if (_type.equals(String.class))
                 _array.set(i, (E) os.unpackString());
-            else {
+            else
+            {
                 boolean ptr = os.unpackBoolean();
-
+                
                 if (!ptr)
                     _array.set(i, null);
-                else {
+                else
+                {
                     /*
-                     * Assume transactional object! Responsible for its own
-                     * state, so we only track references.
+                     * Assume transactional object! Responsible for its own state, so we only
+                     * track references.
                      */
-
-                    try {
+                    
+                    try
+                    {
                         Uid temp = UidHelper.unpackFrom(os);
-
+                        
                         _array.set(i, _container.getHandle(temp));
-                    } catch (final Exception ex) {
+                    }
+                    catch (final Exception ex)
+                    {
                         throw new IOException(ex);
                     }
                 }
             }
         }
     }
-
-    private boolean basicType(E val) {
+    
+    private boolean basicType (E val)
+    {
         if (_type == null)
             _type = val.getClass();
-
+        
         if (_type.equals(Boolean.class))
             return true;
         else if (_type.equals(Byte.class))

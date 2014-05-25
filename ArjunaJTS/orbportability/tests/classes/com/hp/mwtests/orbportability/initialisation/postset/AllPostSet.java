@@ -31,9 +31,11 @@ package com.hp.mwtests.orbportability.initialisation.postset;
  * $Id: AllPostSet.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class AllPostSet {
-    public AllPostSet() {
-        System.out.println(this.getClass().getName() + ": called");
+public class AllPostSet
+{
+    public AllPostSet()
+    {
+        System.out.println(this.getClass().getName()+": called");
 
         _called = true;
     }

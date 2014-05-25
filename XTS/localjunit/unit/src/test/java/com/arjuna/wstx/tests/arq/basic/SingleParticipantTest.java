@@ -16,11 +16,14 @@ public class SingleParticipantTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoDurableParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoDurableParticipant.class);
     }
 
     @Test
-    public void testSingleParticipant() throws Exception {
+    public void testSingleParticipant()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
         DemoDurableParticipant p = new DemoDurableParticipant();
@@ -28,14 +31,14 @@ public class SingleParticipantTest {
         ut.begin();
         try {
             tm.enlistForDurableTwoPhase(p, p.identifier());
-        } catch (Exception eouter) {
+        }  catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
 
         ut.commit();
-    }
+            }
 }
