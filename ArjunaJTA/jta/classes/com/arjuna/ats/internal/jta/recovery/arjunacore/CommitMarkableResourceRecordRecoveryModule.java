@@ -107,6 +107,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
     private Map<String, String> commitMarkableResourceTableNameMap = jtaEnvironmentBean
             .getCommitMarkableResourceTableNameMap();
     private Map<String, List<Xid>> completedBranches = new HashMap<String, List<Xid>>();
+    private boolean inFirstPass;
     private static String defaultTableName = jtaEnvironmentBean.getDefaultCommitMarkableTableName();
 
     public CommitMarkableResourceRecordRecoveryModule() throws NamingException, ObjectStoreException {
@@ -144,7 +145,11 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
     }
 
     @Override
-    public void periodicWorkFirstPass() {
+    public synchronized void periodicWorkFirstPass() {
+        if (inFirstPass) {
+            return;
+        }
+        inFirstPass = true;
         // TODO - this is one shot only due to a
         // remove in the function, if this delete fails only normal
         // recovery is possible
@@ -356,7 +361,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
                                     // Update the completed outcome for the 1PC
                                     // resource
                                     rcaa.updateCommitMarkableResourceRecord(
-                                            wasCommitted(commitMarkableResourceJndiName, rcaa.getXid()));
+                                            committedXidsToJndiNames.get(rcaa.getXid()) != null);
                                 }
                             }
                         }
@@ -370,10 +375,11 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
             // Thrown when AS is shutting down and we attempt a lookup
             tsLogger.logger.debug("Could not lookup datasource, AS is shutting down: " + e.getMessage(), e);
         }
+        inFirstPass = false;
     }
 
     @Override
-    public void periodicWorkSecondPass() {
+    public synchronized void periodicWorkSecondPass() {
         /**
          * This is the list of AtomicActions that were prepared but not
          * completed.
@@ -426,7 +432,10 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
      * @param xid
      * @return
      */
-    public boolean wasCommitted(String jndiName, Xid xid) throws ObjectStoreException {
+    public synchronized boolean wasCommitted(String jndiName, Xid xid) throws ObjectStoreException {
+        if (!queriedResourceManagers.contains(jndiName) || committedXidsToJndiNames.get(xid) == null) {
+            periodicWorkFirstPass();
+        }
         if (!queriedResourceManagers.contains(jndiName)) {
             throw new ObjectStoreException(jndiName + " was not online");
         }
