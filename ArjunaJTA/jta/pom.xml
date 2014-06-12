@@ -218,6 +218,13 @@
             <scope>provided</scope>
         </dependency>
 
+       <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc</artifactId>
+        <version>${version.mysql}</version>
+        <scope>system</scope>
+        <systemPath>path/to/mysql-connector-java-5.1.31-bin.jar</systemPath>
+      </dependency>
   </dependencies>
   <profiles>
         <profile>
