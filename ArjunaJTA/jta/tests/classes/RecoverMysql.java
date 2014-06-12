@@ -100,6 +100,7 @@ public class RecoverMysql {
                           System.out.println("Executing statement INSERT INTO testentity");
                           xaConnection.getConnection().createStatement().execute("INSERT INTO testentity (id, a) VALUES ('1', 1)");
                           System.out.println("Preparing: " + xid);
+                          xaResource2.end(xid, XAResource.TMSUCCESS);
                           xaResource2.prepare(xid);
                           System.out.println("Prepared");
                        } catch (XAException xae) {
