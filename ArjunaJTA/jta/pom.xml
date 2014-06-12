@@ -218,6 +218,28 @@
             <scope>provided</scope>
         </dependency>
 
+       <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc</artifactId>
+        <version>${version.mysql}</version>
+        <scope>system</scope>
+        <systemPath>/home/ochaloup/tmp/mysql-connector-java-5.1.28-bin.jar</systemPath>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle</groupId>
+        <artifactId>ojdbc</artifactId>
+        <version>${version.com.oracle}</version>
+        <scope>system</scope>
+        <systemPath>/home/ochaloup/tmp/ojdbc6-oracle12c.jar</systemPath>
+      </dependency>
+      <dependency>
+        <groupId>com.sybase</groupId>
+        <artifactId>jconn4</artifactId>
+        <version>${version.com.sybase.jConnect}</version>
+        <scope>system</scope>
+        <systemPath>/home/ochaloup/tmp/jconn4-sybase157.jar</systemPath>
+      </dependency>
+
   </dependencies>
   <profiles>
         <profile>
