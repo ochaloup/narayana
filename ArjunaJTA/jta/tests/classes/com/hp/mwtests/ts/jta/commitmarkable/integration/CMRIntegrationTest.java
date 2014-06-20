@@ -119,8 +119,8 @@ public class CMRIntegrationTest {
         }
     }
 
-    private int threadCount = 10;
-    private int iterationCount = 50;
+    private int threadCount = 5;
+    private int iterationCount = 20;
     private int waiting;
     private boolean go;
     private final Object waitLock = new Object();
