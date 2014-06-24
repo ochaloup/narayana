@@ -93,8 +93,7 @@ public class ExposeAllLogsTest {
     }
 
     private void probeObjectStore(boolean exposeAllLogs, boolean useJMX) {
-        ObjectStoreEnvironmentBean osEnvBean = BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class,
-                "default");
+        ObjectStoreEnvironmentBean osEnvBean = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class);
 
         osEnvBean.setExposeAllLogRecordsAsMBeans(exposeAllLogs);
 
