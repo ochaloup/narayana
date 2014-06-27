@@ -221,7 +221,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
         Utils.createTables(pooledConnection.getConnection());
         pooledConnection.close();
 
-        doTest(new Handler(dataSource, recoveryDataSource), "testCommitMarkableResource");
+        doTest(new Handler(dataSource, recoveryDataSource), dbType + "_testCommitMarkableResource");
     }
 
     // @org.junit.Ignore
@@ -296,7 +296,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
 
         Utils.createTables(dataSource);
 
-        doTest(new Handler(dataSource), "testXAResource");
+        doTest(new Handler(dataSource), dbType + "_testXAResource");
     }
 
     public void doTest(final Handler xaHandler, String testName) throws Exception {
