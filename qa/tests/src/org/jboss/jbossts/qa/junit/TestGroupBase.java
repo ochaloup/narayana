@@ -66,7 +66,7 @@ public class TestGroupBase {
 
         if (isRecoveryManagerNeeded) {
             recoveryManager = createTask("server0", com.arjuna.ats.arjuna.recovery.RecoveryManager.class,
-                    Task.TaskType.EXPECT_READY, 480);
+                    Task.TaskType.EXPECT_READY, 960);
             recoveryManager.start("-test");
         }
     }
