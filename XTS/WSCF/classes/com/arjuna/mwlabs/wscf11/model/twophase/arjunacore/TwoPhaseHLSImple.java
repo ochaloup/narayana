@@ -198,8 +198,6 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService {
         if (!initialised) {
             synchronized (this) {
                 if (!initialised) {
-                    // we only do this once no matter what happens
-                    initialised = true;
                     try {
                         Class<?> factoryClass = ProtocolRegistry.sharedManager()
                                 .getProtocolImplementation(coordinationType).getClass();
@@ -218,6 +216,9 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService {
                         CONTEXT_IMPLE_CLASS = contextClass;
                     } catch (ProtocolNotRegisteredException pnre) {
                         throw new SystemException("No SOAPContext factory registered for Two Phase 1.1 service");
+                    } finally {
+                        // we only do this once no matter what happens
+                        initialised = true;
                     }
                 }
             }
