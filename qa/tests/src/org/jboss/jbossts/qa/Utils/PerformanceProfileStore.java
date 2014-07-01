@@ -103,7 +103,7 @@ public class PerformanceProfileStore {
                     dateFormat.format(cal.getTime()).toString() + ": Performance profile (time in milli-seconds)");
         }
 
-        return isWithinTolerance(metricValue, canonicalValue, variance, largerIsBetter);
+        return isWithinTolerance(metricName, metricValue, canonicalValue, variance, largerIsBetter);
     }
 
     public static PerformanceProfileStore getMetrics() throws IOException {
@@ -128,7 +128,8 @@ public class PerformanceProfileStore {
         }
     }
 
-    boolean isWithinTolerance(Float metricValue, Float canonicalValue, Float variance, boolean largerIsBetter) {
+    boolean isWithinTolerance(String metricName, Float metricValue, Float canonicalValue, Float variance,
+            boolean largerIsBetter) {
         Float headRoom = Math.abs(canonicalValue * (variance - 1));
 
         boolean within;
@@ -138,8 +139,8 @@ public class PerformanceProfileStore {
         else
             within = (metricValue <= canonicalValue + headRoom);
 
-        System.out.printf("actual %f versus best %f: variance %f: head room: %f biggerBetter=%b ok=%b%n", metricValue,
-                canonicalValue, variance, headRoom, largerIsBetter, within);
+        System.out.printf("%s: actual %f versus best %f: variance %f: head room: %f biggerBetter=%b ok=%b%n",
+                metricName, metricValue, canonicalValue, variance, headRoom, largerIsBetter, within);
 
         return within;
     }
