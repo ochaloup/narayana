@@ -27,23 +27,31 @@ import javax.transaction.xa.Xid;
 
 public class TestResource implements XAResource {
     public TestResource() {
-        this(false);
+        this(false, true);
     }
 
     public TestResource(boolean readonly) {
+        this(readonly, true);
+    }
+
+    public TestResource(boolean readonly, boolean print) {
         _readonly = readonly;
+        _doPrint = print;
     }
 
     public void commit(Xid id, boolean onePhase) throws XAException {
-        System.out.println("XA_COMMIT[" + id + "]");
+        if (_doPrint)
+            System.out.println("XA_COMMIT[" + id + "]");
     }
 
     public void end(Xid xid, int flags) throws XAException {
-        System.out.println("XA_END[" + xid + "] Flags=" + flags);
+        if (_doPrint)
+            System.out.println("XA_END[" + xid + "] Flags=" + flags);
     }
 
     public void forget(Xid xid) throws XAException {
-        System.out.println("XA_FORGET[" + xid + "]");
+        if (_doPrint)
+            System.out.println("XA_FORGET[" + xid + "]");
     }
 
     public int getTransactionTimeout() throws XAException {
@@ -55,7 +63,8 @@ public class TestResource implements XAResource {
     }
 
     public int prepare(Xid xid) throws XAException {
-        System.out.println("XA_PREPARE[" + xid + "]");
+        if (_doPrint)
+            System.out.println("XA_PREPARE[" + xid + "]");
 
         if (_readonly)
             return XA_RDONLY;
@@ -66,12 +75,15 @@ public class TestResource implements XAResource {
     }
 
     public Xid[] recover(int flag) throws XAException {
-        System.out.println("RECOVER[" + flag + "]");
+        if (_doPrint)
+            System.out.println("RECOVER[" + flag + "]");
+
         return (null);
     }
 
     public void rollback(Xid xid) throws XAException {
-        System.out.println("XA_ROLLBACK[" + xid + "]");
+        if (_doPrint)
+            System.out.println("XA_ROLLBACK[" + xid + "]");
     }
 
     public boolean setTransactionTimeout(int seconds) throws XAException {
@@ -80,10 +92,13 @@ public class TestResource implements XAResource {
     }
 
     public void start(Xid xid, int flags) throws XAException {
-        System.out.println("XA_START[" + xid + "] Flags=" + flags);
+        if (_doPrint)
+            System.out.println("XA_START[" + xid + "] Flags=" + flags);
     }
 
     protected int _timeout = 0;
+
+    protected boolean _doPrint = false;
 
     private boolean _readonly = false;
 }
