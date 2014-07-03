@@ -48,7 +48,6 @@ public class BeanPopulator {
         return getNamedInstance(beanClass, DEFAULT_NAME, null);
     }
 
-    @Deprecated
     public static <T> T getDefaultInstance(Class<T> beanClass, Properties properties) throws RuntimeException {
         return getNamedInstance(beanClass, DEFAULT_NAME, properties);
     }
