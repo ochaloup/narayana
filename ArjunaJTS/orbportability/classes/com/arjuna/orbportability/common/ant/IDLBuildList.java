@@ -74,6 +74,6 @@ public class IDLBuildList extends Task {
             }
         }
 
-        project.setProperty(_storeInProperty, propertyValue);
+        getProject().setProperty(_storeInProperty, propertyValue);
     }
 }
