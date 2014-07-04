@@ -483,6 +483,7 @@ public class Services {
                     }
                 }
             } while (line != null);
+            input.close();
         }
 
         String[] completeServices = null;

@@ -62,6 +62,7 @@ public class Outcome01 {
                     foundRecoveryPassed = true;
                 }
             }
+            br.close();
         } catch (Exception ex) {
         }
 

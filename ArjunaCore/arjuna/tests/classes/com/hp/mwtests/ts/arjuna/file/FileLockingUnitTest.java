@@ -101,6 +101,8 @@ public class FileLockingUnitTest {
 
         ofile.writeInt(0);
 
+        ofile.close();
+
         /*
          * Now create the threads.
          */

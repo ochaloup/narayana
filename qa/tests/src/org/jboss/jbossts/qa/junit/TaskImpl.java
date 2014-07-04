@@ -664,6 +664,7 @@ public class TaskImpl implements Task {
             while (scanner.hasNextLine())
                 createThreadDump(scanner.nextLine());
 
+            scanner.close();
             process.destroy();
         } catch (IOException e) {
             System.out.printf("%s ERROR CREATING THREAD DUMPS: %s%n", getTaskPrefix(), e.getMessage());
