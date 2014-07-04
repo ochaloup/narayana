@@ -20,6 +20,7 @@
  */
 package org.jboss.jbossts.qa.junit.testgroup;
 
+import org.jboss.jbossts.qa.Utils.PerformanceProfileStore;
 import org.jboss.jbossts.qa.junit.Task;
 import org.jboss.jbossts.qa.junit.TestGroupBase;
 import org.junit.Test;
@@ -152,8 +153,13 @@ public class TestGroup_jtsremote extends TestGroupBase {
     // TODO move this test into perfprofile01_
     @Test
     public void JTSRemote_PerfTest() {
+        String metricName = "JTSRemote_PerfTest_PerfHammer_" + System.getProperty("org.omg.CORBA.ORBClass", "");
+        String[] xargs = PerformanceProfileStore.getTestArgs(metricName);
+        // ignore xargs[0] which specifies the max test time
+        int maxTime = PerformanceProfileStore.getArg(metricName, xargs, 0, 960, Integer.class);
+
         Task server1 = createTask("server1", com.hp.mwtests.ts.jts.remote.servers.GridServer.class,
-                Task.TaskType.EXPECT_READY, 960);
+                Task.TaskType.EXPECT_READY, maxTime);
         server1.start("$(1)");
 
         startAndWaitForClient(com.hp.mwtests.ts.jts.remote.hammer.PerfHammer.class, "$(1)");

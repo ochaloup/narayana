@@ -300,9 +300,13 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
     }
 
     public void doTest(final Handler xaHandler, String testName) throws Exception {
+        String fullTestName = getClass().getName() + testName;
+        final String[] args = PerformanceProfileStore.getTestArgs(fullTestName);
+        final int numberOfCalls = PerformanceProfileStore.getArg(fullTestName, args, 1, iterationCount, Integer.class);
+        final int numberOfThreads = PerformanceProfileStore.getArg(fullTestName, args, 2, threadCount, Integer.class);
 
         // Test code
-        Thread[] threads = new Thread[threadCount];
+        Thread[] threads = new Thread[numberOfThreads];
         for (int i = 0; i < threads.length; i++) {
             threads[i] = new Thread(new Runnable() {
 
@@ -323,7 +327,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
                     }
 
                     int success = 0;
-                    for (int i = 0; i < iterationCount; i++) {
+                    for (int i = 0; i < numberOfCalls; i++) {
                         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
                                 .transactionManager();
                         try {
@@ -396,7 +400,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
 
         System.out.println(new Date() + "  Number of transactions: " + totalExecuted.intValue());
 
-        long additionalCleanuptime = xaHandler.postRunCleanup();
+        long additionalCleanuptime = xaHandler.postRunCleanup(numberOfCalls, numberOfThreads);
 
         long timeInMillis = (endTime - startTime) + additionalCleanuptime;
         long throughput = Math.round((totalExecuted.intValue() / (timeInMillis / 1000d)));
@@ -406,11 +410,11 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
         System.out.println("  Average transaction time: " + timeInMillis / totalExecuted.intValue());
         System.out.println("  Transactions per second: " + throughput);
 
-        xaHandler.checkFooSize();
+        xaHandler.checkFooSize(numberOfCalls, numberOfThreads);
 
-        boolean correct = PerformanceProfileStore.checkPerformance(getClass().getName() + testName, throughput, true);
+        boolean correct = PerformanceProfileStore.checkPerformance(fullTestName, throughput, true);
 
-        Assert.assertTrue(getClass().getName() + testName + ": performance regression", correct);
+        Assert.assertTrue(fullTestName + ": performance regression", correct);
     }
 
     private class Handler {
@@ -472,7 +476,8 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
             }
         }
 
-        public long postRunCleanup() throws NamingException, SQLException, ObjectStoreException {
+        public long postRunCleanup(int numberOfCalls, int numberOfThreads)
+                throws NamingException, SQLException, ObjectStoreException {
             if (dataSource != null) {
                 PooledConnection pooledConnection = null;
                 Connection connection = null;
@@ -498,7 +503,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
                     int expectedReapableRecords = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
                             .isPerformImmediateCleanupOfCommitMarkableResourceBranches()
                                     ? 0
-                                    : threadCount * iterationCount;
+                                    : numberOfThreads * numberOfCalls;
                     checkSize("xids", statement, expectedReapableRecords);
                     if (expectedReapableRecords > 0) {
                         // The recovery module has to perform lookups
@@ -531,7 +536,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
             return 0;
         }
 
-        public void checkFooSize() throws SQLException {
+        public void checkFooSize(int numberOfCalls, int numberOfThreads) throws SQLException {
             Connection connection = null;
             XAConnection xaConnection = null;
             PooledConnection pooledConnection = null;
@@ -546,7 +551,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
                 tableToCheck = Utils.getXAFooTableName();
             }
             Statement statement = connection.createStatement();
-            checkSize(tableToCheck, statement, threadCount * iterationCount);
+            checkSize(tableToCheck, statement, numberOfThreads * numberOfCalls);
             statement.close();
             connection.close();
             if (xaConnection != null) {
