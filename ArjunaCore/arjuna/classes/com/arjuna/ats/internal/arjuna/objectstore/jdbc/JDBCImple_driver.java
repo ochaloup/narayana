@@ -540,7 +540,7 @@ public abstract class JDBCImple_driver {
                     updateBytes(rs, 1, b);
                     rs.updateRow();
                 } else {
-                    // TODO connection.get().commit();
+                    connection.commit();
                     // not in database, do insert:
                     pstmt2 = connection.prepareStatement("INSERT INTO " + tableName
                             + " (StateType,Hidden,TypeName,UidString,ObjectState) VALUES (?,0,?,?,?)");
