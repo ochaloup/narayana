@@ -676,6 +676,18 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                                                                         // without
                                                                         // asking
                                                                         // us!
+                        // Some RMs do (or did) one-phase commit but
+                        // interpreting end as prepare and once you’ve prepared
+                        // (in end) you can commit or rollback when a timeout
+                        // goes off
+                        // I *think* we’re talking about a while ago so those
+                        // RMs may no longer exist.
+                        // The alternative implication is that the RM timed out
+                        // the branch between the end above and the completion
+                        // call, if we do make a change to assume that scenario
+                        // it is possible we could break existing deployments so
+                        // changes should be considered and potentially
+                        // configurable
                         case XAException.XAER_INVAL : // resource manager
                                                         // failed, did it
                                                         // rollback?
