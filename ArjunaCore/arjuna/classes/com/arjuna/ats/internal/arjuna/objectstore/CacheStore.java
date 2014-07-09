@@ -551,19 +551,21 @@ class AsyncStore extends Thread // keep priority same as app. threads
             LinkedList list = getList();
 
             if (list != null) {
-                try {
-                    _work = (StoreElement) list.removeLast();
+                synchronized (list) {
+                    try {
+                        _work = (StoreElement) list.removeLast();
 
-                    _numberOfEntries--;
+                        _numberOfEntries--;
 
-                    if ((_work.state != null) && !_work.removed)
-                        _currentCacheSize -= _work.state.size();
+                        if ((_work.state != null) && !_work.removed)
+                            _currentCacheSize -= _work.state.size();
 
-                    if (_work.removed) {
-                        _removedItems--;
+                        if (_work.removed) {
+                            _removedItems--;
+                        }
+                    } catch (java.util.NoSuchElementException ex) {
+                        _work = null;
                     }
-                } catch (java.util.NoSuchElementException ex) {
-                    _work = null;
                 }
             } else
                 _work = null;
