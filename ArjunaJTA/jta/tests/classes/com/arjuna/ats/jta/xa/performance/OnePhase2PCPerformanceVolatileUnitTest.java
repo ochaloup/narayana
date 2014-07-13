@@ -31,8 +31,8 @@
 
 package com.arjuna.ats.jta.xa.performance;
 
+import io.narayana.perf.Measurement;
 import io.narayana.perf.PerformanceProfileStore;
-import io.narayana.perf.Result;
 import io.narayana.perf.Worker;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,8 +57,9 @@ public class OnePhase2PCPerformanceVolatileUnitTest {
         int batchSize = 1000;
         int numberOfTransactions = numberOfThreads * batchSize;
 
-        Result measurement = PerformanceProfileStore.regressionCheck(worker, worker, getClass().getName() + "_test1",
-                true, maxTestTime, warmUpCount, numberOfTransactions, numberOfThreads, batchSize);
+        Measurement measurement = PerformanceProfileStore.regressionCheck(worker, worker,
+                getClass().getName() + "_test1", true, maxTestTime, warmUpCount, numberOfTransactions, numberOfThreads,
+                batchSize);
 
         System.out.printf("%s%n", measurement.getInfo());
         Assert.assertEquals(0, measurement.getErrorCount());
@@ -90,7 +91,7 @@ public class OnePhase2PCPerformanceVolatileUnitTest {
         }
 
         @Override
-        public Void doWork(Void context, int batchSize, Result<Void> measurement) {
+        public Void doWork(Void context, int batchSize, Measurement<Void> measurement) {
             for (int i = 0; i < batchSize; i++) {
                 try {
                     tm.begin();

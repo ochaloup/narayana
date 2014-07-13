@@ -31,7 +31,7 @@ public interface WorkerLifecycle<T> {
 
     /**
      * notify the worker that the test is starting
-     * (@link{io.narayana.perf.Result#measure})
+     * (@link{io.narayana.perf.Measurement#measure})
      */
     void init();
 

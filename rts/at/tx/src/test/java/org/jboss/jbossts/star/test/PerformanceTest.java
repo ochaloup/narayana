@@ -22,14 +22,12 @@
 package org.jboss.jbossts.star.test;
 
 import io.narayana.perf.PerformanceProfileStore;
-import io.narayana.perf.Result;
+import io.narayana.perf.Measurement;
 import io.narayana.perf.WorkerWorkload;
 import org.jboss.jbossts.star.util.TxSupport;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
 
 public class PerformanceTest extends BaseTest {
     private boolean doRealWork = false;
@@ -71,7 +69,7 @@ public class PerformanceTest extends BaseTest {
             batchSize = getArg(args, 2, batchSize);
         }
 
-        Result<String> opts = new Result<String>(threadCount, callCount, batchSize).measure(new RTSWorker());
+        Measurement<String> opts = new Measurement<String>(threadCount, callCount, batchSize).measure(new RTSWorker());
 
         System.out.printf(
                 "%s:  Test performance: %d calls/sec (%d invocations using %d threads with %d errors. Total time %d ms)%n",
@@ -136,7 +134,7 @@ public class PerformanceTest extends BaseTest {
         }
 
         @Override
-        public String doWork(String context, int niters, Result<String> opts) {
+        public String doWork(String context, int niters, Measurement<String> opts) {
             TxSupport txn = new TxSupport();
 
             for (int i = 0; i < niters; i++) {
