@@ -348,5 +348,7 @@ public class LogBrowser {
         LogConsole console = new LogConsole();
 
         console.doWork();
+
+        StoreManager.getRecoveryStore().stop();
     }
 }
