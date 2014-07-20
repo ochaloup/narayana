@@ -354,14 +354,15 @@ public class PerformanceProfileStore {
         }
 
         Measurement<T> opts = new Measurement<T>(maxTestTime, threadCount, numberOfCalls, batchSize).measure(lifecycle,
-                workload, warmUpCount);
+                workload);
         StringBuilder sb = new StringBuilder();
 
-        opts.setRegression(!PerformanceProfileStore.checkPerformance(sb, metricName, opts.getThroughput(), true));
+        opts.setRegression(
+                !PerformanceProfileStore.checkPerformance(sb, metricName, (float) opts.getThroughput(), true));
         sb.append(String.format(
-                " %d iterations using %d threads with a batch size of %d (warmup: %d error count: %d, tot millis: %d throughput: %d)",
-                opts.getNumberOfCalls(), opts.getThreadCount(), opts.getBatchSize(), opts.getWarmUpCallCount(),
-                opts.getErrorCount(), opts.getTotalMillis(), opts.getThroughput()));
+                " %d iterations using %d threads with a batch size of %d (warmup: %d error count: %d, tot millis: %d throughput: %f)",
+                opts.getNumberOfCalls(), opts.getNumberOfThreads(), opts.getBatchSize(), opts.getNumberOfWarmupCalls(),
+                opts.getNumberOfErrors(), opts.getTotalMillis(), opts.getThroughput()));
         opts.setInfo(sb.toString());
 
         return opts;
