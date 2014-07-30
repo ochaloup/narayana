@@ -311,6 +311,13 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
                                     // next stage update it
                                     moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
                                 }
+                            } else {
+                                if (tsLogger.logger.isTraceEnabled()) {
+                                    tsLogger.logger.trace("Moving " + currentUid + " back to being an AA");
+                                }
+                                // It is now safe to move it back to being an AA
+                                // so that it can call getNewXAResourceRecord
+                                moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
                             }
                         }
                     }
@@ -362,6 +369,11 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
                                     // resource
                                     rcaa.updateCommitMarkableResourceRecord(
                                             committedXidsToJndiNames.get(rcaa.getXid()) != null);
+                                    // Swap the type to avoid the rest of
+                                    // recovery round processing this TX as it
+                                    // already called getNewXAResourceRecord
+                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE, CONNECTABLE_ATOMIC_ACTION_TYPE);
+
                                 }
                             }
                         }

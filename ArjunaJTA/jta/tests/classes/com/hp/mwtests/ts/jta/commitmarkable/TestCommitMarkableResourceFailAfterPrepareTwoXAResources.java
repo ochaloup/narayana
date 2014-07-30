@@ -22,6 +22,7 @@ package com.hp.mwtests.ts.jta.commitmarkable;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.sql.Connection;
 import java.util.Enumeration;
@@ -29,6 +30,7 @@ import java.util.Vector;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import org.h2.jdbcx.JdbcDataSource;
@@ -41,6 +43,8 @@ import org.junit.runner.RunWith;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.internal.arjuna.recovery.RecoveryManagerImple;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.CommitMarkableResourceRecordRecoveryModule;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
+import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 
 @RunWith(BMUnitRunner.class)
 public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends TestCommitMarkableResourceBase {
@@ -64,6 +68,7 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
         // the transaction
         // manager would have used to mark the transaction for GC
         CommitMarkableResourceRecordRecoveryModule recoveryModule = null;
+        XARecoveryModule xarm = null;
         Vector recoveryModules = manager.getModules();
         if (recoveryModules != null) {
             Enumeration modules = recoveryModules.elements();
@@ -73,6 +78,17 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
 
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     recoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
+                } else if (m instanceof XARecoveryModule) {
+                    xarm = (XARecoveryModule) m;
+                    xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
+                        public boolean initialise(String p) throws Exception {
+                            return true;
+                        }
+
+                        public XAResource[] getXAResources() throws Exception {
+                            return new XAResource[]{xaResource, xaResource2};
+                        }
+                    });
                 }
             }
         }
@@ -124,18 +140,25 @@ public class TestCommitMarkableResourceFailAfterPrepareTwoXAResources extends Te
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Run the first pass it will load the committed Xids into memory
-        recoveryModule.periodicWorkFirstPass();
+        manager.scan();
         assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
 
         // Now we need to correctly complete the transaction
         assertFalse(xaResource.wasCommitted());
         assertFalse(xaResource.wasRolledback());
         SimpleXAResource2.injectRollbackError();
+        boolean scanned = false;
         try {
             manager.scan();
+            scanned = true;
         } catch (Error error) {
             // This is expected from xaResource2, it is intended to simulate a
             // crash
+            xarm.periodicWorkSecondPass(); // Should clear off the scanning flag
+                                            // only
+        }
+        if (scanned) {
+            fail("Should have failed scan");
         }
         assertFalse(xaResource.wasCommitted());
         assertTrue(xaResource.wasRolledback());

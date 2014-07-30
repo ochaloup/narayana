@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import org.h2.jdbcx.JdbcDataSource;
@@ -40,6 +41,8 @@ import org.junit.runner.RunWith;
 
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.CommitMarkableResourceRecordRecoveryModule;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
+import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 
 @RunWith(BMUnitRunner.class)
 public class TestCommitMarkableResourceFailAfterPrepare extends TestCommitMarkableResourceBase {
@@ -62,6 +65,7 @@ public class TestCommitMarkableResourceFailAfterPrepare extends TestCommitMarkab
         // the transaction
         // manager would have used to mark the transaction for GC
         CommitMarkableResourceRecordRecoveryModule recoveryModule = null;
+
         Vector recoveryModules = manager.getModules();
         if (recoveryModules != null) {
             Enumeration modules = recoveryModules.elements();
@@ -71,6 +75,17 @@ public class TestCommitMarkableResourceFailAfterPrepare extends TestCommitMarkab
 
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     recoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
+                } else if (m instanceof XARecoveryModule) {
+                    XARecoveryModule xarm = (XARecoveryModule) m;
+                    xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
+                        public boolean initialise(String p) throws Exception {
+                            return true;
+                        }
+
+                        public XAResource[] getXAResources() throws Exception {
+                            return new XAResource[]{xaResource};
+                        }
+                    });
                 }
             }
         }
@@ -118,11 +133,11 @@ public class TestCommitMarkableResourceFailAfterPrepare extends TestCommitMarkab
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
-        // Run the first pass it will load the committed Xids into memory
-        recoveryModule.periodicWorkFirstPass();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
 
         // Now we need to correctly complete the transaction
+        manager.scan();
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
+
         manager.scan();
         assertFalse(xaResource.wasCommitted());
         assertTrue(xaResource.wasRolledback());
