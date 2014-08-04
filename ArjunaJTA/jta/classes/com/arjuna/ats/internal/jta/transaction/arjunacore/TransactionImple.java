@@ -336,7 +336,8 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
             throws javax.transaction.RollbackException, java.lang.IllegalStateException,
             javax.transaction.SystemException {
         if (jtaLogger.logger.isTraceEnabled()) {
-            jtaLogger.logger.trace("TransactionImple.registerSynchronization");
+            jtaLogger.logger.trace("TransactionImple.registerSynchronization - Class: " + sync.getClass()
+                    + " HashCode: " + sync.hashCode() + " toString: " + sync);
         }
 
         if (sync == null) {
