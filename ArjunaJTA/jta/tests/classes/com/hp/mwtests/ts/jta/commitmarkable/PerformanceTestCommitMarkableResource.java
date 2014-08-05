@@ -158,8 +158,8 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
 
         System.out.println(new Date() + "  Number of transactions: " + totalExecuted.intValue());
 
-        long additionalCleanuptime = xaHandler.postRunCleanup(measurement.getNumberOfCalls(),
-                measurement.getNumberOfThreads());
+        long additionalCleanuptime = xaHandler.postRunCleanup(measurement.getNumberOfMeasurements(),
+                measurement.getNumberOfCalls(), measurement.getNumberOfThreads());
 
         long timeInMillis = measurement.getTotalMillis() + additionalCleanuptime;
         long throughput = Math.round((totalExecuted.intValue() / (timeInMillis / 1000d)));
@@ -450,7 +450,7 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
             }
         }
 
-        public long postRunCleanup(int numberOfCalls, int numberOfThreads)
+        public long postRunCleanup(int numberOfMeasurements, int numberOfCalls, int numberOfThreads)
                 throws NamingException, SQLException, ObjectStoreException {
             if (dataSource != null) {
                 PooledConnection pooledConnection = null;
@@ -475,7 +475,9 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
                         }
                     }
                     int expectedReapableRecords = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
-                            .isPerformImmediateCleanupOfCommitMarkableResourceBranches() ? 0 : numberOfCalls;
+                            .isPerformImmediateCleanupOfCommitMarkableResourceBranches()
+                                    ? 0
+                                    : numberOfMeasurements * numberOfCalls;
                     checkSize("xids", statement, expectedReapableRecords);
                     if (expectedReapableRecords > 0) {
                         // The recovery module has to perform lookups
