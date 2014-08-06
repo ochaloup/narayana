@@ -48,4 +48,17 @@ public interface WorkerWorkload<T> {
      *         calls to the doWork method by the thread
      */
     T doWork(T context, int batchSize, Measurement<T> measurement);
+
+    /**
+     * Notify the worker that the @link{doWork} method will not be called again
+     * on the current thread (but it may still be called from other threads).
+     *
+     * @param measurement
+     *            config parameters for the work that triggered this call - each
+     *            worker thread gets its own copy of the config. NB: Any context
+     *            object associated with the last call to the @link{doWork} call
+     *            is available by calling @link{measurement.getContext} on this
+     *            parameter.
+     */
+    void finishWork(Measurement<T> measurement);
 }

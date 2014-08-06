@@ -72,5 +72,9 @@ public class Performance1 {
 
             return context;
         }
+
+        @Override
+        public void finishWork(Measurement<Void> measurement) {
+        }
     };
 }

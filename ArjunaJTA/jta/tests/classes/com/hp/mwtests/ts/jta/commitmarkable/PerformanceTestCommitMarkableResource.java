@@ -85,14 +85,17 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
 
             @Override
             public void fini() {
+                // totalExecuted.addAndGet(success);
+            }
+
+            @Override
+            public void finishWork(Measurement<Void> measurement) {
                 try {
                     xaHandler.finishWork();
                 } catch (SQLException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
-                // totalExecuted.addAndGet(success);
             }
 
             @Override
@@ -311,7 +314,6 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
         }
         PooledConnection pooledConnection = dataSource.getPooledConnection();
         Utils.createTables(pooledConnection.getConnection());
-        pooledConnection.close();
 
         doTest(new Handler(dataSource, recoveryDataSource), "_testCommitMarkableResource_" + dbType);
     }
@@ -514,25 +516,29 @@ public class PerformanceTestCommitMarkableResource extends TestCommitMarkableRes
             Connection connection = null;
             XAConnection xaConnection = null;
             PooledConnection pooledConnection = null;
-            String tableToCheck = null;
-            if (dataSource != null) {
-                pooledConnection = dataSource.getPooledConnection();
-                connection = pooledConnection.getConnection();
-                tableToCheck = "foo";
-            } else {
-                xaConnection = xaDataSource.getXAConnection();
-                connection = xaConnection.getConnection();
-                tableToCheck = Utils.getXAFooTableName();
-            }
-            Statement statement = connection.createStatement();
-            checkSize(tableToCheck, statement, numberOfRuns * numberOfThreads * batchSize);
-            statement.close();
-            connection.close();
-            if (xaConnection != null) {
-                xaConnection.close();
-            }
-            if (pooledConnection != null) {
-                pooledConnection.close();
+
+            try {
+                String tableToCheck = null;
+                if (dataSource != null) {
+                    pooledConnection = dataSource.getPooledConnection();
+                    connection = pooledConnection.getConnection();
+                    tableToCheck = "foo";
+                } else {
+                    xaConnection = xaDataSource.getXAConnection();
+                    connection = xaConnection.getConnection();
+                    tableToCheck = Utils.getXAFooTableName();
+                }
+                Statement statement = connection.createStatement();
+                checkSize(tableToCheck, statement, numberOfRuns * numberOfThreads * batchSize);
+                statement.close();
+            } finally {
+                connection.close();
+                if (xaConnection != null) {
+                    xaConnection.close();
+                }
+                if (pooledConnection != null) {
+                    pooledConnection.close();
+                }
             }
         }
     }

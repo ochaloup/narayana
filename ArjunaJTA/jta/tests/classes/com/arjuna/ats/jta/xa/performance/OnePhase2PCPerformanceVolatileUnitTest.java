@@ -107,5 +107,9 @@ public class OnePhase2PCPerformanceVolatileUnitTest {
 
             return context;
         }
+
+        @Override
+        public void finishWork(Measurement<Void> measurement) {
+        }
     };
 }

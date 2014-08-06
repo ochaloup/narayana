@@ -56,6 +56,10 @@ public class ProductWorker<Void> implements WorkerWorkload<Void>, WorkerLifecycl
     }
 
     @Override
+    public void finishWork(Measurement<Void> measurement) {
+    }
+
+    @Override
     public void init() {
         prod.init();
     }

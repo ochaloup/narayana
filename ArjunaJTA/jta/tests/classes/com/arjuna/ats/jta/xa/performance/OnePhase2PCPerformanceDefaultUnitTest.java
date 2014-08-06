@@ -103,5 +103,9 @@ public class OnePhase2PCPerformanceDefaultUnitTest {
 
             return context;
         }
+
+        @Override
+        public void finishWork(Measurement<Void> measurement) {
+        }
     };
 }
