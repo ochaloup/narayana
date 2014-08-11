@@ -63,6 +63,7 @@ public class Measurement<T> implements Serializable {
     int numberOfBatches = 0;
     boolean regression;
     boolean failOnRegression;
+    private Exception exception;
 
     public Measurement(int numberOfThreads, int numberOfCalls) {
         this(numberOfThreads, numberOfCalls, 10);
@@ -349,8 +350,16 @@ public class Measurement<T> implements Serializable {
                         while (count.decrementAndGet() >= 0) {
                             res.setNumberOfCalls(opts.getBatchSize());
                             // ask the worker to do batchSize units or work
-                            res.setContext(workload.doWork(res.getContext(), opts.getBatchSize(), res));
-                            errorCount += res.getNumberOfErrors();
+                            try {
+                                res.setContext(workload.doWork(res.getContext(), opts.getBatchSize(), res));
+                                errorCount += res.getNumberOfErrors();
+                            } catch (Exception e) {
+                                if (res.getException() == null)
+                                    e.printStackTrace();
+                                res.setException(e);
+                                errorCount += opts.getBatchSize();
+                                res.setCancelled(true);
+                            }
 
                             if (res.isCancelled()) {
                                 for (Future<Measurement<T>> task : tasks) {
@@ -359,6 +368,8 @@ public class Measurement<T> implements Serializable {
                                 }
 
                                 opts.setContext(res.getContext());
+                                if (res.getException() != null)
+                                    opts.setException(res.getException());
 
                                 break;
                             }
@@ -420,6 +431,9 @@ public class Measurement<T> implements Serializable {
                 if (context != null)
                     opts.addContext(context);
 
+                if (outcome.getException() != null)
+                    opts.setException(outcome.getException());
+
                 opts.incrementErrorCount(outcome.getNumberOfErrors());
             } catch (CancellationException e) {
                 opts.incrementErrorCount(opts.getBatchSize());
@@ -439,6 +453,14 @@ public class Measurement<T> implements Serializable {
         executor.shutdownNow();
 
         return opts;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
+    }
+
+    public Exception getException() {
+        return exception;
     }
 
     public static final class Builder<T> {

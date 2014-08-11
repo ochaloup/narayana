@@ -34,6 +34,9 @@ public interface WorkerWorkload<T> {
      * of threads and each thread then invokes the doWork method in parallel
      * until there is no more remaining work.
      *
+     * If work throws an exception then whole test is cancelled and exception is
+     * reported via the (@link{Measurement.exception}) property
+     *
      * @param context
      *            a thread specific instance that may have been returned by a
      *            previous invocation of the doWork method by this thread. This
