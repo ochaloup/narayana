@@ -138,27 +138,21 @@
                 <version>1.0.1.Final</version>
             </dependency>
             <dependency>
-                <groupId>org.jboss.arquillian.junit</groupId>
-                <artifactId>arquillian-junit-container</artifactId>
-                <version>1.0.3.Final</version>
-                <scope>test</scope>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${version.org.jboss.arquillian.core}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>org.jboss.arquillian.protocol</groupId>
-                <artifactId>arquillian-protocol-servlet</artifactId>
-                <version>1.0.3.Final</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.arquillian</groupId>
                 <artifactId>wildfly-arquillian-container-remote</artifactId>
-                <version>${jboss-as.version}</version>
-                <scope>test</scope>
+                <version>${version.org.wildfly.arquillian}</version>
             </dependency>
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.core</groupId>
                 <artifactId>wildfly-controller-client</artifactId>
-                <version>${jboss-as.version}</version>
+                <version>${version.org.wildfly.core}</version>
             </dependency>
             <dependency>
                 <groupId>jacorb</groupId>
@@ -173,12 +167,12 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-        <version>${version.junit}</version>
+                <version>${version.junit}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.narayana.jts</groupId>
                 <artifactId>narayana-jts-jacorb</artifactId>
-                <version>5.0.3.Final-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>cppunit.contrib</groupId>
@@ -372,23 +366,23 @@
                     <artifactId>blacktie-cpp-plugin</artifactId>
                     <version>${project.version}</version>
                 </plugin>
-                               <plugin>
-                                       <groupId>org.apache.maven.plugins</groupId>
-                                       <artifactId>maven-ear-plugin</artifactId>
-                                       <version>2.5</version>
-                               </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>2.5</version>
+                    </plugin>
             </plugins>
         </pluginManagement>
-               <plugins>
-                       <plugin>
-                               <inherited>false</inherited>
-                               <groupId>org.apache.maven.plugins</groupId>
-                               <artifactId>maven-deploy-plugin</artifactId>
-                               <configuration>
-                                       <skip>false</skip>
-                               </configuration>
-                       </plugin>
-               </plugins>
+        <plugins>
+            <plugin>
+                <inherited>false</inherited>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
