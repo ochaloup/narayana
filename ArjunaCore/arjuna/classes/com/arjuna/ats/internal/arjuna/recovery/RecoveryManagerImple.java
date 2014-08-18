@@ -172,8 +172,8 @@ public class RecoveryManagerImple {
      *            before returning.
      */
 
-    public void suspendScan(boolean async) {
-        _periodicRecovery.suspendScan(async);
+    public PeriodicRecovery.Mode trySuspendScan(boolean async) {
+        return _periodicRecovery.suspendScan(async);
     }
 
     public void resumeScan() {

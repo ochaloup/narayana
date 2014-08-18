@@ -39,6 +39,7 @@ public class CommitMarkableResourceRecordBean extends LogRecordWrapper
     String eisProductName = "unavailable";
     String eisProductVersion = "unavailable";
     String jndiName = "unavailable";
+    int timeout = 0;
 
     public CommitMarkableResourceRecordBean(UidWrapper w) {
         super(w.getUid());
@@ -63,6 +64,15 @@ public class CommitMarkableResourceRecordBean extends LogRecordWrapper
             jndiName = xarec.getJndiName();
         }
 
+        if (xares != null) {
+            className = xares.getClass().getName();
+
+            try {
+                timeout = xares.getTransactionTimeout();
+            } catch (Exception e) {
+            }
+        }
+
         return ok;
     }
 
@@ -76,6 +86,11 @@ public class CommitMarkableResourceRecordBean extends LogRecordWrapper
 
     public String getEisProductVersion() {
         return eisProductVersion;
+    }
+
+    @Override
+    public int getTimeout() {
+        return timeout;
     }
 
     public String getJndiName() {
