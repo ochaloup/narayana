@@ -1,5 +1,6 @@
 package com.arjuna.ats.arjuna.tools.osb.mbean;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         }
     }
 
-    private static final String SUBORDINATE_AA_TYPE = "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA";
+    private static final String SUBORDINATE_AA_TYPE = "StateManager" + File.separator + "BasicAction" + File.separator
+            + "TwoPhaseCoordinator" + File.separator + "AtomicAction" + File.separator + "SubordinateAtomicAction"
+            + File.separator + "JCA";
 
     private static OSBType[] defaultOsbTypes = {
             new OSBType(true, "com.arjuna.ats.internal.jta.recovery.arjunacore.RecoverConnectableAtomicAction",
@@ -50,13 +53,15 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                     // "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.CommitMarkableResourceRecordBean",
                     // "com.arjuna.ats.arjuna.AtomicAction",
                     // "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean",
-                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicActionConnectable"),
+                    "StateManager" + File.separator + "BasicAction" + File.separator + "TwoPhaseCoordinator"
+                            + File.separator + "AtomicActionConnectable"),
             new OSBType(false,
                     "com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.SubordinateActionBean", SUBORDINATE_AA_TYPE),
             new OSBType(true, "com.arjuna.ats.arjuna.AtomicAction",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean",
-                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction"),
+                    "StateManager" + File.separator + "BasicAction" + File.separator + "TwoPhaseCoordinator"
+                            + File.separator + "AtomicAction"),
             new OSBType(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper",
                     "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean", "")
 
@@ -128,6 +133,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
             if (typeName != null && typeName.startsWith("/"))
                 typeName = typeName.substring(1);
 
+            typeName = typeName.replaceAll("/", File.separator);
             osbTypeMap.put(typeName, new OSBType(true, osTypeClassName, beanTypeClassName, typeName));
 
             return true;
