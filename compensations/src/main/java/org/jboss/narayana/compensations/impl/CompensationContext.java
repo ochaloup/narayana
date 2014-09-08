@@ -121,6 +121,7 @@ public class CompensationContext implements Context {
      *            the Transaction Context associated with this context.
      */
     public static void close(Object currentTX) {
+
         txContextToExtend.set(null);
         beanStorePerTransaction.remove(currentTX);
     }

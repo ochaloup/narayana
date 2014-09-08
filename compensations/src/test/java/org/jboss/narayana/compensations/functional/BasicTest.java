@@ -66,6 +66,7 @@ public abstract class BasicTest {
 
     @After
     public void after() {
+
         try {
             BAControllerFactory.getInstance().cancelBusinessActivity();
         } catch (Throwable t) {

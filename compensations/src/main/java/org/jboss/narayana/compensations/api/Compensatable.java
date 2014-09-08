@@ -75,7 +75,7 @@ public @interface Compensatable {
      * class is specified for either of these elements, the designated behavior
      * applies to subclasses of that class as well. If both elements are
      * specified, dontCancelOn takes precedence.
-     * 
+     *
      * @return Class[] of Exceptions
      */
     @Nonbinding
@@ -89,7 +89,7 @@ public @interface Compensatable {
      * a class is specified for either of these elements, the designated
      * behavior applies to subclasses of that class as well. If both elements
      * are specified, dontCancelOn takes precedence.
-     * 
+     *
      * @return Class[] of Exceptions
      */
     @Nonbinding
@@ -99,7 +99,7 @@ public @interface Compensatable {
      * The distributed element states whether a distributed or local transaction
      * should be begun, under circumstances where this annotation causes a new
      * transaction to begin.
-     * 
+     *
      * @return Class[] of Exceptions
      */
     @Nonbinding

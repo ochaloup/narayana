@@ -41,6 +41,7 @@ public class CompensationInterceptorMandatory extends CompensationInterceptorBas
 
     @AroundInvoke
     public Object intercept(final InvocationContext ic) throws Exception {
+
         BAControler baControler = BAControllerFactory.getInstance();
         if (!baControler.isBARunning()) {
             throw new TransactionalException("Transaction is required for invocation",

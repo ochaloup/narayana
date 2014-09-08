@@ -142,6 +142,7 @@ public class TXDataMapImpl<K, V> implements TXDataMap<K, V> {
     }
 
     public static boolean isActive() {
+
         return mapThreadLocal.get() != null;
     }
 }
