@@ -267,7 +267,6 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
 
                     }
                 } catch (NamingException e) {
-                    tsLogger.logger.warn("Could not lookup CommitMarkableResource: " + jndiName);
                     tsLogger.logger.debug("Could not lookup CommitMarkableResource: " + jndiName, e);
                 } catch (SQLException e) {
                     tsLogger.logger.warn("Could not handle connection", e);
