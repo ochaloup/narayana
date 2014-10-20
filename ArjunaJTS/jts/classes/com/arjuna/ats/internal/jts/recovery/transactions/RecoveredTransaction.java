@@ -42,6 +42,7 @@ import org.omg.CosTransactions.Status;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
+import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
@@ -247,7 +248,17 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
     }
 
     public boolean assumeComplete() {
-        _typeName = AssumedCompleteTransaction.typeName();
+        final int heuristicDecision = getHeuristicDecision();
+
+        if (heuristicDecision == TwoPhaseOutcome.HEURISTIC_COMMIT
+                || heuristicDecision == TwoPhaseOutcome.HEURISTIC_HAZARD
+                || heuristicDecision == TwoPhaseOutcome.HEURISTIC_MIXED
+                || heuristicDecision == TwoPhaseOutcome.HEURISTIC_ROLLBACK) {
+
+            _typeName = AssumedCompleteHeuristicTransaction.typeName();
+        } else {
+            _typeName = AssumedCompleteTransaction.typeName();
+        }
 
         return true;
     }
