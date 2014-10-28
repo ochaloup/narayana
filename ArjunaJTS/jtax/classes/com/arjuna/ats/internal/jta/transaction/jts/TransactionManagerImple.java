@@ -38,8 +38,11 @@ import javax.naming.Name;
 import javax.transaction.InvalidTransactionException;
 import javax.transaction.Transaction;
 
+import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
 import org.omg.CosTransactions.Control;
+import org.omg.PortableInterceptor.InvalidSlot;
 
+import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 import com.arjuna.ats.internal.jts.ControlWrapper;
 import com.arjuna.ats.internal.jts.OTSImpleManager;
@@ -66,6 +69,19 @@ public class TransactionManagerImple extends BaseTransaction
             return TransactionImple.getTransaction();
         } catch (NullPointerException ex) {
             return null;
+        } catch (TRANSACTION_UNAVAILABLE e) {
+            try {
+                Uid uid = OTSImpleManager.systemCurrent().contextManager().getReceivedCoordinatorUid();
+                if (uid != null) {
+                    return TransactionImple.getTransactions().get(uid);
+                } else {
+                    return null;
+                }
+            } catch (InvalidSlot e1) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+                systemException.initCause(e);
+                throw systemException;
+            }
         } catch (Exception e) {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
@@ -87,6 +103,21 @@ public class TransactionManagerImple extends BaseTransaction
             Control theControl = OTSManager.get_current().suspend();
 
             return tx;
+        } catch (org.omg.CORBA.TRANSACTION_UNAVAILABLE e) {
+            try {
+                Uid uid = OTSImpleManager.systemCurrent().contextManager().getReceivedCoordinatorUid();
+                if (uid != null) {
+                    OTSImpleManager.systemCurrent().contextManager()
+                            .disassociateContext(OTSManager.getReceivedSlotId());
+                    return TransactionImple.getTransactions().get(uid);
+                } else {
+                    return null;
+                }
+            } catch (InvalidSlot e1) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
+                systemException.initCause(e);
+                throw systemException;
+            }
         } catch (Exception e) {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
