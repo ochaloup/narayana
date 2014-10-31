@@ -137,12 +137,20 @@ public class JDBC3Test extends JDBC2Test {
     }
 
     @Test
-    public void testStatements() {
+    public void testStatements() throws SQLException {
         System.out.println("testStatements...");
 
-        javax.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
+        Statement stmt = conn.createStatement(); // non-tx statement
 
-        Statement stmt = null;
+        try {
+            stmt.executeUpdate("DROP TABLE B");
+        } catch (Exception e) {
+            // Ignore
+        }
+
+        stmt.executeUpdate("CREATE TABLE B (a INTEGER,b INTEGER)");
+
+        javax.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
         try {
             tx.begin();
