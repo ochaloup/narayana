@@ -63,7 +63,8 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                     "StateManager" + File.separator + "BasicAction" + File.separator + "TwoPhaseCoordinator"
                             + File.separator + "AtomicAction"),
             new OSBType(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper",
-                    "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean", "")
+                    "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean",
+                    "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple")
 
     };
 

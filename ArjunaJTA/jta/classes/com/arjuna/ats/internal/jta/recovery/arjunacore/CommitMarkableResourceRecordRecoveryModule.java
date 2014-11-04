@@ -57,6 +57,7 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
 import com.arjuna.ats.internal.jta.xa.XID;
 import com.arjuna.ats.jta.common.JTAEnvironmentBean;
+import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.xa.XidImple;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
@@ -124,7 +125,10 @@ public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModul
         }
 
         List<String> xaRecoveryNodes = jtaEnvironmentBean.getXaRecoveryNodes();
-        if (xaRecoveryNodes.contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)) {
+        if (xaRecoveryNodes.size() == 0) {
+            jtaLogger.i18NLogger.info_recovery_noxanodes();
+            whereFilter = "";
+        } else if (xaRecoveryNodes.contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)) {
             whereFilter = "";
         } else {
             StringBuffer buffer = new StringBuffer();
