@@ -1231,18 +1231,18 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      */
 
     private final boolean endAssociation() {
-        boolean doEnd = true;
+        if (_doEnd && _theTransaction != null) {
+            if (_theTransaction.getXAResourceState(_theXAResource) == TxInfo.ASSOCIATED) {
+                // end has been called so we don't need to do it next time
 
-        if (_theTransaction != null) {
-            if (_theTransaction.getXAResourceState(_theXAResource) == TxInfo.NOT_ASSOCIATED) {
-                // end has been called so we don't need to do it again!
-
-                doEnd = false;
+                _doEnd = false;
+                return true;
             }
-        } else
-            doEnd = false; // recovery mode
+        }
+        // else if (_theTransaction == null)
+        // _doEnd = false; // recovery mode
 
-        return doEnd;
+        return false;
     }
 
     private List<SerializableXAResourceDeserializer> getXAResourceDeserializers() {
@@ -1280,6 +1280,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
     private org.omg.CosTransactions.Resource _theReference;
     private org.omg.CosTransactions.RecoveryCoordinator _recoveryCoordinator;
     private TransactionImple _theTransaction;
+    boolean _doEnd = true;
 
     // cached variables
 
