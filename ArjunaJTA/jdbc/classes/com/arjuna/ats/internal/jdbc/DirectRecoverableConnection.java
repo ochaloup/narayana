@@ -100,6 +100,7 @@ public class DirectRecoverableConnection implements RecoverableXAConnection, Con
             if (_theConnection != null) {
                 _theConnection.close();
                 _theConnection = null;
+                _theXAResource = null;
             }
         } catch (SQLException e) {
             jdbcLogger.i18NLogger.warn_drcdest(e);
