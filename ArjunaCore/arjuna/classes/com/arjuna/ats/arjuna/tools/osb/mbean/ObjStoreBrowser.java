@@ -270,7 +270,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                 }
 
                 if (exposeAllLogs || osbTypeMap.containsKey(tname))
-                    updateMBeans(uids, System.currentTimeMillis(), true, tname);
+                    updateMBeans(uids, System.nanoTime(), true, tname);
             }
         } finally {
             tryResumeRM(rmStatus);
