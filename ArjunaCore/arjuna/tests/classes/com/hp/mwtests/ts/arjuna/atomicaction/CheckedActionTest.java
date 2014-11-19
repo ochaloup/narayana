@@ -84,6 +84,7 @@ public class CheckedActionTest {
     @Test
     public void testCanChangeCheckedActionFactory() {
         {
+            arjPropertyManager.getCoordinatorEnvironmentBean().setAllowCheckedActionFactoryOverride(true);
             arjPropertyManager.getCoordinatorEnvironmentBean().setCheckedActionFactory(new CheckedActionFactory() {
                 @Override
                 public CheckedAction getCheckedAction(Uid txId, String actionType) {
@@ -91,6 +92,8 @@ public class CheckedActionTest {
                     return null;
                 }
             });
+            arjPropertyManager.getCoordinatorEnvironmentBean().setAllowCheckedActionFactoryOverride(false);
+
             AtomicAction A = new AtomicAction();
             A.begin();
             A.commit();
@@ -140,8 +143,9 @@ public class CheckedActionTest {
             A.begin();
             A.commit();
         }
-        assertTrue(factory1Called == 3);
+        assertTrue(factory1Called == 2);
         assertTrue(factory2Called == 0);
+        assertTrue(factory3Called == 2);
 
         arjPropertyManager.getCoordinatorEnvironmentBean().setAllowCheckedActionFactoryOverride(true);
 
@@ -157,7 +161,8 @@ public class CheckedActionTest {
             A.begin();
             A.commit();
         }
-        assertTrue(factory1Called == 3);
+        assertTrue(factory1Called == 2);
         assertTrue(factory2Called == 1);
+        assertTrue(factory3Called == 2);
     }
 }
