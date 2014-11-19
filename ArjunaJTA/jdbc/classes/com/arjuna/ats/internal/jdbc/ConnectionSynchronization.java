@@ -46,7 +46,7 @@ import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 
 public class ConnectionSynchronization implements Synchronization {
 
-    public ConnectionSynchronization(Connection conn, RecoverableXAConnection rxac) {
+    public ConnectionSynchronization(Connection conn, TransactionalDriverXAConnection rxac) {
         _theConnection = conn;
         _recoveryConnection = rxac;
     }
@@ -66,5 +66,5 @@ public class ConnectionSynchronization implements Synchronization {
     }
 
     private Connection _theConnection = null;
-    private RecoverableXAConnection _recoveryConnection;
+    private TransactionalDriverXAConnection _recoveryConnection;
 }

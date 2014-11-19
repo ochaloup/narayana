@@ -50,7 +50,7 @@ import org.junit.Test;
 import com.arjuna.ats.internal.jdbc.DynamicClass;
 import com.arjuna.ats.jdbc.TransactionalDriver;
 
-public class JDBC2Test implements DynamicClass {
+public class JDBC2Test {
     protected Connection conn = null;
     protected Connection conn2 = null;
     protected boolean commit = true;
@@ -61,7 +61,7 @@ public class JDBC2Test implements DynamicClass {
 
     @Before
     public void setup() throws Exception {
-        url = "jdbc:arjuna:jdbc:h2:target/h2/foo";
+        url = "jdbc:arjuna:";
         Properties p = System.getProperties();
         p.put("jdbc.drivers", Driver.class.getName());
 
@@ -69,7 +69,11 @@ public class JDBC2Test implements DynamicClass {
         DriverManager.registerDriver(new TransactionalDriver());
 
         dbProperties = new Properties();
-        dbProperties.put(TransactionalDriver.dynamicClass, JDBC2Test.class.getName());
+
+        JdbcDataSource ds = new JdbcDataSource();
+        ds.setURL("jdbc:h2:./h2/foo");
+        dbProperties.put(TransactionalDriver.XADataSource, ds);
+
         conn = DriverManager.getConnection(url, dbProperties);
         conn2 = DriverManager.getConnection(url, dbProperties);
     }
@@ -270,12 +274,5 @@ public class JDBC2Test implements DynamicClass {
             conn.close();
         } catch (Exception e) {
         }
-    }
-
-    @Override
-    public XADataSource getDataSource(String dbName) throws SQLException {
-        JdbcDataSource ds = new JdbcDataSource();
-        ds.setURL(dbName);
-        return ds;
     }
 }

@@ -34,6 +34,7 @@ package com.arjuna.ats.internal.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
@@ -64,7 +65,9 @@ public class ConnectionManager {
         boolean poolingEnabled = "true".equalsIgnoreCase(poolConnections);
 
         if (poolingEnabled) {
-            for (ConnectionImple conn : _connections) {
+            Iterator<ConnectionImple> iterator = _connections.iterator();
+            while (iterator.hasNext()) {
+                ConnectionImple conn = iterator.next();
                 ConnectionControl connControl = conn.connectionControl();
                 TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                 Transaction tx1, tx2 = null;
@@ -103,7 +106,7 @@ public class ConnectionManager {
                     // JBTM-764
 
                     if (tx1 == null)
-                        remove(conn);
+                        iterator.remove();
                 }
             }
         }
