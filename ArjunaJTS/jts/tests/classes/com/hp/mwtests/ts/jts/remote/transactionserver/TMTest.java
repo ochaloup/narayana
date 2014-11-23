@@ -45,6 +45,12 @@ import com.arjuna.orbportability.RootOA;
 import com.arjuna.orbportability.Services;
 
 public class TMTest {
+    public static void main(String[] args) throws Exception {
+        TMTest theTest = new TMTest();
+
+        theTest.test();
+    }
+
     @Test
     public void test() throws Exception {
         ORB myORB = null;
