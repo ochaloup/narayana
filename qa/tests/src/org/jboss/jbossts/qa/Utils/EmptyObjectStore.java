@@ -61,7 +61,7 @@ public class EmptyObjectStore {
             }
 
             ObjectStoreEnvironmentBean storeEnvBean = BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class,
-                    "default");
+                    null);
 
             if (storeEnvBean.getObjectStoreType() != null && storeEnvBean.getObjectStoreType().contains("JDBCStore")) {
                 // ensure that all relevant JDBC store tables are cleared
