@@ -1035,6 +1035,9 @@ public class BasicAction extends StateManager {
         }
 
         if (hSize > 0) {
+            if (tsLogger.logger.isWarnEnabled())
+                tsLogger.logger.warn("Transaction " + get_uid() + " has " + hSize + " heuristic participant(s)!");
+
             try {
                 record_type = os.unpackInt();
 
@@ -1052,6 +1055,9 @@ public class BasicAction extends StateManager {
                     res = (record.restore_state(os, ot) && heuristicList.insert(record));
 
                     record_type = os.unpackInt();
+
+                    if (tsLogger.logger.isWarnEnabled())
+                        tsLogger.logger.warn("Transaction " + get_uid() + " restored heuristic participant " + record);
 
                     if (tsLogger.logger.isTraceEnabled()) {
                         tsLogger.logger.trace("HeuristicList - Unpacked a " + record_type + " record");

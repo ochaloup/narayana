@@ -80,6 +80,7 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.internal.jta.xa.TxInfo;
 import com.arjuna.ats.internal.jts.ORBManager;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
+import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.recovery.SerializableXAResourceDeserializer;
 import com.arjuna.ats.jta.recovery.XARecoveryResource;
 import com.arjuna.ats.jta.utils.XAHelper;
@@ -943,6 +944,16 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_restoreerror2(e);
 
             res = false;
+        } finally {
+            /*
+             * If we're here then we've restored enough to print data on this
+             * instance.
+             */
+
+            if (_heuristic != TwoPhaseOutcome.FINISH_OK) {
+                if (jtaxLogger.logger.isWarnEnabled())
+                    jtaxLogger.logger.warn("XAResourceRecord restored heuristic instance: " + this);
+            }
         }
 
         return res;

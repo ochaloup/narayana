@@ -939,10 +939,21 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                     XAHelper.xidToString(_tranID), e);
 
             res = false;
-        }
+        } finally {
 
-        if (res)
-            res = super.restore_state(os, t);
+            if (res)
+                res = super.restore_state(os, t);
+
+            /*
+             * If we're here then we've restored enough to print data on this
+             * instance.
+             */
+
+            if (_heuristic != TwoPhaseOutcome.FINISH_OK) {
+                if (jtaLogger.logger.isWarnEnabled())
+                    jtaLogger.logger.warn("XAResourceRecord restored heuristic instance: " + this);
+            }
+        }
 
         return res;
     }
