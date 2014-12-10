@@ -193,6 +193,7 @@ public class RegistrarImple implements com.arjuna.wsc11.Registrar {
             terminator.setEndpoint(participantProtocolService);
 
             try {
+                _coordManager.suspend();
                 return getParticipantManager(ArjunaTX11Constants.TERMINATION_COORDINATOR_SERVICE_QNAME,
                         ArjunaTX11Constants.TERMINATION_COORDINATOR_PORT_QNAME,
                         ServiceRegistry.getRegistry()
@@ -223,6 +224,7 @@ public class RegistrarImple implements com.arjuna.wsc11.Registrar {
              */
 
             try {
+                _coordManager.suspend();
                 return getParticipantManager(ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_QNAME,
                         ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_PORT_QNAME,
                         ServiceRegistry.getRegistry()
