@@ -97,10 +97,10 @@ public class ServerTransaction
         try {
             if (_theXid != null) {
                 os.packBoolean(true);
-
                 _theXid.packInto(os);
-            } else
+            } else {
                 os.packBoolean(false);
+            }
 
             return super.save_state(os, ot);
         } catch (IOException e) {
