@@ -24,15 +24,23 @@ import javax.transaction.xa.XAException;
 import java.io.Serializable;
 
 /**
- * An ASFailureSpec is for defining different ways of generating failures and
- * essentially consists of a mode and type.
+ * An ASFailureSpec is for defining different ways of generating
+ * failures and essentially consists of a mode and type.
  *
- * If you need to generate new kinds of failure you should modify the
- * ASFailureMode and ASFailureType classes. Your test will be given a reference
- * to these specifications and is responsible for interpreting their meaning.
+ * If you need to generate new kinds of failure you should
+ * modify the ASFailureMode and ASFailureType classes. Your
+ * test will be given a reference to these specifications and is
+ * responsible for interpreting their meaning.
  *
  * @author Mike Musgrove
  */
+/**
+ * @Deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
+ */
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class XAFailureSpec implements Serializable {
     String name;
     XAFailureMode mode;

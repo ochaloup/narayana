@@ -32,11 +32,17 @@ import com.arjuna.ats.jta.xa.XidImple;
 import java.io.IOException;
 
 /**
- * Extension of an XAResource record for exposing the underlying XAResource
- * which is protected
+ * Extension of an XAResource record for exposing the underlying XAResource which is protected
  *
  * @author Mike Musgrove
  */
+/**
+ * @Deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
+ */
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class JTSXAResourceRecordWrapper extends OSEntryBean implements XARecoveryResourceMBean {
     int heuristic;
     boolean committed;

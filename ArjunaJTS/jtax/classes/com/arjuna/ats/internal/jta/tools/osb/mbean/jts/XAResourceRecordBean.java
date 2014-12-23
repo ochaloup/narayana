@@ -31,11 +31,17 @@ import com.arjuna.ats.jta.xa.XidImple;
 import java.io.IOException;
 
 /**
- * MBean implementation of a transaction participant corresponding to a JTA
- * XAResource
+ * MBean implementation of a transaction participant corresponding to a JTA XAResource
  *
  * @author Mike Musgrove
  */
+/**
+ * @Deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
+ */
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class XAResourceRecordBean extends LogRecordWrapper implements XAResourceRecordBeanMBean {
     JTSXAResourceRecordWrapper xares;
     String className = "unavailable";

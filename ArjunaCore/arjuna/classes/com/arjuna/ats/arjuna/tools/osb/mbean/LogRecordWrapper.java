@@ -27,11 +27,17 @@ import com.arjuna.ats.arjuna.coordinator.HeuristicInformation;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 
 /**
- * An MBean implementation for representing a participant in an Atomic Action or
- * transaction
+ * An MBean implementation for representing a participant in an Atomic Action or transaction
  *
  * @author Mike Musgrove
  */
+/**
+ * @Deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
+ */
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class LogRecordWrapper extends OSEntryBean implements LogRecordWrapperMBean {
     protected ActionBean parent;
     protected AbstractRecord rec;

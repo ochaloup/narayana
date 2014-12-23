@@ -36,12 +36,18 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.tools.osb.util.JMXServer;
 
 /**
- * An MBean implementation for walking an ObjectStore and creating/deleting
- * MBeans that represent completing transactions (ie ones on which the user has
- * called commit)
+ * An MBean implementation for walking an ObjectStore and creating/deleting MBeans
+ * that represent completing transactions (ie ones on which the user has called commit)
  *
  * @author Mike Musgrove
  */
+/**
+ * @Deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
+ */
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     private static final String SUBORDINATE_AA_TYPE = "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA"
