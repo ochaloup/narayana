@@ -228,9 +228,15 @@ public class JDBC2Test {
                 }
             }
 
+            conn.close(); // connections must be closed before committing a JTA
+                            // transaction
             tx.commit();
 
             tx.begin();
+
+            conn.isClosed(); // this will blow up the underlying
+                                // TransactionalDriverXAConnection still thinks
+                                // its associated with an old txn
 
             if (!reuseconn) {
                 conn = DriverManager.getConnection(url, dbProperties);

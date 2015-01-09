@@ -359,7 +359,8 @@ public class ConnectionImple implements Connection {
         checkTransaction();
 
         if (_theConnection == null)
-            return false; // not opened yet.
+            return false; // not opened yet. // TODO why don't we return true
+                            // here
         else
             return _theConnection.isClosed();
     }
