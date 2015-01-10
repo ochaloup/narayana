@@ -507,6 +507,9 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                     jtaLogger.i18NLogger.info_resources_arjunacore_assumecomplete(XAHelper.xidToString(_tranID));
 
                     return TwoPhaseOutcome.FINISH_OK;
+                } else if (_jndiName != null && wasResourceContactedByRecoveryModule(_jndiName)) {
+                    jtaLogger.i18NLogger.info_resources_arjunacore_rmcompleted(XAHelper.xidToString(_tranID));
+                    return TwoPhaseOutcome.FINISH_OK;
                 } else
                     return TwoPhaseOutcome.FINISH_ERROR;
             }
@@ -1176,6 +1179,18 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
             doEnd = false; // Recovery mode
 
         return doEnd;
+    }
+
+    private boolean wasResourceContactedByRecoveryModule(final String jndiName) {
+        final Vector<RecoveryModule> recoveryModules = RecoveryManager.manager().getModules();
+
+        for (final RecoveryModule recoveryModule : recoveryModules) {
+            if (recoveryModule instanceof XARecoveryModule) {
+                return ((XARecoveryModule) recoveryModule).getContactedJndiNames().contains(jndiName);
+            }
+        }
+
+        return false;
     }
 
     protected XAResource _theXAResource;

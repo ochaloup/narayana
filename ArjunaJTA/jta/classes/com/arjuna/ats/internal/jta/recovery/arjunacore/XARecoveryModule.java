@@ -33,6 +33,7 @@ package com.arjuna.ats.internal.jta.recovery.arjunacore;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -65,6 +66,7 @@ import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
 import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 import com.arjuna.ats.jta.utils.XAHelper;
+import org.jboss.tm.XAResourceWrapper;
 
 /**
  * Designed to be able to recover any XAResource.
@@ -76,6 +78,10 @@ public class XARecoveryModule implements RecoveryModule {
                 "Local XARecoveryModule");
 
         com.arjuna.ats.internal.jta.Implementations.initialise();
+    }
+
+    public Set<String> getContactedJndiNames() {
+        return Collections.unmodifiableSet(contactedJndiNames);
     }
 
     public void addXAResourceRecoveryHelper(XAResourceRecoveryHelper xaResourceRecoveryHelper) {
@@ -146,6 +152,8 @@ public class XARecoveryModule implements RecoveryModule {
         if (jtaLogger.logger.isDebugEnabled()) {
             jtaLogger.logger.debugv("{0} - first pass", _logName);
         }
+
+        contactedJndiNames.clear();
 
         _uids = new InputObjectState();
 
@@ -565,6 +573,7 @@ public class XARecoveryModule implements RecoveryModule {
         }
 
         xidsToRecover.nextScan(trans);
+        saveContactedJndiName(xares);
     }
 
     private void xaRecoverySecondPass(XAResource xares) {
@@ -898,6 +907,18 @@ public class XARecoveryModule implements RecoveryModule {
         return ScanStates.values()[scanState.get()];
     }
 
+    private void saveContactedJndiName(final XAResource xaResource) {
+        if (!(xaResource instanceof XAResourceWrapper)) {
+            return;
+        }
+
+        final String jndiName = ((XAResourceWrapper) xaResource).getJndiName();
+
+        if (jndiName != null && jndiName.length() > 0) {
+            contactedJndiNames.add(jndiName);
+        }
+    }
+
     private RecoveryStore _recoveryStore = StoreManager.getRecoveryStore();
 
     private InputObjectState _uids = new InputObjectState();
@@ -928,5 +949,7 @@ public class XARecoveryModule implements RecoveryModule {
     private String _logName = null;
 
     private List<SerializableXAResourceDeserializer> _seriablizableXAResourceDeserializers = new ArrayList<SerializableXAResourceDeserializer>();
+
+    private Set<String> contactedJndiNames = new HashSet<String>();
 
 }
