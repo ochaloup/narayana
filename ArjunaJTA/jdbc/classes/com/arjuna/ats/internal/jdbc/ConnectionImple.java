@@ -311,7 +311,7 @@ public class ConnectionImple implements Connection {
                              * Synchronization here.
                              */
 
-                            jdbcLogger.i18NLogger.warn_closingconnection(_theConnection.toString());
+                            jdbcLogger.i18NLogger.debug_closingconnection(_theConnection.toString());
 
                             delayClose = true;
                         }
