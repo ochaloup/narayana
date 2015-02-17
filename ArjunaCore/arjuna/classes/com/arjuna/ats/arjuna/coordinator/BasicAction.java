@@ -1344,6 +1344,8 @@ public class BasicAction extends StateManager {
             return Abort();
         }
 
+        Long startTime = TxStats.enabled() ? System.nanoTime() : null;
+
         if (pendingList != null) {
             /*
              * If we only have a single item on the prepare list then we can try
@@ -1384,7 +1386,10 @@ public class BasicAction extends StateManager {
 
             if (TxStats.enabled()) {
                 if (heuristicDecision != TwoPhaseOutcome.HEURISTIC_ROLLBACK) {
-                    TxStats.getInstance().incrementCommittedTransactions();
+                    if (startTime == null)
+                        TxStats.getInstance().incrementCommittedTransactions(0L);
+                    else
+                        TxStats.getInstance().incrementCommittedTransactions(System.nanoTime() - startTime);
                 }
             }
         }
@@ -1659,6 +1664,8 @@ public class BasicAction extends StateManager {
 
             phase2Abort(reportHeuristics);
         } else {
+            Long startTime = TxStats.enabled() ? System.nanoTime() : null;
+
             criticalStart();
 
             actionStatus = ActionStatus.COMMITTING;
@@ -1726,7 +1733,12 @@ public class BasicAction extends StateManager {
 
             if (TxStats.enabled()) {
                 if (heuristicDecision != TwoPhaseOutcome.HEURISTIC_ROLLBACK) {
-                    TxStats.getInstance().incrementCommittedTransactions();
+                    // NB statistics monitoring could have been dynamically
+                    // enabled after starting this transaction
+                    if (startTime == null)
+                        TxStats.getInstance().incrementCommittedTransactions(0L);
+                    else
+                        TxStats.getInstance().incrementCommittedTransactions(System.nanoTime() - startTime);
                 }
             }
 
@@ -1789,11 +1801,14 @@ public class BasicAction extends StateManager {
 
         /*
          * To get to this stage we had to try to commit, which means that we're
-         * rolling back because of a resource problem.
+         * rolling back because of a resource problem or an internal error.
          */
 
         if (TxStats.enabled()) {
-            TxStats.getInstance().incrementResourceRollbacks();
+            if (internalError)
+                TxStats.getInstance().incrementSystemRollbacks();
+            else
+                TxStats.getInstance().incrementResourceRollbacks();
             TxStats.getInstance().incrementAbortedTransactions();
         }
     }
@@ -1899,7 +1914,7 @@ public class BasicAction extends StateManager {
         if (actionType == ActionType.TOP_LEVEL) {
             if (getStore() == null) {
                 actionStatus = ActionStatus.ABORT_ONLY;
-
+                internalError = true;
                 return TwoPhaseOutcome.PREPARE_NOTOK;
             }
         }
@@ -2070,6 +2085,8 @@ public class BasicAction extends StateManager {
 
                 criticalEnd();
 
+                internalError = true;
+
                 return TwoPhaseOutcome.PREPARE_NOTOK;
             }
 
@@ -2080,11 +2097,15 @@ public class BasicAction extends StateManager {
 
                         criticalEnd();
 
+                        internalError = true;
+
                         return TwoPhaseOutcome.PREPARE_NOTOK;
                     } else
                         savedIntentionList = true;
                 } catch (ObjectStoreException e) {
                     criticalEnd();
+
+                    internalError = true;
 
                     return TwoPhaseOutcome.PREPARE_NOTOK;
                 }
@@ -2118,6 +2139,8 @@ public class BasicAction extends StateManager {
 
             return;
         }
+
+        Long startTime = TxStats.enabled() ? System.nanoTime() : null;
 
         actionStatus = ActionStatus.COMMITTING;
 
@@ -2254,7 +2277,10 @@ public class BasicAction extends StateManager {
             if (actionStatus == ActionStatus.ABORTED) {
                 TxStats.getInstance().incrementAbortedTransactions();
             } else {
-                TxStats.getInstance().incrementCommittedTransactions();
+                if (startTime == null)
+                    TxStats.getInstance().incrementCommittedTransactions(0L);
+                else
+                    TxStats.getInstance().incrementCommittedTransactions(System.nanoTime() - startTime);
             }
         }
 
@@ -2928,6 +2954,8 @@ public class BasicAction extends StateManager {
                             tsLogger.i18NLogger.warn_coordinator_BasicAction_65();
                         }
                     } catch (ObjectStoreException e) {
+                        // just log a warning since the intentions list has
+                        // already been written
                         tsLogger.logger.warn(e);
                     }
                 }
@@ -3336,6 +3364,8 @@ public class BasicAction extends StateManager {
                                             // active when terminating.
     private boolean pastFirstParticipant; // remember where we are (were) in
                                             // committing during recovery
+    private boolean internalError; // is there an error internal to the TM (such
+                                    // as write log errors, for example)
 
     /*
      * We need to keep track of the number of threads associated with each
