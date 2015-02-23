@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.jts;
 
+import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.internal.jts.ORBManager;
 import com.arjuna.common.util.ConfigurationInfo;
 import com.arjuna.orbportability.OA;
@@ -83,7 +84,7 @@ public class TransactionServer {
             if (args[i].compareTo("-test") == 0)
                 printReady = true;
             if (args[i].compareTo("-help") == 0) {
-                System.out.println("Usage: [-otsname <name>] [-help] [-version]");
+                System.out.println("Usage: [-otsname <name>] [-help] [-version] [-recovery]");
 
                 if (exitOnComplete)
                     return;
@@ -97,6 +98,10 @@ public class TransactionServer {
                     return;
                 else
                     System.exit(0);
+            }
+
+            if (args[i].compareTo("-recovery") == 0) {
+                RecoveryManager.manager().startRecoveryManagerThread();
             }
         }
 
