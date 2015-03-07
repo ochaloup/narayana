@@ -38,24 +38,21 @@ import javax.transaction.Transactional;
 @Transactional(Transactional.TxType.REQUIRED)
 @Priority(Interceptor.Priority.PLATFORM_BEFORE + 200)
 public class TransactionalInterceptorRequired extends TransactionalInterceptorBase {
+    public TransactionalInterceptorRequired() {
+        super(false);
+    }
 
     @AroundInvoke
     public Object intercept(InvocationContext ic) throws Exception {
+        return super.intercept(ic);
+    }
 
-        final TransactionManager tm = getTransactionManager();
-        final Transaction tx = tm.getTransaction();
-
-        try {
-            setUserTransactionAvailable(false);
-
-            if (tx == null) {
-                return invokeInOurTx(ic, tm);
-            } else {
-                return invokeInCallerTx(ic, tx);
-            }
-        } finally {
-            resetUserTransactionAvailability();
+    @Override
+    protected Object doIntercept(TransactionManager tm, Transaction tx, InvocationContext ic) throws Exception {
+        if (tx == null) {
+            return invokeInOurTx(ic, tm);
+        } else {
+            return invokeInCallerTx(ic, tx);
         }
-
     }
 }
