@@ -146,6 +146,23 @@ public abstract class CompensationScopedTest {
     }
 
     @Test
+    public void testTwoCompensationHandlers() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
+        MyCompensationHandler.expectedData = "blah";
+        MyConfirmationHandler.expectedData = "blah";
+
+        getBAControler().beginBusinessActivity();
+        service.doWork("blah");
+        service.doWork("blah");
+        getBAControler().cancelBusinessActivity();
+
+        Assert.assertTrue(MyCompensationHandler.dataAvailable);
+        Assert.assertFalse(MyConfirmationHandler.dataAvailable);
+    }
+
+    @Test
     public void testConfirmationHandler() throws Exception {
 
         ParticipantCompletionCoordinatorRules.setParticipantCount(3);
@@ -159,6 +176,23 @@ public abstract class CompensationScopedTest {
 
         Assert.assertEquals(false, MyCompensationHandler.dataAvailable);
         Assert.assertEquals(true, MyConfirmationHandler.dataAvailable);
+    }
+
+    @Test
+    public void testTwoConfirmationHandlers() throws Exception {
+
+        ParticipantCompletionCoordinatorRules.setParticipantCount(6);
+
+        MyCompensationHandler.expectedData = "blah";
+        MyConfirmationHandler.expectedData = "blah";
+
+        getBAControler().beginBusinessActivity();
+        service.doWork("blah");
+        service.doWork("blah");
+        getBAControler().closeBusinessActivity();
+
+        Assert.assertFalse(MyCompensationHandler.dataAvailable);
+        Assert.assertTrue(MyConfirmationHandler.dataAvailable);
     }
 
 }
