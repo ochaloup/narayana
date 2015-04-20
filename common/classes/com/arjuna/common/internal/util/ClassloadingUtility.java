@@ -18,7 +18,7 @@
  * (C) 2010,
  * @author JBoss, by Red Hat.
  */
-package com.arjuna.ats.internal.arjuna.common;
+package com.arjuna.common.internal.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -26,8 +26,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
+import com.arjuna.common.logging.commonLogger;
 
 /**
  * Utility functions, used mainly by the EnvironmentBeans, for managing dynamic
@@ -36,8 +36,6 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-04
  */
 public class ClassloadingUtility {
-    // this really belongs in common...
-
     /**
      * Load a class. No instantiation.
      * 
@@ -62,7 +60,7 @@ public class ClassloadingUtility {
             // className ) ;
             clazz = Class.forName(className);
         } catch (ClassNotFoundException e) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_2(className, e);
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_2(className, e);
             return null;
         }
         return clazz;
@@ -82,12 +80,12 @@ public class ClassloadingUtility {
      * @return the specified class, or null.
      */
     public static <T> Class<? extends T> loadClass(Class<T> iface, String className) {
-        if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("Loading class " + className);
+        if (commonLogger.logger.isTraceEnabled()) {
+            commonLogger.logger.trace("Loading class " + className);
         }
 
         if (className == null) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_1();
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_1();
             return null;
         }
 
@@ -100,7 +98,7 @@ public class ClassloadingUtility {
             Class<? extends T> clazz2 = clazz.asSubclass(iface);
             return clazz2;
         } catch (ClassCastException e) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_3(className, iface.getName(), e);
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_3(className, iface.getName(), e);
             return null;
         }
     }
@@ -149,11 +147,11 @@ public class ClassloadingUtility {
             }
 
         } catch (InstantiationException e) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_4(className, e);
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_4(className, e);
         } catch (IllegalAccessException e) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_5(className, e);
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_5(className, e);
         } catch (InvocationTargetException e) {
-            tsLogger.i18NLogger.warn_common_ClassloadingUtility_4(className, e);
+            commonLogger.i18NLogger.warn_common_ClassloadingUtility_4(className, e);
         }
 
         return instance;
@@ -204,7 +202,7 @@ public class ClassloadingUtility {
                                                                                                                 // spelling
                         method.invoke(instance, theParameter);
                     } catch (Exception e) {
-                        tsLogger.i18NLogger.warn_common_ClassloadingUtility_6(theClassAndParameter, e);
+                        commonLogger.i18NLogger.warn_common_ClassloadingUtility_6(theClassAndParameter, e);
                         continue;
                     }
                 }

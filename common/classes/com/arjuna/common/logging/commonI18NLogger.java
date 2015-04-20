@@ -54,6 +54,30 @@ public interface commonI18NLogger {
     @LogMessage(level = WARN)
     public void warn_could_not_find_config_file(URL url);
 
+    @Message(id = 48003, value = "className is null", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_1();
+
+    @Message(id = 48004, value = "attempt to load {0} threw ClassNotFound. Wrong classloader?", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_2(String arg0, @Cause() Throwable arg1);
+
+    @Message(id = 48005, value = "class {0} does not implement {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_3(String arg0, String arg1, @Cause() Throwable arg2);
+
+    @Message(id = 48006, value = "can't create new instance of {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_4(String arg0, @Cause() Throwable arg1);
+
+    @Message(id = 48007, value = "can't access {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_5(String arg0, @Cause() Throwable arg1);
+
+    @Message(id = 48008, value = "can't initialize from string {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_common_ClassloadingUtility_6(String arg0, @Cause() Throwable arg1);
+
     /*
      * Allocate new messages directly above this notice. - id: use the next id
      * number in sequence. Don't reuse ids. The first two digits of the
@@ -65,5 +89,4 @@ public interface commonI18NLogger {
      * return type have prefix get_, all others are log methods and have prefix
      * <level>_
      */
-
 }
