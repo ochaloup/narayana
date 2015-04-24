@@ -35,6 +35,7 @@ import com.arjuna.mw.wsas.activity.ActivityHierarchy;
 import com.arjuna.mw.wsas.exceptions.InvalidActivityException;
 import com.arjuna.mw.wscf11.model.sagas.CoordinatorManagerFactory;
 import com.arjuna.mw.wscf.model.sagas.api.CoordinatorManager;
+import com.arjuna.mw.wstx.logging.wstxLogger;
 import com.arjuna.wst.SystemException;
 import com.arjuna.wst.UnknownTransactionException;
 import com.arjuna.wst.WrongStateException;
@@ -54,6 +55,10 @@ import javax.xml.namespace.QName;
 public class BAParticipantManagerImple implements BAParticipantManager {
 
     public BAParticipantManagerImple(String participantId) {
+        if (wstxLogger.logger.isTraceEnabled()) {
+            wstxLogger.logger.trace(getClass().getSimpleName() + " constructor. Participant id: " + participantId);
+        }
+
         try {
             _coordManager = CoordinatorManagerFactory.coordinatorManager();
             _hier = _coordManager.currentActivity();
@@ -65,6 +70,10 @@ public class BAParticipantManagerImple implements BAParticipantManager {
 
     public void exit() throws WrongStateException, UnknownTransactionException, SystemException {
         try {
+            if (wstxLogger.logger.isTraceEnabled()) {
+                wstxLogger.logger.trace(getClass().getSimpleName() + ".exit. Participant id: " + _participantId);
+            }
+
             if (_hier == null)
                 throw new UnknownTransactionException();
 
@@ -87,6 +96,10 @@ public class BAParticipantManagerImple implements BAParticipantManager {
     }
 
     public void completed() throws WrongStateException, UnknownTransactionException, SystemException {
+        if (wstxLogger.logger.isTraceEnabled()) {
+            wstxLogger.logger.trace(getClass().getSimpleName() + ".completed. Participant id: " + _participantId);
+        }
+
         try {
             if (_hier == null)
                 throw new UnknownTransactionException();
@@ -110,6 +123,11 @@ public class BAParticipantManagerImple implements BAParticipantManager {
     }
 
     public void fail(final QName exceptionIdentifier) throws SystemException {
+        if (wstxLogger.logger.isTraceEnabled()) {
+            wstxLogger.logger.trace(getClass().getSimpleName() + ".fail. Participant id: " + _participantId
+                    + ", exceptionIdentifier: " + exceptionIdentifier);
+        }
+
         try {
             if (_hier == null)
                 throw new UnknownTransactionException();
@@ -134,6 +152,10 @@ public class BAParticipantManagerImple implements BAParticipantManager {
     }
 
     public void cannotComplete() throws WrongStateException, UnknownTransactionException, SystemException {
+        if (wstxLogger.logger.isTraceEnabled()) {
+            wstxLogger.logger.trace(getClass().getSimpleName() + ".cannotComplete. Participant id: " + _participantId);
+        }
+
         try {
             if (_hier == null)
                 throw new UnknownTransactionException();
@@ -159,6 +181,10 @@ public class BAParticipantManagerImple implements BAParticipantManager {
     }
 
     public void error() throws SystemException {
+        if (wstxLogger.logger.isTraceEnabled()) {
+            wstxLogger.logger.trace(getClass().getSimpleName() + ".error. Participant id: " + _participantId);
+        }
+
         try {
             _coordManager.setCancelOnly();
         } catch (com.arjuna.mw.wsas.exceptions.WrongStateException ex) {

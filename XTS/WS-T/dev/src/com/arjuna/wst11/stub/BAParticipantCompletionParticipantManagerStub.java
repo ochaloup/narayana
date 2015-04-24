@@ -20,6 +20,7 @@
  */
 package com.arjuna.wst11.stub;
 
+import com.arjuna.webservices.logging.WSTLogger;
 import com.arjuna.webservices11.wsba.State;
 import com.arjuna.wst.SystemException;
 import com.arjuna.wst.UnknownTransactionException;
@@ -34,10 +35,18 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
 
     public BAParticipantCompletionParticipantManagerStub(final ParticipantCompletionParticipantEngine coordinator)
             throws Exception {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + " constructor");
+        }
+
         this.coordinator = coordinator;
     }
 
     public synchronized void exit() throws WrongStateException, UnknownTransactionException, SystemException {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".exit");
+        }
+
         /*
          * Active -> illegal state Canceling -> illegal state Completed ->
          * illegal state Closing -> illegal state Compensating -> illegal state
@@ -46,6 +55,11 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
          * Exiting -> no response Ended -> ended
          */
         final State state = coordinator.exit();
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".exit. State: " + state);
+        }
+
         if (state == State.STATE_EXITING) {
             throw new SystemException();
         } else if (state != State.STATE_ENDED) {
@@ -54,14 +68,27 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
     }
 
     public synchronized void completed() throws WrongStateException, UnknownTransactionException, SystemException {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".completed");
+        }
+
         // returns original state
         final State state = coordinator.completed();
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".completed. State: " + state);
+        }
+
         if ((state != State.STATE_ACTIVE) && (state != State.STATE_COMPLETED)) {
             throw new WrongStateException();
         }
     }
 
     public void cannotComplete() throws WrongStateException, UnknownTransactionException, SystemException {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".cannotComplete");
+        }
+
         /*
          * Active -> illegal state Canceling -> illegal state Completed ->
          * illegal state Closing -> illegal state Compensating -> illegal state
@@ -70,6 +97,11 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
          * Exiting -> illegal state Ended -> ended
          */
         final State state = coordinator.cannotComplete();
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".completed. State: " + state);
+        }
+
         if (state == State.STATE_NOT_COMPLETING) {
             throw new SystemException();
         } else if (state != State.STATE_ENDED) {
@@ -78,6 +110,10 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
     }
 
     public synchronized void fail(final QName exceptionIdentifier) throws SystemException {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".fail");
+        }
+
         /*
          * Active -> illegal state Canceling -> illegal state Completed ->
          * illegal state Closing -> illegal state Compensating -> illegal state
@@ -86,6 +122,11 @@ public class BAParticipantCompletionParticipantManagerStub implements BAParticip
          * Exiting -> illegal state Ended -> ended
          */
         final State state = coordinator.fail(exceptionIdentifier);
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass().getSimpleName() + ".fail. State: " + state);
+        }
+
         if (state != State.STATE_ENDED) {
             throw new SystemException();
         }

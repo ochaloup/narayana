@@ -102,6 +102,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      */
     public ParticipantCompletionCoordinatorEngine(final String id, final W3CEndpointReference participant,
             final State state, final boolean recovered) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + " constructor. Id: " + id + ", participant: " + participant
+                    + ", state: " + state + ", recovered: " + recovered);
+        }
+
         this.id = id;
         this.instanceIdentifier = new InstanceIdentifier(id);
         this.participant = participant;
@@ -125,6 +130,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param coordinator
      */
     public void setCoordinator(final BAParticipantManager coordinator) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".setCoordinator");
+        }
+
         this.coordinator = coordinator;
     }
 
@@ -148,12 +157,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            Exiting (invalid state) Ended -> Ended
      */
     public void cancelled(final NotificationType cancelled, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cancelled");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if (current == State.STATE_CANCELING) {
                 ended();
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cancelled. State: " + current);
         }
     }
 
@@ -177,12 +194,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            Exiting (invalid state) Ended -> Ended
      */
     public void closed(final NotificationType closed, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".closed");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if (current == State.STATE_CLOSING) {
                 ended();
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".closed. State: " + current);
         }
     }
 
@@ -206,12 +231,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            Exiting (invalid state) Ended -> Ended
      */
     public void compensated(final NotificationType compensated, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".compensated");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if (current == State.STATE_COMPENSATING) {
                 ended();
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".compensated. State: " + current);
         }
     }
 
@@ -234,12 +267,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            state) Ended -> Ended
      */
     public void completed(final NotificationType completed, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".completed");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if (current == State.STATE_ACTIVE || current == State.STATE_CANCELING) {
                 changeState(State.STATE_COMPLETED);
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".completed. State: " + current);
         }
 
         if (current == State.STATE_ACTIVE) {
@@ -271,12 +312,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            Ended (resend Exited)
      */
     public void exit(final NotificationType exit, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".exit");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if ((current == State.STATE_ACTIVE) || (current == State.STATE_CANCELING)) {
                 changeState(State.STATE_EXITING);
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".exit. State: " + current);
         }
 
         if ((current == State.STATE_ACTIVE) || (current == State.STATE_CANCELING)) {
@@ -351,6 +400,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            just detecting that the pariticpant has ended.
      */
     public void fail(final ExceptionType fail, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".fail");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
@@ -363,6 +416,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
                 failureState = State.STATE_FAILING_COMPENSATING;
                 ended();
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".fail. State: " + current);
         }
 
         if (current == State.STATE_ACTIVE) {
@@ -394,12 +451,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      */
     public void cannotComplete(final NotificationType cannotComplete, final MAP map,
             final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cannotComplete");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
             if ((current == State.STATE_ACTIVE) || (state == State.STATE_CANCELING)) {
                 changeState(State.STATE_NOT_COMPLETING);
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cannotComplete. State: " + current);
         }
 
         if ((current == State.STATE_ACTIVE) || (current == State.STATE_CANCELING)) {
@@ -419,10 +484,18 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            The arjuna context.
      */
     public void getStatus(final NotificationType getStatus, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getStatus");
+        }
+
         final State current;
         synchronized (this) {
             current = state;
         }
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getStatus. State: " + current);
+        }
+
         sendStatus(current);
     }
 
@@ -437,12 +510,21 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            The arjuna context.
      */
     public void status(final StatusType status, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".status");
+        }
+
         // TODO - is this correct?
 
         final State current;
         synchronized (this) {
             current = state;
         }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".status. State: " + current);
+        }
+
         sendStatus(current);
     }
 
@@ -452,6 +534,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @return The state.
      */
     public synchronized State getStatus() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getStatus. State: " + state);
+        }
+
         return state;
     }
 
@@ -469,6 +555,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *         Exiting (invalid state) Ended -> Ended (invalid state)
      */
     public State cancel() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cancel");
+        }
+
         State current;
         synchronized (this) {
             current = state;
@@ -480,6 +570,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
         if ((current == State.STATE_ACTIVE) || (current == State.STATE_CANCELING)) {
             sendCancel();
             current = waitForState(State.STATE_CANCELING, TransportTimer.getTransportTimeout());
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".cancel. State: " + current);
         }
 
         // if we reached ended via a failure then make sure we return the
@@ -508,12 +602,20 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *         Ended -> Ended (invalid state)
      */
     public State compensate() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".compensate");
+        }
+
         State current;
         synchronized (this) {
             current = state;
             if (current == State.STATE_COMPLETED) {
                 changeState(State.STATE_COMPENSATING);
             }
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".compensate. State: " + current);
         }
 
         if ((current == State.STATE_COMPLETED) || (current == State.STATE_COMPENSATING)) {
@@ -559,6 +661,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *         Exiting (invalid state) Ended -> Ended (invalid state)
      */
     public State close() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".close");
+        }
+
         State current;
         synchronized (this) {
             current = state;
@@ -570,6 +676,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
         if ((current == State.STATE_COMPLETED) || (current == State.STATE_CLOSING)) {
             sendClose();
             waitForState(State.STATE_CLOSING, TransportTimer.getTransportTimeout());
+        }
+
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".close. State: " + current);
         }
 
         synchronized (this) {
@@ -607,6 +717,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *            The arjuna context.
      */
     public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".soapFault");
+        }
+
         ended();
         try {
             // TODO - we cannot do this with JaxWS. need to log something
@@ -619,6 +733,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendClose() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendClose. Participant: " + participant + ", instance identifier: "
+                    + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendClose(participant, map, instanceIdentifier);
@@ -634,6 +753,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendCompensate() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendCompensate. Participant: " + participant
+                    + ", instance identifier: " + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendCompensate(participant, map, instanceIdentifier);
@@ -649,6 +773,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendCancel() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendCancel. Participant: " + participant + ", instance identifier: "
+                    + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendCancel(participant, map, instanceIdentifier);
@@ -664,6 +793,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendExited() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendExited. Participant: " + participant + ", instance identifier: "
+                    + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendExited(participant, map, instanceIdentifier);
@@ -679,6 +813,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendFailed() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendFailed. Participant: " + participant + ", instance identifier: "
+                    + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendFailed(participant, map, instanceIdentifier);
@@ -694,6 +833,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendNotCompleted() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendNotCompleted. Participant: " + participant
+                    + ", instance identifier: " + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendNotCompleted(participant, map, instanceIdentifier);
@@ -712,6 +856,11 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void sendStatus(final State state) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".sendStatus. Participant: " + participant + ", instance identifier: "
+                    + instanceIdentifier);
+        }
+
         final MAP map = createContext();
         try {
             ParticipantCompletionParticipantClient.getClient().sendStatus(participant, map, instanceIdentifier,
@@ -729,6 +878,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @return The coordinator id.
      */
     public String getId() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getId. Id: " + id);
+        }
+
         return id;
     }
 
@@ -738,6 +891,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @return The participant endpoint reference
      */
     public W3CEndpointReference getParticipant() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getParticipant. Participant: " + participant);
+        }
+
         return participant;
     }
 
@@ -747,6 +904,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @return The associated coordinator.
      */
     public BAParticipantManager getCoordinator() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".getCoordinator. Coordinator: " + coordinator);
+        }
+
         return coordinator;
     }
 
@@ -756,6 +917,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @return true if the participant is recovered otherwise false
      */
     public boolean isRecovered() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".isRecovered. Recovered: " + recovered);
+        }
+
         return recovered;
     }
 
@@ -803,6 +968,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void executeCompleted() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".executeCompleted");
+        }
+
         try {
             coordinator.completed();
         } catch (final Throwable th) {
@@ -817,6 +986,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void executeExit() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".executeExit");
+        }
+
         try {
             coordinator.exit();
         } catch (final Throwable th) {
@@ -839,6 +1012,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void executeFail(QName fail) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".executeFail");
+        }
+
         try {
             coordinator.fail(fail);
         } catch (final Throwable th) {
@@ -859,6 +1036,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      *
      */
     private void executeCannotComplete() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".executeCannotComplete");
+        }
+
         try {
             coordinator.cannotComplete();
         } catch (final Throwable th) {
@@ -874,6 +1055,10 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * End the current coordinator.
      */
     private void ended() {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            WSTLogger.logger.trace(getClass() + ".ended");
+        }
+
         changeState(State.STATE_ENDED);
         // participants which have not been recovered from the log can be
         // deactivated now.
