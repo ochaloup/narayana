@@ -335,7 +335,9 @@ public class AtomicAction extends TwoPhaseCoordinator {
 
     public static final boolean resume(AtomicAction act) {
         if (act == null) {
-            suspend();
+            suspend(); // If you ever change this, you need to change the way
+                        // resume is handled in
+                        // /ArjunaJTS/integration/src/main/java/com/arjuna/ats/jbossatx/BaseTransactionManagerDelegate.java
         } else
             ThreadActionData.restoreActions(act);
 
