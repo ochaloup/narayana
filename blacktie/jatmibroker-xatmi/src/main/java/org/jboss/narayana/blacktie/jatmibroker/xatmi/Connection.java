@@ -93,8 +93,6 @@ public interface Connection {
      *            The name of the service to call
      * @param buffer
      *            The inbound data
-     * @param len
-     *            The length of the data
      * @param flags
      *            The flags to use
      * @return The returned buffer
@@ -111,8 +109,6 @@ public interface Connection {
      *            The name of the service to call
      * @param toSend
      *            The inbound data
-     * @param len
-     *            The length of the data
      * @param flags
      *            The flags to use
      * @return The connection descriptor
@@ -152,8 +148,6 @@ public interface Connection {
      *            The name of the service
      * @param toSend
      *            The outbound buffer
-     * @param len
-     *            The length of the data
      * @param flags
      *            The flags to use
      * @return The connection descriptor

@@ -226,8 +226,6 @@ public class ThreadActionData {
      * happen after the transaction service really ends, or you risk having some
      * threads see one view of the list that is different to other threads.
      * 
-     * @param s
-     *            the setup to add.
      */
     /*
      * XXX NOT USED public static boolean removeSetup (ThreadSetup s) {

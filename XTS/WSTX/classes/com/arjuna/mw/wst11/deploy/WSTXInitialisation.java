@@ -37,9 +37,6 @@ public class WSTXInitialisation {
 
     /**
      * The context has been initialized.
-     * 
-     * @param servletContextEvent
-     *            The servlet context event.
      *
      */
     public static void startup() {
@@ -89,9 +86,6 @@ public class WSTXInitialisation {
 
     /**
      * The context is about to be destroyed.
-     * 
-     * @param servletContextEvent
-     *            The servlet context event.
      */
     public static void shutdown() {
     }

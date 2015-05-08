@@ -102,7 +102,7 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      * Start a new activity. If there is already an activity associated with the
      * thread then it will be nested.
      * 
-     * @param int
+     * @param timeout
      *            timeout The timeout associated with the activity. If the
      *            activity has not been terminated by the time this period
      *            elapses, then it will automatically be terminated.
@@ -285,7 +285,7 @@ public class CoordinatorServiceImple implements UserCoordinator, CoordinatorMana
      * thread and this means that no application specified timeout is set for
      * activities.
      * 
-     * @param int
+     * @param timeout
      *            timeout The timeout (in seconds) to associate with all
      *            subsequently created activities. This value must be 0 or
      *            greater.

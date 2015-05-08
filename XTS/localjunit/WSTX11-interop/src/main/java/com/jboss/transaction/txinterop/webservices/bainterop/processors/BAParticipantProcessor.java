@@ -61,7 +61,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -79,7 +79,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -100,7 +100,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -121,7 +121,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -142,7 +142,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -164,7 +164,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -183,7 +183,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -205,7 +205,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -226,7 +226,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -248,7 +248,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -270,7 +270,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -289,7 +289,7 @@ public class BAParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
+     * 
      * @throws SoapFault11
      *             for errors during processing
      */

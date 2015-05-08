@@ -101,7 +101,7 @@ public class TransactionReaper {
      * newly expired transactions are passed to a worker thread for cancellation
      * and requeued for subsequent progress checks. the worker is given a kick
      * if such checks find it is wedged.
-     * <p/>
+     * 
      * Timeout is given in milliseconds.
      */
 
@@ -649,7 +649,7 @@ public class TransactionReaper {
     /**
      * Given a Control, return the associated timeout, or 0 if we do not know
      * about it.
-     * <p/>
+     * 
      * Return in seconds!
      *
      * Takes an Object because TransactionFactoryImple.getTransactionInfo and
@@ -895,7 +895,7 @@ public class TransactionReaper {
     /**
      * Terminate the transaction reaper. This is a synchronous operation and
      * will only return once the reaper has been shutdown cleanly.
-     * <p/>
+     * 
      * Note, this method assumes that the transaction system has been shutdown
      * already so no new transactions can be created, or we could be here for a
      * long time!

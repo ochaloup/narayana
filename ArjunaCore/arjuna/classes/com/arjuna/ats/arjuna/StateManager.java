@@ -599,7 +599,7 @@ public class StateManager {
      * Unpack the crash recovery state header information and return it.
      * 
      * @since JTS 2.1.
-     * @param txId
+     * @param os
      *            the identity of the transaction that last caused the state to
      *            be written to the object store.
      */

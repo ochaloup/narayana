@@ -188,7 +188,7 @@ public class TxStats implements TxStatsMBean {
     }
 
     /**
-     * @Deprecated as of 5.0.5.Final use
+     * @deprecated as of 5.0.5.Final use
      *             {@link #incrementCommittedTransactions(long)}} instead
      */
     @Deprecated

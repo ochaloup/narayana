@@ -355,8 +355,8 @@ public class Coordinator {
      * @param content
      *            empty if no transaction timeout is required otherwise the
      *            number of milliseconds after which the transaction is eligible
-     *            for being timed out. The content should have the format @ see
-     * TxSupport#TIMEOUT_PROPERTY=<milliseconds>
+     *            for being timed out. The content should have the format
+     *            TxSupport#TIMEOUT_PROPERTY milliseconds
      * @return http status code
      */
     @SuppressWarnings({"UnusedDeclaration"})
@@ -679,9 +679,9 @@ public class Coordinator {
     }
 
     /**
-     * PUT /recovery-coordinator/<RecCoordId>/<new participant URL> - overwrite
-     * the old <participant URL> with <new participant URL> (as with JTS, this
-     * will also trigger off a recovery attempt on the associated transaction) A
+     * PUT /recovery-coordinator/_RecCoordId_/_new participant URL_ - overwrite
+     * the old participant URL with new participant URL (as with JTS, this will
+     * also trigger off a recovery attempt on the associated transaction) A
      * participant may use this url to notifiy the coordinator that he has moved
      * to a new location.
      *

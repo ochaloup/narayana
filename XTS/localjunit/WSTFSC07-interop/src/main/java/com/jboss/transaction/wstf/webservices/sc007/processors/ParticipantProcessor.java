@@ -83,7 +83,6 @@ public class ParticipantProcessor {
      *            The address of the coordinator to employ.
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -103,7 +102,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -121,7 +119,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -139,7 +136,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -159,7 +155,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -179,7 +174,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -198,7 +192,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -219,7 +212,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -240,7 +232,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -260,7 +251,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -281,7 +271,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -300,7 +289,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -318,7 +306,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */
@@ -339,7 +326,6 @@ public class ParticipantProcessor {
      * 
      * @param map
      *            The current addressing context.
-     * @return The response.
      * @throws SoapFault11
      *             for errors during processing
      */

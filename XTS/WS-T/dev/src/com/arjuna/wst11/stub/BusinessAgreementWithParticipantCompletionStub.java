@@ -64,8 +64,6 @@ public class BusinessAgreementWithParticipantCompletionStub
 
     /**
      * constructor for use during recovery
-     * 
-     * @throws Exception
      */
     public BusinessAgreementWithParticipantCompletionStub() {
         this.participant = null;

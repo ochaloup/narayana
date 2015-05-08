@@ -42,7 +42,7 @@ public class CoordinationContextHelper {
      * @param headerElement
      *            The SOAP header element to deserialise.
      * @return The coordination context.
-     * @throws javax.xml.stream.XMLStreamException
+     * @throws JAXBException
      *             for errors during parsing.
      */
     public static CoordinationContextType deserialise(final Element headerElement) throws JAXBException {
@@ -76,8 +76,7 @@ public class CoordinationContextHelper {
      * 
      * @param headerElement
      *            The SOAP header element to deserialise.
-     * @return The coordination context.
-     * @throws javax.xml.stream.XMLStreamException
+     * @throws JAXBException
      *             for errors during parsing.
      */
     public static void serialise(final CoordinationContextType coordinationContextType, Element headerElement)

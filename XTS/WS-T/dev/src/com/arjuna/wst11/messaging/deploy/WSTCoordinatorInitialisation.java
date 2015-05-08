@@ -37,9 +37,6 @@ import com.arjuna.wst11.messaging.*;
 public class WSTCoordinatorInitialisation {
     /**
      * The context has been initialized.
-     * 
-     * @param servletContextEvent
-     *            The servlet context event.
      */
     public static void startup() {
         CompletionCoordinatorProcessor.setProcessor(new CompletionCoordinatorProcessorImpl());
@@ -53,9 +50,6 @@ public class WSTCoordinatorInitialisation {
 
     /**
      * The context is about to be destroyed.
-     * 
-     * @param servletContextEvent
-     *            The servlet context event.
      */
     public static void shutdown() {
     }

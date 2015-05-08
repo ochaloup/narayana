@@ -97,10 +97,6 @@ public class ActivityImple {
     /**
      * Start a new activity.
      *
-     * @param int
-     *            timeout The timeout associated with the activity. If the
-     *            activity has not been terminated by the time this period
-     *            elapses, then it will automatically be terminated.
      * @exception WrongStateException
      *                Thrown if the currently associated activity is in a state
      *                that does not allow a new activity to be enlisted as a
@@ -123,7 +119,7 @@ public class ActivityImple {
      * Start a new activity. If there is already an activity associated with the
      * thread then it will be nested.
      *
-     * @param int
+     * @param timeout
      *            timeout The timeout associated with the activity. If the
      *            activity has not been terminated by the time this period
      *            elapses, then it will automatically be terminated.
@@ -201,6 +197,10 @@ public class ActivityImple {
     /**
      * Complete the activity with the completion status provided.
      *
+     *
+     * @param cs
+     *            The CompletionStatus to use.
+     * 
      * @exception InvalidActivityException
      *                Thrown if the current activity is not known about by the
      *                activity system.
@@ -216,9 +216,6 @@ public class ActivityImple {
      *                terminate the transaction.
      * @exception SystemException
      *                Thrown if some other error occurred.
-     *
-     * @param CompletionStatus
-     *            cs The CompletionStatus to use.
      *
      * @return the result of completing the activity. Null is valid and must be
      *         interpreted within the context of any HLS that may exist.

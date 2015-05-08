@@ -147,14 +147,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Active (invalid state) Canceling -> Ended Completed
-     *            -> Completed (invalid state) Closing -> Closing (invalid
-     *            state) Compensating -> Compensating (invalid state)
-     *            Failing-Active -> Failing-Active (invalid state)
-     *            Failing-Canceling -> Failing-Canceling (invalid state)
-     *            Failing-Compensating -> Failing-Compensating (invalid state)
-     *            NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *            Exiting (invalid state) Ended -> Ended
+     *            Active -&gt; Active (invalid state) Canceling -&gt; Ended
+     *            Completed -&gt; Completed (invalid state) Closing -&gt;
+     *            Closing (invalid state) Compensating -&gt; Compensating
+     *            (invalid state) Failing-Active -&gt; Failing-Active (invalid
+     *            state) Failing-Canceling -&gt; Failing-Canceling (invalid
+     *            state) Failing-Compensating -&gt; Failing-Compensating
+     *            (invalid state) NotCompleting -&gt; NotCompleting (invalid
+     *            state) Exiting -&gt; Exiting (invalid state) Ended -&gt; Ended
      */
     public void cancelled(final NotificationType cancelled, final MAP map, final ArjunaContext arjunaContext) {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -184,14 +184,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Active (invalid state) Canceling -> Canceling
-     *            (invalid state) Completed -> Completed (invalid state) Closing
-     *            -> Ended Compensating -> Compensating (invalid state)
-     *            Failing-Active -> Failing-Active (invalid state)
-     *            Failing-Canceling -> Failing-Canceling (invalid state)
-     *            Failing-Compensating -> Failing-Compensating (invalid state)
-     *            NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *            Exiting (invalid state) Ended -> Ended
+     *            Active -&gt; Active (invalid state) Canceling -&gt; Canceling
+     *            (invalid state) Completed -&gt; Completed (invalid state)
+     *            Closing -&gt; Ended Compensating -&gt; Compensating (invalid
+     *            state) Failing-Active -&gt; Failing-Active (invalid state)
+     *            Failing-Canceling -&gt; Failing-Canceling (invalid state)
+     *            Failing-Compensating -&gt; Failing-Compensating (invalid
+     *            state) NotCompleting -&gt; NotCompleting (invalid state)
+     *            Exiting -&gt; Exiting (invalid state) Ended -&gt; Ended
      */
     public void closed(final NotificationType closed, final MAP map, final ArjunaContext arjunaContext) {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -221,14 +221,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Active (invalid state) Canceling -> Canceling
-     *            (invalid state) Completed -> Completed (invalid state) Closing
-     *            -> Closing (invalid state) Compensating -> Ended
-     *            Failing-Active -> Failing-Active (invalid state)
-     *            Failing-Canceling -> Failing-Canceling (invalid state)
-     *            Failing-Compensating -> Failing-Compensating (invalid state)
-     *            NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *            Exiting (invalid state) Ended -> Ended
+     *            Active -&gt; Active (invalid state) Canceling -&gt; Canceling
+     *            (invalid state) Completed -&gt; Completed (invalid state)
+     *            Closing -&gt; Closing (invalid state) Compensating -&gt; Ended
+     *            Failing-Active -&gt; Failing-Active (invalid state)
+     *            Failing-Canceling -&gt; Failing-Canceling (invalid state)
+     *            Failing-Compensating -&gt; Failing-Compensating (invalid
+     *            state) NotCompleting -&gt; NotCompleting (invalid state)
+     *            Exiting -&gt; Exiting (invalid state) Ended -&gt; Ended
      */
     public void compensated(final NotificationType compensated, final MAP map, final ArjunaContext arjunaContext) {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -258,13 +258,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Completed Canceling -> Completed Completed ->
-     *            Completed Closing -> Closing (resend Close) Compensating ->
-     *            (resend Compensate) Failing-Active -> Failing-Active (invalid
-     *            state) Failing-Canceling -> Failing-Canceling (invalid state)
-     *            Failing-Compensating -> Failing-Compensating NotCompleting ->
-     *            NotCompleting (invalid state) Exiting -> Exiting (invalid
-     *            state) Ended -> Ended
+     *            Active -&gt; Completed Canceling -&gt; Completed Completed
+     *            -&gt; Completed Closing -&gt; Closing (resend Close)
+     *            Compensating -&gt; (resend Compensate) Failing-Active -&gt;
+     *            Failing-Active (invalid state) Failing-Canceling -&gt;
+     *            Failing-Canceling (invalid state) Failing-Compensating -&gt;
+     *            Failing-Compensating NotCompleting -&gt; NotCompleting
+     *            (invalid state) Exiting -&gt; Exiting (invalid state) Ended
+     *            -&gt; Ended
      */
     public void completed(final NotificationType completed, final MAP map, final ArjunaContext arjunaContext) {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -302,14 +303,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Exiting Canceling -> Exiting Completed -> Completed
-     *            (invalid state) Closing -> Closing (invalid state)
-     *            Compensating -> Compensating (invalid state) Failing-Active ->
-     *            Failing-Active (invalid state) Failing-Canceling ->
-     *            Failing-Canceling (invalid state) Failing-Compensating ->
-     *            Failing-Compensating (invalid state) NotCompleting ->
-     *            NotCompleting (invalid state) Exiting -> Exiting Ended ->
-     *            Ended (resend Exited)
+     *            Active -&gt; Exiting Canceling -&gt; Exiting Completed -&gt;
+     *            Completed (invalid state) Closing -&gt; Closing (invalid
+     *            state) Compensating -&gt; Compensating (invalid state)
+     *            Failing-Active -&gt; Failing-Active (invalid state)
+     *            Failing-Canceling -&gt; Failing-Canceling (invalid state)
+     *            Failing-Compensating -&gt; Failing-Compensating (invalid
+     *            state) NotCompleting -&gt; NotCompleting (invalid state)
+     *            Exiting -&gt; Exiting Ended -&gt; Ended (resend Exited)
      */
     public void exit(final NotificationType exit, final MAP map, final ArjunaContext arjunaContext) {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -345,13 +346,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> Failing-Active Canceling -> Failing-Canceling
-     *            Completed -> Completed (invalid state) Closing -> Closing
-     *            (invalid state) Compensating -> Failing-Compensating
-     *            Failing-Active -> Failing-Active Failing-Canceling ->
-     *            Failing-Canceling Failing-Compensating -> Failing-Compensating
-     *            NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *            Exiting (invalid state) Ended -> Ended (resend Failed)
+     *            Active -&gt; Failing-Active Canceling -&gt; Failing-Canceling
+     *            Completed -&gt; Completed (invalid state) Closing -&gt;
+     *            Closing (invalid state) Compensating -&gt;
+     *            Failing-Compensating Failing-Active -&gt; Failing-Active
+     *            Failing-Canceling -&gt; Failing-Canceling Failing-Compensating
+     *            -&gt; Failing-Compensating NotCompleting -&gt; NotCompleting
+     *            (invalid state) Exiting -&gt; Exiting (invalid state) Ended
+     *            -&gt; Ended (resend Failed)
      *
      *            In fact we only execute the transition to FAILING_ACTIVE and
      *            in this case we send a message to the coordinator by calling
@@ -440,14 +442,15 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * @param arjunaContext
      *            The arjuna context.
      *
-     *            Active -> NotCompleting Canceling -> NotCompleting Completed
-     *            -> Completed (invalid state) Closing -> Closing (invalid
-     *            state) Compensating -> Compensating (invalid state)
-     *            Failing-Active -> Failing-Active (invalid state)
-     *            Failing-Canceling -> Failing-Canceling (invalid state)
-     *            Failing-Compensating -> Failing-Compensating (invalid state)
-     *            NotCompleting -> NotCompleting Exiting -> Exiting (invalid
-     *            state) Ended -> Ended (resend NotCompleted)
+     *            Active -&gt; NotCompleting Canceling -&gt; NotCompleting
+     *            Completed -&gt; Completed (invalid state) Closing -&gt;
+     *            Closing (invalid state) Compensating -&gt; Compensating
+     *            (invalid state) Failing-Active -&gt; Failing-Active (invalid
+     *            state) Failing-Canceling -&gt; Failing-Canceling (invalid
+     *            state) Failing-Compensating -&gt; Failing-Compensating
+     *            (invalid state) NotCompleting -&gt; NotCompleting Exiting
+     *            -&gt; Exiting (invalid state) Ended -&gt; Ended (resend
+     *            NotCompleted)
      */
     public void cannotComplete(final NotificationType cannotComplete, final MAP map,
             final ArjunaContext arjunaContext) {
@@ -546,13 +549,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * 
      * @return The state.
      *
-     *         Active -> Canceling Canceling -> Canceling Completed -> Completed
-     *         (invalid state) Closing -> Closing (invalid state) Compensating
-     *         -> Compensating (invalid state) Failing-Active -> Failing-Active
-     *         (invalid state) Failing-Canceling -> Failing-Canceling (invalid
-     *         state) Failing-Compensating -> Failing-Compensating (invalid
-     *         state) NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *         Exiting (invalid state) Ended -> Ended (invalid state)
+     *         Active -&gt; Canceling Canceling -&gt; Canceling Completed -&gt;
+     *         Completed (invalid state) Closing -&gt; Closing (invalid state)
+     *         Compensating -&gt; Compensating (invalid state) Failing-Active
+     *         -&gt; Failing-Active (invalid state) Failing-Canceling -&gt;
+     *         Failing-Canceling (invalid state) Failing-Compensating -&gt;
+     *         Failing-Compensating (invalid state) NotCompleting -&gt;
+     *         NotCompleting (invalid state) Exiting -&gt; Exiting (invalid
+     *         state) Ended -&gt; Ended (invalid state)
      */
     public State cancel() {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -592,14 +596,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * 
      * @return The state.
      *
-     *         Active -> Active (invalid state) Canceling -> Canceling (invalid
-     *         state) Completed -> Compensating Closing -> Closing (invalid
-     *         state) Compensating -> Compensating Failing-Active ->
-     *         Failing-Active (invalid state) Failing-Canceling ->
-     *         Failing-Canceling (invalid state) Failing-Compensating ->
-     *         Failing-Compensating (invalid state) NotCompleting ->
-     *         NotCompleting (invalid state) Exiting -> Exiting (invalid state)
-     *         Ended -> Ended (invalid state)
+     *         Active -&gt; Active (invalid state) Canceling -&gt; Canceling
+     *         (invalid state) Completed -&gt; Compensating Closing -&gt;
+     *         Closing (invalid state) Compensating -&gt; Compensating
+     *         Failing-Active -&gt; Failing-Active (invalid state)
+     *         Failing-Canceling -&gt; Failing-Canceling (invalid state)
+     *         Failing-Compensating -&gt; Failing-Compensating (invalid state)
+     *         NotCompleting -&gt; NotCompleting (invalid state) Exiting -&gt;
+     *         Exiting (invalid state) Ended -&gt; Ended (invalid state)
      */
     public State compensate() {
         if (WSTLogger.logger.isTraceEnabled()) {
@@ -652,13 +656,14 @@ public class ParticipantCompletionCoordinatorEngine implements ParticipantComple
      * 
      * @return The state.
      *
-     *         Active -> Active (invalid state) Canceling -> Canceling (invalid
-     *         state) Completed -> Closing Closing -> Closing Compensating ->
-     *         Compensating (invalid state) Failing-Active -> Failing-Active
-     *         (invalid state) Failing-Canceling -> Failing-Canceling (invalid
-     *         state) Failing-Compensating -> Failing-Compensating (invalid
-     *         state) NotCompleting -> NotCompleting (invalid state) Exiting ->
-     *         Exiting (invalid state) Ended -> Ended (invalid state)
+     *         Active -&gt; Active (invalid state) Canceling -&gt; Canceling
+     *         (invalid state) Completed -&gt; Closing Closing -&gt; Closing
+     *         Compensating -&gt; Compensating (invalid state) Failing-Active
+     *         -&gt; Failing-Active (invalid state) Failing-Canceling -&gt;
+     *         Failing-Canceling (invalid state) Failing-Compensating -&gt;
+     *         Failing-Compensating (invalid state) NotCompleting -&gt;
+     *         NotCompleting (invalid state) Exiting -&gt; Exiting (invalid
+     *         state) Ended -&gt; Ended (invalid state)
      */
     public State close() {
         if (WSTLogger.logger.isTraceEnabled()) {
