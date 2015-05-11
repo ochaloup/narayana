@@ -169,7 +169,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
      * 
      * @param osTypeClassName
      * @param beanTypeClassName
-     * @return
+     * @return whether the type was set OK
      */
     public boolean setType(String osTypeClassName, String beanTypeClassName) {
         try {
