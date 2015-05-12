@@ -100,6 +100,7 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
                         rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_DEFAULT_SERVANT)};
 
                 _poa = rootPOA.create_POA(poaName, rootPOA.the_POAManager(), policies);
+                _oa.addPreShutdown(new JavaIdlRCShutdown());
             } catch (Exception ex) {
                 jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_1(ex);
             }
