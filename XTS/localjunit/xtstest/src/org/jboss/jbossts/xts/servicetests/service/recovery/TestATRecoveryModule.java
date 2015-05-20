@@ -64,7 +64,7 @@ public class TestATRecoveryModule implements XTSATRecoveryModule {
      *            a stream from which the application should deserialise the
      *            participant if it recognises that the id belongs to the
      *            module's application
-     * @return
+     * @return the Durable2PCParticipant
      * @throws Exception
      *             if an error occurs deserializing the durable participant
      */
@@ -92,7 +92,7 @@ public class TestATRecoveryModule implements XTSATRecoveryModule {
      *            a byte array returned form the original participant via a call
      *            to method getRecoveryState of interface
      *            PersistableATParticipant
-     * @return
+     * @return the Durable2PCParticipant
      * @throws Exception
      *             if an error occurs converting the recoveryState back to a
      *             durable participant

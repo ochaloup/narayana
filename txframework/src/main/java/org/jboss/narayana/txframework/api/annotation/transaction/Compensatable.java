@@ -53,7 +53,7 @@ public @interface Compensatable {
      * the specific WSBA completion protocol which should be used for a WSBA
      * service participant
      *
-     * @return
+     * @return the type of completion to execute (coordinator or participant)
      */
     public CompletionType completionType() default CompletionType.COORDINATOR;
 }

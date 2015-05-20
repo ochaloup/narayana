@@ -96,7 +96,7 @@ public enum TaskMonitor {
      * @param millisBetweenUpdates
      *            if the job does not make progress within this many
      *            milliseconds take stack dumps
-     * @return
+     * @return get the tasks progress back
      */
     public synchronized TaskProgress monitorProgress(String name, String cmdLinePattern, TaskProgress progress,
             long millisBetweenUpdates) {

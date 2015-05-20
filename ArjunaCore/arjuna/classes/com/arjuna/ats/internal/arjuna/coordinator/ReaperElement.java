@@ -289,7 +289,7 @@ public class ReaperElement implements Comparable<ReaperElement> {
     /**
      * Returns absolute timeout in milliseconds
      * 
-     * @return
+     * @return The absolute timeout in millis
      */
     public long getAbsoluteTimeout() {
         return _absoluteTimeoutMills;

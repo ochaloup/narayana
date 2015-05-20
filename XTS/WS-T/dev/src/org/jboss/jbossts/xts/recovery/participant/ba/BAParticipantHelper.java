@@ -50,7 +50,8 @@ public class BAParticipantHelper {
      * otherwise return false
      * 
      * @param participant
-     * @return
+     * @return whether the BusinessAgreementWithParticipantCompletionParticipant
+     *         was serializable
      */
     public static boolean isSerializable(BusinessAgreementWithParticipantCompletionParticipant participant) {
         if (participant instanceof Serializable) {

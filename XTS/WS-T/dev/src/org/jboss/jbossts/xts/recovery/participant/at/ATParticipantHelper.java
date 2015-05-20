@@ -44,11 +44,9 @@ public class ATParticipantHelper {
     }
 
     /**
-     * return true if the object can be saved and restored using serialization
-     * otherwise return false
-     * 
+     * @return true if the object can be saved and restored using serialization
+     *         otherwise
      * @param participant
-     * @return
      */
     public static boolean isSerializable(Durable2PCParticipant participant) {
         if (participant instanceof Serializable) {

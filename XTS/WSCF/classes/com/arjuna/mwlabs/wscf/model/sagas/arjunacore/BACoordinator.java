@@ -168,7 +168,7 @@ public class BACoordinator extends TwoPhaseCoordinator {
     /**
      * close the activity
      * 
-     * @return
+     * @return the outcome of the close
      * @throws SystemException
      */
     public int close() throws SystemException {
@@ -191,7 +191,7 @@ public class BACoordinator extends TwoPhaseCoordinator {
     /**
      * cancel the activity
      * 
-     * @return
+     * @return the outcome of the cancel
      */
     public int cancel() {
         return super.cancel();

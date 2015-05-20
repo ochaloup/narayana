@@ -398,7 +398,7 @@ public class AddressingHelper {
      * 
      * @param ctx
      *            the server message context
-     * @return
+     * @return the inbound server message address properties
      */
     public static MAP inboundMap(MessageContext ctx) {
         return MAPBuilderFactory.getInstance().getBuilderInstance().inboundMap(ctx);
@@ -410,7 +410,7 @@ public class AddressingHelper {
      * 
      * @param ctx
      *            the client request properties map
-     * @return
+     * @return the outbound client message address properties
      */
     public static MAP outboundMap(Map<String, Object> ctx) {
         return MAPBuilderFactory.getInstance().getBuilderInstance().outboundMap(ctx);

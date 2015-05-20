@@ -256,7 +256,7 @@ public class SubordinateDurable2PCStub
      * this participant implements the PersistableATarticipant interface so it
      * can save its state. recovery is managed by an XTS recovery module
      * 
-     * @return
+     * @return the recover state for the stub
      * @throws Exception
      */
     public byte[] getRecoveryState() throws Exception {

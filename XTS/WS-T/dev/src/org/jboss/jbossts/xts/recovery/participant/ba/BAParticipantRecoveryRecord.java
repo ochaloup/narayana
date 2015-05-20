@@ -126,7 +126,7 @@ public abstract class BAParticipantRecoveryRecord implements PersistableParticip
      * 
      * @param module
      *            the XTS recovery module to be used to attempt the conversion
-     * @return
+     * @return whether the participant could be restored
      */
 
     public boolean restoreParticipant(XTSBARecoveryModule module) throws Exception {
@@ -175,10 +175,8 @@ public abstract class BAParticipantRecoveryRecord implements PersistableParticip
     }
 
     /**
-     * return the path string under which BA participant records are to be
-     * located in the TX object store
-     * 
-     * @return
+     * @return the path string under which BA participant records are to be
+     *         located in the TX object store
      */
     public static String type() {
         return type;

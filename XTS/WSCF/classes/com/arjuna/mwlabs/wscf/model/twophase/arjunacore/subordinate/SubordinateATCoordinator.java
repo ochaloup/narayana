@@ -342,7 +342,7 @@ public class SubordinateATCoordinator extends ATCoordinator {
      * participant. this indicates that we crashed between preparing the
      * suborindate TX and logging the proxy participant.
      * 
-     * @return
+     * @return whether the at is orphaned
      */
     public boolean isOrphaned() {
         String id = get_uid().stringForm();
