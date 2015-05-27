@@ -23,7 +23,9 @@ package com.hp.mwtests.ts.jta.jts.tools;
 
 import com.arjuna.ats.arjuna.common.Uid;
 
+import com.arjuna.ats.arjuna.tools.osb.mbean.UidWrapper;
 import com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper;
+import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
 import com.arjuna.ats.internal.jts.recovery.transactions.*;
 
 import org.junit.Test;
@@ -42,6 +44,10 @@ import org.junit.Test;
 public class JTSOSBTransactionTypeTests extends JTSOSBTestBase {
     @Test
     public void testArjunaTransactionImpleWrapper() {
+        // We need to set the transaction type as a thread local to work around
+        // an issue in BasicAction constructor
+        // calling overridable methods before the object is fully constructed
+        UidWrapper.setRecordWrapperTypeName(ArjunaTransactionImpleWrapper.typeName());
         assertBeanWasCreated(new ArjunaTransactionImpleWrapper(new Uid()));
     }
     @Test
@@ -70,12 +76,8 @@ public class JTSOSBTransactionTypeTests extends JTSOSBTestBase {
     }
     @Test
     public void testServerTransaction() {
-        RecoveringServerTransaction txn = new RecoveringServerTransaction(new Uid()); // ,
-                                                                                        // null);
-        assertBeanWasCreated(txn);
+        assertBeanWasCreated(new RecoveringServerTransaction(new Uid()));
     }
-
-    // "CosTransactions/XAResourceRecord",
 
     private static class RecoveringServerTransaction
             extends
