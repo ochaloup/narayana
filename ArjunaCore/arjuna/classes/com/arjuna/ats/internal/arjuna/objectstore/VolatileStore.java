@@ -20,6 +20,10 @@
  */
 package com.arjuna.ats.internal.arjuna.objectstore;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,6 +35,7 @@ import com.arjuna.ats.arjuna.objectstore.ObjectStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
+import com.arjuna.ats.internal.arjuna.common.UidHelper;
 
 /**
  * An in-memory ObjectStore that never writes to stable storage. Useless for
@@ -42,6 +47,9 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
 public class VolatileStore extends ObjectStore {
     public VolatileStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException {
         super(objectStoreEnvironmentBean);
+
+        if (objectStoreEnvironmentBean.isVolatileStoreSupportAllObjUids())
+            stateTypes = new ConcurrentHashMap<>();
     }
 
     /**
@@ -58,7 +66,20 @@ public class VolatileStore extends ObjectStore {
      */
 
     public boolean allObjUids(String s, InputObjectState buff, int m) throws ObjectStoreException {
-        throw new ObjectStoreException("Operation not supported by this implementation");
+        if (stateTypes == null)
+            throw new ObjectStoreException("Operation not supported by this implementation");
+
+        OutputObjectState store = new OutputObjectState();
+
+        for (Map.Entry<Uid, String> entry : stateTypes.entrySet())
+            if (entry.getValue().equals(s))
+                packUid(store, entry.getKey());
+
+        packUid(store, Uid.nullUid());
+
+        buff.setBuffer(store.buffer());
+
+        return true;
     }
 
     /**
@@ -71,7 +92,20 @@ public class VolatileStore extends ObjectStore {
      */
 
     public boolean allTypes(InputObjectState buff) throws ObjectStoreException {
-        throw new ObjectStoreException("Operation not supported by this implementation");
+        if (stateTypes == null)
+            throw new ObjectStoreException("Operation not supported by this implementation");
+
+        Set<String> types = new HashSet<>(stateTypes.values());
+        OutputObjectState store = new OutputObjectState();
+
+        for (String type : types)
+            packString(store, type);
+
+        packString(store, "");
+
+        buff.setBuffer(store.buffer());
+
+        return true;
     }
 
     /**
@@ -228,7 +262,14 @@ public class VolatileStore extends ObjectStore {
             tsLogger.logger.trace("VolatileStore.write_committed(Uid=" + u + ", typeName=" + tn + ")");
         }
 
-        return write(u, tn, buff, StateStatus.OS_COMMITTED);
+        if (write(u, tn, buff, StateStatus.OS_COMMITTED)) {
+            if (stateTypes != null)
+                addUidMapping(u, tn);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -246,6 +287,10 @@ public class VolatileStore extends ObjectStore {
 
     public boolean write_uncommitted(Uid u, String tn, OutputObjectState buff) throws ObjectStoreException {
         throw new ObjectStoreException("Operation not supported by this implementation");
+    }
+
+    void addUidMapping(Uid uid, String typeName) {
+        stateTypes.put(uid, typeName);
     }
 
     /**
@@ -280,6 +325,8 @@ public class VolatileStore extends ObjectStore {
      */
     private ConcurrentMap<Uid, byte[]> stateMap = new ConcurrentHashMap<Uid, byte[]>();
 
+    private ConcurrentMap<Uid, String> stateTypes;
+
     private boolean remove(Uid u, String tn, int state) throws ObjectStoreException {
         Object oldValue = stateMap.remove(u);
         return (oldValue != null);
@@ -306,6 +353,22 @@ public class VolatileStore extends ObjectStore {
             return StateStatus.OS_COMMITTED;
         } else {
             return StateStatus.OS_UNKNOWN;
+        }
+    }
+
+    private void packUid(OutputObjectState store, Uid uid) throws ObjectStoreException {
+        try {
+            UidHelper.packInto(uid, store);
+        } catch (IOException e) {
+            throw new ObjectStoreException("TypedVolatileStore::packUid - could not pack uid: " + e.getMessage());
+        }
+    }
+
+    private void packString(OutputObjectState store, String s) throws ObjectStoreException {
+        try {
+            store.packString(s);
+        } catch (IOException e) {
+            throw new ObjectStoreException("TypedVolatileStore::packString - could not pack string: " + e.getMessage());
         }
     }
 }
