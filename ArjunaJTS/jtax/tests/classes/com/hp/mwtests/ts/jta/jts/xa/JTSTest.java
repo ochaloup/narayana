@@ -32,12 +32,17 @@
 package com.hp.mwtests.ts.jta.jts.xa;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.omg.CORBA.SystemException;
+import org.omg.CORBA.ORBPackage.InvalidName;
 
 import com.arjuna.ats.internal.jts.ORBManager;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
@@ -46,11 +51,22 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
 public class JTSTest {
-    @Test
-    public void test() throws Exception {
+    private ORB myORB;
+    private RootOA myOA;
 
-        ORB myORB = ORB.getInstance("test");
-        RootOA myOA = OA.getRootOA(myORB);
+    @Before
+    public void setup() throws InvalidName, SystemException {
+        System.setProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.versions.javaidl_1_4"));
+        myORB = ORB.getInstance("test");
+        myOA = OA.getRootOA(myORB);
         myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
@@ -60,6 +76,86 @@ public class JTSTest {
                 com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
         jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
                 com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+    }
+
+    @After
+    public void tearDown() {
+        if (myOA != null) {
+            // myOA.destroy();
+            // myORB.shutdown();
+        }
+    }
+
+    @Test
+    public void testRMFAILcommit1PC() throws Exception {
+        XAResource theResource = new XAResource() {
+
+            @Override
+            public void start(Xid xid, int flags) throws XAException {
+            }
+
+            @Override
+            public void end(Xid xid, int flags) throws XAException {
+            }
+
+            @Override
+            public int prepare(Xid xid) throws XAException {
+                return 0;
+            }
+
+            @Override
+            public void commit(Xid xid, boolean onePhase) throws XAException {
+                throw new XAException(XAException.XAER_RMFAIL);
+            }
+
+            @Override
+            public void rollback(Xid xid) throws XAException {
+            }
+
+            @Override
+            public void forget(Xid xid) throws XAException {
+            }
+
+            @Override
+            public Xid[] recover(int flag) throws XAException {
+                return null;
+            }
+
+            @Override
+            public boolean isSameRM(XAResource xaRes) throws XAException {
+                return false;
+            }
+
+            @Override
+            public int getTransactionTimeout() throws XAException {
+                return 0;
+            }
+
+            @Override
+            public boolean setTransactionTimeout(int seconds) throws XAException {
+                return false;
+            }
+        };
+
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+
+        tm.begin();
+
+        javax.transaction.Transaction theTransaction = tm.getTransaction();
+
+        assertTrue(theTransaction.enlistResource(theResource));
+
+        try {
+            tm.commit();
+            fail();
+        } catch (javax.transaction.HeuristicMixedException e) {
+            // Expected
+        }
+    }
+
+    @Test
+    public void test() throws Exception {
+
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
@@ -70,9 +166,6 @@ public class JTSTest {
         assertTrue(theTransaction.enlistResource(new XARMERRXAResource(true)));
 
         tm.rollback();
-
-        myOA.destroy();
-        myORB.shutdown();
     }
 
     private class XARMERRXAResource implements XAResource {
