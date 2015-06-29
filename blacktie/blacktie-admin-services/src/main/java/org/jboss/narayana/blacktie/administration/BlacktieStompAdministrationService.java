@@ -123,7 +123,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
             prefix = "BTR_";
         }
         ObjectName objName = new ObjectName(
-                "jboss.as:subsystem=messaging,hornetq-server=default,jms-" + type + "=" + prefix + "*");
+                "jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix + "*");
         ObjectInstance[] dests = getMBeanServerConnection().queryMBeans(objName, null).toArray(new ObjectInstance[]{});
         for (int i = 0; i < dests.length; i++) {
             String serviceComponentOfObjectName = dests[i].getObjectName().getCanonicalName();
@@ -191,7 +191,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
 
         Integer count = null;
         ObjectName objName = new ObjectName(
-                "jboss.as:subsystem=messaging,hornetq-server=default,jms-" + type + "=" + prefix + serviceName);
+                "jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix + serviceName);
         if (type.toLowerCase().equals("queue")) {
             count = (Integer) getMBeanServerConnection().getAttribute(objName, "consumerCount");
         } else {
@@ -284,17 +284,17 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
 
                     log.trace(serviceName);
 
-                    log.debug("Invoking hornetq to deploy queue");
+                    log.debug("Invoking activemq to deploy queue");
                     ModelNode op = new ModelNode();
                     op.get("operation").set("add");
-                    op.get("address").add("subsystem", "messaging");
-                    op.get("address").add("hornetq-server", "default");
+                    op.get("address").add("subsystem", "messaging-activemq");
+                    op.get("address").add("server", "default");
                     op.get("address").add("jms-" + type, prefix + serviceName);
                     op.get("entries").add("/" + type + "/" + prefix + serviceName);
                     // op.get("jms-" + type + "-address").set("jms." + type +
                     // "." + prefix + serviceName);
                     applyUpdate(op, getClient());
-                    log.debug("Invoked hornetq to deploy queue");
+                    log.debug("Invoked activemq to deploy queue");
                 }
                 log.debug("Created: " + serviceName);
                 // QUEUE_CREATION_TIMES.put(serviceName, currentTime);
@@ -343,8 +343,8 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
 
                 ModelNode op = new ModelNode();
                 op.get("operation").set("remove");
-                op.get("address").add("subsystem", "messaging");
-                op.get("address").add("hornetq-server", "default");
+                op.get("address").add("subsystem", "messaging-activemq");
+                op.get("address").add("server", "default");
                 op.get("address").add("jms-" + type, prefix + serviceName);
                 applyUpdate(op, getClient());
             }
