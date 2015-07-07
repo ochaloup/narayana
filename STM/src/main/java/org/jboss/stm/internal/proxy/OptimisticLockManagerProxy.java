@@ -242,6 +242,10 @@ public class OptimisticLockManagerProxy<T> extends OptimisticLockManager {
         return "/StateManager/LockManager/OptimisticLockManager/" + _theObject.getClass().getCanonicalName();
     }
 
+    public final RecoverableContainer<T> getContainer() {
+        return _container;
+    }
+
     private boolean packPrimitive(final Field afield, OutputObjectState os) {
         try {
             /*
