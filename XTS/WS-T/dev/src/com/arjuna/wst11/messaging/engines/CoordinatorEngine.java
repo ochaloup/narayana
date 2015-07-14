@@ -583,7 +583,7 @@ public class CoordinatorEngine implements CoordinatorInboundEvents {
         // reobtain the lock before deciding whether to schedule the timer
 
         synchronized (this) {
-            if (timerTask.equals(newTimerTask)) {
+            if (timerTask != null && timerTask.equals(newTimerTask)) {
                 // the timer task has not been cancelled so schedule it if
                 // appropriate
                 if (state == State.STATE_PREPARING) {
@@ -633,7 +633,7 @@ public class CoordinatorEngine implements CoordinatorInboundEvents {
         // reobtain the lock before deciding whether to schedule the timer
 
         synchronized (this) {
-            if (timerTask.equals(newTimerTask)) {
+            if (timerTask != null && timerTask.equals(newTimerTask)) {
                 // the timer task has not been cancelled so schedule it if
                 // appropriate
                 if (state == State.STATE_COMMITTING) {
