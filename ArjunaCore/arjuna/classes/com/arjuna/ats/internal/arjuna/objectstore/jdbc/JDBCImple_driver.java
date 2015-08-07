@@ -68,10 +68,11 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
 
         boolean result = false;
+        Connection connection = null;
         PreparedStatement pstmt = null;
         PreparedStatement pstmt2 = null;
         try {
-            Connection connection = jdbcAccess.getConnection();
+            connection = jdbcAccess.getConnection();
             // Delete any previously committed state
             pstmt = connection.prepareStatement(
                     "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
@@ -100,7 +101,6 @@ public abstract class JDBCImple_driver {
             } else {
                 connection.rollback();
             }
-            connection.close();
 
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_writefailed(e);
@@ -119,6 +119,13 @@ public abstract class JDBCImple_driver {
                     // Ignore
                 }
             }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
         }
 
         return result;
@@ -130,9 +137,10 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
         boolean result = false;
 
+        Connection connection = null;
         PreparedStatement pstmt = null;
         try {
-            Connection connection = jdbcAccess.getConnection();
+            connection = jdbcAccess.getConnection();
             pstmt = connection.prepareStatement(
                     "UPDATE " + tableName + " SET Hidden = 1 WHERE UidString = ? AND TypeName = ? AND Hidden = 0");
 
@@ -144,13 +152,19 @@ public abstract class JDBCImple_driver {
                 result = true;
             }
             connection.commit();
-            connection.close();
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_1(e);
         } finally {
             if (pstmt != null) {
                 try {
                     pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
                 } catch (SQLException e) {
                     // Ignore
                 }
@@ -166,9 +180,10 @@ public abstract class JDBCImple_driver {
             typeName = typeName.substring(1);
         boolean result = false;
 
+        Connection connection = null;
         PreparedStatement pstmt = null;
         try {
-            Connection connection = jdbcAccess.getConnection();
+            connection = jdbcAccess.getConnection();
             pstmt = connection.prepareStatement(
                     "UPDATE " + tableName + " SET Hidden = 0 WHERE UidString = ? AND TypeName = ? AND Hidden = 1");
 
@@ -180,13 +195,19 @@ public abstract class JDBCImple_driver {
                 result = true;
             }
             connection.commit();
-            connection.close();
         } catch (SQLException e) {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_2(e);
         } finally {
             if (pstmt != null) {
                 try {
                     pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
                 } catch (SQLException e) {
                     // Ignore
                 }
@@ -208,9 +229,10 @@ public abstract class JDBCImple_driver {
         int theState = StateStatus.OS_UNKNOWN;
         ResultSet rs = null;
 
+        Connection connection = null;
         PreparedStatement pstmt = null;
         try {
-            Connection connection = jdbcAccess.getConnection();
+            connection = jdbcAccess.getConnection();
             pstmt = connection.prepareStatement(
                     "SELECT StateType, Hidden FROM " + tableName + " WHERE UidString = ? AND TypeName = ?");
 
@@ -249,7 +271,6 @@ public abstract class JDBCImple_driver {
                 }
             }
             connection.commit();
-            connection.close();
 
             // examine in reverse order:
             if (have_OS_COMMITTED_HIDDEN) {
@@ -278,6 +299,13 @@ public abstract class JDBCImple_driver {
             if (pstmt != null) {
                 try {
                     pstmt.close();
+                } catch (SQLException e) {
+                    // Ignore
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
                 } catch (SQLException e) {
                     // Ignore
                 }
@@ -328,7 +356,6 @@ public abstract class JDBCImple_driver {
                     }
                 }
                 connection.commit();
-                connection.close();
             } catch (Exception e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_4(e);
             } finally {
@@ -336,6 +363,8 @@ public abstract class JDBCImple_driver {
                     rs.close();
                 if (stmt != null)
                     stmt.close();
+                if (connection != null)
+                    connection.close();
             }
 
             UidHelper.packInto(Uid.nullUid(), store);
@@ -384,7 +413,6 @@ public abstract class JDBCImple_driver {
                 }
 
                 connection.commit();
-                connection.close();
             } catch (Exception e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_6(e);
             } finally {
@@ -392,6 +420,8 @@ public abstract class JDBCImple_driver {
                     rs.close();
                 if (stmt != null)
                     stmt.close();
+                if (connection != null)
+                    connection.close();
             }
 
             store.packString("");
@@ -413,9 +443,10 @@ public abstract class JDBCImple_driver {
         if (typeName != null) {
             if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
 
+                Connection connection = null;
                 PreparedStatement pstmt = null;
                 try {
-                    Connection connection = jdbcAccess.getConnection();
+                    connection = jdbcAccess.getConnection();
                     pstmt = connection.prepareStatement(
                             "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
 
@@ -428,13 +459,19 @@ public abstract class JDBCImple_driver {
                     }
 
                     connection.commit();
-                    connection.close();
                 } catch (SQLException e) {
                     tsLogger.i18NLogger.warn_objectstore_JDBCImple_8(e);
                 } finally {
                     if (pstmt != null) {
                         try {
                             pstmt.close();
+                        } catch (SQLException e) {
+                            // Ignore
+                        }
+                    }
+                    if (connection != null) {
+                        try {
+                            connection.close();
                         } catch (SQLException e) {
                             // Ignore
                         }
@@ -460,9 +497,10 @@ public abstract class JDBCImple_driver {
         if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
             ResultSet rs = null;
 
+            Connection connection = null;
             PreparedStatement pstmt = null;
             try {
-                Connection connection = jdbcAccess.getConnection();
+                connection = jdbcAccess.getConnection();
                 pstmt = connection.prepareStatement("SELECT ObjectState FROM " + tableName
                         + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
                 pstmt.setString(1, objUid.stringForm());
@@ -482,7 +520,6 @@ public abstract class JDBCImple_driver {
                 }
 
                 connection.commit();
-                connection.close();
             } catch (SQLException e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_14(e);
             } finally {
@@ -496,6 +533,13 @@ public abstract class JDBCImple_driver {
                 if (pstmt != null) {
                     try {
                         pstmt.close();
+                    } catch (SQLException e) {
+                        // Ignore
+                    }
+                }
+                if (connection != null) {
+                    try {
+                        connection.close();
                     } catch (SQLException e) {
                         // Ignore
                     }
@@ -521,10 +565,11 @@ public abstract class JDBCImple_driver {
             byte[] b = state.buffer();
             ResultSet rs = null;
 
+            Connection connection = null;
             PreparedStatement pstmt = null;
             PreparedStatement pstmt2 = null;
             try {
-                Connection connection = jdbcAccess.getConnection();
+                connection = jdbcAccess.getConnection();
                 pstmt = connection.prepareStatement(
                         "SELECT ObjectState, UidString, StateType, TypeName FROM " + tableName
                                 + " WHERE UidString = ? AND StateType = ? AND TypeName = ? FOR UPDATE",
@@ -554,7 +599,6 @@ public abstract class JDBCImple_driver {
                 }
 
                 connection.commit();
-                connection.close();
                 result = true;
             } catch (SQLException e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_writefailed(e);
@@ -576,6 +620,13 @@ public abstract class JDBCImple_driver {
                 if (pstmt2 != null) {
                     try {
                         pstmt2.close();
+                    } catch (SQLException e) {
+                        // Ignore
+                    }
+                }
+                if (connection != null) {
+                    try {
+                        connection.close();
                     } catch (SQLException e) {
                         // Ignore
                     }
