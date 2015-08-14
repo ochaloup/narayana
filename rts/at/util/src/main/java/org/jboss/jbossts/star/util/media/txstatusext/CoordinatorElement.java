@@ -40,7 +40,7 @@ public class CoordinatorElement {
 
     @XmlElement
     public Date getCreated() {
-        return created;
+        return new Date(created.getTime());
     }
     @XmlElement
     public long getTimeout() {
@@ -80,7 +80,7 @@ public class CoordinatorElement {
     }
 
     public void setCreated(Date created) {
-        this.created = created;
+        this.created = new Date(created.getTime());
     }
 
     public void setTimeout(long timeout) {
