@@ -39,6 +39,8 @@ public interface XARecoveryResource {
 
     /**
      * Results of performing recovery.
+     * 
+     * Remember to update com.arjuna.ats.jta.utils.XARecoveryResourceHelper
      */
 
     public static final int RECOVERED_OK = 1;
@@ -48,6 +50,8 @@ public interface XARecoveryResource {
 
     /**
      * Responses to whether or not the instance is recoverable.
+     * 
+     * Remember to update com.arjuna.ats.jta.utils.XARecoveryResourceHelper
      */
 
     public static final int INCOMPLETE_STATE = 10;

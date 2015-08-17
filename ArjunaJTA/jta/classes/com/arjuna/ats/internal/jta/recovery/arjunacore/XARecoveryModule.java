@@ -66,6 +66,8 @@ import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
 import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 import com.arjuna.ats.jta.utils.XAHelper;
+import com.arjuna.ats.jta.utils.XARecoveryResourceHelper;
+
 import org.jboss.tm.XAResourceWrapper;
 
 /**
@@ -323,10 +325,10 @@ public class XARecoveryModule implements RecoveryModule {
                                             problem = false;
 
                                             jtaLogger.i18NLogger.info_recovery_recoverydelayed(theUid,
-                                                    Integer.toString(recoveryStatus));
+                                                    XARecoveryResourceHelper.stringForm(recoveryStatus));
                                         } else {
                                             jtaLogger.i18NLogger.warn_recovery_recoveryfailed(theUid,
-                                                    Integer.toString(recoveryStatus));
+                                                    XARecoveryResourceHelper.stringForm(recoveryStatus));
                                         }
                                     } else
                                         problem = false;
@@ -637,7 +639,7 @@ public class XARecoveryModule implements RecoveryModule {
 
                                 if (recoveryStatus != XARecoveryResource.RECOVERED_OK) {
                                     jtaLogger.i18NLogger.warn_recovery_failedtorecover(_logName + ".xaRecovery",
-                                            Integer.toString(recoveryStatus));
+                                            XARecoveryResourceHelper.stringForm(recoveryStatus));
                                 }
 
                                 removeFailure(record.getXid(), record.get_uid());
