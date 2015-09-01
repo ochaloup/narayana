@@ -28,6 +28,7 @@ import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.wildfly.extension.blacktie.configuration.Attribute;
 
@@ -48,6 +49,11 @@ public class BlacktieSubsystemDefinition extends SimpleResourceDefinition {
                     .setXmlName(Attribute.CONNECTION_FACTORYNAME.getLocalName())
                     .setFlags(AttributeAccess.Flag.RESTART_JVM).build();
 
+    protected static final SimpleAttributeDefinition MQ_SERVER = new SimpleAttributeDefinitionBuilder(
+            Attribute.MQ_SERVER.getLocalName(), ModelType.STRING, true).setDefaultValue(new ModelNode().set("default"))
+                    .setAllowExpression(true).setXmlName(Attribute.MQ_SERVER.getLocalName())
+                    .setFlags(AttributeAccess.Flag.RESTART_JVM).build();
+
     private BlacktieSubsystemDefinition() {
         super(BlacktieSubsystemExtension.SUBSYSTEM_PATH,
                 BlacktieSubsystemExtension.getResourceDescriptionResolver(null), BlacktieSubsystemAdd.INSTANCE,
@@ -65,6 +71,8 @@ public class BlacktieSubsystemDefinition extends SimpleResourceDefinition {
                 new ReloadRequiredWriteAttributeHandler(CONNECTION_FACTORYNAME));
         resourceRegistration.registerReadWriteAttribute(SOCKET_BINDING, null,
                 new ReloadRequiredWriteAttributeHandler(SOCKET_BINDING));
+        resourceRegistration.registerReadWriteAttribute(MQ_SERVER, null,
+                new ReloadRequiredWriteAttributeHandler(MQ_SERVER));
 
     }
 }
