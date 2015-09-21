@@ -1,5 +1,6 @@
 package com.arjuna.webservices11.wsaddr;
 
+import com.arjuna.webservices11.util.PrivilegedMapBuilderFactory;
 import com.arjuna.wsc11.messaging.MessageId;
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 
@@ -22,7 +23,7 @@ public class AddressingHelper {
     public static MAP createOneWayResponseContext(final MAP map, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP responseMap = builder.newMap();
         // ok just calling initializeAsDestination directly fails when the
         // FaultTo/ReplyTo/From
@@ -66,7 +67,7 @@ public class AddressingHelper {
     public static MAP createResponseContext(final MAP map, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP responseMap = builder.newMap();
         MAPEndpoint epref = map.getReplyTo();
         if (isNoneAddress(epref)) {
@@ -98,7 +99,7 @@ public class AddressingHelper {
     public static MAP createFaultContext(final MAP map, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP faultMap = builder.newMap();
         // ok just calling initializeAsDestination directly fails when the
         // FaultTo/ReplyTo/From
@@ -147,7 +148,7 @@ public class AddressingHelper {
     public static MAP createRequestContext(final String address, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP requestMap = builder.newMap();
         requestMap.setTo(address);
         if (messageID != null) {
@@ -180,7 +181,7 @@ public class AddressingHelper {
     public static MAP createRequestContext(final String address, final String action, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP requestMap = builder.newMap();
         requestMap.setTo(address);
         if (messageID != null) {
@@ -214,7 +215,7 @@ public class AddressingHelper {
     public static MAP createRequestContext(final MAP map, final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP requestMap = builder.newMap();
         // ok just calling initializeAsDestination directly fails when the
         // FaultTo/ReplyTo/From
@@ -258,7 +259,7 @@ public class AddressingHelper {
     public static MAP createNotificationContext(final String messageID) {
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         final MAP requestMap = builder.newMap();
         requestMap.setMessageID(messageID);
         requestMap.setAction("");
@@ -275,7 +276,6 @@ public class AddressingHelper {
 
         // create this each time so it uses the current thread classloader
         // this allows the builder class to be redefined via a property
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
         map.setMessageID(messageID);
         map.setAction(action);
     }
@@ -315,14 +315,14 @@ public class AddressingHelper {
     }
 
     public static void installFaultTo(MAP map, MAPEndpoint epReference, InstanceIdentifier identifier) {
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         MAPEndpoint from = builder.newEndpoint(epReference.getAddress());
         InstanceIdentifier.setEndpointInstanceIdentifier(from, identifier);
         map.setFaultTo(from);
     }
 
     public static void installFromFaultTo(MAP map, MAPEndpoint epReference, InstanceIdentifier identifier) {
-        MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         MAPEndpoint from = builder.newEndpoint(epReference.getAddress());
         InstanceIdentifier.setEndpointInstanceIdentifier(from, identifier);
         map.setFrom(from);
@@ -401,7 +401,7 @@ public class AddressingHelper {
      * @return the inbound server message address properties
      */
     public static MAP inboundMap(MessageContext ctx) {
-        return MAPBuilderFactory.getInstance().getBuilderInstance().inboundMap(ctx);
+        return PrivilegedMapBuilderFactory.getInstance().getBuilderInstance().inboundMap(ctx);
     }
 
     /**
@@ -413,14 +413,14 @@ public class AddressingHelper {
      * @return the outbound client message address properties
      */
     public static MAP outboundMap(Map<String, Object> ctx) {
-        return MAPBuilderFactory.getInstance().getBuilderInstance().outboundMap(ctx);
+        return PrivilegedMapBuilderFactory.getInstance().getBuilderInstance().outboundMap(ctx);
     }
 
     private static MAPEndpoint noneAddress = null;
 
     private static synchronized MAPEndpoint getNoneAddress() {
         if (noneAddress == null) {
-            MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+            final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
             MAPConstants mapConstants = builder.newConstants();
             String noneURI = mapConstants.getNoneURI();
             noneAddress = builder.newEndpoint(noneURI);

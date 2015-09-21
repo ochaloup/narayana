@@ -21,6 +21,8 @@
 package com.arjuna.webservices11.wsba.client;
 
 import com.arjuna.webservices11.SoapFault11;
+import com.arjuna.webservices11.util.PrivilegedMapBuilderFactory;
+import com.arjuna.webservices11.util.PrivilegedServiceRegistryFactory;
 import com.arjuna.webservices11.wsba.BusinessActivityConstants;
 import com.arjuna.webservices.SoapFault;
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
@@ -35,7 +37,6 @@ import org.oasis_open.docs.ws_tx.wsba._2006._06.NotificationType;
 import org.oasis_open.docs.ws_tx.wsba._2006._06.StatusType;
 import org.jboss.ws.api.addressing.MAP;
 import org.jboss.ws.api.addressing.MAPBuilder;
-import org.jboss.ws.api.addressing.MAPBuilderFactory;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
 import javax.xml.namespace.QName;
@@ -104,7 +105,7 @@ public class CoordinatorCompletionCoordinatorClient {
      * Construct the participant completion coordinator client.
      */
     private CoordinatorCompletionCoordinatorClient() {
-        final MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         completedAction = BusinessActivityConstants.WSBA_ACTION_COMPLETED;
         failAction = BusinessActivityConstants.WSBA_ACTION_FAIL;
         compensatedAction = BusinessActivityConstants.WSBA_ACTION_COMPENSATED;
@@ -115,9 +116,10 @@ public class CoordinatorCompletionCoordinatorClient {
         getStatusAction = BusinessActivityConstants.WSBA_ACTION_GET_STATUS;
         statusAction = BusinessActivityConstants.WSBA_ACTION_STATUS;
 
-        final String coordinatorCompletionParticipantURIString = ServiceRegistry.getRegistry()
+        final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+        final String coordinatorCompletionParticipantURIString = serviceRegistry
                 .getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_SERVICE_NAME, false);
-        final String secureCoordinatorCompletionParticipantURIString = ServiceRegistry.getRegistry()
+        final String secureCoordinatorCompletionParticipantURIString = serviceRegistry
                 .getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_PARTICIPANT_SERVICE_NAME, true);
         coordinatorCompletionParticipant = builder.newEndpoint(coordinatorCompletionParticipantURIString);
         secureCoordinatorCompletionParticipant = builder.newEndpoint(secureCoordinatorCompletionParticipantURIString);

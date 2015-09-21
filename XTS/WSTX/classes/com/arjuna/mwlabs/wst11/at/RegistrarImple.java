@@ -13,6 +13,7 @@ import com.arjuna.mwlabs.wst11.at.participants.CompletionCoordinatorImple;
 import com.arjuna.mwlabs.wst.at.participants.DurableTwoPhaseCommitParticipant;
 import com.arjuna.mwlabs.wst.at.participants.VolatileTwoPhaseCommitParticipant;
 import com.arjuna.mwlabs.wst11.at.participants.CompletionCoordinatorRPCImple;
+import com.arjuna.webservices11.util.PrivilegedServiceRegistryFactory;
 import com.arjuna.webservices11.wsat.processors.CompletionCoordinatorProcessor;
 import com.arjuna.webservices11.wsat.AtomicTransactionConstants;
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
@@ -250,8 +251,9 @@ public class RegistrarImple implements Registrar {
     private W3CEndpointReference getCompletionCoordinator(final InstanceIdentifier instanceIdentifier,
             final boolean isSecure) {
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
-        String address = ServiceRegistry.getRegistry()
-                .getServiceURI(AtomicTransactionConstants.COMPLETION_COORDINATOR_SERVICE_NAME, isSecure);
+        ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+        String address = serviceRegistry.getServiceURI(AtomicTransactionConstants.COMPLETION_COORDINATOR_SERVICE_NAME,
+                isSecure);
         builder.serviceName(AtomicTransactionConstants.COMPLETION_COORDINATOR_SERVICE_QNAME);
         builder.endpointName(AtomicTransactionConstants.COMPLETION_COORDINATOR_PORT_QNAME);
         builder.address(address);
@@ -262,7 +264,8 @@ public class RegistrarImple implements Registrar {
     private W3CEndpointReference getCompletionCoordinatorRPC(final InstanceIdentifier instanceIdentifier,
             final boolean isSecure) {
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
-        String address = ServiceRegistry.getRegistry()
+        ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+        String address = serviceRegistry
                 .getServiceURI(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME, isSecure);
         builder.serviceName(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_QNAME);
         builder.endpointName(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_PORT_QNAME);
@@ -273,8 +276,8 @@ public class RegistrarImple implements Registrar {
 
     private W3CEndpointReference getCoordinator(final String participantId, final boolean isSecure) {
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
-        String address = ServiceRegistry.getRegistry()
-                .getServiceURI(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, isSecure);
+        ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+        String address = serviceRegistry.getServiceURI(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, isSecure);
         builder.serviceName(AtomicTransactionConstants.COORDINATOR_SERVICE_QNAME);
         builder.endpointName(AtomicTransactionConstants.COORDINATOR_PORT_QNAME);
         builder.address(address);

@@ -20,12 +20,13 @@
  */
 package com.arjuna.webservices11.wsarjtx.client;
 
-import com.arjuna.schemas.ws._2005._10.wsarjtx.ExceptionType;
 import com.arjuna.schemas.ws._2005._10.wsarjtx.NotificationType;
 import com.arjuna.schemas.ws._2005._10.wsarjtx.TerminationParticipantPortType;
 import com.arjuna.webservices.SoapFault;
 import com.arjuna.webservices.wsarjtx.ArjunaTXConstants;
 import com.arjuna.webservices11.SoapFault11;
+import com.arjuna.webservices11.util.PrivilegedMapBuilderFactory;
+import com.arjuna.webservices11.util.PrivilegedServiceRegistryFactory;
 import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 import com.arjuna.webservices11.wsaddr.NativeEndpointReference;
@@ -39,7 +40,6 @@ import java.io.IOException;
 
 import org.jboss.ws.api.addressing.MAP;
 import org.jboss.ws.api.addressing.MAPBuilder;
-import org.jboss.ws.api.addressing.MAPBuilderFactory;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
 /**
@@ -88,16 +88,17 @@ public class TerminationParticipantClient {
      * Construct the terminator coordinator client.
      */
     private TerminationParticipantClient() {
-        final MAPBuilder builder = MAPBuilderFactory.getInstance().getBuilderInstance();
+        final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         completedAction = ArjunaTXConstants.WSARJTX_ACTION_COMPLETED;
         closedAction = ArjunaTXConstants.WSARJTX_ACTION_CLOSED;
         cancelledAction = ArjunaTXConstants.WSARJTX_ACTION_CANCELLED;
         faultedAction = ArjunaTXConstants.WSARJTX_ACTION_FAULTED;
         soapFaultAction = ArjunaTXConstants.WSARJTX_ACTION_SOAP_FAULT;
 
-        final String terminationCoordinatorURIString = ServiceRegistry.getRegistry()
+        final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
+        final String terminationCoordinatorURIString = serviceRegistry
                 .getServiceURI(ArjunaTX11Constants.TERMINATION_COORDINATOR_SERVICE_NAME, false);
-        final String secureTerminationCoordinatorURIString = ServiceRegistry.getRegistry()
+        final String secureTerminationCoordinatorURIString = serviceRegistry
                 .getServiceURI(ArjunaTX11Constants.TERMINATION_COORDINATOR_SERVICE_NAME, true);
         terminationCoordinator = builder.newEndpoint(terminationCoordinatorURIString);
         secureTerminationCoordinator = builder.newEndpoint(secureTerminationCoordinatorURIString);
