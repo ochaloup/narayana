@@ -33,11 +33,11 @@ import org.apache.activemq.artemis.core.journal.Journal;
 import org.apache.activemq.artemis.core.journal.JournalLoadInformation;
 import org.apache.activemq.artemis.core.journal.PreparedTransactionInfo;
 import org.apache.activemq.artemis.core.journal.RecordInfo;
-import org.apache.activemq.artemis.core.journal.SequentialFileFactory;
+import org.apache.activemq.artemis.core.io.SequentialFileFactory;
 import org.apache.activemq.artemis.core.journal.TransactionFailureCallback;
-import org.apache.activemq.artemis.core.journal.impl.AIOSequentialFileFactory;
+import org.apache.activemq.artemis.core.io.aio.AIOSequentialFileFactory;
 import org.apache.activemq.artemis.core.journal.impl.JournalImpl;
-import org.apache.activemq.artemis.core.journal.impl.NIOSequentialFileFactory;
+import org.apache.activemq.artemis.core.io.nio.NIOSequentialFileFactory;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
@@ -117,19 +117,19 @@ public class HornetqJournalStore {
 
         SequentialFileFactory sequentialFileFactory;
         if (envBean.isAsyncIO() && AIOSequentialFileFactory.isSupported()) {
-            sequentialFileFactory = new AIOSequentialFileFactory(envBean.getStoreDir(), envBean.getBufferSize(),
+            sequentialFileFactory = new AIOSequentialFileFactory(storeDir, envBean.getBufferSize(),
                     (int) (1000000000d / envBean.getBufferFlushesPerSecond()), // bufferTimeout
                                                                                 // nanos
                                                                                 // .000000001
                                                                                 // second
-                    envBean.isLogRates());
+                    envBean.getMaxIO(), envBean.isLogRates());
         } else {
-            sequentialFileFactory = new NIOSequentialFileFactory(envBean.getStoreDir(), true, envBean.getBufferSize(),
+            sequentialFileFactory = new NIOSequentialFileFactory(storeDir, true, envBean.getBufferSize(),
                     (int) (1000000000d / envBean.getBufferFlushesPerSecond()), // bufferTimeout
                                                                                 // nanos
                                                                                 // .000000001
                                                                                 // second
-                    envBean.isLogRates());
+                    envBean.getMaxIO(), envBean.isLogRates());
         }
 
         journal = new JournalImpl(envBean.getFileSize(), envBean.getMinFiles(), envBean.getCompactMinFiles(),
