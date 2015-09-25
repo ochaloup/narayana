@@ -1,5 +1,7 @@
 package com.arjuna.webservices11.wsba.client;
 
+import com.arjuna.webservices11.util.PrivilegedServiceFactory;
+import com.arjuna.webservices11.util.PrivilegedServiceHelper;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 import org.jboss.ws.api.addressing.MAP;
 import org.oasis_open.docs.ws_tx.wsba._2006._06.*;
@@ -48,12 +50,8 @@ public class WSBAClient {
      */
     private static synchronized BusinessAgreementWithParticipantCompletionCoordinatorService getParticipantCompletionCoordinatorService() {
         if (participantCompletionCoordinatorService.get() == null) {
-            // participantCompletionCoordinatorService.set(new
-            // BusinessAgreementWithParticipantCompletionCoordinatorService(null,
-            // new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
-            // "BusinessAgreementWithParticipantCompletionCoordinatorService")));
-            participantCompletionCoordinatorService
-                    .set(new BusinessAgreementWithParticipantCompletionCoordinatorService());
+            participantCompletionCoordinatorService.set(PrivilegedServiceFactory
+                    .getInstance(BusinessAgreementWithParticipantCompletionCoordinatorService.class).getService());
         }
         return participantCompletionCoordinatorService.get();
     }
@@ -66,12 +64,8 @@ public class WSBAClient {
      */
     private static synchronized BusinessAgreementWithParticipantCompletionParticipantService getParticipantCompletionParticipantService() {
         if (participantCompletionParticipantService.get() == null) {
-            // participantCompletionParticipantService.set(new
-            // BusinessAgreementWithParticipantCompletionParticipantService(null,
-            // new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
-            // "BusinessAgreementWithParticipantCompletionParticipantService")));
-            participantCompletionParticipantService
-                    .set(new BusinessAgreementWithParticipantCompletionParticipantService());
+            participantCompletionParticipantService.set(PrivilegedServiceFactory
+                    .getInstance(BusinessAgreementWithParticipantCompletionParticipantService.class).getService());
         }
         return participantCompletionParticipantService.get();
     }
@@ -84,12 +78,8 @@ public class WSBAClient {
      */
     private static synchronized BusinessAgreementWithCoordinatorCompletionCoordinatorService getCoordinatorCompletionCoordinatorService() {
         if (coordinatorCompletionCoordinatorService.get() == null) {
-            // coordinatorCompletionCoordinatorService.set(new
-            // BusinessAgreementWithCoordinatorCompletionCoordinatorService(null,
-            // new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
-            // "BusinessAgreementWithCoordinatorCompletionCoordinatorService")));
-            coordinatorCompletionCoordinatorService
-                    .set(new BusinessAgreementWithCoordinatorCompletionCoordinatorService());
+            coordinatorCompletionCoordinatorService.set(PrivilegedServiceFactory
+                    .getInstance(BusinessAgreementWithCoordinatorCompletionCoordinatorService.class).getService());
         }
         return coordinatorCompletionCoordinatorService.get();
     }
@@ -102,12 +92,8 @@ public class WSBAClient {
      */
     private static synchronized BusinessAgreementWithCoordinatorCompletionParticipantService getCoordinatorCompletionParticipantService() {
         if (coordinatorCompletionParticipantService.get() == null) {
-            // coordinatorCompletionParticipantService.set(new
-            // BusinessAgreementWithCoordinatorCompletionParticipantService(null,
-            // new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
-            // "BusinessAgreementWithCoordinatorCompletionParticipantService")));
-            coordinatorCompletionParticipantService
-                    .set(new BusinessAgreementWithCoordinatorCompletionParticipantService());
+            coordinatorCompletionParticipantService.set(PrivilegedServiceFactory
+                    .getInstance(BusinessAgreementWithCoordinatorCompletionParticipantService.class).getService());
         }
         return coordinatorCompletionParticipantService.get();
     }
@@ -116,9 +102,11 @@ public class WSBAClient {
 
     public static BusinessAgreementWithParticipantCompletionCoordinatorPortType getParticipantCompletionCoordinatorPort(
             W3CEndpointReference endpointReference, String action, MAP map) {
-        BusinessAgreementWithParticipantCompletionCoordinatorService service = getParticipantCompletionCoordinatorService();
-        BusinessAgreementWithParticipantCompletionCoordinatorPortType port = service.getPort(endpointReference,
-                BusinessAgreementWithParticipantCompletionCoordinatorPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithParticipantCompletionCoordinatorService service = getParticipantCompletionCoordinatorService();
+        final BusinessAgreementWithParticipantCompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, endpointReference,
+                        BusinessAgreementWithParticipantCompletionCoordinatorPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -128,9 +116,11 @@ public class WSBAClient {
 
     public static BusinessAgreementWithParticipantCompletionParticipantPortType getParticipantCompletionParticipantPort(
             W3CEndpointReference endpointReference, String action, MAP map) {
-        BusinessAgreementWithParticipantCompletionParticipantService service = getParticipantCompletionParticipantService();
-        BusinessAgreementWithParticipantCompletionParticipantPortType port = service.getPort(endpointReference,
-                BusinessAgreementWithParticipantCompletionParticipantPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithParticipantCompletionParticipantService service = getParticipantCompletionParticipantService();
+        final BusinessAgreementWithParticipantCompletionParticipantPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, endpointReference,
+                        BusinessAgreementWithParticipantCompletionParticipantPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -140,9 +130,11 @@ public class WSBAClient {
 
     public static BusinessAgreementWithCoordinatorCompletionCoordinatorPortType getCoordinatorCompletionCoordinatorPort(
             W3CEndpointReference endpointReference, String action, MAP map) {
-        BusinessAgreementWithCoordinatorCompletionCoordinatorService service = getCoordinatorCompletionCoordinatorService();
-        BusinessAgreementWithCoordinatorCompletionCoordinatorPortType port = service.getPort(endpointReference,
-                BusinessAgreementWithCoordinatorCompletionCoordinatorPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithCoordinatorCompletionCoordinatorService service = getCoordinatorCompletionCoordinatorService();
+        final BusinessAgreementWithCoordinatorCompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, endpointReference,
+                        BusinessAgreementWithCoordinatorCompletionCoordinatorPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -152,9 +144,11 @@ public class WSBAClient {
 
     public static BusinessAgreementWithCoordinatorCompletionParticipantPortType getCoordinatorCompletionParticipantPort(
             W3CEndpointReference endpointReference, String action, MAP map) {
-        BusinessAgreementWithCoordinatorCompletionParticipantService service = getCoordinatorCompletionParticipantService();
-        BusinessAgreementWithCoordinatorCompletionParticipantPortType port = service.getPort(endpointReference,
-                BusinessAgreementWithCoordinatorCompletionParticipantPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithCoordinatorCompletionParticipantService service = getCoordinatorCompletionParticipantService();
+        final BusinessAgreementWithCoordinatorCompletionParticipantPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, endpointReference,
+                        BusinessAgreementWithCoordinatorCompletionParticipantPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -166,9 +160,10 @@ public class WSBAClient {
 
     public static BusinessAgreementWithParticipantCompletionCoordinatorPortType getParticipantCompletionCoordinatorPort(
             String action, MAP map) {
-        BusinessAgreementWithParticipantCompletionCoordinatorService service = getParticipantCompletionCoordinatorService();
-        BusinessAgreementWithParticipantCompletionCoordinatorPortType port = service.getPort(
-                BusinessAgreementWithParticipantCompletionCoordinatorPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithParticipantCompletionCoordinatorService service = getParticipantCompletionCoordinatorService();
+        final BusinessAgreementWithParticipantCompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, BusinessAgreementWithParticipantCompletionCoordinatorPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -178,9 +173,10 @@ public class WSBAClient {
 
     public static BusinessAgreementWithParticipantCompletionParticipantPortType getParticipantCompletionParticipantPort(
             String action, MAP map) {
-        BusinessAgreementWithParticipantCompletionParticipantService service = getParticipantCompletionParticipantService();
-        BusinessAgreementWithParticipantCompletionParticipantPortType port = service.getPort(
-                BusinessAgreementWithParticipantCompletionParticipantPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithParticipantCompletionParticipantService service = getParticipantCompletionParticipantService();
+        final BusinessAgreementWithParticipantCompletionParticipantPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, BusinessAgreementWithParticipantCompletionParticipantPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -190,9 +186,10 @@ public class WSBAClient {
 
     public static BusinessAgreementWithCoordinatorCompletionParticipantPortType getCoordinatorCompletionParticipantPort(
             String action, MAP map) {
-        BusinessAgreementWithCoordinatorCompletionParticipantService service = getCoordinatorCompletionParticipantService();
-        BusinessAgreementWithCoordinatorCompletionParticipantPortType port = service.getPort(
-                BusinessAgreementWithCoordinatorCompletionParticipantPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithCoordinatorCompletionParticipantService service = getCoordinatorCompletionParticipantService();
+        final BusinessAgreementWithCoordinatorCompletionParticipantPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, BusinessAgreementWithCoordinatorCompletionParticipantPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -202,9 +199,10 @@ public class WSBAClient {
 
     public static BusinessAgreementWithCoordinatorCompletionCoordinatorPortType getCoordinatorCompletionCoordinatorPort(
             String action, MAP map) {
-        BusinessAgreementWithCoordinatorCompletionCoordinatorService service = getCoordinatorCompletionCoordinatorService();
-        BusinessAgreementWithCoordinatorCompletionCoordinatorPortType port = service.getPort(
-                BusinessAgreementWithCoordinatorCompletionCoordinatorPortType.class, new AddressingFeature(true, true));
+        final BusinessAgreementWithCoordinatorCompletionCoordinatorService service = getCoordinatorCompletionCoordinatorService();
+        final BusinessAgreementWithCoordinatorCompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance()
+                .getPort(service, BusinessAgreementWithCoordinatorCompletionCoordinatorPortType.class,
+                        new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);

@@ -1,5 +1,7 @@
 package com.arjuna.webservices11.wsat.client;
 
+import com.arjuna.webservices11.util.PrivilegedServiceFactory;
+import com.arjuna.webservices11.util.PrivilegedServiceHelper;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 import org.jboss.ws.api.addressing.MAP;
 import org.oasis_open.docs.ws_tx.wsat._2006._06.*;
@@ -51,10 +53,7 @@ public class WSATClient {
      */
     private static synchronized CoordinatorService getCoordinatorService() {
         if (coordinatorService.get() == null) {
-            // coordinatorService.set(new CoordinatorService(null, new
-            // QName("http://docs.oasis-open.org/ws-tx/wsat/2006/06",
-            // "CoordinatorService")));
-            coordinatorService.set(new CoordinatorService());
+            coordinatorService.set(PrivilegedServiceFactory.getInstance(CoordinatorService.class).getService());
         }
         return coordinatorService.get();
     }
@@ -66,10 +65,7 @@ public class WSATClient {
      */
     private static synchronized ParticipantService getParticipantService() {
         if (participantService.get() == null) {
-            // participantService.set(new ParticipantService(null, new
-            // QName("http://docs.oasis-open.org/ws-tx/wsat/2006/06",
-            // "ParticipantService")));
-            participantService.set(new ParticipantService());
+            participantService.set(PrivilegedServiceFactory.getInstance(ParticipantService.class).getService());
         }
         return participantService.get();
     }
@@ -81,11 +77,8 @@ public class WSATClient {
      */
     private static synchronized CompletionCoordinatorService getCompletionCoordinatorService() {
         if (completionCoordinatorService.get() == null) {
-            // completionCoordinatorService.set(new
-            // CompletionCoordinatorService(null, new
-            // QName("http://docs.oasis-open.org/ws-tx/wsat/2006/06",
-            // "CompletionCoordinatorService")));
-            completionCoordinatorService.set(new CompletionCoordinatorService());
+            completionCoordinatorService
+                    .set(PrivilegedServiceFactory.getInstance(CompletionCoordinatorService.class).getService());
         }
         return completionCoordinatorService.get();
     }
@@ -97,11 +90,8 @@ public class WSATClient {
      */
     private static synchronized CompletionInitiatorService getCompletionInitiatorService() {
         if (completionInitiatorService.get() == null) {
-            // completionInitiatorService.set(new
-            // CompletionInitiatorService(null, new
-            // QName("http://docs.oasis-open.org/ws-tx/wsat/2006/06",
-            // "CompletionInitiatorService")));
-            completionInitiatorService.set(new CompletionInitiatorService());
+            completionInitiatorService
+                    .set(PrivilegedServiceFactory.getInstance(CompletionInitiatorService.class).getService());
         }
         return completionInitiatorService.get();
     }
@@ -113,18 +103,19 @@ public class WSATClient {
      */
     private static synchronized CompletionCoordinatorRPCService getCompletionCoordinatorRPCService() {
         if (completionCoordinatorRPCService.get() == null) {
-            completionCoordinatorRPCService.set(new CompletionCoordinatorRPCService());
+            completionCoordinatorRPCService
+                    .set(PrivilegedServiceFactory.getInstance(CompletionCoordinatorRPCService.class).getService());
         }
         return completionCoordinatorRPCService.get();
     }
 
     // fetch ports when we HAVE an endpoint
 
-    public static CoordinatorPortType getCoordinatorPort(W3CEndpointReference endpointReference, String action,
+    public static CoordinatorPortType getCoordinatorPort(final W3CEndpointReference endpointReference, String action,
             MAP map) {
-        CoordinatorService service = getCoordinatorService();
-        CoordinatorPortType port = service.getPort(endpointReference, CoordinatorPortType.class,
-                new AddressingFeature(true, true));
+        final CoordinatorService service = getCoordinatorService();
+        final CoordinatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service, endpointReference,
+                CoordinatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -132,11 +123,11 @@ public class WSATClient {
         return port;
     }
 
-    public static ParticipantPortType getParticipantPort(W3CEndpointReference endpointReference, String action,
+    public static ParticipantPortType getParticipantPort(final W3CEndpointReference endpointReference, String action,
             MAP map) {
-        ParticipantService service = getParticipantService();
-        ParticipantPortType port = service.getPort(endpointReference, ParticipantPortType.class,
-                new AddressingFeature(true, true));
+        final ParticipantService service = getParticipantService();
+        final ParticipantPortType port = PrivilegedServiceHelper.getInstance().getPort(service, endpointReference,
+                ParticipantPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -144,11 +135,11 @@ public class WSATClient {
         return port;
     }
 
-    public static CompletionCoordinatorPortType getCompletionCoordinatorPort(W3CEndpointReference endpointReference,
-            String action, MAP map) {
-        CompletionCoordinatorService service = getCompletionCoordinatorService();
-        CompletionCoordinatorPortType port = service.getPort(endpointReference, CompletionCoordinatorPortType.class,
-                new AddressingFeature(true, true));
+    public static CompletionCoordinatorPortType getCompletionCoordinatorPort(
+            final W3CEndpointReference endpointReference, String action, MAP map) {
+        final CompletionCoordinatorService service = getCompletionCoordinatorService();
+        final CompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                endpointReference, CompletionCoordinatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -156,11 +147,11 @@ public class WSATClient {
         return port;
     }
 
-    public static CompletionInitiatorPortType getCompletionInitiatorPort(W3CEndpointReference endpointReference,
+    public static CompletionInitiatorPortType getCompletionInitiatorPort(final W3CEndpointReference endpointReference,
             String action, MAP map) {
-        CompletionInitiatorService service = getCompletionInitiatorService();
-        CompletionInitiatorPortType port = service.getPort(endpointReference, CompletionInitiatorPortType.class,
-                new AddressingFeature(true, true));
+        final CompletionInitiatorService service = getCompletionInitiatorService();
+        final CompletionInitiatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                endpointReference, CompletionInitiatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -169,10 +160,10 @@ public class WSATClient {
     }
 
     public static CompletionCoordinatorRPCPortType getCompletionCoordinatorRPCPort(
-            W3CEndpointReference endpointReference, String action, MAP map) {
-        CompletionCoordinatorRPCService service = getCompletionCoordinatorRPCService();
-        CompletionCoordinatorRPCPortType port = service.getPort(endpointReference,
-                CompletionCoordinatorRPCPortType.class, new AddressingFeature(true, true));
+            final W3CEndpointReference endpointReference, String action, MAP map) {
+        final CompletionCoordinatorRPCService service = getCompletionCoordinatorRPCService();
+        final CompletionCoordinatorRPCPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                endpointReference, CompletionCoordinatorRPCPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configureEndpointPort(bindingProvider, action, map);
@@ -183,8 +174,9 @@ public class WSATClient {
     // fetch ports when we have NO endpoint
 
     public static CoordinatorPortType getCoordinatorPort(String action, MAP map) {
-        CoordinatorService service = getCoordinatorService();
-        CoordinatorPortType port = service.getPort(CoordinatorPortType.class, new AddressingFeature(true, true));
+        final CoordinatorService service = getCoordinatorService();
+        final CoordinatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                CoordinatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -193,8 +185,9 @@ public class WSATClient {
     }
 
     public static ParticipantPortType getParticipantPort(String action, MAP map) {
-        ParticipantService service = getParticipantService();
-        ParticipantPortType port = service.getPort(ParticipantPortType.class, new AddressingFeature(true, true));
+        final ParticipantService service = getParticipantService();
+        final ParticipantPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                ParticipantPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -203,9 +196,9 @@ public class WSATClient {
     }
 
     public static CompletionCoordinatorPortType getCompletionCoordinatorPort(String action, MAP map) {
-        CompletionCoordinatorService service = getCompletionCoordinatorService();
-        CompletionCoordinatorPortType port = service.getPort(CompletionCoordinatorPortType.class,
-                new AddressingFeature(true, true));
+        final CompletionCoordinatorService service = getCompletionCoordinatorService();
+        final CompletionCoordinatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                CompletionCoordinatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
@@ -214,9 +207,9 @@ public class WSATClient {
     }
 
     public static CompletionInitiatorPortType getCompletionInitiatorPort(String action, MAP map) {
-        CompletionInitiatorService service = getCompletionInitiatorService();
-        CompletionInitiatorPortType port = service.getPort(CompletionInitiatorPortType.class,
-                new AddressingFeature(true, true));
+        final CompletionInitiatorService service = getCompletionInitiatorService();
+        final CompletionInitiatorPortType port = PrivilegedServiceHelper.getInstance().getPort(service,
+                CompletionInitiatorPortType.class, new AddressingFeature(true, true));
         BindingProvider bindingProvider = (BindingProvider) port;
 
         configurePort(bindingProvider, action, map);
