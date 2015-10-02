@@ -1173,27 +1173,6 @@ public class BasicAction extends StateManager {
      * @return a list of ThrowableS, if any
      */
     public List<Throwable> getDeferredThrowables() {
-        List<Throwable> deferredThrowables = new ArrayList<>();
-
-        if (onePhaseCommitExceptionDeferrer != null)
-            onePhaseCommitExceptionDeferrer.getDeferredThrowables(deferredThrowables);
-
-        if (failedList != null) {
-            AbstractRecord current = failedList.listHead;
-            while (current != null) {
-                addDeferredThrowables(current, deferredThrowables);
-                current = failedList.peekNext(current);
-            }
-        }
-
-        if (heuristicList != null) {
-            AbstractRecord current = heuristicList.listHead;
-            while (current != null) {
-                addDeferredThrowables(current, deferredThrowables);
-                current = heuristicList.peekNext(current);
-            }
-        }
-
         return deferredThrowables;
     }
 
@@ -2185,10 +2164,7 @@ public class BasicAction extends StateManager {
                  */
 
                 if (p == TwoPhaseOutcome.ONE_PHASE_ERROR) {
-                    if (recordBeingHandled instanceof ExceptionDeferrer)
-                        onePhaseCommitExceptionDeferrer = (ExceptionDeferrer) recordBeingHandled;
-                    else if (recordBeingHandled.value() instanceof ExceptionDeferrer)
-                        onePhaseCommitExceptionDeferrer = (ExceptionDeferrer) recordBeingHandled.value();
+                    addDeferredThrowables(recordBeingHandled, deferredThrowables);
                 }
 
                 if (p == TwoPhaseOutcome.FINISH_ERROR) {
@@ -2200,6 +2176,7 @@ public class BasicAction extends StateManager {
                     if (!failedList.insert(recordBeingHandled))
                         recordBeingHandled = null;
                     else {
+                        addDeferredThrowables(recordBeingHandled, deferredThrowables);
                         if (!stateToSave)
                             stateToSave = recordBeingHandled.doSave();
                     }
@@ -2227,6 +2204,7 @@ public class BasicAction extends StateManager {
                     if (!heuristicList.insert(recordBeingHandled))
                         recordBeingHandled = null;
                     else {
+                        addDeferredThrowables(recordBeingHandled, deferredThrowables);
                         if (!stateToSave)
                             stateToSave = recordBeingHandled.doSave();
                     }
@@ -2644,6 +2622,7 @@ public class BasicAction extends StateManager {
                             || (ok == TwoPhaseOutcome.HEURISTIC_HAZARD))) {
                         updateHeuristic(ok, true);
                         heuristicList.insert(recordBeingHandled);
+                        addDeferredThrowables(recordBeingHandled, deferredThrowables);
                     } else {
                         if (ok == TwoPhaseOutcome.NOT_PREPARED) {
                             /*
@@ -2667,6 +2646,7 @@ public class BasicAction extends StateManager {
                             }
 
                             failedList.insert(recordBeingHandled);
+                            addDeferredThrowables(recordBeingHandled, deferredThrowables);
                         }
                     }
                 }
@@ -2752,6 +2732,7 @@ public class BasicAction extends StateManager {
 
                         updateHeuristic(ok, false);
                         heuristicList.insert(recordBeingHandled);
+                        addDeferredThrowables(recordBeingHandled, deferredThrowables);
                     } else {
                         if (ok != TwoPhaseOutcome.FINISH_OK) {
                             if (actionType == ActionType.TOP_LEVEL)
@@ -3381,8 +3362,7 @@ public class BasicAction extends StateManager {
             .isFinalizeBasicActions();
 
     // private Mutex _lock = new Mutex(); // TODO
-
-    ExceptionDeferrer onePhaseCommitExceptionDeferrer;
+    private List<Throwable> deferredThrowables = new ArrayList<>();
 
 }
 
