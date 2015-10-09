@@ -567,7 +567,6 @@ public abstract class JDBCImple_driver {
 
             Connection connection = null;
             PreparedStatement pstmt = null;
-            PreparedStatement pstmt2 = null;
             try {
                 connection = jdbcAccess.getConnection();
                 pstmt = connection.prepareStatement(
@@ -582,20 +581,32 @@ public abstract class JDBCImple_driver {
                 rs = pstmt.executeQuery();
 
                 if (rs.next()) {
-                    updateBytes(rs, 1, b);
-                    rs.updateRow();
+                    PreparedStatement pstmt2 = connection.prepareStatement("UPDATE " + tableName
+                            + " SET ObjectState = ?" + " WHERE StateType=? AND TypeName=? AND UidString=?");
+                    try {
+                        pstmt2.setBytes(1, b);
+                        pstmt2.setInt(2, stateType);
+                        pstmt2.setString(3, typeName);
+                        pstmt2.setString(4, objUid.stringForm());
+                        pstmt2.executeUpdate();
+                    } finally {
+                        pstmt2.close();
+                    }
                 } else {
                     connection.commit();
                     // not in database, do insert:
-                    pstmt2 = connection.prepareStatement("INSERT INTO " + tableName
+                    PreparedStatement pstmt2 = connection.prepareStatement("INSERT INTO " + tableName
                             + " (StateType,Hidden,TypeName,UidString,ObjectState) VALUES (?,0,?,?,?)");
+                    try {
+                        pstmt2.setInt(1, stateType);
+                        pstmt2.setString(2, typeName);
+                        pstmt2.setString(3, objUid.stringForm());
+                        pstmt2.setBytes(4, b);
 
-                    pstmt2.setInt(1, stateType);
-                    pstmt2.setString(2, typeName);
-                    pstmt2.setString(3, objUid.stringForm());
-                    pstmt2.setBytes(4, b);
-
-                    pstmt2.executeUpdate();
+                        pstmt2.executeUpdate();
+                    } finally {
+                        pstmt2.close();
+                    }
                 }
 
                 connection.commit();
@@ -613,13 +624,6 @@ public abstract class JDBCImple_driver {
                 if (pstmt != null) {
                     try {
                         pstmt.close();
-                    } catch (SQLException e) {
-                        // Ignore
-                    }
-                }
-                if (pstmt2 != null) {
-                    try {
-                        pstmt2.close();
                     } catch (SQLException e) {
                         // Ignore
                     }
@@ -714,9 +718,5 @@ public abstract class JDBCImple_driver {
 
     public int getMaxStateSize() {
         return 65535;
-    }
-
-    protected void updateBytes(ResultSet rs, int i, byte[] b) throws SQLException {
-        rs.updateBytes(i, b);
     }
 }
