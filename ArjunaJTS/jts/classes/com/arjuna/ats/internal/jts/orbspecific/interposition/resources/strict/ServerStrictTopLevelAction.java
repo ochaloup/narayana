@@ -52,7 +52,6 @@ public class ServerStrictTopLevelAction extends ServerTopLevelAction {
                     "ServerStrictTopLevelAction::ServerStrictTopLevelAction (ServerControl, " + doRegister + " )");
         }
 
-        _registered = false;
         _theResource = null;
 
         if (_theControl != null) {
@@ -101,7 +100,5 @@ public class ServerStrictTopLevelAction extends ServerTopLevelAction {
     public String type() {
         return "/Resources/Arjuna/ServerTopLevelAction/ServerStrictTopLevelAction";
     }
-
-    private boolean _registered;
 
 }
