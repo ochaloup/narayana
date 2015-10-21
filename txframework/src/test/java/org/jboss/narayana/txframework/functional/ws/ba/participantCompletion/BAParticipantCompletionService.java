@@ -47,11 +47,13 @@ import java.lang.annotation.Annotation;
 
 import static org.jboss.narayana.txframework.functional.common.ServiceCommand.*;
 
+
 /**
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
 @Stateless
-@WebService(serviceName = "BAParticipantCompletionService", portName = "BAParticipantCompletionService", name = "BAParticipantCompletion", targetNamespace = "http://www.jboss.com/functional/ba/participantcompletion/")
+@WebService(serviceName = "BAParticipantCompletionService", portName = "BAParticipantCompletionService",
+        name = "BAParticipantCompletion", targetNamespace = "http://www.jboss.com/functional/ba/participantcompletion/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @Compensatable(completionType = CompletionType.PARTICIPANT)
 public class BAParticipantCompletionService implements BAParticipantCompletion {
@@ -175,7 +177,7 @@ public class BAParticipantCompletionService implements BAParticipantCompletion {
     }
 
     private void logEvent(Class<? extends Annotation> event) {
-        // Check data is available
+        //Check data is available
         if (txDataMap.get("data") == null) {
             eventLog.addDataUnavailable(event);
         }

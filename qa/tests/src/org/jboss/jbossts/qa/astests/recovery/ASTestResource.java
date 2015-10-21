@@ -33,7 +33,8 @@ import java.util.HashMap;
 /**
  * Simulate a variety of faults during the various phases of the XA protocol
  */
-public class ASTestResource implements Synchronization, XAResource, Serializable {
+public class ASTestResource implements Synchronization, XAResource, Serializable
+{
     private static final Map<String, XAException> xaCodeMap = new HashMap<String, XAException>();
 
     private ASFailureType _xaFailureType = ASFailureType.NONE;
@@ -44,76 +45,96 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
     private XAException _xaException;
     private int txTimeout = 10;
     private Set<Xid> _xids = new HashSet<Xid>();
-    private transient boolean _isPrepared = false; // transient so it doesn't
-                                                    // get persisted in the tx
-                                                    // store
+    private transient boolean _isPrepared = false; // transient so it doesn't get persisted in the tx store
 
-    static {
+    static
+    {
         init();
     }
-
-    public ASTestResource() {
+    
+    public ASTestResource()
+    {
     }
 
-    public ASTestResource(ASFailureSpec spec) {
+    public ASTestResource(ASFailureSpec spec)
+    {
         this();
 
         if (spec == null)
             throw new IllegalArgumentException("Invalid XA resource failure injection specification");
-
+        
         setFailureMode(spec.getMode(), spec.getModeArg());
         setFailureType(spec.getType());
         setRecoveryAttempts(spec.getRecoveryArg());
     }
 
-    public void applySpec(String message) throws XAException {
+    public void applySpec(String message) throws XAException
+    {
         applySpec(message, _isPrepared);
     }
 
-    public void applySpec(String message, boolean prepared) throws XAException {
-        if (_xaFailureType.equals(ASFailureType.NONE) || _xaFailureMode.equals(ASFailureMode.NONE) || !prepared) {
+    public void applySpec(String message, boolean prepared) throws XAException
+    {
+        if (_xaFailureType.equals(ASFailureType.NONE) || _xaFailureMode.equals(ASFailureMode.NONE) || !prepared)
+        {
             System.out.println(message + (_isPrepared ? " ... " : " recovery"));
-            return; // NB if !_isPrepared then we must have been called from the
-                    // recovery subsystem
+            return; // NB if !_isPrepared then we must have been called from the recovery subsystem
         }
 
         System.out.println("Applying fault injection with " + _xids.size() + " active branches");
-        if (_xaException != null) {
+        if (_xaException != null)
+        {
             System.out.println(message + " ... xa error: " + _xaException.getMessage());
             throw _xaException;
-        } else if (_xaFailureMode.equals(ASFailureMode.HALT)) {
+        }
+        else if (_xaFailureMode.equals(ASFailureMode.HALT))
+        {
             System.out.println(message + " ... halting");
             Runtime.getRuntime().halt(1);
-        } else if (_xaFailureMode.equals(ASFailureMode.EXIT)) {
+        }
+        else if (_xaFailureMode.equals(ASFailureMode.EXIT))
+        {
             System.out.println(message + " ... exiting");
             System.exit(1);
-        } else if (_xaFailureMode.equals(ASFailureMode.SUSPEND)) {
+        }
+        else if (_xaFailureMode.equals(ASFailureMode.SUSPEND))
+        {
             System.out.println(message + " ... suspending for " + _suspend);
             suspend(_suspend);
             System.out.println(message + " ... resuming");
         }
     }
 
-    public String toString() {
+    public String toString()
+    {
         return _xaFailureType + ", " + _xaFailureMode + ", " + (_args != null && _args.length != 0 ? _args[0] : "");
     }
 
-    private void suspend(int msecs) {
-        try {
+    private void suspend(int msecs)
+    {
+        try
+        {
             Thread.sleep(msecs);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             e.printStackTrace();
         }
     }
 
-    public void setFailureMode(ASFailureMode mode, String... args) throws IllegalArgumentException {
+    public void setFailureMode(ASFailureMode mode, String ... args) throws IllegalArgumentException
+    {
         _xaFailureMode = mode;
         _args = args;
 
-        if (args != null && args.length != 0) {
-            if (_xaFailureMode.equals(ASFailureMode.SUSPEND)) {
+        if (args != null && args.length != 0)
+        {
+            if (_xaFailureMode.equals(ASFailureMode.SUSPEND))
+            {
                 _suspend = Integer.parseInt(args[0]);
-            } else if (_xaFailureMode.equals(ASFailureMode.XAEXCEPTION)) {
+            }
+            else if (_xaFailureMode.equals(ASFailureMode.XAEXCEPTION))
+            {
                 _xaException = xaCodeMap.get(args[0]);
 
                 if (_xaException == null)
@@ -122,41 +143,53 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         }
     }
 
-    public void setFailureType(ASFailureType type) {
+    public void setFailureType(ASFailureType type)
+    {
         _xaFailureType = type;
     }
 
-    public ASFailureType getFailureType() {
+    public ASFailureType getFailureType()
+    {
         return _xaFailureType;
     }
 
-    public void setRecoveryAttempts(int _recoveryAttempts) {
+    public void setRecoveryAttempts(int _recoveryAttempts)
+    {
         this._recoveryAttempts = _recoveryAttempts;
     }
 
     // Synchronizatons
 
-    public void beforeCompletion() {
+    public void beforeCompletion()
+    {
         if (_xaFailureType.equals(ASFailureType.SYNCH_BEFORE))
-            try {
+            try
+            {
                 applySpec("Before completion");
-            } catch (XAException e) {
+            }
+            catch (XAException e)
+            {
                 throw new RuntimeException(e);
             }
     }
 
-    public void afterCompletion(int i) {
+    public void afterCompletion(int i)
+    {
         if (_xaFailureType.equals(ASFailureType.SYNCH_AFTER))
-            try {
+            try
+            {
                 applySpec("After completion");
-            } catch (XAException e) {
+            }
+            catch (XAException e)
+            {
                 throw new RuntimeException(e);
             }
     }
 
     // XA Interface implementation
 
-    public void commit(Xid xid, boolean b) throws XAException {
+    public void commit(Xid xid, boolean b) throws XAException
+    {
         if (_xaFailureType.equals(ASFailureType.XARES_COMMIT))
             applySpec("xa commit");
 
@@ -164,20 +197,23 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         _xids.remove(xid);
     }
 
-    public void rollback(Xid xid) throws XAException {
-        if (_xaFailureType.equals(ASFailureType.XARES_ROLLBACK))
+    public void rollback(Xid xid) throws XAException
+    {
+       if (_xaFailureType.equals(ASFailureType.XARES_ROLLBACK))
             applySpec("xa rollback");
 
         _isPrepared = false;
         _xids.remove(xid);
     }
-
-    public void end(Xid xid, int i) throws XAException {
+    
+    public void end(Xid xid, int i) throws XAException
+    {
         if (_xaFailureType.equals(ASFailureType.XARES_END))
             applySpec("xa end");
     }
 
-    public void forget(Xid xid) throws XAException {
+    public void forget(Xid xid) throws XAException
+    {
         if (_xaFailureType.equals(ASFailureType.XARES_FORGET))
             applySpec("xa forget");
 
@@ -185,17 +221,20 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         _xids.remove(xid);
     }
 
-    public int getTransactionTimeout() throws XAException {
+    public int getTransactionTimeout() throws XAException
+    {
         return txTimeout;
     }
 
-    public boolean isSameRM(XAResource xaResource) throws XAException {
+    public boolean isSameRM(XAResource xaResource) throws XAException
+    {
         return false;
     }
 
-    public int prepare(Xid xid) throws XAException {
+    public int prepare(Xid xid) throws XAException
+    {
         _isPrepared = true;
-
+        
         if (_xaFailureType.equals(ASFailureType.XARES_PREPARE))
             applySpec("xa prepare");
 
@@ -204,7 +243,8 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         return XA_OK;
     }
 
-    public Xid[] recover(int i) throws XAException {
+    public Xid[] recover(int i) throws XAException
+    {
         if (_recoveryAttempts <= 0)
             return _xids.toArray(new Xid[_xids.size()]);
 
@@ -216,29 +256,28 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         return new Xid[0];
     }
 
-    public boolean setTransactionTimeout(int txTimeout) throws XAException {
+    public boolean setTransactionTimeout(int txTimeout) throws XAException
+    {
         this.txTimeout = txTimeout;
-
-        return true; // set was successfull
+        
+        return true;    // set was successfull
     }
 
-    public void start(Xid xid, int i) throws XAException {
+    public void start(Xid xid, int i) throws XAException
+    {
         _xids.add(xid);
 
-        if (_xaFailureType.equals(ASFailureType.XARES_START))
+       if (_xaFailureType.equals(ASFailureType.XARES_START))
             applySpec("xa start");
     }
 
-    public String getEISProductName() {
-        return "Test XAResouce";
-    }
-
-    public String getEISProductVersion() {
-        return "v666.0";
-    }
+    public String getEISProductName() { return "Test XAResouce";}
+    
+    public String getEISProductVersion() { return "v666.0";}
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-    private static void init() {
+    private static void init()
+    {
         xaCodeMap.put("XA_HEURCOM", new XAException(XAException.XA_HEURCOM));
         xaCodeMap.put("XA_HEURHAZ", new XAException(XAException.XA_HEURHAZ));
         xaCodeMap.put("XA_HEURMIX", new XAException(XAException.XA_HEURMIX));
@@ -266,19 +305,23 @@ public class ASTestResource implements Synchronization, XAResource, Serializable
         xaCodeMap.put("XAER_RMFAIL ", new XAException(XAException.XAER_RMFAIL));
     }
 
-    public boolean isXAResource() {
+    public boolean isXAResource()
+    {
         return _xaFailureType.isXA() || _xaFailureType.equals(ASFailureType.NONE);
     }
 
-    public boolean isSynchronization() {
+    public boolean isSynchronization()
+    {
         return _xaFailureType.isSynchronization();
     }
 
-    public boolean isPreCommit() {
+    public boolean isPreCommit()
+    {
         return _xaFailureType.isPreCommit();
     }
 
-    public boolean expectException() {
+    public boolean expectException()
+    {
         return _xaFailureMode.equals(ASFailureMode.XAEXCEPTION);
     }
 }

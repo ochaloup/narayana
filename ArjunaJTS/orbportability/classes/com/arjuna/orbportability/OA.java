@@ -63,7 +63,8 @@ import com.arjuna.orbportability.oa.PreShutdown;
  * @since JTS 2.1.
  */
 
-public abstract class OA {
+public abstract class OA
+{
 
     /**
      * Ensure that all OA specific initialisation is done even if the programmer
@@ -73,20 +74,25 @@ public abstract class OA {
      * @since JTS 2.1.1.
      */
 
-    public synchronized void init() throws SystemException {
+    public synchronized void init () throws SystemException
+    {
         // null op - just to ensure we create the OA object!
     }
 
-    public synchronized void initPOA() throws InvalidName, SystemException {
+    public synchronized void initPOA () throws InvalidName, SystemException
+    {
         initPOA(null);
     }
 
-    public ORB getAssociatedORB() {
+    public ORB getAssociatedORB ()
+    {
         return _associatedORB;
     }
 
-    public void setPOA(org.omg.PortableServer.POA p) throws SystemException {
-        if (!_oa.initialised()) {
+    public void setPOA (org.omg.PortableServer.POA p) throws SystemException
+    {
+        if (!_oa.initialised())
+        {
             _oa.rootPoa(p);
 
             performPostSet(this._oaName);
@@ -97,108 +103,128 @@ public abstract class OA {
      * Loads and runs the configured pre-initialisation classes
      */
 
-    protected void performPreInit(String oaName) {
+    protected void performPreInit (String oaName)
+    {
         /**
          * Perform pre-initialisation classes for all OAs
          */
-        PreInitLoader preInit = new PreInitLoader(PreInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS), this);
+        PreInitLoader preInit = new PreInitLoader(PreInitLoader
+                .generateOAPropertyName(ORB.ORB_INITIALISER_NS), this);
 
         /**
          * Perform pre-initialisation classes for all OAs
          */
-        preInit = new PreInitLoader(
-                PreInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
+        preInit = new PreInitLoader(PreInitLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
 
         /**
          * Perform pre-initialisation classes for this OA only
          */
-        preInit = new PreInitLoader(
-                PreInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
+        preInit = new PreInitLoader(PreInitLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
         preInit = null;
     }
 
-    protected void performPostSet(String oaName) {
+    protected void performPostSet (String oaName)
+    {
         /**
          * Perform post-set operations for all OAs
          */
-        new PostSetLoader(PostSetLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS), this);
+        new PostSetLoader(PostSetLoader
+                .generateOAPropertyName(ORB.ORB_INITIALISER_NS), this);
 
         /**
          * Perform post-set operations for all OAs
          */
-        new PostSetLoader(PostSetLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
+        new PostSetLoader(PostSetLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
 
         /**
          * Perform post-set operations for this OA only
          */
-        new PreInitLoader(
-                PostSetLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
+        new PreInitLoader(PostSetLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
     }
 
     /**
      * Loads and runs the configured post-initialisation classes
      */
 
-    protected void performPostInit(String oaName) {
+    protected void performPostInit (String oaName)
+    {
         /**
          * Perform post-initialisation classes for all OAs
          */
-        PostInitLoader postInit = new PostInitLoader(PostInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS),
-                this);
+        PostInitLoader postInit = new PostInitLoader(PostInitLoader
+                .generateOAPropertyName(ORB.ORB_INITIALISER_NS), this);
 
         /**
          * Perform post-initialisation classes for all OAs
          */
-        postInit = new PostInitLoader(
-                PostInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
+        postInit = new PostInitLoader(PostInitLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName()), this);
 
         /**
          * Perform post-initialisation classes for this OA only
          */
-        postInit = new PostInitLoader(
-                PostInitLoader.generateOAPropertyName(ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
+        postInit = new PostInitLoader(PostInitLoader.generateOAPropertyName(
+                ORB.ORB_INITIALISER_NS, _associatedORB.getName(), oaName), this);
         postInit = null;
     }
 
-    public synchronized void initPOA(String[] args) throws InvalidName, SystemException {
+    public synchronized void initPOA (String[] args) throws InvalidName,
+            SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("OA::initPOA (String[])");
         }
 
-        if (!_oa.initialised()) {
-            if (_associatedORB._orb.initialised()) {
+        if (!_oa.initialised())
+        {
+            if (_associatedORB._orb.initialised())
+            {
                 performPreInit(_oaName);
 
                 parseProperties(args, true);
 
-                try {
+                try
+                {
                     _oa.init(); // create the root poa
-                } catch (final org.omg.CORBA.INITIALIZE ex) {
+                }
+                catch (final org.omg.CORBA.INITIALIZE ex)
+                {
                     opLogger.i18NLogger.warn_OA_initialize();
-
+                    
                     throw ex;
-                } catch (final Exception e) {
+                }
+                catch (final Exception e)
+                {
                     opLogger.i18NLogger.warn_OA_caughtexception("OA.initPOA", e);
 
-                    throw new FatalError("OA.initPOA: " + e.toString());
+                   throw new FatalError("OA.initPOA: "+e.toString());
                 }
 
                 parseProperties(args, false);
 
                 performPostInit(_oaName);
-            } else {
-                throw new FatalError(opLogger.i18NLogger.get_OA_uninitialsedorb());
+            }
+            else
+            {
+                throw new FatalError( opLogger.i18NLogger.get_OA_uninitialsedorb() );
             }
         }
     }
 
-    public synchronized ChildOA createPOA(String adapterName, Policy[] policies)
-            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive {
+    public synchronized ChildOA createPOA (String adapterName, Policy[] policies)
+            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive
+    {
         if (opLogger.logger.isTraceEnabled()) {
-            opLogger.logger.trace("OA::createPOA (" + adapterName + " )");
+            opLogger.logger.trace("OA::createPOA ("
+                    + adapterName + " )");
         }
 
-        if (!_oa.initialised()) {
+        if (!_oa.initialised())
+        {
             opLogger.i18NLogger.warn_OA_oanotinitialised();
 
             throw new AdapterInactive();
@@ -216,7 +242,8 @@ public abstract class OA {
          * Create a child POA of this POA passing the policies passed in
          */
         _oa.createPOA(adapterName, policies);
-        ChildOA newChildOA = new ChildOA(_associatedORB, adapterName, _oa.poa(adapterName));
+        ChildOA newChildOA = new ChildOA(_associatedORB, adapterName, _oa
+                .poa(adapterName));
 
         /**
          * Perform OA post-initialisation routines
@@ -226,17 +253,21 @@ public abstract class OA {
         return (newChildOA);
     }
 
-    public void initOA() throws InvalidName, SystemException {
+    public void initOA () throws InvalidName, SystemException
+    {
         initOA(null);
     }
 
-    public void initOA(String[] args) throws InvalidName, SystemException {
+    public void initOA (String[] args) throws InvalidName, SystemException
+    {
         initPOA(args);
     }
 
-    public synchronized boolean addAttribute(Attribute p) {
+    public synchronized boolean addAttribute (Attribute p)
+    {
         if (opLogger.logger.isTraceEnabled()) {
-            opLogger.logger.trace("OA::addAttribute (" + p + ")");
+            opLogger.logger.trace("OA::addAttribute (" + p
+                    + ")");
         }
 
         if ((_oa.initialised()) || (p == null)) // oa already set up!
@@ -250,36 +281,45 @@ public abstract class OA {
         return true;
     }
 
-    public abstract void destroy() throws SystemException;
+    public abstract void destroy () throws SystemException;
 
-    public synchronized POA rootPoa() {
+    public synchronized POA rootPoa ()
+    {
         return _oa.rootPoa();
     }
 
-    public synchronized POA poa(String adapterName) {
+    public synchronized POA poa (String adapterName)
+    {
         return _oa.poa(adapterName);
     }
 
-    public synchronized boolean setPoa(String adapterName, POA thePOA) {
-        if (adapterName != null) {
+    public synchronized boolean setPoa (String adapterName, POA thePOA)
+    {
+        if (adapterName != null)
+        {
             _oa.poa(adapterName, thePOA);
 
             return true;
-        } else
+        }
+        else
             return false;
     }
 
-    public synchronized void addPreShutdown(PreShutdown c) {
+    public synchronized void addPreShutdown (PreShutdown c)
+    {
         if (opLogger.logger.isTraceEnabled()) {
-            opLogger.logger.trace("OA::addPreShutdown (" + c + ")");
+            opLogger.logger.trace("OA::addPreShutdown ("
+                    + c + ")");
         }
 
         _preOAShutdown.put(c, c);
     }
 
-    public synchronized void addPostShutdown(PostShutdown c) {
+    public synchronized void addPostShutdown (PostShutdown c)
+    {
         if (opLogger.logger.isTraceEnabled()) {
-            opLogger.logger.trace("OA::addPostShutdown (" + c + ")");
+            opLogger.logger.trace("OA::addPostShutdown ("
+                    + c + ")");
         }
 
         _postOAShutdown.put(c, c);
@@ -289,12 +329,16 @@ public abstract class OA {
      * @return a CORBA object reference for the Servant/Implementation.
      */
 
-    public abstract org.omg.CORBA.Object corbaReference(Servant obj);
+    public abstract org.omg.CORBA.Object corbaReference (Servant obj);
 
-    public org.omg.CORBA.Object corbaReference(Servant obj, POA poa) {
-        try {
+    public org.omg.CORBA.Object corbaReference (Servant obj, POA poa)
+    {
+        try
+        {
             return poa.servant_to_reference(obj);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return null;
         }
     }
@@ -302,23 +346,25 @@ public abstract class OA {
     /**
      * Register the object with the ORB.
      */
-    public abstract boolean objectIsReady(Servant obj, byte[] id) throws SystemException;
+    public abstract boolean objectIsReady (Servant obj, byte[] id)
+            throws SystemException;
 
-    public abstract boolean objectIsReady(Servant obj) throws SystemException;
+    public abstract boolean objectIsReady (Servant obj) throws SystemException;
 
     /**
      * Dispose of the object, i.e., unregister it from the ORB.
      */
-    public abstract boolean shutdownObject(org.omg.CORBA.Object obj);
+    public abstract boolean shutdownObject (org.omg.CORBA.Object obj);
 
-    public abstract boolean shutdownObject(Servant obj);
+    public abstract boolean shutdownObject (Servant obj);
 
     /**
      * Place the server into a state where it can begin to accept requests for
      * objects from clients.
      */
 
-    public void run(String name) throws SystemException {
+    public void run (String name) throws SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("OA::run (" + name + ")");
         }
@@ -326,7 +372,8 @@ public abstract class OA {
         _oa.run(name);
     }
 
-    public void run() throws SystemException {
+    public void run () throws SystemException
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("OA::run ()");
         }
@@ -334,22 +381,27 @@ public abstract class OA {
         _oa.run();
     }
 
-    private final void parseProperties(String[] params, boolean preInit) {
+    private final void parseProperties (String[] params, boolean preInit)
+    {
         if (opLogger.logger.isTraceEnabled()) {
             opLogger.logger.trace("OA::parseProperties (String[], " + preInit + ")");
         }
 
         Hashtable work = ((preInit) ? _preOAInitProperty : _postOAInitProperty);
 
-        if (!work.isEmpty()) {
+        if (!work.isEmpty())
+        {
             Enumeration elements = work.elements();
 
-            while (elements.hasMoreElements()) {
+            while (elements.hasMoreElements())
+            {
                 Attribute p = (Attribute) elements.nextElement();
 
-                if (p != null) {
+                if (p != null)
+                {
                     if (opLogger.logger.isTraceEnabled()) {
-                        opLogger.logger.trace("Attribute " + p + " initialising.");
+                        opLogger.logger.trace("Attribute "
+                                + p + " initialising.");
                     }
 
                     p.initialise(params);
@@ -361,7 +413,8 @@ public abstract class OA {
         }
     }
 
-    OA(com.arjuna.orbportability.ORB orb, String oaName) {
+    OA(com.arjuna.orbportability.ORB orb, String oaName)
+    {
         _associatedORB = orb;
         _oaName = oaName;
         _oa = new com.arjuna.orbportability.oa.core.OA(_associatedORB._orb);
@@ -376,7 +429,8 @@ public abstract class OA {
      * @param oa
      *            The OA this class will wrap around
      */
-    OA(com.arjuna.orbportability.ORB orb, String oaName, POA oa) {
+    OA(com.arjuna.orbportability.ORB orb, String oaName, POA oa)
+    {
         _associatedORB = orb;
         _oaName = oaName;
 
@@ -399,14 +453,16 @@ public abstract class OA {
      *            The ORB this OA is being created for.
      * @return The OA instance referred to by the name given.
      */
-    public synchronized static RootOA getRootOA(ORB associatedORB) {
+    public synchronized static RootOA getRootOA (ORB associatedORB)
+    {
 
         /**
          * Get the OA for this ORB instance
          */
         RootOA oa = (RootOA) _orbToOAMap.get(associatedORB);
 
-        if (oa == null) {
+        if (oa == null)
+        {
             oa = new com.arjuna.orbportability.RootOA(associatedORB);
 
             _orbToOAMap.put(associatedORB, oa);

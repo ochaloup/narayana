@@ -33,16 +33,22 @@ import com.arjuna.wst.UnknownTransactionException;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public class TestSystemExceptionCompletionCoordinatorParticipant implements CompletionCoordinatorParticipant {
-    public TestSystemExceptionCompletionCoordinatorParticipant(W3CEndpointReference endpointReference) {
+public class TestSystemExceptionCompletionCoordinatorParticipant implements CompletionCoordinatorParticipant
+{
+    public TestSystemExceptionCompletionCoordinatorParticipant(W3CEndpointReference endpointReference)
+    {
         this.endpointReference = endpointReference;
     }
 
-    public void commit() throws TransactionRolledBackException, UnknownTransactionException, SystemException {
+    public void commit()
+        throws TransactionRolledBackException, UnknownTransactionException, SystemException
+    {
         throw new SystemException();
     }
 
-    public void rollback() throws UnknownTransactionException, SystemException {
+    public void rollback()
+        throws UnknownTransactionException, SystemException
+    {
         throw new SystemException();
     }
 

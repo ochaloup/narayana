@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client14.java,v 1.2 2003/06/26 11:43:11 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client14 {
-    public static void main(String[] args) {
-        try {
+public class Client14
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -76,17 +80,20 @@ public class Client14 {
 
             Worker[] workers = new Worker[numberOfWorkers];
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index] = new Worker(numberOfCalls, counter);
             }
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index].start();
             }
 
             boolean correct = true;
 
-            for (int index = 0; index < workers.length; index++) {
+            for (int index = 0; index < workers.length; index++)
+            {
                 workers[index].join();
                 correct = correct && workers[index].isCorrect();
             }
@@ -95,50 +102,69 @@ public class Client14 {
             counter.get(value, null);
             correct = correct && (value.value == (numberOfWorkers * numberOfCalls));
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client14.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client14.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 
-    private static class Worker extends Thread {
-        public Worker(int numberOfCalls, Counter counter) {
+    private static class Worker extends Thread
+    {
+        public Worker(int numberOfCalls, Counter counter)
+        {
             _numberOfCalls = numberOfCalls;
             _counter = counter;
         }
 
-        public void run() {
-            try {
+        public void run()
+        {
+            try
+            {
                 int index = 0;
-                while (index < _numberOfCalls) {
-                    try {
+                while (index < _numberOfCalls)
+                {
+                    try
+                    {
                         _counter.increase(null);
                         index++;
-                    } catch (InvocationException invocationException) {
+                    }
+                    catch (InvocationException invocationException)
+                    {
                     }
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("Client14.Worker.run: " + exception);
                 exception.printStackTrace(System.err);
                 _correct = false;
             }
         }
 
-        public boolean isCorrect() {
+        public boolean isCorrect()
+        {
             return _correct;
         }
 

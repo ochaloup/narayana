@@ -29,11 +29,12 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Terminator Coordinator service
- * 
  * @author kevin
  */
-public class TerminationParticipantInitialisation {
-    public static void startup() {
+public class TerminationParticipantInitialisation
+{
+    public static void startup()
+    {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -44,6 +45,7 @@ public class TerminationParticipantInitialisation {
         if (clientServiceURLPath == null) {
             clientServiceURLPath = "/ws-t11-client";
         }
+
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -57,16 +59,16 @@ public class TerminationParticipantInitialisation {
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" + bindAddress + ":" + bindPort + clientServiceURLPath;
+        final String baseUri = "http://" +  bindAddress + ":" + bindPort + clientServiceURLPath;
         final String uri = baseUri + "/" + ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME;
-        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + clientServiceURLPath;
+        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + clientServiceURLPath;
         final String secureUri = secureBaseUri + "/" + ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME, uri);
-        serviceRegistry.registerSecureServiceProvider(ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME,
-                secureUri);
+        serviceRegistry.registerServiceProvider(ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME, uri) ;
+        serviceRegistry.registerSecureServiceProvider(ArjunaTX11Constants.TERMINATION_PARTICIPANT_SERVICE_NAME, secureUri) ;
     }
 
-    public static void shutdown() {
+    public static void shutdown()
+    {
     }
 }

@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.Hammer02Outcomes;
  * $Id: Outcome02.java,v 1.2 2003/06/26 11:44:02 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Hammer02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Outcome02 {
-    public static void main(String[] args) {
-        try {
+public class Outcome02
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -75,8 +79,10 @@ public class Outcome02 {
             int matrixHeight = matrix.get_height();
 
             int total = 0;
-            for (int x = 0; x < matrixWidth; x++) {
-                for (int y = 0; y < matrixHeight; y++) {
+            for (int x = 0; x < matrixWidth; x++)
+            {
+                for (int y = 0; y < matrixHeight; y++)
+                {
                     IntHolder value = new IntHolder();
 
                     matrix.get_value(x, y, value, null);
@@ -85,21 +91,29 @@ public class Outcome02 {
                 }
             }
 
-            if (total == (matrixWidth * matrixHeight / 2)) {
+            if (total == (matrixWidth * matrixHeight / 2))
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Outcome02.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Outcome02.main: " + exception);
             exception.printStackTrace(System.err);
         }

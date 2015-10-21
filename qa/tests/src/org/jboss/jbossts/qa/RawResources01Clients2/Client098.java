@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.RawResources01Clients2;
  * $Id: Client098.java,v 1.3 2003/07/07 13:43:17 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.RawResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -64,9 +65,12 @@ import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CosTransactions.HeuristicHazard;
 import org.omg.CosTransactions.HeuristicMixed;
 
-public class Client098 {
-    public static void main(String[] args) {
-        try {
+public class Client098
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -98,41 +102,54 @@ public class Client098 {
 
             service2.oper(resourceBehaviors2);
 
-            try {
+            try
+            {
                 OTS.current().commit(true);
                 System.err.println("Commit succeeded when it shouldn't");
                 correct = false;
-            } catch (HeuristicMixed heuristicMixed) {
-            } catch (HeuristicHazard heuristicHazard) {
+            }
+            catch (HeuristicMixed heuristicMixed)
+            {
+            }
+            catch (HeuristicHazard heuristicHazard)
+            {
             }
 
             correct = correct && service1.is_correct() && service2.is_correct();
-            if (!correct) {
+            if (!correct)
+            {
                 System.err.println("service1.is_correct() or service2.is_correct() returned false");
             }
 
             ResourceTrace resourceTrace1 = service1.get_resource_trace(0);
             ResourceTrace resourceTrace2 = service2.get_resource_trace(0);
 
-            correct = correct && ((resourceTrace1 == ResourceTrace.ResourceTracePrepareRollbackForget)
-                    || (resourceTrace1 == ResourceTrace.ResourceTraceRollback));
+            correct = correct && ((resourceTrace1 == ResourceTrace.ResourceTracePrepareRollbackForget) || (resourceTrace1 == ResourceTrace.ResourceTraceRollback));
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTracePrepareForget);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client098.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client098.main: " + exception);
             exception.printStackTrace(System.err);
         }

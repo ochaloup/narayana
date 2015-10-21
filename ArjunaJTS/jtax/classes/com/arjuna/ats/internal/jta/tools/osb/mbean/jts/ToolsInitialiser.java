@@ -28,8 +28,10 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
  */
 @Deprecated // no longer required
 public class ToolsInitialiser {
-    static private String JTS_TM_CLASSNAME_STANDALONE = "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple";
-    static private String JTS_TM_CLASSNAME_ATS = "com.arjuna.ats.jbossatx.jts.TransactionManagerDelegate";
+    static private String JTS_TM_CLASSNAME_STANDALONE =
+        "com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple";
+    static private String JTS_TM_CLASSNAME_ATS =
+        "com.arjuna.ats.jbossatx.jts.TransactionManagerDelegate";
     static private String ORB_NAME = "tools-orb";
     static boolean initOrb = false;
 
@@ -42,7 +44,8 @@ public class ToolsInitialiser {
     public ToolsInitialiser() throws Exception {
         String tmClassName = jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerClassName();
 
-        isJTS = (JTS_TM_CLASSNAME_STANDALONE.equals(tmClassName) || JTS_TM_CLASSNAME_ATS.equals(tmClassName));
+        isJTS = (JTS_TM_CLASSNAME_STANDALONE.equals(tmClassName)
+            || JTS_TM_CLASSNAME_ATS.equals(tmClassName));
 
         if (initOrb) {
             try {
@@ -55,16 +58,14 @@ public class ToolsInitialiser {
                     oa.initPOA(null);
                 }
             } catch (Exception e) {
-
+                
             }
         }
 
         if (isJTS) {
             try {
                 Class c = Class.forName("com.arjuna.ats.internal.jts.Implementations");
-                // Class<?> c2 =
-                // Class.forName("com.arjuna.ats.internal.jta.Implementationsx");
-                // // needed for XAResourceRecord
+                //Class<?> c2 = Class.forName("com.arjuna.ats.internal.jta.Implementationsx"); // needed for XAResourceRecord
 
                 c.getMethod("initialise").invoke(null);
             } catch (Exception e) {

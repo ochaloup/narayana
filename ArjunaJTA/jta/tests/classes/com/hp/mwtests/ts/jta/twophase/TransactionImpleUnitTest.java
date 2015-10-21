@@ -61,271 +61,332 @@ import com.hp.mwtests.ts.jta.common.FailureXAResource.FailLocation;
 import com.hp.mwtests.ts.jta.common.RecoveryXAResource;
 import com.hp.mwtests.ts.jta.common.Synchronization;
 
-class TxImpleOverride extends TransactionImple {
-    public TxImpleOverride() {
+class TxImpleOverride extends TransactionImple
+{
+    public TxImpleOverride ()
+    {
         super();
     }
-
-    public static void put(TransactionImple tx) {
+    
+    public static void put (TransactionImple tx)
+    {
         TransactionImple.putTransaction(tx);
     }
-
-    public static void remove(TransactionImple tx) {
+    
+    public static void remove (TransactionImple tx)
+    {
         TransactionImple.removeTransaction(tx);
     }
 }
 
-class DummyXAModifier implements XAModifier {
+class DummyXAModifier implements XAModifier
+{
     @Override
-    public Xid createXid(Xid xid) throws SQLException, NotImplementedException {
+    public Xid createXid (Xid xid) throws SQLException, NotImplementedException
+    {
         return xid;
     }
 
     @Override
-    public int xaStartParameters(int level) throws SQLException, NotImplementedException {
+    public int xaStartParameters (int level) throws SQLException,
+            NotImplementedException
+    {
         return 0;
     }
-
+    
 }
 
-public class TransactionImpleUnitTest {
+public class TransactionImpleUnitTest
+{
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         ThreadActionData.purgeActions();
         TransactionImple tx = new TransactionImple(0);
-
+        
         TxImpleOverride.put(tx);
-
+        
         assertEquals(tx, TransactionImple.getTransaction(tx.get_uid()));
-
+        
         DummyXA res = new DummyXA(false);
-
+        
         tx.enlistResource(res);
-
+        
         tx.delistResource(res, XAResource.TMSUSPEND);
-
+        
         assertTrue(tx.isAlive());
-
-        tx.commit();
-
+        
+        tx.commit();  
+        
         assertTrue(tx.getRemainingTimeoutMills() != -1);
         assertTrue(tx.getTimeout() != -1);
         assertEquals(tx.getSynchronizations().size(), 0);
         assertEquals(tx.getResources().size(), 1);
-
+        
         TxImpleOverride.remove(tx);
-
+        
         assertTrue(TransactionImple.getTransactions() != null);
-
+        
         assertEquals(TransactionImple.getTransaction(tx.get_uid()), null);
-
-        try {
+        
+        try
+        {
             tx = (TransactionImple) TransactionManager.transactionManager(new InitialContext());
-
+        
             fail();
-        } catch (final Throwable ex) {
         }
-
+        catch (final Throwable ex)
+        {
+        }
+        
         assertNull(TransactionImple.getTransaction(null));
     }
-
+    
     @Test
-    public void testThreadIsActive() throws Exception {
+    public void testThreadIsActive () throws Exception
+    {
         ThreadActionData.purgeActions();
-
+        
         Class[] parameterTypes = new Class[1];
         TransactionImple tx = new TransactionImple(0);
 
         tx.enlistResource(new RecoveryXAResource());
-
+        
         parameterTypes[0] = XAResource.class;
-
+        
         Method m = tx.getClass().getDeclaredMethod("threadIsActive", parameterTypes);
         m.setAccessible(true);
-
+        
         Object[] parameters = new Object[1];
         parameters[0] = new RecoveryXAResource();
-
+        
         Boolean res = (Boolean) m.invoke(tx, parameters);
-
+        
         assertFalse(res.booleanValue());
-
+        
         tx.rollback();
         ThreadActionData.purgeActions();
     }
-
+    
     @Test
-    public void testXidCreation() throws Exception {
+    public void testXidCreation () throws Exception
+    {
         ThreadActionData.purgeActions();
         Class[] parameterTypes = new Class[3];
         TransactionImple tx = new TransactionImple(0);
-
+        
         parameterTypes[0] = boolean.class;
         parameterTypes[1] = XAModifier.class;
         parameterTypes[2] = XAResource.class;
-
+        
         Method m = tx.getClass().getDeclaredMethod("createXid", parameterTypes);
         m.setAccessible(true);
-
+        
         Object[] parameters = new Object[3];
-
+        
         parameters[0] = false;
         parameters[1] = new DummyXAModifier();
         parameters[2] = new DummyXA(false);
-
+        
         Xid res = (Xid) m.invoke(tx, parameters);
-
+        
         assertTrue(res != null);
-
+        
         tx.rollback();
     }
-
+    
     @Test
-    public void testEnlist() throws Exception {
+    public void testEnlist () throws Exception
+    {
         ThreadActionData.purgeActions();
-
+        
         TransactionImple tx = new TransactionImple(0);
-
+        
         tx.setRollbackOnly();
-
-        try {
+        
+        try
+        {
             tx.enlistResource(null);
-
+            
             fail();
-        } catch (final SystemException ex) {
         }
-
-        try {
+        catch (final SystemException ex)
+        {
+        }
+        
+        try
+        {
             tx.enlistResource(new DummyXA(false));
-
+            
             fail();
-        } catch (final RollbackException ex) {
         }
-
-        try {
+        catch (final RollbackException ex)
+        {
+        }
+        
+        try
+        {
             tx.commit();
-
+            
             fail();
-        } catch (final RollbackException ex) {
         }
-
-        try {
+        catch (final RollbackException ex)
+        {
+        }
+        
+        try
+        {
             tx.enlistResource(new DummyXA(false));
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
+        }
+        catch (final IllegalStateException ex)
+        {
         }
     }
-
+    
     @Test
-    public void testDelist() throws Exception {
+    public void testDelist () throws Exception
+    {
         ThreadActionData.purgeActions();
-
+        
         TransactionImple tx = new TransactionImple(0);
 
-        try {
+        try
+        {
             tx.delistResource(null, XAResource.TMSUCCESS);
-
+            
             fail();
-        } catch (final SystemException ex) {
+        }
+        catch (final SystemException ex)
+        {
         }
 
         DummyXA xares = new DummyXA(false);
-
-        try {
+        
+        try
+        {
             assertFalse(tx.delistResource(xares, XAResource.TMSUCCESS));
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
             fail();
         }
 
         tx.enlistResource(xares);
-
+        
         assertTrue(tx.delistResource(xares, XAResource.TMSUCCESS));
-
+        
         tx.commit();
-
-        try {
+        
+        try
+        {
             tx.delistResource(xares, XAResource.TMSUCCESS);
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
+        }
+        catch (final IllegalStateException ex)
+        {
         }
     }
-
+    
     @Test
-    public void testFailure() throws Exception {
+    public void testFailure () throws Exception
+    {
         ThreadActionData.purgeActions();
-
+        
         TransactionImple tx = new TransactionImple(0);
-
+        
         assertFalse(tx.equals(null));
         assertTrue(tx.equals(tx));
-
+        
         tx.enlistResource(new FailureXAResource(FailLocation.commit));
-
-        try {
+        
+        try
+        {
             tx.commit();
-
+            
             fail();
-        } catch (final HeuristicMixedException ex) {
         }
-
+        catch (final HeuristicMixedException ex)
+        {
+        }
+        
         assertEquals(tx.getStatus(), Status.STATUS_COMMITTED);
-
-        try {
+        
+        try
+        {
             tx.registerSynchronization(null);
-
+            
             fail();
-        } catch (final SystemException ex) {
         }
-
-        try {
+        catch (final SystemException ex)
+        {
+        }
+        
+        try
+        {
             tx.commit();
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
+        }
+        catch (final IllegalStateException ex)
+        {
         }
     }
-
+    
     @Test
-    public void testInvalid() throws Exception {
+    public void testInvalid () throws Exception
+    {
         ThreadActionData.purgeActions();
-
+        
         TxImpleOverride tx = new TxImpleOverride();
-
+        
         assertEquals(tx.hashCode(), -1);
         assertEquals(tx.getStatus(), Status.STATUS_NO_TRANSACTION);
-
-        try {
+        
+        try
+        {
             tx.commit();
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
         }
-
-        try {
+        catch (final IllegalStateException ex)
+        {
+        }
+        
+        try
+        {
             tx.rollback();
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
         }
-
-        try {
+        catch (final IllegalStateException ex)
+        {
+        }
+        
+        try
+        {
             tx.setRollbackOnly();
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
         }
-
-        try {
+        catch (final IllegalStateException ex)
+        {
+        }
+        
+        try
+        {
             tx.registerSynchronization(new Synchronization());
-
+            
             fail();
-        } catch (final IllegalStateException ex) {
         }
-
+        catch (final IllegalStateException ex)
+        {
+        }
+        
         tx.toString();
-
+        
         assertFalse(tx.isAlive());
     }
 }

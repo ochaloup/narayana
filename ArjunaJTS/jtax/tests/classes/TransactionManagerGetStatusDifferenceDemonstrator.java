@@ -46,9 +46,12 @@ import com.arjuna.orbportability.RootOA;
 public class TransactionManagerGetStatusDifferenceDemonstrator {
 
     @Test
-    public void test() throws InvalidName, SystemException, NotSupportedException, javax.transaction.SystemException,
-            IllegalStateException, RollbackException, IOException, SecurityException, HeuristicMixedException,
-            HeuristicRollbackException, Unavailable, SynchronizationUnavailable, Inactive {
+    public void test() throws InvalidName, SystemException,
+            NotSupportedException, javax.transaction.SystemException,
+            IllegalStateException, RollbackException, IOException,
+            SecurityException, HeuristicMixedException,
+            HeuristicRollbackException, Unavailable,
+            SynchronizationUnavailable, Inactive {
 
         String mode = "jts";
         TransactionManager transactionManager;
@@ -71,7 +74,8 @@ public class TransactionManagerGetStatusDifferenceDemonstrator {
         transactionManager.begin();
 
         GetStatusSync getStatusSync = new GetStatusSync(transactionManager);
-        transactionManager.getTransaction().registerSynchronization(getStatusSync);
+        transactionManager.getTransaction().registerSynchronization(
+                getStatusSync);
 
         transactionManager.commit();
 
@@ -81,19 +85,22 @@ public class TransactionManagerGetStatusDifferenceDemonstrator {
 
                 System.out.printf("%s: orbClassName=%s%n", this.getClass().getName(), orbClassName);
 
-                if ("com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"
-                        .equals(orbClassName)
-                        || "com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1"
-                                .equals(orbClassName)) {
-                    assertTrue("Status: " + getStatusSync.getTransactionManagerGetStatus(),
+                if ("com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4".equals(orbClassName) ||
+                        "com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementations.ibmorb_7_1".equals(orbClassName)) {
+                    assertTrue(
+                            "Status: " + getStatusSync .getTransactionManagerGetStatus(),
                             getStatusSync.getTransactionManagerGetStatus() == Status.STATUS_COMMITTED);
                 } else {
                     // com.arjuna.orbportability.internal.orbspecific.jacorb.orb.implementations.jacorb_2_0
-                    assertTrue("Status: " + getStatusSync.getTransactionManagerGetStatus(),
+                    assertTrue(
+                            "Status: " + getStatusSync.getTransactionManagerGetStatus(),
                             getStatusSync.getTransactionManagerGetStatus() == Status.STATUS_NO_TRANSACTION);
                 }
             } else {
-                assertTrue("Status: " + getStatusSync.getTransactionManagerGetStatus(),
+                assertTrue(
+                        "Status: "
+                                + getStatusSync
+                                        .getTransactionManagerGetStatus(),
                         getStatusSync.getTransactionManagerGetStatus() == Status.STATUS_COMMITTED);
             }
 
@@ -128,7 +135,8 @@ public class TransactionManagerGetStatusDifferenceDemonstrator {
             afterCompletionStatus = status;
 
             try {
-                this.transactionManagerGetStatus = transactionManager.getStatus();
+                this.transactionManagerGetStatus = transactionManager
+                        .getStatus();
             } catch (javax.transaction.SystemException e) {
                 e.printStackTrace();
             }

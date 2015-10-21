@@ -40,13 +40,15 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jts.orbspecific.recovery.recoverycoordinators.GenericRecoveryCoordinator;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class RecoveryCoordinatorUnitTest extends TestBase {
+public class RecoveryCoordinatorUnitTest extends TestBase
+{
     @Test
-    public void testGeneric() throws Exception {
+    public void testGeneric () throws Exception
+    {
         GenericRecoveryCoordinator rec = new GenericRecoveryCoordinator(new Uid(), new Uid(), new Uid(), false);
-
+        
         rec.replay_completion(null);
-
+        
         assertTrue(GenericRecoveryCoordinator.makeId(new Uid(), new Uid(), new Uid(), true) != null);
         assertEquals(GenericRecoveryCoordinator.reconstruct("foobar"), null);
     }

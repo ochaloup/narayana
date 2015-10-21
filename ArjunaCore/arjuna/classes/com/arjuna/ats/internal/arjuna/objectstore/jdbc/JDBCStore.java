@@ -240,8 +240,7 @@ public class JDBCStore implements ObjectStoreAPI {
 
                 name = name.toLowerCase();
 
-                final String packagePrefix = JDBCStore.class.getName().substring(0,
-                        JDBCStore.class.getName().lastIndexOf('.')) + ".drivers.";
+                final String packagePrefix = JDBCStore.class.getName().substring(0, JDBCStore.class.getName().lastIndexOf('.')) + ".drivers.";
                 Class jdbcImpleClass = null;
                 try {
                     jdbcImpleClass = Class.forName(packagePrefix + name + "_" + major + "_" + minor + "_driver");
@@ -252,8 +251,7 @@ public class JDBCStore implements ObjectStoreAPI {
                         jdbcImpleClass = Class.forName(packagePrefix + name + "_driver");
                     }
                 }
-                _theImple = (com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver) jdbcImpleClass
-                        .newInstance();
+                _theImple = (com.arjuna.ats.internal.arjuna.objectstore.jdbc.JDBCImple_driver) jdbcImpleClass.newInstance();
 
                 _theImple.initialise(jdbcAccess, tableName, jdbcStoreEnvironmentBean);
                 imples.put(key, _theImple);

@@ -35,28 +35,28 @@ import javax.transaction.InvalidTransactionException;
 import javax.transaction.Transaction;
 
 /**
- * Manages Thread association of the interposed coordinator. Typically called
- * from handlers in the WS stack.
+ * Manages Thread association of the interposed coordinator.
+ * Typically called from handlers in the WS stack.
  *
  * @author jonathan.halliday@redhat.com, 2007-04-30
  */
-public class InboundBridge {
+public class InboundBridge
+{
     /**
      * Identifier for the subordinate transaction.
      */
     private final Xid xid;
 
     /**
-     * Create a new InboundBridge to manage the given subordinate JTA
-     * transaction.
+     * Create a new InboundBridge to manage the given subordinate JTA transaction.
      *
-     * @param xid
-     *            the subordinate transaction id
+     * @param xid the subordinate transaction id
      * @throws XAException
      * @throws SystemException
      */
-    InboundBridge(Xid xid) throws XAException, SystemException {
-        txbridgeLogger.logger.trace("InboundBridge.<ctor>(Xid=" + xid + ")");
+    InboundBridge(Xid xid) throws XAException, SystemException
+    {
+        txbridgeLogger.logger.trace("InboundBridge.<ctor>(Xid="+xid+")");
 
         this.xid = xid;
 
@@ -64,15 +64,16 @@ public class InboundBridge {
     }
 
     /**
-     * Associate the JTA transaction to the current Thread. Typically used by a
-     * server side inbound handler.
+     * Associate the JTA transaction to the current Thread.
+     * Typically used by a server side inbound handler.
      *
      * @throws XAException
      * @throws SystemException
      * @throws InvalidTransactionException
      */
-    public void start() throws XAException, SystemException, InvalidTransactionException {
-        txbridgeLogger.logger.trace("InboundBridge.start(Xid=" + xid + ")");
+    public void start() throws XAException, SystemException, InvalidTransactionException
+    {
+        txbridgeLogger.logger.trace("InboundBridge.start(Xid="+xid+")");
 
         Transaction tx = getTransaction();
 
@@ -80,21 +81,23 @@ public class InboundBridge {
     }
 
     /**
-     * Disassociate the JTA transaction from the current Thread. Typically used
-     * by a server side outbound handler.
+     * Disassociate the JTA transaction from the current Thread.
+     * Typically used by a server side outbound handler.
      *
      * @throws XAException
      * @throws SystemException
      * @throws InvalidTransactionException
      */
-    public void stop() throws XAException, SystemException, InvalidTransactionException {
-        txbridgeLogger.logger.trace("InboundBridge.stop(" + xid + ")");
+    public void stop() throws XAException, SystemException, InvalidTransactionException
+    {
+        txbridgeLogger.logger.trace("InboundBridge.stop("+xid+")");
 
         TransactionManager.transactionManager().suspend();
     }
 
-    public void setRollbackOnly() throws XAException, SystemException {
-        txbridgeLogger.logger.trace("InboundBridge.setRollbackOnly(" + xid + ")");
+    public void setRollbackOnly() throws XAException, SystemException
+    {
+        txbridgeLogger.logger.trace("InboundBridge.setRollbackOnly("+xid+")");
 
         getTransaction().setRollbackOnly();
     }
@@ -106,16 +109,19 @@ public class InboundBridge {
      * @throws XAException
      * @throws SystemException
      */
-    private Transaction getTransaction() throws XAException, SystemException {
+    private Transaction getTransaction()
+            throws XAException, SystemException
+    {
         Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
-        switch (tx.getStatus()) {
+        switch (tx.getStatus())
+        {
             // TODO: other cases?
 
-            case Status.STATUS_ACTIVE :
-            case Status.STATUS_MARKED_ROLLBACK :
+            case Status.STATUS_ACTIVE:
+            case Status.STATUS_MARKED_ROLLBACK:
                 break;
-            default :
+            default:
                 throw new IllegalStateException("Transaction not in state ACTIVE");
         }
         return tx;

@@ -38,23 +38,29 @@ import org.omg.CORBA.SystemException;
 import com.arjuna.ats.arjuna.coordinator.CheckedAction;
 import com.arjuna.ats.arjuna.utils.ThreadUtil;
 
-public class CheckedActions {
+public class CheckedActions
+{
 
-    public static final synchronized void remove() throws SystemException {
+    public static final synchronized void remove () throws SystemException
+    {
         otsCheckedAction.remove(ThreadUtil.getThreadId());
     }
-
-    public static final synchronized CheckedAction get() throws SystemException {
-        if (otsCheckedAction != null) {
+    
+    public static final synchronized CheckedAction get () throws SystemException
+    {
+        if (otsCheckedAction != null)
+        {
             return (CheckedAction) otsCheckedAction.get(ThreadUtil.getThreadId());
-        } else
+        }
+        else
             return null;
     }
 
-    public static final synchronized void set(CheckedAction ca) throws SystemException {
+    public static final synchronized void set (CheckedAction ca) throws SystemException
+    {
         if (otsCheckedAction == null)
             otsCheckedAction = new Hashtable<String, CheckedAction>();
-
+    
         otsCheckedAction.put(ThreadUtil.getThreadId(), ca);
     }
 

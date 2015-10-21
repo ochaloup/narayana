@@ -18,11 +18,14 @@ public class ExitTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoBusinessParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoBusinessParticipant.class);
     }
 
     @Test
-    public void testExit() throws Exception {
+    public void testExit()
+            throws Exception
+            {
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
         BusinessActivityManager bam = BusinessActivityManager.getBusinessActivityManager();
         com.arjuna.wst11.BAParticipantManager bpm = null;
@@ -36,7 +39,7 @@ public class ExitTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
@@ -44,5 +47,5 @@ public class ExitTest {
         uba.close();
 
         assertTrue(p.passed());
-    }
+            }
 }

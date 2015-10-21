@@ -26,14 +26,17 @@ import java.net.URL;
 /**
  * Utility for loading testharnes property file.
  */
-public class PropertyFileLoader {
-    public static String getFileLocation() {
-        // we hard code this from the class location
+public class PropertyFileLoader
+{
+    public static String getFileLocation()
+    {
+        //we hard code this from the class location
         String key = "propertyfiles" + File.separator + "etc";
         String key1 = "propertyfiles/etc";
         URL test = sPropertyFileLoader.getClass().getResource(key);
 
-        if (test == null) {
+        if (test == null)
+        {
             test = sPropertyFileLoader.getClass().getResource(key1);
         }
 

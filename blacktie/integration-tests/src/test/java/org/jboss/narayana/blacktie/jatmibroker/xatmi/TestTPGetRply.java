@@ -116,8 +116,7 @@ public class TestTPGetRply extends TestCase {
     // assertTrue(tperrno == TPEINVAL);
     // }
 
-    // public void test_tpgetrply_with_TPNOBLOCK() throws ConnectionException,
-    // ConfigurationException {
+    // public void test_tpgetrply_with_TPNOBLOCK() throws ConnectionException, ConfigurationException {
     // log.info("test_tpgetrply_with_TPNOBLOCK");
     // server.tpadvertiseTestTPGetRplyTPNOBLOCK();
     //
@@ -138,8 +137,7 @@ public class TestTPGetRply extends TestCase {
     // }
     // }
     //
-    // public void test_tpgetrply_without_TPNOBLOCK() throws
-    // ConnectionException, ConfigurationException {
+    // public void test_tpgetrply_without_TPNOBLOCK() throws ConnectionException, ConfigurationException {
     // log.info("test_tpgetrply_without_TPNOBLOCK");
     // server.tpadvertiseTestTPGetRplyTPNOBLOCK();
     //

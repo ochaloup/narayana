@@ -58,13 +58,16 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 @BMScript("fail2pc")
 public class CrashRecovery2 {
     @Test
-    public void test() throws NotSupportedException, SystemException, IllegalStateException, RollbackException,
-            SecurityException, HeuristicMixedException, HeuristicRollbackException, NoSuchFieldException,
-            IllegalArgumentException, IllegalAccessException {
-
+    public void test() throws NotSupportedException, SystemException,
+            IllegalStateException, RollbackException, SecurityException,
+            HeuristicMixedException, HeuristicRollbackException,
+            NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException {
+        
         jtaPropertyManager.getJTAEnvironmentBean().setOrphanSafetyInterval(0);
-
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
+        
+        recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .setRecoveryBackoffPeriod(1);
 
         // ok, now drive a TX to completion. the script should ensure that the
         // recovery
@@ -72,7 +75,8 @@ public class CrashRecovery2 {
         TestXAResource firstResource = new TestXAResource();
         TestXAResource secondResource = new TestXAResource();
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.begin();
 
@@ -90,20 +94,29 @@ public class CrashRecovery2 {
         assertTrue(secondResource.rollbackCount() == 0);
         assertTrue(secondResource.rollbackCount() == 0);
 
-        RecoveryEnvironmentBean recoveryEnvironmentBean = recoveryPropertyManager.getRecoveryEnvironmentBean();
-        recoveryEnvironmentBean.setRecoveryModuleClassNames(
-                Arrays.asList(new String[]{"com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
-                        "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule"}));
+        RecoveryEnvironmentBean recoveryEnvironmentBean = recoveryPropertyManager
+                .getRecoveryEnvironmentBean();
+        recoveryEnvironmentBean
+                .setRecoveryModuleClassNames(Arrays
+                        .asList(new String[] {
+                                "com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
+                                "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule" }));
 
-        JTAEnvironmentBean jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
-        jtaEnvironmentBean.setXaResourceRecoveryClassNames(
-                Arrays.asList(new String[]{"com.hp.mwtests.ts.jta.recovery.TestXAResourceRecovery"}));
-        jtaEnvironmentBean.setXaResourceOrphanFilterClassNames(Arrays.asList(
-                new String[]{"com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter",
-                        "com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter"}));
-        jtaEnvironmentBean.setXaRecoveryNodes(Arrays.asList(new String[]{"1"}));
+        JTAEnvironmentBean jtaEnvironmentBean = jtaPropertyManager
+                .getJTAEnvironmentBean();
+        jtaEnvironmentBean
+                .setXaResourceRecoveryClassNames(Arrays
+                        .asList(new String[] { "com.hp.mwtests.ts.jta.recovery.TestXAResourceRecovery" }));
+        jtaEnvironmentBean
+                .setXaResourceOrphanFilterClassNames(Arrays
+                        .asList(new String[] {
+                                "com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter",
+                                "com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter" }));
+        jtaEnvironmentBean.setXaRecoveryNodes(Arrays
+                .asList(new String[] { "1" }));
 
-        RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
+        RecoveryManager manager = RecoveryManager
+                .manager(RecoveryManager.DIRECT_MANAGEMENT);
         manager.initialize();
 
         manager.scan();

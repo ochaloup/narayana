@@ -36,7 +36,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class ProductComparison extends Product {
-    final private static String outerClassName = ProductComparison.class.getName();
+    final private static String outerClassName =  ProductComparison.class.getName();
 
     private static Map<String, Double> oldMetrics;
     final static private String narayanaMetricName = outerClassName + METHOD_SEP + "Narayana";
@@ -67,14 +67,12 @@ public class ProductComparison extends Product {
 
     @AfterClass
     public static void afterClass() throws IOException {
-        Map<String, Double> newMetrics = new RegressionChecker()
-                .getMatchingMetrics(ProductComparison.getMetricPrefix() + ".*");
+        Map<String, Double> newMetrics = new RegressionChecker().getMatchingMetrics(ProductComparison.getMetricPrefix() + ".*");
 
         Map<String, Double> oldVariances = getVariances(oldMetrics, oldMetrics.get(narayanaMetricName));
         Map<String, Double> newVariances = getVariances(newMetrics, getThroughput(narayanaMetricName));
 
-        Map<String, String> failures = new HashMap<>(); // metric name -> reason
-                                                        // for failure
+        Map<String, String> failures = new HashMap<>(); // metric name -> reason for failure
         double variance = 1.1;
 
         StringBuilder sb = new StringBuilder("Performance Regressions:%n");
@@ -86,22 +84,14 @@ public class ProductComparison extends Product {
                 Double oldVariance = entry.getValue(); // the previous value
                 Double newVariance = newVariances.get(metricName);
 
-                Double headRoom = Math.abs(oldVariance * (variance - 1)); // the
-                                                                            // leeway
-                                                                            // either
-                                                                            // side
-                                                                            // of
-                                                                            // the
-                                                                            // prev
-                                                                            // value
+                Double headRoom = Math.abs(oldVariance * (variance - 1)); // the leeway either side of the prev value
                 Double difference = (oldVariance - newVariance) / newVariance * 100;
 
                 boolean withinTolerance = (newVariance >= oldVariance - headRoom);
 
                 if (!withinTolerance) {
-                    String s = String.format(
-                            "%s: %f%% performance regression (%f versus %f) (variance=%f headroom=%f)%n", metricName,
-                            difference, newVariance, oldVariance, variance, headRoom);
+                    String s = String.format("%s: %f%% performance regression (%f versus %f) (variance=%f headroom=%f)%n",
+                            metricName, difference, newVariance, oldVariance, variance, headRoom);
 
                     failures.put(metricName, s);
                     sb.append(s);
@@ -151,12 +141,11 @@ public class ProductComparison extends Product {
             @Override
             public UserTransaction getUserTransaction() throws SystemException {
                 return jotm.getUserTransaction();
-                /*
-                 * try { return (UserTransaction) new
-                 * InitialContext().lookup("UserTransaction"); } catch
-                 * (NamingException e) { throw new
-                 * SystemException(e.getMessage()); }
-                 */
+/*                try {
+                    return (UserTransaction) new InitialContext().lookup("UserTransaction");
+                } catch (NamingException e) {
+                    throw new SystemException(e.getMessage());
+                }*/
             }
 
             @Override

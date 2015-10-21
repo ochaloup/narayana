@@ -31,6 +31,7 @@
 
 package com.arjuna.ats.internal.jts.interposition;
 
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.omg.CORBA.SystemException;
@@ -50,18 +51,23 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * Default visibility.
  */
 
-class FactoryElement {
-    public FactoryElement(FactoryCreator create, int formatID) {
+class FactoryElement
+{
+    public FactoryElement (FactoryCreator create, int formatID)
+    {
         _create = create;
         _formatID = formatID;
         _next = null;
     }
 
-    public ControlImple recreateLocal(PropagationContext ctx) throws SystemException {
+    public ControlImple recreateLocal (PropagationContext ctx)
+            throws SystemException
+    {
         return _create.recreateLocal(ctx);
     }
 
-    public Control recreate(PropagationContext ctx) throws SystemException {
+    public Control recreate (PropagationContext ctx) throws SystemException
+    {
         return recreateLocal(ctx).getControl();
     }
 
@@ -81,51 +87,57 @@ class FactoryElement {
  * Maintains the list of known transaction interposition factories.
  */
 
-public class FactoryList {
+public class FactoryList
+{
     public static final int DEFAULT_ID = 0;
-
-    public FactoryList() {
+    
+    public FactoryList ()
+    {
         FactoryList.add(new InterpositionCreator(), Arjuna.XID());
         FactoryList.add(new StrictInterpositionCreator(), Arjuna.strictXID());
         FactoryList.add(new RestrictedInterpositionCreator(), Arjuna.restrictedXID());
         FactoryList.add(new OSIInterpositionCreator(), 0); // 0 is OSI TP!
-        FactoryList.addDefault(new OSIInterpositionCreator(), DEFAULT_ID); // 0
-                                                                            // is
-                                                                            // OSI
-                                                                            // TP!
+        FactoryList.addDefault(new OSIInterpositionCreator(), DEFAULT_ID); // 0 is OSI TP!
     }
 
-    public static ControlImple recreateLocal(PropagationContext ctx, int formatID) throws SystemException {
+    public static ControlImple recreateLocal (PropagationContext ctx, int formatID)
+            throws SystemException
+    {
         ControlImple toReturn = null;
 
         if (ctx == null)
-            throw new INVALID_TRANSACTION();
-
+                    throw new INVALID_TRANSACTION();
+        
         FactoryElement ptr = find(formatID);
 
-        if (ptr != null) {
+        if (ptr != null)
+        {
             toReturn = ptr.recreateLocal(ctx);
         }
 
         return toReturn;
     }
 
-    public static Control recreate(PropagationContext ctx, int formatID) throws SystemException {
+    public static Control recreate (PropagationContext ctx, int formatID)
+            throws SystemException
+    {
         Control toReturn = null;
-
+        
         if (ctx == null)
             throw new INVALID_TRANSACTION();
 
         FactoryElement ptr = find(formatID);
 
-        if (ptr != null) {
+        if (ptr != null)
+        {
             toReturn = ptr.recreate(ctx);
         }
 
         return toReturn;
     }
 
-    public static void add(FactoryCreator create, int formatID) {
+    public static void add (FactoryCreator create, int formatID)
+    {
         FactoryElement ptr = find(formatID);
 
         _lock.lock();
@@ -140,26 +152,31 @@ public class FactoryList {
         _lock.unlock();
     }
 
-    public static void remove(int formatID) {
+    public static void remove (int formatID)
+    {
         _lock.lock();
 
         FactoryElement ptr = _list;
         FactoryElement trail = null;
         boolean found = false;
 
-        while ((ptr != null) && (!found)) {
+        while ((ptr != null) && (!found))
+        {
             if (ptr._formatID == formatID)
                 found = true;
-            else {
+            else
+            {
                 trail = ptr;
                 ptr = ptr._next;
             }
         }
 
-        if (found) {
+        if (found)
+        {
             if (_list == ptr)
                 _list = ptr._next;
-            else {
+            else
+            {
                 if (trail != null)
                     trail._next = ptr._next;
             }
@@ -176,15 +193,18 @@ public class FactoryList {
      * Only allow a default to be added once!
      */
 
-    public static boolean addDefault(FactoryCreator create, int formatID) {
+    public static boolean addDefault (FactoryCreator create, int formatID)
+    {
         boolean res = false;
 
         _lock.lock();
 
-        if (FactoryList._default == null) {
+        if (FactoryList._default == null)
+        {
             FactoryList._default = new FactoryElement(create, formatID);
             res = true;
-        } else {
+        }
+        else {
             jtsLogger.i18NLogger.warn_interposition_fldefault("FactoryList.addDefault");
         }
 
@@ -193,12 +213,14 @@ public class FactoryList {
         return res;
     }
 
-    public static boolean removeDefault() {
+    public static boolean removeDefault ()
+    {
         boolean found = false;
 
         _lock.lock();
 
-        if (FactoryList._default != null) {
+        if (FactoryList._default != null)
+        {
             FactoryList._default = null;
             found = true;
         }
@@ -208,20 +230,23 @@ public class FactoryList {
         return found;
     }
 
-    protected static FactoryElement find(int formatID) {
+    protected static FactoryElement find (int formatID)
+    {
         FactoryElement ptr = _list;
         FactoryElement toReturn = null;
 
         _lock.lock();
 
-        while ((ptr != null) && (toReturn == null)) {
+        while ((ptr != null) && (toReturn == null))
+        {
             if (ptr._formatID == formatID)
                 toReturn = ptr;
             else
                 ptr = ptr._next;
         }
 
-        if (toReturn == null) {
+        if (toReturn == null)
+        {
             /*
              * No ID matches, so use default.
              */
@@ -235,7 +260,6 @@ public class FactoryList {
     }
 
     private static FactoryElement _list = null;
-    private static FactoryElement _default = null; // used if no formatID values
-                                                    // match.
+    private static FactoryElement _default = null; // used if no formatID values match.
     private static ReentrantLock _lock = new ReentrantLock();
 }

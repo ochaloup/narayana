@@ -113,8 +113,7 @@ public class TestTPAlloc extends TestCase {
 
         // CHECK THE ASSIGNATIONS
         assertTrue(aptr.getLong("acct_no") == 12345678);
-        assertTrue(Arrays.equals(aptr.getByteArray("name"),
-                "12345678901234567890123456789012345678901234567890".getBytes()));
+        assertTrue(Arrays.equals(aptr.getByteArray("name"), "12345678901234567890123456789012345678901234567890".getBytes()));
         assertTrue(aptr.getByteArray("address") == null);
         assertTrue(aptr.getDoubleArray("balances")[0] == 0);
         assertTrue(aptr.getDoubleArray("balances")[1] == 0);

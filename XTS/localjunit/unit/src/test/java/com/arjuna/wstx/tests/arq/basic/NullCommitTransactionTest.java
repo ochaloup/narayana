@@ -18,11 +18,13 @@ public class NullCommitTransactionTest {
     }
 
     @Test
-    public void testNullCommitTransaction() throws Exception {
+    public void testNullCommitTransaction()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
 
         ut.begin();
 
         ut.commit();
-    }
+            }
 }

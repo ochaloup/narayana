@@ -39,16 +39,19 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseCoordinator;
 import com.hp.mwtests.ts.arjuna.resources.SyncRecord;
 
-public class Performance3 {
+public class Performance3
+{
     @Test
-    public void test() {
+    public void test()
+    {
         int warmUpCount = 10;
         int numberOfTransactions = 1000000;
-        int threadCount = 1;
+        int threadCount =  1;
         int batchSize = 100;
 
-        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1").maxTestTime(0L)
-                .numberOfCalls(numberOfTransactions).numberOfThreads(threadCount).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1")
+                .maxTestTime(0L).numberOfCalls(numberOfTransactions)
+                .numberOfThreads(threadCount).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker);
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());

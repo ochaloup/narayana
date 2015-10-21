@@ -31,14 +31,18 @@
 
 package org.jboss.jbossts.qa.JDBCLocals01Impls;
 
-public class InvocationException extends Exception {
+public class InvocationException extends Exception
+{
 
-    public InvocationException() {
+    public InvocationException()
+    {
         super();
     }
 
-    public InvocationException(String s) {
+    public InvocationException(String s)
+    {
         super(s);
     }
 
 }
+

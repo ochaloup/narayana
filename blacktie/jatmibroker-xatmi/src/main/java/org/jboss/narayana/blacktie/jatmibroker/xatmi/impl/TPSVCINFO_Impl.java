@@ -11,8 +11,8 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.Session;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.TPSVCINFO;
 
 /**
- * This structure contains the data that the client presented for processing to
- * the service during its invocation from either tpcall, tpacall or tpconnect.
+ * This structure contains the data that the client presented for processing to the service during its invocation from either
+ * tpcall, tpacall or tpconnect.
  */
 public class TPSVCINFO_Impl implements Serializable, TPSVCINFO {
     /**
@@ -58,18 +58,12 @@ public class TPSVCINFO_Impl implements Serializable, TPSVCINFO {
     /**
      * Create a new tpsvcinfo wrapper class
      * 
-     * @param name
-     *            The name of the service
-     * @param buffer
-     *            The data sent by the client
-     * @param flags
-     *            The flags that the client issued
-     * @param session
-     *            The connection descriptor used
-     * @param connection
-     *            The connection to use
-     * @param len
-     *            The length of the said data
+     * @param name The name of the service
+     * @param buffer The data sent by the client
+     * @param flags The flags that the client issued
+     * @param session The connection descriptor used
+     * @param connection The connection to use
+     * @param len The length of the said data
      */
     public TPSVCINFO_Impl(String name, Buffer buffer, int flags, Session session, Connection connection, int len) {
         this.name = name;

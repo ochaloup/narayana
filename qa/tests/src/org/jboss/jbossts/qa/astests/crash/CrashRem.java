@@ -30,6 +30,6 @@ public interface CrashRem extends EJBObject {
     String BMT_JNDI_NAME = "org.jboss.jbossts.qa.astests.crash.CrashBMTRem";
     String CMT_JNDI_NAME = "org.jboss.jbossts.qa.astests.crash.CrashCMTRem";
 
-    String testXA(String... args) throws RemoteException;
+    String testXA(String ... args) throws RemoteException;
     String testXA(ASFailureSpec... specs) throws RemoteException;
 }

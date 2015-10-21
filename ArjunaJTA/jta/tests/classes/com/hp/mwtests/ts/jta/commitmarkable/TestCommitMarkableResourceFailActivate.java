@@ -45,7 +45,8 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableResourceBase {
+public class TestCommitMarkableResourceFailActivate extends
+        TestCommitMarkableResourceBase {
 
     JDBCConnectableResource nonXAResource;
     boolean failed = false;
@@ -56,7 +57,8 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
     @BMScript("commitMarkableResourceFailAfterCommit")
     public void testFailAfterPrepare() throws Exception {
         final DataSource dataSource = new JdbcDataSource();
-        ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+        ((JdbcDataSource) dataSource)
+                .setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
 
         // Test code
         Utils.createTables(dataSource.getConnection());
@@ -76,14 +78,14 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     recoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
                 } else if (m instanceof XARecoveryModule) {
-                    XARecoveryModule xarm = (XARecoveryModule) m;
+                    XARecoveryModule  xarm = (XARecoveryModule) m;
                     xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
                         public boolean initialise(String p) throws Exception {
                             return true;
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[]{xaResource};
+                            return new XAResource[] {xaResource};
                         }
                     });
                 }
@@ -104,13 +106,15 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    nonXAResource = new JDBCConnectableResource(localJDBCConnection);
+                    nonXAResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(nonXAResource);
 
                     xaResource = new SimpleXAResource();
                     tm.getTransaction().enlistResource(xaResource);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
 
                     tm.commit();
                 } catch (ExecuteException t) {
@@ -135,7 +139,8 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
         // This is test code, it allows us to verify that the
         // correct XID was
         // removed
-        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource)
+                .getStartedXid();
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
@@ -144,7 +149,8 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
         // indepently verify that the item was committed
         recoveryModule.periodicWorkFirstPass();
         recoveryModule.periodicWorkSecondPass();
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
 
         // Run the scan to clear the content
         manager.scan();
@@ -154,11 +160,14 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
         assertFalse(xaResource.wasRolledback());
 
         // Make sure that the resource was GC'd by the CRRRM
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
         recoveryModule.periodicWorkFirstPass();
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
         // This is the pass that will delete it
         recoveryModule.periodicWorkSecondPass();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
     }
 }

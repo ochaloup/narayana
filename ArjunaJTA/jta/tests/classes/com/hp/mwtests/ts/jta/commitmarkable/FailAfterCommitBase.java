@@ -64,14 +64,14 @@ public class FailAfterCommitBase extends TestCommitMarkableResourceBase {
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     commitMarkableResourceRecoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
                 } else if (m instanceof XARecoveryModule) {
-                    XARecoveryModule xarm = (XARecoveryModule) m;
+                    XARecoveryModule  xarm = (XARecoveryModule) m;
                     xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
                         public boolean initialise(String p) throws Exception {
                             return true;
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[]{xaResource};
+                            return new XAResource[] {xaResource};
                         }
                     });
                 }
@@ -92,13 +92,15 @@ public class FailAfterCommitBase extends TestCommitMarkableResourceBase {
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    nonXAResource = new JDBCConnectableResource(localJDBCConnection);
+                    nonXAResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(nonXAResource);
 
                     xaResource = new SimpleXAResource();
                     tm.getTransaction().enlistResource(xaResource);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
 
                     tm.commit();
                 } catch (ExecuteException t) {
@@ -115,13 +117,15 @@ public class FailAfterCommitBase extends TestCommitMarkableResourceBase {
 
         assertFalse(failed);
 
-        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource)
+                .getStartedXid();
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Check if the item is still in the db
         commitMarkableResourceRecoveryModule.periodicWorkFirstPass();
-        assertTrue(commitMarkableResourceRecoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(commitMarkableResourceRecoveryModule.wasCommitted(
+                "commitmarkableresource", committed));
         commitMarkableResourceRecoveryModule.periodicWorkSecondPass();
 
         // Now we need to correctly complete the transaction
@@ -131,7 +135,8 @@ public class FailAfterCommitBase extends TestCommitMarkableResourceBase {
         // second phase of the CommitMarkableResourceRecoveryModule will have
         // executed before the AtomicActionRecoveryModule has been able to GC
         // it
-        assertTrue(commitMarkableResourceRecoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(commitMarkableResourceRecoveryModule.wasCommitted(
+                "commitmarkableresource", committed));
         manager.scan();
         commitMarkableResourceRecoveryModule.periodicWorkFirstPass();
         commitMarkableResourceRecoveryModule.periodicWorkSecondPass();
@@ -140,6 +145,7 @@ public class FailAfterCommitBase extends TestCommitMarkableResourceBase {
         assertFalse(xaResource.wasRolledback());
 
         // Make sure that the resource was GC'd by the CRRRM
-        assertFalse(commitMarkableResourceRecoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertFalse(commitMarkableResourceRecoveryModule.wasCommitted(
+                "commitmarkableresource", committed));
     }
 }

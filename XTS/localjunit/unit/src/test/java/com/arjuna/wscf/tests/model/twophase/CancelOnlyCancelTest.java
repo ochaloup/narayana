@@ -21,25 +21,32 @@ public class CancelOnlyCancelTest {
     }
 
     @Test
-    public void testCancelOnlyCancel() throws Exception {
+    public void testCancelOnlyCancel()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("TwoPhase11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ua.setCancelOnly();
 
             ua.cancel();
-        } catch (CoordinatorCancelledException ex) {
+        }
+        catch (CoordinatorCancelledException ex)
+        {
             // why is it ok to get here?
             WSCF11TestUtils.cleanup(ua);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

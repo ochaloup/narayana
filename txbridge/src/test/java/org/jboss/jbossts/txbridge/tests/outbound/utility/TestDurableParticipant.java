@@ -34,18 +34,18 @@ public class TestDurableParticipant implements Durable2PCParticipant, Serializab
     private static Logger log = Logger.getLogger(TestDurableParticipant.class);
 
     /*
-     * Uniq String used to prefix ids at participant registration, so that the
-     * recovery module can identify relevant instances.
+     * Uniq String used to prefix ids at participant registration,
+     * so that the recovery module can identify relevant instances.
      */
     public static final String TYPE_IDENTIFIER = "TestDurableParticipant_";
 
     private String prepareOutcome = "prepared";
 
     /**
-     * Perform any work necessary to allow it to either commit or rollback the
-     * work performed by the Web service under the scope of the transaction. The
-     * implementation is free to do whatever it needs to in order to fulfill the
-     * implicit contract between it and the coordinator.
+     * Perform any work necessary to allow it to either commit or rollback
+     * the work performed by the Web service under the scope of the
+     * transaction. The implementation is free to do whatever it needs to in
+     * order to fulfill the implicit contract between it and the coordinator.
      *
      * @return an indication of whether it can prepare or not.
      * @see com.arjuna.wst.Vote

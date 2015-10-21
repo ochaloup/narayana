@@ -70,11 +70,12 @@ import com.arjuna.ats.jts.utils.Utility;
  * routines which Current does not do.
  * 
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: AtomicTransaction.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: AtomicTransaction.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
-public class AtomicTransaction {
+public class AtomicTransaction
+{
 
     /**
      * The types of transactions which can be created.
@@ -87,7 +88,8 @@ public class AtomicTransaction {
      * Create a new transaction. It is not running at this stage.
      */
 
-    public AtomicTransaction() {
+    public AtomicTransaction ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("AtomicTransaction::AtomicTransaction ()");
         }
@@ -97,12 +99,14 @@ public class AtomicTransaction {
         _timeout = get_timeout();
     }
 
-    public void finalize() {
+    public void finalize ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("AtomicTransaction.finalize ()");
         }
 
-        if (_theAction != null) {
+        if (_theAction != null)
+        {
             if (getStatus() == Status.StatusActive) {
                 jtsLogger.i18NLogger.warn_extensions_atscope("AtomicTransaction.finalize", get_uid());
 
@@ -110,15 +114,18 @@ public class AtomicTransaction {
 
                 try {
                     name = get_transaction_name();
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex) {
                     jtsLogger.i18NLogger.warn_extensions_namefail(ex);
                 }
 
                 try {
                     rollback(); // tidies up for us.
-                } catch (NoTransaction e) {
+                }
+                catch (NoTransaction e) {
                     jtsLogger.i18NLogger.warn_extensions_abortfailnoexist(name);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     jtsLogger.i18NLogger.warn_extensions_abortfail(name);
                 }
             }
@@ -129,21 +136,28 @@ public class AtomicTransaction {
      * @return the transaction name. Should only be used for debugging purposes.
      */
 
-    public String get_transaction_name() throws SystemException {
+    public String get_transaction_name () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("AtomicTransaction::get_transaction_name ()");
         }
 
-        if (_theAction != null) {
-            try {
+        if (_theAction != null)
+        {
+            try
+            {
                 return _theAction.get_transaction_name();
-            } catch (SystemException e) {
+            }
+            catch (SystemException e)
+            {
                 jtsLogger.i18NLogger.warn_extensions_atunavailable("AtomicTransaction.get_transaction_name");
 
                 throw e;
             }
-        } else
-            throw new UNKNOWN(ExceptionCodes.UNKNOWN_EXCEPTION, CompletionStatus.COMPLETED_NO);
+        }
+        else
+            throw new UNKNOWN(ExceptionCodes.UNKNOWN_EXCEPTION,
+                    CompletionStatus.COMPLETED_NO);
     }
 
     /**
@@ -157,7 +171,8 @@ public class AtomicTransaction {
      *                if the transaction has already begun or has completed.
      */
 
-    public void begin() throws SubtransactionsUnavailable, SystemException {
+    public void begin () throws SubtransactionsUnavailable, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("AtomicTransaction::begin ()");
         }
@@ -166,12 +181,15 @@ public class AtomicTransaction {
 
         CurrentImple current = OTSImpleManager.current();
 
-        synchronized (_theStatus) {
-            if (_theAction != null) {
-                throw new INVALID_TRANSACTION(ExceptionCodes.ALREADY_BEGUN, CompletionStatus.COMPLETED_NO);
+        synchronized (_theStatus)
+        {
+            if (_theAction != null)
+            {
+                throw new INVALID_TRANSACTION(ExceptionCodes.ALREADY_BEGUN,
+                        CompletionStatus.COMPLETED_NO);
             }
 
-            current.begin();
+                current.begin();
 
             _theAction = current.getControlWrapper();
         }
@@ -179,7 +197,8 @@ public class AtomicTransaction {
         _theStatus = current.get_status();
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::begin create " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::begin create "
+                    + _theAction);
         }
     }
 
@@ -208,10 +227,12 @@ public class AtomicTransaction {
      * not this transaction.
      */
 
-    public void commit(boolean report_heuristics)
-            throws NoTransaction, HeuristicMixed, HeuristicHazard, WrongTransaction, SystemException {
+    public void commit (boolean report_heuristics) throws NoTransaction,
+            HeuristicMixed, HeuristicHazard, WrongTransaction, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::commit ( " + report_heuristics + " ) for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::commit ( "
+                    + report_heuristics + " ) for " + _theAction);
         }
 
         /*
@@ -224,13 +245,16 @@ public class AtomicTransaction {
          * Current will do the checking for us.
          */
 
-        synchronized (_theStatus) {
-            if (_theAction == null) {
+        synchronized (_theStatus)
+        {
+            if (_theAction == null)
+            {
                 throw new NoTransaction();
             }
         }
 
-        if (!validTransaction()) {
+        if (!validTransaction())
+        {
             throw new WrongTransaction();
         }
 
@@ -247,27 +271,38 @@ public class AtomicTransaction {
          * action control.
          */
 
-        try {
+        try
+        {
             current.commit(report_heuristics);
 
             _theStatus = Status.StatusCommitted;
-        } catch (NoTransaction e) {
+        }
+        catch (NoTransaction e)
+        {
             _theStatus = Status.StatusNoTransaction;
 
             throw e;
-        } catch (HeuristicMixed e) {
+        }
+        catch (HeuristicMixed e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } catch (HeuristicHazard e) {
+        }
+        catch (HeuristicHazard e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } catch (TRANSACTION_ROLLEDBACK e) {
+        }
+        catch (TRANSACTION_ROLLEDBACK e)
+        {
             _theStatus = Status.StatusRolledBack;
 
             throw e;
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             _theStatus = getStatus();
 
             throw e;
@@ -286,9 +321,12 @@ public class AtomicTransaction {
      * not this transaction.
      */
 
-    public void rollback() throws NoTransaction, WrongTransaction, SystemException {
+    public void rollback () throws NoTransaction, WrongTransaction,
+            SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::rollback for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::rollback for "
+                    + _theAction);
         }
 
         /*
@@ -301,13 +339,16 @@ public class AtomicTransaction {
          * Current will do the checking for us.
          */
 
-        synchronized (_theStatus) {
-            if (_theAction == null) {
+        synchronized (_theStatus)
+        {
+            if (_theAction == null)
+            {
                 throw new NoTransaction();
             }
         }
 
-        if (!validTransaction()) {
+        if (!validTransaction())
+        {
             throw new WrongTransaction();
         }
 
@@ -319,17 +360,24 @@ public class AtomicTransaction {
 
         CurrentImple current = OTSImpleManager.current();
 
-        try {
+        try
+        {
             current.rollback();
 
             _theStatus = Status.StatusRolledBack;
-        } catch (NoTransaction e) {
+        }
+        catch (NoTransaction e)
+        {
             _theStatus = Status.StatusNoTransaction;
 
             throw e;
-        } catch (TRANSACTION_ROLLEDBACK e) {
+        }
+        catch (TRANSACTION_ROLLEDBACK e)
+        {
             _theStatus = Status.StatusRolledBack;
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             _theStatus = getStatus();
 
             throw e;
@@ -341,9 +389,11 @@ public class AtomicTransaction {
      * org.omg.CosTransactions.Current.set_timeout().
      */
 
-    public void set_timeout(int seconds) throws SystemException {
+    public void set_timeout (int seconds) throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::set_timeout ( " + seconds + " )");
+            jtsLogger.logger.trace("AtomicTransaction::set_timeout ( "
+                    + seconds + " )");
         }
 
         CurrentImple current = OTSImpleManager.current();
@@ -359,18 +409,22 @@ public class AtomicTransaction {
      *         thread.
      */
 
-    public int get_timeout() throws SystemException {
+    public int get_timeout () throws SystemException
+    {
         CurrentImple current = OTSImpleManager.current();
 
-        if (current != null) {
+        if (current != null)
+        {
             int val = current.get_timeout();
 
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("AtomicTransaction::get_timeout returning " + val);
+                jtsLogger.logger.trace("AtomicTransaction::get_timeout returning "
+                        + val);
             }
 
             return val;
-        } else
+        }
+        else
             throw new UNKNOWN();
     }
 
@@ -378,7 +432,8 @@ public class AtomicTransaction {
      * @return the timeout associated with this transaction.
      */
 
-    public int getTimeout() throws SystemException {
+    public int getTimeout () throws SystemException
+    {
         return _timeout;
     }
 
@@ -392,15 +447,24 @@ public class AtomicTransaction {
      *                phase.
      */
 
-    public PropagationContext get_txcontext() throws Inactive, SystemException {
-        if (_theAction == null) {
+    public PropagationContext get_txcontext () throws Inactive, SystemException
+    {
+        if (_theAction == null)
+        {
             throw new Inactive();
-        } else {
-            try {
+        }
+        else
+        {
+            try
+            {
                 return _theAction.get_coordinator().get_txcontext();
-            } catch (NullPointerException ex) {
+            }
+            catch (NullPointerException ex)
+            {
                 throw new Inactive();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new BAD_OPERATION(e.toString());
             }
         }
@@ -417,15 +481,20 @@ public class AtomicTransaction {
      *                phase.
      */
 
-    public RecoveryCoordinator registerResource(Resource r) throws Inactive, SystemException {
+    public RecoveryCoordinator registerResource (Resource r) throws Inactive,
+            SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::registerResource ( " + r + " )");
+            jtsLogger.logger.trace("AtomicTransaction::registerResource ( "
+                    + r + " )");
         }
 
         RecoveryCoordinator rc = null;
 
-        synchronized (_theStatus) {
-            if (_theAction == null) {
+        synchronized (_theStatus)
+        {
+            if (_theAction == null)
+            {
                 throw new Inactive();
             }
         }
@@ -444,14 +513,18 @@ public class AtomicTransaction {
      *                if this transaction is not a subtransaction.
      */
 
-    public void registerSubtranAware(SubtransactionAwareResource r)
-            throws Inactive, NotSubtransaction, SystemException {
+    public void registerSubtranAware (SubtransactionAwareResource r)
+            throws Inactive, NotSubtransaction, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::registerSubtranAware ( " + r + " )");
+            jtsLogger.logger.trace("AtomicTransaction::registerSubtranAware ( "
+                    + r + " )");
         }
 
-        synchronized (_theStatus) {
-            if (_theAction == null) {
+        synchronized (_theStatus)
+        {
+            if (_theAction == null)
+            {
                 throw new Inactive();
             }
         }
@@ -470,14 +543,18 @@ public class AtomicTransaction {
      *                if this transaction it not a top-level transaction.
      */
 
-    public void registerSynchronization(Synchronization sync)
-            throws Inactive, SynchronizationUnavailable, SystemException {
+    public void registerSynchronization (Synchronization sync) throws Inactive,
+            SynchronizationUnavailable, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::registerSynchronization ( " + sync + " )");
+            jtsLogger.logger.trace("AtomicTransaction::registerSynchronization ( "
+                    + sync + " )");
         }
 
-        synchronized (_theStatus) {
-            if (_theAction == null) {
+        synchronized (_theStatus)
+        {
+            if (_theAction == null)
+            {
                 throw new Inactive();
             }
         }
@@ -495,32 +572,42 @@ public class AtomicTransaction {
      *         transaction.
      */
 
-    public Control control() throws NoTransaction, SystemException {
-        if (_theAction == null) {
+    public Control control () throws NoTransaction, SystemException
+    {
+        if (_theAction == null)
+        {
             throw new NoTransaction();
-        } else {
-            try {
+        }
+        else
+        {
+            try
+            {
                 return _theAction.get_control();
-            } catch (Unavailable ex) {
+            }
+            catch (Unavailable ex)
+            {
                 throw new NoTransaction();
             }
         }
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals (Object obj)
+    {
         if (obj == null)
             return false;
 
         if (obj == this)
             return true;
 
-        if (obj instanceof AtomicTransaction) {
+        if (obj instanceof AtomicTransaction)
+        {
             /*
              * If we can't get either coordinator to compare, then assume
              * transactions are different.
              */
 
-            try {
+            try
+            {
                 AtomicTransaction tx = (AtomicTransaction) obj;
                 ControlWrapper txControl = tx._theAction;
 
@@ -528,9 +615,11 @@ public class AtomicTransaction {
                     return true;
                 else if (_theAction != null) {
                     return false;
-                } else
+                } else 
                     return _theAction.equals(txControl);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
         }
 
@@ -549,29 +638,35 @@ public class AtomicTransaction {
      *                different from this thread.
      */
 
-    public void suspend() throws NoTransaction, WrongTransaction, SystemException {
+    public void suspend () throws NoTransaction, WrongTransaction,
+            SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::suspend called for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::suspend called for "
+                    + _theAction);
         }
 
-        synchronized (_theStatus) {
+        synchronized (_theStatus)
+        {
             if (_theAction == null)
                 throw new NoTransaction();
         }
 
-        if (!validTransaction()) {
+        if (!validTransaction())
+        {
             throw new WrongTransaction();
         }
 
-        synchronized (_theStatus) {
-            _theAction = OTSImpleManager.current().suspendWrapper();
-
-            /*
-             * Make sure to set the status in case we get called again.
-             */
-
-            if (_theAction == null)
-                _theStatus = org.omg.CosTransactions.Status.StatusNoTransaction;
+        synchronized (_theStatus)
+        {
+                _theAction = OTSImpleManager.current().suspendWrapper();
+                
+                /*
+                 * Make sure to set the status in case we get called again.
+                 */
+                
+                if (_theAction == null)
+                    _theStatus = org.omg.CosTransactions.Status.StatusNoTransaction;
         }
     }
 
@@ -582,12 +677,15 @@ public class AtomicTransaction {
      *                if this transaction is invalid.
      */
 
-    public void resume() throws InvalidControl, SystemException {
+    public void resume () throws InvalidControl, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::resume called for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::resume called for "
+                    + _theAction);
         }
 
-        synchronized (_theStatus) {
+        synchronized (_theStatus)
+        {
             if (_theAction == null)
                 throw new InvalidControl();
         }
@@ -599,11 +697,14 @@ public class AtomicTransaction {
      * @return the status of this transaction.
      */
 
-    public org.omg.CosTransactions.Status get_status() throws SystemException {
+    public org.omg.CosTransactions.Status get_status () throws SystemException
+    {
         _theStatus = getStatus();
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::get_status called for " + _theAction + " returning "
+            jtsLogger.logger.trace("AtomicTransaction::get_status called for "
+                    + _theAction
+                    + " returning "
                     + Utility.stringStatus(_theStatus));
         }
 
@@ -611,17 +712,19 @@ public class AtomicTransaction {
     }
 
     /**
-     * Allow action commit to be supressed. Although the OTS would require an
-     * InactiveException if the transaction is not active, we ignore that via
-     * this route.
+     * Allow action commit to be supressed. Although the OTS would require an InactiveException
+     * if the transaction is not active, we ignore that via this route.
      */
 
-    public void rollbackOnly() throws SystemException, NoTransaction {
+    public void rollbackOnly () throws SystemException, NoTransaction
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::rollbackOnly called for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::rollbackOnly called for "
+                    + _theAction);
         }
 
-        synchronized (_theStatus) {
+        synchronized (_theStatus)
+        {
             if (_theAction == null)
                 throw new NoTransaction();
         }
@@ -629,17 +732,22 @@ public class AtomicTransaction {
         _theAction.preventCommit();
     }
 
-    public int hashCode() {
-        try {
+    public int hashCode ()
+    {
+        try
+        {
             return _theAction.hash_transaction();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return -1;
         }
     }
 
-    public Uid get_uid() {
+    public Uid get_uid ()
+    {
         if (_theAction != null)
-            return _theAction.get_uid();
+        return _theAction.get_uid();
         else
             return Uid.nullUid();
     }
@@ -651,9 +759,11 @@ public class AtomicTransaction {
      * If not valid then abort this transaction here. Leave current alone.
      */
 
-    protected final boolean validTransaction() {
+    protected final boolean validTransaction ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("AtomicTransaction::validTransaction called for " + _theAction);
+            jtsLogger.logger.trace("AtomicTransaction::validTransaction called for "
+                    + _theAction);
         }
 
         /*
@@ -663,10 +773,12 @@ public class AtomicTransaction {
         CurrentImple current = OTSImpleManager.current();
         boolean valid = false;
 
-        try {
+        try
+        {
             ControlWrapper currentTransaction = current.getControlWrapper();
 
-            if (currentTransaction == null) {
+            if (currentTransaction == null)
+            {
                 jtsLogger.i18NLogger.warn_extensions_atnovalidtx("AtomicTransaction.validTransaction");
 
                 return false;
@@ -674,27 +786,34 @@ public class AtomicTransaction {
 
             valid = _theAction.equals(currentTransaction);
 
-            if (!valid) {
+            if (!valid)
+            {
                 String transactionName = get_transaction_name();
                 String currentTransactionName = currentTransaction.get_transaction_name();
 
                 jtsLogger.i18NLogger.warn_extensions_atoutofseq("AtomicTransaction", transactionName);
                 jtsLogger.i18NLogger.warn_extensions_atwillabort(currentTransactionName);
 
-                try {
+                try
+                {
                     _theAction.rollback();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     jtsLogger.i18NLogger.warn_extensions_atcannotabort("AtomicTransaction", transactionName);
                 }
             }
-        } catch (Exception e) {
-            jtsLogger.i18NLogger.warn_extensions_atgenerror("AtomicTransaction", e);
+        }
+        catch (Exception e)
+        {
+            jtsLogger.i18NLogger.warn_extensions_atgenerror("AtomicTransaction", e );
         }
 
         return valid;
     }
 
-    protected AtomicTransaction(ControlWrapper tx) {
+    protected AtomicTransaction (ControlWrapper tx)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("AtomicTransaction::AtomicTransaction ()");
         }
@@ -711,15 +830,18 @@ public class AtomicTransaction {
         _timeout = get_timeout();
     }
 
-    protected final org.omg.CosTransactions.Status getStatus() {
-        if (_theStatus != null) {
-            switch (_theStatus.value()) {
-                case Status._StatusRolledBack :
-                case Status._StatusCommitted :
-                case Status._StatusNoTransaction :
-                    return _theStatus;
-                default :
-                    break;
+    protected final org.omg.CosTransactions.Status getStatus ()
+    {
+        if (_theStatus != null)
+        {
+            switch (_theStatus.value())
+            {
+            case Status._StatusRolledBack:
+            case Status._StatusCommitted:
+            case Status._StatusNoTransaction:
+                return _theStatus;
+            default:
+                break;
             }
         }
 
@@ -727,10 +849,11 @@ public class AtomicTransaction {
          * It shouldn't be possible for _theAction to be null and for the status
          * to be unset. If it is something went wrong!!
          */
-
+        
         org.omg.CosTransactions.Status stat = org.omg.CosTransactions.Status.StatusUnknown;
 
-        if (_theAction != null) {
+        if (_theAction != null)
+        {
             stat = _theAction.get_status();
         }
 

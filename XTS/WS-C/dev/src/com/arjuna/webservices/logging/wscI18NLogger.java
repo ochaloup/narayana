@@ -36,10 +36,10 @@ import static org.jboss.logging.annotations.Message.Format.*;
 public interface wscI18NLogger {
 
     /*
-     * Message IDs are unique and non-recyclable. Don't change the purpose of
-     * existing messages. (tweak the message text or params for clarification if
-     * you like). Allocate new messages by following instructions at the bottom
-     * of the file.
+        Message IDs are unique and non-recyclable.
+        Don't change the purpose of existing messages.
+          (tweak the message text or params for clarification if you like).
+        Allocate new messages by following instructions at the bottom of the file.
      */
 
     @Message(id = 42001, value = "Unhandled error executing task", format = MESSAGE_FORMAT)
@@ -167,10 +167,9 @@ public interface wscI18NLogger {
     @Message(id = 42041, value = "Unexpected element name: {0}", format = MESSAGE_FORMAT)
     public String get_webservices_wsaddr_EndpointReferenceType_1(QName arg0);
 
-    // @Message(id = 42042, value = "Addressing context is not valid", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_webservices_wsaddr2005_AddressingContext_1();
+//    @Message(id = 42042, value = "Addressing context is not valid", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_webservices_wsaddr2005_AddressingContext_1();
 
     @Message(id = 42043, value = "Unexpected element name: {0}", format = MESSAGE_FORMAT)
     public String get_webservices_wsaddr2005_AddressingContext_2(QName arg0);
@@ -248,20 +247,17 @@ public interface wscI18NLogger {
     @Message(id = 42067, value = "Unexpected element name: {0}", format = MESSAGE_FORMAT)
     public String get_webservices_wscoor_RegisterType_2(QName arg0);
 
-    // @Message(id = 42068, value = "Unexpected end element: {0}", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_webservices11_util_StreamHelper_1(String arg0);
+//    @Message(id = 42068, value = "Unexpected end element: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_webservices11_util_StreamHelper_1(String arg0);
 
-    // @Message(id = 42069, value = "Unexpected end of document reached", format
-    // = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_webservices11_util_StreamHelper_2();
+//    @Message(id = 42069, value = "Unexpected end of document reached", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_webservices11_util_StreamHelper_2();
 
-    // @Message(id = 42070, value = "Unexpected start element: {0}", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_webservices11_util_StreamHelper_3(String arg0);
+//    @Message(id = 42070, value = "Unexpected start element: {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_webservices11_util_StreamHelper_3(String arg0);
 
     @Message(id = 42071, value = "Callback execution failed", format = MESSAGE_FORMAT)
     public String get_ActivationCoordinator_1();
@@ -310,14 +306,14 @@ public interface wscI18NLogger {
     public void warn_cannot_create_service_instance(Class arg0, @Cause() Throwable arg1);
 
     /*
-     * Allocate new messages directly above this notice. - id: use the next id
-     * number in numeric sequence. Don't reuse ids. The first two digits of the
-     * id(XXyyy) denote the module all message in this file should have the same
-     * prefix. - value: default (English) version of the log message. - level:
-     * according to severity semantics defined at
-     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
-     * i18n. Everything else MUST be i18n. By convention methods with String
-     * return type have prefix get_, all others are log methods and have prefix
-     * <level>_
+        Allocate new messages directly above this notice.
+          - id: use the next id number in numeric sequence. Don't reuse ids.
+          The first two digits of the id(XXyyy) denote the module
+            all message in this file should have the same prefix.
+          - value: default (English) version of the log message.
+          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
+          Debug and trace don't get i18n. Everything else MUST be i18n.
+          By convention methods with String return type have prefix get_,
+            all others are log methods and have prefix <level>_
      */
 }

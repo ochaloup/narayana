@@ -37,58 +37,69 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 import com.arjuna.ats.internal.jts.resources.ExtendedResourceRecord;
 import com.arjuna.ats.internal.jts.resources.ResourceRecord;
 
-class ResourceRecordMap implements RecordTypeMap {
+class ResourceRecordMap implements RecordTypeMap
+{
     @SuppressWarnings("unchecked")
-    public Class getRecordClass() {
+    public Class getRecordClass ()
+    {
         return ResourceRecord.class;
     }
-
-    public int getType() {
+    
+    public int getType ()
+    {
         return RecordType.OTS_RECORD;
     }
 }
 
-class ExtendedResourceRecordMap implements RecordTypeMap {
+class ExtendedResourceRecordMap implements RecordTypeMap
+{
     @SuppressWarnings("unchecked")
-    public Class getRecordClass() {
+    public Class getRecordClass ()
+    {
         return ExtendedResourceRecord.class;
     }
-
-    public int getType() {
+    
+    public int getType ()
+    {
         return RecordType.OTS_ABSTRACTRECORD;
     }
 }
 
-public class Implementations {
+public class Implementations
+{
 
-    public static synchronized boolean added() {
-        return _added;
+    public static synchronized boolean added ()
+    {
+    return _added;
+    }
+    
+    public static synchronized void initialise ()
+    {
+    if (!_added)
+    {
+        /*
+         * Now add various abstract records which crash recovery needs.
+         */
+
+        RecordTypeManager.manager().add(new ResourceRecordMap());
+        RecordTypeManager.manager().add(new ExtendedResourceRecordMap());
+
+        _added = true;
+    }
     }
 
-    public static synchronized void initialise() {
-        if (!_added) {
-            /*
-             * Now add various abstract records which crash recovery needs.
-             */
-
-            RecordTypeManager.manager().add(new ResourceRecordMap());
-            RecordTypeManager.manager().add(new ExtendedResourceRecordMap());
-
-            _added = true;
-        }
-    }
-
-    private Implementations() {
+    private Implementations ()
+    {
     }
 
     private static boolean _added = false;
 
     /**
-     * Static block triggers initialization of ResourceRecordMap and
-     * ExtendedResourceRecordMap.
+     * Static block triggers initialization of ResourceRecordMap and ExtendedResourceRecordMap.
      */
-    static {
-        initialise();
+    static
+    {
+    initialise();
     }
-
+    
 }

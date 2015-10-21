@@ -56,8 +56,7 @@ public abstract class AbstractTestCase {
 
     protected static final String BASE_URL = getBaseUrl();
 
-    protected static final String TRANSACTION_MANAGER_URL = BASE_URL + "/"
-            + "rest-at-coordinator/tx/transaction-manager";
+    protected static final String TRANSACTION_MANAGER_URL = BASE_URL + "/" + "rest-at-coordinator/tx/transaction-manager";
 
     protected static final String DEPLOYMENT_NAME = "rest-tx-bridge-test";
 
@@ -68,8 +67,7 @@ public abstract class AbstractTestCase {
     protected static final String ADVANCED_INBOUND_BRIDGE_RESOURCE_URL = DEPLOYMENT_URL + "/"
             + AdvancedInboundBridgeResource.URL_SEGMENT;
 
-    protected static final String LOGGING_REST_AT_RESOURCE_URL = DEPLOYMENT_URL + "/"
-            + LoggingRestATResource.BASE_URL_SEGMENT;
+    protected static final String LOGGING_REST_AT_RESOURCE_URL = DEPLOYMENT_URL + "/" + LoggingRestATResource.BASE_URL_SEGMENT;
 
     protected static final String LOGGING_REST_AT_RESOURCE_INVOCATIONS_URL = LOGGING_REST_AT_RESOURCE_URL + "/"
             + LoggingRestATResource.INVOCATIONS_URL_SEGMENT;
@@ -98,7 +96,7 @@ public abstract class AbstractTestCase {
     public void after() {
         try {
             txSupport.rollbackTx();
-        } catch (Throwable t) {
+        } catch (Throwable t){
         }
 
         try {
@@ -159,8 +157,8 @@ public abstract class AbstractTestCase {
         if (jbossHome == null) {
             Assert.fail("$JBOSS_HOME not set");
         } else {
-            final File objectStore = new File(jbossHome + File.separator + "standalone" + File.separator + "data"
-                    + File.separator + "tx-object-store");
+            final File objectStore = new File(jbossHome + File.separator + "standalone" + File.separator + "data" + File.separator
+                    + "tx-object-store");
 
             if (objectStore.exists()) {
                 if (!deleteDirectory(objectStore)) {
@@ -223,8 +221,7 @@ public abstract class AbstractTestCase {
 
         if (baseAddress == null) {
             baseAddress = "http://localhost";
-        } else if (!baseAddress.toLowerCase().startsWith("http://")
-                && !baseAddress.toLowerCase().startsWith("https://")) {
+        } else if (!baseAddress.toLowerCase().startsWith("http://") && !baseAddress.toLowerCase().startsWith("https://")) {
             baseAddress = "http://" + baseAddress;
         }
 

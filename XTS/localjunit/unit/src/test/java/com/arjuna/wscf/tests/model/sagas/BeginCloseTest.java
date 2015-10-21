@@ -20,20 +20,25 @@ public class BeginCloseTest {
     }
 
     @Test
-    public void testBeginClose() throws Exception {
+    public void testBeginClose()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("Sagas11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ua.close();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

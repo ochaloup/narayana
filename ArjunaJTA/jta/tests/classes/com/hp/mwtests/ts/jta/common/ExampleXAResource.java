@@ -35,54 +35,61 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-public abstract class ExampleXAResource implements XAResource {
+public abstract class ExampleXAResource implements XAResource
+{
 
-    public ExampleXAResource() {
+    public ExampleXAResource ()
+    {
         /*
          * Add this instance to a reaper, such that if it is still active when
          * the timeout goes off, the reaper will roll back the work.
          */
     }
 
-    public void start(Xid xid, int flags) throws XAException {
+    public void start (Xid xid, int flags) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
-        switch (flags) {
-            case XAResource.TMNOFLAGS :
-                associateNewUniqueTransaction(xid);
-                break;
-            case XAResource.TMJOIN :
-                joinExistingTransaction(xid);
-                break;
-            case XAResource.TMRESUME :
-                resumeOldTransaction(xid);
-                break;
-            default :
-                throw new XAException(XAException.XAER_PROTO);
+        switch (flags)
+        {
+        case XAResource.TMNOFLAGS:
+            associateNewUniqueTransaction(xid);
+            break;
+        case XAResource.TMJOIN:
+            joinExistingTransaction(xid);
+            break;
+        case XAResource.TMRESUME:
+            resumeOldTransaction(xid);
+            break;
+        default:
+            throw new XAException(XAException.XAER_PROTO);
         }
     }
 
-    public void end(Xid xid, int flags) throws XAException {
+    public void end (Xid xid, int flags) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
-        switch (flags) {
-            case XAResource.TMSUSPEND :
-                temporarilySuspendBranch(xid);
-                break;
-            case XAResource.TMFAIL :
-                endAssociationAndRollback(xid);
-                break;
-            case XAResource.TMSUCCESS :
-                endAssociation(xid);
-                break;
-            default :
-                throw new XAException(XAException.XAER_PROTO);
+        switch (flags)
+        {
+        case XAResource.TMSUSPEND:
+            temporarilySuspendBranch(xid);
+            break;
+        case XAResource.TMFAIL:
+            endAssociationAndRollback(xid);
+            break;
+        case XAResource.TMSUCCESS:
+            endAssociation(xid);
+            break;
+        default:
+            throw new XAException(XAException.XAER_PROTO);
         }
     }
 
-    public int prepare(Xid xid) throws XAException {
+    public int prepare (Xid xid) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
@@ -92,7 +99,8 @@ public abstract class ExampleXAResource implements XAResource {
         return resourceManagerPrepare(xid);
     }
 
-    public void commit(Xid xid, boolean onePhase) throws XAException {
+    public void commit (Xid xid, boolean onePhase) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
@@ -105,7 +113,8 @@ public abstract class ExampleXAResource implements XAResource {
         resourceManagerCommit(xid, onePhase);
     }
 
-    public void rollback(Xid xid) throws XAException {
+    public void rollback (Xid xid) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
@@ -115,7 +124,8 @@ public abstract class ExampleXAResource implements XAResource {
         resourceManagerRollback(xid);
     }
 
-    public void forget(Xid xid) throws XAException {
+    public void forget (Xid xid) throws XAException
+    {
         if (!validXid(xid))
             throw new XAException(XAException.XAER_NOTA);
 
@@ -128,63 +138,79 @@ public abstract class ExampleXAResource implements XAResource {
         resourceManagerForget(xid);
     }
 
-    public Xid[] recover(int flag) throws XAException {
-        switch (flag) {
-            case XAResource.TMNOFLAGS : {
-                if (recoveryScanStarted()) {
-                    return indoubtTransactions();
-                } else
-                    throw new XAException(XAException.XAER_PROTO);
+    public Xid[] recover (int flag) throws XAException
+    {
+        switch (flag)
+        {
+        case XAResource.TMNOFLAGS:
+        {
+            if (recoveryScanStarted())
+            {
+                return indoubtTransactions();
             }
-            case XAResource.TMSTARTRSCAN : {
+            else
+                throw new XAException(XAException.XAER_PROTO);
+        }
+        case XAResource.TMSTARTRSCAN:
+        {
+            if (recoveryScanStarted())
+                throw new XAException(XAException.XAER_PROTO);
+            else
+                startRecoveryScan();
+        }
+            break;
+        case XAResource.TMENDRSCAN:
+        {
+            if (recoveryScanStarted())
+                endRecoveryScan();
+            else
+                throw new XAException(XAException.XAER_PROTO);
+        }
+            break;
+        default:
+        {
+            if ((flag & XAResource.TMSTARTRSCAN & XAResource.TMENDRSCAN) != 0)
+            {
                 if (recoveryScanStarted())
                     throw new XAException(XAException.XAER_PROTO);
                 else
+                {
                     startRecoveryScan();
-            }
-                break;
-            case XAResource.TMENDRSCAN : {
-                if (recoveryScanStarted())
+
+                    Xid[] indoubts = indoubtTransactions();
+
                     endRecoveryScan();
-                else
-                    throw new XAException(XAException.XAER_PROTO);
+
+                    return indoubts;
+                }
             }
-                break;
-            default : {
-                if ((flag & XAResource.TMSTARTRSCAN & XAResource.TMENDRSCAN) != 0) {
-                    if (recoveryScanStarted())
-                        throw new XAException(XAException.XAER_PROTO);
-                    else {
-                        startRecoveryScan();
-
-                        Xid[] indoubts = indoubtTransactions();
-
-                        endRecoveryScan();
-
-                        return indoubts;
-                    }
-                } else
-                    throw new XAException(XAException.XAER_PROTO);
-            }
+            else
+                throw new XAException(XAException.XAER_PROTO);
+        }
         }
 
         return null;
     }
 
-    public int getTransactionTimeout() throws XAException {
+    public int getTransactionTimeout () throws XAException
+    {
         return timeout;
     }
 
-    public boolean setTransactionTimeout(int seconds) throws XAException {
-        if (seconds >= 0) {
+    public boolean setTransactionTimeout (int seconds) throws XAException
+    {
+        if (seconds >= 0)
+        {
             timeout = seconds;
 
             return true;
-        } else
+        }
+        else
             return false;
     }
 
-    public boolean isSameRM(XAResource xares) throws XAException {
+    public boolean isSameRM (XAResource xares) throws XAException
+    {
         return (xares == this);
     }
 
@@ -192,7 +218,7 @@ public abstract class ExampleXAResource implements XAResource {
      * Determine whether or not this is an Xid instance we can deal with.
      */
 
-    protected abstract boolean validXid(Xid xid);
+    protected abstract boolean validXid (Xid xid);
 
     /*
      * Ensure that this Xid is unique within the context of this RM. If it is
@@ -200,7 +226,8 @@ public abstract class ExampleXAResource implements XAResource {
      * Xid, such that all work performed on the RM is transactional.
      */
 
-    protected abstract void associateNewUniqueTransaction(Xid xid) throws XAException;
+    protected abstract void associateNewUniqueTransaction (Xid xid)
+            throws XAException;
 
     /*
      * Ensure that this Xid is one we have seen before and is still active. If
@@ -208,7 +235,8 @@ public abstract class ExampleXAResource implements XAResource {
      * associated with a transaction, then throw an appropriate XAException.
      */
 
-    protected abstract void joinExistingTransaction(Xid xid) throws XAException;
+    protected abstract void joinExistingTransaction (Xid xid)
+            throws XAException;
 
     /*
      * Ensure that this Xid is one we have seen before and have previously
@@ -216,7 +244,7 @@ public abstract class ExampleXAResource implements XAResource {
      * the association.
      */
 
-    protected abstract void resumeOldTransaction(Xid xid) throws XAException;
+    protected abstract void resumeOldTransaction (Xid xid) throws XAException;
 
     /*
      * Ensure that this Xid is one we know about. If it isn't then throw an
@@ -225,7 +253,8 @@ public abstract class ExampleXAResource implements XAResource {
      * association can be (should be) resumed later or ended.
      */
 
-    protected abstract void temporarilySuspendBranch(Xid xid) throws XAException;
+    protected abstract void temporarilySuspendBranch (Xid xid)
+            throws XAException;
 
     /*
      * Ensure that this Xid is one we know about. If it isn't then it's a
@@ -233,7 +262,7 @@ public abstract class ExampleXAResource implements XAResource {
      * then end the association with the RM.
      */
 
-    protected abstract void endAssociation(Xid xid) throws XAException;
+    protected abstract void endAssociation (Xid xid) throws XAException;
 
     /*
      * Ensure that this Xid is one we know about. If it isn't then it's a
@@ -242,13 +271,14 @@ public abstract class ExampleXAResource implements XAResource {
      * the RM in the scope of that transaction.
      */
 
-    protected abstract void endAssociationAndRollback(Xid xid) throws XAException;
+    protected abstract void endAssociationAndRollback (Xid xid)
+            throws XAException;
 
     /*
      * Is there a valid RM associated with this transaction?
      */
 
-    protected abstract boolean validResourceManager(Xid xid);
+    protected abstract boolean validResourceManager (Xid xid);
 
     /*
      * Find the RM associated with this transaction and ask it to prepare the
@@ -256,59 +286,62 @@ public abstract class ExampleXAResource implements XAResource {
      * ONLY.
      */
 
-    protected abstract int resourceManagerPrepare(Xid xid) throws XAException;
+    protected abstract int resourceManagerPrepare (Xid xid) throws XAException;
 
     /*
      * Find the RM associated with this transaction and ask it to commit the
      * work done in the scope of the transaction.
      */
 
-    protected abstract void resourceManagerCommit(Xid xid, boolean onePhase) throws XAException;
+    protected abstract void resourceManagerCommit (Xid xid, boolean onePhase)
+            throws XAException;
 
     /*
      * Find the RM associated with this transaction and ask it to roll back the
      * work done in the scope of the transaction.
      */
 
-    protected abstract void resourceManagerRollback(Xid xid) throws XAException;
+    protected abstract void resourceManagerRollback (Xid xid)
+            throws XAException;
 
     /*
      * Find the RM associated with this transaction and ask it to forget any
      * heuristic information on behalf of the transaction.
      */
 
-    protected abstract void resourceManagerForget(Xid xid) throws XAException;
+    protected abstract void resourceManagerForget (Xid xid) throws XAException;
 
     /*
      * Find the RM associated with this transaction and determine if it has been
      * prepared.
      */
 
-    protected abstract boolean resourceManagerPrepared(Xid xid) throws XAException;
+    protected abstract boolean resourceManagerPrepared (Xid xid)
+            throws XAException;
 
     /*
      * Has the recovery scan begun?
      */
 
-    protected abstract boolean recoveryScanStarted() throws XAException;
+    protected abstract boolean recoveryScanStarted () throws XAException;
 
     /*
      * Return the list of indoubt (and heuristic) transactions.
      */
 
-    protected abstract Xid[] indoubtTransactions() throws XAException;
+    protected abstract Xid[] indoubtTransactions () throws XAException;
 
     /*
      * Start the recovery scan.
      */
 
-    protected abstract void startRecoveryScan() throws XAException;
+    protected abstract void startRecoveryScan () throws XAException;
 
     /*
      * End the recovery scan.
      */
 
-    protected abstract void endRecoveryScan() throws XAException;
+    protected abstract void endRecoveryScan () throws XAException;
 
     private int timeout = 0;
 

@@ -54,7 +54,8 @@ public class ConnectionImpl implements Connection {
     /**
      * The logger to use.
      */
-    private static final Logger log = LogManager.getLogger(ConnectionImpl.class);
+    private static final Logger log = LogManager
+            .getLogger(ConnectionImpl.class);
 
     /**
      * The next id to use for session connection descriptors.
@@ -112,7 +113,8 @@ public class ConnectionImpl implements Connection {
      *            The properties that this connection was created with.
      * @throws ConfigurationException
      */
-    public ConnectionImpl(ConnectionFactory connectionFactory, Properties properties) throws ConfigurationException {
+    public ConnectionImpl(ConnectionFactory connectionFactory,
+            Properties properties) throws ConfigurationException {
         log.debug("Creating connection: " + this);
         this.connectionFactory = connectionFactory;
         this.properties = properties;
@@ -132,22 +134,27 @@ public class ConnectionImpl implements Connection {
      *             If the buffer was unknown or invalid.
      * @throws ConfigurationException
      */
-    public Buffer tpalloc(String type, String subtype) throws ConnectionException, ConfigurationException {
+    public Buffer tpalloc(String type, String subtype)
+            throws ConnectionException, ConfigurationException {
         if (type == null) {
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "No type provided");
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "No type provided");
         } else {
             log.debug("Initializing a new: " + type);
             try {
-                Class clazz = Class.forName(getClass().getPackage().getName() + "." + type + "_Impl");
+                Class clazz = Class.forName(getClass().getPackage().getName() + "."
+                        + type + "_Impl");
                 Constructor ctor = clazz.getConstructor(String.class);
                 return (Buffer) ctor.newInstance(subtype);
             } catch (InvocationTargetException t) {
                 if (t.getCause() instanceof ConfigurationException) {
-                    throw ((ConfigurationException) t.getCause());
+                    throw ((ConfigurationException)t.getCause());
                 }
-                throw new ConnectionException(ConnectionImpl.TPENOENT, "Type was not known: " + type, t);
+                throw new ConnectionException(ConnectionImpl.TPENOENT,
+                        "Type was not known: " + type, t);
             } catch (Throwable t) {
-                throw new ConnectionException(ConnectionImpl.TPENOENT, "Type was not known: " + type, t);
+                throw new ConnectionException(ConnectionImpl.TPENOENT,
+                        "Type was not known: " + type, t);
             }
         }
     }
@@ -166,7 +173,8 @@ public class ConnectionImpl implements Connection {
      *             If the service cannot be contacted.
      * @throws ConfigurationException
      */
-    public Response tpcall(String svc, Buffer buffer, int flags) throws ConnectionException, ConfigurationException {
+    public Response tpcall(String svc, Buffer buffer, int flags)
+            throws ConnectionException, ConfigurationException {
         log.debug("tpcall");
         int tpacallFlags = flags;
         tpacallFlags &= ~TPNOCHANGE;
@@ -191,23 +199,27 @@ public class ConnectionImpl implements Connection {
      * @throws ConnectionException
      *             If the service cannot be contacted.
      */
-    public int tpacall(String svc, Buffer toSend, int flags) throws ConnectionException {
+    public int tpacall(String svc, Buffer toSend, int flags)
+            throws ConnectionException {
         log.debug("tpacall");
-        int toCheck = flags & ~(TPNOTRAN | TPNOREPLY | TPNOBLOCK | TPNOTIME | TPSIGRSTRT);
+        int toCheck = flags
+                & ~(TPNOTRAN | TPNOREPLY | TPNOBLOCK | TPNOTIME | TPSIGRSTRT);
         if (toCheck != 0) {
             log.trace("invalid flags remain: " + toCheck);
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "Invalid flags remain: " + toCheck);
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "Invalid flags remain: " + toCheck);
         }
 
-        svc = svc.substring(0, Math.min(ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
+        svc = svc.substring(0, Math.min(
+                ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
 
         String qtype = (String) properties.get("blacktie." + svc + ".type");
 
         log.debug(svc + " qtype is " + qtype + " and flags is " + flags);
         if ("topic".equals(qtype) && (flags & TPNOREPLY) == 0) {
             log.warn(svc + " type is " + qtype + " and MUST have TPNOREPLY set");
-            throw new ConnectionException(ConnectionImpl.TPEINVAL,
-                    svc + " type is " + qtype + " and MUST have TPNOREPLY set");
+            throw new ConnectionException(ConnectionImpl.TPEINVAL, svc
+                    + " type is " + qtype + " and MUST have TPNOREPLY set");
         }
         int correlationId = 0;
         synchronized (this) {
@@ -215,7 +227,8 @@ public class ConnectionImpl implements Connection {
             log.trace("Allocated next sessionId: " + correlationId);
         }
         Transport transport = getTransport(svc);
-        Receiver endpoint = transport.createReceiver(correlationId, responseMonitor, null);
+        Receiver endpoint = transport.createReceiver(correlationId,
+                responseMonitor, null);
         temporaryQueues.put(correlationId, endpoint);
         log.trace("Added a queue for: " + correlationId);
         // TODO HANDLE TRANSACTION
@@ -225,7 +238,8 @@ public class ConnectionImpl implements Connection {
         byte[] data = null;
         if (toSend != null) {
             CodecFactory factory = new CodecFactory(this);
-            String coding_type = properties.getProperty("blacktie." + svc + ".coding_type");
+            String coding_type = properties.getProperty("blacktie." + svc
+                    + ".coding_type");
             Codec codec = factory.getCodec(coding_type);
             data = codec.encode((BufferImpl) toSend);
             // data = toSend.serialize();
@@ -238,12 +252,13 @@ public class ConnectionImpl implements Connection {
         int ttl = 0;
 
         // Don't set ttl when tpacall and TPNOREPLY set
-        if (timeToLive != null && ((flags & ConnectionImpl.TPNOREPLY) != ConnectionImpl.TPNOREPLY)) {
+        if (timeToLive != null
+                && ((flags & ConnectionImpl.TPNOREPLY) != ConnectionImpl.TPNOREPLY)) {
             ttl = Integer.parseInt(timeToLive) * 1000;
             log.debug("Set ttl: " + ttl);
         }
-        transport.getSender(svc, false).send(endpoint.getReplyTo(), (short) 0, 0, data, len, correlationId, flags, ttl,
-                type, subtype);
+        transport.getSender(svc, false).send(endpoint.getReplyTo(), (short) 0,
+                0, data, len, correlationId, flags, ttl, type, subtype);
         if ((flags & ConnectionImpl.TPNOREPLY) == ConnectionImpl.TPNOREPLY) {
             correlationId = 0;
         }
@@ -270,7 +285,8 @@ public class ConnectionImpl implements Connection {
             toReturn = 0;
         } else {
             log.debug("No endpoint available");
-            throw new ConnectionException(ConnectionImpl.TPEBADDESC, "cd " + cd + " does not exist");
+            throw new ConnectionException(ConnectionImpl.TPEBADDESC, "cd " + cd
+                    + " does not exist");
         }
         log.debug("tpcancel returning: " + toReturn);
         return toReturn;
@@ -288,12 +304,15 @@ public class ConnectionImpl implements Connection {
      *             If the service cannot be contacted.
      * @throws ConfigurationException
      */
-    public Response tpgetrply(int cd, int flags) throws ConnectionException, ConfigurationException {
+    public Response tpgetrply(int cd, int flags)
+            throws ConnectionException, ConfigurationException {
         log.debug("tpgetrply: " + cd);
-        int toCheck = flags & ~(TPGETANY | TPNOCHANGE | TPNOBLOCK | TPNOTIME | TPSIGRSTRT);
+        int toCheck = flags
+                & ~(TPGETANY | TPNOCHANGE | TPNOBLOCK | TPNOTIME | TPSIGRSTRT);
         if (toCheck != 0) {
             log.trace("invalid flags remain: " + toCheck);
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "Invalid flags remain: " + toCheck);
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "Invalid flags remain: " + toCheck);
         }
 
         synchronized (tpGetAnySessions) {
@@ -301,21 +320,28 @@ public class ConnectionImpl implements Connection {
                 if ((flags & ConnectionImpl.TPNOBLOCK) != ConnectionImpl.TPNOBLOCK) {
                     int timeout = 0;
                     if ((flags & ConnectionImpl.TPNOTIME) != ConnectionImpl.TPNOTIME) {
-                        timeout = Integer.parseInt(properties.getProperty("ReceiveTimeout")) * 1000
-                                + Integer.parseInt(properties.getProperty("TimeToLive")) * 1000;
+                        timeout = Integer.parseInt(properties
+                                .getProperty("ReceiveTimeout"))
+                                * 1000
+                                + Integer.parseInt(properties
+                                        .getProperty("TimeToLive")) * 1000;
                     }
                     if (tpGetAnySessions.size() == 0) {
                         try {
                             tpGetAnySessions.wait(timeout);
                         } catch (InterruptedException e) {
-                            throw new ConnectionException(ConnectionImpl.TPESYSTEM, "Could not wait", e);
+                            throw new ConnectionException(
+                                    ConnectionImpl.TPESYSTEM, "Could not wait",
+                                    e);
                         }
                     }
                     if (tpGetAnySessions.size() == 0) {
-                        throw new ConnectionException(ConnectionImpl.TPETIME, "No message arrived");
+                        throw new ConnectionException(ConnectionImpl.TPETIME,
+                                "No message arrived");
                     }
                 } else if (tpGetAnySessions.size() == 0) {
-                    throw new ConnectionException(ConnectionImpl.TPEBLOCK, "No message arrived");
+                    throw new ConnectionException(ConnectionImpl.TPEBLOCK,
+                            "No message arrived");
                 }
                 cd = tpGetAnySessions.remove(0);
             }
@@ -340,18 +366,22 @@ public class ConnectionImpl implements Connection {
      * @throws ConnectionException
      *             If the service cannot be contacted.
      */
-    public Session tpconnect(String svc, Buffer toSend, int flags) throws ConnectionException {
+    public Session tpconnect(String svc, Buffer toSend, int flags)
+            throws ConnectionException {
         log.debug("tpconnect: " + svc);
 
-        svc = svc.substring(0, Math.min(ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
+        svc = svc.substring(0, Math.min(
+                ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
         // Initiate the session
-        svc = svc.substring(0, Math.min(ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
+        svc = svc.substring(0, Math.min(
+                ConnectionImpl.XATMI_SERVICE_NAME_LENGTH, svc.length()));
         int correlationId = 0;
         synchronized (this) {
             correlationId = nextId++;
         }
         Transport transport = getTransport(svc);
-        SessionImpl session = new SessionImpl(this, svc, transport, correlationId);
+        SessionImpl session = new SessionImpl(this, svc, transport,
+                correlationId);
 
         Receiver receiver = session.getReceiver();
         // TODO HANDLE TRANSACTION
@@ -361,7 +391,8 @@ public class ConnectionImpl implements Connection {
         byte[] data = null;
         if (toSend != null) {
             CodecFactory factory = new CodecFactory(this);
-            String coding_type = properties.getProperty("blacktie." + svc + ".coding_type");
+            String coding_type = properties.getProperty("blacktie." + svc
+                    + ".coding_type");
             Codec codec = factory.getCodec(coding_type);
             data = codec.encode((BufferImpl) toSend);
             // data = toSend.serialize();
@@ -377,8 +408,8 @@ public class ConnectionImpl implements Connection {
             ttl = Integer.parseInt(timeToLive) * 1000;
         }
         log.debug("tpconnect sending data");
-        session.getSender().send(receiver.getReplyTo(), (short) 0, 0, data, len, correlationId, flags | TPCONV, ttl,
-                type, subtype);
+        session.getSender().send(receiver.getReplyTo(), (short) 0, 0, data,
+                len, correlationId, flags | TPCONV, ttl, type, subtype);
 
         byte[] response = null;
         try {
@@ -396,16 +427,19 @@ public class ConnectionImpl implements Connection {
             throw new ConnectionException(e.getTperrno(), "Could not connect");
         } catch (ConfigurationException e) {
             session.close();
-            throw new ConnectionException(ConnectionImpl.TPEOS, "Configuration exception: " + e.getMessage(), e);
+            throw new ConnectionException(ConnectionImpl.TPEOS,
+                    "Configuration exception: " + e.getMessage(), e);
         }
         byte[] ack = new byte[4];
         byte[] bytes = "ACK".getBytes();
         System.arraycopy(bytes, 0, ack, 0, 3);
-        boolean connected = response == null ? false : Arrays.equals(ack, response);
+        boolean connected = response == null ? false : Arrays.equals(ack,
+                response);
         if (!connected) {
             log.error("Could not connect");
             session.close();
-            throw new ConnectionException(ConnectionImpl.TPESYSTEM, "Could not connect");
+            throw new ConnectionException(ConnectionImpl.TPESYSTEM,
+                    "Could not connect");
         }
         session.setCreatorState(flags);
         sessions.put(correlationId, session);
@@ -466,7 +500,8 @@ public class ConnectionImpl implements Connection {
         log.debug("Close connection finished");
     }
 
-    private Transport getTransport(String serviceName) throws ConnectionException {
+    private Transport getTransport(String serviceName)
+            throws ConnectionException {
         Transport toReturn = transports.get(serviceName);
         if (toReturn == null) {
             toReturn = transportFactory.createTransport();
@@ -487,33 +522,41 @@ public class ConnectionImpl implements Connection {
      *             If the response cannot be retrieved.
      * @throws ConfigurationException
      */
-    private Response receive(int cd, int flags) throws ConnectionException, ConfigurationException {
+    private Response receive(int cd, int flags) throws ConnectionException,
+            ConfigurationException {
         log.debug("receive: " + cd);
         Receiver endpoint = temporaryQueues.get(cd);
         if (endpoint == null) {
-            throw new ConnectionException(ConnectionImpl.TPEBADDESC, "Session does not exist: " + cd);
+            throw new ConnectionException(ConnectionImpl.TPEBADDESC,
+                    "Session does not exist: " + cd);
         }
         Message message = endpoint.receive(flags);
         Buffer buffer = null;
         if (message.type != null && !message.type.equals("")) {
             CodecFactory factory = new CodecFactory(this);
-            String coding_type = properties.getProperty("blacktie." + message.serviceName + ".coding_type");
+            String coding_type = properties.getProperty("blacktie."
+                    + message.serviceName + ".coding_type");
             Codec codec = factory.getCodec(coding_type);
-            buffer = codec.decode(message.type, message.subtype, message.data, message.len);
+            buffer = codec.decode(message.type, message.subtype, message.data,
+                    message.len);
             // buffer = tpalloc(message.type, message.subtype, message.len);
             // buffer.deserialize(message.data);
         }
         if (message.rval == ConnectionImpl.TPFAIL) {
             if (message.rcode == ConnectionImpl.TPESVCERR) {
-                throw new ResponseException(ConnectionImpl.TPESVCERR, "Got an error back from the remote service", -1,
+                throw new ResponseException(ConnectionImpl.TPESVCERR,
+                        "Got an error back from the remote service", -1,
                         message.rcode, buffer);
             }
-            throw new ResponseException(ConnectionImpl.TPESVCFAIL, "Got a fail back from the remote service", -1,
+            throw new ResponseException(ConnectionImpl.TPESVCFAIL,
+                    "Got a fail back from the remote service", -1,
                     message.rcode, buffer);
         } else {
-            Response response = new Response(cd, message.rval, message.rcode, buffer, message.flags);
+            Response response = new Response(cd, message.rval,
+                    message.rcode, buffer, message.flags);
 
-            log.debug("received returned a response? " + (response == null ? "false" : "true"));
+            log.debug("received returned a response? "
+                    + (response == null ? "false" : "true"));
             return response;
         }
     }
@@ -532,11 +575,13 @@ public class ConnectionImpl implements Connection {
      * @throws ConnectionException
      *             In case the transport cannot be established.
      */
-    public SessionImpl createServiceSession(String name, int cd, Object replyTo) throws ConnectionException {
+    public SessionImpl createServiceSession(String name, int cd, Object replyTo)
+            throws ConnectionException {
         log.trace("Creating the service session");
         if (serviceSession != null) {
             throw new ConnectionException(ConnectionImpl.TPEPROTO,
-                    "Second service session creation attempt, was: " + serviceSession.getCd() + " new: " + cd);
+                    "Second service session creation attempt, was: "
+                            + serviceSession.getCd() + " new: " + cd);
         }
         Transport transport = getTransport(name);
         serviceSession = new SessionImpl(this, transport, cd, replyTo);
@@ -578,7 +623,8 @@ public class ConnectionImpl implements Connection {
             }
         }
         if (!remove) {
-            log.debug("Session did not exist: " + session.getCd() + " size: " + sessions.size());
+            log.debug("Session did not exist: " + session.getCd() + " size: "
+                    + sessions.size());
         }
 
         if (session.equals(serviceSession)) {

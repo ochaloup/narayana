@@ -25,8 +25,8 @@ import org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException;
  * TPSVCINFO structure for a service (assuming the service was invoked within
  * the scope of a tpconnect).
  * 
- * It is used to send and retrieve data: Connection#tpconnect(String, Buffer,
- * int, int) TPSVCINFO#getSession()
+ * It is used to send and retrieve data:
+ * Connection#tpconnect(String, Buffer, int, int) TPSVCINFO#getSession()
  */
 public interface Session {
 
@@ -52,7 +52,8 @@ public interface Session {
      *             If the message cannot be received or the flags are incorrect
      * @throws ConfigurationException
      */
-    public Buffer tprecv(int flags) throws ConnectionException, ConfigurationException;
+    public Buffer tprecv(int flags) throws ConnectionException,
+            ConfigurationException;
 
     /**
      * Close the conversation with the remote service. This will close the

@@ -48,70 +48,59 @@ import com.arjuna.mw.wsas.exceptions.WrongStateException;
  * @since 1.0.
  */
 
-public interface Participant {
+public interface Participant
+{
 
     /**
      * Confirm the participant at top-level.
      *
-     * @exception InvalidParticipantException
-     *                Thrown if the participant identity is invalid (e.g.,
-     *                refers to an unknown participant.)
-     * @exception WrongStateException
-     *                Thrown if the state of the participant is such that it
-     *                cannot confirm.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidParticipantException Thrown if the participant identity is invalid
+     *            (e.g., refers to an unknown participant.)
+     * @exception WrongStateException Thrown if the state of the participant is such that
+     *            it cannot confirm.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void close() throws InvalidParticipantException, WrongStateException, SystemException;
+    public void close () throws InvalidParticipantException, WrongStateException, SystemException;
 
     /**
      * Cancel the participant at top-level.
      *
-     * @exception InvalidParticipantException
-     *                Thrown if the participant identity is invalid (e.g.,
-     *                refers to an unknown participant.)
-     * @exception WrongStateException
-     *                Thrown if the state of the participant is such that it
-     *                cannot cancel.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidParticipantException Thrown if the participant identity is invalid
+     *            (e.g., refers to an unknown participant.)
+     * @exception WrongStateException Thrown if the state of the participant is such that
+     *            it cannot cancel.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void cancel() throws InvalidParticipantException, WrongStateException, SystemException;
+    public void cancel () throws InvalidParticipantException, WrongStateException, SystemException;
 
     /**
      * Compensate the participant.
      *
-     * @exception InvalidParticipantException
-     *                Thrown if the participant identity is invalid (e.g.,
-     *                refers to an unknown participant.)
-     * @exception WrongStateException
-     *                Thrown if the state of the participant is such that it
-     *                cannot cancel.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidParticipantException Thrown if the participant identity is invalid
+     *            (e.g., refers to an unknown participant.)
+     * @exception WrongStateException Thrown if the state of the participant is such that
+     *            it cannot cancel.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void compensate()
-            throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException;
+    public void compensate () throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException;
 
     /**
      * Inform the participant that is can forget the heuristic result.
      *
-     * @exception InvalidParticipantException
-     *                Thrown if the participant identity is invalid.
-     * @exception WrongStateException
-     *                Thrown if the participant is in an invalid state.
-     * @exception SystemException
-     *                Thrown in the event of a general fault.
+     * @exception InvalidParticipantException Thrown if the participant identity is invalid.
+     * @exception WrongStateException Thrown if the participant is in an invalid state.
+     * @exception SystemException Thrown in the event of a general fault.
      */
 
-    public void forget() throws InvalidParticipantException, WrongStateException, SystemException;
+    public void forget () throws InvalidParticipantException, WrongStateException, SystemException;
 
-    public String id() throws SystemException;
-
-    public boolean save_state(OutputObjectState os);
-    public boolean restore_state(InputObjectState os);
-
+    public String id () throws SystemException;
+    
+    public boolean save_state (OutputObjectState os);
+    public boolean restore_state (InputObjectState os);
+    
 }
+

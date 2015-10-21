@@ -60,14 +60,15 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * to interposed resources, synchronizations, and transactions.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ServerControl.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ServerControl.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
-public class ServerControl extends ControlImple {
+public class ServerControl extends ControlImple
+{
 
-    public ServerControl(Uid actUid, Control parentCon, ArjunaTransactionImple parentTran, Coordinator realCoord,
-            Terminator realTerm) {
+    public ServerControl (Uid actUid, Control parentCon, ArjunaTransactionImple parentTran, Coordinator realCoord, Terminator realTerm)
+    {
         super();
 
         _realCoordinator = realCoord;
@@ -81,8 +82,7 @@ public class ServerControl extends ControlImple {
          * are re-importing?
          */
 
-        ControlImple cont = ((ControlImple.allControls != null)
-                ? (ControlImple) ControlImple.allControls.get(actUid)
+        ControlImple cont = ((ControlImple.allControls != null) ? (ControlImple) ControlImple.allControls.get(actUid)
                 : null);
 
         /*
@@ -107,29 +107,39 @@ public class ServerControl extends ControlImple {
          * they will not be able to determine the current transaction.
          */
 
-        if (cont != null) {
+        if (cont != null)
+        {
             _isWrapper = true;
             _transactionHandle = cont.getImplHandle();
 
             Coordinator coord = null;
             Terminator term = null;
 
-            try {
+            try
+            {
                 coord = cont.get_coordinator();
                 term = cont.get_terminator();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
-                try {
+                try
+                {
                     if (coord != null)
                         coord.rollback_only();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                 }
             }
 
             super.duplicateTransactionHandle(coord, term);
-        } else {
-            _transactionHandle = new ServerTransaction(actUid, _parentControl, parentTran);
+        }
+        else
+        {
+            _transactionHandle = new ServerTransaction(actUid, _parentControl,
+                    parentTran);
             _isWrapper = false;
 
             super.createTransactionHandle();
@@ -148,19 +158,24 @@ public class ServerControl extends ControlImple {
         addControl();
     }
 
-    public final boolean isWrapper() {
+    public final boolean isWrapper ()
+    {
         return _isWrapper;
     }
 
-    public Coordinator originalCoordinator() {
+    public Coordinator originalCoordinator ()
+    {
         return _realCoordinator;
     }
 
-    public Terminator originalTerminator() {
+    public Terminator originalTerminator ()
+    {
         return _realTerminator;
     }
 
-    public synchronized void destroy() throws ActiveTransaction, ActiveThreads, BadControl, Destroyed, SystemException {
+    public synchronized void destroy () throws ActiveTransaction,
+            ActiveThreads, BadControl, Destroyed, SystemException
+    {
         if (super._destroyed)
             throw new Destroyed();
 
@@ -170,22 +185,30 @@ public class ServerControl extends ControlImple {
          * variables.
          */
 
-        try {
-            if (_isWrapper) {
+        try
+        {
+            if (_isWrapper)
+            {
                 _transactionHandle = null;
             }
 
             super.destroy();
-        } catch (BAD_PARAM e) {
+        }
+        catch (BAD_PARAM e)
+        {
             // already destroyed
-        } catch (Destroyed de) {
+        }
+        catch (Destroyed de)
+        {
             // already destroyed
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_destfailed("ServerControl", e);
         }
     }
 
-    public ServerControl(ServerTransaction stx) {
+    public ServerControl (ServerTransaction stx)
+    {
         super();
 
         _realCoordinator = null;
@@ -202,42 +225,55 @@ public class ServerControl extends ControlImple {
         addControl();
     }
 
-    public ControlImple getParentImple() {
+    public ControlImple getParentImple ()
+    {
         BasicAction parent = _transactionHandle.parent();
 
-        if (parent != null) {
-            synchronized (ServerControl.allControls) {
+        if (parent != null)
+        {
+            synchronized (ServerControl.allControls)
+            {
                 return (ControlImple) ServerControl.allServerControls.get(parent.get_uid());
             }
-        } else
+        }
+        else
             return null;
     }
 
-    public String toString() {
+    public String toString ()
+    {
         return "ServerControl < " + get_uid() + " >";
     }
 
-    public final boolean forgetHeuristics() {
+    public final boolean forgetHeuristics ()
+    {
         if (_transactionHandle != null)
             return _transactionHandle.forgetHeuristics();
         else
             return true;
     }
 
-    protected boolean addControl() {
-        synchronized (ServerControl.allServerControls) {
+    protected boolean addControl ()
+    {
+        synchronized (ServerControl.allServerControls)
+        {
             ServerControl.allServerControls.put(get_uid(), this);
         }
 
         return true;
     }
 
-    protected boolean removeControl() {
-        try {
-            synchronized (ServerControl.allServerControls) {
+    protected boolean removeControl ()
+    {
+        try
+        {
+            synchronized (ServerControl.allServerControls)
+            {
                 ServerControl.allServerControls.remove(get_uid());
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             return false;
         }
 

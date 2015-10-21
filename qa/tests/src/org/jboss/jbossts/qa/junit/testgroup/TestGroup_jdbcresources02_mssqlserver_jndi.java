@@ -20,7 +20,8 @@
  */
 package org.jboss.jbossts.qa.junit.testgroup;
 
-public class TestGroup_jdbcresources02_mssqlserver_jndi extends TestGroup_jdbcresources02_abstract {
+public class TestGroup_jdbcresources02_mssqlserver_jndi extends TestGroup_jdbcresources02_abstract
+{
     public String getTestGroupName() {
         return "jdbcresources02_mssqlserver_jndi";
     }

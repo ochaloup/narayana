@@ -20,9 +20,12 @@ public class NestedTransactionTest {
     }
 
     @Test
-    public void testNestedTransaction() throws Exception {
+    public void testNestedTransaction()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
-        try {
+        try
+        {
 
             // nesting not supported, so each is a separate top-level tx.
 
@@ -35,20 +38,24 @@ public class NestedTransactionTest {
             ut.commit();
 
             fail("expected WrongStateException");
-        } catch (com.arjuna.wst.WrongStateException ex) {
+        }
+        catch (com.arjuna.wst.WrongStateException ex)
+        {
             // original test was expecting UnknownTransactionException
             // we should get here;
             try {
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
-        } catch (Exception eouter) {
+        }
+        catch (Exception eouter)
+        {
             try {
                 ut.rollback();
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
-    }
+            }
 }

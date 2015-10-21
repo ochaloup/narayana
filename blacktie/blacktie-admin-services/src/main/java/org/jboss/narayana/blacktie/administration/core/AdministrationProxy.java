@@ -51,11 +51,11 @@ public class AdministrationProxy implements BlacktieAdministration {
 
     public AdministrationProxy() throws ConfigurationException {
         log.debug("Administration Proxy");
-
+                
         beanServerConnection = java.lang.management.ManagementFactory.getPlatformMBeanServer();
         log.debug("Created Administration Proxy");
     }
-
+    
     public void onConstruct() throws ConfigurationException {
         log.info("onConstruct load btconfig.xml");
         XMLParser.loadProperties("btconfig.xsd", "btconfig.xml", prop);
@@ -63,8 +63,8 @@ public class AdministrationProxy implements BlacktieAdministration {
         connection = cf.getConnection();
     }
 
-    private Response callAdminService(String serverName, int id, String command)
-            throws ConnectionException, ConfigurationException {
+    private Response callAdminService(String serverName, int id, String command) throws ConnectionException,
+            ConfigurationException {
         log.trace("callAdminService");
         command = command + "\0";
         X_OCTET sendbuf = (X_OCTET) connection.tpalloc("X_OCTET", null);
@@ -85,8 +85,7 @@ public class AdministrationProxy implements BlacktieAdministration {
                 return (received[0] == '1');
             }
         } catch (ConnectionException e) {
-            log.error("call server " + serverName + " id " + id + " command " + command + " failed with "
-                    + e.getTperrno());
+            log.error("call server " + serverName + " id " + id + " command " + command + " failed with " + e.getTperrno());
         } catch (ConfigurationException e) {
             log.error("call server " + serverName + " id " + id + " command " + command
                     + " failed with configuration exception");
@@ -193,7 +192,7 @@ public class AdministrationProxy implements BlacktieAdministration {
 
         try {
             ObjectName objName = new ObjectName("jboss.as:subsystem=messaging-activemq,server=default,jms-queue=BTR_*");
-            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[]{});
+            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[] {});
             for (int i = 0; i < dests.length; i++) {
                 String serviceComponentOfObjectName = dests[i].getObjectName().getCanonicalName();
                 serviceComponentOfObjectName = serviceComponentOfObjectName.substring(
@@ -223,7 +222,7 @@ public class AdministrationProxy implements BlacktieAdministration {
 
         try {
             ObjectName objName = new ObjectName("jboss.as:subsystem=messaging-activemq,server=default,jms-queue=BTR_*");
-            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[]{});
+            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[] {});
             for (int i = 0; i < dests.length; i++) {
                 String serviceComponentOfObjectName = dests[i].getObjectName().getCanonicalName();
                 serviceComponentOfObjectName = serviceComponentOfObjectName.substring(
@@ -338,7 +337,7 @@ public class AdministrationProxy implements BlacktieAdministration {
 
     public Boolean shutdown(String serverName, int id) {
         log.trace("shutdown");
-        List<String> servers = listRunningServers();
+        List<String> servers = listRunningServers(); 
         if (servers.contains(serverName)) {
             String command = "serverdone";
             boolean shutdown = false;
@@ -357,11 +356,8 @@ public class AdministrationProxy implements BlacktieAdministration {
                                 toRethrow = e;
                             }
                         } catch (ConfigurationException e) {
-                            log.error(
-                                    "call server " + serverName + " id " + id + " failed with configuration exception",
-                                    e);
-                            toRethrow = new ConnectionException(Connection.TPEOS,
-                                    "Configuration issue: " + e.getMessage(), e);
+                            log.error("call server " + serverName + " id " + id + " failed with configuration exception", e);
+                            toRethrow = new ConnectionException(Connection.TPEOS, "Configuration issue: " + e.getMessage(), e);
                         }
                     }
                     if (toRethrow != null) {
@@ -608,8 +604,8 @@ public class AdministrationProxy implements BlacktieAdministration {
             } else {
                 prefix = "BTR_";
             }
-            ObjectName objName = new ObjectName(
-                    "jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix + serviceName);
+            ObjectName objName = new ObjectName("jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "="
+                    + prefix + serviceName);
             depth = (Integer) beanServerConnection.getAttribute(objName, "messageCount");
         } catch (Exception e) {
             log.error("getQueueDepth failed with " + e);

@@ -20,11 +20,14 @@ public class TimeoutTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                WSASTestUtils.class);
     }
 
     @Test
-    public void testTimeout() throws Exception {
+    public void testTimeout()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
         int timeout = ua.getTimeout();
         try {
@@ -42,10 +45,10 @@ public class TimeoutTest {
             if (!(ua.getCompletionStatus() instanceof Failure)) {
                 fail("Activity completion status should be Failure " + ua.getCompletionStatus());
             }
-            System.out.println("Activity status: " + ua.status());
+            System.out.println("Activity status: "+ua.status());
         } finally {
             ua.setTimeout(timeout);
             WSASTestUtils.cleanup(ua);
         }
-    }
+            }
 }

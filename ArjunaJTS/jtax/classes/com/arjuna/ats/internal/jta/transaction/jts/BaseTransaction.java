@@ -46,13 +46,16 @@ import com.arjuna.ats.jts.OTSManager;
  * Some common methods for UserTransaction and TransactionManager.
  *
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: BaseTransaction.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: BaseTransaction.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 2.1.
  */
 
-public class BaseTransaction {
+public class BaseTransaction
+{
 
-    public void begin() throws javax.transaction.NotSupportedException, javax.transaction.SystemException {
+    public void begin () throws javax.transaction.NotSupportedException,
+            javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("BaseTransaction.begin");
         }
@@ -62,30 +65,40 @@ public class BaseTransaction {
          * programmer use them. Strict conformance will always say no.
          */
 
-        if (!_supportSubtransactions) {
-            try {
+        if (!_supportSubtransactions)
+        {
+            try
+            {
                 checkTransactionState();
-            } catch (IllegalStateException e1) {
+            }
+            catch (IllegalStateException e1)
+            {
                 NotSupportedException notSupportedException = new NotSupportedException(e1.getMessage());
                 notSupportedException.initCause(e1);
                 throw notSupportedException;
-            } catch (org.omg.CORBA.SystemException e2) {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
-                        e2.toString());
+            }
+            catch (org.omg.CORBA.SystemException e2)
+            {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e2.toString());
                 systemException.initCause(e2);
                 throw systemException;
             }
         }
 
-        try {
+        try
+        {
             TransactionImple.putTransaction(new TransactionImple());
-        } catch (org.omg.CosTransactions.SubtransactionsUnavailable e3) {
+        }
+        catch (org.omg.CosTransactions.SubtransactionsUnavailable e3)
+        {
             // shouldn't happen if we get here from the previous checks!
 
             NotSupportedException notSupportedException = new NotSupportedException(e3.getMessage());
             notSupportedException.initCause(e3);
             throw notSupportedException;
-        } catch (org.omg.CORBA.SystemException e4) {
+        }
+        catch (org.omg.CORBA.SystemException e4)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e4.toString());
             systemException.initCause(e4);
             throw systemException;
@@ -100,109 +113,143 @@ public class BaseTransaction {
      * a differentiation.
      */
 
-    public void commit() throws javax.transaction.RollbackException, javax.transaction.HeuristicMixedException,
-            javax.transaction.HeuristicRollbackException, java.lang.SecurityException, java.lang.IllegalStateException,
-            javax.transaction.SystemException {
+    public void commit () throws javax.transaction.RollbackException,
+            javax.transaction.HeuristicMixedException,
+            javax.transaction.HeuristicRollbackException,
+            java.lang.SecurityException, java.lang.IllegalStateException,
+            javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("BaseTransaction.commit");
         }
 
         TransactionImple theTransaction = TransactionImple.getTransaction();
 
-        try {
+        try
+        {
             theTransaction.commitAndDisassociate();
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             ex.printStackTrace();
 
             throw new IllegalStateException(
-                    "BaseTransaction.commit - " + jtaxLogger.i18NLogger.get_jtax_transaction_jts_notxe() + ex, ex);
+                    "BaseTransaction.commit - "
+                            + jtaxLogger.i18NLogger.get_jtax_transaction_jts_notxe()
+                            + ex, ex);
         }
 
         checkTransactionState();
     }
 
-    public void rollback()
-            throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException {
+    public void rollback () throws java.lang.IllegalStateException,
+            java.lang.SecurityException, javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("BaseTransaction.rollback");
         }
 
         TransactionImple theTransaction = TransactionImple.getTransaction();
 
-        try {
+        try
+        {
             theTransaction.rollbackAndDisassociate();
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             throw new IllegalStateException(ex);
         }
 
         checkTransactionState();
     }
 
-    public void setRollbackOnly() throws java.lang.IllegalStateException, javax.transaction.SystemException {
+    public void setRollbackOnly () throws java.lang.IllegalStateException,
+            javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("BaseTransaction.setRollbackOnly");
         }
 
         TransactionImple theTransaction = TransactionImple.getTransaction();
 
-        try {
+        try
+        {
             theTransaction.setRollbackOnly();
-        } catch (NullPointerException ex) {
-            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_nosuchtx(), ex);
+        }
+        catch (NullPointerException ex)
+        {
+            throw new IllegalStateException(
+                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_nosuchtx(), ex);
         }
     }
 
-    public int getStatus() throws javax.transaction.SystemException {
+    public int getStatus () throws javax.transaction.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("BaseTransaction.getStatus");
         }
 
         TransactionImple theTransaction = null;
-
+    
         try {
-            theTransaction = TransactionImple.getTransaction();
+        theTransaction = TransactionImple.getTransaction();
         } catch (TRANSACTION_UNAVAILABLE e) {
             if (e.minor == 1) {
                 return javax.transaction.Status.STATUS_NO_TRANSACTION;
             }
         }
-
+        
         if (theTransaction == null) {
             return javax.transaction.Status.STATUS_NO_TRANSACTION;
         }
 
-        try {
+        try
+        {
             return theTransaction.getStatus();
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             return javax.transaction.Status.STATUS_NO_TRANSACTION;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
         }
     }
 
-    public void setTransactionTimeout(int seconds) throws javax.transaction.SystemException {
-        try {
+    public void setTransactionTimeout (int seconds)
+            throws javax.transaction.SystemException
+    {
+        try
+        {
             OTSImpleManager.current().set_timeout(seconds);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
         }
     }
 
-    public int getTimeout() throws javax.transaction.SystemException {
-        try {
+    public int getTimeout () throws javax.transaction.SystemException
+    {
+        try
+        {
             return OTSImpleManager.current().get_timeout();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
         }
     }
 
-    protected BaseTransaction() {
+    protected BaseTransaction ()
+    {
     }
 
     /**
@@ -210,34 +257,47 @@ public class BaseTransaction {
      * transaction associated with it.
      */
 
-    final void checkTransactionState() throws IllegalStateException, javax.transaction.SystemException {
-        try {
+    final void checkTransactionState () throws IllegalStateException,
+            javax.transaction.SystemException
+    {
+        try
+        {
             Control cont = OTSManager.get_current().get_control();
 
             /*
              * Control may not be null, but its coordinator may be.
              */
 
-            if (cont != null) {
+            if (cont != null)
+            {
                 Coordinator coord = cont.get_coordinator();
 
-                if (coord != null) {
+                if (coord != null)
+                {
                     if ((coord.get_status() == org.omg.CosTransactions.Status.StatusActive)
-                            && (!_supportSubtransactions)) {
-                        throw new IllegalStateException("BaseTransaction.checkTransactionState - "
-                                + jtaxLogger.i18NLogger.get_jtax_transaction_jts_alreadyassociated());
+                            && (!_supportSubtransactions))
+                    {
+                        throw new IllegalStateException(
+                                "BaseTransaction.checkTransactionState - "
+                                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_alreadyassociated());
                     }
                 }
 
                 cont = null;
             }
-        } catch (org.omg.CORBA.SystemException e1) {
+        }
+        catch (org.omg.CORBA.SystemException e1)
+        {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e1.toString());
             systemException.initCause(e1);
             throw systemException;
-        } catch (org.omg.CosTransactions.Unavailable e2) {
+        }
+        catch (org.omg.CosTransactions.Unavailable e2)
+        {
             // ok, no transaction currently associated with thread.
-        } catch (NullPointerException ex) {
+        }
+        catch (NullPointerException ex)
+        {
             // ok, no transaction currently associated with thread.
         }
     }

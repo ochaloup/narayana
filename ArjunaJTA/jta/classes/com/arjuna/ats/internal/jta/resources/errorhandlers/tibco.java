@@ -35,14 +35,17 @@ import javax.transaction.xa.XAException;
 
 import com.arjuna.ats.jta.resources.XAResourceMap;
 
-public class tibco implements XAResourceMap {
+public class tibco implements XAResourceMap
+{
 
-    public boolean notAProblem(XAException ex, boolean commit) {
-        return false;
+    public boolean notAProblem (XAException ex, boolean commit)
+    {
+    return false;
     }
 
-    public String getXAResourceName() {
-        return "";
+    public String getXAResourceName ()
+    {
+    return "";
     }
 
 }

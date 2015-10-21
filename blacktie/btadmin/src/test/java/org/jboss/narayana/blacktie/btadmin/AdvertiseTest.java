@@ -48,8 +48,8 @@ public class AdvertiseTest extends TestCase {
         }
     }
 
-    public void testAdvertise()
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException, ConfigurationException {
+    public void testAdvertise() throws InstantiationException, IllegalAccessException, ClassNotFoundException,
+            ConfigurationException {
         log.info("AdvertiseTest::testAdvertise");
         String command = "advertise testsui BAR";
         if (commandHandler.handleCommand(command.split(" ")) != 0) {

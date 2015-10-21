@@ -33,12 +33,15 @@ import com.arjuna.ats.arjuna.AtomicAction;
  * $Id: AtomicObjectTest3.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class CommitObject extends Thread {
+public class CommitObject extends Thread
+{
 
-    public CommitObject() {
-    }
+    public CommitObject ()
+        {
+        }
 
-    public void run() {
+    public void run ()
+        {
         int thr = nextThreadId;
 
         nextThreadId++;
@@ -57,8 +60,8 @@ public class CommitObject extends Thread {
 
         AtomicObjectTest3.indent(thr, 0);
         System.out.println("commit");
-    }
+        }
 
     private static int nextThreadId = 3;
 
-}
+    }

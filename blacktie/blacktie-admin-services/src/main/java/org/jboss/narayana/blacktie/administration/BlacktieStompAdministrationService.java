@@ -63,7 +63,7 @@ import org.xml.sax.InputSource;
 
 @MessageDriven(activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/BTR_BTStompAdmin")})
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/BTR_BTStompAdmin") })
 public class BlacktieStompAdministrationService extends MDBBlacktieService implements javax.jms.MessageListener {
     private static final Logger log = LogManager.getLogger(BlacktieStompAdministrationService.class);
 
@@ -76,14 +76,14 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
     private static ModelControllerClient client;
 
     private class ServerInfo {
-        public final String name;
+    public final String name;
         public final boolean conversational;
         public final String type;
         public ServerInfo(String name, boolean conversational, String type) {
-            this.name = name;
-            this.conversational = conversational;
-            this.type = type;
-        }
+           this.name = name;
+           this.conversational = conversational;
+           this.type = type; 
+        } 
     }
 
     public BlacktieStompAdministrationService() throws ConfigurationException {
@@ -109,11 +109,14 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
         String type = "queue";
         if (!serviceName.startsWith(".")) {
             ServerInfo info = SERVICE_OWNERS.get(serviceName);
-            if (info != null) {
-                conversational = info.conversational;
-                type = info.type;
-            } else {
-                return false;
+        if(info != null)
+            {
+               conversational = info.conversational;
+               type = info.type;
+            }
+            else
+            {
+               return false;
             }
         }
         String prefix = null;
@@ -122,9 +125,9 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
         } else {
             prefix = "BTR_";
         }
-        ObjectName objName = new ObjectName(
-                "jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix + "*");
-        ObjectInstance[] dests = getMBeanServerConnection().queryMBeans(objName, null).toArray(new ObjectInstance[]{});
+        ObjectName objName = new ObjectName("jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix
+                + "*");
+        ObjectInstance[] dests = getMBeanServerConnection().queryMBeans(objName, null).toArray(new ObjectInstance[] {});
         for (int i = 0; i < dests.length; i++) {
             String serviceComponentOfObjectName = dests[i].getObjectName().getCanonicalName();
             serviceComponentOfObjectName = serviceComponentOfObjectName.substring(
@@ -141,8 +144,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
         return false;
     }
 
-    private static MBeanServerConnection getMBeanServerConnection()
-            throws ConfigurationException, UnknownHostException {
+    private static MBeanServerConnection getMBeanServerConnection() throws ConfigurationException, UnknownHostException {
         initStatic();
         return beanServerConnection;
     }
@@ -166,8 +168,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
                 if (managementAddress.equals("0.0.0.0")) {
                     managementAddress = "localhost";
                 }
-                client = ModelControllerClient.Factory.create("http-remoting", managementAddress, 9990,
-                        getCallbackHandler(), null, 120 * 1000);
+                client = ModelControllerClient.Factory.create("http-remoting", managementAddress, 9990, getCallbackHandler(), null, 120 * 1000);
             }
         }
     }
@@ -190,8 +191,8 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
         }
 
         Integer count = null;
-        ObjectName objName = new ObjectName(
-                "jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix + serviceName);
+        ObjectName objName = new ObjectName("jboss.as:subsystem=messaging-activemq,server=default,jms-" + type + "=" + prefix
+                + serviceName);
         if (type.toLowerCase().equals("queue")) {
             count = (Integer) getMBeanServerConnection().getAttribute(objName, "consumerCount");
         } else {
@@ -250,13 +251,11 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
         }
     }
 
-    public int deployQueue(String serviceName, String serverName, boolean conversational, String type, String version)
-            throws ConfigurationException, UnknownHostException {
+    public int deployQueue(String serviceName, String serverName, boolean conversational, String type, String version) throws ConfigurationException, UnknownHostException {
         log.trace("deployQueue: " + serviceName + " version: " + version);
 
         if (version == null || !version.equals(getProperty("blacktie.domain.version"))) {
-            log.warn("Blacktie Domain version " + getProperty("blacktie.domain.version") + " not match server "
-                    + version);
+            log.warn("Blacktie Domain version " + getProperty("blacktie.domain.version") + " not match server " + version);
             return 4;
         }
 
@@ -280,7 +279,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
                         prefix = "BTR_";
                     }
                     QUEUE_CREATION_TIMES.put(serviceName, System.currentTimeMillis());
-                    SERVICE_OWNERS.put(serviceName, new ServerInfo(serverName, conversational, type));
+            SERVICE_OWNERS.put(serviceName, new ServerInfo(serverName, conversational, type));
 
                     log.trace(serviceName);
 
@@ -291,8 +290,7 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
                     op.get("address").add("server", "default");
                     op.get("address").add("jms-" + type, prefix + serviceName);
                     op.get("entries").add("/" + type + "/" + prefix + serviceName);
-                    // op.get("jms-" + type + "-address").set("jms." + type +
-                    // "." + prefix + serviceName);
+                    // op.get("jms-" + type + "-address").set("jms." + type + "." + prefix + serviceName);
                     applyUpdate(op, getClient());
                     log.debug("Invoked activemq to deploy queue");
                 }
@@ -397,10 +395,13 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
 
                 ServerInfo info = SERVICE_OWNERS.get(serviceName);
 
-                if (info == null) {
-                    server = serverName;
-                } else {
-                    server = info.name;
+                if(info == null)
+                {
+                   server = serverName;
+                }
+                else
+                {
+                   server = info.name;
                 }
             }
 
@@ -408,8 +409,8 @@ public class BlacktieStompAdministrationService extends MDBBlacktieService imple
                 log.trace("Service " + serviceName + " exists for server: " + server);
                 if (operation.equals("tpadvertise")) {
                     log.trace("Advertising: " + serviceName);
-                    boolean conversational = st.nextToken().equals("1");
-                    String type = st.nextToken();
+            boolean conversational = st.nextToken().equals("1");
+            String type = st.nextToken();
                     String version = st.nextToken();
                     success[0] = (byte) deployQueue(serviceName, serverName, conversational, type, version);
                     log.trace("Advertised: " + serviceName);

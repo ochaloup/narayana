@@ -84,7 +84,8 @@ public interface Connection {
      *             If the buffer was unknown or invalid.
      * @throws ConfigurationException
      */
-    public Buffer tpalloc(String type, String subtype) throws ConnectionException, ConfigurationException;
+    public Buffer tpalloc(String type, String subtype)
+            throws ConnectionException, ConfigurationException;
 
     /**
      * Synchronous call.
@@ -100,7 +101,8 @@ public interface Connection {
      *             If the service cannot be contacted.
      * @throws ConfigurationException
      */
-    public Response tpcall(String svc, Buffer buffer, int flags) throws ConnectionException, ConfigurationException;
+    public Response tpcall(String svc, Buffer buffer, int flags)
+            throws ConnectionException, ConfigurationException;
 
     /**
      * Asynchronous call
@@ -115,7 +117,8 @@ public interface Connection {
      * @throws ConnectionException
      *             If the service cannot be contacted.
      */
-    public int tpacall(String svc, Buffer toSend, int flags) throws ConnectionException;
+    public int tpacall(String svc, Buffer toSend, int flags)
+            throws ConnectionException;
 
     /**
      * Cancel the outstanding asynchronous call.
@@ -139,7 +142,8 @@ public interface Connection {
      *             If the service cannot be contacted.
      * @throws ConfigurationException
      */
-    public Response tpgetrply(int cd, int flags) throws ConnectionException, ConfigurationException;
+    public Response tpgetrply(int cd, int flags) throws ConnectionException,
+            ConfigurationException;
 
     /**
      * Handle the initiation of a conversation with the server.
@@ -154,7 +158,8 @@ public interface Connection {
      * @throws ConnectionException
      *             If the service cannot be contacted.
      */
-    public Session tpconnect(String svc, Buffer toSend, int flags) throws ConnectionException;
+    public Session tpconnect(String svc, Buffer toSend, int flags)
+            throws ConnectionException;
 
     /**
      * Close any resources associated with this connection

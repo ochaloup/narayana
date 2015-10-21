@@ -38,21 +38,23 @@ import java.util.regex.Pattern;
 public abstract class AbstractCrashRecoveryTests extends AbstractBasicTests {
     private static Logger log = Logger.getLogger(AbstractCrashRecoveryTests.class);
 
+
     /**
-     * Instrumentation to be done on server reboot. For details see @link
-     * #rebootServer. Note: Before each server restart it is necessary to store
-     * the instrumentation into a file and then start up the server with that
-     * file as a parameter for byteman to ensure the appropriate classes are
-     * instrumented once the server is up.
+     * Instrumentation to be done on server reboot.
+     * For details see @link #rebootServer.
+     * Note: Before each server restart it is necessary to store the instrumentation into a file and then start up the server
+     * with that file as a parameter for byteman to ensure the appropriate classes are instrumented once the server is up.
      *
      * @throws Exception
      */
     protected abstract void instrumentationOnServerReboot() throws Exception;
 
+
     protected void cleanTxStore() throws Exception {
         String jbossHome = System.getenv("JBOSS_HOME");
         removeContents(new File(jbossHome, "standalone/data/tx-object-store/"));
     }
+
 
     protected void rebootServer(ContainerController controller) throws Exception {
 
@@ -69,16 +71,15 @@ public abstract class AbstractCrashRecoveryTests extends AbstractBasicTests {
 
         // start up the server
         String javaVmArguments = System.getProperty("server.jvm.args").trim();
-        javaVmArguments = javaVmArguments.replaceFirst("byteman-dtest.jar",
-                Matcher.quoteReplacement("byteman-dtest.jar,script:" + rulesFile.getAbsolutePath()));
+        javaVmArguments = javaVmArguments.replaceFirst("byteman-dtest.jar", Matcher.quoteReplacement("byteman-dtest.jar,script:" + rulesFile.getAbsolutePath()));
         log.trace("javaVmArguments = " + javaVmArguments);
         controller.start(CONTAINER, new Config().add("javaVmArguments", javaVmArguments).map());
     }
 
+
     /////////////////
 
-    // stolen from CrashRecoveryDelays - should probably just add that to the
-    // classpath?
+    // stolen from CrashRecoveryDelays - should probably just add that to the classpath?
     // prod the recovery manager via its socket. This avoid any sleep delay.
     protected static void doRecovery() throws InterruptedException {
         int port = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryPort();
@@ -128,16 +129,20 @@ public abstract class AbstractCrashRecoveryTests extends AbstractBasicTests {
 
     // stolen from EmptyObjectStore.java
     protected static void removeContents(File directory) {
-        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
-                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
-                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
+        if ((directory != null) &&
+                directory.isDirectory() &&
+                (!directory.getName().equals("")) &&
+                (!directory.getName().equals("/")) &&
+                (!directory.getName().equals("\\")) &&
+                (!directory.getName().equals(".")) &&
+                (!directory.getName().equals(".."))) {
             File[] contents = directory.listFiles();
 
             for (int index = 0; index < contents.length; index++) {
                 if (contents[index].isDirectory()) {
                     removeContents(contents[index]);
 
-                    // System.err.println("Deleted: " + contents[index]);
+                    //System.err.println("Deleted: " + contents[index]);
                     contents[index].delete();
                 } else {
                     log.info("Deleted: " + contents[index]);

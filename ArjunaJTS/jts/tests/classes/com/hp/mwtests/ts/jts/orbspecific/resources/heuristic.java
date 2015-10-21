@@ -44,85 +44,96 @@ import org.omg.CosTransactions.Vote;
 import com.arjuna.ats.internal.jts.ORBManager;
 import com.hp.mwtests.ts.jts.utils.ResourceTrace;
 
-public class heuristic extends org.omg.CosTransactions.ResourcePOA {
-
-    public heuristic(boolean p) {
-        ORBManager.getPOA().objectIsReady(this);
+public class heuristic extends org.omg.CosTransactions.ResourcePOA
+{
+    
+    public heuristic (boolean p)
+    {
+    ORBManager.getPOA().objectIsReady(this);
 
         trace = new ResourceTrace();
 
-        heuristicPrepare = p;
+    heuristicPrepare = p;
 
-        ref = ResourceHelper.narrow(ORBManager.getPOA().corbaReference(this));
+    ref = ResourceHelper.narrow(ORBManager.getPOA().corbaReference(this));
     }
 
-    public Resource getReference() {
-        return ref;
+    public Resource getReference ()
+    {
+    return ref;
     }
 
-    public ResourceTrace getTrace() {
+    public ResourceTrace getTrace()
+    {
         return trace;
     }
 
-    public org.omg.CosTransactions.Vote prepare() throws HeuristicMixed, HeuristicHazard, SystemException {
-        System.out.println("HEURISTIC : PREPARE");
+    public org.omg.CosTransactions.Vote prepare () throws HeuristicMixed, HeuristicHazard, SystemException
+    {
+    System.out.println("HEURISTIC : PREPARE");
 
         if (trace.getTrace() == ResourceTrace.ResourceTraceNone)
-            trace.setTrace(ResourceTrace.ResourceTracePrepare);
+        trace.setTrace(ResourceTrace.ResourceTracePrepare);
+    else
+        trace.setTrace(ResourceTrace.ResourceTraceUnknown);
+
+    if (heuristicPrepare)
+    {
+        System.out.println("HEURISTIC : throwing HeuristicHazard");
+
+            if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
+            trace.setTrace(ResourceTrace.ResourceTracePrepareHeuristicHazard);
         else
             trace.setTrace(ResourceTrace.ResourceTraceUnknown);
 
-        if (heuristicPrepare) {
-            System.out.println("HEURISTIC : throwing HeuristicHazard");
-
-            if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
-                trace.setTrace(ResourceTrace.ResourceTracePrepareHeuristicHazard);
-            else
-                trace.setTrace(ResourceTrace.ResourceTraceUnknown);
-
-            throw new HeuristicHazard();
-        }
-
-        System.out.println("\tHEURISTIC : VoteCommit");
-
-        return Vote.VoteCommit;
+        throw new HeuristicHazard();
     }
 
-    public void rollback() throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
-        System.out.println("HEURISTIC : ROLLBACK");
+    System.out.println("\tHEURISTIC : VoteCommit");
+    
+    return Vote.VoteCommit;
+    }
+
+    public void rollback () throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard
+    {
+    System.out.println("HEURISTIC : ROLLBACK");
 
         if (trace.getTrace() == ResourceTrace.ResourceTraceNone)
-            trace.setTrace(ResourceTrace.ResourceTraceRollback);
-        else {
-            if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
-                trace.setTrace(ResourceTrace.ResourceTracePrepareRollback);
-            else
-                trace.setTrace(ResourceTrace.ResourceTraceUnknown);
-        }
+        trace.setTrace(ResourceTrace.ResourceTraceRollback);
+    else
+    {
+        if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
+        trace.setTrace(ResourceTrace.ResourceTracePrepareRollback);
+        else
+        trace.setTrace(ResourceTrace.ResourceTraceUnknown);
+    }
     }
 
-    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
-        System.out.println("HEURISTIC : COMMIT");
+    public void commit () throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
+    System.out.println("HEURISTIC : COMMIT");
 
         if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
-            trace.setTrace(ResourceTrace.ResourceTracePrepareCommit);
-        else
-            trace.setTrace(ResourceTrace.ResourceTraceUnknown);
+        trace.setTrace(ResourceTrace.ResourceTracePrepareCommit);
+    else
+        trace.setTrace(ResourceTrace.ResourceTraceUnknown);
 
-        if (!heuristicPrepare) {
-            System.out.println("HEURISTIC : throwing HeuristicRollback");
+    if (!heuristicPrepare)
+    {
+        System.out.println("HEURISTIC : throwing HeuristicRollback");
 
             if (trace.getTrace() == ResourceTrace.ResourceTracePrepareCommit)
-                trace.setTrace(ResourceTrace.ResourceTracePrepareCommitHeurisiticRollback);
-            else
-                trace.setTrace(ResourceTrace.ResourceTraceUnknown);
+        trace.setTrace(ResourceTrace.ResourceTracePrepareCommitHeurisiticRollback);
+        else
+        trace.setTrace(ResourceTrace.ResourceTraceUnknown);
 
-            throw new HeuristicRollback();
-        }
+        throw new HeuristicRollback();
+    }
     }
 
-    public void forget() throws SystemException {
-        System.out.println("HEURISTIC : FORGET");
+    public void forget () throws SystemException
+    {
+    System.out.println("HEURISTIC : FORGET");
 
         if (trace.getTrace() == ResourceTrace.ResourceTracePrepare)
             trace.setTrace(ResourceTrace.ResourceTracePrepareForget);
@@ -140,8 +151,9 @@ public class heuristic extends org.omg.CosTransactions.ResourcePOA {
             trace.setTrace(ResourceTrace.ResourceTraceUnknown);
     }
 
-    public void commit_one_phase() throws SystemException, HeuristicHazard {
-        System.out.println("HEURISTIC : COMMIT_ONE_PHASE");
+    public void commit_one_phase () throws SystemException, HeuristicHazard
+    {
+    System.out.println("HEURISTIC : COMMIT_ONE_PHASE");
 
         if (trace.getTrace() == ResourceTrace.ResourceTraceNone)
             trace.setTrace(ResourceTrace.ResourceTraceCommitOnePhase);

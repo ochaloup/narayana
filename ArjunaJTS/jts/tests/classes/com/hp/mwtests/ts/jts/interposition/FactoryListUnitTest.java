@@ -49,31 +49,38 @@ import com.arjuna.ats.jts.extensions.Arjuna;
 import com.arjuna.ats.jts.utils.Utility;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class FactoryListUnitTest extends TestBase {
+public class FactoryListUnitTest extends TestBase
+{
     @SuppressWarnings("static-access")
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         FactoryList factory = new FactoryList();
-
+        
         factory.removeDefault();
-
-        try {
+        
+        try
+        {
             assertNull(factory.recreate(null, FactoryList.DEFAULT_ID));
-
-            fail();
-        } catch (final INVALID_TRANSACTION ex) {
-        } catch (final Throwable ex) {
+            
             fail();
         }
-
+        catch (final INVALID_TRANSACTION ex)
+        {
+        }
+        catch (final Throwable ex)
+        {
+            fail();
+        }
+        
         FactoryList.remove(Arjuna.restrictedXID());
-
+        
         TransactionFactoryImple imple = new TransactionFactoryImple("test");
         ControlImple tx = imple.createLocal(1000);
-
+        
         PropagationContext ctx = tx.get_coordinator().get_txcontext();
         Control cont = FactoryList.recreate(ctx, Arjuna.XID());
-
+        
         assertTrue(Utility.getUid(cont).equals(tx.get_uid()));
     }
 }

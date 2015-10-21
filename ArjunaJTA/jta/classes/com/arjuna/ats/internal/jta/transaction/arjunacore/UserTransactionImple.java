@@ -41,21 +41,21 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 
 public class UserTransactionImple extends BaseTransaction
-        implements
-            javax.transaction.UserTransaction,
-            javax.naming.spi.ObjectFactory,
-            Serializable,
-            Referenceable {
-
-    public UserTransactionImple() {
+        implements javax.transaction.UserTransaction, javax.naming.spi.ObjectFactory, Serializable, Referenceable {
+    
+    public UserTransactionImple ()
+    {
     }
 
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
+                                    Hashtable environment) throws Exception
+    {
         return this;
     }
 
     @Override
-    public Reference getReference() throws NamingException {
+    public Reference getReference() throws NamingException
+    {
         return new Reference(this.getClass().getCanonicalName(), this.getClass().getCanonicalName(), null);
     }
 }

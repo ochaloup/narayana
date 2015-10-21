@@ -37,63 +37,68 @@ import java.util.Hashtable;
 import com.arjuna.common.internal.util.ClassloadingUtility;
 
 /**
- * Keep track of any "modifiers" we may require to run transactions over
- * specific databases. A modifier implementation has two interfaces, one for XA
- * processing and is used by the JTA layer, and one for connection processing
- * and is used by the JDBC layer. A user needs to know which interface they
+ * Keep track of any "modifiers" we may require to run
+ * transactions over specific databases.
+ * A modifier implementation has two interfaces, one for XA processing
+ * and is used by the JTA layer, and one for connection processing and
+ * is used by the JDBC layer. A user needs to know which interface they
  * require and cast appropriately.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ModifierFactory.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ModifierFactory.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 2.0.
  */
 
-public class ModifierFactory {
+public class ModifierFactory
+{
 
-    public static synchronized void putModifier(String dbName, int major, int minor, String modclass) {
-        ConnectionModifier connectionModifier = ClassloadingUtility.loadAndInstantiateClass(ConnectionModifier.class,
-                modclass, null);
-        if (connectionModifier != null) {
-            _modifiers.put(dbName + "_" + major + "_" + minor, connectionModifier);
+    public static synchronized void putModifier (String dbName, int major, int minor, String modclass)
+    {
+        ConnectionModifier connectionModifier = ClassloadingUtility.loadAndInstantiateClass(ConnectionModifier.class, modclass, null);
+        if(connectionModifier != null) {
+            _modifiers.put(dbName+"_"+major+"_"+minor, connectionModifier);
         }
     }
 
     /*
      * Convert input to lower case first.
      */
+    
+    public static synchronized ConnectionModifier getModifier (String dbName, int major, int minor)
+    {
+    String exactMatch = null;
+    String majorMatch = null;
+    String driverMatch = null;
+    Enumeration e = _modifiers.keys();
+    
+    dbName = dbName.toLowerCase();
 
-    public static synchronized ConnectionModifier getModifier(String dbName, int major, int minor) {
-        String exactMatch = null;
-        String majorMatch = null;
-        String driverMatch = null;
-        Enumeration e = _modifiers.keys();
+    while (e.hasMoreElements())
+    {
+        String s = (String) e.nextElement();
 
-        dbName = dbName.toLowerCase();
-
-        while (e.hasMoreElements()) {
-            String s = (String) e.nextElement();
-
-            if (s.equalsIgnoreCase(dbName + "_" + major + "_" + minor))
-                exactMatch = s;
-            if (s.equalsIgnoreCase(dbName + "_" + major + "_-1"))
-                majorMatch = s;
-            if (s.equalsIgnoreCase(dbName + "_-1_-1"))
-                driverMatch = s;
-        }
-
-        if (exactMatch != null)
-            return _modifiers.get(exactMatch);
-        if (majorMatch != null)
-            return _modifiers.get(majorMatch);
-        if (driverMatch != null)
-            return _modifiers.get(driverMatch);
-
-        return null;
+        if (s.equalsIgnoreCase(dbName + "_" + major + "_" + minor))
+        exactMatch = s;
+        if (s.equalsIgnoreCase(dbName + "_" + major + "_-1"))
+        majorMatch = s;
+        if (s.equalsIgnoreCase(dbName + "_-1_-1"))
+        driverMatch = s;
     }
 
-    private static Hashtable<String, ConnectionModifier> _modifiers = new Hashtable<String, ConnectionModifier>();
+    if (exactMatch != null)
+        return _modifiers.get(exactMatch);
+    if (majorMatch != null)
+        return _modifiers.get(majorMatch);
+    if (driverMatch != null)
+        return _modifiers.get(driverMatch);
 
-    static {
-        new list();
+    return null;
+    }    
+
+    private static Hashtable<String,ConnectionModifier> _modifiers = new Hashtable<String,ConnectionModifier>();
+    
+    static
+    {
+    new list();
     }
 }

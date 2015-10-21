@@ -40,37 +40,46 @@ import javax.transaction.Transaction;
  * It needs to tidy-up any Worker-to-transaction associations and to tear down
  * any other transaction-specific data that we may be holding (e.g., TxWorkers).
  * 
- * @author mcl
+ * @author mcl 
  */
 
-public class WorkSynchronization implements javax.transaction.Synchronization {
+public class WorkSynchronization implements javax.transaction.Synchronization
+{
 
-    public WorkSynchronization(Transaction current) {
+    public WorkSynchronization (Transaction current)
+    {
         _current = current;
     }
 
     /**
-     * If the current transaction still has work associated with it, then we
-     * need to throw an exception. This will cause the current transaction to
-     * rollback.
+     * If the current transaction still has work associated with it, then we need to
+     * throw an exception. This will cause the current transaction to rollback.
      */
-
-    public void beforeCompletion() {
+    
+    public void beforeCompletion ()
+    {
         // check no work associated with transaction
-
-        try {
-            if (TxWorkManager.hasWork(_current)) {
+        
+        try
+        {
+            if (TxWorkManager.hasWork(_current))
+            {
                 /*
-                 * JBoss way of doing things is broken: they throw
-                 * IllegalStateException in an invalid manner (see JTA spec.)
-                 * and don't force the transaction to rollback.
-                 */
-
+                 * JBoss way of doing things is broken: they
+                 * throw IllegalStateException in an invalid manner
+                 * (see JTA spec.) and don't force the transaction to
+                 * rollback.
+                 */  
+                
                 throw new IllegalStateException();
             }
-        } catch (IllegalStateException ex) {
+        }
+        catch (IllegalStateException ex)
+        {
             throw ex;
-        } finally {
+        }
+        finally
+        {
             _current = null;
         }
     }
@@ -78,11 +87,12 @@ public class WorkSynchronization implements javax.transaction.Synchronization {
     /**
      * A null-op.
      */
-
-    public void afterCompletion(int status) {
+    
+    public void afterCompletion (int status)
+    {
         // do nothing
     }
 
     private Transaction _current;
-
+    
 }

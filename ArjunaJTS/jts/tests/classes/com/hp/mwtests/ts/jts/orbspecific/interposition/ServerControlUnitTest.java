@@ -42,23 +42,24 @@ import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImpl
 import com.arjuna.ats.internal.jts.orbspecific.interposition.ServerControl;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class ServerControlUnitTest extends TestBase {
+public class ServerControlUnitTest extends TestBase
+{
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
-                theControl.get_terminator());
-
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator());
+        
         assertTrue(sc.isWrapper());
         assertTrue(sc.get_coordinator() != null);
         assertTrue(sc.get_terminator() != null);
-
+        
         assertEquals(sc.getParentImple(), null);
         assertTrue(sc.forgetHeuristics());
         assertTrue(sc.toString() != null);
-
+        
         sc.destroy();
     }
 }

@@ -38,33 +38,44 @@ import javax.transaction.Synchronization;
 import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 
 /**
- * A synchronization to close the database connection when the transaction has
- * committed or rolled back.
+ * A synchronization to close the database connection when the transaction
+ * has committed or rolled back.
  *
- * @version $Id: ConnectionSynchronization.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ConnectionSynchronization.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class ConnectionSynchronization implements Synchronization {
+public class ConnectionSynchronization implements Synchronization
+{
 
-    public ConnectionSynchronization(Connection conn, TransactionalDriverXAConnection rxac) {
-        _theConnection = conn;
-        _recoveryConnection = rxac;
+    public ConnectionSynchronization (Connection conn, TransactionalDriverXAConnection rxac)
+    {
+    _theConnection = conn;
+    _recoveryConnection = rxac;
     }
 
-    public void afterCompletion(int status) {
-        try {
-            _theConnection.close();
-        } catch (Exception ex) {
-        }
-        try {
-            _recoveryConnection.closeCloseCurrentConnection();
-        } catch (Exception ex) {
-        }
+    public void afterCompletion(int status)
+    {
+    try
+    {
+        _theConnection.close();
+    }
+    catch (Exception ex)
+    {
+    }
+    try
+    {
+        _recoveryConnection.closeCloseCurrentConnection();
+    }
+    catch (Exception ex)
+    {
+    }
     }
 
-    public void beforeCompletion() {
+    public void beforeCompletion()
+    {
     }
 
     private Connection _theConnection = null;
     private TransactionalDriverXAConnection _recoveryConnection;
 }
+

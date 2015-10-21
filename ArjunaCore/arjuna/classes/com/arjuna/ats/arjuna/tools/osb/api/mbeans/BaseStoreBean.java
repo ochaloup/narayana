@@ -44,15 +44,14 @@ public abstract class BaseStoreBean extends NotificationBroadcasterSupport imple
 
     /**
      * The object name that the MBean will be registered with the MBean Server
-     * 
      * @return the MBeans object name
      */
     protected abstract ObjectName getMBeanName();
 
     // implementation of methods in the BaseStore interface
 
-    public String getStoreName() {
-        return store.getStoreName();
+    public String getStoreName () {
+        return store.getStoreName ();
     }
 
     /**
@@ -61,27 +60,29 @@ public abstract class BaseStoreBean extends NotificationBroadcasterSupport imple
     public void start() {
         StoreManagerProxy.registerBean(getMBeanName(), this, true);
         generateNotification("Registering ObjectStore MBean");
-        // store.start ();
+//        store.start ();        
     }
 
     /**
      * life cycle method for un-registering the MBean
      */
     public void stop() {
-        // store.stop ();
+//        store.stop ();
         generateNotification("Unregistering ObjectStore MBean");
         StoreManagerProxy.registerBean(getMBeanName(), this, false);
     }
 
     private void generateNotification(String message) {
-        AttributeChangeNotification acn = new AttributeChangeNotification(this, 0, 0, message, "storeName", "String",
-                "oldValue", "newValue");
+        AttributeChangeNotification acn = new AttributeChangeNotification(this, 0, 0, message,
+            "storeName", "String", "oldValue", "newValue");
         sendNotification(acn);
     }
 
     public MBeanNotificationInfo[] getNotificationInfo() {
-        return new MBeanNotificationInfo[]{new MBeanNotificationInfo(
-                new String[]{AttributeChangeNotification.ATTRIBUTE_CHANGE}, AttributeChangeNotification.class.getName(),
-                "Generated when the ObjectStore MBean is registered and destroyed")};
+        return new MBeanNotificationInfo[] {new MBeanNotificationInfo(
+            new String[] { AttributeChangeNotification.ATTRIBUTE_CHANGE },
+            AttributeChangeNotification.class.getName(),
+            "Generated when the ObjectStore MBean is registered and destroyed")
+        };
     }
 }

@@ -33,10 +33,13 @@ package com.hp.mwtests.ts.jta.basic;
 
 import org.junit.Test;
 
-public class NullResource {
+public class NullResource
+{
     @Test
-    public void test() throws Exception {
-        for (int i = 0; i < 1000; i++) {
+    public void test() throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
             javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
             tm.begin();

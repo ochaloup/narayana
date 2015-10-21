@@ -34,11 +34,12 @@ import org.omg.CosTransactions.RecoveryCoordinatorHelper;
 import org.omg.CosTransactions._RecoveryCoordinatorStub;
 
 /**
- * Construct a recovery IOR for use with the default ORB bundled with the
- * default JDK
+ * Construct a recovery IOR for use with the default ORB bundled with the default JDK
  */
-public class RecoverIOR {
-    static String getIORFromString(org.omg.CORBA.ORB orb, String str, String Key) {
+public class RecoverIOR
+{
+    static String getIORFromString(org.omg.CORBA.ORB orb, String str, String Key )
+    {
         com.ibm.CORBA.iiop.ORB sun_orb = (com.ibm.CORBA.iiop.ORB) orb;
 
         // calculate the new object key
@@ -47,12 +48,11 @@ public class RecoverIOR {
         String new_object_key = object_key.substring(0, position).concat(Key);
         org.omg.CORBA.Object corbject = ORBManager.getORB().orb().string_to_object(str);
 
-        // com.sun.corba.se.spi.ior.IOR ior = IORFactories.getIOR(corbject);
-        // ObjectId oid = IORFactories.makeObjectId(new_object_key.getBytes());
-        // IORImpl new_ior = new IORImpl(sun_orb,
-        // RecoveryCoordinatorHelper.id(), ior.getIORTemplates(), oid);
+//        com.sun.corba.se.spi.ior.IOR ior = IORFactories.getIOR(corbject);
+//        ObjectId oid = IORFactories.makeObjectId(new_object_key.getBytes());
+//        IORImpl new_ior = new IORImpl(sun_orb, RecoveryCoordinatorHelper.id(), ior.getIORTemplates(), oid);
 
-        // return new_ior.stringify();
+//        return new_ior.stringify();
 
         return ((_RecoveryCoordinatorStub) corbject)._get_delegate().toString();
     }

@@ -44,8 +44,7 @@ public final class ParticipantsContainer {
         return volatileParticipants.get(participantId);
     }
 
-    public void addParticipantInformation(final String participantId,
-            final ParticipantInformation participantInformation) {
+    public void addParticipantInformation(final String participantId, final ParticipantInformation participantInformation) {
         participantsInformation.put(participantId, participantInformation);
     }
 

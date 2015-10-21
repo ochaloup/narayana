@@ -9,29 +9,35 @@ import org.junit.runner.RunWith;
 import com.arjuna.mw.wst11.UserTransaction;
 import com.arjuna.wstx.tests.arq.WarDeployment;
 
-class ThreadedObject extends Thread {
+class ThreadedObject extends Thread
+{
     Exception exception;
 
-    public ThreadedObject() {
+    public ThreadedObject ()
+    {
         exception = null;
     }
 
-    public void run() {
-        try {
+    public void run ()
+    {
+        try
+        {
             UserTransaction ut = UserTransaction.getUserTransaction();
 
             ut.begin();
 
-            System.out.println("Thread " + Thread.currentThread() + " started " + ut);
+            System.out.println("Thread "+Thread.currentThread()+" started "+ut);
 
             Thread.yield();
 
-            System.out.println("\nThread " + Thread.currentThread() + " committing " + ut);
+            System.out.println("\nThread "+Thread.currentThread()+" committing "+ut);
 
             ut.commit();
 
             Thread.yield();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
             exception = ex;
         }
@@ -43,11 +49,14 @@ public class ThreadedTransactionTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(ThreadedObject.class);
+        return WarDeployment.getDeployment(
+                ThreadedObject.class);
     }
 
     @Test
-    public void testThreadedTransaction() throws Exception {
+    public void testThreadedTransaction()
+            throws Exception
+            {
         int size = 10;
         ThreadedObject objs[] = new ThreadedObject[size];
 
@@ -65,5 +74,5 @@ public class ThreadedTransactionTest {
                 throw objs[k].exception;
             }
         }
-    }
+            }
 }

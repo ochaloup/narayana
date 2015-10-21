@@ -37,6 +37,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Arquillian.class)
@@ -45,7 +46,8 @@ public class CloseBeforeCompletedTest {
     @Deployment
     public static WebArchive createDeployment() {
 
-        return WarDeployment.getDeployment(DemoBusinessParticipant.class,
+        return WarDeployment.getDeployment(
+                DemoBusinessParticipant.class,
                 ParticipantCompletionCoordinatorCloseBeforeCompletedRules.class);
     }
 

@@ -38,9 +38,11 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.hp.mwtests.ts.txoj.common.resources.RecoverableObject;
 
-public class RecoverableTest {
+public class RecoverableTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         RecoverableObject foo = new RecoverableObject();
 
         AtomicAction A = new AtomicAction();
@@ -68,3 +70,4 @@ public class RecoverableTest {
         assertEquals(4, foo.get());
     }
 }
+

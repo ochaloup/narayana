@@ -5,8 +5,10 @@ import com.arjuna.mw.wst11.deploy.WSTXInitialisation;
 /**
  * A class used to perform all 1.1 client side initialisation
  */
-public class ClientSideStandaloneInitialisation implements XTSInitialisation {
-    public void startup() throws Exception {
+public class ClientSideStandaloneInitialisation implements XTSInitialisation
+{
+    public void startup() throws Exception
+    {
         // there is no WS-C client startup
 
         // there is no WS-T client startup for the standalone client
@@ -18,7 +20,8 @@ public class ClientSideStandaloneInitialisation implements XTSInitialisation {
         WSTXInitialisation.startup();
     }
 
-    public void shutdown() throws Exception {
+    public void shutdown() throws Exception
+    {
         // run WSTX shutdown code
 
         WSTXInitialisation.shutdown();

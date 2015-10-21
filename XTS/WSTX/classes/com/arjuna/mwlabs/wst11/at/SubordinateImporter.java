@@ -12,19 +12,20 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 import java.util.HashMap;
 
 /**
- * class to manage association of incoming AT transactions with subordinate AT
- * transactions coordinated by the local coordination servcie
+ * class to manage association of incoming AT transactions with subordinate AT transactions
+ * coordinated by the local coordination servcie
  */
-public class SubordinateImporter {
+public class SubordinateImporter
+{
     private static HashMap<String, TxContext> subordinateContextMap = new HashMap<String, TxContext>();
 
     /**
      * handle on the local 1.1 context factory implementation
      */
-    private static ContextFactoryImple atContextFactory = (ContextFactoryImple) ContextFactoryMapper.getMapper()
-            .getContextFactory(AtomicTransactionConstants.WSAT_PROTOCOL);
+    private static ContextFactoryImple atContextFactory = (ContextFactoryImple) ContextFactoryMapper.getMapper().getContextFactory(AtomicTransactionConstants.WSAT_PROTOCOL);
 
-    public static TxContext importContext(CoordinationContextType cc) {
+    public static TxContext importContext(CoordinationContextType cc)
+    {
         // get the subordinate transaction manager to install any existing
         // subordinate tx for this one or create and install a new one.
         final String identifier = cc.getIdentifier().getValue();
@@ -40,16 +41,14 @@ public class SubordinateImporter {
             subordinateTxContext = new TxContextImple(context);
             subordinateContextMap.put(identifier, subordinateTxContext);
 
-            // register a cleanup callback with the subordinate transactionso
-            // that the entry gets removed
+            // register a cleanup callback with the subordinate transactionso that the entry gets removed
             // when the transcation commits or rolls back
-
-            String subordinateId = context.getIdentifier().getValue().substring(4); // remove
-                                                                                    // "urn:"
-                                                                                    // prefix
+            
+            String subordinateId = context.getIdentifier().getValue().substring(4); // remove "urn:" prefix
             SubordinateATCoordinator.SubordinateCallback callback = new SubordinateATCoordinator.SubordinateCallback() {
                 public String parentId = identifier;
-                public void run() {
+                public void run()
+                {
                     subordinateContextMap.remove(parentId);
                 }
             };

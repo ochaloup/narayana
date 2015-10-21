@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
  */
 public abstract class ParticipantInterceptor {
 
+
     @AroundInvoke
     public Object intercept(InvocationContext ic) throws Exception {
 
@@ -45,6 +46,7 @@ public abstract class ParticipantInterceptor {
 
         Object result;
         try {
+
 
             result = ic.proceed();
             participantManager.completed();

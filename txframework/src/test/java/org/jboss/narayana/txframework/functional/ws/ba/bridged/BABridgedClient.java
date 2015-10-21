@@ -34,8 +34,8 @@ public class BABridgedClient {
     public static BABridged newInstance() throws Exception {
 
         URLUtils urlUtils = new URLUtils();
-        URL wsdlLocation = new URL(
-                urlUtils.getBaseUrl() + ":" + urlUtils.getBasePort() + "/test/BABridgedService/BABridged?wsdl");
+        URL wsdlLocation = new URL(urlUtils.getBaseUrl() + ":" + urlUtils.getBasePort()
+                + "/test/BABridgedService/BABridged?wsdl");
         QName serviceName = new QName("http://www.jboss.com/functional/ba/bridged/", "BABridgedService");
         QName portName = new QName("http://www.jboss.com/functional/ba/bridged/", "BABridgedService");
 
@@ -45,3 +45,4 @@ public class BABridgedClient {
         return client;
     }
 }
+

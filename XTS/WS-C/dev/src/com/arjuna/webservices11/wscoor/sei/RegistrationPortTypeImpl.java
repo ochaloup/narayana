@@ -19,38 +19,42 @@ import com.arjuna.webservices11.wsarj.ArjunaContext;
 import com.arjuna.webservices11.wsaddr.AddressingHelper;
 
 /**
- * Created by IntelliJ IDEA. User: adinn Date: Sep 27, 2007 Time: 1:33:06 PM To
- * change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA.
+ * User: adinn
+ * Date: Sep 27, 2007
+ * Time: 1:33:06 PM
+ * To change this template use File | Settings | File Templates.
  */
 
 @WebService(targetNamespace = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06", name = "RegistrationPortType",
         // wsdlLocation = "/WEB-INF/wsdl/wscoor-registration-binding.wsdl",
-        serviceName = "RegistrationService", portName = "RegistrationPortType"
-// endpointInterface =
-// "org.oasis_open.docs.ws_tx.wscoor._2006._06.RegistrationPortType",
+        serviceName = "RegistrationService",
+        portName = "RegistrationPortType"
+        // endpointInterface = "org.oasis_open.docs.ws_tx.wscoor._2006._06.RegistrationPortType",
 )
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 // @EndpointConfig(configName = "Standard WSAddressing Endpoint")
-@HandlerChain(file = "/ws-c_handlers.xml")
-@Addressing(required = true)
+@HandlerChain(file="/ws-c_handlers.xml")
+@Addressing(required=true)
 public class RegistrationPortTypeImpl // implements RegistrationPortType
 {
-    @Resource
-    private WebServiceContext webServiceCtx;
+    @Resource private WebServiceContext webServiceCtx;
 
     @WebResult(targetNamespace = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06", partName = "parameters", name = "RegisterResponse")
     @WebMethod(operationName = "RegisterOperation", action = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06/Register")
-    @Action(input = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06/Register", output = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06/RegisterResponse")
+    @Action(input="http://docs.oasis-open.org/ws-tx/wscoor/2006/06/Register", output="http://docs.oasis-open.org/ws-tx/wscoor/2006/06/RegisterResponse")
     public org.oasis_open.docs.ws_tx.wscoor._2006._06.RegisterResponseType registerOperation(
-            @WebParam(targetNamespace = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06", partName = "parameters", name = "Register") org.oasis_open.docs.ws_tx.wscoor._2006._06.RegisterType parameters) {
+        @WebParam(targetNamespace = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06", partName = "parameters", name = "Register")
+        org.oasis_open.docs.ws_tx.wscoor._2006._06.RegisterType parameters
+    )
+    {
         MessageContext ctx = webServiceCtx.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) ctx.get(MessageContext.SERVLET_REQUEST);
+        HttpServletRequest request = (HttpServletRequest)ctx.get(MessageContext.SERVLET_REQUEST);
         boolean isSecure = "https".equals(request.getScheme());
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
-        final ArjunaContext arjunaContext = ArjunaContext.getCurrentContext(ctx);
+        final ArjunaContext arjunaContext = ArjunaContext.getCurrentContext(ctx) ;
 
-        return RegistrationCoordinatorProcessor.getCoordinator().register(parameters, inboundMap, arjunaContext,
-                isSecure);
+        return RegistrationCoordinatorProcessor.getCoordinator().register(parameters, inboundMap, arjunaContext, isSecure);
 
     }
 }

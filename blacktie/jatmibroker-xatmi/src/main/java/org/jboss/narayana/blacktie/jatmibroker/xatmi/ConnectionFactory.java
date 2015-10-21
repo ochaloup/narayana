@@ -15,7 +15,8 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.impl.ConnectionImpl;
  * @see ConnectionException
  */
 public class ConnectionFactory {
-    private static final Logger log = LogManager.getLogger(ConnectionFactory.class);
+    private static final Logger log = LogManager
+            .getLogger(ConnectionFactory.class);
 
     /**
      * The properties inside the connection factory.
@@ -34,7 +35,8 @@ public class ConnectionFactory {
      * @throws ConfigurationException
      *             If the configuration cannot be parsed.
      */
-    public static synchronized ConnectionFactory getConnectionFactory() throws ConfigurationException {
+    public static synchronized ConnectionFactory getConnectionFactory()
+            throws ConfigurationException {
         return new ConnectionFactory();
     }
 

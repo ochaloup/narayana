@@ -23,27 +23,34 @@ public class CancelOnlyCloseTest {
     }
 
     @Test
-    public void testCancelOnlyClose() throws Exception {
+    public void testCancelOnlyClose()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
+        try
+        {
             ua.begin("Sagas11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+            System.out.println("Started: "+ua.identifier()+"\n");
 
             ua.setCancelOnly();
 
             ua.close();
 
             fail("Close succeeded after setCancelOnly");
-        } catch (CoordinatorCancelledException ex) {
+        }
+        catch (CoordinatorCancelledException ex)
+        {
             // we should get here
             WSCF11TestUtils.cleanup(ua);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-    }
+            }
 }

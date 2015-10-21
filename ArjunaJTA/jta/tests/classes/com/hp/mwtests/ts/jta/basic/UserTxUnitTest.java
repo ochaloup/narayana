@@ -25,13 +25,15 @@ import javax.transaction.UserTransaction;
 
 import org.junit.Test;
 
-public class UserTxUnitTest {
+public class UserTxUnitTest
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         UserTransaction ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
-
+        
         ut.begin();
-
+        
         ut.commit();
     }
 }

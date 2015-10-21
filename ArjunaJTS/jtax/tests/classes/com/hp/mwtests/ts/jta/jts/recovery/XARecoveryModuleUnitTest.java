@@ -51,56 +51,62 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jta.common.RecoveryXAResource;
 
-public class XARecoveryModuleUnitTest {
+public class XARecoveryModuleUnitTest
+{
     @Test
-    public void testNull() {
+    public void testNull ()
+    {
         XARecoveryModule xarm = new XARecoveryModule();
-
+        
         xarm.periodicWorkFirstPass();
         xarm.periodicWorkSecondPass();
     }
-
+    
     @Test
-    public void testRecover() throws Exception {
+    public void testRecover () throws Exception
+    {
         ArrayList<String> r = new ArrayList<String>();
         TransactionImple tx = new TransactionImple();
-
+        
         assertTrue(tx.enlistResource(new RecoveryXAResource()));
-
+        
         SubordinateAtomicTransaction sat = new SubordinateAtomicTransaction(tx.get_uid(), tx.getTxId(), 0);
-
+        
         assertEquals(sat.doPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
-
+        
         r.add("com.hp.mwtests.ts.jta.recovery.DummyXARecoveryResource");
 
         jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(r);
-
+        
         XARecoveryModule xarm = new XARecoveryModule();
-
-        for (int i = 0; i < 11; i++) {
+        
+        for (int i = 0; i < 11; i++)
+        {
             xarm.periodicWorkFirstPass();
             xarm.periodicWorkSecondPass();
         }
     }
-
+    
     @Before
-    public void setUp() throws Exception {
+    public void setUp () throws Exception
+    {
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
     }
-
+    
     @After
-    public void tearDown() throws Exception {
+    public void tearDown () throws Exception
+    {
         myOA.destroy();
         myORB.shutdown();
     }
-
+    
     private ORB myORB = null;
     private RootOA myOA = null;
 }

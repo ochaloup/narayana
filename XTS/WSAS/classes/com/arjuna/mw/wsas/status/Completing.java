@@ -39,19 +39,23 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class Completing implements Status {
+public class Completing implements Status
+{
 
-    public static Completing instance() {
-        return _instance;
+    public static Completing instance ()
+    {
+    return _instance;
     }
 
-    public String toString() {
-        return "Status.Completing";
+    public String toString ()
+    {
+    return "Status.Completing";
     }
 
-    private Completing() {
+    private Completing ()
+    {
     }
 
     private static final Completing _instance = new Completing();
-
+    
 }

@@ -53,11 +53,12 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * context propagation is not possible.
  * 
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: ExplicitInterposition.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ExplicitInterposition.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
-public class ExplicitInterposition {
+public class ExplicitInterposition
+{
 
     /**
      * Create a new instance and remember any current transaction that may be
@@ -65,7 +66,8 @@ public class ExplicitInterposition {
      * interposition has finished.
      */
 
-    public ExplicitInterposition() {
+    public ExplicitInterposition ()
+    {
         this(true);
     }
 
@@ -75,9 +77,11 @@ public class ExplicitInterposition {
      * thread so that it can be restored once interposition has finished.
      */
 
-    public ExplicitInterposition(boolean remember) {
+    public ExplicitInterposition (boolean remember)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ExplicitInterposition::ExplicitInterposition ( " + remember + " )");
+            jtsLogger.logger.trace("ExplicitInterposition::ExplicitInterposition ( "
+                    + remember + " )");
         }
 
         _remember = remember;
@@ -92,9 +96,12 @@ public class ExplicitInterposition {
      * can be restored once interposition has finished.
      */
 
-    public ExplicitInterposition(Control action, boolean remember) throws InterpositionFailed, SystemException {
+    public ExplicitInterposition (Control action, boolean remember)
+            throws InterpositionFailed, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ExplicitInterposition::ExplicitInterposition ( Control action, " + remember + " )");
+            jtsLogger.logger.trace("ExplicitInterposition::ExplicitInterposition ( Control action, "
+                    + remember + " )");
         }
 
         _remember = remember;
@@ -111,10 +118,12 @@ public class ExplicitInterposition {
      * can be restored once interposition has finished.
      */
 
-    public ExplicitInterposition(PropagationContext ctx, boolean remember) throws InterpositionFailed, SystemException {
+    public ExplicitInterposition (PropagationContext ctx, boolean remember)
+            throws InterpositionFailed, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger
-                    .trace("ExplicitInterposition::ExplicitInterposition ( PropagationContext ctx, " + remember + " )");
+            jtsLogger.logger.trace("ExplicitInterposition::ExplicitInterposition ( PropagationContext ctx, "
+                    + remember + " )");
         }
 
         _remember = remember;
@@ -124,15 +133,20 @@ public class ExplicitInterposition {
         registerTransaction(ctx);
     }
 
-    public void finalize() {
+    public void finalize ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExplicitInterposition.finalize ()");
         }
 
-        if (_inUse) {
-            try {
+        if (_inUse)
+        {
+            try
+            {
                 unregisterTransaction();
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 jtsLogger.i18NLogger.warn_exunregfail("ExplicitInterposition.finalize");
             }
         }
@@ -142,12 +156,15 @@ public class ExplicitInterposition {
      * Perform interposition with the specified transaction.
      */
 
-    public final synchronized void registerTransaction(Control action) throws InterpositionFailed, SystemException {
+    public final synchronized void registerTransaction (Control action)
+            throws InterpositionFailed, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExplicitInterposition::registerTransaction ( Control action )");
         }
 
-        if (_inUse) {
+        if (_inUse)
+        {
             jtsLogger.i18NLogger.warn_excalledagain("ExplicitInterposition.unregisterTransaction");
 
             throw new InterpositionFailed();
@@ -155,44 +172,61 @@ public class ExplicitInterposition {
 
         boolean registerNull = false;
 
-        if (action != null) {
-            try {
+        if (action != null)
+        {
+            try
+            {
                 Coordinator coord = action.get_coordinator();
 
-                if (coord != null) {
+                if (coord != null)
+                {
                     PropagationContext ctx = coord.get_txcontext();
 
-                    if (ctx != null) {
-                        try {
+                    if (ctx != null)
+                    {
+                        try
+                        {
                             registerTransaction(ctx);
                             ctx = null;
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             e.printStackTrace();
 
                             ctx = null;
 
                             throw new InterpositionFailed(e.toString());
                         }
-                    } else
+                    }
+                    else
                         registerNull = true;
 
                     coord = null;
-                } else
+                }
+                else
                     registerNull = true;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
                 throw new InterpositionFailed(e.toString());
             }
-        } else {
+        }
+        else
+        {
             _inUse = true;
             registerNull = true;
         }
 
-        if (registerNull) {
-            try {
+        if (registerNull)
+        {
+            try
+            {
                 OTSImpleManager.current().resume((Control) null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
                 throw new InterpositionFailed(e.toString());
@@ -206,34 +240,48 @@ public class ExplicitInterposition {
      * interposition class ends!
      */
 
-    public synchronized void unregisterTransaction() throws SystemException {
+    public synchronized void unregisterTransaction () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExplicitInterposition::unregisterTransaction ()");
         }
 
         if (!_inUse)
-            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION, CompletionStatus.COMPLETED_NO);
-        else {
-            try {
+            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION,
+                    CompletionStatus.COMPLETED_NO);
+        else
+        {
+            try
+            {
                 Control control = OTSImpleManager.current().suspend();
 
                 control = null;
 
-                if (_remember && (_oldControl != null)) {
-                    try {
+                if (_remember && (_oldControl != null))
+                {
+                    try
+                    {
                         OTSImpleManager.current().resumeWrapper(_oldControl);
                         _oldControl = null;
-                    } catch (Exception exp) {
+                    }
+                    catch (Exception exp)
+                    {
                         throw new UNKNOWN(exp.toString());
                     }
                 }
-            } catch (UNKNOWN exp) {
+            }
+            catch (UNKNOWN exp)
+            {
                 throw exp;
-            } catch (SystemException ex) {
+            }
+            catch (SystemException ex)
+            {
                 _inUse = false;
 
                 throw ex;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 _inUse = false;
 
                 throw new UNKNOWN(e.toString());
@@ -243,26 +291,30 @@ public class ExplicitInterposition {
         }
     }
 
-    private final synchronized void registerTransaction(PropagationContext ctx)
-            throws InterpositionFailed, SystemException {
+    private final synchronized void registerTransaction (PropagationContext ctx)
+            throws InterpositionFailed, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExplicitInterposition::registerTransaction ( PropagationContext ctx )");
         }
 
-        if (_inUse) {
+        if (_inUse)
+        {
             jtsLogger.i18NLogger.warn_excalledagain("ExplicitInterposition.registerTransaction");
 
             throw new InterpositionFailed();
         }
 
         if ((ctx == null) || (ctx.current.coord == null)) // invalid
-            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION, CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION,
+                    CompletionStatus.COMPLETED_NO);
 
         _inUse = true;
 
         TransactionFactoryImple _localFactory = OTSImpleManager.factory();
 
-        try {
+        try
+        {
             ControlImple cont = _localFactory.recreateLocal(ctx);
             CurrentImple current = OTSImpleManager.current();
 
@@ -272,24 +324,31 @@ public class ExplicitInterposition {
              * remembered them explicitly.
              */
 
-            if (_remember) {
-                try {
+            if (_remember)
+            {
+                try
+                {
                     _oldControl = current.suspendWrapper();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     throw new InterpositionFailed();
                 }
             }
 
             current.resumeImple(cont);
 
-            // current.resume(cont.getControl());
+            //        current.resume(cont.getControl());
 
             cont = null;
-        } catch (InterpositionFailed ex) {
+        }
+        catch (InterpositionFailed ex)
+        {
             throw ex;
-        } catch (Exception e) {
-            jtsLogger.i18NLogger.warn_eicaughtexception("ExplicitInterposition.registerTransaction(PropagationContext)",
-                    e);
+        }
+        catch (Exception e)
+        {
+            jtsLogger.i18NLogger.warn_eicaughtexception("ExplicitInterposition.registerTransaction(PropagationContext)", e);
 
             throw new InterpositionFailed();
         }

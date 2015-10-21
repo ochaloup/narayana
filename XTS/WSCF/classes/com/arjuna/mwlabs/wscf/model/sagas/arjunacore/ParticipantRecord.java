@@ -57,7 +57,9 @@ import java.io.PrintWriter;
  * @version $Id: ParticipantRecord.java,v 1.6 2005/05/19 12:13:37 nmcl Exp $
  */
 
-public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.AbstractRecord {
+public class ParticipantRecord extends
+        com.arjuna.ats.arjuna.coordinator.AbstractRecord
+{
 
     /**
      * Constructor.
@@ -67,7 +69,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public ParticipantRecord(Participant theResource, Uid id) {
+    public ParticipantRecord (Participant theResource, Uid id)
+    {
         super(id, null, ObjectType.ANDPERSISTENT);
 
         _resourceHandle = theResource;
@@ -82,7 +85,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * Override AbstractRecord.propagateOnCommit
      */
 
-    public boolean propagateOnCommit() {
+    public boolean propagateOnCommit ()
+    {
         return true;
     }
 
@@ -90,9 +94,10 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * The type of this abstract record.
      */
 
-    public int typeIs() {
+    public int typeIs ()
+    {
         // TODO add to record list
-
+        
         return RecordType.XTS_WSBA_RECORD;
     }
 
@@ -100,7 +105,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * The internal value.
      */
 
-    public Object value() {
+    public Object value ()
+    {
         return _resourceHandle;
     }
 
@@ -109,7 +115,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public void setValue(Object o) {
+    public void setValue (Object o)
+    {
         wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_2();
     }
 
@@ -119,13 +126,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      */
 
     // TODO
-    public int nestedAbort() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedAbort ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_3(order(), ex6);
 
             ex6.printStackTrace();
@@ -139,13 +151,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int nestedCommit() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_4(order(), ex6);
 
             ex6.printStackTrace();
@@ -159,13 +176,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int nestedPrepare() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedPrepare ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.PREPARE_NOTOK;
-        } catch (Exception e6) {
+        }
+        catch (Exception e6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_5(order(), e6);
 
             e6.printStackTrace();
@@ -179,46 +201,52 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int topLevelAbort() {
-        try {
-            if (_resourceHandle != null) {
-                try {
-                    if (!_exited) {
-                        if (_completed)
-                            _resourceHandle.compensate();
+    public int topLevelAbort ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
+                    if (!_exited)
+                    {
+                        if (_completed) _resourceHandle.compensate();
                         else
                             _resourceHandle.cancel();
                     }
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (WrongStateException ex) {
-                    // this indicates a fail occured and was detected during
-                    // cancel (or compensation?) so we return a
-                    // HEURISTIC_HAZARD which will place the participant in the
-                    // heuristic list
+                }
+                catch (WrongStateException ex)
+                {
+                    // this indicates a fail occured and was detected during cancel (or compensation?) so we return a
+                    // HEURISTIC_HAZARD which will place the participant in the heuristic list
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (CancelFailedException ex) {
-                    // this indicates a fail occured and was detected during
-                    // cancel so we return a HEURISTIC_HAZARD
+                }
+                catch (CancelFailedException ex)
+                {
+                    // this indicates a fail occured and was detected during cancel so we return a HEURISTIC_HAZARD
                     // which will place the participant in the heuristic list
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (CompensateFailedException ex) {
-                    // this indicates a fail occured during compensation so we
-                    // return a HEURISTIC_HAZARD
+                }
+                catch (CompensateFailedException ex)
+                {
+                    // this indicates a fail occured during compensation so we return a HEURISTIC_HAZARD
                     // which will place the participant in the heuristic list
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (SystemException ex) {
-                    // this indicates a comms failure so we return FINISH_ERROR
-                    // which will place
-                    // the participant in the failed list and cause a retry of
-                    // the close
+                }
+                catch (SystemException ex)
+                {
+                    // this indicates a comms failure so we return FINISH_ERROR which will place
+                    // the participant in the failed list and cause a retry of the close
                     return TwoPhaseOutcome.FINISH_ERROR;
                 }
 
-                // we are not guaranteed to detect all state transitions so we
-                // still have to
-                // make sure we did not fail and then end while we were trying
-                // to cancel or
+                // we are not guaranteed to detect all state transitions so we still have to
+                // make sure we did not fail and then end while we were trying to cancel or
                 // compensate
 
                 if (_failed) {
@@ -226,9 +254,11 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                 }
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_6(order(), ex6);
 
             ex6.printStackTrace();
@@ -242,39 +272,45 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int topLevelCommit() {
-        try {
-            if (_resourceHandle != null) {
-                try {
-                    if (!_exited)
-                        _resourceHandle.close();
-                } catch (InvalidParticipantException ex) {
+    public int topLevelCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
+                    if (!_exited) _resourceHandle.close();
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (WrongStateException ex) {
-                    // this indicates a failure to close so we notify a
-                    // heuristic hazard
+                }
+                catch (WrongStateException ex)
+                {
+                    // this indicates a failure to close so we notify a heuristic hazard
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (SystemException ex) {
-                    // this indicates a comms failure so we return FINISH_ERROR
-                    // which will place
-                    // the participant in the failed list and cause a retry of
-                    // the close
+                }
+                catch (SystemException ex)
+                {
+                    // this indicates a comms failure so we return FINISH_ERROR which will place
+                    // the participant in the failed list and cause a retry of the close
                     return TwoPhaseOutcome.FINISH_ERROR;
                 }
 
-                // if we have failed we notify a heuristic hazard to ensure that
-                // the
-                // participant is placed in the heuristic list and the
-                // transaction is logged
+                // if we have failed we notify a heuristic hazard to ensure that the
+                // participant is placed in the heuristic list and the transaction is logged
 
                 if (_failed) {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
                 }
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_7(order(), ex6);
 
             ex6.printStackTrace();
@@ -288,28 +324,28 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int topLevelPrepare() {
-        try {
+    public int topLevelPrepare ()
+    {
+        try
+        {
             boolean result;
             if (_failed) {
-                // if we have failed we return heuristic hazard so the
-                // participant is added to
+                // if we have failed we return heuristic hazard so the participant is added to
                 // the heuristic list and the transaction is logged
 
                 return TwoPhaseOutcome.HEURISTIC_HAZARD;
             } else if (_exited) {
-                // otherwise if we have exited then this means the resource is
-                // read only
+                // otherwise if we have exited then this means the resource is read only
 
                 return TwoPhaseOutcome.PREPARE_READONLY;
             } else {
-                // otherwise we only need to have completed for the prepare to
-                // be ok -- if we have
+                // otherwise we only need to have completed for the prepare to be ok -- if we have
                 // not completed then the prepare is not ok
 
-                return (_completed ? TwoPhaseOutcome.PREPARE_OK : TwoPhaseOutcome.PREPARE_NOTOK);
+                return (_completed ? TwoPhaseOutcome.PREPARE_OK: TwoPhaseOutcome.PREPARE_NOTOK);
             }
-        } catch (Exception e6) {
+        }
+        catch (Exception e6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_8(order(), e6);
 
             e6.printStackTrace();
@@ -324,13 +360,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int nestedOnePhaseCommit() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedOnePhaseCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_9(order(), ex6);
 
             ex6.printStackTrace();
@@ -345,36 +386,38 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public int topLevelOnePhaseCommit() {
-        try {
-            if (_resourceHandle != null) {
-                // we cannot proceed if the participant has neither completed
-                // not exited
+    public int topLevelOnePhaseCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                // we cannot proceed if the participant has neither completed not exited
 
-                if (isActive())
-                    return TwoPhaseOutcome.ONE_PHASE_ERROR;
+                if (isActive()) return TwoPhaseOutcome.ONE_PHASE_ERROR;
 
-                try {
-                    if (!_exited)
-                        _resourceHandle.close();
-                } catch (InvalidParticipantException ex) {
+                try
+                {
+                    if (!_exited) _resourceHandle.close();
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.ONE_PHASE_ERROR;
-                } catch (WrongStateException ex) {
-                    // this indicates a failure to close so we notify a
-                    // heuristic hazard
+                }
+                catch (WrongStateException ex)
+                {
+                    // this indicates a failure to close so we notify a heuristic hazard
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (SystemException ex) {
-                    // this indicates a comms failure so we return FINISH_ERROR
-                    // which will place
-                    // the participant in the failed list and cause a retry of
-                    // the close
+                }
+                catch (SystemException ex)
+                {
+                    // this indicates a comms failure so we return FINISH_ERROR which will place
+                    // the participant in the failed list and cause a retry of the close
                     return TwoPhaseOutcome.FINISH_ERROR;
                 }
 
-                // if we have failed we notify a heuristic hazard to ensure that
-                // the
-                // participant is placed in the heuristic list and the
-                // transaction is logged
+                // if we have failed we notify a heuristic hazard to ensure that the
+                // participant is placed in the heuristic list and the transaction is logged
 
                 if (_failed) {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
@@ -382,9 +425,11 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                 // if we closed or we exited then all is ok
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.ONE_PHASE_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_10(order(), ex6);
 
             ex6.printStackTrace();
@@ -398,25 +443,36 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * 
      */
 
-    public boolean forgetHeuristic() {
-        try {
-            if (_resourceHandle != null) {
-                try {
-                    if (!_exited)
-                        _resourceHandle.forget();
-                } catch (InvalidParticipantException ex) {
+    public boolean forgetHeuristic ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
+                    if (!_exited) _resourceHandle.forget();
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return false;
-                } catch (WrongStateException ex) {
+                }
+                catch (WrongStateException ex)
+                {
                     return false;
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     return false;
                 }
 
                 return true;
-            } else {
+            }
+            else {
                 wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_11(order());
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_12(order(), e);
 
             e.printStackTrace();
@@ -425,30 +481,47 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return false;
     }
 
-    public boolean complete() {
+
+    public boolean complete ()
+    {
         boolean result = false;
 
-        try {
-            if (_resourceHandle != null) {
-                try {
-                    if (isActive()) {
-                        if (_resourceHandle instanceof ParticipantWithComplete) {
-                            ((ParticipantWithComplete) _resourceHandle).complete();
-                            completed();
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
+                    if (isActive())
+                    {
+                        if (_resourceHandle instanceof ParticipantWithComplete)
+                        {
+                            ((ParticipantWithComplete) _resourceHandle)
+                                    .complete();
+                             completed();
                         }
 
                         result = true;
-                    } else {
+                    }
+                    else
+                    {
                         // already completed, so this is a null op. just rtn
                         // true.
                         result = true;
                     }
-                } catch (InvalidParticipantException ex) {
-                } catch (WrongStateException ex) {
-                } catch (SystemException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
+                }
+                catch (WrongStateException ex)
+                {
+                }
+                catch (SystemException ex)
+                {
                 }
             }
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_13(order(), ex6);
 
             ex6.printStackTrace();
@@ -457,25 +530,31 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return result;
     }
 
-    public static AbstractRecord create() {
+    public static AbstractRecord create ()
+    {
         return new ParticipantRecord();
     }
 
-    public void print(PrintWriter strm) {
+    public void print (PrintWriter strm)
+    {
         super.print(strm);
 
         strm.print("ParticipantRecord");
         strm.print(_resourceHandle);
     }
 
-    public boolean restore_state(InputObjectState os, int t) {
+
+    public boolean restore_state (InputObjectState os, int t)
+    {
         boolean result = super.restore_state(os, t);
 
-        if (result) {
-            try {
+        if (result)
+        {
+            try
+            {
                 String resourcehandleImplClassName = os.unpackString();
                 Class clazz = ClassLoaderHelper.forName(ParticipantRecord.class, resourcehandleImplClassName);
-                _resourceHandle = (Participant) clazz.newInstance();
+                _resourceHandle = (Participant)clazz.newInstance();
 
                 result = _resourceHandle.restore_state(os);
 
@@ -487,7 +566,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                         _failed = os.unpackBoolean();
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_14(ex);
 
                 result = false;
@@ -497,18 +577,16 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return result;
     }
 
-    public boolean save_state(OutputObjectState os, int t) {
+
+    public boolean save_state (OutputObjectState os, int t)
+    {
         boolean result = super.save_state(os, t);
 
-        if (result) {
-            try {
-                os.packString(_resourceHandle.getClass().getName()); // TODO: a
-                                                                        // shorter
-                                                                        // value
-                                                                        // whould
-                                                                        // be
-                                                                        // more
-                                                                        // efficient.
+        if (result)
+        {
+            try
+            {
+                os.packString(_resourceHandle.getClass().getName()); // TODO: a shorter value whould be more efficient.
                 result = _resourceHandle.save_state(os);
                 if (result) {
                     os.packLong(_timeout);
@@ -522,7 +600,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                 /*
                  * TODO: pack qualifiers and coord id.
                  */
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_15(ex);
 
                 result = false;
@@ -532,50 +611,57 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return result;
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/AbstractRecord/WSCF/ArjunaCore/ParticipantRecord";
     }
 
-    public boolean doSave() {
+    public boolean doSave ()
+    {
         /*
-         * If the participant has exited without failure, then we don't need to
-         * save anything about it in the transaction log. If it has not exited
-         * or it has exited with failure we do need to log it
+         * If the participant has exited without failure, then we don't need to save anything
+         * about it in the transaction log. If it has not exited or it has exited with failure
+         * we do need to log it
          */
 
         return (!_exited || _failed);
     }
 
-    public void merge(AbstractRecord a) {
+    public void merge (AbstractRecord a)
+    {
     }
 
-    public void alter(AbstractRecord a) {
+    public void alter (AbstractRecord a)
+    {
     }
 
-    public boolean shouldAdd(AbstractRecord a) {
+    public boolean shouldAdd (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldAlter(AbstractRecord a) {
+    public boolean shouldAlter (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldMerge(AbstractRecord a) {
+    public boolean shouldMerge (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldReplace(AbstractRecord rec) {
+    public boolean shouldReplace (AbstractRecord rec)
+    {
         return false;
     }
 
     /**
      * record the fact that this participant has exited
      *
-     * @param failed
-     *            true if the exit was because of a failure i.e. the participant
-     *            may be in an unclean state
+     * @param failed true if the exit was because of a failure i.e. the participant may be in an unclean state
      */
-    public final void delist(boolean failed) {
+    public final void delist (boolean failed)
+    {
         _exited = true;
         _failed = failed;
     }
@@ -583,29 +669,28 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
     /**
      * record the fact that this participant has completed
      */
-    public final synchronized void completed() {
+    public final synchronized void completed ()
+    {
         _completed = true;
     }
 
     /**
      * is the participant is still able to be sent a complete request
      *
-     * @caveat it is only appropriate to call this if this is a
-     *         CoordinatorCompletion participant
-     * @return true if the participant is still able to be sent a complete
-     *         request otherwise false
+     * @caveat it is only appropriate to call this if this is a CoordinatorCompletion participant
+     * @return true if the participant is still able to be sent a complete request otherwise false
      */
-    public final synchronized boolean isActive() {
+    public final synchronized boolean isActive ()
+    {
         return !_completed && !_exited;
     }
 
     /**
      * is this a ParticipantCompletion participant
-     * 
-     * @return true if this is a ParticipantCompletion participant otherwise
-     *         false
+     * @return true if this is a ParticipantCompletion participant otherwise false
      */
-    public final boolean isParticipantCompletion() {
+    public final boolean isParticipantCompletion ()
+    {
         // n.b. this is ok if _resourceHandle is null
         return !(_resourceHandle instanceof ParticipantWithComplete);
     }
@@ -614,7 +699,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * Protected constructor used by crash recovery.
      */
 
-    public ParticipantRecord() {
+    public ParticipantRecord ()
+    {
         super();
 
         _resourceHandle = null;

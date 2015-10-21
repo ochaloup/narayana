@@ -83,8 +83,8 @@ public class CompensationInterceptorBase {
         return ic.proceed();
     }
 
-    private void handleException(final InvocationContext ic, final Exception exception, final boolean started)
-            throws Exception {
+
+    private void handleException(final InvocationContext ic, final Exception exception, final boolean started) throws Exception {
 
         final Compensatable compensatable = getCompensatable(ic);
 

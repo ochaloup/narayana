@@ -34,7 +34,7 @@ public abstract class CSControl extends TestCase {
     static final Logger log = LogManager.getLogger(CSControl.class);
     // the byte pattern written by a server to indicate that it has advertised
     // its services
-    private static final byte[] HANDSHAKE = {83, 69, 82, 86, 73, 67, 69, 83, 32, 82, 69, 65, 68, 89};
+    private static final byte[] HANDSHAKE = { 83, 69, 82, 86, 73, 67, 69, 83, 32, 82, 69, 65, 68, 89 };
 
     private ProcessBuilder serverBuilder;
     private ProcessBuilder clientBuilder;
@@ -108,9 +108,10 @@ public abstract class CSControl extends TestCase {
             String[] command = null;
             String nextSid = nextSid();
             if (property != null && new Boolean(property)) {
-                command = ("valgrind --tool=memcheck --leak-check=full --log-file=server-" + name
-                        + "-valgrind.log -v -d --track-origins=yes --leak-resolution=low --num-callers=40 " + CS_EXE
-                        + " -s testsui -p 12342 -i " + nextSid).split(" ");
+                command = ("valgrind --tool=memcheck --leak-check=full --log-file=server-"
+                        + name
+                        + "-valgrind.log -v -d --track-origins=yes --leak-resolution=low --num-callers=40 "
+                        + CS_EXE + " -s testsui -p 12342 -i " + nextSid).split(" ");
             } else {
                 command = (CS_EXE + " -s testsui -p 12342 -i " + nextSid).split(" ");
             }
@@ -126,8 +127,7 @@ public abstract class CSControl extends TestCase {
     }
 
     public void runTest(String name) {
-        if ((isWinOS && ("2121".equals(name) || "9".equals(name)))
-                || (isSunOS && ("213".equals(name) || "4".equals(name)))) {
+        if ((isWinOS && ("2121".equals(name) || "9".equals(name))) || (isSunOS && ("213".equals(name) || "4".equals(name)))) {
             log.info("skipping test " + name);
             return;
         }
@@ -138,9 +138,10 @@ public abstract class CSControl extends TestCase {
             String property = System.getProperty("USE_VALGRIND");
             String[] command = null;
             if (property != null && new Boolean(property)) {
-                command = ("valgrind --tool=memcheck --leak-check=full --log-file=client-" + name
-                        + "-valgrind.log -v -d --track-origins=yes --leak-resolution=low --num-callers=40 " + CS_EXE
-                        + " " + name).split(" ");
+                command = ("valgrind --tool=memcheck --leak-check=full --log-file=client-"
+                        + name
+                        + "-valgrind.log -v -d --track-origins=yes --leak-resolution=low --num-callers=40 "
+                        + CS_EXE + " " + name).split(" ");
             } else {
                 command = (CS_EXE + " " + name).split(" ");
             }
@@ -177,10 +178,8 @@ public abstract class CSControl extends TestCase {
 
     private TestProcess startServer(String testname, ProcessBuilder builder) throws IOException, InterruptedException {
         String runTime = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
-        FileOutputStream ostream = new FileOutputStream(
-                REPORT_DIR + "/server-" + testname + "-" + runTime + "-out.txt");
-        FileOutputStream estream = new FileOutputStream(
-                REPORT_DIR + "/server-" + testname + "-" + runTime + "-err.txt");
+        FileOutputStream ostream = new FileOutputStream(REPORT_DIR + "/server-" + testname + "-" + runTime + "-out.txt");
+        FileOutputStream estream = new FileOutputStream(REPORT_DIR + "/server-" + testname + "-" + runTime + "-err.txt");
         TestProcess server = new TestProcess(ostream, estream, "server", builder);
         Thread thread = new Thread(server);
 
@@ -236,16 +235,14 @@ public abstract class CSControl extends TestCase {
                 int match = -1;
 
                 /*
-                 * redirect the process I/O to a file - if it is a server then
-                 * notify any waiters when the server outputs a magic sequence
-                 * indicating that it has advertised its services
+                 * redirect the process I/O to a file - if it is a server then notify any waiters when the server outputs a
+                 * magic sequence indicating that it has advertised its services
                  */
                 if ("server".equals(type)) {
                     // assume the HANDSHAKE sequence can be read in one go
                     /*
-                     * while ((len = is.read(buf)) > 0) { if (match == -1 &&
-                     * (match = KMPMatch.indexOf(buf, HANDSHAKE, len)) != -1) {
-                     * synchronized (this) { this.notify(); } }
+                     * while ((len = is.read(buf)) > 0) { if (match == -1 && (match = KMPMatch.indexOf(buf, HANDSHAKE, len)) !=
+                     * -1) { synchronized (this) { this.notify(); } }
                      * 
                      * ostream.write(buf, 0, len); }
                      */
@@ -263,8 +260,7 @@ public abstract class CSControl extends TestCase {
                                 }
                                 pos = 0;
                             } else if (pos == buf.length) {
-                                ostream.write("missing synchronization sequence from service - force notify"
-                                        .getBytes("UTF-8"));
+                                ostream.write("missing synchronization sequence from service - force notify".getBytes("UTF-8"));
                                 log.warn("missing synchronization sequence from service");
                                 synchronized (this) {
                                     this.notify();

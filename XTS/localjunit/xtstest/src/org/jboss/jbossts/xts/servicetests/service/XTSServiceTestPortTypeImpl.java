@@ -35,39 +35,51 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+
 /**
- * A general purpose web service used to test the WSAT and WSBA services. It
- * implements a single service method which accepts a command list and returns a
- * reesult list. This can be used to register participants and script their
- * behaviour.
+ * A general purpose web service used to test the WSAT and WSBA services. It implements
+ * a single service method which accepts a command list and returns a reesult list. This
+ * can be used to register participants and script their behaviour.  
  */
-@WebService(targetNamespace = "http://jbossts.jboss.org/xts/servicetests/generated", wsdlLocation = "WEB-INF/wsdl/xtsservicetests.wsdl", serviceName = "XTSServiceTestService", portName = "XTSServiceTestPortType", name = "XTSServiceTestPortType")
+@WebService(targetNamespace = "http://jbossts.jboss.org/xts/servicetests/generated",
+        wsdlLocation = "WEB-INF/wsdl/xtsservicetests.wsdl",
+        serviceName = "XTSServiceTestService",
+        portName = "XTSServiceTestPortType",
+        name = "XTSServiceTestPortType"
+        )
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 // @EndpointConfig(configName = "Standard WSAddressing Endpoint")
-@HandlerChain(file = "handlers.xml")
-@XmlSeeAlso({ObjectFactory.class})
-public class XTSServiceTestPortTypeImpl implements XTSServiceTestPortType {
+@HandlerChain(file="handlers.xml")
+@XmlSeeAlso({
+    ObjectFactory.class
+})
+public class XTSServiceTestPortTypeImpl implements XTSServiceTestPortType
+{
     protected @Resource WebServiceContext context;
 
     /**
      *
      * @param commands
-     * @return returns org.jboss.jbossts.xts.servicetests.generated.ResultsType
+     * @return
+     *     returns org.jboss.jbossts.xts.servicetests.generated.ResultsType
      */
     @WebMethod
     @WebResult(name = "results", targetNamespace = "http://jbossts.jboss.org/xts/servicetests/generated", partName = "results")
     public ResultsType serve(
-            @WebParam(name = "commands", targetNamespace = "http://jbossts.jboss.org/xts/servicetests/generated", partName = "commands") CommandsType commands) {
+        @WebParam(name = "commands", targetNamespace = "http://jbossts.jboss.org/xts/servicetests/generated", partName = "commands")
+        CommandsType commands)
+    {
         ResultsType results = new ResultsType();
         List<String> resultsList = results.getResultList();
         List<String> commandList = commands.getCommandList();
 
         MessageContext messageContext = context.getMessageContext();
-        HttpServletRequest servletRequest = ((HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST));
+        HttpServletRequest servletRequest = ((HttpServletRequest)messageContext.get(MessageContext.SERVLET_REQUEST));
         String path = servletRequest.getServletPath();
 
         System.out.println("service " + path);
-        for (String s : commandList) {
+        for (String s : commandList)
+        {
             System.out.println("  command " + s);
         }
 

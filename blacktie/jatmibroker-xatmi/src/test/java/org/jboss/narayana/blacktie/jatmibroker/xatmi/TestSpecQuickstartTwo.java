@@ -55,11 +55,8 @@ public class TestSpecQuickstartTwo extends TestCase {
         /* populate typed buffer with input data */
         ((X_C_TYPE) ptr).setByteArray("input", "retrieve all accounts with balances less than 0".getBytes());
         // TODO tx_begin(); /* start global transaction */
-        /*
-         * connect to conversational service, send input data, & yield control
-         */
-        cd = connection.tpconnect(RunServer.getServiceNameINQUIRY(), ptr,
-                Connection.TPRECVONLY | Connection.TPSIGRSTRT);
+        /* connect to conversational service, send input data, & yield control */
+        cd = connection.tpconnect(RunServer.getServiceNameINQUIRY(), ptr, Connection.TPRECVONLY | Connection.TPSIGRSTRT);
         do {
 
             try {

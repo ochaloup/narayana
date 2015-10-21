@@ -38,16 +38,20 @@ import java.sql.*;
 import java.util.Hashtable;
 import java.util.Properties;
 
-public class JDBCNumberTableImpl03 implements NumberTableOperations {
-    public JDBCNumberTableImpl03(String databaseURL, String databaseUser, String databasePassword,
-            String databaseDynamicClass, int timeout) throws InvocationException {
+public class JDBCNumberTableImpl03 implements NumberTableOperations
+{
+    public JDBCNumberTableImpl03(String databaseURL, String databaseUser, String databasePassword, String databaseDynamicClass, int timeout)
+            throws InvocationException
+    {
         _dbUser = databaseUser;
         _databaseTimeout = timeout;
         _databaseURL = databaseURL;
         _dbPassword = databasePassword;
 
-        try {
-            if (databaseDynamicClass != null) {
+        try
+        {
+            if (databaseDynamicClass != null)
+            {
                 _databaseProperties = new Properties();
 
                 _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -55,81 +59,110 @@ public class JDBCNumberTableImpl03 implements NumberTableOperations {
                 _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 _connection = DriverManager.getConnection(databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 _connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
             DatabaseMetaData dbmd = _connection.getMetaData();
-            if (dbmd.getDatabaseProductName().startsWith("Microsoft")) {
+            if (dbmd.getDatabaseProductName().startsWith("Microsoft"))
+            {
                 _useTimeout = true;
-            } else if (dbmd.getDatabaseProductName().equals("FirstSQL/J")) {
+            }
+            else if (dbmd.getDatabaseProductName().equals("FirstSQL/J"))
+            {
                 _useTimeout = true;
             }
 
             _connection.close();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCNumberTableImpl03.JDBCNumberTableImpl03: " + exception);
             throw new InvocationException();
         }
     }
 
-    public void get(String name, IntHolder value) throws InvocationException {
+    public void get(String name, IntHolder value)
+            throws InvocationException
+    {
         Statement statement = null;
         ResultSet resultSet = null;
 
         System.err.println("-- get called --");
-        while (true) {
-            try {
+        while (true)
+        {
+            try
+            {
                 Connection conn = getConnection();
                 statement = conn.createStatement();
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
                 System.err.println("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
-                resultSet = statement
-                        .executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
+                resultSet = statement.executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
                 resultSet.next();
                 value.value = resultSet.getInt("Value");
-                if (resultSet.next()) {
+                if (resultSet.next())
+                {
                     throw new Exception();
                 }
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, conn);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
 
                 return;
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex)
+            {
                 System.err.println("JDBCNumberTableImpl03.get: " + ex);
                 String message = ex.getMessage();
 
-                if (message.indexOf("already associated") == -1) {
+                if (message.indexOf("already associated") == -1)
+                {
                     throw new InvocationException(Reason.ReasonUnknown);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl03.get: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } finally {
-                try {
-                    if (resultSet != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (resultSet != null)
+                    {
                         resultSet.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
-                try {
-                    if (statement != null) {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
@@ -137,59 +170,77 @@ public class JDBCNumberTableImpl03 implements NumberTableOperations {
         }
     }
 
-    public void set(String name, int value) throws InvocationException {
+    public void set(String name, int value)
+            throws InvocationException
+    {
         Statement statement = null;
 
         System.err.println("-- set called --");
-        while (true) {
-            try {
+        while (true)
+        {
+            try
+            {
                 Connection conn = getConnection();
                 statement = conn.createStatement();
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
-                System.err.println(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
-                statement.executeUpdate(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
+                System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
+                statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, conn);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
 
                 return;
-            } catch (java.sql.SQLException sqlException) {
+            }
+            catch (java.sql.SQLException sqlException)
+            {
                 System.err.println("JDBCNumberTableImpl03.set: " + sqlException);
 
-                // Check error message to see if it is a "can't serialize
-                // access" message
+                // Check error message to see if it is a "can't serialize access" message
                 String message = sqlException.getMessage();
 
-                if ((message != null) && (message.indexOf("can't serialize access") != -1)) {
+                if ((message != null) && (message.indexOf("can't serialize access") != -1))
+                {
                     throw new InvocationException(Reason.ReasonCantSerializeAccess);
-                } else if ((message != null) && (message.indexOf("deadlock") != -1)) {
+                }
+                else if ((message != null) && (message.indexOf("deadlock") != -1))
+                {
                     throw new InvocationException(Reason.ReasonCantSerializeAccess);
                 }
 
-                if (message.indexOf("already associated") == -1) {
+                if (message.indexOf("already associated") == -1)
+                {
                     throw new InvocationException(Reason.ReasonUnknown);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl03.set: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } finally {
-                try {
-                    if (statement != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
@@ -197,58 +248,76 @@ public class JDBCNumberTableImpl03 implements NumberTableOperations {
         }
     }
 
-    public void increase(String name) throws InvocationException {
+    public void increase(String name)
+            throws InvocationException
+    {
         Statement statement = null;
 
         System.err.println("-- set called --");
-        while (true) {
-            try {
+        while (true)
+        {
+            try
+            {
                 Connection conn = getConnection();
                 statement = conn.createStatement();
-                if (_useTimeout) {
+                if (_useTimeout)
+                {
                     statement.setQueryTimeout(_databaseTimeout);
                 }
 
-                System.err.println(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
-                statement.executeUpdate(
-                        "UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+                System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+                statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
 
-                try {
-                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                            .transactionManager();
+                try
+                {
+                    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                     javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
                     _connections.put(tx, conn);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     System.err.println(ex);
                 }
 
                 return;
-            } catch (java.sql.SQLException sqlException) {
+            }
+            catch (java.sql.SQLException sqlException)
+            {
                 System.err.println("JDBCNumberTableImpl03.increase: " + sqlException);
-                // Check error message to see if it is a "can't serialize
-                // access" message
+                // Check error message to see if it is a "can't serialize access" message
                 String message = sqlException.getMessage();
 
-                if ((message != null) && (message.indexOf("can't serialize access") != -1)) {
+                if ((message != null) && (message.indexOf("can't serialize access") != -1))
+                {
                     throw new InvocationException(Reason.ReasonCantSerializeAccess);
-                } else if ((message != null) && (message.indexOf("deadlock") != -1)) {
+                }
+                else if ((message != null) && (message.indexOf("deadlock") != -1))
+                {
                     throw new InvocationException(Reason.ReasonCantSerializeAccess);
                 }
 
-                if (message.indexOf("already associated") == -1) {
+                if (message.indexOf("already associated") == -1)
+                {
                     throw new InvocationException(Reason.ReasonUnknown);
                 }
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 System.err.println("JDBCNumberTableImpl03.increase: " + exception);
                 throw new InvocationException(Reason.ReasonUnknown);
-            } finally {
-                try {
-                    if (statement != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if (statement != null)
+                    {
                         statement.close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
@@ -256,34 +325,44 @@ public class JDBCNumberTableImpl03 implements NumberTableOperations {
         }
     }
 
-    private Connection getConnection() throws SQLException {
-        if ("true".equals(System.getProperty("qa.debug"))) {
+    private Connection getConnection() throws SQLException
+    {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
+        try
+        {
             javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
             javax.transaction.Transaction tx = (javax.transaction.Transaction) tm.getTransaction();
 
             Connection conn = (Connection) _connections.get(tx);
 
-            if (conn == null) {
+            if (conn == null)
+            {
                 System.err.println("**creating connection");
 
-                if (_databaseProperties != null) {
+                if (_databaseProperties != null)
+                {
                     conn = DriverManager.getConnection(_databaseURL, _databaseProperties);
-                } else {
+                }
+                else
+                {
                     conn = DriverManager.getConnection(_databaseURL, _dbUser, _dbPassword);
                 }
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("conn = " + conn);
                 System.err.println("Database URL = " + _databaseURL);
             }
             System.err.println("returning " + conn + " for " + tx);
 
             return conn;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SQLException(ex.toString());
         }
     }

@@ -33,14 +33,14 @@ public class ServerTransactionWrapper extends ServerTransaction implements Actio
     private ActionBean action;
     private boolean activated;
 
-    public ServerTransactionWrapper() {
+    public ServerTransactionWrapper () {
         this(Uid.nullUid());
     }
 
-    public ServerTransactionWrapper(Uid uid) {
+    public ServerTransactionWrapper (Uid uid) {
         super(uid);
     }
-    public ServerTransactionWrapper(ActionBean action, UidWrapper w) {
+    public ServerTransactionWrapper (ActionBean action, UidWrapper w) {
         super(w.getUid());
         this.wrapper = w;
         this.action = action;
@@ -53,7 +53,7 @@ public class ServerTransactionWrapper extends ServerTransaction implements Actio
         return activated;
     }
 
-    public String type() {
+    public String type () {
         String name = UidWrapper.getRecordWrapperTypeName();
 
         if (name != null)
@@ -80,17 +80,12 @@ public class ServerTransactionWrapper extends ServerTransaction implements Actio
 
     public RecordList getRecords(ParticipantStatus type) {
         switch (type) {
-            default :
-            case PREPARED :
-                return preparedList;
-            case FAILED :
-                return failedList;
-            case HEURISTIC :
-                return heuristicList;
-            case PENDING :
-                return pendingList;
-            case READONLY :
-                return readonlyList;
+            default:
+            case PREPARED: return preparedList;
+            case FAILED: return failedList;
+            case HEURISTIC: return heuristicList;
+            case PENDING: return pendingList;
+            case READONLY: return readonlyList;
         }
     }
 

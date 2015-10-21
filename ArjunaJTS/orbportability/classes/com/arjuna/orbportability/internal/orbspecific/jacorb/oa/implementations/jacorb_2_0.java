@@ -40,16 +40,21 @@ import org.omg.PortableServer.POAPackage.InvalidPolicy;
 import com.arjuna.orbportability.internal.orbspecific.oa.implementations.POABase;
 import com.arjuna.orbportability.logging.opLogger;
 
-public class jacorb_2_0 extends POABase {
-    public void createPOA(String adapterName, Policy[] policies)
-            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive, SystemException {
-        if (_poa == null) {
+public class jacorb_2_0 extends POABase
+{
+    public void createPOA (String adapterName, Policy[] policies)
+            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive,
+            SystemException
+    {
+        if (_poa == null)
+        {
             opLogger.i18NLogger.warn_internal_orbspecific_oa_implementations("jacorb_2_0.createPOA");
 
             throw new AdapterInactive();
         }
 
-        POA childPoa = _poa.create_POA(adapterName, _poa.the_POAManager(), policies);
+        POA childPoa = _poa.create_POA(adapterName, _poa.the_POAManager(),
+                policies);
 
         childPoa.the_POAManager().activate();
 

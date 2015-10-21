@@ -36,25 +36,23 @@ import java.lang.reflect.Method;
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  * @version $Id$
  */
-public class RecoveryManagerService extends com.arjuna.ats.jbossatx.jta.RecoveryManagerService {
-    public RecoveryManagerService(org.omg.CORBA.ORB theCorbaORB) throws Exception {
+public class RecoveryManagerService extends com.arjuna.ats.jbossatx.jta.RecoveryManagerService
+{
+    public RecoveryManagerService(org.omg.CORBA.ORB theCorbaORB) throws Exception
+    {
         jbossatxLogger.i18NLogger.info_jts_RecoveryManagerService_init();
 
         if (ORBType.JACORB == ORBInfo.getOrbEnumValue()) {
             // Make sure the orb is ready: TODO improve on this
-            Class c = ClassloadingUtility.loadClass(
-                    "com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators.JacOrbRCServiceInit");
+            Class c = ClassloadingUtility.loadClass("com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators.JacOrbRCServiceInit");
             Method m = c.getDeclaredMethod("waitForRunningORBRunner", null);
             m.invoke(null, null);
         }
 
-        /**
-         * Create an ORB portability wrapper around the CORBA ORB services orb
-         **/
+        /** Create an ORB portability wrapper around the CORBA ORB services orb **/
         ORB orb = ORB.getInstance(TransactionManagerService.ORB_NAME);
 
-        org.omg.PortableServer.POA rootPOA = org.omg.PortableServer.POAHelper
-                .narrow(theCorbaORB.resolve_initial_references("RootPOA"));
+        org.omg.PortableServer.POA rootPOA = org.omg.PortableServer.POAHelper.narrow(theCorbaORB.resolve_initial_references("RootPOA"));
 
         orb.setOrb(theCorbaORB);
         OA oa = OA.getRootOA(orb);

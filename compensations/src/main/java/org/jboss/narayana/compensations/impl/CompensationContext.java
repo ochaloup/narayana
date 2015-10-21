@@ -22,6 +22,7 @@
 
 package org.jboss.narayana.compensations.impl;
 
+
 import org.jboss.narayana.compensations.api.CompensationScoped;
 import org.jboss.narayana.compensations.api.CompensationTransactionRuntimeException;
 
@@ -114,11 +115,9 @@ public class CompensationContext implements Context {
     }
 
     /**
-     * Garbage collect the beans. Call when the context is closed and can't be
-     * used again.
+     * Garbage collect the beans. Call when the context is closed and can't be used again.
      *
-     * @param currentTX
-     *            the Transaction Context associated with this context.
+     * @param currentTX the Transaction Context associated with this context.
      */
     public static void close(Object currentTX) {
 
@@ -126,3 +125,4 @@ public class CompensationContext implements Context {
         beanStorePerTransaction.remove(currentTX);
     }
 }
+

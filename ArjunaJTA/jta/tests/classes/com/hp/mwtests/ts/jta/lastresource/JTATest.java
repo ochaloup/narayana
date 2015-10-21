@@ -66,8 +66,8 @@ public class JTATest {
         doTest(XAException.XA_RBROLLBACK);
     }
 
-    private void doTest(final int errorCode) throws IllegalStateException, RollbackException, SystemException,
-            NotSupportedException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
+    private void doTest(final int errorCode) throws IllegalStateException, RollbackException, SystemException, NotSupportedException, SecurityException, HeuristicMixedException,
+            HeuristicRollbackException {
 
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 

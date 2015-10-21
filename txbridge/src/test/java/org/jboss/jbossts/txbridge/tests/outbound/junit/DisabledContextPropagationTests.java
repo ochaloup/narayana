@@ -70,12 +70,13 @@ public final class DisabledContextPropagationTests {
     @Deployment(name = OUTBOUND_CLIENT_DEPLOYMENT_NAME, testable = false)
     @TargetsContainer(CONTAINER)
     public static Archive<?> createClientArchive() {
-        Archive<?> archive = ShrinkWrap.create(WebArchive.class, OUTBOUND_CLIENT_DEPLOYMENT_NAME + ".war")
+        Archive<?> archive = ShrinkWrap
+                .create(WebArchive.class, OUTBOUND_CLIENT_DEPLOYMENT_NAME + ".war")
                 .addClass(org.jboss.jbossts.txbridge.tests.outbound.client.CommonTestService.class)
                 .addClass(org.jboss.jbossts.txbridge.tests.outbound.client.TestATService.class)
                 .addClass(org.jboss.jbossts.txbridge.tests.outbound.client.TestNonATService.class)
-                .addClass(org.jboss.jbossts.txbridge.tests.outbound.client.TestATClient.class).addAsManifestResource(
-                        new StringAsset("Dependencies: org.jboss.xts,org.jboss.jts,org.codehaus.jettison\n"),
+                .addClass(org.jboss.jbossts.txbridge.tests.outbound.client.TestATClient.class)
+                .addAsManifestResource(new StringAsset("Dependencies: org.jboss.xts,org.jboss.jts,org.codehaus.jettison\n"),
                         "MANIFEST.MF");
         return archive;
     }
@@ -115,8 +116,7 @@ public final class DisabledContextPropagationTests {
     }
 
     /**
-     * Tests non-transactional invocation without WSTXFeature and
-     * JTAOverWSATFeature.
+     * Tests non-transactional invocation without WSTXFeature and JTAOverWSATFeature.
      *
      * No two-phase commit calls are expected.
      *
@@ -135,8 +135,7 @@ public final class DisabledContextPropagationTests {
     }
 
     /**
-     * Tests transactional invocation to non-transaction service without
-     * WSTXFeature and JTAOverWSATFeature.
+     * Tests transactional invocation to non-transaction service without WSTXFeature and JTAOverWSATFeature.
      *
      * No two-phase commit calls are expected.
      *
@@ -199,8 +198,7 @@ public final class DisabledContextPropagationTests {
     }
 
     /**
-     * Tests transactional invocation to non-transaction service with enabled
-     * JTAOverWSATFeature.
+     * Tests transactional invocation to non-transaction service with enabled JTAOverWSATFeature.
      *
      * No two-phase commit calls are expected.
      *
@@ -208,8 +206,7 @@ public final class DisabledContextPropagationTests {
      */
     @Test
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)
-    public void testNonTransactionlServiceWithEnabledJTAOverWSATFeature(@ArquillianResource URL baseURL)
-            throws Exception {
+    public void testNonTransactionlServiceWithEnabledJTAOverWSATFeature(@ArquillianResource URL baseURL) throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
         parameters.add(new BasicNameValuePair("isTransaction", "ture"));
@@ -265,8 +262,7 @@ public final class DisabledContextPropagationTests {
     }
 
     /**
-     * Tests transactional invocation to non-transaction service with disabled
-     * JTAOverWSATFeature.
+     * Tests transactional invocation to non-transaction service with disabled JTAOverWSATFeature.
      *
      * No two-phase commit calls are expected.
      *
@@ -274,8 +270,7 @@ public final class DisabledContextPropagationTests {
      */
     @Test
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)
-    public void testNonTransactionlServiceWithDisabledJTAOverWSATFeature(@ArquillianResource URL baseURL)
-            throws Exception {
+    public void testNonTransactionlServiceWithDisabledJTAOverWSATFeature(@ArquillianResource URL baseURL) throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
         parameters.add(new BasicNameValuePair("isTransaction", "ture"));
@@ -298,8 +293,7 @@ public final class DisabledContextPropagationTests {
      */
     @Test
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)
-    public void testCommitWithEnabledJTAOverWSATFeatureAndEnabledWSTXFeature(@ArquillianResource URL baseURL)
-            throws Exception {
+    public void testCommitWithEnabledJTAOverWSATFeatureAndEnabledWSTXFeature(@ArquillianResource URL baseURL) throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
         parameters.add(new BasicNameValuePair("isTransaction", "true"));
@@ -321,8 +315,7 @@ public final class DisabledContextPropagationTests {
      */
     @Test
     @OperateOnDeployment(OUTBOUND_CLIENT_DEPLOYMENT_NAME)
-    public void testCommitWithEnabledJTAOverWSATFeatureAndDisabledWSTXFeature(@ArquillianResource URL baseURL)
-            throws Exception {
+    public void testCommitWithEnabledJTAOverWSATFeatureAndDisabledWSTXFeature(@ArquillianResource URL baseURL) throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
         parameters.add(new BasicNameValuePair("isTransaction", "true"));
@@ -377,8 +370,8 @@ public final class DisabledContextPropagationTests {
         assertInvocations(invocations, "rollback");
     }
 
-    private List<String> makeRequest(URL baseURL, List<NameValuePair> parameters)
-            throws ClientProtocolException, IOException, JSONException {
+    private List<String> makeRequest(URL baseURL, List<NameValuePair> parameters) throws ClientProtocolException, IOException,
+            JSONException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpPost post = new HttpPost(baseURL.toString() + TestATClient.URL_PATTERN);
         post.setEntity(new UrlEncodedFormEntity(parameters));

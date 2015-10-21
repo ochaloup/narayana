@@ -35,27 +35,34 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple;
 import com.hp.mwtests.ts.jta.jts.JTSTestCase;
 
-public class LastResourceAllowedTestCase extends JTSTestCase {
+public class LastResourceAllowedTestCase extends JTSTestCase
+{
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
         arjPropertyManager.getCoreEnvironmentBean().setAllowMultipleLastResources(true);
-        super.setUp();
+        super.setUp() ;
     }
-
+    
     @Test
-    public void testAllowed() throws SystemException, NotSupportedException, RollbackException {
+    public void testAllowed()
+        throws SystemException, NotSupportedException, RollbackException
+    {
         final LastOnePhaseResource firstResource = new LastOnePhaseResource();
         final LastOnePhaseResource secondResource = new LastOnePhaseResource();
         final LastOnePhaseResource thirdResource = new LastOnePhaseResource();
-
+        
         final TransactionManager tm = new TransactionManagerImple();
-        tm.begin();
-        try {
+        tm.begin() ;
+        try
+        {
             final Transaction tx = tm.getTransaction();
             assertTrue("First resource enlisted", tx.enlistResource(firstResource));
             assertTrue("Second resource enlisted", tx.enlistResource(secondResource));
             assertTrue("Third resource enlisted", tx.enlistResource(thirdResource));
-        } finally {
+        }
+        finally
+        {
             tm.rollback();
         }
     }

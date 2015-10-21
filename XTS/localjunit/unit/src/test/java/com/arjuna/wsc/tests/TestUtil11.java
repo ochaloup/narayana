@@ -34,28 +34,24 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
-public class TestUtil11 {
+public class TestUtil11
+{
     final private static String TAG = "wsc";
     final private static String NAMESPACE = "http://wsc.example.org/";
-    final private static String PROTOCOL_PARTICIPANT_ENDPOINT_NAME = "ProtocolParticipantEndpoint";
-    final private static String PROTOCOL_PARTICIPANT_SERVICE_NAME = "ProtocolParticipantService";
-    final private static String PROTOCOL_COORDINATOR_ENDPOINT_NAME = "ProtocolCoordinatorEndpoint";
-    final private static String PROTOCOL_COORDINATOR_SERVICE_NAME = "ProtocolCoordinatorService";
+    final private static String PROTOCOL_PARTICIPANT_ENDPOINT_NAME ="ProtocolParticipantEndpoint";
+    final private static String PROTOCOL_PARTICIPANT_SERVICE_NAME ="ProtocolParticipantService";
+    final private static String PROTOCOL_COORDINATOR_ENDPOINT_NAME ="ProtocolCoordinatorEndpoint";
+    final private static String PROTOCOL_COORDINATOR_SERVICE_NAME ="ProtocolCoordinatorService";
 
     final private static String bindHost = XTSPropertyManager.getWSCEnvironmentBean().getBindAddress11();
 
     final public static String activationCoordinatorService = "http://" + bindHost + ":8080/ws-c11/ActivationService";
-    final public static String registrationCoordinatorService = "http://" + bindHost
-            + ":8080/ws-c11/RegistrationService";
+    final public static String registrationCoordinatorService = "http://" + bindHost + ":8080/ws-c11/RegistrationService";
 
-    final public static QName PROTOCOL_PARTICIPANT_SERVICE_QNAME = new QName(NAMESPACE,
-            PROTOCOL_PARTICIPANT_SERVICE_NAME, TAG);
-    final public static QName PROTOCOL_PARTICIPANT_ENDPOINT_QNAME = new QName(NAMESPACE,
-            PROTOCOL_PARTICIPANT_ENDPOINT_NAME, TAG);
-    final public static QName PROTOCOL_COORDINATOR_SERVICE_QNAME = new QName(NAMESPACE,
-            PROTOCOL_COORDINATOR_SERVICE_NAME, TAG);
-    final public static QName PROTOCOL_COORDINATOR_ENDPOINT_QNAME = new QName(NAMESPACE,
-            PROTOCOL_COORDINATOR_ENDPOINT_NAME, TAG);
+    final public static QName PROTOCOL_PARTICIPANT_SERVICE_QNAME = new QName(NAMESPACE, PROTOCOL_PARTICIPANT_SERVICE_NAME, TAG);
+    final public static QName PROTOCOL_PARTICIPANT_ENDPOINT_QNAME = new QName(NAMESPACE, PROTOCOL_PARTICIPANT_ENDPOINT_NAME, TAG);
+    final public static QName PROTOCOL_COORDINATOR_SERVICE_QNAME = new QName(NAMESPACE, PROTOCOL_COORDINATOR_SERVICE_NAME, TAG);
+    final public static QName PROTOCOL_COORDINATOR_ENDPOINT_QNAME = new QName(NAMESPACE, PROTOCOL_COORDINATOR_ENDPOINT_NAME, TAG);
 
     public static W3CEndpointReference getActivationEndpoint() {
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();

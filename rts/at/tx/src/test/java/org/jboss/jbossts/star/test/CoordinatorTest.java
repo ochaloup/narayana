@@ -42,14 +42,14 @@ public class CoordinatorTest extends BaseTest {
     }
 
     /*
-     * Note: TxSupport methods throw exceptions if unexpected status codes are
-     * returned. use the TxSupport.httpRequest(...) if you want to specify other
-     * status codes
-     */
+      * Note: TxSupport methods throw exceptions if unexpected status codes are returned.
+      * use the TxSupport.httpRequest(...) if you want to specify other status codes
+      */
 
     // list transactions
     @Test
-    public void testListTransactions() throws IOException {
+    public void testListTransactions() throws IOException
+    {
         TxSupport[] txns = {new TxSupport(), new TxSupport()};
         int txnCount = new TxSupport().txCount();
 
@@ -69,7 +69,8 @@ public class CoordinatorTest extends BaseTest {
 
     // 1PC commit abort
     @Test
-    public void test1PCAbort() throws Exception {
+    public void test1PCAbort() throws Exception
+    {
         TxSupport txn = new TxSupport();
         String pUrl = PURL;
         String pid = null;
@@ -94,7 +95,8 @@ public class CoordinatorTest extends BaseTest {
 
     // 1PC commit
     @Test
-    public void test1PCCommit() throws Exception {
+    public void test1PCCommit() throws Exception
+    {
         TxSupport txn = new TxSupport();
         String pUrl = PURL;
         String pid = null;
@@ -119,7 +121,8 @@ public class CoordinatorTest extends BaseTest {
 
     // 2PC commit
     @Test
-    public void test2PC() throws Exception {
+    public void test2PC() throws Exception
+    {
         TxSupport txn = new TxSupport();
         String pUrl = PURL;
         String[] pid = new String[2];
@@ -152,7 +155,8 @@ public class CoordinatorTest extends BaseTest {
     }
 
     @Test
-    public void test2PCCommitWithoutResponse() throws Exception {
+    public void test2PCCommitWithoutResponse() throws Exception
+    {
         TxSupport txn = new TxSupport();
         String pUrl = PURL;
         String[] pid = new String[2];
@@ -184,7 +188,8 @@ public class CoordinatorTest extends BaseTest {
     }
 
     @Test
-    public void test2PCRollbackWithoutResponse() throws Exception {
+    public void test2PCRollbackWithoutResponse() throws Exception
+    {
         TxSupport txn = new TxSupport();
         String pUrl = PURL;
         String[] pid = new String[2];
@@ -217,21 +222,21 @@ public class CoordinatorTest extends BaseTest {
 
     // commit an invalid transaction
     @Test
-    public void testCommitInvalidTx() throws IOException {
+    public void testCommitInvalidTx() throws IOException
+    {
         // start a transaction
         TxSupport txn = new TxSupport().startTx();
 
         String terminator = txn.getTerminatorURI();
         // mangle the terminator URI
-        // terminator = terminator.replace("/terminate", "_dead/terminate");
+        //terminator = terminator.replace("/terminate", "_dead/terminate");
         terminator += "/_dead";
         // an attempt to commit on this URI should fail:
-        txn.httpRequest(new int[]{HttpURLConnection.HTTP_NOT_FOUND}, terminator, "PUT",
-                TxMediaType.TX_STATUS_MEDIA_TYPE, TxStatusMediaType.TX_COMMITTED);
+        txn.httpRequest(new int[] {HttpURLConnection.HTTP_NOT_FOUND}, terminator, "PUT", TxMediaType.TX_STATUS_MEDIA_TYPE, TxStatusMediaType.TX_COMMITTED);
         // commit it properly
         txn.commitTx();
     }
-
+    
     @Test
     public void testTimeoutCleanup() throws InterruptedException {
         TxSupport txn = new TxSupport();
@@ -241,7 +246,7 @@ public class CoordinatorTest extends BaseTest {
 
         // Let the txn timeout
         Thread.sleep(2000);
-
+        
         Assert.assertEquals(txnCount, txn.txCount());
     }
 
@@ -250,8 +255,7 @@ public class CoordinatorTest extends BaseTest {
         Client client = ClientBuilder.newClient();
 
         WebTarget resource = client.target(TXN_MGR_URL);
-        Response response = resource.request(MediaType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.entity(new Form(), MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        Response response = resource.request(MediaType.APPLICATION_FORM_URLENCODED).post(Entity.entity(new Form(), MediaType.APPLICATION_FORM_URLENCODED_TYPE));
 
         int status = response.getStatus();
 
@@ -259,17 +263,16 @@ public class CoordinatorTest extends BaseTest {
 
         response.close();
 
-        Invocation inv = resource.request(MediaType.APPLICATION_FORM_URLENCODED)
-                .buildPost(Entity.entity(new Form(), MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        Invocation inv = resource.request(MediaType.APPLICATION_FORM_URLENCODED).buildPost(Entity.entity(new Form(), MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         response = inv.invoke();
 
         response.close();
 
         String r1 = resource.request("application/txlist").get(String.class);
-        Assert.assertTrue("response should have contained 2 transaction urls", r1.length() != 0);
+        Assert.assertTrue("response should have contained 2 transaction urls",r1.length() != 0);
 
         String r2 = resource.request().get(String.class);
-        Assert.assertTrue("xml response should have contained 2 transaction urls", r2.length() != 0);
+        Assert.assertTrue("xml response should have contained 2 transaction urls",r2.length() != 0);
     }
 
     @Test

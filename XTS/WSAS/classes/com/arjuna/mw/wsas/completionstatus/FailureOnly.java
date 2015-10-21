@@ -40,32 +40,38 @@ package com.arjuna.mw.wsas.completionstatus;
  * @since 1.0.
  */
 
-public class FailureOnly implements CompletionStatus {
+public class FailureOnly implements CompletionStatus
+{
 
-    public static FailureOnly instance() {
-        return _instance;
+    public static FailureOnly instance ()
+    {
+    return _instance;
     }
 
     /**
      * Two statuses are equal if their targets are the same.
      */
 
-    public boolean equals(Object param) {
-        if (this == param)
-            return true;
-        else {
-            if (param instanceof FailureOnly)
-                return true;
-            else
-                return false;
-        }
+    public boolean equals (Object param)
+    {
+    if (this == param)
+        return true;
+    else
+    {
+        if (param instanceof FailureOnly)
+        return true;
+        else
+        return false;
+    }
+    }    
+
+    public String toString ()
+    {
+    return "CompletionStatus.FailureOnly";
     }
 
-    public String toString() {
-        return "CompletionStatus.FailureOnly";
-    }
-
-    private FailureOnly() {
+    private FailureOnly ()
+    {
     }
 
     private static final FailureOnly _instance = new FailureOnly();

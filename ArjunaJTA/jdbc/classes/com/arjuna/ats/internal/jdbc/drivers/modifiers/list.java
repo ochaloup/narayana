@@ -31,11 +31,17 @@
 
 package com.arjuna.ats.internal.jdbc.drivers.modifiers;
 
-public class list {
-    public list() {
-        for (String driver : new String[]{"jConnect (TM) for JDBC (TM)", "Oracle JDBC driver",
-                "IBM DB2 JDBC Universal Driver Architecture", "MySQL Connector Java", "H2 JDBC Driver"}) {
-            ModifierFactory.putModifier(driver, -1, -1, IsSameRMModifier.class.getName());
+public class list
+{
+    public list ()
+    {
+        for (String driver : new String[] { "jConnect (TM) for JDBC (TM)",
+                "Oracle JDBC driver",
+                "IBM DB2 JDBC Universal Driver Architecture",
+                "MySQL Connector Java",
+                "H2 JDBC Driver"}) {
+            ModifierFactory.putModifier(driver, -1, -1,
+                    IsSameRMModifier.class.getName());
         }
     }
 }

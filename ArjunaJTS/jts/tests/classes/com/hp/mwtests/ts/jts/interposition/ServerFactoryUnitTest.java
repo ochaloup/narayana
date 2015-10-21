@@ -76,19 +76,18 @@ public final class ServerFactoryUnitTest extends TestBase {
         final Uid uid = new Uid();
         final OutputObjectState outputObjectState = new OutputObjectState();
         final ServerTransaction transaction = new ServerTransaction(uid, null);
-
+        
         transaction.save_state(outputObjectState, ObjectType.ANDPERSISTENT);
         StoreManager.getRecoveryStore().write_committed(uid, ServerTransaction.typeName(), outputObjectState);
-
+        
         Assert.assertEquals(Status.StatusCommitted, ServerFactory.getOSStatus(uid));
     }
-
+    
     @Test
     public void testGetOSStatusWithAssumedCompleteHeuristicServerTransaction() throws Exception {
         final Uid uid = new Uid();
         final OutputObjectState outputObjectState = new OutputObjectState();
-        final AssumedCompleteHeuristicServerTransaction transaction = new AssumedCompleteHeuristicServerTransaction(
-                uid);
+        final AssumedCompleteHeuristicServerTransaction transaction = new AssumedCompleteHeuristicServerTransaction(uid);
 
         transaction.save_state(outputObjectState, ObjectType.ANDPERSISTENT);
         StoreManager.getRecoveryStore().write_committed(uid, AssumedCompleteHeuristicServerTransaction.typeName(),
@@ -98,18 +97,21 @@ public final class ServerFactoryUnitTest extends TestBase {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         TransactionFactoryImple factory = new TransactionFactoryImple("test");
         ControlImple tx = factory.createLocal(1000);
         Uid u = new Uid();
-        ServerControl server = ServerFactory.create_transaction(u, null, null, tx.get_coordinator(),
-                tx.get_terminator(), 1000);
-
-        try {
+        ServerControl server = ServerFactory.create_transaction(u, null, null, tx.get_coordinator(), tx.get_terminator(), 1000);
+        
+        try
+        {
             ServerFactory.getCurrentStatus(new Uid("", false));
-
+            
             Assert.fail();
-        } catch (final Throwable ex) {
+        }
+        catch (final Throwable ex)
+        {
         }
 
         Assert.assertEquals(ServerFactory.getStatus(tx.get_uid()), org.omg.CosTransactions.Status.StatusActive);
@@ -118,22 +120,22 @@ public final class ServerFactoryUnitTest extends TestBase {
     private void clearObjectStore() {
         final String objectStorePath = arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir();
         final File objectStoreDirectory = new File(objectStorePath);
-
+        
         clearDirectory(objectStoreDirectory);
     }
-
+    
     private void clearDirectory(final File directory) {
         final File[] files = directory.listFiles();
-
+        
         if (files != null) {
             for (final File file : directory.listFiles()) {
                 if (file.isDirectory()) {
                     clearDirectory(file);
                 }
-
+                
                 file.delete();
             }
         }
     }
-
+    
 }

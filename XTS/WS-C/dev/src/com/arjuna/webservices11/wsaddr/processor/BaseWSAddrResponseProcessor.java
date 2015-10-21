@@ -26,24 +26,24 @@ import org.jboss.ws.api.addressing.MAPRelatesTo;
 
 /**
  * Utility class handling common response functionality.
- * 
  * @author kevin
  */
-public abstract class BaseWSAddrResponseProcessor extends BaseProcessor {
+public abstract class BaseWSAddrResponseProcessor extends BaseProcessor
+{
     /**
      * Get the callback ids.
-     * 
-     * @param map
-     *            The addressing context.
+     * @param map The addressing context.
      * @return The callback ids.
      */
-    protected String[] getIDs(final MAP map) {
-        final MAPRelatesTo relatesTo = map.getRelatesTo();
-        if (relatesTo != null) {
-            final String[] ids = new String[1];
+    protected String[] getIDs(final MAP map)
+    {
+        final MAPRelatesTo relatesTo = map.getRelatesTo() ;
+        if (relatesTo != null)
+        {
+            final String[] ids = new String[1] ;
             ids[0] = relatesTo.getRelatesTo();
-            return ids;
+            return ids ;
         }
-        return null;
+        return null ;
     }
 }

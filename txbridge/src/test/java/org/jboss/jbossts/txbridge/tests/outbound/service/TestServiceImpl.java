@@ -42,9 +42,8 @@ import javax.servlet.annotation.WebServlet;
  */
 @WebService(targetNamespace = "http://client.outbound.tests.txbridge.jbossts.jboss.org/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
-@HandlerChain(file = "/jaxws-handlers-server.xml") // relative path from the
-                                                    // class file
-@WebServlet(name = "OutboundTestServiceServlet", urlPatterns = TestServiceImpl.URL_PATTERN)
+@HandlerChain(file = "/jaxws-handlers-server.xml") // relative path from the class file
+@WebServlet(name="OutboundTestServiceServlet", urlPatterns=TestServiceImpl.URL_PATTERN)
 public class TestServiceImpl {
     private static Logger log = Logger.getLogger(TestServiceImpl.class);
 
@@ -60,8 +59,7 @@ public class TestServiceImpl {
         try {
             for (int i = 0; i < count; i++) {
                 TestVolatileParticipant volatileParticipant = new TestVolatileParticipant();
-                tm.enlistForVolatileTwoPhase(volatileParticipant,
-                        "org.jboss.jbossts.txbridge.tests.outbound.Volatile:" + new Uid().toString());
+                tm.enlistForVolatileTwoPhase(volatileParticipant, "org.jboss.jbossts.txbridge.tests.outbound.Volatile:" + new Uid().toString());
             }
         } catch (Exception e) {
             log.error("could not enlist", e);
@@ -73,8 +71,7 @@ public class TestServiceImpl {
         try {
             for (int i = 0; i < count; i++) {
                 TestDurableParticipant durableParticipant = new TestDurableParticipant();
-                tm.enlistForDurableTwoPhase(durableParticipant,
-                        TestDurableParticipant.TYPE_IDENTIFIER + new Uid().toString());
+                tm.enlistForDurableTwoPhase(durableParticipant, TestDurableParticipant.TYPE_IDENTIFIER + new Uid().toString());
             }
         } catch (Exception e) {
             log.error("could not enlist", e);

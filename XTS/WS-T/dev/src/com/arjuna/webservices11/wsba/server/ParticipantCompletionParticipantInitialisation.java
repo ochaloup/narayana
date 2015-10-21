@@ -29,11 +29,12 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Participant Completion Participant service
- * 
  * @author kevin
  */
-public class ParticipantCompletionParticipantInitialisation {
-    public static void startup() {
+public class ParticipantCompletionParticipantInitialisation
+{
+    public static void startup()
+    {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -44,6 +45,7 @@ public class ParticipantCompletionParticipantInitialisation {
         if (participantServiceURLPath == null) {
             participantServiceURLPath = "/ws-t11-participant";
         }
+
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -57,18 +59,16 @@ public class ParticipantCompletionParticipantInitialisation {
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" + bindAddress + ":" + bindPort + participantServiceURLPath;
+        final String baseUri = "http://" +  bindAddress + ":" + bindPort + participantServiceURLPath;
         final String uri = baseUri + "/" + BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME;
-        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + participantServiceURLPath;
-        final String secureUri = secureBaseUri + "/"
-                + BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME;
+        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + participantServiceURLPath;
+        final String secureUri = secureBaseUri + "/" + BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(
-                BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, uri);
-        serviceRegistry.registerSecureServiceProvider(
-                BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, secureUri);
+        serviceRegistry.registerServiceProvider(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, uri) ;
+        serviceRegistry.registerSecureServiceProvider(BusinessActivityConstants.PARTICIPANT_COMPLETION_PARTICIPANT_SERVICE_NAME, secureUri) ;
     }
 
-    public static void shutdown() {
+    public static void  shutdown()
+    {
     }
 }

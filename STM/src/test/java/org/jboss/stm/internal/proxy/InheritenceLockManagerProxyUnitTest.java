@@ -41,106 +41,121 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class InheritenceLockManagerProxyUnitTest extends TestCase {
-    public interface Blank {
+public class InheritenceLockManagerProxyUnitTest extends TestCase
+{
+    public interface Blank
+    {       
     }
-
+    
     @Transactional
-    public class Base {
-        public Base() {
+    public class Base
+    {
+        public Base ()
+        {
             valid = true;
         }
-
+        
         @SaveState
-        public void saveMyState(OutputObjectState os) throws IOException {
+        public void saveMyState (OutputObjectState os) throws IOException
+        {
             os.packBoolean(valid);
         }
-
+        
         @RestoreState
-        public void restoreMyState(InputObjectState os) throws IOException {
+        public void restoreMyState (InputObjectState os) throws IOException
+        {
             valid = os.unpackBoolean();
         }
-
+        
         public boolean valid;
     }
-
+    
     @Transactional
-    public class Inherit extends Base implements Blank {
-        public Inherit() {
+    public class Inherit extends Base implements Blank
+    {
+        public Inherit ()
+        {
             myString = "Hello World";
         }
-
+        
         public String myString;
     }
-
+    
     @Transactional
-    public class BasicLockable extends Base {
-        public BasicLockable() {
+    public class BasicLockable extends Base
+    {
+        public BasicLockable ()
+        {
             _isState = 4;
             _isNotState = 2;
             _saved = 1234;
         }
-
-        public String toString() {
-            return "BasicLockable < " + _isState + ", " + _isNotState + ", " + _saved + " >";
+        
+        public String toString ()
+        {
+            return "BasicLockable < "+_isState+", "+_isNotState+", "+_saved+" >";
         }
-
+        
         @SaveState
-        public void save_state(OutputObjectState os) throws IOException {
+        public void save_state (OutputObjectState os) throws IOException
+        {
             super.saveMyState(os);
-
+            
             os.packInt(_saved);
         }
-
+        
         @RestoreState
-        public void restore_state(InputObjectState os) throws IOException {
+        public void restore_state (InputObjectState os) throws IOException
+        {
             super.restoreMyState(os);
-
+            
             _saved = os.unpackInt();
         }
-
+        
         @State // will be ignored!!
         public int _isState;
 
         public int _isNotState;
-
+        
         public int _saved;
     }
-
-    public void testInheritSaveRestore() {
+    
+    public void testInheritSaveRestore ()
+    {
         Inherit obj = new Inherit();
         LockManagerProxy<Inherit> proxy = new LockManagerProxy<Inherit>(obj);
         OutputObjectState os = new OutputObjectState();
 
         assertTrue(proxy.save_state(os, ObjectType.RECOVERABLE));
-
+        
         obj.myString = "";
-
+        
         InputObjectState ios = new InputObjectState(os);
-
+        
         assertTrue(proxy.restore_state(ios, ObjectType.RECOVERABLE));
-
+        
         assertEquals(obj.myString, "");
     }
-
-    public void testSaveRestore() {
+    
+    public void testSaveRestore ()
+    {
         BasicLockable obj = new BasicLockable();
         LockManagerProxy<BasicLockable> proxy = new LockManagerProxy<BasicLockable>(obj);
         OutputObjectState os = new OutputObjectState();
-
-        assertTrue(proxy.save_state(os, ObjectType.RECOVERABLE));
-
+        
+        assertTrue(proxy.save_state(os, ObjectType.RECOVERABLE));     
+        
         obj._saved = 4567;
-        obj._isState = 0; // make sure it's ignored by save/restore.
+        obj._isState = 0;  // make sure it's ignored by save/restore.
         ((Base) obj).valid = false;
-
+        
         InputObjectState ios = new InputObjectState(os);
-
+        
         assertTrue(proxy.restore_state(ios, ObjectType.RECOVERABLE));
-
+        
         assertEquals(obj._saved, 1234);
         assertEquals(obj._isState, 0);
-
+        
         assertTrue(((Base) obj).valid);
     }
 }

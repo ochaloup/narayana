@@ -73,12 +73,10 @@ import static org.junit.Assert.*;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
+@Deprecated // in order to provide a better separation between public and internal classes.
 public class JTSObjStoreBrowserTest extends TestBase {
     private RecoveryManager rcm;
     private RecoveryDriver rd;
@@ -87,13 +85,13 @@ public class JTSObjStoreBrowserTest extends TestBase {
     public static void initOrb() throws InvalidName {
         int recoveryOrbPort = jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
         final Properties p = new Properties();
-        p.setProperty("OAPort", "" + recoveryOrbPort);
-        p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", "" + recoveryOrbPort);
-        p.setProperty("com.sun.CORBA.POA.ORBServerId", "" + recoveryOrbPort);
+        p.setProperty("OAPort", ""+recoveryOrbPort);
+        p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""+recoveryOrbPort);
+        p.setProperty("com.sun.CORBA.POA.ORBServerId", ""+recoveryOrbPort);
 
         ORB orb = ORB.getInstance("test");
         OA oa = OA.getRootOA(orb);
-        orb.initORB(new String[]{}, p);
+        orb.initORB(new String[] {}, p);
         oa.initOA();
 
         ORBManager.setORB(orb);
@@ -108,7 +106,8 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp () throws Exception
+    {
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryListener(true);
         recoveryPropertyManager.getRecoveryEnvironmentBean().setPeriodicRecoveryPeriod(1);
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
@@ -121,22 +120,22 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown () throws Exception
+    {
         rcm.removeAllModules(false);
         rcm.terminate(false);
         Field f = RecoveryManager.class.getDeclaredField("_recoveryManager");
         f.setAccessible(true);
         f.set(rcm, null);
-
+        
     }
+
 
     private ObjStoreBrowser createObjStoreBrowser(boolean probe) {
         ObjStoreBrowser osb = new ObjStoreBrowser();
 
-        osb.setType("com.arjuna.ats.arjuna.AtomicAction",
-                "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean");
-        osb.setType("com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper",
-                "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean");
+        osb.setType("com.arjuna.ats.arjuna.AtomicAction", "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean");
+        osb.setType("com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper", "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean");
 
         if (probe) {
             osb.start();
@@ -147,21 +146,18 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     /*
-     * TODO JTS test-compile doesn't pull in com.arjuna.common.tests.simple
-     * 
-     * @Test public void testXAResourceRecordBean() throws Exception {
-     * com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(
-     * new XAResourceRecordBean(new UidWrapper(Uid.nullUid()))); }
-     */
+         TODO JTS test-compile doesn't pull in com.arjuna.common.tests.simple
+    @Test
+    public void testXAResourceRecordBean() throws Exception {
+        com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(new XAResourceRecordBean(new UidWrapper(Uid.nullUid())));
+    }
+    */
 
     /**
-     * Create an atomic action with two participants, one of which will generate
-     * a heuristic during phase 2. The test will move the heuristic back into
-     * the prepared state and trigger recovery to replay phase 2. The test then
-     * asserts that the corresponding MBeans have been unregistered.
-     * 
-     * @throws Exception
-     *             if test fails unexpectedly
+     * Create an atomic action with two participants, one of which will generate a heuristic during phase 2.
+     * The test will move the heuristic back into the prepared state and trigger recovery to replay phase 2.
+     * The test then asserts that the corresponding MBeans have been unregistered.
+     * @throws Exception if test fails unexpectedly
      */
     @Test
     public void aaReplayTest() throws Exception {
@@ -176,12 +172,9 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     /**
-     * Similar to @aaReplayTest except that the whole transaction record is
-     * removed from the object store (instead of replaying the record that
-     * generates a heuristic).
-     * 
-     * @throws Exception
-     *             if test fails unexpectedly
+     * Similar to @aaReplayTest except that the whole transaction record is removed from the object store
+     * (instead of replaying the record that generates a heuristic).
+     * @throws Exception if test fails unexpectedly
      */
     @Test
     public void aaRemoveTest() throws Exception {
@@ -196,14 +189,10 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     /**
-     * Similar to aaReplayTest but uses a JTS transaction instead of an
-     * AtomicAction
-     * 
-     * @throws Exception
-     *             if test fails unexpectedly
+     * Similar to aaReplayTest but uses a JTS transaction instead of an AtomicAction
+     * @throws Exception if test fails unexpectedly
      */
-    // TODO for replay to work on JTS participants ExtendedCrashReocrd needs to
-    // extend XAResourceRecord
+    // TODO for replay to work on JTS participants ExtendedCrashReocrd needs to extend XAResourceRecord
     // TODO @Test
     public void jtsReplayTest() throws Exception {
         ArjunaTransactionImple A = new ArjunaTransactionImple(null);
@@ -224,7 +213,6 @@ public class JTSObjStoreBrowserTest extends TestBase {
 
     /**
      * Test that MBeans corresponding to JTS record types are created
-     * 
      * @throws Exception
      */
     @Test
@@ -239,11 +227,9 @@ public class JTSObjStoreBrowserTest extends TestBase {
         } catch (HeuristicHazard e) {
         }
 
-        createObjStoreBrowser(true); // start an mbean server and object store
-                                        // browser
+        createObjStoreBrowser(true); // start an mbean server and object store browser
 
-        // there should now be an MBean entry corresponding to a JTS record,
-        // read it via JMX:
+        // there should now be an MBean entry corresponding to a JTS record, read it via JMX:
         MBeanServer mbs = JMXServer.getAgent().getServer();
         Set<ObjectInstance> transactions = mbs.queryMBeans(new ObjectName("jboss.jta:type=ObjectStore,*"), null);
         boolean foundJTSType = false;
@@ -261,11 +247,8 @@ public class JTSObjStoreBrowserTest extends TestBase {
     }
 
     /**
-     * Similar to aaRemoveTest but uses a JTS transaction instead of an
-     * AtomicAction
-     * 
-     * @throws Exception
-     *             if test fails unexpectedly
+     * Similar to aaRemoveTest but uses a JTS transaction instead of an AtomicAction
+     * @throws Exception if test fails unexpectedly
      */
     @Test
     public void jtsRemoveTest() throws Exception {
@@ -290,39 +273,32 @@ public class JTSObjStoreBrowserTest extends TestBase {
         ThreadActionData.purgeActions();
 
         ExtendedCrashRecord recs[] = {
-                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.NoCrash,
-                        ExtendedCrashRecord.CrashType.Normal),
-                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.CrashInCommit,
-                        ExtendedCrashRecord.CrashType.HeuristicHazard)};
+                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.NoCrash, ExtendedCrashRecord.CrashType.Normal),
+                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.CrashInCommit, ExtendedCrashRecord.CrashType.HeuristicHazard)
+        };
 
         RecordTypeManager.manager().add(new RecordTypeMap() {
-            public Class<? extends AbstractRecord> getRecordClass() {
-                return ExtendedCrashRecord.class;
-            }
-            public int getType() {
-                return RecordType.USER_DEF_FIRST0;
-            }
+            public Class<? extends AbstractRecord> getRecordClass () { return ExtendedCrashRecord.class;}
+            public int getType () {return RecordType.USER_DEF_FIRST0;}
         });
 
         A.start();
 
         for (ExtendedCrashRecord rec : recs)
             A.add(rec);
-
+        
         return recs;
     }
 
     /*
-     * Make sure there is an MBean corresponding to A and that at least one of
-     * recs has a heuristic. Then either remove the action or replay (via the
-     * MBean) the record that got the heuristic checking that the MBeans have
-     * all been unregistered from the MBeanServer.
+     * Make sure there is an MBean corresponding to A and that at least one of recs has a heuristic.
+     * Then either remove the action or replay (via the MBean) the record that got the heuristic
+     * checking that the MBeans have all been unregistered from the MBeanServer.
      */
-    private void finishTest(TwoPhaseCoordinator A, boolean replay, ExtendedCrashRecord... recs) throws Exception {
+    private void finishTest(TwoPhaseCoordinator A, boolean replay, ExtendedCrashRecord ... recs) throws Exception {
         ObjStoreBrowser osb = createObjStoreBrowser(false);
 
-        // there should now be an entry in the object store containing two
-        // participants
+        // there should now be an entry in the object store containing two participants
         osb.start();
         osb.probe();
 
@@ -336,8 +312,7 @@ public class JTSObjStoreBrowserTest extends TestBase {
         assertTrue(ai instanceof ActionBean);
         ActionBean actionBean = (ActionBean) ai;
 
-        // and there should be one MBean corresponding to the CrashRecord that
-        // got the heuristic:
+        // and there should be one MBean corresponding to the CrashRecord that got the heuristic:
         int recCount = 0;
         for (ExtendedCrashRecord rec : recs) {
             LogRecordWrapper lw = actionBean.getParticipant(rec);
@@ -349,8 +324,7 @@ public class JTSObjStoreBrowserTest extends TestBase {
                     if (replay) {
                         rec.forget();
                         lw.setStatus("PREPARED");
-                        // the participant record should no longer be on the
-                        // heuristic list
+                        // the participant record should no longer be on the heuristic list
                         assertFalse(lw.isHeuristic());
                     }
                 }
@@ -363,16 +337,14 @@ public class JTSObjStoreBrowserTest extends TestBase {
             actionBean.remove();
         } else {
             /*
-             * prompt the recovery manager to have a go at replaying the record
-             * that was moved off the heuristic list and back onto the prepared
-             * list
-             */
+            * prompt the recovery manager to have a go at replaying the record that was
+            * moved off the heuristic list and back onto the prepared list
+            */
             rd.synchronousScan();
         }
 
         // another probe should no longer find the record that got the heuristic
-        // (since it was either removed or the RecoveryManager replayed the
-        // commit
+        // (since it was either removed or the RecoveryManager replayed the commit
         // phase) so its corresponding MBean will have been unregistered
         osb.probe();
 

@@ -30,39 +30,41 @@ import javax.transaction.Transaction;
 public class CrashCMTBean implements SessionBean {
     private SessionContext context;
 
-    public void setSessionContext(SessionContext context) {
-        this.context = context;
-    }
-    public void ejbCreate() {
-    }
-    public void ejbActivate() {
-    }
-    public void ejbPassivate() {
-    }
-    public void ejbRemove() {
-    }
+    public void setSessionContext(SessionContext context) { this.context = context; }
+    public void ejbCreate() { }
+    public void ejbActivate() { }
+    public void ejbPassivate() { }
+    public void ejbRemove() { }
 
-    public String testXA(String... args) {
+    public String testXA(String ... args)
+    {
         return "Passed";
     }
 
-    public String testXA(ASFailureSpec... specs) {
+    public String testXA(ASFailureSpec... specs)
+    {
         System.out.println("CMT testXA called with " + specs.length + " specs");
 
         TestASRecovery xatest = new TestASRecovery();
         Transaction tx;
 
-        try {
+        try
+        {
             tx = com.arjuna.ats.jta.TransactionManager.transactionManager().getTransaction();
-        } catch (javax.transaction.SystemException e) {
+        }
+        catch (javax.transaction.SystemException e)
+        {
             tx = null;
         }
 
-        if (tx == null) {
+        if (tx == null)
+        {
             System.out.println("CMT testXA called without a transaction");
 
             return "Failed";
-        } else {
+        }
+        else
+        {
             for (ASFailureSpec spec : specs)
                 xatest.addResource(spec);
 

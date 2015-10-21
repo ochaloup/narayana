@@ -32,32 +32,36 @@ import com.jboss.transaction.wstf.webservices.sc007.InteropUtil;
 /**
  * The VolatileAndDurable volatile 2PC participant
  */
-public class VolatileAndDurableVolatile2PCParticipant extends ParticipantAdapter implements Volatile2PCParticipant {
+public class VolatileAndDurableVolatile2PCParticipant extends ParticipantAdapter implements Volatile2PCParticipant
+{
     /**
      * The current coordination context.
      */
-    private final CoordinationContextType coordinationContext;
-
+    private final CoordinationContextType coordinationContext ;
+    
     /**
      * Construct the participant.
-     * 
-     * @param coordinationContext
-     *            The coordination context.
+     * @param coordinationContext The coordination context.
      */
-    public VolatileAndDurableVolatile2PCParticipant(final CoordinationContextType coordinationContext) {
-        this.coordinationContext = coordinationContext;
+    public VolatileAndDurableVolatile2PCParticipant(final CoordinationContextType coordinationContext)
+    {
+        this.coordinationContext = coordinationContext ;
     }
-
+    
     /**
      * Vote to prepare.
      */
-    public Vote prepare() throws WrongStateException, SystemException {
-        try {
-            InteropUtil.registerDurable2PC(coordinationContext, new VolatileAndDurableDurable2PCParticipant(),
-                    new Uid().toString());
-        } catch (final Throwable th) {
-            throw new SystemException(th.getMessage());
+    public Vote prepare()
+        throws WrongStateException, SystemException
+    {
+        try
+        {
+            InteropUtil.registerDurable2PC(coordinationContext, new VolatileAndDurableDurable2PCParticipant(), new Uid().toString()) ;
         }
-        return new ReadOnly();
-    }
+        catch (final Throwable th)
+        {
+            throw new SystemException(th.getMessage()) ;
+        }
+        return new ReadOnly() ;
+    }    
 }

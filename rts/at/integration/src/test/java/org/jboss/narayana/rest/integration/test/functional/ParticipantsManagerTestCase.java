@@ -47,8 +47,7 @@ public final class ParticipantsManagerTestCase {
     public void testReportHeuristic() throws MalformedURLException {
         final String participantId = new Uid().toString();
         registerParticipant(participantId, new LoggingParticipant(new Prepared()));
-        final ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
-                .getParticipantInformation(participantId);
+        final ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(participantId);
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
         participantsManager.reportHeuristic(participantId, HeuristicType.HEURISTIC_ROLLBACK);
@@ -56,10 +55,8 @@ public final class ParticipantsManagerTestCase {
         Assert.assertEquals(TxStatus.TransactionHeuristicRollback.name(), participantInformation.getStatus());
     }
 
-    private void registerParticipant(final String participantId, final Participant participant)
-            throws MalformedURLException {
-        ParticipantInformation participantInformation = new ParticipantInformation(participantId, APPLICATION_ID, "",
-                participant);
+    private void registerParticipant(final String participantId, final Participant participant) throws MalformedURLException {
+        ParticipantInformation participantInformation = new ParticipantInformation(participantId, APPLICATION_ID, "", participant);
         participantInformation.setStatus(TxStatus.TransactionActive.name());
         ParticipantsContainer.getInstance().addParticipantInformation(participantId, participantInformation);
     }

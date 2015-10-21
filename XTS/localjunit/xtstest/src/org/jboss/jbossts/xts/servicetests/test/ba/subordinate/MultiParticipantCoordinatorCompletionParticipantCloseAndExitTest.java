@@ -40,17 +40,14 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlists a cooprdinator completion participant with
- * instructions to complete and close without error then gets the web service to
- * start a subordinate transaction and enlist several cooprdinator completion
- * participants for a second web service in the subtransaction with no
- * instructions. The subordinate participants are then told to exit. This checks
- * that the subordinate coordinator works ok when all its participants are read
- * only and hence that no subordinate tx is logged at commit
+ * Starts a transaction and enlists a cooprdinator completion participant with instructions to complete and close
+ * without error then gets the web service to start a subordinate transaction and enlist several cooprdinator
+ * completion participants for a second web service in the subtransaction with no instructions. The subordinate
+ * participants are then told to exit. This checks that the subordinate coordinator works ok when all its
+ * participants are read only and hence that no subordinate tx is logged at commit
  */
-public class MultiParticipantCoordinatorCompletionParticipantCloseAndExitTest extends XTSServiceTestBase
-        implements
-            XTSServiceTest {
+public class MultiParticipantCoordinatorCompletionParticipantCloseAndExitTest extends XTSServiceTestBase implements XTSServiceTest
+{
     public void run() {
 
         // wait a while so the service has time to start

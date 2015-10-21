@@ -8,9 +8,10 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
  * @since 1.0.
  */
 
-public interface Context {
+public interface Context
+{
 
-    public CoordinationContextType getCoordinationContext();
+    public CoordinationContextType getCoordinationContext ();
 
-    public void setCoordinationContext(CoordinationContextType cc);
+    public void setCoordinationContext (CoordinationContextType cc);
 }

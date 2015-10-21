@@ -27,47 +27,42 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.RegisterType;
 
 /**
  * The Registration Coordinator processor.
- * 
  * @author kevin
  */
-public abstract class RegistrationCoordinatorProcessor {
+public abstract class RegistrationCoordinatorProcessor
+{
     /**
      * The coordinator.
      */
-    private static RegistrationCoordinatorProcessor COORDINATOR;
-
+    private static RegistrationCoordinatorProcessor COORDINATOR ;
+    
     /**
      * Get the coordinator.
-     * 
      * @return The coordinator.
      */
-    public static RegistrationCoordinatorProcessor getCoordinator() {
-        return COORDINATOR;
+    public static RegistrationCoordinatorProcessor getCoordinator()
+    {
+        return COORDINATOR ;
     }
-
+    
     /**
      * Set the coordinator.
-     * 
-     * @param coordinator
-     *            The coordinator.
+     * @param coordinator The coordinator.
      * @return The orig coordinator.
      */
-    public static RegistrationCoordinatorProcessor setCoordinator(final RegistrationCoordinatorProcessor coordinator) {
-        final RegistrationCoordinatorProcessor origCoordinator = COORDINATOR;
-        COORDINATOR = coordinator;
-        return origCoordinator;
+    public static RegistrationCoordinatorProcessor setCoordinator(final RegistrationCoordinatorProcessor coordinator)
+    {
+        final RegistrationCoordinatorProcessor origCoordinator = COORDINATOR ;
+        COORDINATOR = coordinator ;
+        return origCoordinator ;
     }
 
     /**
      * Register the participant in the protocol.
-     * 
-     * @param register
-     *            The register request.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param register The register request.
+     * @param map The addressing context.
+     * @param arjunaContext The arjuna context.
      */
     public abstract RegisterResponseType register(final RegisterType register, final MAP map,
-            final ArjunaContext arjunaContext, final boolean isSecure);
+        final ArjunaContext arjunaContext, final boolean isSecure) ;
 }

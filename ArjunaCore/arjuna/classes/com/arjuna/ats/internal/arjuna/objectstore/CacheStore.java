@@ -51,18 +51,26 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
  * @since JTS 3.0.
  */
 
-public class CacheStore extends HashedStore {
+public class CacheStore extends HashedStore
+{
     static final int NO_STATE_TYPE = -1;
 
-    public boolean commit_state(Uid objUid, String tName) throws ObjectStoreException {
-        return CacheStore._storeManager.addWork(this, AsyncStore.COMMIT, objUid, tName, null, CacheStore.NO_STATE_TYPE);
+    public boolean commit_state (Uid objUid, String tName)
+            throws ObjectStoreException
+    {
+        return CacheStore._storeManager.addWork(this, AsyncStore.COMMIT,
+                objUid, tName, null, CacheStore.NO_STATE_TYPE);
     }
 
-    public void sync() throws java.io.SyncFailedException, ObjectStoreException {
+    public void sync () throws java.io.SyncFailedException,
+            ObjectStoreException
+    {
         CacheStore._storeManager.flush();
     }
 
-    protected boolean remove_state(Uid objUid, String name, int ft) throws ObjectStoreException {
+    protected boolean remove_state (Uid objUid, String name, int ft)
+            throws ObjectStoreException
+    {
         /*
          * Is it in the cache?
          */
@@ -79,9 +87,14 @@ public class CacheStore extends HashedStore {
 
         int fileState = currentState(objUid, name);
 
-        if ((fileState != StateStatus.OS_UNKNOWN) || (status == AsyncStore.IN_USE)) {
-            return CacheStore._storeManager.addWork(this, AsyncStore.REMOVE, objUid, name, null, fileState);
-        } else {
+        if ((fileState != StateStatus.OS_UNKNOWN)
+                || (status == AsyncStore.IN_USE))
+        {
+            return CacheStore._storeManager.addWork(this, AsyncStore.REMOVE,
+                    objUid, name, null, fileState);
+        }
+        else
+        {
             if (fileState == StateStatus.OS_UNKNOWN)
                 return false;
             else
@@ -89,8 +102,9 @@ public class CacheStore extends HashedStore {
         }
     }
 
-    protected boolean write_state(Uid objUid, String tName, OutputObjectState state, int ft)
-            throws ObjectStoreException {
+    protected boolean write_state (Uid objUid, String tName,
+            OutputObjectState state, int ft) throws ObjectStoreException
+    {
         /*
          * If there is already a write operation in the cache for exactly this
          * state and type, then remove it and any corresponding remove_state
@@ -101,7 +115,8 @@ public class CacheStore extends HashedStore {
 
         int status = CacheStore._storeManager.removeWriteState(objUid, ft);
 
-        return CacheStore._storeManager.addWork(this, AsyncStore.WRITE, objUid, tName, state, ft);
+        return CacheStore._storeManager.addWork(this, AsyncStore.WRITE, objUid,
+                tName, state, ft);
     }
 
     /**
@@ -109,7 +124,9 @@ public class CacheStore extends HashedStore {
      * state, just in case it hasn't been written out to persistent store yet.
      */
 
-    protected InputObjectState read_state(Uid objUid, String tName, int ft) throws ObjectStoreException {
+    protected InputObjectState read_state (Uid objUid, String tName, int ft)
+            throws ObjectStoreException
+    {
         OutputObjectState state = CacheStore._storeManager.getState(objUid, ft);
 
         if (state == null) // not in the cache
@@ -122,20 +139,26 @@ public class CacheStore extends HashedStore {
      * The methods that do the real work when the thread gets round to it.
      */
 
-    protected boolean commitState(Uid objUid, String tName) throws ObjectStoreException {
+    protected boolean commitState (Uid objUid, String tName)
+            throws ObjectStoreException
+    {
         return super.commit_state(objUid, tName);
     }
 
-    protected boolean removeState(Uid objUid, String name, int ft) throws ObjectStoreException {
+    protected boolean removeState (Uid objUid, String name, int ft)
+            throws ObjectStoreException
+    {
         return super.remove_state(objUid, name, ft);
     }
 
-    protected boolean writeState(Uid objUid, String tName, OutputObjectState state, int ft)
-            throws ObjectStoreException {
+    protected boolean writeState (Uid objUid, String tName,
+            OutputObjectState state, int ft) throws ObjectStoreException
+    {
         return super.write_state(objUid, tName, state, ft);
     }
 
-    public CacheStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException {
+    public CacheStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException
+    {
         super(objectStoreEnvironmentBean);
 
         super.syncWrites = objectStoreEnvironmentBean.isCacheStoreSync();
@@ -144,9 +167,12 @@ public class CacheStore extends HashedStore {
     static final AsyncStore _storeManager = new AsyncStore();
 }
 
-class StoreElement {
+class StoreElement
+{
 
-    public StoreElement(CacheStore s, int tow, Uid ou, String tn, OutputObjectState st, int ft) {
+    public StoreElement(CacheStore s, int tow, Uid ou, String tn,
+            OutputObjectState st, int ft)
+    {
         store = s;
         typeOfWork = tow;
         objUid = new Uid(ou);
@@ -156,7 +182,8 @@ class StoreElement {
         removed = false;
     }
 
-    public void remove() {
+    public void remove ()
+    {
         store = null;
         typeOfWork = AsyncStore.NO_WORK;
         objUid = null;
@@ -166,8 +193,10 @@ class StoreElement {
         removed = true;
     }
 
-    public String toString() {
-        return "< " + typeOfWork + ", " + objUid + ", " + tName + ", " + fileType + ", " + removed + " >";
+    public String toString ()
+    {
+        return "< " + typeOfWork + ", " + objUid + ", " + tName + ", "
+                + fileType + ", " + removed + " >";
     }
 
     public CacheStore store;
@@ -189,29 +218,33 @@ class StoreElement {
 class ShutdownThread extends Thread // used to flush on exit
 {
 
-    public ShutdownThread() {
+    public ShutdownThread()
+    {
         super("CacheStoreShutdownThread");
     }
 
-    public void run() {
+    public void run ()
+    {
         CacheStore._storeManager.flush();
 
-        synchronized (CacheStore._storeManager) {
+        synchronized (CacheStore._storeManager)
+        {
             CacheStore._storeManager.notifyAll();
         }
 
-        synchronized (CacheStore._storeManager._activeLock) {
+        synchronized (CacheStore._storeManager._activeLock)
+        {
             /*
              * We don't want to exit the VM if the worker thread is currently
              * writing to the disk. That would be very bad :-(! So, just check
              * that the thread isn't actively doing work.
              */
 
-            if (tsLogger.logger.isTraceEnabled()) {
-                tsLogger.logger.trace("ShutdownThread.run () - terminating");
-            }
-        }
-    }
+          if (tsLogger.logger.isTraceEnabled()) {
+              tsLogger.logger.trace("ShutdownThread.run () - terminating");
+          }
+      }
+   }
 
 }
 
@@ -232,7 +265,8 @@ class AsyncStore extends Thread // keep priority same as app. threads
 
     public static final int NOT_PRESENT = 5;
 
-    public AsyncStore() {
+    public AsyncStore()
+    {
         super("AsyncStoreThread");
 
         _maximumCacheSize = _defaultCacheSize;
@@ -249,7 +283,8 @@ class AsyncStore extends Thread // keep priority same as app. threads
         start();
     }
 
-    public final void flush() {
+    public final void flush ()
+    {
         /*
          * Do it this way because by the time we get here the daemon thread has
          * been removed by the system.
@@ -257,21 +292,26 @@ class AsyncStore extends Thread // keep priority same as app. threads
 
         boolean stop = false;
 
-        do {
-            synchronized (_workList) {
+        do
+        {
+            synchronized (_workList)
+            {
                 stop = _numberOfEntries <= 0;
             }
 
-            if (!stop) {
+            if (!stop)
+            {
                 doWork();
             }
-        } while (!stop);
+        }
+        while (!stop);
 
         _terminated = true;
     }
 
-    public final boolean addWork(CacheStore store, int workType, Uid objUid, String tName, OutputObjectState state,
-            int ft) {
+    public final boolean addWork (CacheStore store, int workType, Uid objUid,
+            String tName, OutputObjectState state, int ft)
+    {
         /*
          * If the cache is full already, then wait until it has drained. We sit
          * in a while/do loop because many threads could be blocked and only one
@@ -281,23 +321,33 @@ class AsyncStore extends Thread // keep priority same as app. threads
 
         boolean stop = false;
 
-        do {
-            synchronized (_overflowLock) {
-                if (cacheIsFull()) {
-                    try {
+        do
+        {
+            synchronized (_overflowLock)
+            {
+                if (cacheIsFull())
+                {
+                    try
+                    {
                         _overflowLock.wait();
-                    } catch (Exception ex) {
                     }
-                } else
+                    catch (Exception ex)
+                    {
+                    }
+                }
+                else
                     stop = true;
             }
-        } while (!stop);
+        }
+        while (!stop);
 
-        StoreElement toAdd = new StoreElement(store, workType, objUid, tName, state, ft);
+        StoreElement toAdd = new StoreElement(store, workType, objUid, tName,
+                state, ft);
 
         getList(objUid).addFirst(toAdd);
 
-        synchronized (_workList) {
+        synchronized (_workList)
+        {
             if (state != null)
                 _currentCacheSize += state.size();
 
@@ -315,168 +365,206 @@ class AsyncStore extends Thread // keep priority same as app. threads
      * recovery should fix this up later though.
      */
 
-    public final int removeState(Uid objUid, int ft) {
+    public final int removeState (Uid objUid, int ft)
+    {
         Object[] elements = null;
 
         /*
          * Check the cache first. Take a snapshot.
          */
 
-        try {
+        try
+        {
             elements = getList(objUid).toArray();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             elements = null;
         }
 
         int status = NOT_PRESENT;
-
+        
         if (elements == null)
             return status;
 
-        synchronized (elements) {
-            for (int i = 0; i < elements.length; i++) {
+        synchronized (elements)
+        {
+            for (int i = 0; i < elements.length; i++)
+            {
                 StoreElement element = (StoreElement) elements[i];
-
-                if ((element != null) && !element.removed && element.objUid.equals(objUid)) {
-                    switch (element.typeOfWork) {
-                        case AsyncStore.REMOVE :
-                            element.remove();
-
-                            synchronized (_workList) {
-                                _removedItems++;
-                            }
-
-                            if (status != IN_USE)
-                                status = REMOVED;
-
-                            break;
-                        case AsyncStore.WRITE :
-                        // if (element.fileType == ft)
+    
+                if ((element != null) && !element.removed
+                        && element.objUid.equals(objUid))
+                {
+                    switch (element.typeOfWork)
+                    {
+                    case AsyncStore.REMOVE:
+                        element.remove();
+    
+                        synchronized (_workList)
                         {
-                            synchronized (_workList) {
-                                if (element.state != null)
-                                    _currentCacheSize -= element.state.size();
-
-                                _removedItems++;
-                            }
-
-                            element.remove();
-
-                            if (status != IN_USE)
-                                status = REMOVED;
+                            _removedItems++;
                         }
-
-                            break;
-                        default :
-                            break;
+    
+                        if (status != IN_USE)
+                            status = REMOVED;
+    
+                        break;
+                    case AsyncStore.WRITE:
+                        // if (element.fileType == ft)
+                    {
+                        synchronized (_workList)
+                        {
+                            if (element.state != null)
+                                _currentCacheSize -= element.state.size();
+    
+                            _removedItems++;
+                        }
+    
+                        element.remove();
+    
+                        if (status != IN_USE)
+                            status = REMOVED;
+                    }
+    
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
         }
 
-        if (cacheIsFull()) {
-            synchronized (_workList) {
+        if (cacheIsFull())
+        {
+            synchronized (_workList)
+            {
                 _workList.notify();
             }
         }
-
+        
         /*
          * Does the worker thread currently have it?
          */
 
-        if (CacheStore._storeManager.currentWork(objUid, ft)) {
+        if (CacheStore._storeManager.currentWork(objUid, ft))
+        {
             status = IN_USE;
         }
 
         return status;
     }
 
-    public final int removeWriteState(Uid objUid, int ft) {
+    public final int removeWriteState (Uid objUid, int ft)
+    {
         int status = NOT_PRESENT;
         Object[] elements = null;
 
-        try {
+        try
+        {
             elements = getList(objUid).toArray();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             elements = null;
         }
 
         if (elements == null)
             return status;
 
-        for (int i = 0; i < elements.length; i++) {
+        for (int i = 0; i < elements.length; i++)
+        {
             StoreElement element = (StoreElement) elements[i];
 
-            if ((element != null) && !element.removed && element.objUid.equals(objUid)) {
-                switch (element.typeOfWork) {
-                    case AsyncStore.WRITE :
-                        if (ft == element.fileType) {
-                            synchronized (_workList) {
-                                if (element.state != null)
-                                    _currentCacheSize -= element.state.size();
+            if ((element != null) && !element.removed
+                    && element.objUid.equals(objUid))
+            {
+                switch (element.typeOfWork)
+                {
+                case AsyncStore.WRITE:
+                    if (ft == element.fileType)
+                    {
+                        synchronized (_workList)
+                        {
+                            if (element.state != null)
+                                _currentCacheSize -= element.state.size();
 
-                                _removedItems++;
-                            }
+                            _removedItems++;
+                        }
 
-                            element.remove();
+                        element.remove();
 
-                            status = REMOVED;
-                        } else {
-                            if (ft == StateType.OS_ORIGINAL) {
-                                if (element.fileType == StateType.OS_SHADOW) {
-                                    synchronized (_workList) {
-                                        if (element.state != null)
-                                            _currentCacheSize -= element.state.size();
+                        status = REMOVED;
+                    }
+                    else
+                    {
+                        if (ft == StateType.OS_ORIGINAL)
+                        {
+                            if (element.fileType == StateType.OS_SHADOW)
+                            {
+                                synchronized (_workList)
+                                {
+                                    if (element.state != null)
+                                        _currentCacheSize -= element.state
+                                                .size();
 
-                                        _removedItems++;
-                                    }
-
-                                    element.remove();
-
-                                    status = REMOVED;
+                                    _removedItems++;
                                 }
+
+                                element.remove();
+
+                                status = REMOVED;
                             }
                         }
+                    }
 
-                        break;
-                    case AsyncStore.COMMIT :
-                        if (ft == StateType.OS_ORIGINAL) {
-                            synchronized (_workList) {
-                                if (element.state != null)
-                                    _currentCacheSize -= element.state.size();
+                    break;
+                case AsyncStore.COMMIT:
+                    if (ft == StateType.OS_ORIGINAL)
+                    {
+                        synchronized (_workList)
+                        {
+                            if (element.state != null)
+                                _currentCacheSize -= element.state.size();
 
-                                _removedItems++;
-                            }
-
-                            element.remove();
-
-                            status = REMOVED;
+                            _removedItems++;
                         }
 
-                        break;
-                    default :
-                        break;
+                        element.remove();
+
+                        status = REMOVED;
+                    }
+
+                    break;
+                default:
+                    break;
                 }
             }
         }
 
-        if (cacheIsFull()) {
-            synchronized (_workList) {
+        if (cacheIsFull())
+        {
+            synchronized (_workList)
+            {
                 _workList.notify();
             }
         }
-
+        
         return status;
     }
 
-    public final OutputObjectState getState(Uid objUid, int ft) {
+    public final OutputObjectState getState (Uid objUid, int ft)
+    {
         LinkedList list = getList(objUid);
 
-        synchronized (list) {
-            for (int i = 0; i < list.size(); i++) {
+        synchronized (list)
+        {
+            for (int i = 0; i < list.size(); i++)
+            {
                 StoreElement element = (StoreElement) list.get(i);
 
-                if ((element != null) && !element.removed && (element.objUid.equals(objUid))) {
+                if ((element != null) && !element.removed && (element.objUid.equals(objUid)))
+                {
                     if (element.fileType == ft)
                         return element.state;
                 }
@@ -486,7 +574,8 @@ class AsyncStore extends Thread // keep priority same as app. threads
              * If not in cache then maybe we're working on it?
              */
 
-            synchronized (_workList) {
+            synchronized (_workList)
+            {
                 if ((_work != null) && (objUid.equals(_work.objUid)))
                     return _work.state;
             }
@@ -495,16 +584,23 @@ class AsyncStore extends Thread // keep priority same as app. threads
         return null;
     }
 
-    public void run() {
-        synchronized (_workList) {
-            try {
+    public void run ()
+    {
+        synchronized (_workList)
+        {
+            try
+            {
                 _workList.wait();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
             }
         }
 
-        while (!_terminated) {
-            synchronized (_activeLock) {
+        while (!_terminated)
+        {
+            synchronized (_activeLock)
+            {
                 while (!queueIsEmpty()) // drain the queue
                 {
                     doWork();
@@ -515,97 +611,127 @@ class AsyncStore extends Thread // keep priority same as app. threads
                  * that they get a chance to add something to the queue again.
                  */
 
-                synchronized (_overflowLock) {
+                synchronized (_overflowLock)
+                {
                     _overflowLock.notifyAll();
                 }
             }
 
-            synchronized (_workList) {
-                if (!cacheIsFull()) {
-                    try {
+            synchronized (_workList)
+            {
+                if (!cacheIsFull())
+                {
+                    try
+                    {
                         _workList.wait(_scanPeriod);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                     }
                 }
             }
         }
     }
 
-    public boolean currentWork(Uid objUid, int ft) {
-        try {
-            synchronized (_workList) {
-                if (_work != null) {
-                    if (_work.objUid.equals(objUid) && (_work.fileType == ft)) {
+    public boolean currentWork (Uid objUid, int ft)
+    {
+        try
+        {
+            synchronized (_workList)
+            {
+                if (_work != null)
+                {
+                    if (_work.objUid.equals(objUid) && (_work.fileType == ft))
+                    {
                         return true;
                     }
                 }
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
         }
 
         return false;
     }
 
-    private final void doWork() {
-        synchronized (_workList) {
+    private final void doWork ()
+    {
+        synchronized (_workList)
+        {
             LinkedList list = getList();
 
-            if (list != null) {
-                synchronized (list) {
-                    try {
+            if (list != null)
+            {
+                synchronized (list)
+                {
+                    try
+                    {
                         _work = (StoreElement) list.removeLast();
-
+    
                         _numberOfEntries--;
-
+    
                         if ((_work.state != null) && !_work.removed)
                             _currentCacheSize -= _work.state.size();
-
-                        if (_work.removed) {
+    
+                        if (_work.removed)
+                        {
                             _removedItems--;
                         }
-                    } catch (java.util.NoSuchElementException ex) {
+                    }
+                    catch (java.util.NoSuchElementException ex)
+                    {
                         _work = null;
                     }
                 }
-            } else
+            }
+            else
                 _work = null;
         }
 
-        if ((_work != null) && !_work.removed) {
+        if ((_work != null) && !_work.removed)
+        {
             /*
              * Should write any errors to a persistent log so that an admin tool
              * can pick up the pieces later.
              */
 
-            try {
+            try
+            {
                 switch (_work.typeOfWork) {
-                    case AsyncStore.COMMIT : {
+                    case AsyncStore.COMMIT: {
                         if (!_work.store.commitState(_work.objUid, _work.tName)) {
                             tsLogger.i18NLogger.warn_objectstore_CacheStore_1(_work.objUid, _work.tName);
                         }
                     }
-                        break;
-                    case AsyncStore.REMOVE : {
-                        if (!_work.store.removeState(_work.objUid, _work.tName, _work.fileType)) {
+                    break;
+                    case AsyncStore.REMOVE: {
+                        if (!_work.store.removeState(_work.objUid, _work.tName,
+                                _work.fileType)) {
                             tsLogger.i18NLogger.warn_objectstore_CacheStore_2(_work.objUid, _work.tName,
                                     Integer.toString(_work.fileType));
                         }
                     }
-                        break;
-                    case AsyncStore.WRITE : {
-                        if (!_work.store.writeState(_work.objUid, _work.tName, _work.state, _work.fileType)) {
+                    break;
+                    case AsyncStore.WRITE: {
+                        if (!_work.store.writeState(_work.objUid, _work.tName,
+                                _work.state, _work.fileType)) {
                             tsLogger.i18NLogger.warn_objectstore_CacheStore_3(_work.objUid, _work.tName,
                                     _work.state.toString(), Integer.toString(_work.fileType));
                         }
                     }
-                        break;
-                    default :
+                    break;
+                    default:
                         tsLogger.i18NLogger.warn_objectstore_CacheStore_4(Integer.toString(_work.typeOfWork));
                         break;
                 }
-            } catch (ObjectStoreException ex) {
+            }
+            catch (ObjectStoreException ex)
+            {
                 ex.printStackTrace();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.printStackTrace();
             }
         }
@@ -617,8 +743,10 @@ class AsyncStore extends Thread // keep priority same as app. threads
      * @return true if the queue is empty, false otherwise.
      */
 
-    private final boolean queueIsEmpty() {
-        synchronized (_workList) {
+    private final boolean queueIsEmpty ()
+    {
+        synchronized (_workList)
+        {
             if (_numberOfEntries == 0)
                 return true;
             else
@@ -630,20 +758,27 @@ class AsyncStore extends Thread // keep priority same as app. threads
      * @return true if the cache is full, false otherwise.
      */
 
-    private final boolean cacheIsFull() {
-        synchronized (_workList) {
-            if ((_currentCacheSize >= _maximumCacheSize) || (_removedItems >= _maximumRemovedItems)
-                    || (_numberOfEntries - _removedItems >= _maximumWorkItems)) {
+    private final boolean cacheIsFull ()
+    {
+        synchronized (_workList)
+        {
+            if ((_currentCacheSize >= _maximumCacheSize)
+                    || (_removedItems >= _maximumRemovedItems)
+                    || (_numberOfEntries - _removedItems >= _maximumWorkItems))
+            {
                 _workList.notifyAll();
 
                 return true; // cache is full, so wait
-            } else
+            }
+            else
                 return false; // cache is ok
         }
     }
 
-    private final LinkedList getList() {
-        for (int i = 0; i < HASH_SIZE; i++) {
+    private final LinkedList getList ()
+    {
+        for (int i = 0; i < HASH_SIZE; i++)
+        {
             if ((_workList[i] != null) && (_workList[i].size() > 0))
                 return _workList[i];
         }
@@ -651,10 +786,12 @@ class AsyncStore extends Thread // keep priority same as app. threads
         return null;
     }
 
-    private final LinkedList getList(Uid objUid) {
+    private final LinkedList getList (Uid objUid)
+    {
         int index = objUid.hashCode() % HASH_SIZE;
 
-        synchronized (_workList) {
+        synchronized (_workList)
+        {
             if (_workList[index] == null)
                 _workList[index] = new LinkedList();
 
@@ -690,13 +827,11 @@ class AsyncStore extends Thread // keep priority same as app. threads
 
     private static final int _defaultCacheSize = arjPropertyManager.getObjectStoreEnvironmentBean().getCacheStoreSize();
 
-    private static final int _defaultRemovedItems = arjPropertyManager.getObjectStoreEnvironmentBean()
-            .getCacheStoreRemovedItems();
+    private static final int _defaultRemovedItems = arjPropertyManager
+            .getObjectStoreEnvironmentBean().getCacheStoreRemovedItems();
 
-    private static final int _defaultWorkItems = arjPropertyManager.getObjectStoreEnvironmentBean()
-            .getCacheStoreWorkItems();
+    private static final int _defaultWorkItems = arjPropertyManager.getObjectStoreEnvironmentBean().getCacheStoreWorkItems();
 
-    private static final int _defaultScanPeriod = arjPropertyManager.getObjectStoreEnvironmentBean()
-            .getCacheStoreScanPeriod();
+    private static final int _defaultScanPeriod = arjPropertyManager.getObjectStoreEnvironmentBean().getCacheStoreScanPeriod();
 
 }

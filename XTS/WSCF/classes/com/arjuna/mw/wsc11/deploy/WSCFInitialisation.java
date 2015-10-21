@@ -24,16 +24,18 @@ import com.arjuna.mw.wscf.protocols.ProtocolRegistry;
 
 /**
  * Initialise WSCF.
- * 
  * @author kevin
  */
-public class WSCFInitialisation {
-    public static void startup() {
+public class WSCFInitialisation
+{
+    public static void startup()
+    {
         // ensure we load any required protocol implementations
 
         ProtocolRegistry.sharedManager().initialise();
     }
 
-    public static void shutdown() {
+    public static void shutdown()
+    {
     }
 }

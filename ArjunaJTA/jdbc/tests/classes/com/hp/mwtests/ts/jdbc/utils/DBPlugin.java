@@ -31,6 +31,7 @@ package com.hp.mwtests.ts.jdbc.utils;
  * $Id: DBPlugin.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public interface DBPlugin {
+public interface DBPlugin
+{
     public javax.sql.DataSource getDataSource(String[] args) throws java.sql.SQLException;
 }

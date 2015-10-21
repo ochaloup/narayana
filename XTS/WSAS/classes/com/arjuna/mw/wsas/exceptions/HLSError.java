@@ -39,14 +39,19 @@ package com.arjuna.mw.wsas.exceptions;
  * @since 1.0.
  */
 
-public class HLSError extends Error {
+public class HLSError extends Error
+{
 
-    public HLSError() {
-        super();
+    public HLSError ()
+    {
+    super();
     }
 
-    public HLSError(String s) {
-        super(s);
+    public HLSError (String s)
+    {
+    super(s);
     }
 
 }
+
+

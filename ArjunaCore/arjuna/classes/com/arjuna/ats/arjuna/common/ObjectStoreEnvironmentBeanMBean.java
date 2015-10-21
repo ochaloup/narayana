@@ -23,12 +23,12 @@ package com.arjuna.ats.arjuna.common;
 import com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess;
 
 /**
- * A JMX MBean interface containing configuration for the objectstore and
- * various implementations thereof.
+ * A JMX MBean interface containing configuration for the objectstore and various implementations thereof.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface ObjectStoreEnvironmentBeanMBean {
+public interface ObjectStoreEnvironmentBeanMBean
+{
     int getCacheStoreSize();
 
     boolean isCacheStoreSync();
@@ -64,7 +64,7 @@ public interface ObjectStoreEnvironmentBeanMBean {
     long getTxLogSize();
 
     long getPurgeTime();
-
+    
     /**
      * Get the JDBCAccess details.
      */

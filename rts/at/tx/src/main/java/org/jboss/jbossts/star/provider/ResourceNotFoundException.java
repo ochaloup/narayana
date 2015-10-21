@@ -18,14 +18,16 @@
  * (C) 2010
  * @author JBoss Inc.
  */
-package org.jboss.jbossts.star.provider;
+ package org.jboss.jbossts.star.provider;
 
 /**
  * 404 exception
  */
-public class ResourceNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends RuntimeException
+{
 
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(String message)
+    {
         super(message);
     }
 }

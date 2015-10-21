@@ -33,14 +33,14 @@ public class RecoveredTransactionWrapper extends RecoveredTransaction implements
     private ActionBean action;
     private boolean activated;
 
-    public RecoveredTransactionWrapper() {
+    public RecoveredTransactionWrapper () {
         this(Uid.nullUid());
     }
 
-    public RecoveredTransactionWrapper(Uid uid) {
+    public RecoveredTransactionWrapper (Uid uid) {
         super(uid);
     }
-    public RecoveredTransactionWrapper(ActionBean action, UidWrapper w) {
+    public RecoveredTransactionWrapper (ActionBean action, UidWrapper w) {
         super(w.getUid());
         this.wrapper = w;
         this.action = action;
@@ -53,7 +53,7 @@ public class RecoveredTransactionWrapper extends RecoveredTransaction implements
         return activated;
     }
 
-    public String type() {
+    public String type () {
         String name = UidWrapper.getRecordWrapperTypeName();
 
         if (name != null)
@@ -80,17 +80,12 @@ public class RecoveredTransactionWrapper extends RecoveredTransaction implements
 
     public RecordList getRecords(ParticipantStatus type) {
         switch (type) {
-            default :
-            case PREPARED :
-                return preparedList;
-            case FAILED :
-                return failedList;
-            case HEURISTIC :
-                return heuristicList;
-            case PENDING :
-                return pendingList;
-            case READONLY :
-                return readonlyList;
+            default:
+            case PREPARED: return preparedList;
+            case FAILED: return failedList;
+            case HEURISTIC: return heuristicList;
+            case PENDING: return pendingList;
+            case READONLY: return readonlyList;
         }
     }
 

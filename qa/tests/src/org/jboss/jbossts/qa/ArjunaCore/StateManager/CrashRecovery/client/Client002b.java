@@ -25,17 +25,22 @@ import org.jboss.jbossts.qa.ArjunaCore.StateManager.impl.BasicStateRecord;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class Client002b extends BaseTestClient {
-    public static void main(String[] args) {
+public class Client002b extends BaseTestClient
+{
+    public static void main(String[] args)
+    {
         Client002b test = new Client002b(args);
     }
 
-    private Client002b(String[] args) {
+    private Client002b(String[] args)
+    {
         super(args);
     }
 
-    public void Test() {
-        try {
+    public void Test()
+    {
+        try
+        {
             setNumberOfCalls(5);
             setNumberOfResources(4);
             setCrashPoint(3);
@@ -43,44 +48,51 @@ public class Client002b extends BaseTestClient {
             setUniquePrefix(1);
 
             BasicStateRecord[] mStateRecordList = new BasicStateRecord[mNumberOfResources];
-            // set up lock records and store away uids
-            for (int i = 0; i < mNumberOfResources; i++) {
+            //set up lock records and store away uids
+            for (int i = 0; i < mNumberOfResources; i++)
+            {
                 mStateRecordList[i] = new BasicStateRecord(i);
                 String key = getResourceName("resource_" + i);
-                try {
+                try
+                {
                     qautil.storeUid(key, mStateRecordList[i].get_uid());
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     Debug("Error when creating ior store");
                     mCorrect = false;
                 }
             }
 
             // Create crash record last so record is processed last. We want the
-            // crash to occur after prepare has been called on the statemanager
-            // objects.
+            // crash to occur after prepare has been called on the statemanager objects.
             CrashAbstractRecord mCrashObject = new CrashAbstractRecord(mCrashPoint, mCrashType);
 
-            // start transaction to check all is ok.
+            //start transaction    to check all is ok.
             startTx();
-            for (int j = 0; j < mNumberOfResources; j++) {
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
                 mStateRecordList[j].increase();
             }
             commit();
 
-            // start new AtomicAction
+            //start new AtomicAction
             startTx();
             add(mCrashObject);
-            for (int j = 0; j < mNumberOfResources; j++) {
-                for (int i = 0; i < mMaxIteration; i++) {
+            for (int j = 0; j < mNumberOfResources; j++)
+            {
+                for (int i = 0; i < mMaxIteration; i++)
+                {
                     mStateRecordList[j].increase();
                 }
             }
             commit();
 
-            // we do not need to do anything else it should finish here if not
-            // print failed
+            //we do not need to do anything else it should finish here if not print failed
             Fail();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Fail("Error in Client002b.test() :", e);
         }
     }

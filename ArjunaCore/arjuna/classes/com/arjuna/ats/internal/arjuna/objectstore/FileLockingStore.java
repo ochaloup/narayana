@@ -49,15 +49,20 @@ import com.arjuna.ats.arjuna.utils.FileLock;
  * @since JTS 1.0.
  */
 
-public abstract class FileLockingStore extends FileSystemStore {
+public abstract class FileLockingStore extends FileSystemStore
+{
 
-    protected abstract InputObjectState read_state(Uid u, String tn, int s) throws ObjectStoreException;
+    protected abstract InputObjectState read_state (Uid u, String tn, int s)
+            throws ObjectStoreException;
 
-    protected abstract boolean remove_state(Uid u, String tn, int s) throws ObjectStoreException;
+    protected abstract boolean remove_state (Uid u, String tn, int s)
+            throws ObjectStoreException;
 
-    protected abstract boolean write_state(Uid u, String tn, OutputObjectState buff, int s) throws ObjectStoreException;
+    protected abstract boolean write_state (Uid u, String tn,
+            OutputObjectState buff, int s) throws ObjectStoreException;
 
-    public FileLockingStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException {
+    public FileLockingStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException
+    {
         super(objectStoreEnvironmentBean);
     }
 
@@ -65,10 +70,10 @@ public abstract class FileLockingStore extends FileSystemStore {
      * Lock files as we would do on a Unix system.
      */
 
-    protected synchronized boolean lock(File fd, int lmode, boolean create) {
+    protected synchronized boolean lock (File fd, int lmode, boolean create)
+    {
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger
-                    .trace("FileLockingStore.lock(" + fd + ", " + FileLock.modeString(lmode) + ", " + create + ")");
+            tsLogger.logger.trace("FileLockingStore.lock(" + fd + ", " + FileLock.modeString(lmode) + ", " + create + ")");
         }
 
         FileLock fileLock = new FileLock(fd);
@@ -76,7 +81,8 @@ public abstract class FileLockingStore extends FileSystemStore {
         return fileLock.lock(lmode, create);
     }
 
-    protected synchronized boolean unlock(File fd) {
+    protected synchronized boolean unlock (File fd)
+    {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("FileLockingStore.unlock(" + fd + ")");
         }

@@ -31,9 +31,8 @@ import javax.transaction.Transactional.TxType;
 import javax.transaction.UserTransaction;
 
 /**
- * @author <a href=
- *         "mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz
- *         Krakowiak &lt;tomasz.krakowiak@efish.pl&gt;</a>
+ * @author <a href="mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz Krakowiak
+ *         &lt;tomasz.krakowiak@efish.pl&gt;</a>
  */
 @ApplicationScoped
 public class TestTransactionalInvokerHelper {
@@ -44,41 +43,40 @@ public class TestTransactionalInvokerHelper {
     @Inject
     private TestTransactionalInvokerBean bean;
 
-    public Runnable runWithTransactionManagement(TransactionManagementType transactionManagementType,
-            boolean startTransaction, Runnable runnable) {
+    public Runnable runWithTransactionManagement(TransactionManagementType transactionManagementType, boolean startTransaction, Runnable runnable) {
         switch (transactionManagementType) {
-            case CONTAINER :
+            case CONTAINER:
                 if (startTransaction) {
                     return new RunInTxRequired(runnable);
                 } else {
                     return new RunInTxSupports(runnable);
                 }
-            case BEAN :
+            case BEAN:
                 if (startTransaction) {
                     return new RunInTxNotSupported(new RunInBmtTransaction(runnable));
                 } else {
                     return new RunInTxNotSupported(runnable);
                 }
-            default :
+            default:
                 throw new RuntimeException("Unexpected transaction management type " + transactionManagementType);
         }
     }
 
     public Runnable runInTxType(TxType txType, Runnable runnable) {
         switch (txType) {
-            case REQUIRED :
+            case REQUIRED:
                 return new RunInTxRequired(runnable);
-            case REQUIRES_NEW :
+            case REQUIRES_NEW:
                 return new RunInTxRequiresNew(runnable);
-            case MANDATORY :
+            case MANDATORY:
                 return new RunInTxMandatory(runnable);
-            case NOT_SUPPORTED :
+            case NOT_SUPPORTED:
                 return new RunInTxNotSupported(runnable);
-            case SUPPORTS :
+            case SUPPORTS:
                 return new RunInTxSupports(runnable);
-            case NEVER :
+            case NEVER:
                 return new RunInTxNever(runnable);
-            default :
+            default:
                 throw new RuntimeException("Unexpected tx type " + txType);
         }
     }
@@ -127,6 +125,7 @@ public class TestTransactionalInvokerHelper {
         }
     }
 
+
     private class RunInTxRequiresNew implements Runnable {
         Runnable runnable;
 
@@ -139,6 +138,7 @@ public class TestTransactionalInvokerHelper {
             bean.invokeInTxRequiresNew(runnable);
         }
     }
+
 
     private class RunInTxMandatory implements Runnable {
         Runnable runnable;
@@ -198,6 +198,7 @@ public class TestTransactionalInvokerHelper {
         public RunInBmtTransaction(Runnable runnable) {
             this.runnable = runnable;
         }
+
 
         @Override
         public void run() {

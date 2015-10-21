@@ -36,59 +36,72 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 
-public class BasicThreadedObject extends Thread {
 
-    public BasicThreadedObject(boolean start) {
-        startAction = start;
-        uid = new Uid();
+public class BasicThreadedObject extends Thread
+{
+    
+public BasicThreadedObject (boolean start)
+    {
+    startAction = start;
+    uid = new Uid();
     }
 
-    public void run() {
-        if (startAction) {
-            BasicThreadedObject.A = new AtomicAction();
+public void run ()
+    {
+    if (startAction)
+    {
+        BasicThreadedObject.A = new AtomicAction();
 
-            System.out.println("BasicThreadedObject " + uid + " created action " + BasicThreadedObject.A.get_uid());
+        System.out.println("BasicThreadedObject "+uid+" created action "+BasicThreadedObject.A.get_uid());
 
-            BasicThreadedObject.A.begin();
+        BasicThreadedObject.A.begin();
 
-            Thread.yield();
-        } else {
-            System.out.println("BasicThreadedObject " + uid + " adding to action " + BasicThreadedObject.A.get_uid());
+        Thread.yield();        
+    }
+    else
+    {
+        System.out.println("BasicThreadedObject "+uid+" adding to action "+BasicThreadedObject.A.get_uid());
+        
+        BasicThreadedObject.A.addThread();
 
-            BasicThreadedObject.A.addThread();
-
-            Thread.yield();
-        }
-
-        BasicAction act = BasicAction.Current();
-
-        if (act != null)
-            System.out.println("BasicThreadedObject " + uid + " current action " + act.get_uid());
-        else
-            System.out.println("BasicThreadedObject " + uid + " current action null");
-
-        try {
-            BasicThreadedObject.O.incr(4);
-
-            Thread.yield();
-        } catch (TestException e) {
-        }
-
-        if (startAction) {
-            System.out.println("\nBasicThreadedObject " + uid + " committing action " + act.get_uid());
-            BasicThreadedObject.A.commit();
-            System.out.println("BasicThreadedObject " + uid + " action " + act.get_uid() + " committed\n");
-        } else {
-            System.out.println("\nBasicThreadedObject " + uid + " aborting action " + act.get_uid());
-            BasicThreadedObject.A.abort();
-            System.out.println("BasicThreadedObject " + uid + " action " + act.get_uid() + " aborted\n");
-        }
+         Thread.yield();        
     }
 
-    private Uid uid;
-    private boolean startAction;
+    BasicAction act = BasicAction.Current();
 
-    public static AtomicAction A = null;
-    public static AtomicObject O = new AtomicObject();
+    if (act != null)
+        System.out.println("BasicThreadedObject "+uid+" current action "+act.get_uid());
+    else
+        System.out.println("BasicThreadedObject "+uid+" current action null");
 
+    try
+    {
+        BasicThreadedObject.O.incr(4);
+
+        Thread.yield();
+    }
+    catch (TestException e)
+    {
+    }
+    
+    if (startAction)
+    {
+        System.out.println("\nBasicThreadedObject "+uid+" committing action "+act.get_uid());
+        BasicThreadedObject.A.commit();
+        System.out.println("BasicThreadedObject "+uid+" action "+act.get_uid()+" committed\n");
+    }
+    else
+    {
+        System.out.println("\nBasicThreadedObject "+uid+" aborting action "+act.get_uid());
+        BasicThreadedObject.A.abort();
+        System.out.println("BasicThreadedObject "+uid+" action "+act.get_uid()+" aborted\n");
+    }
+    }
+
+private Uid uid;
+private boolean startAction;
+
+public static AtomicAction A = null;
+public static AtomicObject O = new AtomicObject();
+    
 }

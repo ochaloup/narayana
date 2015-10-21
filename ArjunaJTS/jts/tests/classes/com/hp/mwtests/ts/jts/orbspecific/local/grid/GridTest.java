@@ -52,17 +52,20 @@ import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.grid_i;
 import com.hp.mwtests.ts.jts.resources.TransactionalThread;
 
-public class GridTest {
+public class GridTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -75,46 +78,57 @@ public class GridTest {
 
             myControl = theOTS.create(0);
 
-            assertNotNull(myControl);
-
+            assertNotNull( myControl );
+            
             h = localGrid.height();
             w = localGrid.width();
 
-            localGrid.set(2, 4, 123, myControl);
+            localGrid.set( 2, 4, 123, myControl);
             v = localGrid.get(2, 4, myControl);
 
             // no problem setting and getting the elememt:
 
-            System.out.println("grid[2,4] is " + v);
+            System.out.println("grid[2,4] is "+v);
 
             assertEquals(123, v);
 
-            Terminator handle = myControl.get_terminator();
+                Terminator handle = myControl.get_terminator();
 
-            try {
-                if (handle != null) {
-                    handle.commit(false);
-                } else
-                    System.err.println("Error - no transaction terminator!");
-            } catch (Exception ex) {
-                System.out.println("Test error! Caught: " + ex);
-            }
+                try
+                {
+                    if (handle != null)
+                    {
+                        handle.commit(false);
+                    }
+                    else
+                        System.err.println("Error - no transaction terminator!");
+                }
+                catch (Exception ex)
+                {
+                    System.out.println("Test error! Caught: "+ex);
+                }
+
 
             ORBManager.getPOA().shutdownObject(theOTS);
             ORBManager.getPOA().shutdownObject(localGrid);
-        } catch (UserException e) {
-            fail("Caught UserException: " + e);
+        }
+        catch (UserException e)
+        {
+            fail("Caught UserException: "+e);
 
             e.printStackTrace();
-        } catch (SystemException e) {
-            fail("Caught SystemException: " + e);
+        }
+        catch (SystemException e)
+        {
+            fail("Caught SystemException: "+e);
 
             e.printStackTrace();
         }
 
         System.out.println("\nWill now try different thread terminating transaction.\n");
 
-        try {
+        try
+        {
             org.omg.CosTransactions.Current current = OTSManager.get_current();
 
             System.out.println("Starting new transaction.");
@@ -123,7 +137,8 @@ public class GridTest {
 
             Control tc = current.get_control();
 
-            if (tc != null) {
+            if (tc != null)
+            {
                 System.out.println("Creating new thread.");
 
                 TransactionalThread tranThread = new TransactionalThread(tc);
@@ -137,27 +152,38 @@ public class GridTest {
 
                 System.out.println("\nCreator will now attempt to rollback transaction. Should fail.");
 
-                try {
+                try
+                {
                     current.rollback();
 
                     fail("Error - managed to rollback transaction!");
-                } catch (NoTransaction e1) {
-                    System.out.println("Correct termination - caught: " + e1);
-                } catch (INVALID_TRANSACTION e2) {
-                    System.out.println("Correct termination - caught: " + e2);
-                } catch (Exception e3) {
-                    fail("Wrong termination - caught unexpected exception: " + e3);
+                }
+                catch (NoTransaction e1)
+                {
+                    System.out.println("Correct termination - caught: "+e1);
+                }
+                catch (INVALID_TRANSACTION e2)
+                {
+                    System.out.println("Correct termination - caught: "+e2);
+                }
+                catch (Exception e3)
+                {
+                    fail("Wrong termination - caught unexpected exception: "+e3);
                     e3.printStackTrace();
                 }
 
                 System.out.println("Test completed successfully.");
-            } else
+            }
+            else
                 System.err.println("Error - null transaction control!");
-        } catch (Exception e) {
-            System.out.println("Caught unexpected exception: " + e);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Caught unexpected exception: "+e);
         }
 
         myOA.destroy();
         myORB.shutdown();
     }
 }
+

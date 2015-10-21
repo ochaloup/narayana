@@ -59,27 +59,33 @@ package org.jboss.jbossts.qa.JTA01Tests;
  * $Id: Test05.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.Setup;
 
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 
-public class Test05 {
-    public static void main(String[] args) {
+public class Test05
+{
+    public static void main(String[] args)
+    {
         Setup orbClass = null;
 
-        try {
+        try
+        {
             boolean needOrb = true;
 
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-local")) {
+            for (int i = 0; i < args.length; i++)
+            {
+                if (args[i].equals("-local"))
+                {
                     needOrb = false;
                 }
             }
 
-            if (needOrb) {
-                Class c = Thread.currentThread().getContextClassLoader()
-                        .loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
+            if (needOrb)
+            {
+                Class c = Thread.currentThread().getContextClassLoader().loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
 
                 orbClass = (Setup) c.newInstance();
 
@@ -90,12 +96,12 @@ public class Test05 {
 
             boolean correct = true;
 
-            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
-                    .transactionManager();
+            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
             Transaction[] transactions = new Transaction[numberOfTransactions];
 
-            for (int index = 0; index < transactions.length; index++) {
+            for (int index = 0; index < transactions.length; index++)
+            {
                 correct = correct && (transactionManager.getTransaction() == null);
                 correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
 
@@ -106,15 +112,19 @@ public class Test05 {
             correct = correct && (transactionManager.getTransaction() == null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
 
-            for (int index = 0; index < transactions.length; index++) {
+            for (int index = 0; index < transactions.length; index++)
+            {
                 transactionManager.resume(transactions[index]);
 
                 correct = correct && (transactionManager.getTransaction() != null);
                 correct = correct && (transactionManager.getStatus() == Status.STATUS_ACTIVE);
 
-                if ((index % 2) == 0) {
+                if ((index % 2) == 0)
+                {
                     transactionManager.commit();
-                } else {
+                }
+                else
+                {
                     transactionManager.rollback();
                 }
             }
@@ -122,29 +132,42 @@ public class Test05 {
             correct = correct && (transactionManager.getTransaction() == null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.print("Test05.main: ");
             exception.printStackTrace(System.err);
-        } catch (Error error) {
+        }
+        catch (Error error)
+        {
             System.out.println("Failed");
             System.err.print("Test05.main: ");
             error.printStackTrace(System.err);
         }
 
-        try {
-            if (orbClass != null) {
+        try
+        {
+            if (orbClass != null)
+            {
                 orbClass.stop();
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.print("Test05.main: ");
             exception.printStackTrace(System.err);
-        } catch (Error error) {
+        }
+        catch (Error error)
+        {
             System.err.print("Test05.main: ");
             error.printStackTrace(System.err);
         }

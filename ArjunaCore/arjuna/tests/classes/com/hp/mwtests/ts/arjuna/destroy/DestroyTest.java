@@ -36,9 +36,11 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.hp.mwtests.ts.arjuna.resources.BasicObject;
 
-public class DestroyTest {
+public class DestroyTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         for (int i = 0; i < 100; i++) {
             AtomicAction A = new AtomicAction();
 
@@ -52,10 +54,10 @@ public class DestroyTest {
 
             AtomicAction B = new AtomicAction();
             AtomicAction C = new AtomicAction();
-
+            
             B.begin();
             C.begin();
-
+            
             bo.destroy();
 
             C.commit();

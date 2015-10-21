@@ -49,25 +49,27 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.demosync;
 
-public class Performance {
+public class Performance
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         int maxTestTime = 0;
         int numberOfCalls = 1000;
         int warmUpCount = 0;
         int numberOfThreads = 1;
         int batchSize = numberOfCalls;
 
-        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1").maxTestTime(0L)
-                .numberOfCalls(numberOfCalls).numberOfThreads(numberOfThreads).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1")
+                .maxTestTime(0L).numberOfCalls(numberOfCalls)
+                .numberOfThreads(numberOfThreads).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker, worker);
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());
         Assert.assertFalse(measurement.getInfo(), measurement.shouldFail());
 
         System.out.printf("%s%n", measurement.getInfo());
-        System.out.println(
-                "Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
+        System.out.println("Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
         System.out.printf("TPS: %f%n", measurement.getThroughput());
     }
 
@@ -82,7 +84,7 @@ public class Performance {
 
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
 
             try {
                 myOA.initOA();
@@ -111,7 +113,8 @@ public class Performance {
 
         @Override
         public Void doWork(Void context, int batchSize, Measurement<Void> measurement) {
-            for (int i = 0; i < batchSize; i++) {
+            for (int i = 0; i < batchSize; i++)
+            {
                 try {
                     current.begin();
 
@@ -127,7 +130,7 @@ public class Performance {
                         e.printStackTrace();
 
                     measurement.incrementErrorCount();
-                    fail("Caught UserException: " + e);
+                    fail("Caught UserException: "+e);
                 } catch (SystemException e) {
                     if (measurement.getNumberOfErrors() == 0)
                         e.printStackTrace();

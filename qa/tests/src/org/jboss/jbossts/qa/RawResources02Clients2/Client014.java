@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.RawResources02Clients2;
  * $Id: Client014.java,v 1.3 2003/07/07 13:43:29 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.RawResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -65,9 +66,12 @@ import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 import org.omg.CosTransactions.HeuristicHazard;
 import org.omg.CosTransactions.HeuristicMixed;
 
-public class Client014 {
-    public static void main(String[] args) {
-        try {
+public class Client014
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -99,17 +103,25 @@ public class Client014 {
 
             service2.oper(resourceBehaviors2, OTS.current().get_control());
 
-            try {
+            try
+            {
                 OTS.current().commit(true);
                 System.err.println("Commit succeeded when it shouldn't");
                 correct = false;
-            } catch (final TRANSACTION_ROLLEDBACK ex) {
-            } catch (HeuristicMixed heuristicMixed) {
-            } catch (HeuristicHazard heuristicHazard) {
+            }
+            catch (final TRANSACTION_ROLLEDBACK ex)
+            {                
+            }
+            catch (HeuristicMixed heuristicMixed)
+            {
+            }
+            catch (HeuristicHazard heuristicHazard)
+            {
             }
 
             correct = correct && service1.is_correct() && service2.is_correct();
-            if (!correct) {
+            if (!correct)
+            {
                 System.err.println("service1.is_correct() or service2.is_correct() returned false");
             }
 
@@ -119,21 +131,29 @@ public class Client014 {
             correct = correct && (resourceTrace1 == ResourceTrace.ResourceTracePrepareCommitForget);
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTracePrepareRollback);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client014.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client014.main: " + exception);
             exception.printStackTrace(System.err);
         }

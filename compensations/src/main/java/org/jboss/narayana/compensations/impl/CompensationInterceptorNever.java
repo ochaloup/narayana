@@ -44,8 +44,7 @@ public class CompensationInterceptorNever extends CompensationInterceptorBase {
 
         BAControler baControler = BAControllerFactory.getInstance();
         if (baControler.isBARunning()) {
-            throw new TransactionalException("Transaction is not allowed for invocation",
-                    new InvalidTransactionException());
+            throw new TransactionalException("Transaction is not allowed for invocation", new InvalidTransactionException());
         }
 
         return invokeInNoTx(ic);

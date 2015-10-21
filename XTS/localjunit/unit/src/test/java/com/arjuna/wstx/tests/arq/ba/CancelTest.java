@@ -18,11 +18,14 @@ public class CancelTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoBusinessParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoBusinessParticipant.class);
     }
 
     @Test
-    public void testCancel() throws Exception {
+    public void testCancel()
+            throws Exception
+            {
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
         BusinessActivityManager bam = BusinessActivityManager.getBusinessActivityManager();
         String participantId = "1234";
@@ -35,12 +38,12 @@ public class CancelTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
         uba.cancel();
 
         assertTrue(p.passed());
-    }
+            }
 }

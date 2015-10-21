@@ -52,35 +52,40 @@ import org.omg.PortableServer.*;
 import java.util.Properties;
 
 /**
- * Initialises JavaIdl ORB RecoveryCoordinator creation subsystem and provides
- * the JavaIdl specific implementations of stuff
+ * Initialises JavaIdl ORB RecoveryCoordinator creation subsystem
+ * and provides the JavaIdl specific implementations of stuff
  *
  * All orbs are likely to be the same, constructing a GenericRecoveryCreator,
  * but with an orb-specific manager
  *
  */
 
-public class JavaIdlRCServiceInit implements RecoveryServiceInit {
+public class JavaIdlRCServiceInit implements RecoveryServiceInit
+{
 
-    public JavaIdlRCServiceInit() {
+    public JavaIdlRCServiceInit()
+    {
     }
 
     /**
-     * Provide the POA for the RecoveryCoordinator. Construct with the policies
-     * appropriate for its use in the RecoveryManager
+     * Provide the POA for the RecoveryCoordinator.
+     * Construct with the policies appropriate for its use in the RecoveryManager
      */
-    private static POA getRCPOA() {
+    private static POA getRCPOA ()
+    {
         String rcServiceName = GenericRecoveryCreator.getRecCoordServiceName();
 
         if (jtsLogger.logger.isDebugEnabled()) {
             jtsLogger.logger.debug("JavaIdlRCServiceInit.getRCPOA " + rcServiceName);
         }
 
-        if (_poa == null) {
+        if (_poa == null)
+        {
             String domainName = "recovery_coordinator";
-            String poaName = POA_NAME_PREFIX + rcServiceName + domainName;
+            String poaName = POA_NAME_PREFIX + rcServiceName+domainName;
 
-            try {
+            try
+            {
                 POA rootPOA = _oa.rootPoa();
 
                 if (rootPOA == null) {
@@ -93,15 +98,19 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
                 // make the policy lists, with standard policies
                 Policy[] policies = null;
 
-                policies = new Policy[]{rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT),
-                        rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN),
-                        rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID),
-                        rootPOA.create_id_uniqueness_policy(IdUniquenessPolicyValue.MULTIPLE_ID),
-                        rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_DEFAULT_SERVANT)};
+                policies = new Policy []
+                        {
+                                rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT),
+                                rootPOA.create_servant_retention_policy(ServantRetentionPolicyValue.NON_RETAIN),
+                                rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID),
+                                rootPOA.create_id_uniqueness_policy(IdUniquenessPolicyValue.MULTIPLE_ID),
+                                rootPOA.create_request_processing_policy(RequestProcessingPolicyValue.USE_DEFAULT_SERVANT)
+                        };
 
                 _poa = rootPOA.create_POA(poaName, rootPOA.the_POAManager(), policies);
                 _oa.addPreShutdown(new JavaIdlRCShutdown());
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_1(ex);
             }
         }
@@ -109,33 +118,34 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
         return _poa;
     }
 
-    private static void initORBandOA() throws InvalidName {
-        if (!ORBManager.isInitialised()) {
-            // If the ORB Manager hasn't been initialised then create our own
-            // ORB
+    private static void initORBandOA() throws InvalidName
+    {
+        if ( !ORBManager.isInitialised() )
+        {
+            // If the ORB Manager hasn't been initialised then create our own ORB
 
             _orb = com.arjuna.orbportability.ORB.getInstance("RecoveryServer");
 
-            String recoveryManagerPort = "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
+            String recoveryManagerPort = ""+ jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
             String recoveryManagerAddr = jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerAddress();
 
-            jtsLogger.i18NLogger.info_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_6(recoveryManagerPort,
-                    recoveryManagerAddr);
+            jtsLogger.i18NLogger.info_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_6(recoveryManagerPort, recoveryManagerAddr);
 
             final Properties p = new Properties();
             p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", recoveryManagerPort);
             p.setProperty("com.sun.CORBA.POA.ORBServerId", recoveryManagerPort);
 
-            if (recoveryManagerAddr != null && recoveryManagerAddr.length() > 0) {
+            if (recoveryManagerAddr != null && recoveryManagerAddr.length() > 0)
+            {
                 p.setProperty("OAIAddr", recoveryManagerAddr);
                 // TODO what is the JAVA Idl equivalent
             }
 
             try {
-                _orb.initORB((String[]) null, p);
+                _orb.initORB((String[])null, p);
                 _oa = OA.getRootOA(_orb);
                 _oa.initOA();
-            } catch (RuntimeException e) {
+            } catch(RuntimeException e) {
                 ORBManager.reset();
                 _orb.shutdown();
                 throw e;
@@ -143,7 +153,9 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
 
             ORBManager.setORB(_orb);
             ORBManager.setPOA(_oa);
-        } else {
+        }
+        else
+        {
             // Otherwise use the ORB already registered with the ORB Manager
 
             _orb = ORBManager.getORB();
@@ -157,67 +169,75 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
      * This starts the service in the RecoveryManager.
      */
 
-    public boolean startRCservice() {
-        try {
-            initORBandOA();
+    public  boolean startRCservice ()
+    {
+        try
+            {
+                initORBandOA();
 
-            POA ourPOA = getRCPOA();
+                POA ourPOA = getRCPOA();
 
-            if (ourPOA == null) // shortcut
-                return false;
+                if (ourPOA == null)  // shortcut
+                    return false;
 
-            Implementations.initialise();
+                Implementations.initialise();
 
-            // get the orb, so we can pass it to the default servant
 
-            // make the default servant
-            JavaIdlRCDefaultServant theButler = new JavaIdlRCDefaultServant(_orb.orb());
+                // get the orb, so we can pass it to the default servant
 
-            // register it on the POA
-            ourPOA.set_servant(theButler);
+                // make the default servant
+                JavaIdlRCDefaultServant theButler = new JavaIdlRCDefaultServant(_orb.orb());
 
-            // ourPOA.the_POAManager().activate( );
+                // register it on the POA
+                ourPOA.set_servant(theButler);
 
-            org.omg.CORBA.Object obj = ourPOA.create_reference_with_id(RC_ID.getBytes(),
-                    RecoveryCoordinatorHelper.id());
+//                ourPOA.the_POAManager().activate( );
 
-            // Write the object reference in the file
+                org.omg.CORBA.Object obj = ourPOA.create_reference_with_id(RC_ID.getBytes(),
+                                                                           RecoveryCoordinatorHelper.id());
 
-            String reference = _orb.orb().object_to_string(obj);
+                // Write the object reference in the file
 
-            try {
-                OutputObjectState oState = new OutputObjectState();
-                oState.packString(reference);
+                String reference = _orb.orb().object_to_string(obj);
 
-                TxLog txLog = StoreManager.getCommunicationStore();
-                txLog.write_committed(new Uid(uid4Recovery), type(), oState);
-            } catch (SecurityException sex) {
-                jtsLogger.i18NLogger.fatal_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_5();
-            }
+                try
+                    {
+                        OutputObjectState oState = new OutputObjectState();
+                        oState.packString(reference);
 
-            if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("JavaIdlRCServiceInit - set default servant and activated");
-            }
+                        TxLog txLog = StoreManager.getCommunicationStore();
+                        txLog.write_committed( new Uid(uid4Recovery), type(), oState);
+                    }
+                catch ( SecurityException sex )
+                {
+                    jtsLogger.i18NLogger.fatal_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_5();
+                }
 
-            // activate the poa
+                if (jtsLogger.logger.isDebugEnabled()) {
+                    jtsLogger.logger.debug("JavaIdlRCServiceInit - set default servant and activated");
+                }
 
-            _oa.rootPoa().the_POAManager().activate();
+                // activate the poa
 
-            ORBRunner _runOA = new ORBRunner();
+                _oa.rootPoa().the_POAManager().activate();
 
-            return true;
-        } catch (Exception ex) {
+                ORBRunner _runOA = new ORBRunner();
+
+                return true;
+            } catch (Exception ex) {
             jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_3(ex);
             return false;
         }
 
     }
 
-    public static void shutdownRCService() {
+    public static void shutdownRCService ()
+    {
         _poa = null;
     }
 
-    public static String type() {
+    public static String type ()
+    {
         return "/RecoveryCoordinator";
     }
 
@@ -228,9 +248,8 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
     }
 
     private static final String POA_NAME_PREFIX = "RcvCo-";
-    private static String OBJ_KEY_PREFIX = ""; // is there an equivalent of
-                                                // JacORBs jacorb.implname
-    protected static POA _poa = null;
+    private static String OBJ_KEY_PREFIX = ""; // is there an equivalent of JacORBs jacorb.implname
+    protected static POA                _poa = null;
     static String RC_ID = "RecoveryManager";
 
     static String RC_KEY = initRCKey();

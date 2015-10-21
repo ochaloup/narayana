@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 /**
- * A scriptable coordinator completion participant for use by the XTSServiceTest
- * service.
+ * A scriptable coordinator completion participant for use by the XTSServiceTest service.
  */
 
 public class CoordinatorCompletionTestParticipant extends ParticipantCompletionTestParticipant
-        implements
-            BusinessAgreementWithCoordinatorCompletionParticipant,
-            Serializable {
+        implements BusinessAgreementWithCoordinatorCompletionParticipant, Serializable
+{
     // constructor for recovery only
-    protected CoordinatorCompletionTestParticipant() {
+    protected CoordinatorCompletionTestParticipant()
+    {
     }
 
-    public CoordinatorCompletionTestParticipant(String id) {
+    public CoordinatorCompletionTestParticipant(String id)
+    {
         super(id);
     }
 

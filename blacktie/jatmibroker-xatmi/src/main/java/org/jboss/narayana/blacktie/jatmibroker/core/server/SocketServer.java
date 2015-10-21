@@ -41,7 +41,6 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.Connection;
 
 /**
  * Socket Server for client call back
- * 
  * @author zhfeng
  *
  */
@@ -67,13 +66,13 @@ public class SocketServer implements Runnable {
             reference = 0;
         }
 
-        reference++;
+        reference ++;
         return instance;
     }
 
     public static synchronized void discardInstance() {
-        reference--;
-        if (reference == 0) {
+        reference --;
+        if(reference == 0) {
             instance.shutdown();
             instance = null;
         }
@@ -103,15 +102,13 @@ public class SocketServer implements Runnable {
 
     public Socket getClientSocket(int sid) {
         ClientContext context = getContext(sid);
-        if (context != null)
-            return context.getSocket();
-        else
-            return null;
+        if(context != null) return context.getSocket();
+        else return null;
     }
 
     public synchronized ClientContext register(int sid, ResponseMonitor responseMonitor, EventListener eventListener) {
-        for (int i = 0; i < contexts.size(); i++) {
-            if (contexts.get(i).getSid() == sid) {
+        for(int i = 0; i < contexts.size(); i++) {
+            if(contexts.get(i).getSid() == sid) {
                 return contexts.get(i);
             }
         }
@@ -126,8 +123,8 @@ public class SocketServer implements Runnable {
     }
 
     public synchronized void unregister(int sid) {
-        for (int i = 0; i < contexts.size(); i++) {
-            if (contexts.get(i).getSid() == sid) {
+        for(int i = 0; i < contexts.size(); i++) {
+            if(contexts.get(i).getSid() == sid) {
                 contexts.remove(i);
                 log.debug("unregister sid " + sid);
             }
@@ -137,8 +134,8 @@ public class SocketServer implements Runnable {
     public Message receiveMessage(int sid, long timeout) {
         ClientContext context = this.getContext(sid);
         Message msg = null;
-        if (context != null) {
-            synchronized (context) {
+        if(context != null) {
+            synchronized(context) {
                 msg = context.getMessage(timeout);
             }
         } else {
@@ -148,8 +145,8 @@ public class SocketServer implements Runnable {
     }
 
     public ClientContext getContext(int sid) {
-        for (int i = 0; i < contexts.size(); i++) {
-            if (contexts.get(i).getSid() == sid) {
+        for(int i = 0; i < contexts.size(); i++) {
+            if(contexts.get(i).getSid() == sid) {
                 return contexts.get(i);
             }
         }
@@ -160,7 +157,7 @@ public class SocketServer implements Runnable {
         log.debug("shutdowning server");
         try {
             shutdown = true;
-            for (int i = 0; i < threads.size(); i++) {
+            for(int i = 0; i < threads.size(); i++) {
                 try {
                     clients.get(i).close();
                     threads.get(i).join();
@@ -168,7 +165,7 @@ public class SocketServer implements Runnable {
                     log.error("join client " + i + " failed with " + e);
                 }
             }
-            if (serverSocket != null) {
+            if(serverSocket != null) {
                 serverSocket.close();
             }
             serverThread.join();
@@ -184,26 +181,25 @@ public class SocketServer implements Runnable {
         this.shutdown();
     }
 
-    /*
-     * running to accept client connection and handle the message.
+    /* running to accept client connection and handle the message.
      * 
      */
     public void run() {
-        while (!shutdown) {
+        while(!shutdown) {
             try {
-                Socket clientSocket = serverSocket.accept();
+                Socket clientSocket  = serverSocket.accept();
                 log.debug("connection from " + clientSocket);
                 Client client = new Client(this, clientSocket);
                 clients.add(client);
                 Thread thread = new Thread(client);
-                threads.add(thread);
+                threads.add(thread);                
                 thread.start();
-            } catch (SocketException e) {
-            } catch (IOException e) {
+            } catch(SocketException e) {
+            } catch(IOException e) {
                 log.error("run server failed with " + e);
             }
         }
-    }
+    }  
 }
 
 class Client implements Runnable {
@@ -229,7 +225,7 @@ class Client implements Runnable {
     }
 
     public void close() {
-        if (!isClose && socket != null) {
+        if(!isClose && socket != null) {
             try {
                 socket.close();
             } catch (IOException e) {
@@ -242,18 +238,18 @@ class Client implements Runnable {
             DataInputStream ins = new DataInputStream(socket.getInputStream());
 
             int size;
-            while ((size = ins.readInt()) != -1) {
+            while((size = ins.readInt()) != -1) {
                 log.debug("size is " + size);
                 Message message = new Message();
 
                 byte[] buf = new byte[size];
                 int readn = 0;
                 int remain = size;
-                while (remain > 0) {
+                while(remain > 0) {
                     int n;
                     n = ins.read(buf, readn, remain);
 
-                    if (n != -1) {
+                    if(n != -1) {
                         remain -= n;
                         readn += n;
                     } else {
@@ -262,7 +258,7 @@ class Client implements Runnable {
                     }
                 }
 
-                if (remain == 0) {
+                if(remain == 0) {
                     log.debug("receive from " + socket + " and size is " + size + " buffer is " + buf);
                     String[] s = new String(buf).split("\n");
 
@@ -298,8 +294,8 @@ class Client implements Runnable {
                     log.debug("data is " + new String(message.data));
 
                     ClientContext context = server.getContext(sid);
-                    if (context != null) {
-                        synchronized (context) {
+                    if(context != null) {
+                        synchronized(context) {
                             EventListener eventListener = context.getEventListener();
                             if (eventListener != null) {
                                 log.debug("Event listener will be called back");
@@ -315,7 +311,7 @@ class Client implements Runnable {
                             log.debug("add message to context " + context.getSid());
                             context.setSocket(socket);
                             ResponseMonitor responseMonitor = context.getResponseMonitor();
-                            if (responseMonitor != null) {
+                            if(responseMonitor != null) {
                                 responseMonitor.responseReceived(sid, false);
                             }
                             log.debug("notifying");
@@ -325,7 +321,7 @@ class Client implements Runnable {
                     }
                 }
             }
-            socket.shutdownInput();
+            socket.shutdownInput();   
             isClose = true;
         } catch (EOFException e) {
             log.debug("client " + socket + " close");
@@ -334,7 +330,7 @@ class Client implements Runnable {
             isClose = true;
         } catch (IOException e) {
             log.error("client " + socket + " run failed with " + e);
-        }
+        }       
     }
 }
 
@@ -370,7 +366,7 @@ class ClientContext {
     }
 
     public void setResponseMonitor(ResponseMonitor responseMonitor) {
-        this.responseMonitor = responseMonitor;
+        this.responseMonitor = responseMonitor;        
     }
 
     public ResponseMonitor getResponseMonitor() {
@@ -387,8 +383,8 @@ class ClientContext {
 
     public Message getMessage(long timeout) {
         log.debug("receive message for context " + sid);
-        if (data.isEmpty()) {
-            synchronized (this) {
+        if(data.isEmpty()) {
+            synchronized(this) {
                 try {
                     log.debug("waiting for " + timeout);
                     wait(timeout);
@@ -398,7 +394,7 @@ class ClientContext {
                 }
             }
         }
-        if (data.isEmpty()) {
+        if(data.isEmpty()) {
             return null;
         } else {
             return data.remove(0);

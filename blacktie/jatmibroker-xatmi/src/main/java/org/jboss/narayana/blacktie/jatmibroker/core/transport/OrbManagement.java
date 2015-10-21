@@ -36,8 +36,8 @@ public class OrbManagement implements Runnable {
     private POA root_poa;
     private Thread callbackThread;
 
-    public static synchronized OrbManagement getInstance(Properties properties) throws InvalidName, AdapterInactive,
-            NotFound, CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName, ConfigurationException {
+    public static synchronized OrbManagement getInstance(Properties properties) throws InvalidName, AdapterInactive, NotFound,
+            CannotProceed, org.omg.CosNaming.NamingContextPackage.InvalidName, ConfigurationException {
         if (instance == null) {
             instance = new OrbManagement(properties);
         }

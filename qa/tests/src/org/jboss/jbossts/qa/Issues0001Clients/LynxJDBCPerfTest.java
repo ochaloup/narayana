@@ -34,6 +34,7 @@
 /***************************************************************/
 package org.jboss.jbossts.qa.Issues0001Clients;
 
+
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -42,7 +43,8 @@ import javax.transaction.TransactionManager;
 import java.sql.*;
 import java.util.Properties;
 
-public class LynxJDBCPerfTest extends Thread {
+public class LynxJDBCPerfTest extends Thread
+{
 
     private java.sql.Connection _dbConn;
     private PreparedStatement _prepStmt;
@@ -58,26 +60,36 @@ public class LynxJDBCPerfTest extends Thread {
     private long _count = 0;
 
     // Print out test stats to client err file.
-    private void printStats() {
-        try {
+    private void printStats()
+    {
+        try
+        {
             _iterPerSec = ((double) _count) / ((double) (_end - _start)) * 1000.0;
             System.err.println("Messages Received    : " + _count);
-            System.err.println("Elapsed time         : " + (_end - _start) + " ms");
-            System.err.println("Expected Performance : " + ((int) _expected_iterPerSec) + " iterations/sec");
-            System.err.println("Actual Performance   : " + ((int) _iterPerSec) + " iterations/sec");
+            System.err.println("Elapsed time         : " +
+                    (_end - _start) + " ms");
+            System.err.println("Expected Performance : " +
+                    ((int) _expected_iterPerSec) + " iterations/sec");
+            System.err.println("Actual Performance   : " +
+                    ((int) _iterPerSec) + " iterations/sec");
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             System.err.println("Exception occurred in printStats(), ex: " + ex);
         }
     }
 
     // Setup DB connection and create test table.
-    private void initSequeLink(String profileName) {
-        try {
+    private void initSequeLink(String profileName)
+    {
+        try
+        {
 
             // REGISTER DRIVER
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++) {
+            for (int index = 0; index < numberOfDrivers; index++)
+            {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -90,7 +102,8 @@ public class LynxJDBCPerfTest extends Thread {
 
             // Get DB connection.
             Connection connection;
-            if (databaseDynamicClass != null) {
+            if (databaseDynamicClass != null)
+            {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -98,7 +111,9 @@ public class LynxJDBCPerfTest extends Thread {
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 _dbConn = DriverManager.getConnection(databaseURL, databaseProperties);
-            } else {
+            }
+            else
+            {
                 _dbConn = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -106,31 +121,40 @@ public class LynxJDBCPerfTest extends Thread {
             Statement st = _dbConn.createStatement();
 
             // Create TEST table (drop if already exists).
-            rs = st.executeQuery("SELECT * FROM USER_TABLES " + "WHERE TABLE_NAME = \'LYNX_TEST\'");
-            if (rs.next()) {
+            rs = st.executeQuery("SELECT * FROM USER_TABLES " +
+                    "WHERE TABLE_NAME = \'LYNX_TEST\'");
+            if (rs.next())
+            {
                 st.execute("DROP TABLE LYNX_TEST");
                 st.execute("DROP SEQUENCE LYNX_TESTSEQ");
             }
 
-            st.execute("CREATE TABLE LYNX_TEST (id number(20) not null," + "description varchar2 (2000),"
-                    + "CONSTRAINT lynx_pk_id PRIMARY KEY (id) " + "USING index storage (initial 10k next 10k))");
+            st.execute("CREATE TABLE LYNX_TEST (id number(20) not null," +
+                    "description varchar2 (2000)," +
+                    "CONSTRAINT lynx_pk_id PRIMARY KEY (id) " +
+                    "USING index storage (initial 10k next 10k))");
 
             st.execute("CREATE SEQUENCE LYNX_TESTSEQ");
 
             _prepStmt = _dbConn.prepareStatement("insert into LYNX_TEST values (LYNX_TESTSEQ.nextval, ?)");
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println(e);
         }
     }
 
     // Perform actual test - insert x rows and record time taken.
-    public void doTest() {
-        try {
+    public void doTest()
+    {
+        try
+        {
             _start = System.currentTimeMillis();
             _txMgr = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
-            for (int i = 0; i < _noOfIterations; ++i) {
+            for (int i = 0; i < _noOfIterations; ++i)
+            {
                 _count++;
 
                 _txMgr.begin();
@@ -148,20 +172,25 @@ public class LynxJDBCPerfTest extends Thread {
             _end = System.currentTimeMillis();
 
             printStats();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             ex.printStackTrace();
             System.exit(0);
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
 
         // Process args.
-        if (args.length > 1) {
+        if (args.length > 1)
+        {
             _expected_iterPerSec = Float.parseFloat(args[1]);
         }
 
-        if (args.length > 2) {
+        if (args.length > 2)
+        {
             _noOfIterations = Float.parseFloat(args[2]);
         }
 
@@ -174,22 +203,29 @@ public class LynxJDBCPerfTest extends Thread {
         tester.shutdownTransactionManager();
 
         // Output Passed if performance meets expections.
-        if ((_iterPerSec) > _expected_iterPerSec) {
+        if ((_iterPerSec) > _expected_iterPerSec)
+        {
             System.out.println("Passed");
-        } else {
+        }
+        else
+        {
             System.out.println("Failed");
         }
 
     }
 
-    private void startTransactionManager(String[] args) throws Exception {
+    private void startTransactionManager(String[] args) throws Exception
+    {
         ORBInterface.initORB(args, null);
         OAInterface.initOA();
     }
 
-    private void shutdownTransactionManager() {
+    private void shutdownTransactionManager()
+    {
         OAInterface.shutdownOA();
         ORBInterface.shutdownORB();
     }
 
 }
+
+

@@ -38,27 +38,31 @@ import com.arjuna.ats.jts.logging.jtsLogger;
 /**
  * Initialises JacORB RecoveryCoordinator IOR creation mechanism
  *
- * An instance of this class is constructed by RecoveryEnablement and registered
- * as an OAAttribute whose initialise method is called after root POA is set up
+ * An instance of this class is constructed by RecoveryEnablement and 
+ * registered as an OAAttribute whose initialise method is called after
+ * root POA is set up
  *
  * All orbs are likely to be the same, constructing a GenericRecoveryCreator,
  * but with an orb-specific manager
  *
  */
 
-public class JacOrbRecoveryInit {
-    public JacOrbRecoveryInit() {
-        // make a orbix-style manager for the RC IOR creation
-        RcvCoManager theManager = new JacOrbRCManager();
-
-        // and register it (which will cause creation of a
-        // GenericRecoveryCreator
-        // and it's registration with CosTransactions)
-        GenericRecoveryCreator.register(theManager);
-
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("JacOrb RecoveryCoordinator creator setup");
-        }
+public class JacOrbRecoveryInit
+{
+    public JacOrbRecoveryInit ()
+    {
+    // make a orbix-style manager for the RC IOR creation
+    RcvCoManager theManager = new JacOrbRCManager();
+    
+    // and register it (which will cause creation of a GenericRecoveryCreator
+    // and it's registration with CosTransactions)
+    GenericRecoveryCreator.register(theManager);
+ 
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("JacOrb RecoveryCoordinator creator setup");
     }
-
+    }
+    
 }
+
+

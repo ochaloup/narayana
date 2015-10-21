@@ -33,8 +33,9 @@ package com.arjuna.ats.jta.resources;
 
 import javax.transaction.xa.XAException;
 
-public interface XAResourceMap {
-    public boolean notAProblem(XAException ex, boolean commit);
+public interface XAResourceMap
+{
+    public boolean notAProblem (XAException ex, boolean commit);
 
-    public String getXAResourceName();
+    public String getXAResourceName ();
 }

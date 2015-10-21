@@ -9,13 +9,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlType;
 
+
 /**
- * <p>
- * Java class for resultsType complex type.
+ * <p>Java class for resultsType complex type.
  * 
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="resultsType">
@@ -32,7 +30,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "resultsType", propOrder = {"resultList"})
+@XmlType(name = "resultsType", propOrder = {
+    "resultList"
+})
 public class ResultsType {
 
     @XmlList
@@ -43,21 +43,21 @@ public class ResultsType {
      * Gets the value of the resultList property.
      * 
      * <p>
-     * This accessor method returns a reference to the live list, not a
-     * snapshot. Therefore any modification you make to the returned list will
-     * be present inside the JAXB object. This is why there is not a
-     * <CODE>set</CODE> method for the resultList property.
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the resultList property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
-     * 
      * <pre>
-     * getResultList().add(newItem);
+     *    getResultList().add(newItem);
      * </pre>
      * 
      * 
      * <p>
-     * Objects of the following type(s) are allowed in the list {@link String }
+     * Objects of the following type(s) are allowed in the list
+     * {@link String }
      * 
      * 
      */

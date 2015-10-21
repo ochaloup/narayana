@@ -33,14 +33,18 @@ public class AdvertiseUnadvertiseTest {
     public static Archive<?> createTestArchive() {
         final String ManifestMF = "Manifest-Version: 1.0\n"
                 + "Dependencies: org.jboss.jts,org.jboss.as.controller-client,org.jboss.dmr\n";
-        return ShrinkWrap.create(WebArchive.class, "test.war")
+        return ShrinkWrap
+                .create(WebArchive.class, "test.war")
                 .addClasses(BlacktieStompAdministrationService.class, Authentication.class, AdministrationProxy.class,
                         BlacktieAdministration.class)
-                .addPackage(MDBBlacktieService.class.getPackage()).addPackage(BlackTieService.class.getPackage())
-                .addPackage(TransactionException.class.getPackage())
-                .addPackage(ConfigurationException.class.getPackage()).addPackage(Message.class.getPackage())
-                .addPackage(X_OCTET_Impl.class.getPackage()).addAsResource("btconfig.xsd").addAsResource("btconfig.xml")
-                .setManifest(new StringAsset(ManifestMF));
+                        .addPackage(MDBBlacktieService.class.getPackage())
+                        .addPackage(BlackTieService.class.getPackage())
+                        .addPackage(TransactionException.class.getPackage())
+                        .addPackage(ConfigurationException.class.getPackage())
+                        .addPackage(Message.class.getPackage())
+                        .addPackage(X_OCTET_Impl.class.getPackage())
+                        .addAsResource("btconfig.xsd")
+                .addAsResource("btconfig.xml").setManifest(new StringAsset(ManifestMF));
     }
 
     @Test
@@ -56,7 +60,7 @@ public class AdvertiseUnadvertiseTest {
             log.info("Got the exception");
         }
 
-        assertTrue(service.deployQueue(".testsui1", "testui", false, "queue", "5.2.6.Final") == 1);
+        assertTrue(service.deployQueue(".testsui1", "testui", false, "queue", "5.2.7.Final-SNAPSHOT") == 1);
         try {
             new InitialContext().lookup("java:/queue/BTR_.testsui1");
             log.info("Got the queue");

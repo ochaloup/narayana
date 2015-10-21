@@ -49,8 +49,7 @@ public class BlackTieServerTestCase extends TestCase {
     }
 
     public void testAdvertiseAdvertised() throws ConnectionException {
-        server.tpadvertise("JAVA_Converse",
-                "org.jboss.narayana.blacktie.jatmibroker.xatmi.services.TPCallXOctetService");
+        server.tpadvertise("JAVA_Converse", "org.jboss.narayana.blacktie.jatmibroker.xatmi.services.TPCallXOctetService");
     }
 
     public void testAdvertiseMatch() {

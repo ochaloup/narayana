@@ -40,24 +40,26 @@ import org.junit.Test;
 import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.internal.jts.orbspecific.CurrentImple;
 
-public class Performance1 {
+public class Performance1
+{
     @Test
-    public void test() {
+    public void test()
+    {
         int numberOfCalls = 1000;
         int warmUpCount = 10;
         int numberOfThreads = 1;
         int batchSize = numberOfCalls;
 
-        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1").maxTestTime(0L)
-                .numberOfCalls(numberOfCalls).numberOfThreads(numberOfThreads).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1")
+                .maxTestTime(0L).numberOfCalls(numberOfCalls)
+                .numberOfThreads(numberOfThreads).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker, worker);
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());
         Assert.assertFalse(measurement.getInfo(), measurement.shouldFail());
 
         System.out.printf("%s%n", measurement.getInfo());
-        System.out.println(
-                "Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
+        System.out.println("Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
         System.out.printf("Transactions per second = %f%n", measurement.getThroughput());
     }
 
@@ -103,3 +105,4 @@ public class Performance1 {
         }
     };
 }
+

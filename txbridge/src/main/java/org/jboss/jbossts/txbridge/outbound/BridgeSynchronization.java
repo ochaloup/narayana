@@ -32,58 +32,55 @@ import javax.transaction.Status;
 import com.arjuna.ats.jta.utils.JTAHelper;
 
 /**
- * Provides method call mapping between JTA parent coordinator and WS-AT
- * subordinate transaction.
+ * Provides method call mapping between JTA parent coordinator and WS-AT subordinate transaction.
  *
  * @author jonathan.halliday@redhat.com, 2009-06-01
  */
-public class BridgeSynchronization implements Synchronization {
+public class BridgeSynchronization implements Synchronization
+{
     private final BridgeWrapper bridgeWrapper;
 
-    public BridgeSynchronization(BridgeWrapper bridgeWrapper) {
-        txbridgeLogger.logger.trace("BridgeSynchronization.<ctor>(BridgeWrapper=" + bridgeWrapper + ")");
+    public BridgeSynchronization(BridgeWrapper bridgeWrapper)
+    {
+        txbridgeLogger.logger.trace("BridgeSynchronization.<ctor>(BridgeWrapper="+bridgeWrapper+")");
 
         this.bridgeWrapper = bridgeWrapper;
     }
 
     /**
-     * The beforeCompletion method is called by the transaction manager prior to
-     * the start of the two-phase transaction commit process.
+     * The beforeCompletion method is called by the transaction manager prior to the start of the two-phase transaction commit process.
      */
-    public void beforeCompletion() {
+    public void beforeCompletion()
+    {
         txbridgeLogger.logger.trace("BridgeSynchronization.beforeCompletion()");
 
-        if (!bridgeWrapper.prepareVolatile()) {
-            // JTA does not explicitly provide for beforeCompletion signalling
-            // problems, but in
-            // our impl the engine will set the tx rollbackOnly if
-            // beforeCompletion throw an exception
-            // Note
-            // com.arjuna.ats.jta.TransactionManager.getTransaction().setRollbackOnly
-            // may also work.
+        if(!bridgeWrapper.prepareVolatile())
+        {
+            // JTA does not explicitly provide for beforeCompletion signalling problems, but in
+            // our impl the engine will set the tx rollbackOnly if beforeCompletion throw an exception
+            // Note com.arjuna.ats.jta.TransactionManager.getTransaction().setRollbackOnly may also work.
             throw new RuntimeException("BridgeWrapper.prepareVolatile() returned false");
         }
     }
 
     /**
-     * This method is called by the transaction manager after the transaction is
-     * committed or rolled back.
+     * This method is called by the transaction manager after the transaction is committed or rolled back.
      *
-     * @param status
-     *            the javax.transaction.Status representing the tx outcome.
+     * @param status the javax.transaction.Status representing the tx outcome.
      */
-    public void afterCompletion(int status) {
-        txbridgeLogger.logger.trace(
-                "BridgeSynchronization.afterCompletion(status=" + status + "/" + JTAHelper.stringForm(status) + ")");
+    public void afterCompletion(int status)
+    {
+        txbridgeLogger.logger.trace("BridgeSynchronization.afterCompletion(status="+status+"/"+ JTAHelper.stringForm(status)+")");
 
-        switch (status) {
-            case Status.STATUS_COMMITTED :
+        switch(status)
+        {
+            case Status.STATUS_COMMITTED:
                 bridgeWrapper.commitVolatile();
                 break;
-            case Status.STATUS_ROLLEDBACK :
+            case Status.STATUS_ROLLEDBACK:
                 bridgeWrapper.rollbackVolatile();
                 break;
-            default :
+            default:
                 txbridgeLogger.i18NLogger.warn_obs_unexpectedstatus(Integer.toString(status));
                 bridgeWrapper.rollbackVolatile();
         }

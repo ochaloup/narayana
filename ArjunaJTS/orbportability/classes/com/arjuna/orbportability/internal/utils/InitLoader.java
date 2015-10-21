@@ -43,55 +43,69 @@ import com.arjuna.orbportability.utils.InitClassInterface;
  * which must be instantiated before/after ORB initialisation.
  */
 
-abstract class InitLoader {
+abstract class InitLoader
+{
 
-    protected InitLoader(String name, String attrName, Object obj) {
-        initName = name;
-        propertyName = attrName;
+protected InitLoader (String name, String attrName, Object obj)
+    {
+    initName = name;
+    propertyName = attrName;
         initObj = obj;
     }
 
-    protected void initialise() {
-        Map<String, String> properties = opPropertyManager.getOrbPortabilityEnvironmentBean()
-                .getOrbInitializationProperties();
+    protected void initialise()
+    {
+        Map<String, String> properties = opPropertyManager.getOrbPortabilityEnvironmentBean().getOrbInitializationProperties();
 
-        for (String attrName : properties.keySet()) {
-            if (attrName.indexOf(propertyName) != -1) {
+        for(String attrName : properties.keySet())
+        {
+            if (attrName.indexOf(propertyName) != -1)
+            {
                 createInstance(attrName, properties.get(attrName));
             }
         }
     }
 
-    private void createInstance(String attrName, String className) {
-        if (className == null) {
-            opLogger.i18NLogger.warn_internal_utils_InitLoader_initfailed(initName, attrName);
+private void createInstance (String attrName, String className)
+    {
+    if (className == null)
+    {
+        opLogger.i18NLogger.warn_internal_utils_InitLoader_initfailed(initName, attrName);
 
+        return;
+    }
+    else
+    {
+        opLogger.i18NLogger.info_internal_utils_InitLoader_loading(initName, className);
+
+        Class c = ClassloadingUtility.loadClass(className);
+        if(c == null) {
             return;
-        } else {
-            opLogger.i18NLogger.info_internal_utils_InitLoader_loading(initName, className);
+        }
+        try
+        {
+            Object o = c.newInstance();
 
-            Class c = ClassloadingUtility.loadClass(className);
-            if (c == null) {
-                return;
+            if ( o instanceof InitClassInterface )
+            {
+                ((InitClassInterface)o).invoke(initObj);
             }
-            try {
-                Object o = c.newInstance();
 
-                if (o instanceof InitClassInterface) {
-                    ((InitClassInterface) o).invoke(initObj);
-                }
-
-                o = null;
-            } catch (IllegalAccessException e1) {
-                opLogger.i18NLogger.warn_internal_utils_InitLoader_exception(initName, e1);
-            } catch (InstantiationException e2) {
-                opLogger.i18NLogger.warn_internal_utils_InitLoader_exception(initName, e2);
-            }
+            o = null;
+        }
+        catch (IllegalAccessException e1)
+        {
+            opLogger.i18NLogger.warn_internal_utils_InitLoader_exception(initName, e1);
+        }
+        catch (InstantiationException e2)
+        {
+            opLogger.i18NLogger.warn_internal_utils_InitLoader_exception(initName, e2);
         }
     }
+    }
 
-    private String initName;
-    private String propertyName;
-    private Object initObj;
+private String initName;
+private String propertyName;
+private Object initObj;
 
 }

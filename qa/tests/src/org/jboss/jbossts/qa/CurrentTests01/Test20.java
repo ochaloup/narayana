@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.CurrentTests01;
  * $Id: Test20.java,v 1.2 2003/06/26 11:43:52 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.omg.CosTransactions.Control;
 import org.omg.CosTransactions.Current;
 
-public class Test20 {
-    public static void main(String[] args) {
-        try {
+public class Test20
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -76,33 +80,43 @@ public class Test20 {
 
             String[] transactionNames = new String[numberOfControls];
             Control[] controls = new Control[numberOfControls];
-            for (int index = 0; index < numberOfControls; index++) {
+            for (int index = 0; index < numberOfControls; index++)
+            {
                 current.begin();
                 transactionNames[index] = current.get_transaction_name();
                 controls[index] = current.suspend();
             }
 
-            for (int index = 0; index < numberOfControls; index++) {
+            for (int index = 0; index < numberOfControls; index++)
+            {
                 current.resume(controls[index]);
                 correct = correct && transactionNames[index].equals(current.get_transaction_name());
                 current.commit(true);
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Test20.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Test20.main: " + exception);
             exception.printStackTrace(System.err);
         }

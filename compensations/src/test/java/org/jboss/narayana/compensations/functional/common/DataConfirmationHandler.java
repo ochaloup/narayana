@@ -48,7 +48,7 @@ public class DataConfirmationHandler implements ConfirmationHandler {
                     dataAvailable = true;
                 }
             } catch (Exception e) {
-                // unavailable
+                //unavailable
             }
         }
     }

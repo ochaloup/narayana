@@ -44,7 +44,8 @@ public class ProductWorker<Void> implements WorkerWorkload<Void>, WorkerLifecycl
                 ut.begin();
                 ut.commit();
 
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 if (config.getNumberOfErrors() == 0)
                     e.printStackTrace();
 

@@ -49,12 +49,8 @@ import com.arjuna.wst11.ConfirmCompletedParticipant;
 @WebService(name = "TestServiceBA", targetNamespace = "http://arjuna.com/wstx/tests/common", serviceName = "TestServiceBAService", portName = "TestServiceBA")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @HandlerChain(file = "/context-handlers.xml")
-public class TestServiceBAImple
-        implements
-            TestServiceBA,
-            BusinessAgreementWithCoordinatorCompletionParticipant,
-            ConfirmCompletedParticipant,
-            Serializable {
+public class TestServiceBAImple implements TestServiceBA, BusinessAgreementWithCoordinatorCompletionParticipant,
+        ConfirmCompletedParticipant, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,8 +62,7 @@ public class TestServiceBAImple
     public void increment() {
         try {
             BusinessActivityManager activityManager = BusinessActivityManagerFactory.businessActivityManager();
-            activityManager.enlistForBusinessAgreementWithCoordinatorCompletion(this,
-                    "TestService:" + UUID.randomUUID());
+            activityManager.enlistForBusinessAgreementWithCoordinatorCompletion(this, "TestService:" + UUID.randomUUID());
         } catch (NullPointerException e) {
             // Ignore if no activity
         } catch (Exception e) {

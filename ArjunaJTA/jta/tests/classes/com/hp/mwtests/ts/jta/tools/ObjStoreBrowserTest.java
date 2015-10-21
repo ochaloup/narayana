@@ -30,12 +30,10 @@ import com.hp.mwtests.ts.jta.common.DummyXA;
 import com.hp.mwtests.ts.jta.common.FailureXAResource;
 
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
+@Deprecated // in order to provide a better separation between public and internal classes.
 class ExtendedFailureXAResource extends FailureXAResource {
     boolean forgotten;
 
@@ -57,8 +55,7 @@ public class ObjStoreBrowserTest {
     private ObjStoreBrowser createObjStoreBrowser() {
         ObjStoreBrowser osb = new ObjStoreBrowser();
 
-        osb.setType("com.arjuna.ats.arjuna.AtomicAction",
-                "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean");
+        osb.setType("com.arjuna.ats.arjuna.AtomicAction", "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.JTAActionBean");
 
         return osb;
     }
@@ -69,25 +66,22 @@ public class ObjStoreBrowserTest {
 
     @Test
     public void testXAResourceRecordBean() throws Exception {
-        com.arjuna.common.tests.simple.EnvironmentBeanTest
-                .testBeanByReflection(new XAResourceRecordBean(new UidWrapper(Uid.nullUid())));
+        com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(new XAResourceRecordBean(new UidWrapper(Uid.nullUid())));
     }
 
     @Test
     public void testCommitMarkableResourceRecordBean() throws Exception {
-        com.arjuna.common.tests.simple.EnvironmentBeanTest
-                .testBeanByReflection(new CommitMarkableResourceRecordBean(new UidWrapper(Uid.nullUid())));
+        com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(new CommitMarkableResourceRecordBean(new UidWrapper(Uid.nullUid())));
     }
 
     @Test
-    public void testMBeanHeuristic() throws Exception {
+    public void testMBeanHeuristic () throws Exception
+    {
         ThreadActionData.purgeActions();
         ObjStoreBrowser osb = createObjStoreBrowser();
-        XAResource[] resources = {new DummyXA(false), new FailureXAResource(FailureXAResource.FailLocation.commit) // generates
-                                                                                                                    // a
-                                                                                                                    // heuristic
-                                                                                                                    // on
-                                                                                                                    // commit
+        XAResource[] resources = {
+                new DummyXA(false),
+                new FailureXAResource(FailureXAResource.FailLocation.commit) // generates a heuristic on commit
         };
 
         TransactionImple tx = new TransactionImple(0);
@@ -117,8 +111,7 @@ public class ObjStoreBrowserTest {
         assertTrue(ai instanceof JTAActionBean);
         JTAActionBean actionBean = (JTAActionBean) ai;
 
-        // and the transaction should contain only one participant (namely the
-        // FailureXAResource that generated the heuristic):
+        // and the transaction should contain only one participant (namely the FailureXAResource that generated the heuristic):
         Collection<LogRecordWrapper> participants = actionBean.getParticipants();
 
         assertEquals(1, participants.size());

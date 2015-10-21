@@ -22,11 +22,14 @@ public class StatusCheckTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                WSASTestUtils.class);
     }
 
     @Test
-    public void testStatusCheck() throws Exception {
+    public void testStatusCheck()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
 
         if (ua.status() != NoActivity.instance()) {
@@ -43,5 +46,5 @@ public class StatusCheckTest {
         if (!res.completedStatus().equals(Failure.instance())) {
             fail("Completed status should be Failure " + res.completedStatus());
         }
-    }
+            }
 }

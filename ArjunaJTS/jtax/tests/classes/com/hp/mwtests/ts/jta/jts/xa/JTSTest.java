@@ -30,7 +30,7 @@
  */
 
 package com.hp.mwtests.ts.jta.jts.xa;
-
+ 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -56,38 +56,31 @@ public class JTSTest {
 
     @Before
     public void setup() throws InvalidName, SystemException {
-        System.setProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
-                System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
-                        "com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"));
-        System.setProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
-                System.getProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
-                        "com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4"));
-        System.setProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
-                System.getProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
-                        "com.arjuna.orbportability.internal.orbspecific.versions.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.orbImpleClassName", System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName", "com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.poaImpleClassName", System.getProperty("OrbPortabilityEnvironmentBean.poaImpleClassName", "com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.orbDataClassName", System.getProperty("OrbPortabilityEnvironmentBean.orbDataClassName", "com.arjuna.orbportability.internal.orbspecific.versions.javaidl_1_4"));
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
-                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
-                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
     }
-
+    
     @After
     public void tearDown() {
         if (myOA != null) {
-            // myOA.destroy();
-            // myORB.shutdown();
+//            myOA.destroy();
+//            myORB.shutdown();
         }
     }
-
+    
     @Test
-    public void testRMFAILcommit1PC() throws Exception {
+    public void testRMFAILcommit1PC() throws Exception
+    {
         XAResource theResource = new XAResource() {
 
             @Override
@@ -152,7 +145,7 @@ public class JTSTest {
             // Expected
         }
     }
-
+    
     @Test
     public void test() throws Exception {
 

@@ -31,9 +31,11 @@
 
 package com.arjuna.ats.internal.jdbc.drivers;
 
-public class jndi {
+public class jndi
+{
 
-    public jndi() {
+    public jndi ()
+    {
     }
-
+    
 }

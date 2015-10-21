@@ -49,9 +49,8 @@ import org.codehaus.stomp.Stomp;
 import org.codehaus.stomp.StompFrame;
 
 /**
- * Represents a logical session (a parallel unit of work) within a Stomp
- * connection
- *
+ * Represents a logical session (a parallel unit of work) within a Stomp connection
+  *
  * @version $Revision: 61 $
  */
 public class StompSession {
@@ -90,8 +89,8 @@ public class StompSession {
         }
     }
 
-    public void sendToJms(StompFrame command)
-            throws JMSException, ProtocolException, NamingException, UnsupportedEncodingException {
+    public void sendToJms(StompFrame command) throws JMSException, ProtocolException, NamingException,
+            UnsupportedEncodingException {
         Map headers = command.getHeaders();
         String destinationName = (String) headers.remove(Stomp.Headers.Send.DESTINATION);
         Message message = convertFrame(command);
@@ -112,30 +111,26 @@ public class StompSession {
         protocolConverter.sendToStomp(frame);
     }
 
-    public Destination convertDestination(String name, boolean forceNew)
-            throws ProtocolException, JMSException, NamingException {
+    public Destination convertDestination(String name, boolean forceNew) throws ProtocolException, JMSException,
+            NamingException {
         if (name == null) {
             throw new ProtocolException("No destination is specified!");
         } else if (name.startsWith("/queue/") || name.startsWith("/topic/")) {
             return (Destination) initialContext.lookup("java:" + name);
             // } else if (name.startsWith("/temp-queue/")) {
-            // String tempName = name.substring("/temp-queue/".length(),
-            // name.length());
+            // String tempName = name.substring("/temp-queue/".length(), name.length());
             // Destination answer = temporaryDestinations.get(tempName);
             //
             // if (forceNew || answer == null) {
-            // return temporaryDestination(tempName,
-            // session.createTemporaryQueue());
+            // return temporaryDestination(tempName, session.createTemporaryQueue());
             // } else {
             // return answer;
             // }
             // } else if (name.startsWith("/temp-topic/")) {
-            // String tempName = name.substring("/temp-topic/".length(),
-            // name.length());
+            // String tempName = name.substring("/temp-topic/".length(), name.length());
             // Destination answer = temporaryDestinations.get(tempName);
             // if (forceNew || answer == null) {
-            // return temporaryDestination(tempName,
-            // session.createTemporaryTopic());
+            // return temporaryDestination(tempName, session.createTemporaryTopic());
             // } else {
             // return answer;
             // }
@@ -232,8 +227,8 @@ public class StompSession {
         }
     }
 
-    protected void copyStandardHeadersFromFrameToMessage(StompFrame command, Message msg)
-            throws JMSException, ProtocolException, NamingException {
+    protected void copyStandardHeadersFromFrameToMessage(StompFrame command, Message msg) throws JMSException,
+            ProtocolException, NamingException {
         final Map headers = new HashMap(command.getHeaders());
 
         // the standard JMS headers
@@ -258,8 +253,8 @@ public class StompSession {
         }
     }
 
-    protected Message convertFrame(StompFrame command)
-            throws JMSException, UnsupportedEncodingException, ProtocolException, NamingException {
+    protected Message convertFrame(StompFrame command) throws JMSException, UnsupportedEncodingException, ProtocolException,
+            NamingException {
         final Map headers = command.getHeaders();
         final Message msg;
         if (headers.containsKey(Stomp.Headers.CONTENT_LENGTH)) {
@@ -298,8 +293,7 @@ public class StompSession {
         return command;
     }
 
-    public Message receiveFromJms(String destinationName, Map headers)
-            throws JMSException, ProtocolException, NamingException {
+    public Message receiveFromJms(String destinationName, Map headers) throws JMSException, ProtocolException, NamingException {
         long ttl = getTimeToLive(headers);
         log.trace("Consuming message - ttl=" + ttl);
         Destination destination = convertDestination(destinationName, true);
@@ -344,8 +338,8 @@ public class StompSession {
         return consumer;
     }
 
-    public StompSubscription subscribe(String subscriptionId, StompFrame command)
-            throws ProtocolException, JMSException, NamingException {
+    public StompSubscription subscribe(String subscriptionId, StompFrame command) throws ProtocolException, JMSException,
+            NamingException {
         if (subscriptions.size() > 0) {
             throw new ProtocolException("This connection already has a subscription");
         }

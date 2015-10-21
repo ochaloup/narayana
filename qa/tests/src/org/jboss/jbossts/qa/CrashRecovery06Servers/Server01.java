@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.CrashRecovery06Servers;
  * $Id: Server01.java,v 1.2 2003/06/26 11:43:39 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery06.*;
 import org.jboss.jbossts.qa.CrashRecovery06Impls.ServiceImpl01;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server01 {
-    public static void main(String args[]) {
-        try {
+public class Server01
+{
+    public static void main(String args[])
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -79,9 +83,12 @@ public class Server01 {
             System.out.println("Ready");
 
             ORBInterface.run();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Server01.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
+

@@ -107,10 +107,8 @@ public class RemoteServerImpl implements RemoteServer {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-            Set<Xid> toReturn = ((TransactionImporterImple) SubordinationManager.getTransactionImporter())
-                    .getInflightXids(localServerName);
-            Xid[] doRecover = ((XATerminatorImple) SubordinationManager.getXATerminator()).doRecover(null,
-                    localServerName);
+            Set<Xid> toReturn = ((TransactionImporterImple) SubordinationManager.getTransactionImporter()).getInflightXids(localServerName);
+            Xid[] doRecover = ((XATerminatorImple) SubordinationManager.getXATerminator()).doRecover(null, localServerName);
             if (doRecover != null) {
                 toReturn.addAll(Arrays.asList(doRecover));
             }

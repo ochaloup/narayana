@@ -110,24 +110,30 @@ import com.arjuna.ats.jts.utils.Utility;
  * the tie facility (uuuggghhhh!!!!)
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ArjunaTransactionImple.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ArjunaTransactionImple.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
-public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.TwoPhaseCoordinator
-        implements
-            com.arjuna.ArjunaOTS.ArjunaTransactionOperations {
+public class ArjunaTransactionImple extends
+        com.arjuna.ats.arjuna.coordinator.TwoPhaseCoordinator implements
+        com.arjuna.ArjunaOTS.ArjunaTransactionOperations
+{
 
-    public ArjunaTransactionImple(Control myParent) {
+    public ArjunaTransactionImple (Control myParent)
+    {
         this(myParent, null);
     }
 
-    public ArjunaTransactionImple(Control myParent, ArjunaTransactionImple parent) {
+    public ArjunaTransactionImple (Control myParent, ArjunaTransactionImple parent)
+    {
         super();
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple Begin for < " + get_uid() + " , "
-                    + ((parent != null) ? parent.get_uid() : Uid.nullUid()) + " >");
+            jtsLogger.logger.trace("ArjunaTransactionImple Begin for < "
+                    + get_uid()
+                    + " , "
+                    + ((parent != null) ? parent.get_uid() : Uid.nullUid())
+                    + " >");
         }
 
         parentTransaction = parent;
@@ -156,15 +162,18 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         hashCode = get_uid().hashCode();
 
-        if (parent != null) {
+        if (parent != null)
+        {
             while ((rootAction.parent()) != null)
                 rootAction = rootAction.parent();
 
             topLevelHashCode = rootAction.get_uid().hashCode();
-        } else
+        }
+        else
             topLevelHashCode = hashCode;
 
-        if (ArjunaTransactionImple._checkedTransactions) {
+        if (ArjunaTransactionImple._checkedTransactions)
+        {
             /*
              * Fully checked transactions only allow the thread which began the
              * transaction to terminate it. We get the id of the beginning
@@ -183,27 +192,34 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              */
 
             transactionCreator = Thread.currentThread();
-        } else
+        }
+        else
             transactionCreator = null;
 
         CheckedAction ca = CheckedActions.get();
 
-        if (ca != null) {
+        if (ca != null)
+        {
             super.setCheckedAction(ca);
             ca = null;
         }
     }
 
-    public ArjunaTransactionImple(Uid actUid, Control myParent) {
+    public ArjunaTransactionImple (Uid actUid, Control myParent)
+    {
         this(actUid, myParent, null);
     }
 
-    public ArjunaTransactionImple(Uid actUid, Control myParent, ArjunaTransactionImple parent) {
+    public ArjunaTransactionImple (Uid actUid, Control myParent, ArjunaTransactionImple parent)
+    {
         super(actUid);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple Begin for < " + get_uid() + " , "
-                    + ((parent != null) ? parent.get_uid() : Uid.nullUid()) + " >");
+            jtsLogger.logger.trace("ArjunaTransactionImple Begin for < "
+                    + get_uid()
+                    + " , "
+                    + ((parent != null) ? parent.get_uid() : Uid.nullUid())
+                    + " >");
         }
 
         parentTransaction = parent;
@@ -228,15 +244,18 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         hashCode = get_uid().hashCode();
 
-        if (parent != null) {
+        if (parent != null)
+        {
             while ((rootAction.parent()) != null)
                 rootAction = rootAction.parent();
 
             topLevelHashCode = rootAction.get_uid().hashCode();
-        } else
+        }
+        else
             topLevelHashCode = hashCode;
 
-        if (ArjunaTransactionImple._checkedTransactions) {
+        if (ArjunaTransactionImple._checkedTransactions)
+        {
             /*
              * Fully checked transactions only allow the thread which began the
              * transaction to terminate it. We get the id of the beginning
@@ -244,12 +263,14 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              */
 
             transactionCreator = Thread.currentThread();
-        } else
+        }
+        else
             transactionCreator = null;
 
         CheckedAction ca = CheckedActions.get();
 
-        if (ca != null) {
+        if (ca != null)
+        {
             super.setCheckedAction(ca);
             ca = null;
         }
@@ -260,9 +281,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * the Control referencing the transaction and vice versa.
      */
     @Override
-    public void finalize() {
+    public void finalize ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple.finalize - called for < " + get_uid() + " >");
+            jtsLogger.logger.trace("ArjunaTransactionImple.finalize - called for < "
+                    + get_uid() + " >");
         }
 
         if (_synchs != null) {
@@ -280,11 +303,13 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         super.finalizeInternal();
     }
 
-    public final synchronized ControlImple getControlHandle() {
+    public final synchronized ControlImple getControlHandle ()
+    {
         return controlHandle;
     }
 
-    public final synchronized void setControlHandle(ControlImple handle) {
+    public final synchronized void setControlHandle (ControlImple handle)
+    {
         controlHandle = handle;
     }
 
@@ -294,37 +319,44 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * INVALID_TRANSACTION. However, if it was rolledback then we throw
      * TRANSACTION_ROLLEDBACK. Seems like an inconsistency.
      *
-     * OTS is vague as to what to do if the transaction has been terminated, so
-     * we make a sensible choice.
+     * OTS is vague as to what to do if the transaction has been terminated,
+     * so we make a sensible choice.
      *
      * report_heuristics is ignored if we are a subtransaction.
      */
 
-    public void commit(boolean report_heuristics) throws HeuristicMixed, HeuristicHazard, SystemException {
+    public void commit (boolean report_heuristics) throws HeuristicMixed,
+            HeuristicHazard, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::commit for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::commit for "
+                    + get_uid());
         }
 
-        if (ArjunaTransactionImple._checkedTransactions && !checkAccess()) {
+        if (ArjunaTransactionImple._checkedTransactions && !checkAccess())
+        {
             throw new NO_PERMISSION(0, CompletionStatus.COMPLETED_NO);
         }
 
         int outcome = super.status();
 
-        if ((outcome == ActionStatus.RUNNING) || (outcome == ActionStatus.ABORT_ONLY)) // have
-                                                                                        // we
-                                                                                        // already
-                                                                                        // been
-                                                                                        // committed?
+        if ((outcome == ActionStatus.RUNNING)
+                || (outcome == ActionStatus.ABORT_ONLY)) // have we already been
+                                                         // committed?
         {
-            try {
-                if (_synchs != null) {
-                    if (outcome == ActionStatus.RUNNING
-                            || (outcome == ActionStatus.ABORT_ONLY && TxControl.isBeforeCompletionWhenRollbackOnly())) {
+            try
+            {
+                if (_synchs != null)
+                {
+                    if(outcome == ActionStatus.RUNNING ||
+                            (outcome == ActionStatus.ABORT_ONLY && TxControl.isBeforeCompletionWhenRollbackOnly()))
+                    {
                         doBeforeCompletion();
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 /*
                  * Don't do anything, since we will have marked the transaction
                  * as rollback only.
@@ -335,26 +367,32 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * Remove the uid of this action from the parent.
              */
 
-            if (parentTransaction != null) {
+            if (parentTransaction != null)
+            {
                 parentTransaction.removeChildAction(this);
             }
 
             outcome = super.End(report_heuristics);
 
-            try {
-                if (_synchs != null) {
+            try
+            {
+                if (_synchs != null)
+                {
                     currentStatus = determineStatus(this);
 
                     doAfterCompletion(currentStatus);
 
                     _synchs = null;
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
 
             destroyAction();
         } else if (outcome == ActionStatus.ABORTED || outcome == ActionStatus.H_ROLLBACK) {
-            throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT, CompletionStatus.COMPLETED_NO);
+            throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT,
+                    CompletionStatus.COMPLETED_NO);
         } else {
             /*
              * Differentiate between us committing the transaction and some
@@ -364,58 +402,70 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
             throw new INVALID_TRANSACTION(0, CompletionStatus.COMPLETED_NO);
         }
 
-        switch (outcome) {
-            case ActionStatus.COMMITTED :
-            case ActionStatus.H_COMMIT :
-            case ActionStatus.COMMITTING : // in case asynchronous commit!
-                return;
-            case ActionStatus.ABORTED :
-            case ActionStatus.ABORTING : // in case of asynchronous abort!
-            case ActionStatus.H_ROLLBACK :
-                throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT, CompletionStatus.COMPLETED_NO);
-            case ActionStatus.H_MIXED :
-                if (report_heuristics)
-                    throw new HeuristicMixed();
-                break;
-            case ActionStatus.H_HAZARD :
-            default :
-                if (report_heuristics)
-                    throw new HeuristicHazard();
-                break;
+        switch (outcome)
+        {
+        case ActionStatus.COMMITTED:
+        case ActionStatus.H_COMMIT:
+        case ActionStatus.COMMITTING: // in case asynchronous commit!
+            return;
+        case ActionStatus.ABORTED:
+        case ActionStatus.ABORTING:  // in case of asynchronous abort!
+        case ActionStatus.H_ROLLBACK:
+            throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT,
+                    CompletionStatus.COMPLETED_NO);
+        case ActionStatus.H_MIXED:
+            if (report_heuristics)
+            throw new HeuristicMixed();
+            break;
+        case ActionStatus.H_HAZARD:
+        default:
+            if (report_heuristics)
+                throw new HeuristicHazard();
+            break;
         }
     }
 
-    public void rollback() throws SystemException {
+    public void rollback () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::rollback for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::rollback for "
+                    + get_uid());
         }
 
-        if (ArjunaTransactionImple._checkedTransactions && !checkAccess()) {
+        if (ArjunaTransactionImple._checkedTransactions && !checkAccess())
+        {
             throw new NO_PERMISSION(0, CompletionStatus.COMPLETED_NO);
         }
 
         int status = super.status();
 
-        if ((status == ActionStatus.RUNNING) || (status == ActionStatus.ABORT_ONLY)) // already
-                                                                                        // aborted?
+        if ((status == ActionStatus.RUNNING)
+                || (status == ActionStatus.ABORT_ONLY)) // already aborted?
         {
 
-            if (ArjunaTransactionImple._syncOn) {
-                if (TxControl.isBeforeCompletionWhenRollbackOnly()) {
-                    try {
+            if (ArjunaTransactionImple._syncOn)
+            {
+                if(TxControl.isBeforeCompletionWhenRollbackOnly())
+                {
+                    try
+                    {
                         if (_synchs != null)
                             doBeforeCompletion();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         /*
-                         * Don't do anything - we're about to rollback anyway!
-                         */
+                           * Don't do anything - we're about to rollback anyway!
+                           */
                     }
                 }
-            } else {
+            }
+            else
+            {
                 /*
-                 * If we have any synchronizations delete them now. Can only be
-                 * a top-level action.
-                 */
+                     * If we have any synchronizations delete them now. Can only be
+                     * a top-level action.
+                     */
 
                 _synchs = null;
             }
@@ -424,92 +474,107 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * Remove uid of this action from parent even if remote.
              */
 
-            if (parentTransaction != null) {
+            if (parentTransaction != null)
+            {
                 parentTransaction.removeChildAction(this);
             }
 
             super.Abort();
 
-            if (ArjunaTransactionImple._syncOn) {
-                try {
-                    if (_synchs != null) {
+            if (ArjunaTransactionImple._syncOn)
+            {
+                try
+                {
+                    if (_synchs != null)
+                    {
                         currentStatus = determineStatus(this);
 
                         doAfterCompletion(currentStatus);
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                 }
             }
 
             destroyAction();
 
             status = super.status();
-        } else {
+        }
+        else
+        {
             /*
              * Differentiate between us ending the transaction and some other
              * thread doing it.
              */
 
             throw new INVALID_TRANSACTION(0, CompletionStatus.COMPLETED_NO); // means
-                                                                                // transaction
-                                                                                // already
-                                                                                // terminated.
+                                                                             // transaction
+                                                                             // already
+                                                                             // terminated.
         }
 
-        switch (status) {
-            case ActionStatus.ABORTING :
-            case ActionStatus.ABORTED :
-            case ActionStatus.H_ROLLBACK :
-                /*
-                 * If the transaction has already rolledback then silently
-                 * ignore the multiple rollback attempts.
-                 */
-                return;
-            case ActionStatus.PREPARING : // shouldn't be able to get heuristics
-                                            // or
-                                            // any of these!
-            case ActionStatus.PREPARED :
-            case ActionStatus.COMMITTING :
-            case ActionStatus.COMMITTED :
-            case ActionStatus.H_COMMIT :
-            case ActionStatus.H_MIXED :
-            case ActionStatus.H_HAZARD :
-                throw new INVALID_TRANSACTION(0, CompletionStatus.COMPLETED_NO); // means
-                                                                                    // transaction
-                                                                                    // already
-                                                                                    // terminated.
-            case ActionStatus.INVALID :
-            case ActionStatus.CLEANUP :
-                throw new UNKNOWN(ExceptionCodes.UNKNOWN_EXCEPTION, CompletionStatus.COMPLETED_MAYBE);
+        switch (status)
+        {
+        case ActionStatus.ABORTING:
+        case ActionStatus.ABORTED:
+        case ActionStatus.H_ROLLBACK:
+            /*
+             * If the transaction has already rolledback then silently ignore
+             * the multiple rollback attempts.
+             */
+            return;
+        case ActionStatus.PREPARING: // shouldn't be able to get heuristics or
+                                     // any of these!
+        case ActionStatus.PREPARED:
+        case ActionStatus.COMMITTING:
+        case ActionStatus.COMMITTED:
+        case ActionStatus.H_COMMIT:
+        case ActionStatus.H_MIXED:
+        case ActionStatus.H_HAZARD:
+            throw new INVALID_TRANSACTION(0, CompletionStatus.COMPLETED_NO); // means
+                                                                             // transaction
+                                                                             // already
+                                                                             // terminated.
+        case ActionStatus.INVALID:
+        case ActionStatus.CLEANUP:
+            throw new UNKNOWN(ExceptionCodes.UNKNOWN_EXCEPTION,
+                    CompletionStatus.COMPLETED_MAYBE);
         }
     }
 
-    public org.omg.CosTransactions.Status get_status() throws SystemException {
+    public org.omg.CosTransactions.Status get_status () throws SystemException
+    {
         Status s = determineStatus(this);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace(
-                    "ArjunaTransactionImple::get_status for " + get_uid() + " returning " + Utility.stringStatus(s));
+            jtsLogger.logger.trace("ArjunaTransactionImple::get_status for "
+                    + get_uid() + " returning " + Utility.stringStatus(s));
         }
 
         return s;
     }
 
-    public org.omg.CosTransactions.Status get_parent_status() throws SystemException {
+    public org.omg.CosTransactions.Status get_parent_status ()
+            throws SystemException
+    {
         if (parentTransaction != null)
             return parentTransaction.get_status();
         else
             return get_status();
     }
 
-    public org.omg.CosTransactions.Status get_top_level_status() throws SystemException {
+    public org.omg.CosTransactions.Status get_top_level_status ()
+            throws SystemException
+    {
         if (rootAction != null)
             return determineStatus(rootAction);
         else
             return get_status();
     }
 
-    public boolean is_same_transaction(Coordinator tc) throws SystemException {
+    public boolean is_same_transaction (Coordinator tc) throws SystemException
+    {
         if (tc == null)
             return false;
 
@@ -528,10 +593,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         boolean result = false;
 
-        try {
+        try
+        {
             UidCoordinator ptr = com.arjuna.ArjunaOTS.UidCoordinatorHelper.narrow(tc);
 
-            if (ptr != null) {
+            if (ptr != null)
+            {
                 /*
                  * Must be an Arjuna coordinator.
                  */
@@ -540,8 +607,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 String compareUid = ptr.uid();
 
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("ArjunaTransactionImple::is_same_transaction comparing uids < " + compareUid
-                            + ", " + myUid + " >");
+                    jtsLogger.logger.trace("ArjunaTransactionImple::is_same_transaction comparing uids < "
+                            + compareUid + ", " + myUid + " >");
                 }
 
                 if (myUid.compareTo(compareUid) == 0)
@@ -551,9 +618,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 compareUid = null;
 
                 ptr = null;
-            } else
+            }
+            else
                 throw new BAD_PARAM();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             /*
              * Narrow failed, so can't be an Arjuna Uid. Therefore, the answer
              * must be false.
@@ -563,16 +633,20 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         return result;
     }
 
-    public boolean is_related_transaction(Coordinator tc) throws SystemException {
+    public boolean is_related_transaction (Coordinator tc)
+            throws SystemException
+    {
         if (tc == null)
             return false;
 
         boolean result = false;
 
-        try {
+        try
+        {
             UidCoordinator ptr = com.arjuna.ArjunaOTS.UidCoordinatorHelper.narrow(tc);
 
-            if (ptr != null) {
+            if (ptr != null)
+            {
                 /*
                  * Must be an Arjuna coordinator.
                  */
@@ -596,9 +670,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 compareTLUid = null;
 
                 ptr = null;
-            } else
+            }
+            else
                 throw new BAD_PARAM();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             /*
              * Narrow failed, so can't be an Arjuna Uid. Therefore, the answer
              * must be false.
@@ -612,7 +689,9 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * Is this transaction an ancestor of tc?
      */
 
-    public boolean is_ancestor_transaction(Coordinator tc) throws SystemException {
+    public boolean is_ancestor_transaction (Coordinator tc)
+            throws SystemException
+    {
         if (tc == null)
             return false;
 
@@ -622,17 +701,20 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         if (is_same_transaction(tc))
             return true;
-        else {
+        else
+        {
             /*
              * Are we related?
              */
 
-            if (is_related_transaction(tc)) {
+            if (is_related_transaction(tc))
+            {
                 if (is_descendant_transaction(tc))
                     return false;
                 else
                     return true;
-            } else
+            }
+            else
                 return false;
         }
     }
@@ -641,14 +723,18 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * Is this transaction a descendant of tc?
      */
 
-    public boolean is_descendant_transaction(Coordinator tc) throws SystemException {
+    public boolean is_descendant_transaction (Coordinator tc)
+            throws SystemException
+    {
         if (tc == null)
             return false;
 
-        try {
+        try
+        {
             UidCoordinator ptr = com.arjuna.ArjunaOTS.UidCoordinatorHelper.narrow(tc);
 
-            if (ptr != null) {
+            if (ptr != null)
+            {
                 /*
                  * Must be an Arjuna coordinator.
                  */
@@ -657,11 +743,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 BasicAction lookingAt = this;
 
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger
-                            .trace("ArjunaTransactionImple::is_descendant_transaction - looking for " + lookingFor);
+                    jtsLogger.logger.trace("ArjunaTransactionImple::is_descendant_transaction - looking for "
+                            + lookingFor);
                 }
 
-                while (lookingAt != null) {
+                while (lookingAt != null)
+                {
                     if (jtsLogger.logger.isTraceEnabled()) {
                         jtsLogger.logger.trace("ArjunaTransactionImple::is_descendant_transaction - looking for "
                                 + lookingAt.get_uid());
@@ -674,9 +761,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 }
 
                 ptr = null;
-            } else
+            }
+            else
                 throw new BAD_PARAM();
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             /*
              * Narrow failed, so can't be an Arjuna Uid. Therefore, the answer
              * must be false.
@@ -686,15 +776,18 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         return false;
     }
 
-    public boolean is_top_level_transaction() throws SystemException {
+    public boolean is_top_level_transaction () throws SystemException
+    {
         return (this == rootAction);
     }
 
-    public int hash_transaction() throws SystemException {
+    public int hash_transaction () throws SystemException
+    {
         return hashCode;
     }
 
-    public int hash_top_level_tran() throws SystemException {
+    public int hash_top_level_tran () throws SystemException
+    {
         return topLevelHashCode;
     }
 
@@ -704,9 +797,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * current transaction ends.
      */
 
-    public RecoveryCoordinator register_resource(Resource r) throws SystemException, Inactive {
+    public RecoveryCoordinator register_resource (Resource r)
+            throws SystemException, Inactive
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::register_resource ( " + r + " ) - called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::register_resource ( "
+                    + r + " ) - called for " + get_uid());
         }
 
         if (r == null)
@@ -714,15 +810,20 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         currentStatus = determineStatus(this);
 
-        if (currentStatus != Status.StatusActive) {
+        if (currentStatus != Status.StatusActive)
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
                 jtsLogger.logger.trace("ArjunaTransactionImple::register_resource - transaction not active: "
                         + Utility.stringStatus(currentStatus));
             }
 
-            if (currentStatus == Status.StatusMarkedRollback) {
-                throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.MARKED_ROLLEDBACK, CompletionStatus.COMPLETED_NO);
-            } else
+            if (currentStatus == Status.StatusMarkedRollback)
+            {
+                throw new TRANSACTION_ROLLEDBACK(
+                        ExceptionCodes.MARKED_ROLLEDBACK,
+                        CompletionStatus.COMPLETED_NO);
+            }
+            else
                 throw new Inactive();
         }
 
@@ -730,7 +831,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         BasicAction registerIn = this;
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple " + get_uid() + " ::register_resource: ");
+            jtsLogger.logger.trace("ArjunaTransactionImple "
+                    + get_uid() + " ::register_resource: ");
         }
 
         //
@@ -755,32 +857,38 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
          * considered an error and we will roll back the transaction.
          */
 
-        try {
+        try
+        {
             recoveryCoordinator = RecoveryCreator.createRecoveryCoordinator(r, params);
 
             if (recoveryCoordinator == null)
                 throw new BAD_OPERATION(
-                        "RecoveryCoordinator " + jtsLogger.i18NLogger.get_orbspecific_coordinator_rcnotcreated());
-        } catch (NO_IMPLEMENT ex) {
+                        "RecoveryCoordinator "
+                                + jtsLogger.i18NLogger.get_orbspecific_coordinator_rcnotcreated());
+        }
+        catch (NO_IMPLEMENT ex)
+        {
             /*
              * This is legal, and is meant to show that this ORB or
              * configuration simply doesn't support crash recovery.
              */
 
             recoveryCoordinator = null;
-        } catch (SystemException e) {
+        }
+        catch (SystemException e) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_rccreate(get_uid(), e);
 
             /*
-             * Set transaction to rollback only and re-throw exception.
-             */
+                * Set transaction to rollback only and re-throw exception.
+                */
 
             try {
                 rollback_only();
-            } catch (Inactive ex1) {
-            } catch (SystemException ex2) {
-                jtsLogger.i18NLogger.warn_orbspecific_coordinator_rbofail("ArjunaTransactionImple.register_resource",
-                        get_uid(), ex2);
+            }
+            catch (Inactive ex1) {
+            }
+            catch (SystemException ex2) {
+                jtsLogger.i18NLogger.warn_orbspecific_coordinator_rbofail("ArjunaTransactionImple.register_resource", get_uid(), ex2);
 
                 throw ex2;
             }
@@ -788,7 +896,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
             throw e;
         }
 
-        if (recoveryCoordinator != null) {
+        if (recoveryCoordinator != null)
+        {
             //
             // We got a RecoveryCoordinator, so unpack the other return values:
             // [0] = RecoveryCoordinator Uid*
@@ -796,7 +905,9 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
             index = 0;
             recoveryCoordinatorUid = (Uid) params[index++];
-        } else {
+        }
+        else
+        {
             //
             // We didn't get a RecoveryCoordinator, so we don't assume that
             // the other return values have been populated.
@@ -805,9 +916,9 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
             recoveryCoordinatorUid = Uid.nullUid();
         }
 
-        try {
-            SubtransactionAwareResource staResource = org.omg.CosTransactions.SubtransactionAwareResourceHelper
-                    .narrow(r);
+        try
+        {
+            SubtransactionAwareResource staResource = org.omg.CosTransactions.SubtransactionAwareResourceHelper.narrow(r);
 
             /*
              * Some Orbs (e.g., Orbix) throw BAD_PARAM is the object in X.narrow
@@ -815,9 +926,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * NULL!
              */
 
-            if (staResource != null) {
+            if (staResource != null)
+            {
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for " + get_uid()
+                    jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                            + get_uid()
                             + " - subtransaction aware resource: YES");
                 }
 
@@ -828,7 +941,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
                 Coordinator coord = null;
 
-                if (parentHandle != null) {
+                if (parentHandle != null)
+                {
                     /*
                      * If we are a SubTranResource then we get registered with
                      * the current transaction and its parents upon completion.
@@ -844,12 +958,15 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
                 coord = null;
                 staResource = null;
-            } else
+            }
+            else
                 throw new BAD_PARAM(0, CompletionStatus.COMPLETED_NO);
-        } catch (BAD_PARAM ex) {
+        }
+        catch (BAD_PARAM ex)
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for " + get_uid()
-                        + " - subtransaction aware resource: NO");
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                        + get_uid() + " - subtransaction aware resource: NO");
             }
 
             /* narrow failed must be a plain resource */
@@ -860,45 +977,58 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              */
 
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger
-                        .trace("ArjunaTransactionImple " + get_uid() + " ::register_resource: Simple resource - " + ex);
+                jtsLogger.logger.trace("ArjunaTransactionImple "
+                        + get_uid()
+                        + " ::register_resource: Simple resource - " + ex);
             }
 
             corbaRec = createOTSRecord(true, r, null, recoveryCoordinatorUid);
-        } catch (Unavailable e1) {
+        }
+        catch (Unavailable e1)
+        {
             throw new Inactive();
-        } catch (SystemException e2) {
+        }
+        catch (SystemException e2)
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for " + get_uid()
-                        + " : catch (SystemException) - " + e2);
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                        + get_uid() + " : catch (SystemException) - " + e2);
             }
 
             throw e2;
-        } catch (Exception e3) {
+        }
+        catch (Exception e3)
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger
-                        .trace("ArjunaTransactionImple::register_resource for " + get_uid() + " : catch (...) - " + e3);
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                        + get_uid() + " : catch (...) - " + e3);
             }
 
             /*
              * Cannot just rethrow exception, so throw UNKNOWN.
              */
 
-            throw new UNKNOWN(e3.toString(), ExceptionCodes.UNKNOWN_EXCEPTION, CompletionStatus.COMPLETED_NO);
+            throw new UNKNOWN(e3.toString(), ExceptionCodes.UNKNOWN_EXCEPTION,
+                    CompletionStatus.COMPLETED_NO);
         }
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for " + get_uid() + " : try end");
+            jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                    + get_uid() + " : try end");
         }
 
-        if (registerIn.add(corbaRec) != AddOutcome.AR_ADDED) {
+        if (registerIn.add(corbaRec) != AddOutcome.AR_ADDED)
+        {
             corbaRec = null;
 
-            throw new INVALID_TRANSACTION(ExceptionCodes.ADD_FAILED, CompletionStatus.COMPLETED_NO);
-        } else {
+            throw new INVALID_TRANSACTION(ExceptionCodes.ADD_FAILED,
+                    CompletionStatus.COMPLETED_NO);
+        }
+        else
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger
-                        .trace("ArjunaTransactionImple::register_resource for " + get_uid() + " : resource registered");
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_resource for "
+                        + get_uid() + " : resource registered");
             }
         }
 
@@ -909,10 +1039,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * Do not propagate the resource to the parent.
      */
 
-    public void register_subtran_aware(SubtransactionAwareResource r)
-            throws Inactive, NotSubtransaction, SystemException {
+    public void register_subtran_aware (SubtransactionAwareResource r)
+            throws Inactive, NotSubtransaction, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for "
+                    + get_uid());
         }
 
         if (r == null)
@@ -920,32 +1052,41 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         currentStatus = determineStatus(this);
 
-        if (currentStatus != Status.StatusActive) {
-            if (currentStatus == Status.StatusMarkedRollback) {
-                throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.MARKED_ROLLEDBACK, CompletionStatus.COMPLETED_NO);
-            } else
+        if (currentStatus != Status.StatusActive)
+        {
+            if (currentStatus == Status.StatusMarkedRollback)
+            {
+                throw new TRANSACTION_ROLLEDBACK(
+                        ExceptionCodes.MARKED_ROLLEDBACK,
+                        CompletionStatus.COMPLETED_NO);
+            }
+            else
                 throw new Inactive();
         }
 
-        if (this == rootAction) {
+        if (this == rootAction)
+        {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for " + get_uid()
-                        + " : not a subtransaction!");
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for "
+                        + get_uid() + " : not a subtransaction!");
             }
 
             throw new NotSubtransaction();
-        } else {
+        }
+        else
+        {
             Coordinator coord = null;
             AbstractRecord corbaRec = null;
 
-            try {
+            try
+            {
                 coord = parentHandle.get_coordinator();
                 corbaRec = createOTSRecord(false, r, coord);
-            } catch (Unavailable ex) {
-                throw new UNKNOWN(ExceptionCodes.INACTIVE_TRANSACTION, CompletionStatus.COMPLETED_NO); // what
-                                                                                                        // else
-                                                                                                        // to
-                                                                                                        // raise?
+            }
+            catch (Unavailable ex)
+            {
+                throw new UNKNOWN(ExceptionCodes.INACTIVE_TRANSACTION,
+                        CompletionStatus.COMPLETED_NO); // what else to raise?
             }
 
             coord = null;
@@ -954,10 +1095,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * Throw some exception here?
              */
 
-            if (add(corbaRec) != AddOutcome.AR_ADDED) {
+            if (add(corbaRec) != AddOutcome.AR_ADDED)
+            {
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for " + get_uid()
-                            + " : could not add.");
+                    jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for "
+                            + get_uid() + " : could not add.");
                 }
 
                 corbaRec = null;
@@ -966,21 +1108,28 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         }
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for " + get_uid()
-                    + " : subtran_aware_resource registered");
+            jtsLogger.logger.trace("ArjunaTransactionImple::register_subtran_aware called for "
+                    + get_uid() + " : subtran_aware_resource registered");
         }
     }
 
-    public void rollback_only() throws SystemException, Inactive {
+    public void rollback_only () throws SystemException, Inactive
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::rollback_only - called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::rollback_only - called for "
+                    + get_uid());
         }
 
-        if (determineStatus(this) != Status.StatusPrepared) {
-            if (!preventCommit()) {
-                throw new INVALID_TRANSACTION(ExceptionCodes.INACTIVE_TRANSACTION, CompletionStatus.COMPLETED_NO);
+        if (determineStatus(this) != Status.StatusPrepared)
+        {
+            if (!preventCommit())
+            {
+                throw new INVALID_TRANSACTION(
+                        ExceptionCodes.INACTIVE_TRANSACTION,
+                        CompletionStatus.COMPLETED_NO);
             }
-        } else
+        }
+        else
             throw new Inactive();
     }
 
@@ -988,21 +1137,27 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * To be used for debugging purposes only.
      */
 
-    public String get_transaction_name() throws SystemException {
+    public String get_transaction_name () throws SystemException
+    {
         return get_uid().stringForm();
     }
 
-    public Control create_subtransaction() throws SystemException, SubtransactionsUnavailable, Inactive {
+    public Control create_subtransaction () throws SystemException,
+            SubtransactionsUnavailable, Inactive
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::create_subtransaction - called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::create_subtransaction - called for "
+                    + get_uid());
         }
 
         if (determineStatus(this) != Status.StatusActive)
             throw new Inactive();
-        else {
+        else
+        {
             if (!_subtran)
                 throw new SubtransactionsUnavailable();
-            else {
+            else
+            {
                 if (controlHandle == null)
                     throw new Inactive();
                 else
@@ -1021,10 +1176,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      */
 
     // why not use SynchronizationRecords?
-    public void register_synchronization(Synchronization sync)
-            throws Inactive, SynchronizationUnavailable, SystemException {
+    public void register_synchronization (Synchronization sync)
+            throws Inactive, SynchronizationUnavailable, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - called for "
+                    + get_uid());
         }
 
         if (sync == null)
@@ -1033,34 +1190,38 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         if (!is_top_level_transaction()) // are we a top-level transaction?
         {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - " + get_uid()
-                        + " is not a top-level transaction!");
+                jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - "
+                        + get_uid() + " is not a top-level transaction!");
             }
 
             throw new SynchronizationUnavailable();
-        } else {
+        }
+        else
+        {
             currentStatus = determineStatus(this);
 
             // https://jira.jboss.org/jira/browse/JBTM-608
 
-            if ((currentStatus == Status.StatusActive) || (currentStatus == Status.StatusPreparing))// is
-                                                                                                    // transaction
-                                                                                                    // still
-            // running?
+            if ((currentStatus == Status.StatusActive) || (currentStatus == Status.StatusPreparing))// is transaction still
+                // running?
             {
-                synchronized (this) {
-                    if (_synchs == null) {
-                        // Synchronizations should be stored (or at least
-                        // iterated) in their natural order
+                synchronized (this)
+                {
+                    if (_synchs == null)
+                    {
+                        // Synchronizations should be stored (or at least iterated) in their natural order
                         _synchs = new TreeSet();
                     }
                 }
 
                 SynchronizationRecord otsSync;
 
-                if (sync._is_a(JTAInterposedSynchronizationHelper.id())) {
+                if(sync._is_a(JTAInterposedSynchronizationHelper.id()))
+                {
                     otsSync = new SynchronizationRecord(sync, true);
-                } else {
+                }
+                else
+                {
                     otsSync = new SynchronizationRecord(sync);
                 }
 
@@ -1068,37 +1229,48 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 // earlier in sequence than any that has already been called
                 // during the pre-commmit phase. This is required for
                 // JTA 1.1 Synchronization ordering behaviour
-                if (_currentRecord != null) {
-                    Comparable c = (Comparable) otsSync;
-                    if (c.compareTo(_currentRecord) != 1) {
+                if(_currentRecord != null) {
+                    Comparable c = (Comparable)otsSync;
+                    if(c.compareTo(_currentRecord) != 1) {
                         throw new UNKNOWN(ExceptionCodes.ADD_FAILED, CompletionStatus.COMPLETED_NO);
                     }
                 }
 
-                if (!_synchs.add(otsSync)) {
+                if (!_synchs.add(otsSync))
+                {
                     otsSync = null;
-                    throw new UNKNOWN(ExceptionCodes.ADD_FAILED, CompletionStatus.COMPLETED_NO); // what
-                                                                                                    // else
-                                                                                                    // to
+                    throw new UNKNOWN(ExceptionCodes.ADD_FAILED,
+                            CompletionStatus.COMPLETED_NO); // what else to
                     // raise?
                 }
-            } else {
+            }
+            else
+            {
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - " + get_uid()
-                            + " is not active: " + Utility.stringStatus(currentStatus));
+                    jtsLogger.logger.trace("ArjunaTransactionImple::register_synchronization - "
+                            + get_uid()
+                            + " is not active: "
+                            + Utility.stringStatus(currentStatus));
                 }
 
-                if (currentStatus == Status.StatusMarkedRollback) {
-                    throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.MARKED_ROLLEDBACK, CompletionStatus.COMPLETED_NO);
-                } else
+                if (currentStatus == Status.StatusMarkedRollback)
+                {
+                    throw new TRANSACTION_ROLLEDBACK(
+                            ExceptionCodes.MARKED_ROLLEDBACK,
+                            CompletionStatus.COMPLETED_NO);
+                }
+                else
                     throw new Inactive();
             }
         }
     }
 
-    public PropagationContext get_txcontext() throws Unavailable, SystemException {
+    public PropagationContext get_txcontext () throws Unavailable,
+            SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::get_txcontext - called for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::get_txcontext - called for "
+                    + get_uid());
         }
 
         /*
@@ -1107,21 +1279,26 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         currentStatus = determineStatus(this);
 
-        if ((currentStatus != Status.StatusActive) && (currentStatus != Status.StatusMarkedRollback)) {
+        if ((currentStatus != Status.StatusActive)
+                && (currentStatus != Status.StatusMarkedRollback))
+        {
             /*
-             * If XA compliant then return context even if we're inactive.
-             * Otherwise throw Unavailable for consistency with other OTS
-             * implementations.
+             * If XA compliant then return context even if we're inactive. Otherwise
+             * throw Unavailable for consistency with other OTS implementations.
              */
 
             if (!XA_COMPLIANT)
                 throw new Unavailable();
         }
 
-        try {
+        try
+        {
             return propagationContext();
-        } catch (Exception e) {
-            throw new UNKNOWN(e.toString(), ExceptionCodes.UNKNOWN_EXCEPTION, CompletionStatus.COMPLETED_NO);
+        }
+        catch (Exception e)
+        {
+            throw new UNKNOWN(e.toString(), ExceptionCodes.UNKNOWN_EXCEPTION,
+                    CompletionStatus.COMPLETED_NO);
         }
     }
 
@@ -1135,46 +1312,56 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * be unique.
      */
 
-    public String uid() throws SystemException {
+    public String uid () throws SystemException
+    {
         return get_uid().stringForm();
     }
 
-    public String topLevelUid() throws SystemException {
+    public String topLevelUid () throws SystemException
+    {
         if (rootAction != null)
             return rootAction.get_uid().stringForm();
         else
             return null;
     }
 
-    public String type() {
+    public String type ()
+    {
         return ArjunaTransactionImple.typeName();
     }
 
-    public static final int interpositionType() {
+    public static final int interpositionType ()
+    {
         return _ipType;
     }
 
-    public static String typeName() {
+    public static String typeName ()
+    {
         return "/StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple";
     }
 
-    public String toString() {
+    public String toString ()
+    {
         return "ArjunaTransactionImple < " + get_uid() + " >";
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof ArjunaTransactionImple) {
+    public boolean equals (Object o)
+    {
+        if (o instanceof ArjunaTransactionImple)
+        {
             ArjunaTransactionImple tx = (ArjunaTransactionImple) o;
 
             if (tx == this)
                 return true;
             else
                 return tx.get_uid().equals(get_uid());
-        } else
+        }
+        else
             return false;
     }
 
-    public boolean forgetHeuristics() {
+    public boolean forgetHeuristics ()
+    {
         return super.forgetHeuristics();
     }
 
@@ -1182,11 +1369,13 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * For crash recovery purposes only.
      */
 
-    protected ArjunaTransactionImple(Uid actUid) {
+    protected ArjunaTransactionImple (Uid actUid)
+    {
         super(actUid);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::ArjunaTransactionImple ( " + actUid + " )");
+            jtsLogger.logger.trace("ArjunaTransactionImple::ArjunaTransactionImple ( "
+                    + actUid + " )");
         }
 
         parentTransaction = null;
@@ -1218,9 +1407,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
          */
     }
 
-    protected void doBeforeCompletion() throws SystemException {
+    protected void doBeforeCompletion () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::doBeforeCompletion for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::doBeforeCompletion for "
+                    + get_uid());
         }
 
         boolean problem = false;
@@ -1229,11 +1420,13 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         /*
          * If we have a synchronization list then we must be top-level.
          */
-        if (_synchs != null) {
+        if (_synchs != null)
+        {
             boolean doSuspend = false;
             ControlWrapper cw = null;
 
-            try {
+            try
+            {
                 /*
                  * Make sure that this transaction is active on the thread
                  * before we invoke any Synchronizations. They are
@@ -1241,8 +1434,9 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                  * them.
                  */
 
-                try {
-                    // cw = OTSImpleManager.systemCurrent().getControlWrapper();
+                try
+                {
+                    //            cw = OTSImpleManager.systemCurrent().getControlWrapper();
 
                     cw = OTSImpleManager.current().getControlWrapper();
 
@@ -1251,14 +1445,17 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                      * we got at creation time.
                      */
 
-                    if ((cw == null) || (!controlHandle.equals(cw.getImple()))) {
-                        // OTSImpleManager.systemCurrent().resumeImple(controlHandle);
+                    if ((cw == null) || (!controlHandle.equals(cw.getImple())))
+                    {
+                        //            OTSImpleManager.systemCurrent().resumeImple(controlHandle);
 
                         OTSImpleManager.current().resumeImple(controlHandle);
 
                         doSuspend = true;
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     /*
                      * It should be OK to continue with the invocations even if
                      * we couldn't resume, because a Synchronization is only
@@ -1268,36 +1465,32 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 }
 
                 /*
-                 * Since Synchronizations may add register other
-                 * Synchronizations, we can't simply iterate the collection.
-                 * Instead we work from an ordered copy, which we periodically
-                 * check for freshness. The addSynchronization method uses
-                 * _currentRecord to disallow adding records in the part of the
-                 * array we have already traversed, thus all Synchronization
-                 * will be called and the (jta only) rules on ordering of
-                 * interposed Synchronization will be respected.
+                 * Since Synchronizations may add register other Synchronizations, we can't simply
+                 * iterate the collection. Instead we work from an ordered copy, which we periodically
+                 * check for freshness. The addSynchronization method uses _currentRecord to disallow
+                 * adding records in the part of the array we have already traversed, thus all
+                 * Synchronization will be called and the (jta only) rules on ordering of interposed
+                 * Synchronization will be respected.
                  */
                 int lastIndexProcessed = -1;
-                SynchronizationRecord[] copiedSynchs = (SynchronizationRecord[]) _synchs
-                        .toArray(new SynchronizationRecord[]{});
+                SynchronizationRecord[] copiedSynchs = (SynchronizationRecord[])_synchs.toArray(new SynchronizationRecord[] {});
 
-                while ((lastIndexProcessed < _synchs.size() - 1) && !problem) {
+                while( (lastIndexProcessed < _synchs.size()-1) && !problem) {
 
-                    // if new Synchronization have been registered, refresh our
-                    // copy of the collection:
-                    if (copiedSynchs.length != _synchs.size()) {
-                        copiedSynchs = (SynchronizationRecord[]) _synchs.toArray(new SynchronizationRecord[]{});
+                    // if new Synchronization have been registered, refresh our copy of the collection:
+                    if(copiedSynchs.length != _synchs.size()) {
+                        copiedSynchs = (SynchronizationRecord[])_synchs.toArray(new SynchronizationRecord[] {});
                     }
 
-                    lastIndexProcessed = lastIndexProcessed + 1;
+                    lastIndexProcessed = lastIndexProcessed+1;
                     _currentRecord = copiedSynchs[lastIndexProcessed];
 
                     Synchronization c = _currentRecord.contents();
                     c.before_completion();
                 }
-            } catch (SystemException e) {
-                jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.doBeforeCompletion",
-                        e);
+            }
+            catch (SystemException e) {
+                jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.doBeforeCompletion", e);
 
                 if (!problem) {
                     exp = e;
@@ -1311,7 +1504,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
                     try {
                         rollback_only();
-                    } catch (Inactive ex) {
+                    }
+                    catch (Inactive ex) {
                         /*
                          * This should not happen. If it does, continue with
                          * commit to tidy-up.
@@ -1321,42 +1515,52 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                                 "ArjunaTransactionImple.doBeforeCompletion", get_uid(), ex);
                     }
                 }
-            } finally {
-                if (doSuspend) {
-                    try {
-                        // OTSImpleManager.systemCurrent().resumeWrapper(cw);
+            }
+            finally
+            {
+                if (doSuspend)
+                {
+                    try
+                    {
+                        //            OTSImpleManager.systemCurrent().resumeWrapper(cw);
 
                         if (cw != null)
                             OTSImpleManager.current().resumeWrapper(cw);
                         else
                             OTSImpleManager.current().suspend();
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                     }
 
-                    // OTSImpleManager.systemCurrent().suspend();
+                    //            OTSImpleManager.systemCurrent().suspend();
                 }
             }
         }
 
         /*
-         * If there's no problem so far then call beforeCompletion on the
-         * underlying TwoPhaseCoordinator.
+         * If there's no problem so far then call beforeCompletion on the underlying TwoPhaseCoordinator.
          */
 
         if (!problem)
             problem = !super.beforeCompletion();
 
-        if (problem) {
+        if (problem)
+        {
             if (exp != null)
                 throw exp;
             else
-                throw new UNKNOWN(ExceptionCodes.SYNCHRONIZATION_EXCEPTION, CompletionStatus.COMPLETED_NO);
+                throw new UNKNOWN(ExceptionCodes.SYNCHRONIZATION_EXCEPTION,
+                        CompletionStatus.COMPLETED_NO);
         }
     }
 
-    protected void doAfterCompletion(org.omg.CosTransactions.Status myStatus) throws SystemException {
+    protected void doAfterCompletion (org.omg.CosTransactions.Status myStatus)
+            throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::doAfterCompletion for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::doAfterCompletion for "
+                    + get_uid());
         }
 
         if (myStatus == Status.StatusActive) {
@@ -1368,12 +1572,14 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         boolean problem = false;
         SystemException exp = null;
 
-        if (_synchs != null) {
+        if (_synchs != null)
+        {
             ControlWrapper cw = null;
             boolean doSuspend = false;
 
-            try {
-                // cw = OTSImpleManager.systemCurrent().getControlWrapper();
+            try
+            {
+                //        cw = OTSImpleManager.systemCurrent().getControlWrapper();
 
                 cw = OTSImpleManager.current().getControlWrapper();
 
@@ -1382,14 +1588,17 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                  * one we had during creation.
                  */
 
-                if ((cw == null) || (!controlHandle.equals(cw.getImple()))) {
-                    // OTSImpleManager.systemCurrent().resumeImple(controlHandle);
+                if ((cw == null) || (!controlHandle.equals(cw.getImple())))
+                {
+                    //            OTSImpleManager.systemCurrent().resumeImple(controlHandle);
 
                     OTSImpleManager.current().resumeImple(controlHandle);
 
                     doSuspend = true;
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 /*
                  * It should still be OK to make the call without a context
                  * because a Synchronization can only be associated with a
@@ -1404,11 +1613,10 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * happened.
              */
 
-            // afterCompletions should run in reverse order compared to
-            // beforeCompletions
+            // afterCompletions should run in reverse order compared to beforeCompletions
             Stack stack = new Stack();
             Iterator iterator = _synchs.iterator();
-            while (iterator.hasNext()) {
+            while(iterator.hasNext()) {
                 stack.push(iterator.next());
             }
 
@@ -1418,15 +1626,20 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * Regardless of failures, we must tell all synchronizations what
              * happened.
              */
-            while (!stack.isEmpty()) {
-                SynchronizationRecord value = (SynchronizationRecord) stack.pop();
+            while(!stack.isEmpty())
+            {
+                SynchronizationRecord value = (SynchronizationRecord)stack.pop();
                 Synchronization c = value.contents();
 
-                try {
+                try
+                {
                     c.after_completion(myStatus);
-                } catch (SystemException e) {
+                }
+                catch (SystemException e)
+                {
                     if (jtsLogger.logger.isTraceEnabled()) {
-                        jtsLogger.logger.trace("ArjunaTransactionImple.doAfterCompletion - caught exception " + e);
+                        jtsLogger.logger.trace("ArjunaTransactionImple.doAfterCompletion - caught exception "
+                                + e);
                     }
 
                     problem = true;
@@ -1442,29 +1655,34 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                 }
             }
 
-            if (doSuspend) {
-                try {
-                    // OTSImpleManager.systemCurrent().resumeWrapper(cw);
+            if (doSuspend)
+            {
+                try
+                {
+                    //            OTSImpleManager.systemCurrent().resumeWrapper(cw);
 
                     if (cw != null)
                         OTSImpleManager.current().resumeWrapper(cw);
                     else
                         OTSImpleManager.current().suspend();
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                 }
             }
 
             _synchs = null;
         }
 
-        boolean superProblem = !super.afterCompletion(
-                myStatus == Status.StatusCommitted ? ActionStatus.COMMITTED : ActionStatus.ABORTED);
+        boolean superProblem = !super.afterCompletion(myStatus == Status.StatusCommitted ? ActionStatus.COMMITTED : ActionStatus.ABORTED);
 
-        if (problem || superProblem) {
+        if (problem || superProblem)
+        {
             if (exp != null)
                 throw exp;
             else
-                throw new UNKNOWN(ExceptionCodes.SYNCHRONIZATION_EXCEPTION, CompletionStatus.COMPLETED_NO);
+                throw new UNKNOWN(ExceptionCodes.SYNCHRONIZATION_EXCEPTION,
+                        CompletionStatus.COMPLETED_NO);
         }
     }
 
@@ -1475,9 +1693,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * allowed, so we need some way to circumvent this.
      */
 
-    final void forceRollback() throws SystemException {
+    final void forceRollback () throws SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::forceRollback for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::forceRollback for "
+                    + get_uid());
         }
 
         if (super.status() == ActionStatus.RUNNING) // already aborted?
@@ -1487,18 +1707,25 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * top-level action.
              */
 
-            if (ArjunaTransactionImple._syncOn) {
-                if (TxControl.isBeforeCompletionWhenRollbackOnly()) {
-                    try {
+            if (ArjunaTransactionImple._syncOn)
+            {
+                if(TxControl.isBeforeCompletionWhenRollbackOnly())
+                {
+                    try
+                    {
                         if (_synchs != null)
                             doBeforeCompletion();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         /*
-                         * Don't do anything - we're about to rollback anyway!
-                         */
+                           * Don't do anything - we're about to rollback anyway!
+                           */
                     }
                 }
-            } else {
+            }
+            else
+            {
                 /*
                  * If we have any synchronizations delete them now. Can only be
                  * a top-level action.
@@ -1511,20 +1738,26 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * Remove uid of this action from parent even if remote.
              */
 
-            if (parentTransaction != null) {
+            if (parentTransaction != null)
+            {
                 parentTransaction.removeChildAction(this);
             }
 
             Abort();
 
-            if (ArjunaTransactionImple._syncOn) {
-                try {
-                    if (_synchs != null) {
+            if (ArjunaTransactionImple._syncOn)
+            {
+                try
+                {
+                    if (_synchs != null)
+                    {
                         currentStatus = determineStatus(this);
 
                         doAfterCompletion(currentStatus);
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                 }
             }
 
@@ -1532,60 +1765,65 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         }
     }
 
-    private final org.omg.CosTransactions.Status determineStatus(BasicAction whichAction) {
+    private final org.omg.CosTransactions.Status determineStatus (BasicAction whichAction)
+    {
         org.omg.CosTransactions.Status theStatus = org.omg.CosTransactions.Status.StatusUnknown;
 
-        if (whichAction != null) {
-            switch (whichAction.status()) {
-                case ActionStatus.INVALID : // probably locked, so try again
-                                            // later
-                    theStatus = Status.StatusUnknown;
-                    break;
-                case ActionStatus.RUNNING :
-                    theStatus = Status.StatusActive;
-                    break;
-                case ActionStatus.PREPARED :
-                    theStatus = Status.StatusPrepared;
-                    break;
-                case ActionStatus.COMMITTED :
-                case ActionStatus.H_COMMIT :
-                case ActionStatus.H_MIXED :
-                case ActionStatus.H_HAZARD :
-                    theStatus = Status.StatusCommitted;
-                    break;
-                case ActionStatus.ABORTED :
-                case ActionStatus.H_ROLLBACK :
-                    theStatus = Status.StatusRolledBack;
-                    break;
-                case ActionStatus.ABORT_ONLY :
-                    theStatus = Status.StatusMarkedRollback;
-                    break;
-                case ActionStatus.PREPARING :
-                    theStatus = Status.StatusPreparing;
-                    break;
-                case ActionStatus.COMMITTING :
-                    theStatus = Status.StatusCommitting;
-                    break;
-                case ActionStatus.ABORTING :
-                    theStatus = Status.StatusRollingBack;
-                    break;
-                default :
-                    theStatus = Status.StatusUnknown;
+        if (whichAction != null)
+        {
+            switch (whichAction.status())
+            {
+            case ActionStatus.INVALID: // probably locked, so try again later
+                theStatus = Status.StatusUnknown;
+                break;
+            case ActionStatus.RUNNING:
+                theStatus = Status.StatusActive;
+                break;
+            case ActionStatus.PREPARED:
+                theStatus = Status.StatusPrepared;
+                break;
+            case ActionStatus.COMMITTED:
+            case ActionStatus.H_COMMIT:
+            case ActionStatus.H_MIXED:
+            case ActionStatus.H_HAZARD:
+                theStatus = Status.StatusCommitted;
+                break;
+            case ActionStatus.ABORTED:
+            case ActionStatus.H_ROLLBACK:
+                theStatus = Status.StatusRolledBack;
+                break;
+            case ActionStatus.ABORT_ONLY:
+                theStatus = Status.StatusMarkedRollback;
+                break;
+            case ActionStatus.PREPARING:
+                theStatus = Status.StatusPreparing;
+                break;
+            case ActionStatus.COMMITTING:
+                theStatus = Status.StatusCommitting;
+                break;
+            case ActionStatus.ABORTING:
+                theStatus = Status.StatusRollingBack;
+                break;
+            default:
+                theStatus = Status.StatusUnknown;
             }
-        } else
+        }
+        else
             theStatus = Status.StatusNoTransaction;
 
         return theStatus;
     }
 
-    protected final AbstractRecord createOTSRecord(boolean propagate, Resource resource, Coordinator coord) {
+    protected final AbstractRecord createOTSRecord (boolean propagate, Resource resource, Coordinator coord)
+    {
         return createOTSRecord(propagate, resource, coord, null);
     }
 
-    protected final AbstractRecord createOTSRecord(boolean propagate, Resource resource, Coordinator coord,
-            Uid recCoordUid) {
+    protected final AbstractRecord createOTSRecord (boolean propagate, Resource resource, Coordinator coord, Uid recCoordUid)
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::createOTSRecord for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::createOTSRecord for "
+                    + get_uid());
         }
 
         /*
@@ -1601,38 +1839,53 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
         ArjunaSubtranAwareResource absRec = null;
         AbstractRecord corbaRec = null;
 
-        if (resource != null) {
-            try {
+        if (resource != null)
+        {
+            try
+            {
                 absRec = com.arjuna.ArjunaOTS.ArjunaSubtranAwareResourceHelper.narrow(resource);
 
                 if (absRec == null)
                     throw new BAD_PARAM(0, CompletionStatus.COMPLETED_NO);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // can't be an ArjunaOTS.ArjunaSubtranAwareResource
 
                 absRec = null;
             }
         }
 
-        if (absRec == null) {
-            corbaRec = new ResourceRecord(propagate, resource, coord, recCoordUid, this);
-        } else {
+        if (absRec == null)
+        {
+            corbaRec = new ResourceRecord(propagate, resource, coord,
+                    recCoordUid, this);
+        }
+        else
+        {
             Uid u = null;
             OTSAbstractRecord otsRec;
 
-            try {
+            try
+            {
                 otsRec = com.arjuna.ArjunaOTS.OTSAbstractRecordHelper.narrow(absRec);
 
                 if (otsRec == null)
                     throw new BAD_PARAM(0, CompletionStatus.COMPLETED_NO);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 otsRec = null;
             }
 
-            if (otsRec != null) {
-                try {
+            if (otsRec != null)
+            {
+                try
+                {
                     u = new Uid(otsRec.uid());
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     u = null;
                 }
 
@@ -1644,7 +1897,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
             if (u == null)
                 u = new Uid();
 
-            corbaRec = new ExtendedResourceRecord(propagate, u, absRec, coord, recCoordUid, this);
+            corbaRec = new ExtendedResourceRecord(propagate, u, absRec, coord,
+                    recCoordUid, this);
 
             otsRec = null;
             absRec = null;
@@ -1658,7 +1912,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * Is the calling thread the one which began this transaction?
      */
 
-    private final boolean checkAccess() {
+    private final boolean checkAccess ()
+    {
         if (Thread.currentThread() == transactionCreator)
             return true;
         else
@@ -1680,9 +1935,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * just call get_txcontext on the control!
      */
 
-    private final PropagationContext propagationContext() throws Unavailable, Inactive, SystemException {
+    private final PropagationContext propagationContext () throws Unavailable,
+            Inactive, SystemException
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::propagationContext for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::propagationContext for "
+                    + get_uid());
         }
 
         String theUid = null;
@@ -1709,7 +1967,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
          * it only applies to the top-level transaction.
          */
 
-        try {
+        try
+        {
             context.current.coord = controlHandle.get_coordinator();
             context.timeout = 0; // will reset later!
 
@@ -1718,11 +1977,15 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * anyone other than the creator from terminating a transaction.
              */
 
-            if (ArjunaTransactionImple._propagateTerminator) {
+            if (ArjunaTransactionImple._propagateTerminator)
+            {
                 context.current.term = controlHandle.get_terminator();
-            } else
+            }
+            else
                 context.current.term = null;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return null;
         }
 
@@ -1738,18 +2001,22 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         int index = 0;
 
-        while (currentControl != null) {
-            try {
+        while (currentControl != null)
+        {
+            try
+            {
                 ActionControl control = com.arjuna.ArjunaOTS.ActionControlHelper.narrow(currentControl);
 
-                if (control != null) {
+                if (control != null)
+                {
                     /*
                      * Must be an Arjuna control.
                      */
 
                     currentControl = control.getParentControl();
 
-                    if (currentControl != null) {
+                    if (currentControl != null)
+                    {
                         if (index == 0) // first time
                         {
                             context.parents = new TransIdentity[sequenceThreshold]; // initial
@@ -1790,11 +2057,15 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
                         index++;
 
-                        if (index >= sequenceThreshold) {
+                        if (index >= sequenceThreshold)
+                        {
                             sequenceThreshold = index + sequenceIncrement;
-                            context.parents = resizeHierarchy(context.parents, index + sequenceIncrement);
+                            context.parents = resizeHierarchy(context.parents, index
+                                    + sequenceIncrement);
                         }
-                    } else {
+                    }
+                    else
+                    {
                         /*
                          * Found the top-level transaction, so we can now setup
                          * the timeout value. All transactions will non-zero
@@ -1803,39 +2074,48 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
                          */
 
                         /*
-                         * By default we send over the time remaining (in
-                         * seconds), since that is what OTS 1.2 requires. For
-                         * backward compatibility with earlier versions, there's
-                         * a configurable option.
+                         * By default we send over the time remaining (in seconds), since that
+                         * is what OTS 1.2 requires. For backward compatibility with earlier
+                         * versions, there's a configurable option.
                          */
 
-                        if (_propagateRemainingTimeout) {
+                        if (_propagateRemainingTimeout)
+                        {
                             long timeInMills = TransactionReaper.transactionReaper().getRemainingTimeoutMills(control);
-                            context.timeout = (int) (timeInMills / 1000L);
-                        } else {
+                            context.timeout = (int)(timeInMills/1000L);
+                        }
+                        else
+                        {
                             context.timeout = TransactionReaper.transactionReaper().getTimeout(control);
                         }
                     }
 
                     control = null;
-                } else
+                }
+                else
                     throw new BAD_PARAM(0, CompletionStatus.COMPLETED_NO);
-            } catch (SystemException e) {
+            }
+            catch (SystemException e)
+            {
                 /*
                  * Not an Arjuna control!! Should not happen!!
                  */
 
                 currentControl = null;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
 
                 currentControl = null;
             }
         }
 
-        try {
+        try
+        {
             context.parents = resizeHierarchy(context.parents, index);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.resizeHierarchy", e);
 
             context = null;
@@ -1848,7 +2128,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * Watch out - we can resize down as well as up!
      */
 
-    private final TransIdentity[] resizeHierarchy(TransIdentity[] current, int size) {
+    private final TransIdentity[] resizeHierarchy (TransIdentity[] current, int size)
+    {
         if ((current == null) || (size == 0))
             return new TransIdentity[0];
 
@@ -1860,7 +2141,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
         System.arraycopy(current, 0, toReturn, 0, copySize);
 
-        if (copySize < size) {
+        if (copySize < size)
+        {
             for (int j = copySize; j < size; j++)
                 toReturn[j] = null;
         }
@@ -1873,9 +2155,11 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
      * transactions have been destroyed. Environment variable enabled?
      */
 
-    protected final void destroyAction() {
+    protected final void destroyAction ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ArjunaTransactionImple::destroyAction for " + get_uid());
+            jtsLogger.logger.trace("ArjunaTransactionImple::destroyAction for "
+                    + get_uid());
         }
 
         /*
@@ -1883,13 +2167,15 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
          * have created recovery coordinators.
          */
 
-        if (parentHandle == null) {
+        if (parentHandle == null)
+        {
             Object params[] = new Object[1];
 
             params[0] = this;
 
             RecoveryCreator.destroyAllRecoveryCoordinators(params);
-        } else
+        }
+        else
             parentHandle = null;
 
         /*
@@ -1901,7 +2187,8 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
          * (BasicAction.maintainHeuristics()) return; } }
          */
 
-        try {
+        try
+        {
             /*
              * We do not need to do worry about deleting the transaction in Java
              * as we do in C++ because of the way garbage collection works - the
@@ -1909,29 +2196,36 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
              * it alive.
              */
 
-            if (controlHandle != null) {
+            if (controlHandle != null)
+            {
                 OTSManager.destroyControl(controlHandle);
 
                 controlHandle = null;
             }
-        } catch (ActiveThreads ex1) {
+        }
+        catch (ActiveThreads ex1) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex1);
-        } catch (BadControl ex2) {
+        }
+        catch (BadControl ex2) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex2);
-        } catch (ActiveTransaction ex3) {
+        }
+        catch (ActiveTransaction ex3) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex3);
-        } catch (Destroyed ex4) {
+        }
+        catch (Destroyed ex4) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex4);
-        } catch (OutOfMemoryError ex5) {
+        }
+        catch (OutOfMemoryError ex5) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex5);
 
             /*
-             * Rather than try again after running gc simply return and let the
-             * user deal with it. May help with memory!
-             */
+                * Rather than try again after running gc simply return and let the
+                * user deal with it. May help with memory!
+                */
 
             System.gc();
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             jtsLogger.i18NLogger.warn_orbspecific_coordinator_generror("ArjunaTransactionImple.destroyAction", ex6);
         }
     }
@@ -1954,8 +2248,7 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
     private BasicAction rootAction;
 
     private SortedSet _synchs;
-    private SynchronizationRecord _currentRecord; // the most recently processed
-                                                    // Synchronization.
+    private SynchronizationRecord _currentRecord; // the most recently processed Synchronization.
 
     static final int _ipType = Arjuna.nameToXID(jtsPropertyManager.getJTSEnvironmentBean().getInterposition());
 
@@ -1967,34 +2260,33 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
 
     static final boolean _propagateTerminator = jtsPropertyManager.getJTSEnvironmentBean().isPropagateTerminator();
 
-    static final boolean _propagateRemainingTimeout = jtsPropertyManager.getJTSEnvironmentBean().isTimeoutPropagation(); // OTS
-                                                                                                                            // 1.2
-                                                                                                                            // onwards
-                                                                                                                            // supported
-                                                                                                                            // this.
+    static final boolean _propagateRemainingTimeout = jtsPropertyManager.getJTSEnvironmentBean().isTimeoutPropagation();  // OTS 1.2 onwards supported this.
 
-    private static final boolean XA_COMPLIANT = true; // if we ever want to
-                                                        // disable this then add
-                                                        // an mbean option.
+    private static final boolean XA_COMPLIANT = true; // if we ever want to disable this then add an mbean option.
 
-    public java.util.Map<Uid, String> getSynchronizations() {
-        if (_synchs != null) {
-            java.util.Map<Uid, String> synchMap = new java.util.HashMap<Uid, String>();
-            SynchronizationRecord[] synchs = (SynchronizationRecord[]) _synchs.toArray(new SynchronizationRecord[]{});
+    public java.util.Map<Uid, String> getSynchronizations()
+    {
+        if (_synchs != null)
+        {
+            java.util.Map<Uid, String> synchMap = new java.util.HashMap<Uid, String> ();
+            SynchronizationRecord[] synchs = (SynchronizationRecord[]) _synchs.toArray(new SynchronizationRecord[] {});
 
-            for (SynchronizationRecord synch : synchs) {
+            for (SynchronizationRecord synch : synchs)
+            {
                 Synchronization c = synch.contents();
                 String cn;
 
-                if (c._is_a(ManagedSynchronizationHelper.id())) {
+                if (c._is_a(ManagedSynchronizationHelper.id()))
+                {
                     ManagedSynchronization mc = ManagedSynchronizationHelper.narrow(c);
 
                     try {
-                        cn = mc.instanceName(); // implementationType() ;
+                        cn = mc.instanceName(); //implementationType() ;
                     } catch (Throwable t) {
                         cn = synch.getClass().getCanonicalName();
                     }
-                } else {
+                }
+                else {
                     cn = synch.getClass().getCanonicalName();
                 }
 

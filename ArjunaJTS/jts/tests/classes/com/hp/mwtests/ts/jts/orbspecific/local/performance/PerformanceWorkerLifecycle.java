@@ -19,7 +19,7 @@ public class PerformanceWorkerLifecycle<Void> implements WorkerLifecycle<Void> {
 
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
 
         try {
             myOA.initOA();

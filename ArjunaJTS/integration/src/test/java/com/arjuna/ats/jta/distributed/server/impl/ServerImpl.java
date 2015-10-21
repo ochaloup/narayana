@@ -70,14 +70,12 @@ public class ServerImpl implements LocalServer {
     private RecoveryManager _recoveryManager;
     private ClassLoader classLoaderForTransactionManager;
 
-    public void initialise(LookupProvider lookupProvider, String nodeName, int portOffset, String[] clusterBuddies,
-            ClassLoader classLoaderForTransactionManager) throws CoreEnvironmentBeanException, IOException,
-            SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    public void initialise(LookupProvider lookupProvider, String nodeName, int portOffset, String[] clusterBuddies, ClassLoader classLoaderForTransactionManager)
+            throws CoreEnvironmentBeanException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         this.nodeName = nodeName;
         this.classLoaderForTransactionManager = classLoaderForTransactionManager;
 
-        RecoveryEnvironmentBean recoveryEnvironmentBean = com.arjuna.ats.arjuna.common.recoveryPropertyManager
-                .getRecoveryEnvironmentBean();
+        RecoveryEnvironmentBean recoveryEnvironmentBean = com.arjuna.ats.arjuna.common.recoveryPropertyManager.getRecoveryEnvironmentBean();
         recoveryEnvironmentBean.setRecoveryBackoffPeriod(1);
 
         recoveryEnvironmentBean.setRecoveryInetAddress(InetAddress.getByName("localhost"));
@@ -95,55 +93,46 @@ public class ServerImpl implements LocalServer {
         recoveryEnvironmentBean.setExpiryScannerClassNames(expiryScannerClassNames);
         recoveryEnvironmentBean.setRecoveryActivators(null);
 
-        CoreEnvironmentBean coreEnvironmentBean = com.arjuna.ats.arjuna.common.arjPropertyManager
-                .getCoreEnvironmentBean();
+        CoreEnvironmentBean coreEnvironmentBean = com.arjuna.ats.arjuna.common.arjPropertyManager.getCoreEnvironmentBean();
         // coreEnvironmentBean.setSocketProcessIdPort(4714 + nodeName);
         coreEnvironmentBean.setNodeIdentifier(nodeName);
         // coreEnvironmentBean.setSocketProcessIdMaxPorts(1);
         coreEnvironmentBean.setProcessImplementationClassName(ManualProcessId.class.getName());
         coreEnvironmentBean.setPid(portOffset);
 
-        CoordinatorEnvironmentBean coordinatorEnvironmentBean = com.arjuna.ats.arjuna.common.arjPropertyManager
-                .getCoordinatorEnvironmentBean();
+        CoordinatorEnvironmentBean coordinatorEnvironmentBean = com.arjuna.ats.arjuna.common.arjPropertyManager.getCoordinatorEnvironmentBean();
         coordinatorEnvironmentBean.setEnableStatistics(false);
         coordinatorEnvironmentBean.setDefaultTimeout(300);
         coordinatorEnvironmentBean.setTransactionStatusManagerEnable(false);
         coordinatorEnvironmentBean.setDefaultTimeout(0);
 
-        ObjectStoreEnvironmentBean actionStoreObjectStoreEnvironmentBean = com.arjuna.common.internal.util.propertyservice.BeanPopulator
-                .getNamedInstance(com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean.class, null);
-        actionStoreObjectStoreEnvironmentBean.setObjectStoreDir(
-                System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
+        ObjectStoreEnvironmentBean actionStoreObjectStoreEnvironmentBean = com.arjuna.common.internal.util.propertyservice.BeanPopulator.getNamedInstance(
+                com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean.class, null);
+        actionStoreObjectStoreEnvironmentBean.setObjectStoreDir(System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
 
-        ObjectStoreEnvironmentBean stateStoreObjectStoreEnvironmentBean = com.arjuna.common.internal.util.propertyservice.BeanPopulator
-                .getNamedInstance(com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean.class, "stateStore");
-        stateStoreObjectStoreEnvironmentBean.setObjectStoreDir(
-                System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
+        ObjectStoreEnvironmentBean stateStoreObjectStoreEnvironmentBean = com.arjuna.common.internal.util.propertyservice.BeanPopulator.getNamedInstance(
+                com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean.class, "stateStore");
+        stateStoreObjectStoreEnvironmentBean.setObjectStoreDir(System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
 
         ObjectStoreEnvironmentBean communicationStoreObjectStoreEnvironmentBean = com.arjuna.common.internal.util.propertyservice.BeanPopulator
                 .getNamedInstance(com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean.class, "communicationStore");
-        communicationStoreObjectStoreEnvironmentBean.setObjectStoreDir(
-                System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
+        communicationStoreObjectStoreEnvironmentBean.setObjectStoreDir(System.getProperty("user.dir") + "/distributedjta-tests/tx-object-store/" + nodeName);
 
         JTAEnvironmentBean jTAEnvironmentBean = com.arjuna.ats.jta.common.jtaPropertyManager.getJTAEnvironmentBean();
         jTAEnvironmentBean.setLastResourceOptimisationInterface(org.jboss.tm.LastResource.class);
         jTAEnvironmentBean.setTransactionManagerClassName("com.arjuna.ats.jbossatx.jta.TransactionManagerDelegate");
+        jTAEnvironmentBean.setUserTransactionClassName("com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple");
         jTAEnvironmentBean
-                .setUserTransactionClassName("com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple");
-        jTAEnvironmentBean.setTransactionSynchronizationRegistryClassName(
-                "com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple");
+                .setTransactionSynchronizationRegistryClassName("com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple");
         List<String> xaRecoveryNodes = new ArrayList<String>();
         xaRecoveryNodes.add(nodeName);
         jTAEnvironmentBean.setXaRecoveryNodes(xaRecoveryNodes);
 
         List<String> xaResourceOrphanFilterClassNames = new ArrayList<String>();
 
-        xaResourceOrphanFilterClassNames
-                .add("com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter");
-        xaResourceOrphanFilterClassNames
-                .add("com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter");
-        xaResourceOrphanFilterClassNames
-                .add("com.arjuna.ats.internal.jta.recovery.arjunacore.SubordinateJTAXAResourceOrphanFilter");
+        xaResourceOrphanFilterClassNames.add("com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter");
+        xaResourceOrphanFilterClassNames.add("com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter");
+        xaResourceOrphanFilterClassNames.add("com.arjuna.ats.internal.jta.recovery.arjunacore.SubordinateJTAXAResourceOrphanFilter");
         jTAEnvironmentBean.setXaResourceOrphanFilterClassNames(xaResourceOrphanFilterClassNames);
         jTAEnvironmentBean.setXAResourceRecordWrappingPlugin(new XAResourceRecordWrappingPluginImpl());
 
@@ -163,8 +152,8 @@ public class ServerImpl implements LocalServer {
         transactionManagerService = new TransactionManagerService();
         TxControl txControl = new com.arjuna.ats.arjuna.coordinator.TxControl();
         transactionManagerService.setJbossXATerminator(new com.arjuna.ats.internal.jbossatx.jta.jca.XATerminator());
-        transactionManagerService.setTransactionSynchronizationRegistry(
-                new com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple());
+        transactionManagerService
+                .setTransactionSynchronizationRegistry(new com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple());
         transactionManagerService.create();
     }
 
@@ -233,15 +222,14 @@ public class ServerImpl implements LocalServer {
     }
 
     @Override
-    public Xid locateOrImportTransactionThenResumeIt(int remainingTimeout, Xid toResume)
-            throws XAException, IllegalStateException, SystemException, IOException {
+    public Xid locateOrImportTransactionThenResumeIt(int remainingTimeout, Xid toResume) throws XAException, IllegalStateException, SystemException,
+            IOException {
         Xid toReturn = null;
         Transaction transaction = rootTransactionsAsSubordinate.get(new SubordinateXidImple(toResume));
         if (transaction == null) {
             transaction = SubordinationManager.getTransactionImporter().getImportedTransaction(toResume);
             if (transaction == null) {
-                transaction = SubordinationManager.getTransactionImporter().importTransaction(toResume,
-                        remainingTimeout);
+                transaction = SubordinationManager.getTransactionImporter().importTransaction(toResume, remainingTimeout);
                 toReturn = ((TransactionImple) transaction).getTxId();
             }
         }
@@ -256,22 +244,19 @@ public class ServerImpl implements LocalServer {
 
     @Override
     public long getTimeLeftBeforeTransactionTimeout() throws RollbackException {
-        return ((TransactionTimeoutConfiguration) transactionManagerService.getTransactionManager())
-                .getTimeLeftBeforeTransactionTimeout(true);
+        return ((TransactionTimeoutConfiguration) transactionManagerService.getTransactionManager()).getTimeLeftBeforeTransactionTimeout(true);
     }
 
     @Override
     public void storeRootTransaction() throws SystemException {
-        TransactionImple transaction = ((TransactionImple) transactionManagerService.getTransactionManager()
-                .getTransaction());
+        TransactionImple transaction = ((TransactionImple) transactionManagerService.getTransactionManager().getTransaction());
         Xid txId = transaction.getTxId();
         rootTransactionsAsSubordinate.put(new SubordinateXidImple(txId), transaction);
     }
 
     @Override
     public Xid getCurrentXid() throws SystemException {
-        TransactionImple transaction = ((TransactionImple) transactionManagerService.getTransactionManager()
-                .getTransaction());
+        TransactionImple transaction = ((TransactionImple) transactionManagerService.getTransactionManager().getTransaction());
         return transaction.getTxId();
     }
 
@@ -281,8 +266,7 @@ public class ServerImpl implements LocalServer {
     }
 
     @Override
-    public ProxyXAResource generateProxyXAResource(String remoteServerName, Xid migratedXid)
-            throws SystemException, IOException {
+    public ProxyXAResource generateProxyXAResource(String remoteServerName, Xid migratedXid) throws SystemException, IOException {
         return new ProxyXAResource(nodeName, remoteServerName, migratedXid);
     }
 

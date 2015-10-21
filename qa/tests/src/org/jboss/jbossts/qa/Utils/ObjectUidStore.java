@@ -36,15 +36,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-public class ObjectUidStore {
-    public static void storeUid(String objectName, Uid objectUid) throws Exception {
+public class ObjectUidStore
+{
+    public static void storeUid(String objectName, Uid objectUid)
+            throws Exception
+    {
         Properties objectUids = new Properties();
 
-        try {
+        try
+        {
             FileInputStream objectUidsFileInputStream = new FileInputStream("ObjectUids");
             objectUids.load(objectUidsFileInputStream);
             objectUidsFileInputStream.close();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
         }
 
         objectUids.put(objectName, objectUid.toString());
@@ -54,7 +60,9 @@ public class ObjectUidStore {
         objectUidsFileOutputStream.close();
     }
 
-    public static void removeUid(String objectName) throws Exception {
+    public static void removeUid(String objectName)
+            throws Exception
+    {
         Properties objectUids = new Properties();
 
         FileInputStream objectUidsFileInputStream = new FileInputStream("ObjectUids");
@@ -68,7 +76,9 @@ public class ObjectUidStore {
         objectUidsFileOutputStream.close();
     }
 
-    public static Uid loadUid(String objectName) throws Exception {
+    public static Uid loadUid(String objectName)
+            throws Exception
+    {
         Uid objectUid = null;
 
         Properties objectUids = new Properties();
@@ -82,12 +92,16 @@ public class ObjectUidStore {
         return objectUid;
     }
 
-    public static void remove() {
-        try {
+    public static void remove()
+    {
+        try
+        {
             File file = new File("ObjectUids");
 
             file.delete();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Failed to remove \"ObjectUids\": " + exception);
         }
     }

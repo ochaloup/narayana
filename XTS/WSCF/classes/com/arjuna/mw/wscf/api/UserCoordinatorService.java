@@ -50,67 +50,60 @@ import com.arjuna.mw.wscf.exceptions.*;
  * coordination protocol.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: UserCoordinatorService.java,v 1.2 2005/05/19 12:13:20 nmcl Exp
- *          $
+ * @version $Id: UserCoordinatorService.java,v 1.2 2005/05/19 12:13:20 nmcl Exp $
  * @since 1.0.
  */
 
-public interface UserCoordinatorService {
+public interface UserCoordinatorService
+{
 
     /**
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
-     * @return the status of the current coordinator. If there is no activity
-     *         associated with the thread then NoActivity will be returned.
+     * @return the status of the current coordinator. If there is no
+     * activity associated with the thread then NoActivity
+     * will be returned.
      *
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status() throws SystemException;
+    public com.arjuna.mw.wsas.status.Status status () throws SystemException;
 
     /**
-     * If the application requires and if the coordination protocol supports it,
-     * then this method can be used to execute a coordination protocol on the
-     * currently enlisted participants at any time prior to the termination of
-     * the coordination scope.
+     * If the application requires and if the coordination protocol supports
+     * it, then this method can be used to execute a coordination protocol on
+     * the currently enlisted participants at any time prior to the termination
+     * of the coordination scope.
      *
-     * @param cs
-     *            The completion status to use when determining how to execute
-     *            the protocol.
+     * @param cs The completion status to use when determining
+     * how to execute the protocol.
      *
-     * @exception WrongStateException
-     *                Thrown if the coordinator is in a state the does not allow
-     *                coordination to occur.
-     * @exception ProtocolViolationException
-     *                Thrown if the protocol is violated in some manner during
-     *                execution.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception WrongStateException Thrown if the coordinator is in a state
+     * the does not allow coordination to occur.
+     * @exception ProtocolViolationException Thrown if the protocol is violated
+     * in some manner during execution.
+     * @exception SystemException Thrown if any other error occurs.
      *
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate(CompletionStatus cs)
-            throws WrongStateException, ProtocolViolationException, NoCoordinatorException, SystemException;
+    public Outcome coordinate (CompletionStatus cs) throws WrongStateException, ProtocolViolationException, NoCoordinatorException, SystemException;
 
     /**
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return the complete list of qualifiers that have been registered with
-     *         the current coordinator.
+     * the current coordinator.
      */
 
-    public Qualifier[] qualifiers() throws NoCoordinatorException, SystemException;
+    public Qualifier[] qualifiers () throws NoCoordinatorException, SystemException;
 
     /**
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return The unique identity of the current coordinator.
      */
 
-    public CoordinatorId identifier() throws NoCoordinatorException, SystemException;
-
+    public CoordinatorId identifier () throws NoCoordinatorException, SystemException;
+    
 }

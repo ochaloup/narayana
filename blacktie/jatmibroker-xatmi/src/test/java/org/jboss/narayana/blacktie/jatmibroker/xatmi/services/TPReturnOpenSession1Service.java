@@ -15,8 +15,7 @@ public class TPReturnOpenSession1Service implements Service {
 
     public Response tpservice(TPSVCINFO svcinfo) throws ConfigurationException, ConnectionException {
         log.info("testtpreturn_service_opensession1");
-        svcinfo.getConnection().tpacall(RunServer.getServiceNameTestTPReturn2(), svcinfo.getBuffer(),
-                svcinfo.getFlags());
+        svcinfo.getConnection().tpacall(RunServer.getServiceNameTestTPReturn2(), svcinfo.getBuffer(), svcinfo.getFlags());
         return new Response(Connection.TPSUCCESS, 0, svcinfo.getBuffer(), 0);
     }
 }

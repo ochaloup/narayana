@@ -86,8 +86,7 @@ public class TestTPSend extends TestCase {
         cd.tpsend(sendbuf, 0);
     }
 
-    // public void test_tpsend_non_TPCONV_session() throws ConnectionException,
-    // ConfigurationException {
+    // public void test_tpsend_non_TPCONV_session() throws ConnectionException, ConfigurationException {
     // server.tpadvertiseTestTPSendNonTPCONVService();
     //
     // try {

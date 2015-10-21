@@ -42,15 +42,14 @@ import java.net.URI;
 import java.util.Map;
 
 public class SpdyEnabledHttpServer {
-    public static HttpServer create(URI u, Map<String, String> initParams, String trustStoreFile, String trustStorePswd,
-            int threadPoolSize, boolean enableSpdy) throws IOException {
-        return create(u, ServletContainer.class, null, initParams, null, trustStoreFile, trustStorePswd, threadPoolSize,
-                enableSpdy);
+    public static HttpServer create(URI u, Map<String, String> initParams, String trustStoreFile, String trustStorePswd, int threadPoolSize, boolean enableSpdy) throws IOException {
+        return create(u, ServletContainer.class, null, initParams, null, trustStoreFile, trustStorePswd, threadPoolSize, enableSpdy);
     }
 
-    public static HttpServer create(URI u, Class<? extends Servlet> c, Servlet servlet, Map<String, String> initParams,
-            Map<String, String> contextInitParams, String trustStoreFile, String trustStorePswd, int poolSize,
-            boolean enableSpdy) throws IOException {
+    public static HttpServer create(URI u, Class<? extends Servlet> c, Servlet servlet,
+                                     Map<String, String> initParams, Map<String, String> contextInitParams,
+            String trustStoreFile, String trustStorePswd, int poolSize, boolean enableSpdy)
+            throws IOException {
         if (u == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
@@ -68,29 +67,27 @@ public class SpdyEnabledHttpServer {
 
         WebappContext context = new WebappContext("GrizzlyContext", path);
         ServletRegistration registration;
-        if (c != null) {
+        if(c != null) {
             registration = context.addServlet(c.getName(), c);
         } else {
             registration = context.addServlet(servlet.getClass().getName(), servlet);
         }
         registration.addMapping("/*");
 
-        if (contextInitParams != null) {
-            for (Map.Entry<String, String> e : contextInitParams.entrySet()) {
+        if(contextInitParams != null) {
+            for(Map.Entry<String, String> e : contextInitParams.entrySet()) {
                 context.setInitParameter(e.getKey(), e.getValue());
             }
         }
 
         if (initParams == null) {
-            // registration.setInitParameter(ClassPathResourceConfig.PROPERTY_CLASSPATH,
-            // System.getProperty("java.class.path").replace(File.pathSeparatorChar,
-            // ';'));
+//            registration.setInitParameter(ClassPathResourceConfig.PROPERTY_CLASSPATH,
+//                    System.getProperty("java.class.path").replace(File.pathSeparatorChar, ';'));
         } else {
             registration.setInitParameters(initParams);
         }
 
-        HttpServer server = createHttpServer(u, null, true, getSSLConfig(trustStoreFile, trustStorePswd), poolSize,
-                enableSpdy); // GrizzlyHttpServerFactory.createHttpServer(u);
+        HttpServer server = createHttpServer(u, null, true, getSSLConfig(trustStoreFile, trustStorePswd), poolSize, enableSpdy); //GrizzlyHttpServerFactory.createHttpServer(u);
 
         context.deploy(server);
         return server;
@@ -110,17 +107,22 @@ public class SpdyEnabledHttpServer {
         listener.registerAddOn(spdyAddOn);
     }
 
-    private static HttpServer createHttpServer(final URI uri, final GrizzlyHttpContainer handler, final boolean secure,
-            final SSLEngineConfigurator sslEngineConfigurator, final int poolSize, final boolean enableSpdy)
+    private static HttpServer createHttpServer(final URI uri,
+                                               final GrizzlyHttpContainer handler,
+                                               final boolean secure,
+                                               final SSLEngineConfigurator sslEngineConfigurator,
+                                               final int poolSize,
+                                               final boolean enableSpdy)
             throws ProcessingException {
-        final String host = (uri.getHost() == null) ? NetworkListener.DEFAULT_NETWORK_HOST : uri.getHost();
+        final String host = (uri.getHost() == null) ? NetworkListener.DEFAULT_NETWORK_HOST
+                : uri.getHost();
         final int port = (uri.getPort() == -1) ? 80 : uri.getPort();
         final HttpServer server = new HttpServer();
         final NetworkListener listener = new NetworkListener("grizzly", host, port);
 
         listener.setSecure(secure);
 
-        if (sslEngineConfigurator != null) {
+        if(sslEngineConfigurator != null) {
             listener.setSSLEngineConfig(sslEngineConfigurator);
         }
 
@@ -155,5 +157,6 @@ public class SpdyEnabledHttpServer {
 
         return server;
     }
+
 
 }

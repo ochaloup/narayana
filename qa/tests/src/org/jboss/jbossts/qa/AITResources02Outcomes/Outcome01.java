@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.AITResources02Outcomes;
  * $Id: Outcome01.java,v 1.2 2003/06/26 11:43:13 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Outcome01 {
-    public static void main(String[] args) {
-        try {
+public class Outcome01
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
 
             int expectedValue = Integer.parseInt(args[args.length - 2]);
@@ -75,21 +79,29 @@ public class Outcome01 {
             IntHolder value = new IntHolder();
             counter.get(value, null);
 
-            if (value.value == expectedValue) {
+            if (value.value == expectedValue)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Outcome01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Outcome01.main: " + exception);
             exception.printStackTrace(System.err);
         }

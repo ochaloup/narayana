@@ -42,50 +42,61 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 /**
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: TxContextImple.java,v 1.2.20.1 2005/11/22 10:36:16 kconner Exp
- *          $
+ * @version $Id: TxContextImple.java,v 1.2.20.1 2005/11/22 10:36:16 kconner Exp $
  */
 
-public class TxContextImple implements TxContext {
+public class TxContextImple implements TxContext
+{
 
-    public TxContextImple(CoordinationContextType ctx) {
+    public TxContextImple(CoordinationContextType ctx)
+    {
         _context = new ContextImple(ctx);
     }
 
-    public TxContextImple(Context context) {
+    public TxContextImple(Context context)
+    {
         _context = context;
     }
 
-    public boolean valid() {
-        return (_context != null);
+    public boolean valid ()
+    {
+        return (_context != null) ;
     }
 
-    public boolean equals(Object obj) {
-        if (obj instanceof TxContextImple) {
+    public boolean equals (Object obj)
+    {
+        if (obj instanceof TxContextImple)
+        {
             TxContextImple compare = (TxContextImple) obj;
 
             return compare.context().equals(_context);
-        } else
+        }
+        else
             return false;
     }
 
-    public final String identifier() {
+    public final String identifier ()
+    {
         final String value = _context.getCoordinationContext().getIdentifier().getValue();
-        if ((value != null) && value.startsWith("urn:")) {
-            return value.substring(4);
+        if ((value != null) && value.startsWith("urn:"))
+        {
+            return value.substring(4) ;
         }
-        return value;
+        return value ;
     }
 
-    public final Context context() {
+    public final Context context ()
+    {
         return _context;
     }
 
-    public String toString() {
+    public String toString ()
+    {
         return _context.toString();
     }
 
-    public boolean isSecure() {
+    public boolean isSecure()
+    {
         if (valid()) {
             CoordinationContextType coordinationContextType = _context.getCoordinationContext();
             W3CEndpointReference epref = coordinationContextType.getRegistrationService();

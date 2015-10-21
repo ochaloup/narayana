@@ -56,14 +56,18 @@ package org.jboss.jbossts.qa.SupportTests01Clients;
  * $Id: Client02.java,v 1.2 2003/06/26 11:45:05 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.SupportTests01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client02 {
-    public static void main(String[] args) {
-        try {
+public class Client02
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -72,21 +76,29 @@ public class Client02 {
 
             service.test();
 
-            if (service.isCorrect()) {
+            if (service.isCorrect())
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }

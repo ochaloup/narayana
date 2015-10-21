@@ -16,42 +16,50 @@ import com.arjuna.wscf.tests.WarDeployment;
 
 @RunWith(Arquillian.class)
 public class SuspendResumeTest {
-
+    
     @Deployment
     public static WebArchive createDeployment() {
         return WarDeployment.getDeployment();
     }
-
+    
     @Test
-    public void testSuspendResume() throws Exception {
+    public void testSuspendResume()
+            throws Exception
+    {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try {
-            ua.begin("TwoPhase11HLS");
+    try
+    {
+        ua.begin("TwoPhase11HLS");
 
-            System.out.println("Started: " + ua.identifier() + "\n");
+        System.out.println("Started: "+ua.identifier()+"\n");
 
-            ActivityHierarchy hier = ua.suspend();
+        ActivityHierarchy hier = ua.suspend();
 
-            System.out.println("Suspended: " + hier + "\n");
+        System.out.println("Suspended: "+hier+"\n");
 
-            if (ua.currentActivity() != null) {
-                WSCF11TestUtils.cleanup(ua);
-                fail("Hierarchy still active");
-            } else {
-                ua.resume(hier);
-
-                System.out.println("Resumed: " + hier + "\n");
-
-                ua.cancel();
-
-                System.out.println("Cancelled");
-            }
-        } catch (Exception ex) {
+        if (ua.currentActivity() != null)
+        {
             WSCF11TestUtils.cleanup(ua);
-            throw ex;
+            fail("Hierarchy still active");
         }
+        else
+        {
+            ua.resume(hier);
+
+            System.out.println("Resumed: "+hier+"\n");
+
+            ua.cancel();
+
+            System.out.println("Cancelled");
+        }
+    }
+    catch (Exception ex)
+    {
+        WSCF11TestUtils.cleanup(ua);
+        throw ex;
+    }
     }
 }

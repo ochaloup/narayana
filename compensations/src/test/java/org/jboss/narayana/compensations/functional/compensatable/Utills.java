@@ -54,8 +54,7 @@ public class Utills {
         if (txContext == null || currentTx == null) {
             Assert.fail();
         }
-        Assert.assertTrue(
-                "Expected transaction to be the same, but it wasn't. '" + txContext + "' != '" + currentTx + "'",
+        Assert.assertTrue("Expected transaction to be the same, but it wasn't. '" + txContext + "' != '" + currentTx + "'",
                 txContext.equals(currentTx));
     }
 
@@ -65,8 +64,7 @@ public class Utills {
         if (txContext == null || currentTx == null) {
             return;
         }
-        Assert.assertTrue(
-                "Expected transaction to be different, but it wasn't. '" + txContext + "' == '" + currentTx + "'",
+        Assert.assertTrue("Expected transaction to be different, but it wasn't. '" + txContext + "' == '" + currentTx + "'",
                 !txContext.equals(currentTx));
     }
 

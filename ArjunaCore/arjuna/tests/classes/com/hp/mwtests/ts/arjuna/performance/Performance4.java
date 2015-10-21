@@ -41,9 +41,11 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.internal.arjuna.objectstore.TwoPhaseVolatileStore;
 import com.hp.mwtests.ts.arjuna.resources.BasicRecord;
 
-public class Performance4 {
+public class Performance4
+{
     @Test
-    public void test() {
+    public void test()
+    {
         int threadCount = 10;
         int batchSize = 100;
         int warmUpCount = 0;
@@ -52,8 +54,9 @@ public class Performance4 {
         arjPropertyManager.getCoordinatorEnvironmentBean().setCommitOnePhase(false);
         arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreType(TwoPhaseVolatileStore.class.getName());
 
-        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1").maxTestTime(0L)
-                .numberOfCalls(numberOfTransactions).numberOfThreads(threadCount).batchSize(batchSize)
+         Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1")
+                .maxTestTime(0L).numberOfCalls(numberOfTransactions)
+                .numberOfThreads(threadCount).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker);
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());
@@ -61,8 +64,7 @@ public class Performance4 {
 
         System.out.printf("%s%n", measurement.getInfo());
 
-        System.out
-                .println("time for " + numberOfTransactions + " write transactions is " + measurement.getTotalMillis());
+        System.out.println("time for " + numberOfTransactions + " write transactions is " + measurement.getTotalMillis());
         System.out.println("number of transactions: " + numberOfTransactions);
         System.out.println("throughput: " + (float) (numberOfTransactions / (measurement.getTotalMillis() / 1000.0)));
     }
@@ -80,7 +82,8 @@ public class Performance4 {
                     A.add(new BasicRecord());
 
                     A.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     if (config.getNumberOfErrors() == 0)
                         e.printStackTrace();
 

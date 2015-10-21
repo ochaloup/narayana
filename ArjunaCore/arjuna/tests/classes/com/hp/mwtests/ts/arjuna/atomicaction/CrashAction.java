@@ -39,18 +39,20 @@ import com.hp.mwtests.ts.arjuna.resources.CrashRecord;
 import com.hp.mwtests.ts.arjuna.resources.CrashRecord.CrashLocation;
 import com.hp.mwtests.ts.arjuna.resources.CrashRecord.CrashType;
 
-public class CrashAction {
+public class CrashAction
+{
     @Test
-    public void test() {
+    public void test()
+    {
         AtomicAction A = new AtomicAction();
-
+        
         A.begin();
-
+        
         A.add(new CrashRecord(CrashLocation.NoCrash, CrashType.Normal));
         A.add(new CrashRecord(CrashLocation.CrashInCommit, CrashType.HeuristicHazard));
-
+        
         int outcome = A.commit();
-
-        System.out.println("Transaction " + A + " committed with " + ActionStatus.stringForm(outcome));
+        
+        System.out.println("Transaction "+A+" committed with "+ActionStatus.stringForm(outcome));
     }
 }

@@ -37,14 +37,17 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import org.jboss.jbossts.qa.CrashRecovery13Impls.ExampleXAResource;
 
-public class Test03 {
-    public static void main(String[] args) throws Exception {
+public class Test03
+{
+    public static void main(String[] args) throws Exception
+    {
         System.setProperty("XAConnectionRecovery1", "ExampleXAConnectionRecovery");
 
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
@@ -53,23 +56,30 @@ public class Test03 {
 
             ORBManager.setORB(myORB);
             ORBManager.setPOA(myOA);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Initialisation failed: " + e);
 
             System.exit(0);
         }
 
-        com.arjuna.ats.internal.arjuna.recovery.RecoveryManagerImple rm = new com.arjuna.ats.internal.arjuna.recovery.RecoveryManagerImple(
-                true);
+        com.arjuna.ats.internal.arjuna.recovery.RecoveryManagerImple rm = new com.arjuna.ats.internal.arjuna.recovery.RecoveryManagerImple(true);
 
-        try {
+        try
+        {
             Thread.sleep(140000);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
         }
 
-        if (ExampleXAResource.passed) {
+        if (ExampleXAResource.passed)
+        {
             System.out.println("Passed.");
-        } else {
+        }
+        else
+        {
             System.out.println("Failed.");
         }
         System.clearProperty("XAConnectionRecovery1");

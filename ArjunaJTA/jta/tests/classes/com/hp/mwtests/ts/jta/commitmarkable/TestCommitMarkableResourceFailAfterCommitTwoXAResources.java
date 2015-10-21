@@ -45,7 +45,8 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends FailAfterCommitBase {
+public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends
+        FailAfterCommitBase {
 
     private JDBCConnectableResource nonXAResource;
     private boolean failed = false;
@@ -78,14 +79,14 @@ public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends Fai
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     recoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
                 } else if (m instanceof XARecoveryModule) {
-                    XARecoveryModule xarm = (XARecoveryModule) m;
+                    XARecoveryModule  xarm = (XARecoveryModule) m;
                     xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
                         public boolean initialise(String p) throws Exception {
                             return true;
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[]{xaResource};
+                            return new XAResource[] {xaResource};
                         }
                     });
                 }
@@ -106,7 +107,8 @@ public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends Fai
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    nonXAResource = new JDBCConnectableResource(localJDBCConnection);
+                    nonXAResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(nonXAResource);
 
                     xaResource = new SimpleXAResource();
@@ -114,7 +116,8 @@ public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends Fai
                     xaResource2 = new SimpleXAResource2();
                     tm.getTransaction().enlistResource(xaResource2);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
 
                     tm.commit();
                 } catch (ExecuteException t) {
@@ -131,13 +134,15 @@ public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends Fai
 
         assertFalse(failed);
 
-        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource)
+                .getStartedXid();
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Check if the item is still in the db
         recoveryModule.periodicWorkFirstPass();
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
         recoveryModule.periodicWorkSecondPass();
 
         // Now we need to correctly complete the transaction
@@ -147,10 +152,12 @@ public class TestCommitMarkableResourceFailAfterCommitTwoXAResources extends Fai
         // second phase of the CommitMarkableResourceRecoveryModule will have
         // executed before the AtomicActionRecoveryModule has been able to GC
         // it
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
         recoveryModule.periodicWorkFirstPass();
         recoveryModule.periodicWorkSecondPass();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
 
         assertTrue(xaResource.wasCommitted());
         assertFalse(xaResource.wasRolledback());

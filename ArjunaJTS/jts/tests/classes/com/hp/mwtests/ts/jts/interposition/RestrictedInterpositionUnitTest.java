@@ -42,23 +42,25 @@ import com.arjuna.ats.internal.jts.interposition.resources.restricted.Restricted
 import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class RestrictedInterpositionUnitTest extends TestBase {
+public class RestrictedInterpositionUnitTest extends TestBase
+{
     @Test
-    public void test() throws Exception {
+    public void test () throws Exception
+    {
         RestrictedInterposition inter = new RestrictedInterposition();
-
+        
         OTSImpleManager.current().begin();
         OTSImpleManager.current().begin();
-
+        
         PropagationContext ctx = OTSImpleManager.current().get_control().get_coordinator().get_txcontext();
-
+        
         ControlImple cont = inter.setupHierarchy(ctx);
-
+        
         RestrictedInterpositionCreator creator = new RestrictedInterpositionCreator();
-
-        assertTrue(creator.recreateLocal(ctx) != null);
+        
+        assertTrue(creator.recreateLocal(ctx) != null);       
         assertTrue(creator.recreate(ctx) != null);
-
+        
         OTSImpleManager.current().rollback();
         OTSImpleManager.current().rollback();
     }

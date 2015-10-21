@@ -27,9 +27,11 @@ import org.junit.Test;
 
 import com.arjuna.ats.arjuna.coordinator.TxControl;
 
-public class TxControlUnitTest {
+public class TxControlUnitTest
+{
     @Test
-    public void testStartStop() throws Exception {
+    public void testStartStop() throws Exception
+    {
         TxControl.enable();
 
         assertTrue(TxControl.isEnabled());

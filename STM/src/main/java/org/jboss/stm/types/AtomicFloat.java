@@ -28,16 +28,17 @@ import org.jboss.stm.annotations.WriteLock;
 // TODO maybe pull all of this into a separate jar
 
 @Transactional
-public interface AtomicFloat {
+public interface AtomicFloat
+{
     @WriteLock
-    public void set(float val);
-
+    public void set (float val);
+    
     @ReadLock
-    public float get();
-
+    public float get ();
+    
     @WriteLock
-    public AtomicFloat add(AtomicFloat obj);
-
+    public AtomicFloat add (AtomicFloat obj);
+    
     @WriteLock
-    public AtomicFloat subtract(AtomicFloat obj);
+    public AtomicFloat subtract (AtomicFloat obj);
 }

@@ -58,23 +58,28 @@ public class CompletionCoordinatorTest extends BaseWSTTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(TestCompletionInitiatorCallback.class);
+        return WarDeployment.getDeployment(
+                TestCompletionInitiatorCallback.class);
     }
 
     @Before
-    public void setUp() throws Exception {
-    }
+    public void setUp()
+            throws Exception
+            {
+            }
 
     @Test
-    public void testSendCommitted() throws Exception {
-        final String messageId = "123456";
-        final String instanceIdentifier = "testSendCommitted";
-        final W3CEndpointReference completionInitiatorEndpoint = TestUtil
-                .getCompletionInitiatorEndpoint(instanceIdentifier);
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId);
+    public void testSendCommitted()
+            throws Exception
+            {
+        final String messageId = "123456" ;
+        final String instanceIdentifier = "testSendCommitted" ;
+        final W3CEndpointReference completionInitiatorEndpoint = TestUtil.getCompletionInitiatorEndpoint(instanceIdentifier);
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId) ;
 
         final TestCompletionInitiatorCallback callback = new TestCompletionInitiatorCallback() {
-            public void committed(final Notification committed, final MAP map, final ArjunaContext arjunaContext) {
+            public void committed(final Notification committed, final MAP map, final ArjunaContext arjunaContext)
+            {
                 assertEquals(map.getTo(), TestUtil.completionInitiatorServiceURI);
                 assertNull(map.getFrom());
                 assertNotNull(map.getFaultTo());
@@ -83,35 +88,39 @@ public class CompletionCoordinatorTest extends BaseWSTTest {
                 assertTrue(AddressingHelper.isNoneReplyTo(map));
                 assertEquals(map.getMessageID(), messageId);
 
-                assertNotNull(arjunaContext);
-                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier());
+                assertNotNull(arjunaContext) ;
+                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
             }
         };
-        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor();
-        initiator.registerCallback(instanceIdentifier, callback);
+        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor() ;
+        initiator.registerCallback(instanceIdentifier, callback) ;
 
-        try {
-            CompletionInitiatorClient.getClient().sendCommitted(completionInitiatorEndpoint, map,
-                    new InstanceIdentifier("sender"));
-            callback.waitUntilTriggered();
-        } finally {
-            initiator.removeCallback(instanceIdentifier);
+        try
+        {
+            CompletionInitiatorClient.getClient().sendCommitted(completionInitiatorEndpoint, map, new InstanceIdentifier("sender")) ;
+            callback.waitUntilTriggered() ;
+        }
+        finally
+        {
+            initiator.removeCallback(instanceIdentifier) ;
         }
 
-        assertTrue(callback.hasTriggered());
-        assertFalse(callback.hasFailed());
-    }
+        assertTrue(callback.hasTriggered()) ;
+        assertFalse(callback.hasFailed()) ;
+            }
 
     @Test
-    public void testSendAborted() throws Exception {
-        final String messageId = "123456";
-        final String instanceIdentifier = "testSendAborted";
-        final W3CEndpointReference completionInitiatorEndpoint = TestUtil
-                .getCompletionInitiatorEndpoint(instanceIdentifier);
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId);
+    public void testSendAborted()
+            throws Exception
+            {
+        final String messageId = "123456" ;
+        final String instanceIdentifier = "testSendAborted" ;
+        final W3CEndpointReference completionInitiatorEndpoint = TestUtil.getCompletionInitiatorEndpoint(instanceIdentifier);
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId) ;
 
         final TestCompletionInitiatorCallback callback = new TestCompletionInitiatorCallback() {
-            public void aborted(final Notification aborted, final MAP map, final ArjunaContext arjunaContext) {
+            public void aborted(final Notification aborted, final MAP map, final ArjunaContext arjunaContext)
+            {
                 assertEquals(map.getTo(), TestUtil.completionInitiatorServiceURI);
                 assertNull(map.getFrom());
                 assertNotNull(map.getFaultTo());
@@ -121,40 +130,44 @@ public class CompletionCoordinatorTest extends BaseWSTTest {
                 assertNotNull(map.getMessageID());
                 assertEquals(map.getMessageID(), messageId);
 
-                assertNotNull(arjunaContext);
-                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier());
+                assertNotNull(arjunaContext) ;
+                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
             }
         };
-        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor();
-        initiator.registerCallback(instanceIdentifier, callback);
+        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor() ;
+        initiator.registerCallback(instanceIdentifier, callback) ;
 
-        try {
-            CompletionInitiatorClient.getClient().sendAborted(completionInitiatorEndpoint, map,
-                    new InstanceIdentifier("sender"));
-            callback.waitUntilTriggered();
-        } finally {
-            initiator.removeCallback(instanceIdentifier);
+        try
+        {
+            CompletionInitiatorClient.getClient().sendAborted(completionInitiatorEndpoint, map, new InstanceIdentifier("sender")) ;
+            callback.waitUntilTriggered() ;
+        }
+        finally
+        {
+            initiator.removeCallback(instanceIdentifier) ;
         }
 
-        assertTrue(callback.hasTriggered());
-        assertFalse(callback.hasFailed());
-    }
+        assertTrue(callback.hasTriggered()) ;
+        assertFalse(callback.hasFailed()) ;
+            }
 
     @Test
-    public void testSendError() throws Exception {
-        final String messageId = "123456";
-        final String reason = "testSendErrorReason";
-        final String instanceIdentifier = "testSendError";
-        final W3CEndpointReference completionInitiatorEndpoint = TestUtil
-                .getCompletionInitiatorEndpoint(instanceIdentifier);
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId);
+    public void testSendError()
+            throws Exception
+            {
+        final String messageId = "123456" ;
+        final String reason = "testSendErrorReason" ;
+        final String instanceIdentifier = "testSendError" ;
+        final W3CEndpointReference completionInitiatorEndpoint = TestUtil.getCompletionInitiatorEndpoint(instanceIdentifier);
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionInitiatorServiceURI, messageId) ;
 
-        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER;
-        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME;
-        final SoapFault soapFault = new SoapFault11(soapFaultType, subcode, reason);
+        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER ;
+        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME ;
+        final SoapFault soapFault = new SoapFault11(soapFaultType, subcode, reason) ;
 
         final TestCompletionInitiatorCallback callback = new TestCompletionInitiatorCallback() {
-            public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext) {
+            public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext)
+            {
                 assertEquals(map.getTo(), TestUtil.completionInitiatorServiceURI);
                 assertNull(map.getFrom());
                 assertNull(map.getFaultTo());
@@ -163,31 +176,35 @@ public class CompletionCoordinatorTest extends BaseWSTTest {
                 assertNotNull(map.getMessageID());
                 assertEquals(map.getMessageID(), messageId);
 
-                assertNotNull(arjunaContext);
-                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier());
+                assertNotNull(arjunaContext) ;
+                assertEquals(instanceIdentifier, arjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
 
-                assertNotNull(soapFault);
-                assertEquals(soapFaultType, soapFault.getSoapFaultType());
-                assertEquals(subcode, soapFault.getSubcode());
-                assertEquals(reason, soapFault.getReason());
+                assertNotNull(soapFault) ;
+                assertEquals(soapFaultType, soapFault.getSoapFaultType()) ;
+                assertEquals(subcode, soapFault.getSubcode()) ;
+                assertEquals(reason, soapFault.getReason()) ;
             }
         };
-        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor();
-        initiator.registerCallback(instanceIdentifier, callback);
+        final CompletionInitiatorProcessor initiator = CompletionInitiatorProcessor.getProcessor() ;
+        initiator.registerCallback(instanceIdentifier, callback) ;
 
-        try {
-            CompletionInitiatorClient.getClient().sendSoapFault(completionInitiatorEndpoint, map, soapFault,
-                    new InstanceIdentifier("sender"));
-            callback.waitUntilTriggered();
-        } finally {
-            initiator.removeCallback(instanceIdentifier);
+        try
+        {
+            CompletionInitiatorClient.getClient().sendSoapFault(completionInitiatorEndpoint, map, soapFault, new InstanceIdentifier("sender")) ;
+            callback.waitUntilTriggered() ;
+        }
+        finally
+        {
+            initiator.removeCallback(instanceIdentifier) ;
         }
 
-        assertTrue(callback.hasTriggered());
-        assertFalse(callback.hasFailed());
-    }
+        assertTrue(callback.hasTriggered()) ;
+        assertFalse(callback.hasFailed()) ;
+            }
 
     @After
-    public void tearDown() throws Exception {
-    }
+    public void tearDown()
+            throws Exception
+            {
+            }
 }

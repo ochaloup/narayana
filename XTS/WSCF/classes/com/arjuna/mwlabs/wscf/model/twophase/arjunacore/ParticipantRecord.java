@@ -56,7 +56,9 @@ import java.io.PrintWriter;
  * @version $Id: ParticipantRecord.java,v 1.11 2005/06/09 09:41:27 nmcl Exp $
  */
 
-public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.AbstractRecord {
+public class ParticipantRecord extends
+        com.arjuna.ats.arjuna.coordinator.AbstractRecord
+{
 
     /**
      * Constructor.
@@ -66,7 +68,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public ParticipantRecord(Participant theResource, Uid id) {
+    public ParticipantRecord (Participant theResource, Uid id)
+    {
         super(id, null, ObjectType.ANDPERSISTENT);
 
         _resourceHandle = theResource;
@@ -81,7 +84,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * Override AbstractRecord.propagateOnCommit
      */
 
-    public boolean propagateOnCommit() {
+    public boolean propagateOnCommit ()
+    {
         return true;
     }
 
@@ -89,7 +93,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * The type of this abstract record.
      */
 
-    public int typeIs() {
+    public int typeIs ()
+    {
         // TODO add specific record type.
 
         return RecordType.XTS_WSAT_RECORD;
@@ -99,7 +104,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * The internal value.
      */
 
-    public Object value() {
+    public Object value ()
+    {
         return _resourceHandle;
     }
 
@@ -108,7 +114,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public void setValue(Object o) {
+    public void setValue (Object o)
+    {
         wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_2();
     }
 
@@ -118,13 +125,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      */
 
     // TODO
-    public int nestedAbort() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedAbort ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_3(order(), ex6);
 
             ex6.printStackTrace();
@@ -138,13 +150,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int nestedCommit() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_4(order(), ex6);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -156,13 +173,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int nestedPrepare() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedPrepare ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.PREPARE_NOTOK;
-        } catch (Exception e6) {
+        }
+        catch (Exception e6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_5(order(), e6);
 
             return TwoPhaseOutcome.HEURISTIC_HAZARD;
@@ -174,30 +196,48 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int topLevelAbort() {
-        try {
-            if (_resourceHandle != null) {
-                try {
+    public int topLevelAbort ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
                     if (!_rolledback)
                         _resourceHandle.cancel();
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (WrongStateException ex) {
+                }
+                catch (WrongStateException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (HeuristicHazardException ex) {
+                }
+                catch (HeuristicHazardException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (HeuristicMixedException ex) {
+                }
+                catch (HeuristicMixedException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_MIXED;
-                } catch (HeuristicConfirmException ex) {
+                }
+                catch (HeuristicConfirmException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_COMMIT;
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
                 }
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_6(order(), ex6);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -209,36 +249,55 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int topLevelCommit() {
-        try {
-            if (_resourceHandle != null) {
-                try {
+    public int topLevelCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
                     if (!_rolledback && !_readonly)
                         _resourceHandle.confirm();
 
                     if (_rolledback)
                         throw new HeuristicHazardException();
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (WrongStateException ex) {
-                    return TwoPhaseOutcome.NOT_PREPARED; // should be
-                                                            // HEURISTIC_HAZARD?
-                } catch (HeuristicHazardException ex) {
+                }
+                catch (WrongStateException ex)
+                {
+                    return TwoPhaseOutcome.NOT_PREPARED; // should be HEURISTIC_HAZARD?
+                }
+                catch (HeuristicHazardException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (HeuristicMixedException ex) {
+                }
+                catch (HeuristicMixedException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_MIXED;
-                } catch (HeuristicCancelException ex) {
+                }
+                catch (HeuristicCancelException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
-                } catch (SystemCommunicationException ex) {
+                }
+                catch(SystemCommunicationException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
                 }
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_7(order(), ex6);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -250,50 +309,73 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int topLevelPrepare() {
-        try {
-            if (_resourceHandle != null) {
+    public int topLevelPrepare ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 if (_rolledback)
                     return TwoPhaseOutcome.PREPARE_NOTOK;
 
                 if (_readonly)
                     return TwoPhaseOutcome.PREPARE_READONLY;
 
-                try {
+                try
+                {
                     Vote res = _resourceHandle.prepare();
 
-                    if (res instanceof VoteConfirm) {
+                    if (res instanceof VoteConfirm)
+                    {
                         return TwoPhaseOutcome.PREPARE_OK;
-                    } else {
-                        if (res instanceof VoteReadOnly) {
+                    }
+                    else
+                    {
+                        if (res instanceof VoteReadOnly)
+                        {
                             _readonly = true;
 
                             return TwoPhaseOutcome.PREPARE_READONLY;
-                        } else {
+                        }
+                        else
+                        {
                             _rolledback = true;
 
                             return TwoPhaseOutcome.PREPARE_NOTOK;
                         }
                     }
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (WrongStateException ex) {
+                }
+                catch (WrongStateException ex)
+                {
                     return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (HeuristicHazardException ex) {
-                    return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (HeuristicMixedException ex) {
-                    return TwoPhaseOutcome.HEURISTIC_MIXED;
-                } catch (SystemCommunicationException ex) {
-                    // if prepare timed out then we return error so it goes back
-                    // on the
-                    // prepare list and is rolled back
-                    return TwoPhaseOutcome.FINISH_ERROR;
-                } catch (SystemException ex) {
+                }
+                catch (HeuristicHazardException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
                 }
-            } else
+                catch (HeuristicMixedException ex)
+                {
+                    return TwoPhaseOutcome.HEURISTIC_MIXED;
+                }
+                catch(SystemCommunicationException ex)
+                {
+                    // if prepare timed out then we return error so it goes back on the
+                    // prepare list and is rolled back
+                    return TwoPhaseOutcome.FINISH_ERROR;
+                }
+                catch (SystemException ex)
+                {
+                    return TwoPhaseOutcome.HEURISTIC_HAZARD;
+                }
+            }
+            else
                 return TwoPhaseOutcome.PREPARE_NOTOK;
-        } catch (Exception e6) {
+        }
+        catch (Exception e6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_8(order(), e6);
 
             return TwoPhaseOutcome.PREPARE_NOTOK;
@@ -306,13 +388,18 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int nestedOnePhaseCommit() {
-        try {
-            if (_resourceHandle != null) {
+    public int nestedOnePhaseCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 return TwoPhaseOutcome.FINISH_ERROR;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_9(order(), ex6);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -325,41 +412,58 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public int topLevelOnePhaseCommit() {
-        try {
-            if (_resourceHandle != null) {
+    public int topLevelOnePhaseCommit ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
                 if (_rolledback)
                     return TwoPhaseOutcome.ONE_PHASE_ERROR;
 
                 if (_readonly)
                     return TwoPhaseOutcome.FINISH_OK;
 
-                try {
+                try
+                {
                     _resourceHandle.confirmOnePhase();
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return TwoPhaseOutcome.ONE_PHASE_ERROR;
-                } catch (WrongStateException ex) {
+                }
+                catch (WrongStateException ex)
+                {
                     return TwoPhaseOutcome.ONE_PHASE_ERROR;
-                } catch (HeuristicHazardException ex) {
+                }
+                catch (HeuristicHazardException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
-                } catch (HeuristicMixedException ex) {
+                }
+                catch (HeuristicMixedException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_MIXED;
-                } catch (HeuristicCancelException ex) {
+                }
+                catch (HeuristicCancelException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
                 }
                 // TODO explicit in the signature
-                catch (ParticipantCancelledException ex) // a type of
-                                                            // SystemException
+                catch (ParticipantCancelledException ex)  // a type of SystemException
                 {
                     return TwoPhaseOutcome.ONE_PHASE_ERROR;
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     return TwoPhaseOutcome.HEURISTIC_HAZARD;
                 }
 
                 return TwoPhaseOutcome.FINISH_OK;
-            } else
+            }
+            else
                 return TwoPhaseOutcome.ONE_PHASE_ERROR;
-        } catch (Exception ex6) {
+        }
+        catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_10(order(), ex6);
 
             return TwoPhaseOutcome.ONE_PHASE_ERROR;
@@ -371,24 +475,36 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      *
      */
 
-    public boolean forgetHeuristic() {
-        try {
-            if (_resourceHandle != null) {
-                try {
+    public boolean forgetHeuristic ()
+    {
+        try
+        {
+            if (_resourceHandle != null)
+            {
+                try
+                {
                     _resourceHandle.forget();
-                } catch (InvalidParticipantException ex) {
+                }
+                catch (InvalidParticipantException ex)
+                {
                     return false;
-                } catch (WrongStateException ex) {
+                }
+                catch (WrongStateException ex)
+                {
                     return false;
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     return false;
                 }
 
                 return true;
-            } else {
+            }
+            else {
                 wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_11(order());
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_12(order(), e);
 
             e.printStackTrace();
@@ -397,25 +513,31 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return false;
     }
 
-    public static AbstractRecord create() {
+    public static AbstractRecord create ()
+    {
         return new ParticipantRecord();
     }
 
-    public void print(PrintWriter strm) {
+    public void print (PrintWriter strm)
+    {
         super.print(strm);
 
         strm.print("ParticipantRecord");
         strm.print(_resourceHandle);
     }
 
-    public boolean restore_state(InputObjectState os, int t) {
+
+    public boolean restore_state (InputObjectState os, int t)
+    {
         boolean result = super.restore_state(os, t);
 
-        if (result) {
-            try {
+        if (result)
+        {
+            try
+            {
                 String resourcehandleImplClassName = os.unpackString();
                 Class clazz = ClassLoaderHelper.forName(ParticipantRecord.class, resourcehandleImplClassName);
-                _resourceHandle = (Participant) clazz.newInstance();
+                _resourceHandle = (Participant)clazz.newInstance();
 
                 result = _resourceHandle.restore_state(os);
 
@@ -425,7 +547,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                 /*
                  * TODO: unpack qualifiers and coord id.
                  */
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_13(ex);
 
                 result = false;
@@ -435,18 +558,16 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return result;
     }
 
-    public boolean save_state(OutputObjectState os, int t) {
+
+    public boolean save_state (OutputObjectState os, int t)
+    {
         boolean result = super.save_state(os, t);
 
-        if (result) {
-            try {
-                os.packString(_resourceHandle.getClass().getName()); // TODO: a
-                                                                        // shorter
-                                                                        // value
-                                                                        // whould
-                                                                        // be
-                                                                        // more
-                                                                        // efficient.
+        if (result)
+        {
+            try
+            {
+                os.packString(_resourceHandle.getClass().getName()); // TODO: a shorter value whould be more efficient.
                 result = _resourceHandle.save_state(os);
 
                 if (result)
@@ -455,7 +576,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
                 /*
                  * TODO: pack qualifiers and coord id.
                  */
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 wscfLogger.i18NLogger.warn_model_twophase_arjunacore_ParticipantRecord_14(ex);
 
                 result = false;
@@ -465,41 +587,51 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
         return result;
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/AbstractRecord/WSCF/ArjunaCore/ParticipantRecord";
     }
 
-    public boolean doSave() {
+    public boolean doSave ()
+    {
         return true;
     }
 
-    public void merge(AbstractRecord a) {
+    public void merge (AbstractRecord a)
+    {
     }
 
-    public void alter(AbstractRecord a) {
+    public void alter (AbstractRecord a)
+    {
     }
 
-    public boolean shouldAdd(AbstractRecord a) {
+    public boolean shouldAdd (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldAlter(AbstractRecord a) {
+    public boolean shouldAlter (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldMerge(AbstractRecord a) {
+    public boolean shouldMerge (AbstractRecord a)
+    {
         return false;
     }
 
-    public boolean shouldReplace(AbstractRecord rec) {
+    public boolean shouldReplace (AbstractRecord rec)
+    {
         return false;
     }
 
-    public final void rolledback() {
+    public final void rolledback ()
+    {
         _rolledback = true;
     }
 
-    public final void readonly() {
+    public final void readonly ()
+    {
         _readonly = true;
     }
 
@@ -507,7 +639,8 @@ public class ParticipantRecord extends com.arjuna.ats.arjuna.coordinator.Abstrac
      * Protected constructor used by crash recovery.
      */
 
-    public ParticipantRecord() {
+    public ParticipantRecord ()
+    {
         super();
 
         _resourceHandle = null;

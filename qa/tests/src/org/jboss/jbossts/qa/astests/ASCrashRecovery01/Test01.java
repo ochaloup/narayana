@@ -25,16 +25,21 @@ import org.jboss.jbossts.qa.astests.taskdefs.ASTestConfig;
 
 import java.util.Map;
 
-public class Test01 implements ClientAction {
-    public static void main(String args[]) {
+public class Test01 implements ClientAction
+{
+    public static void main(String args[])
+    {
         System.out.println("Passed");
     }
 
-    public boolean execute(ASTestConfig config, Map<String, String> params) {
+    public boolean execute(ASTestConfig config, Map<String, String> params)
+    {
         return true;
     }
 
-    public boolean cancel() throws UnsupportedOperationException {
+    public boolean cancel() throws UnsupportedOperationException
+    {
         throw new UnsupportedOperationException("TODO");
     }
 }
+

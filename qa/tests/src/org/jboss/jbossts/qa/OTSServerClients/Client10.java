@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.OTSServerClients;
  * $Id: Client10.java,v 1.2 2003/06/26 11:44:17 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ORBServices;
@@ -64,50 +65,64 @@ import org.omg.CosTransactions.Status;
 import org.omg.CosTransactions.TransactionFactory;
 import org.omg.CosTransactions.TransactionFactoryHelper;
 
-public class Client10 {
-    public static void main(String[] args) {
-        try {
+public class Client10
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             TransactionFactory transactionFactory = null;
 
+
             String[] transactionFactoryParams = new String[1];
             transactionFactoryParams[0] = ORBServices.otsKind;
 
-            transactionFactory = TransactionFactoryHelper
-                    .narrow(ORBServices.getService(ORBServices.transactionService, transactionFactoryParams));
+            transactionFactory = TransactionFactoryHelper.narrow(ORBServices.getService(ORBServices.transactionService, transactionFactoryParams));
+
 
             int numberOfControls = Integer.parseInt(args[args.length - 1]);
 
             boolean correct = true;
             Control[] controls = new Control[numberOfControls];
 
-            for (int index = 0; correct && (index < controls.length); index++) {
+            for (int index = 0; correct && (index < controls.length); index++)
+            {
                 controls[index] = transactionFactory.create(0);
 
                 correct = correct && (controls[index].get_coordinator().get_status() == Status.StatusActive);
             }
 
-            for (int index = 0; correct && (index < controls.length); index++) {
+            for (int index = 0; correct && (index < controls.length); index++)
+            {
                 controls[index].get_terminator().commit(true);
             }
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client10.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client10.main: " + exception);
             exception.printStackTrace(System.err);
         }

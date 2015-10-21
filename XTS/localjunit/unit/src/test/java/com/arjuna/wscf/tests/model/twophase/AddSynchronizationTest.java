@@ -21,22 +21,27 @@ public class AddSynchronizationTest {
     }
 
     @Test
-    public void testAddSynchronization() throws Exception {
+    public void testAddSynchronization()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         CoordinatorManager cm = CoordinatorManagerFactory.coordinatorManager();
 
-        try {
+        try
+        {
             cm.begin("TwoPhase11HLS");
 
             cm.enlistSynchronization(new TwoPhaseSynchronization());
 
-            System.out.println("Started: " + cm.identifier() + "\n");
+            System.out.println("Started: "+cm.identifier()+"\n");
 
             cm.confirm();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(cm);
             throw ex;
         }
-    }
+            }
 }

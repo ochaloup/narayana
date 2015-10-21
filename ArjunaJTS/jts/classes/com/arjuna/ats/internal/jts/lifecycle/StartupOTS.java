@@ -31,9 +31,11 @@
 
 package com.arjuna.ats.internal.jts.lifecycle;
 
-public class StartupOTS {
+public class StartupOTS
+{
 
-    public StartupOTS() {
+    public StartupOTS ()
+    {
     }
-
+ 
 }

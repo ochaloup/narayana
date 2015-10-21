@@ -45,8 +45,7 @@ public class TestResourceRecovery implements XAResourceRecovery {
                 File currentFile = listFiles[i];
                 if (currentFile.getAbsolutePath().endsWith("_")) {
                     resources.add(new TestResource(nodeName, currentFile));
-                    System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName
-                            + ") Added TestResource: " + currentFile.getName());
+                    System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName + ") Added TestResource: " + currentFile.getName());
                 }
             }
         }
@@ -54,9 +53,8 @@ public class TestResourceRecovery implements XAResourceRecovery {
 
     @Override
     public XAResource[] getXAResources() {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName
-                + ") returning list of TestResources of length: " + resources.size());
-        return resources.toArray(new XAResource[]{});
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResourceRecovery (" + nodeName + ") returning list of TestResources of length: " + resources.size());
+        return resources.toArray(new XAResource[] {});
     }
 
 }

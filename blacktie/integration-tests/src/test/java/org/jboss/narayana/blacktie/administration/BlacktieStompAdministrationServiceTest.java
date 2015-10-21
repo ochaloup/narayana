@@ -39,13 +39,12 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
     }
 
     /**
-     * Cannot test this without using a C server as unadvertise checks for a
-     * running server
+     * Cannot test this without using a C server as unadvertise checks for a running server
      * 
      * @throws ConnectionException
      */
     public void xtest() throws ConnectionException, ConfigurationException {
-        processStompCommand("tpadvertise,foo,FOOTest,0,queue,5.2.6.Final,", 1);
+        processStompCommand("tpadvertise,foo,FOOTest,0,queue,5.2.7.Final-SNAPSHOT,", 1);
         try {
             connection.tpacall("FOOTest", null, Connection.TPNOREPLY);
         } catch (ConnectionException e) {
@@ -60,7 +59,7 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
             // EXPECTED
         }
 
-        processStompCommand("tpadvertise,foo,FOOTest,0,queue,5.2.6.Final,", 1);
+        processStompCommand("tpadvertise,foo,FOOTest,0,queue,5.2.7.Final-SNAPSHOT,", 1);
 
         try {
             connection.tpacall("FOOTest", null, Connection.TPNOREPLY);
@@ -74,8 +73,7 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
         processStompCommand("tpadvertise,foo,FOOTest,0,queue,WrongVersion,", 4);
     }
 
-    private void processStompCommand(String command, int expectation)
-            throws ConnectionException, ConfigurationException {
+    private void processStompCommand(String command, int expectation) throws ConnectionException, ConfigurationException {
         byte[] toSend = command.getBytes();
         X_OCTET buffer = (X_OCTET) connection.tpalloc("X_OCTET", null);
         buffer.setByteArray(toSend);
@@ -86,8 +84,7 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
         assertEquals(expectation, responseData[0]);
     }
 
-    private void processDomainCommand(String command, int expectation)
-            throws ConnectionException, ConfigurationException {
+    private void processDomainCommand(String command, int expectation) throws ConnectionException, ConfigurationException {
         byte[] toSend = command.getBytes();
         X_OCTET buffer = (X_OCTET) connection.tpalloc("X_OCTET", null);
         buffer.setByteArray(toSend);

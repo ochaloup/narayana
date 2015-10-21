@@ -19,16 +19,20 @@ public class CommitExceptionInPrepareTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoDurableParticipant.class, FailureParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoDurableParticipant.class,
+                FailureParticipant.class);
     }
 
     @Test
-    public void testCommitExceptionInPrepare() throws Exception {
+    public void testCommitExceptionInPrepare()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
-        try {
+        try
+        {
             TransactionManager tm = TransactionManager.getTransactionManager();
-            FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE,
-                    FailureParticipant.WRONG_STATE);
+            FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE, FailureParticipant.WRONG_STATE);
             DemoDurableParticipant p2 = new DemoDurableParticipant();
 
             ut.begin();
@@ -38,7 +42,7 @@ public class CommitExceptionInPrepareTest {
         } catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
@@ -46,10 +50,14 @@ public class CommitExceptionInPrepareTest {
             ut.commit();
 
             fail("expected SystemException");
-        } catch (com.arjuna.wst.SystemException ex) {
+        }
+        catch (com.arjuna.wst.SystemException ex)
+        {
             // we should arrive here
-        } catch (com.arjuna.wst.TransactionRolledBackException ex) {
+        }
+        catch (com.arjuna.wst.TransactionRolledBackException ex)
+        {
             // or if not we should arrive here
         }
-    }
+            }
 }

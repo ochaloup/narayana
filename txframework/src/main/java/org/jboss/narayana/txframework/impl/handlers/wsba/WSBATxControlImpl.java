@@ -30,12 +30,13 @@ public class WSBATxControlImpl implements WSBATxControl {
 
     private static final ThreadLocal<BAParticipantManager> baParticipantManagerThreadLocal = new ThreadLocal<BAParticipantManager>();
 
-    // todo: Need to hook into lifecycle or record it here.
+    //todo: Need to hook into lifecycle or record it here.
     static final ThreadLocal<Boolean> cannotCompleteThreadLocal = new ThreadLocal<Boolean>();
 
     public WSBATxControlImpl() {
 
     }
+
 
     public static void resume(BAParticipantManager baParticipantManager) {
 
@@ -88,7 +89,7 @@ public class WSBATxControlImpl implements WSBATxControl {
     public void fail() throws TXControlRuntimeException {
 
         try {
-            // todo: Why does this take a QName?
+            //todo: Why does this take a QName?
             baParticipantManagerThreadLocal.get().fail(null);
         } catch (Exception e) {
             throw new TXControlRuntimeException("Exception when calling 'fail' on participant manager", e);

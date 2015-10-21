@@ -21,11 +21,15 @@ public class SubtransactionRollbackTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoDurableParticipant.class, DemoVolatileParticipant.class);
+        return WarDeployment.getDeployment(
+                DemoDurableParticipant.class,
+                DemoVolatileParticipant.class);
     }
 
     @Test
-    public void testSubTransactionRollback() throws Exception {
+    public void testSubTransactionRollback()
+            throws Exception
+            {
         final UserTransaction ut = UserTransactionFactory.userTransaction();
         final UserTransaction ust = UserTransactionFactory.userSubordinateTransaction();
         final TransactionManager tm = TransactionManager.getTransactionManager();
@@ -53,5 +57,5 @@ public class SubtransactionRollbackTest {
         assertTrue(p2.resolved() && !p2.passed());
         assertTrue(p3.resolved() && !p3.passed());
         assertTrue(p4.resolved() && !p4.passed());
-    }
+            }
 }

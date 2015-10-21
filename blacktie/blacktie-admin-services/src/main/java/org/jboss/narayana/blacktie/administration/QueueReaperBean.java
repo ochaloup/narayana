@@ -75,9 +75,9 @@ public class QueueReaperBean {
 
             timerService.createIntervalTimer(interval, interval, new TimerConfig("queue reaper", false));
             log.info("QueueReaper create timer with " + interval + "ms");
-        } catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
             log.error("btconfig.xml is not valid: " + e);
-        }
+    } 
     }
 
     @PreDestroy
@@ -90,7 +90,7 @@ public class QueueReaperBean {
         try {
             log.trace("QueueReaper Running: timer is " + timer.getInfo());
             ObjectName objName = new ObjectName("jboss.as:subsystem=messaging,hornetq-server=default,jms-queue=*");
-            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[]{});
+            ObjectInstance[] dests = beanServerConnection.queryMBeans(objName, null).toArray(new ObjectInstance[] {});
 
             for (int i = 0; i < dests.length; i++) {
                 String serviceComponentOfObjectName = dests[i].getObjectName().getCanonicalName();
@@ -102,17 +102,17 @@ public class QueueReaperBean {
                 log.trace("Checking for: " + serviceComponentOfObjectName + " " + server + " "
                         + prop.get("blacktie." + serviceComponentOfObjectName + ".externally-managed-destination"));
 
-                if ((serviceComponentOfObjectName.startsWith(".") || ((server != null && !(Boolean) prop
-                        .get("blacktie." + serviceComponentOfObjectName + ".externally-managed-destination"))))
+                if ((serviceComponentOfObjectName.startsWith(".") || ((server != null && !(Boolean) prop.get("blacktie."
+                        + serviceComponentOfObjectName + ".externally-managed-destination"))))
                         && consumerCount(serviceComponentOfObjectName) == 0) {
                     log.warn("undeploy service pending for " + serviceComponentOfObjectName
                             + " as consumer count is 0, will check again in " + interval + "ms");
                     long queueReapCheck = System.currentTimeMillis();
 
-                    Thread.sleep(this.interval);
+                    Thread.sleep(this.interval);   
                     // double check consumer is 0
-                    if (BlacktieStompAdministrationService.isOlderThanReapCheck(serviceComponentOfObjectName,
-                            queueReapCheck) && consumerCount(serviceComponentOfObjectName) == 0) {
+                    if (BlacktieStompAdministrationService.isOlderThanReapCheck(serviceComponentOfObjectName, queueReapCheck)
+                            && consumerCount(serviceComponentOfObjectName) == 0) {
                         BlacktieStompAdministrationService.undeployQueue(serviceComponentOfObjectName);
                         log.warn("undeploy service " + serviceComponentOfObjectName + " for consumer is 0");
                     } else {
@@ -123,8 +123,8 @@ public class QueueReaperBean {
                     log.debug("Undeploy not required for: " + serviceComponentOfObjectName + " at: " + server);
                 }
             }
-        } catch (NoSuchObjectLocalException e) {
-            log.debug("The timer has expired or has been cancelled");
+    } catch (NoSuchObjectLocalException e) {
+        log.debug("The timer has expired or has been cancelled");
         } catch (InterruptedException e) {
             log.debug("Sleeping interrupted");
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public class QueueReaperBean {
     }
 
     int consumerCount(String serviceName) throws MalformedObjectNameException, NullPointerException,
-            AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException, MBeanException {
+    AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException, MBeanException {
         log.trace(serviceName);
         boolean conversational = false;
         String type = "queue";
@@ -148,8 +148,8 @@ public class QueueReaperBean {
             prefix = "BTR_";
         }
 
-        ObjectName objName = new ObjectName(
-                "jboss.as:subsystem=messaging,hornetq-server=default,jms-" + type + "=" + prefix + serviceName);
+        ObjectName objName = new ObjectName("jboss.as:subsystem=messaging,hornetq-server=default,jms-" + type + "=" + prefix
+                + serviceName);
         try {
             Integer count = null;
             if (type.equals("queue")) {

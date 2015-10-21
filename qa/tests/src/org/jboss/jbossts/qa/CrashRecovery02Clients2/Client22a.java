@@ -56,25 +56,27 @@ package org.jboss.jbossts.qa.CrashRecovery02Clients2;
  * $Id: Client22a.java,v 1.2 2003/06/26 11:43:21 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client22a {
-    public static void main(String[] args) {
-        try {
+public class Client22a
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
-            AfterCrashService service1 = AfterCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR1));
+            AfterCrashService service1 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR1));
 
             String serviceIOR2 = ServerIORStore.loadIOR(args[args.length - 1]);
-            AfterCrashService service2 = AfterCrashServiceHelper
-                    .narrow(ORBInterface.orb().string_to_object(serviceIOR2));
+            AfterCrashService service2 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR2));
 
             CheckBehavior[] checkBehaviors1 = new CheckBehavior[1];
             checkBehaviors1[0] = new CheckBehavior();
@@ -112,21 +114,29 @@ public class Client22a {
             correct = correct && (resourceTrace1 == ResourceTrace.ResourceTraceRollback);
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTraceRollback);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client22a.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client22a.main: " + exception);
             exception.printStackTrace(System.err);
         }

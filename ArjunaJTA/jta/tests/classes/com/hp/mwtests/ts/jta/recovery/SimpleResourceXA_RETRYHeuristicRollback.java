@@ -63,7 +63,7 @@ public class SimpleResourceXA_RETRYHeuristicRollback implements XAResource {
 
     public Xid[] recover(int flag) throws XAException {
         if (xid != null) {
-            return new Xid[]{xid};
+            return new Xid[] { xid };
         }
         return null;
     }

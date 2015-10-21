@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.RawResources02Clients2;
  * $Id: Client058.java,v 1.3 2003/07/07 13:43:31 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.RawResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client058 {
-    public static void main(String[] args) {
-        try {
+public class Client058
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -99,7 +103,8 @@ public class Client058 {
             OTS.current().commit(true);
 
             correct = correct && service1.is_correct() && service2.is_correct();
-            if (!correct) {
+            if (!correct)
+            {
                 System.err.println("service1.is_correct() or service2.is_correct() returned false");
             }
 
@@ -109,21 +114,29 @@ public class Client058 {
             correct = correct && (resourceTrace1 == ResourceTrace.ResourceTracePrepareCommit);
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTracePrepare);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client058.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client058.main: " + exception);
             exception.printStackTrace(System.err);
         }

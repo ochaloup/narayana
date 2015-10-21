@@ -47,16 +47,20 @@ import com.arjuna.ats.txoj.Lock;
 
 // todo different lock mode instead of WRITE and READ?
 
-public class OptimisticLock extends Lock {
-    public OptimisticLock() {
+public class OptimisticLock extends Lock
+{
+    public OptimisticLock ()
+    {
         super();
     }
-
-    public OptimisticLock(int lm) {
+    
+    public OptimisticLock (int lm)
+    {
         super(lm);
     }
-
-    public OptimisticLock(final Uid storeId) {
+    
+    public OptimisticLock (final Uid storeId)
+    {
         super(storeId);
     }
 
@@ -69,7 +73,8 @@ public class OptimisticLock extends Lock {
      *         <code>false</code> otherwise.
      */
 
-    public boolean conflictsWith(Lock otherLock) {
+    public boolean conflictsWith (Lock otherLock)
+    {
         return false; /* no conflict between these locks */
     }
 
@@ -77,7 +82,8 @@ public class OptimisticLock extends Lock {
      * Overrides StateManager.type()
      */
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/Lock/OptimisticLock";
     }
 }

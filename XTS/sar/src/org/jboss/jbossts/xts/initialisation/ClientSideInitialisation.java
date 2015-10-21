@@ -7,8 +7,10 @@ import com.arjuna.webservices11.wsat.server.CompletionInitiatorInitialisation;
 /**
  * A class used to perform all 1.1 client side initialisation
  */
-public class ClientSideInitialisation implements XTSInitialisation {
-    public void startup() throws Exception {
+public class ClientSideInitialisation implements XTSInitialisation
+{
+    public void startup() throws Exception
+    {
         // there is no WS-C client startup
 
         // run WS-T initialisation code
@@ -23,7 +25,8 @@ public class ClientSideInitialisation implements XTSInitialisation {
         WSTXInitialisation.startup();
     }
 
-    public void shutdown() throws Exception {
+    public void shutdown() throws Exception
+    {
         // run WSTX shutdown code
 
         WSTXInitialisation.shutdown();

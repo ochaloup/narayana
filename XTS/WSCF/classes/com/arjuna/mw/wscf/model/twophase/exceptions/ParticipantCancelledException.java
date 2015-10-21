@@ -37,23 +37,28 @@ import com.arjuna.mw.wsas.exceptions.SystemException;
  * There is no coordinator associated with the target.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: ParticipantCancelledException.java,v 1.1 2005/06/09 09:41:43
- *          nmcl Exp $
+ * @version $Id: ParticipantCancelledException.java,v 1.1 2005/06/09 09:41:43 nmcl Exp $
  * @since 1.0.
  */
 
-public class ParticipantCancelledException extends SystemException {
+public class ParticipantCancelledException extends SystemException
+{
 
-    public ParticipantCancelledException() {
-        super();
+    public ParticipantCancelledException ()
+    {
+    super();
     }
 
-    public ParticipantCancelledException(String s) {
-        super(s);
+    public ParticipantCancelledException (String s)
+    {
+    super(s);
     }
 
-    public ParticipantCancelledException(String s, int errorcode) {
-        super(s, errorcode);
+    public ParticipantCancelledException (String s, int errorcode)
+    {
+    super(s, errorcode);
     }
-
+    
 }
+
+

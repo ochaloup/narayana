@@ -20,6 +20,7 @@
  */
 package com.arjuna.mw.wstx.logging;
 
+
 import org.jboss.logging.annotations.*;
 import static org.jboss.logging.Logger.Level.*;
 import static org.jboss.logging.annotations.Message.Format.*;
@@ -33,10 +34,10 @@ import static org.jboss.logging.annotations.Message.Format.*;
 public interface wstxI18NLogger {
 
     /*
-     * Message IDs are unique and non-recyclable. Don't change the purpose of
-     * existing messages. (tweak the message text or params for clarification if
-     * you like). Allocate new messages by following instructions at the bottom
-     * of the file.
+        Message IDs are unique and non-recyclable.
+        Don't change the purpose of existing messages.
+          (tweak the message text or params for clarification if you like).
+        Allocate new messages by following instructions at the bottom of the file.
      */
 
     @Message(id = 45001, value = "Error in {0}", format = MESSAGE_FORMAT)
@@ -47,10 +48,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mw_wst_client_JaxHCP_2(String arg0, String arg1);
 
-    // @Message(id = 45003, value = "Unknown context type:", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mw_wst_client_JaxHCP_3();
+//    @Message(id = 45003, value = "Unknown context type:", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mw_wst_client_JaxHCP_3();
 
     @Message(id = 45004, value = "WSTX Initialisation: init failed", format = MESSAGE_FORMAT)
     @LogMessage(level = ERROR)
@@ -73,10 +73,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mw_wst_service_JaxHCP_2(String arg0, String arg2);
 
-    // @Message(id = 45010, value = "Unknown context type:", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mw_wst_service_JaxHCP_3();
+//    @Message(id = 45010, value = "Unknown context type:", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mw_wst_service_JaxHCP_3();
 
     @Message(id = 45011, value = "Error in {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -86,10 +85,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mw_wst11_client_JaxHC11P_2(String arg0, String arg1);
 
-    // @Message(id = 45013, value = "Unknown context type:", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mw_wst11_client_JaxHC11P_3();
+//    @Message(id = 45013, value = "Unknown context type:", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mw_wst11_client_JaxHC11P_3();
 
     @Message(id = 45014, value = "WSTX11 Initialisation: init failed", format = MESSAGE_FORMAT)
     @LogMessage(level = ERROR)
@@ -112,10 +110,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mw_wst11_service_JaxHC11P_2(String arg0, String arg1);
 
-    // @Message(id = 45020, value = "Unknown context type:", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mw_wst11_service_JaxHC11P_3();
+//    @Message(id = 45020, value = "Unknown context type:", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mw_wst11_service_JaxHC11P_3();
 
     @Message(id = 45021, value = "Invalid type URI: < {0} , {1} >", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -224,9 +221,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mwlabs_wst_ba_local_LocalRegistrarImple_1(String arg0, String arg1);
 
-    // @Message(id = 45051, value = "Invalid address.", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mwlabs_wst_ba_remote_UserBusinessActivityImple_1();
+//    @Message(id = 45051, value = "Invalid address.", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mwlabs_wst_ba_remote_UserBusinessActivityImple_1();
 
     @Message(id = 45052, value = "Received context is null!", format = MESSAGE_FORMAT)
     public String get_mwlabs_wst_ba_remote_UserBusinessActivityImple_2();
@@ -254,9 +251,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_mwlabs_wst11_ba_context_ArjunaContextImple_1(String arg0);
 
-    // @Message(id = 45059, value = "Invalid address.", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_mwlabs_wst11_ba_remote_UserBusinessActivityImple_1();
+//    @Message(id = 45059, value = "Invalid address.", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_mwlabs_wst11_ba_remote_UserBusinessActivityImple_1();
 
     @Message(id = 45060, value = "Received context is null!", format = MESSAGE_FORMAT)
     public String get_mwlabs_wst11_ba_remote_UserBusinessActivityImple_2();
@@ -266,17 +263,17 @@ public interface wstxI18NLogger {
 
     @Message(id = 45062, value = "Coordinator cancelled the activity", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_mwlabs_wst11_ba_coordinator_cancelled_activity();
+       public void warn_mwlabs_wst11_ba_coordinator_cancelled_activity();
 
     /*
-     * Allocate new messages directly above this notice. - id: use the next id
-     * number in numeric sequence. Don't reuse ids. The first two digits of the
-     * id(XXyyy) denote the module all message in this file should have the same
-     * prefix. - value: default (English) version of the log message. - level:
-     * according to severity semantics defined at
-     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
-     * i18n. Everything else MUST be i18n. By convention methods with String
-     * return type have prefix get_, all others are log methods and have prefix
-     * <level>_
+        Allocate new messages directly above this notice.
+          - id: use the next id number in numeric sequence. Don't reuse ids.
+          The first two digits of the id(XXyyy) denote the module
+            all message in this file should have the same prefix.
+          - value: default (English) version of the log message.
+          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
+          Debug and trace don't get i18n. Everything else MUST be i18n.
+          By convention methods with String return type have prefix get_,
+            all others are log methods and have prefix <level>_
      */
 }

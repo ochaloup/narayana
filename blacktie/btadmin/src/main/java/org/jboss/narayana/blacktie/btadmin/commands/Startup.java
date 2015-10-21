@@ -90,8 +90,7 @@ public class Startup implements Command {
                         log.debug("Found machine");
                         Machine localMachine = localMachines.next();
                         String pathToExecutable = localMachine.getPathToExecutable();
-                        String argLine = "-i " + localMachine.getServerId() + " -s "
-                                + localMachine.getServer().getName();
+                        String argLine = "-i " + localMachine.getServerId() + " -s " + localMachine.getServer().getName();
                         if (localMachine.getArgLine() != null) {
                             argLine = argLine + " " + localMachine.getArgLine();
                         }
@@ -105,7 +104,7 @@ public class Startup implements Command {
                             ProcessBuilder pb = new ProcessBuilder();
                             pb.command(Arrays.<String>asList(cmdarray));
                             pb.directory(dir);
-
+                            
                             String id = localMachine.getId();
                             String output_fname = id + "-out";
                             String error_fname = id + "-err";
@@ -114,19 +113,16 @@ public class Startup implements Command {
                             Process exec = pb.start();
 
                             log.debug("Launched server: " + pathToExecutable + " " + argLine);
-                            BufferedReader output = new BufferedReader(
-                                    new InputStreamReader(new FileInputStream(output_fname)));
-                            BufferedReader error = new BufferedReader(
-                                    new InputStreamReader(new FileInputStream(error_fname)));
+                            BufferedReader output = new BufferedReader(new InputStreamReader(new FileInputStream(output_fname)));
+                            BufferedReader error = new BufferedReader(new InputStreamReader(new FileInputStream(error_fname)));
                             while (true) {
                                 String readLine = output.readLine();
                                 if (readLine == null) {
                                     readLine = error.readLine();
                                 }
-                                if (readLine != null)
-                                    log.info(readLine);
+                                if(readLine != null) log.info(readLine);
                                 if (readLine == null) {
-                                    // throw new CommandFailedException(-3);
+                                    //throw new CommandFailedException(-3);
                                 } else if (readLine.endsWith("serverinit failed")) {
                                     throw new CommandFailedException(-2);
                                 } else if (readLine.endsWith("Server waiting for requests...")) {

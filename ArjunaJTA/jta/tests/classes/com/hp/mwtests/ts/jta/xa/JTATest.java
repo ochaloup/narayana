@@ -50,9 +50,10 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 public class JTATest {
 
     private XAException exception;
-
+    
     @Test
-    public void testRMFAILcommit1PC() throws Exception {
+    public void testRMFAILcommit1PC() throws Exception
+    {
         XAResource theResource = new XAResource() {
 
             @Override
@@ -121,7 +122,8 @@ public class JTATest {
     @Test
     public void test() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.begin();
 
@@ -134,13 +136,13 @@ public class JTATest {
         tm.rollback();
         assertTrue(rollbackCalled.getRollbackCalled());
     }
-
+    
+    
     @Test
-    public void testHeuristicRollbackSuppressedException()
-            throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException,
-            HeuristicMixedException, HeuristicRollbackException {
+    public void testHeuristicRollbackSuppressedException() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.begin();
 
@@ -151,11 +153,13 @@ public class JTATest {
             @Override
             public void start(Xid xid, int flags) throws XAException {
 
+                
             }
 
             @Override
             public void end(Xid xid, int flags) throws XAException {
 
+                
             }
 
             @Override
@@ -173,11 +177,13 @@ public class JTATest {
             @Override
             public void rollback(Xid xid) throws XAException {
 
+                
             }
 
             @Override
             public void forget(Xid xid) throws XAException {
 
+                
             }
 
             @Override
@@ -202,18 +208,19 @@ public class JTATest {
             public boolean setTransactionTimeout(int seconds) throws XAException {
 
                 return false;
-            }
-        }));
+            }}));
         assertTrue(theTransaction.enlistResource(new XAResource() {
 
             @Override
             public void start(Xid xid, int flags) throws XAException {
 
+                
             }
 
             @Override
             public void end(Xid xid, int flags) throws XAException {
 
+                
             }
 
             @Override
@@ -225,16 +232,19 @@ public class JTATest {
             @Override
             public void commit(Xid xid, boolean onePhase) throws XAException {
 
+                
             }
 
             @Override
             public void rollback(Xid xid) throws XAException {
 
+                
             }
 
             @Override
             public void forget(Xid xid) throws XAException {
 
+                
             }
 
             @Override
@@ -259,8 +269,7 @@ public class JTATest {
             public boolean setTransactionTimeout(int seconds) throws XAException {
 
                 return false;
-            }
-        }));
+            }}));
 
         try {
             tm.commit();
@@ -269,7 +278,7 @@ public class JTATest {
             e.printStackTrace();
             assertTrue(e.getSuppressed()[0] == exception);
         }
-
+        
     }
 
     private class XARMERRXAResource implements XAResource {

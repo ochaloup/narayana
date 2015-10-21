@@ -32,16 +32,15 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import java.io.IOException;
 
 /**
- * The client side which makes synchronous requests to the BA termination
- * coordinator using an RPC MEP.
- * 
+ * The client side which makes synchronous requests to the BA termination coordinator using an RPC MEP.
  * @author kevin
  */
-public class TerminationCoordinatorRPCClient {
+public class TerminationCoordinatorRPCClient
+{
     /**
      * The client singleton.
      */
-    private static final TerminationCoordinatorRPCClient CLIENT = new TerminationCoordinatorRPCClient();
+    private static final TerminationCoordinatorRPCClient CLIENT = new TerminationCoordinatorRPCClient() ;
 
     /**
      * The complete action.
@@ -59,7 +58,8 @@ public class TerminationCoordinatorRPCClient {
     /**
      * Construct the terminator participant client.
      */
-    private TerminationCoordinatorRPCClient() {
+    private TerminationCoordinatorRPCClient()
+    {
         completeAction = ArjunaTXConstants.WSARJTX_ACTION_COMPLETE;
         closeAction = ArjunaTXConstants.WSARJTX_ACTION_CLOSE;
         cancelAction = ArjunaTXConstants.WSARJTX_ACTION_CANCEL;
@@ -67,18 +67,14 @@ public class TerminationCoordinatorRPCClient {
 
     /**
      * Send a complete request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendComplete(final W3CEndpointReference coordinator, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault11, IOException {
+        throws SoapFault11, IOException
+    {
         final TerminationCoordinatorRPCPortType port = getPort(coordinator, map, completeAction);
         final NotificationType complete = new NotificationType();
 
@@ -91,18 +87,14 @@ public class TerminationCoordinatorRPCClient {
 
     /**
      * Send a close request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendClose(final W3CEndpointReference coordinator, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault11, IOException {
+        throws SoapFault11, IOException
+    {
         final TerminationCoordinatorRPCPortType port = getPort(coordinator, map, closeAction);
         final NotificationType close = new NotificationType();
 
@@ -115,18 +107,14 @@ public class TerminationCoordinatorRPCClient {
 
     /**
      * Send a cancel request.
-     * 
-     * @param map
-     *            addressing context initialised with to and message ID.
-     * @param identifier
-     *            The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault
-     *             For any errors.
-     * @throws java.io.IOException
-     *             for any transport errors.
+     * @param map addressing context initialised with to and message ID.
+     * @param identifier The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault For any errors.
+     * @throws java.io.IOException for any transport errors.
      */
     public void sendCancel(final W3CEndpointReference coordinator, final MAP map, final InstanceIdentifier identifier)
-            throws SoapFault11, IOException {
+        throws SoapFault11, IOException
+    {
         final TerminationCoordinatorRPCPortType port = getPort(coordinator, map, cancelAction);
         final NotificationType cancel = new NotificationType();
 
@@ -139,15 +127,17 @@ public class TerminationCoordinatorRPCClient {
 
     /**
      * Get the Terminator Coordinator client singleton.
-     * 
      * @return The Terminator Coordinator client singleton.
      */
-    public static TerminationCoordinatorRPCClient getClient() {
-        return CLIENT;
+    public static TerminationCoordinatorRPCClient getClient()
+    {
+        return CLIENT ;
     }
 
-    private TerminationCoordinatorRPCPortType getPort(final W3CEndpointReference endpoint, final MAP map,
-            final String action) {
-        return WSARJTXClient.getTerminationCoordinatorRPCPort(endpoint, action, map);
+    private TerminationCoordinatorRPCPortType getPort(final W3CEndpointReference endpoint,
+                                                      final MAP map,
+                                                      final String action)
+    {
+        return WSARJTXClient.getTerminationCoordinatorRPCPort(endpoint,  action, map);
     }
 }

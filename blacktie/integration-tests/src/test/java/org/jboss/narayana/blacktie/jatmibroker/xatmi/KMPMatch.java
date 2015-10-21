@@ -6,8 +6,7 @@ package org.jboss.narayana.blacktie.jatmibroker.xatmi;
  */
 public class KMPMatch {
     /**
-     * Search the data byte array for the first occurrence of the byte array
-     * pattern.
+     * Search the data byte array for the first occurrence of the byte array pattern.
      */
     public static int indexOf(byte[] data, byte[] pattern, int datalen) {
         int[] failure = computeFailure(pattern);
@@ -29,8 +28,7 @@ public class KMPMatch {
     }
 
     /**
-     * Computes the failure function using a boot-strapping process, where the
-     * pattern is matched against itself.
+     * Computes the failure function using a boot-strapping process, where the pattern is matched against itself.
      */
     private static int[] computeFailure(byte[] pattern) {
         int[] failure = new int[pattern.length];

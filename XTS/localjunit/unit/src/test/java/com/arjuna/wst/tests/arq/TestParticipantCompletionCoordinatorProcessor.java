@@ -32,42 +32,44 @@ import org.oasis_open.docs.ws_tx.wsba._2006._06.NotificationType;
 import org.oasis_open.docs.ws_tx.wsba._2006._06.ExceptionType;
 import org.oasis_open.docs.ws_tx.wsba._2006._06.StatusType;
 
-public class TestParticipantCompletionCoordinatorProcessor extends ParticipantCompletionCoordinatorProcessor {
-    private Map messageIdMap = new HashMap();
+public class TestParticipantCompletionCoordinatorProcessor extends ParticipantCompletionCoordinatorProcessor
+{
+    private Map messageIdMap = new HashMap() ;
 
-    public ParticipantCompletionCoordinatorDetails getParticipantCompletionCoordinatorDetails(final String messageId,
-            final long timeout) {
-        final long endTime = System.currentTimeMillis() + timeout;
-        synchronized (messageIdMap) {
-            long now = System.currentTimeMillis();
-            while (now < endTime) {
-                final ParticipantCompletionCoordinatorDetails details = (ParticipantCompletionCoordinatorDetails) messageIdMap
-                        .remove(messageId);
-                if (details != null) {
-                    return details;
+    public ParticipantCompletionCoordinatorDetails getParticipantCompletionCoordinatorDetails(final String messageId, final long timeout)
+    {
+        final long endTime = System.currentTimeMillis() + timeout ;
+        synchronized(messageIdMap)
+        {
+            long now = System.currentTimeMillis() ;
+            while(now < endTime)
+            {
+                final ParticipantCompletionCoordinatorDetails details = (ParticipantCompletionCoordinatorDetails)messageIdMap.remove(messageId) ;
+                if (details != null)
+                {
+                    return details ;
                 }
-                try {
-                    messageIdMap.wait(endTime - now);
-                } catch (final InterruptedException ie) {
-                } // ignore
-                now = System.currentTimeMillis();
+                try
+                {
+                    messageIdMap.wait(endTime - now) ;
+                }
+                catch (final InterruptedException ie) {} // ignore
+                now = System.currentTimeMillis() ;
             }
-            final ParticipantCompletionCoordinatorDetails details = (ParticipantCompletionCoordinatorDetails) messageIdMap
-                    .remove(messageId);
-            if (details != null) {
-                return details;
+            final ParticipantCompletionCoordinatorDetails details = (ParticipantCompletionCoordinatorDetails)messageIdMap.remove(messageId) ;
+            if (details != null)
+            {
+                return details ;
             }
         }
-        throw new NullPointerException("Timeout occurred waiting for id: " + messageId);
+        throw new NullPointerException("Timeout occurred waiting for id: " + messageId) ;
     }
 
     /**
      * Activate the coordinator.
      *
-     * @param coordinator
-     *            The coordinator.
-     * @param identifier
-     *            The identifier.
+     * @param coordinator The coordinator.
+     * @param identifier       The identifier.
      */
     public void activateCoordinator(ParticipantCompletionCoordinatorInboundEvents coordinator, String identifier) {
     }
@@ -75,232 +77,206 @@ public class TestParticipantCompletionCoordinatorProcessor extends ParticipantCo
     /**
      * Deactivate the coordinator.
      *
-     * @param coordinator
-     *            The coordinator.
+     * @param coordinator The coordinator.
      */
     public void deactivateCoordinator(ParticipantCompletionCoordinatorInboundEvents coordinator) {
     }
 
     public ParticipantCompletionCoordinatorInboundEvents getCoordinator(String identifier) {
-        return null; // To change body of implemented methods use File |
-                        // Settings | File Templates.
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
      * Cancelled.
      *
-     * @param cancelled
-     *            The cancelled notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param cancelled         The cancelled notification.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void cancelled(NotificationType cancelled, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setCancelled(true);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setCancelled(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * Closed.
      *
-     * @param closed
-     *            The closed notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param closed            The closed notification.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void closed(NotificationType closed, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setClosed(true);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setClosed(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * Compensated.
      *
-     * @param compensated
-     *            The compensated notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param compensated       The compensated notification.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void compensated(NotificationType compensated, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setCompensated(true);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setCompensated(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * Completed.
      *
-     * @param completed
-     *            The completed notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param completed         The completed notification.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void completed(NotificationType completed, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setCompleted(true);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setCompleted(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * CannotComplete.
      *
-     * @param cannotComplete
-     *            The cannot complete notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param cannotComplete       The cannot complete notification.
+     * @param map The addressing context.
+     * @param arjunaContext        The arjuna context.
      */
-    public void cannotComplete(NotificationType cannotComplete, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setCannotComplete(true);
+    public void cannotComplete(NotificationType cannotComplete, MAP map, ArjunaContext arjunaContext)
+    {
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setCannotComplete(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * exit
-     * 
-     * @param exit
-     *            The exit notification.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param exit                 The exit notification.
+     * @param map The addressing context.
+     * @param arjunaContext        The arjuna context.
      */
-    public void exit(NotificationType exit, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setExit(true);
+    public void exit(NotificationType exit, MAP map, ArjunaContext arjunaContext)
+    {
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setExit(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * Fault.
      *
-     * @param fault
-     *            The fault exception.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param fault             The fault exception.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void fail(ExceptionType fault, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setFault(fault);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setFault(fault) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
-    public void getStatus(NotificationType getStatus, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setGetStatus(true);
+    public void getStatus(NotificationType getStatus, MAP map, ArjunaContext arjunaContext)
+    {
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setGetStatus(true) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * Status.
      *
-     * @param status
-     *            The status.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param status            The status.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void status(StatusType status, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setStatus(status);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setStatus(status) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
     /**
      * SOAP fault.
      *
-     * @param soapFault
-     *            The SOAP fault.
-     * @param map
-     *            The addressing context.
-     * @param arjunaContext
-     *            The arjuna context.
+     * @param soapFault         The SOAP fault.
+     * @param map The addressing context.
+     * @param arjunaContext     The arjuna context.
      */
     public void soapFault(SoapFault soapFault, MAP map, ArjunaContext arjunaContext) {
-        final String messageId = map.getMessageID();
-        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map,
-                arjunaContext);
-        details.setSoapFault(soapFault);
+        final String messageId = map.getMessageID() ;
+        final ParticipantCompletionCoordinatorDetails details = new ParticipantCompletionCoordinatorDetails(map, arjunaContext) ;
+        details.setSoapFault(soapFault) ;
 
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, details);
-            messageIdMap.notifyAll();
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, details) ;
+            messageIdMap.notifyAll() ;
         }
     }
 
-    public static class ParticipantCompletionCoordinatorDetails {
-        private final MAP map;
-        private final ArjunaContext arjunaContext;
-        private boolean exit;
-        private boolean getStatus;
+    public static class ParticipantCompletionCoordinatorDetails
+    {
+        private final MAP map ;
+        private final ArjunaContext arjunaContext ;
+        private boolean exit ;
+        private boolean getStatus ;
         private boolean cancelled;
         private boolean closed;
         private boolean compensated;
@@ -310,41 +286,50 @@ public class TestParticipantCompletionCoordinatorProcessor extends ParticipantCo
         private StatusType status;
         private SoapFault soapFault;
 
-        ParticipantCompletionCoordinatorDetails(final MAP map, final ArjunaContext arjunaContext) {
-            this.map = map;
-            this.arjunaContext = arjunaContext;
+        ParticipantCompletionCoordinatorDetails(final MAP map, final ArjunaContext arjunaContext)
+        {
+            this.map = map ;
+            this.arjunaContext = arjunaContext ;
         }
 
-        public MAP getMAP() {
-            return map;
+        public MAP getMAP()
+        {
+            return map ;
         }
 
-        public ArjunaContext getArjunaContext() {
-            return arjunaContext;
+        public ArjunaContext getArjunaContext()
+        {
+            return arjunaContext ;
         }
 
-        public boolean hasCannotComplete() {
-            return cannotComplete;
+        public boolean hasCannotComplete()
+        {
+            return cannotComplete ;
         }
 
-        void setCannotComplete(final boolean cannotComplete) {
-            this.cannotComplete = cannotComplete;
+        void setCannotComplete(final boolean cannotComplete)
+        {
+            this.cannotComplete = cannotComplete ;
         }
 
-        public boolean hasExit() {
-            return exit;
+        public boolean hasExit()
+        {
+            return exit ;
         }
 
-        void setExit(final boolean exit) {
-            this.exit = exit;
+        void setExit(final boolean exit)
+        {
+            this.exit = exit ;
         }
 
-        public boolean hasGetStatus() {
-            return getStatus;
+        public boolean hasGetStatus()
+        {
+            return getStatus ;
         }
 
-        void setGetStatus(final boolean getStatus) {
-            this.getStatus = getStatus;
+        void setGetStatus(final boolean getStatus)
+        {
+            this.getStatus = getStatus ;
         }
 
         public boolean hasCancelled() {

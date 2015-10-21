@@ -11,67 +11,58 @@ import com.arjuna.wst.SystemException;
 import org.jboss.jbossts.xts.recovery.participant.at.XTSATRecoveryManager;
 
 /**
- * An API class for use by the JTA ==> AT bridge manager providing a wrapper
- * around a subordinate transaction. Static methods are provided to create and
- * register a WS-AT subordinate transaction or to locate a recovered
- * transaction. The returned wrapper allows a client to drive the coordinator
- * through prepare, (phase 2) commit and/or rollback, to access the transaction
- * id under which the coordinator is registered and, if the transaction has not
- * been recovered, to obtain a resumable tx context for the transaction.
+ * An API class for use by the JTA ==> AT bridge manager providing a wrapper around a subordinate transaction.
+ * Static methods are provided to create and register a WS-AT subordinate transaction or to locate a recovered
+ * transaction. The returned wrapper allows a client to drive the coordinator through prepare, (phase 2) commit
+ * and/or rollback, to access the transaction id under which the coordinator is registered and, if the transaction
+ * has not been recovered, to obtain a resumable tx context for the transaction.
  *
  * n.b. this class only supports bridging to WS-AT 1.1 transactions.
  */
-public class BridgeWrapper {
+public class BridgeWrapper
+{
     /**
-     * cached reference to the WS-AT 1.1. context factory - we only support
-     * bridging to WS-AT 1.1 subordinate transactions
+     * cached reference to the WS-AT 1.1. context factory - we only support bridging to WS-AT 1.1 subordinate
+     * transactions
      */
-    private static ContextFactoryImple contextFactory = (ContextFactoryImple) ContextFactoryMapper.getMapper()
-            .getContextFactory(AtomicTransactionConstants.WSAT_PROTOCOL);
+    private static ContextFactoryImple contextFactory =
+            (ContextFactoryImple)ContextFactoryMapper.getMapper().getContextFactory(AtomicTransactionConstants.WSAT_PROTOCOL);
 
     /**
-     * this class handles all creation of bridged transactions
+     * this class handles all creation of bridged transactions 
      */
 
-    private BridgeWrapper() {
+    private BridgeWrapper()
+    {
     }
 
     /**
-     * the standard type string used to identify AT AT subordinate transactions.
-     * bridge clients must ensure that they do not employ this type for their
-     * subordinates.
+     * the standard type string used to identify AT AT subordinate transactions. bridge clients
+     * must ensure that they do not employ this type for their subordinates.
      */
 
     public static final String SUBORDINATE_TX_TYPE_AT_AT = SubordinateATCoordinator.SUBORDINATE_TX_TYPE_AT_AT;
 
+
     /**
-     * create an AT 1.1 subordinate transaction, associate it with the AT 1.1.
-     * registry then return a BridgedTransaction wrapper allowing the
-     * transaction to be driven through prepare, commit and/or rollback and
-     * providing access to the transaction id and a context which can be used to
+     * create an AT 1.1 subordinate transaction, associate it with the AT 1.1. registry then return a
+     * BridgedTransaction wrapper allowing the transaction to be driven through prepare, commit
+     * and/or rollback and providing access to the transaction id and a context which can be used to
      * resume the transaction.
-     * 
-     * @param subordinateType
-     *            a unique string which groups subordinates for the benefit of
-     *            their parent tx/app and allows them to be identified and
-     *            retrieved as a group during recovery. this must differ from
-     *            the string {@link SUBORDINATE_TX_TYPE_AT_AT}
-     * @param expires
-     *            the timeout for the bridged-to transaction or 0 if no timeout
-     *            is required
-     * @param isSecure
-     *            true if AT 1.1. protocol messages for the bridged-to
-     *            transaction should employ secure communications, otherwise
-     *            false
+     * @param subordinateType a unique string which groups subordinates for the benefit of their parent
+     * tx/app and allows them to be identified and retrieved as a group during recovery. this must differ
+     * from the string {@link SUBORDINATE_TX_TYPE_AT_AT}
+     * @param expires the timeout for the bridged-to transaction or 0 if no timeout is required
+     * @param isSecure true if AT 1.1. protocol messages for the bridged-to transaction should employ
+     * secure communications, otherwise false
      * @return a wrapper for the bridged-to transaction
      * @throws SystemException
      */
-    public static BridgeWrapper create(String subordinateType, long expires, boolean isSecure) {
-        // the AT 1.1 context factory provides us with a means to create the
-        // required data.
+    public static BridgeWrapper create(String subordinateType, long expires, boolean isSecure)
+    {
+        // the AT 1.1 context factory provides us with a means to create the required data.
 
-        ContextFactoryImple.BridgeTxData bridgeTxData = contextFactory.createBridgedTransaction(subordinateType,
-                expires, isSecure);
+        ContextFactoryImple.BridgeTxData bridgeTxData = contextFactory.createBridgedTransaction(subordinateType, expires, isSecure);
         if (bridgeTxData != null) {
             BridgeWrapper bridgeWrapper = new BridgeWrapper();
 
@@ -86,23 +77,19 @@ public class BridgeWrapper {
     }
 
     /**
-     * recreate a wrapper for a bridged-to WS-AT 1.1 transaction recovered from
-     * the log
-     * 
-     * @param identifier
-     *            the identifier of a previously created bridged-to transaction
-     * @return a wrapper for the bridged-to transaction or null if it may still
-     *         be awaiting recovery
-     * @throws UnknownTransactionException
-     *             if recovery has been performed and no transaction with the
-     *             given identifier has been found in the log
+     * recreate a wrapper for a bridged-to WS-AT 1.1 transaction recovered from the log
+     * @param identifier the identifier of a previously created bridged-to transaction
+     * @return a wrapper for the bridged-to transaction or null if it may still be awaiting recovery
+     * @throws UnknownTransactionException if recovery has been performed and no transaction with the
+     * given identifier has been found in the log
      */
-    public static BridgeWrapper recover(String identifier) throws UnknownTransactionException {
+    public static BridgeWrapper recover(String identifier) throws UnknownTransactionException
+    {
         SubordinateATCoordinator coordinator = SubordinateATCoordinator.getRecoveredCoordinator(identifier);
         if (coordinator != null) {
             BridgeWrapper bridgeWrapper = new BridgeWrapper();
             bridgeWrapper.context = null;
-            bridgeWrapper.coordinator = coordinator;
+            bridgeWrapper.coordinator =coordinator;
             bridgeWrapper.id = identifier;
             bridgeWrapper.subordinateType = coordinator.getSubordinateType();
             return bridgeWrapper;
@@ -117,18 +104,15 @@ public class BridgeWrapper {
     }
 
     /**
-     * return a list of bridge wrappers for all recovered subordinate
-     * transactions with a given subordinate type
-     * 
-     * @param subordinateType
-     *            the subordinate type supplied in the original bridge wrapper
-     *            create call which created the subordinate transaction.
-     * @return a possibly zero-length array of bridge wrappers for all recovered
-     *         subordinate AT transactions with the given subordinate type or
-     *         null if a subordinate coordinator recovery scan has not yet
-     *         occurred
+     * return a list of bridge wrappers for all recovered subordinate transactions with a given
+     * subordinate type
+     * @param subordinateType the subordinate type supplied in the original bridge wrapper create call
+     * which created the subordinate transaction.
+     * @return a possibly zero-length array of bridge wrappers for all recovered subordinate AT transactions
+     * with the given subordinate type or null if a subordinate coordinator recovery scan has not yet occurred
      */
-    public static BridgeWrapper[] scan(String subordinateType) {
+    public static BridgeWrapper[] scan(String subordinateType)
+    {
         // return null if not yet ready
 
         XTSATRecoveryManager recoveryManager = XTSATRecoveryManager.getRecoveryManager();
@@ -175,22 +159,21 @@ public class BridgeWrapper {
 
     /**
      * obtain the identifier for the bridged-to transaction
-     * 
      * @return the identifier for the bridged-to transaction
      */
-    public String getIdentifier() {
+    public String getIdentifier()
+    {
         return id;
     }
 
     /**
      * obtain a resumable transaction context for the bridged-to transaction
-     * 
      * @return a resumable transaction context
-     * @throws UnknownTransactionException
-     *             if this transaction has been recovered from the log and hence
-     *             has no associated transaction context.
+     * @throws UnknownTransactionException if this transaction has been recovered from the log and hence
+     * has no associated transaction context.
      */
-    public TxContext getContext() throws UnknownTransactionException {
+    public TxContext getContext() throws UnknownTransactionException
+    {
         if (context != null) {
             return context;
         } else {
@@ -200,38 +183,40 @@ public class BridgeWrapper {
 
     /**
      * obtain the subordinate type for the bridged-to transaction
-     * 
      * @return the subordinate type for the bridged-to transaction
      */
-    public String getSubordinateType() {
+    public String getSubordinateType()
+    {
         return subordinateType;
     }
 
     /**
-     * initiate synchronization beforeCompletion processing for the bridged-to
-     * transaction
+     * initiate synchronization beforeCompletion processing for the bridged-to transaction
      *
      * @return true if the beforeCompletion succeeds otherwise false.
      */
-    public boolean prepareVolatile() {
+    public boolean prepareVolatile()
+    {
         return coordinator.prepareVolatile();
     }
 
     /**
      * prepare the bridged-to transaction
-     * 
      * @return the result of preparing the transaction
      */
 
-    public int prepare() {
+    public int prepare ()
+    {
         return coordinator.prepare();
     }
+    
 
     /**
-     * initiate synchronization afterCompletion processing for the bridged-to
-     * transaction following a successful commit
+     * initiate synchronization afterCompletion processing for the bridged-to transaction following a
+     * successful commit
      */
-    public void commitVolatile() {
+    public void commitVolatile()
+    {
         coordinator.commitVolatile();
     }
 
@@ -239,22 +224,25 @@ public class BridgeWrapper {
      * perform a phase 2 commit for the bridged-to transaction
      */
 
-    public void commit() {
+    public void commit ()
+    {
         coordinator.commit();
     }
 
     /**
-     * initiate synchronization afterCompletion processing for the bridged-to
-     * transaction following a rollback
+     * initiate synchronization afterCompletion processing for the bridged-to transaction following a
+     * rollback
      */
-    public void rollbackVolatile() {
+    public void rollbackVolatile()
+    {
         coordinator.rollbackVolatile();
     }
 
     /**
      * rollback the bridged-to transaction
      */
-    public void rollback() {
+    public void rollback ()
+    {
         coordinator.rollback();
     }
 

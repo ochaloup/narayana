@@ -51,180 +51,208 @@ import com.arjuna.ats.jdbc.logging.jdbcLogger;
 import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 
 /**
- * This class is responsible for maintaining connection information in such a
- * manner that we can recover the connection to the XA database in the event of
- * a failure.
+ * This class is responsible for maintaining connection information
+ * in such a manner that we can recover the connection to the XA
+ * database in the event of a failure.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: IndirectRecoverableConnection.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: IndirectRecoverableConnection.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 2.0.
  */
 
-public class IndirectRecoverableConnection
-        implements
-            RecoverableXAConnection,
-            ConnectionControl,
-            TransactionalDriverXAConnection {
+public class IndirectRecoverableConnection implements RecoverableXAConnection, ConnectionControl, TransactionalDriverXAConnection
+{
 
-    public IndirectRecoverableConnection() throws SQLException {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.IndirectRecoverableConnection ()");
-        }
+    public IndirectRecoverableConnection () throws SQLException
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.IndirectRecoverableConnection ()");
+    }
 
-        _dbName = null;
-        _user = null;
-        _passwd = null;
+    _dbName = null;
+    _user = null;
+    _passwd = null;
+    _theConnection = null;
+    _theDataSource = null;
+    _theXAResource = null;
+    _theTransaction = null;
+    _theArjunaConnection = null;
+    _theModifier = null;
+    }
+
+    public IndirectRecoverableConnection (String dbName, String user,
+                     String passwd,
+                     ConnectionImple conn) throws SQLException
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.IndirectRecoverableConnection ( " + dbName + ", " + user + ", " + passwd + " )");
+    }
+
+    _dbName = dbName;
+    _user = user;
+    _passwd = passwd;
+    _theConnection = null;
+    _theDataSource = null;
+    _theXAResource = null;
+    _theTransaction = null;
+    _theArjunaConnection = conn;
+
+    /*
+     * Create a jndi specific modifier first, so that we can then
+     * use this to find out what the end-point datasource really
+     * is.
+     */
+
+    com.arjuna.ats.internal.jdbc.drivers.modifiers.jndi jndiModifier = new com.arjuna.ats.internal.jdbc.drivers.modifiers.jndi();
+
+    _dbName = jndiModifier.initialise(_dbName);
+    _theModifier = null;
+
+    createDataSource();
+    }
+
+    public void finalize ()
+    {
+    try
+    {
+        if (_theConnection != null)
+        {
+        _theConnection.close();
         _theConnection = null;
-        _theDataSource = null;
-        _theXAResource = null;
-        _theTransaction = null;
-        _theArjunaConnection = null;
-        _theModifier = null;
-    }
-
-    public IndirectRecoverableConnection(String dbName, String user, String passwd, ConnectionImple conn)
-            throws SQLException {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.IndirectRecoverableConnection ( " + dbName + ", "
-                    + user + ", " + passwd + " )");
-        }
-
-        _dbName = dbName;
-        _user = user;
-        _passwd = passwd;
-        _theConnection = null;
-        _theDataSource = null;
-        _theXAResource = null;
-        _theTransaction = null;
-        _theArjunaConnection = conn;
-
-        /*
-         * Create a jndi specific modifier first, so that we can then use this
-         * to find out what the end-point datasource really is.
-         */
-
-        com.arjuna.ats.internal.jdbc.drivers.modifiers.jndi jndiModifier = new com.arjuna.ats.internal.jdbc.drivers.modifiers.jndi();
-
-        _dbName = jndiModifier.initialise(_dbName);
-        _theModifier = null;
-
-        createDataSource();
-    }
-
-    public void finalize() {
-        try {
-            if (_theConnection != null) {
-                _theConnection.close();
-                _theConnection = null;
-            }
-        } catch (SQLException e) {
-            jdbcLogger.i18NLogger.warn_drcdest(e);
         }
     }
-
-    public boolean packInto(OutputObjectState os) {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.packInto ()");
-        }
-
-        try {
-            os.packString(_dbName);
-            os.packString(_user);
-            os.packString(_passwd);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    catch (SQLException e)
+    {
+        jdbcLogger.i18NLogger.warn_drcdest(e);
+    }
     }
 
-    public boolean unpackFrom(InputObjectState os) {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.unpackFrom ()");
-        }
-
-        try {
-            _dbName = os.unpackString();
-            _user = os.unpackString();
-            _passwd = os.unpackString();
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean packInto (OutputObjectState os)
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.packInto ()");
     }
 
-    public String getDatabaseName() {
-        return _dbName;
+    try
+    {
+        os.packString(_dbName);
+        os.packString(_user);
+        os.packString(_passwd);
+
+        return true;
+    }
+    catch (Exception e)
+    {
+        return false;
+    }
     }
 
-    public XAResource getResource() throws SQLException {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.getResource ()");
-        }
-
-        try {
-            if (_theXAResource == null) {
-                if (_theModifier != null && _theModifier.requiresSameRMOverride()) {
-                    _theXAResource = new IsSameRMOverrideXAResource(getConnection().getXAResource());
-                } else {
-                    _theXAResource = getConnection().getXAResource();
-                }
-            }
-            return _theXAResource;
-        } catch (Exception e) {
-            SQLException sqlException = new SQLException(e.toString());
-            sqlException.initCause(e);
-            throw sqlException;
-        }
+    public boolean unpackFrom (InputObjectState os)
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.unpackFrom ()");
     }
 
-    public final void close() {
-        reset();
+    try
+    {
+        _dbName = os.unpackString();
+        _user = os.unpackString();
+        _passwd = os.unpackString();
+
+        return true;
+    }
+    catch (Exception e)
+    {
+        return false;
+    }
     }
 
-    public final void reset() {
-        _theXAResource = null;
-        _theTransaction = null;
+    public String getDatabaseName ()
+    {
+    return _dbName;
     }
 
-    public boolean setTransaction(javax.transaction.Transaction tx) {
-        synchronized (this) {
-            if (_theTransaction == null) {
-                _theTransaction = tx;
+    public XAResource getResource () throws SQLException
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.getResource ()");
+    }
 
-                return true;
+    try
+    {
+        if (_theXAResource == null) {
+            if (_theModifier != null && _theModifier.requiresSameRMOverride()) {
+                _theXAResource = new IsSameRMOverrideXAResource(getConnection().getXAResource());
+            } else {
+                _theXAResource = getConnection().getXAResource();
             }
         }
-
-        /*
-         * In case we have already set it for this transaction.
-         */
-
-        return validTransaction(tx);
+        return _theXAResource;
+    }
+    catch (Exception e)
+    {
+        SQLException sqlException = new SQLException(e.toString());
+        sqlException.initCause(e);
+        throw sqlException;
+    }
     }
 
-    public boolean validTransaction(javax.transaction.Transaction tx) {
-        boolean valid = true;
+    public final void close ()
+    {
+    reset();
+    }
 
-        if (_theTransaction != null)
-            valid = _theTransaction.equals(tx);
+    public final void reset ()
+    {
+    _theXAResource = null;
+    _theTransaction = null;
+    }
 
-        return valid;
+    public boolean setTransaction (javax.transaction.Transaction tx)
+    {
+    synchronized (this)
+    {
+        if (_theTransaction == null)
+        {
+        _theTransaction = tx;
+
+        return true;
+        }
     }
 
     /*
-     * If there is a connection then return it. Do not create a new connection
-     * otherwise.
+     * In case we have already set it for this transaction.
      */
 
-    public XAConnection getCurrentConnection() throws SQLException {
-        return _theConnection;
+    return validTransaction(tx);
     }
 
-    public void closeCloseCurrentConnection() throws SQLException {
-        synchronized (this) {
-            if (_theConnection != null) {
+    public boolean validTransaction (javax.transaction.Transaction tx)
+    {
+    boolean valid = true;
+
+    if (_theTransaction != null)
+        valid = _theTransaction.equals(tx);
+
+    return valid;
+    }
+
+    /*
+     * If there is a connection then return it. Do not create a
+     * new connection otherwise.
+     */
+
+    public XAConnection getCurrentConnection () throws SQLException
+    {
+    return _theConnection;
+    }
+
+    public void closeCloseCurrentConnection() throws SQLException
+    {
+        synchronized (this)
+        {
+            if (_theConnection != null)
+            {
                 _theConnection.close();
                 _theConnection = null;
                 _theXAResource = null;
@@ -232,171 +260,201 @@ public class IndirectRecoverableConnection
         }
     }
 
-    public XAConnection getConnection() throws SQLException {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.getConnection ()");
+    public XAConnection getConnection () throws SQLException
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.getConnection ()");
+    }
+
+    try
+    {
+        synchronized (this)
+        {
+        if (_theConnection == null)
+        {
+            createConnection();
+        }
         }
 
-        try {
-            synchronized (this) {
-                if (_theConnection == null) {
-                    createConnection();
-                }
-            }
+        return _theConnection;
+    }
+    catch (Exception e)
+    {
+        e.printStackTrace();
 
-            return _theConnection;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            SQLException sqlException = new SQLException(e.toString());
-            sqlException.initCause(e);
-            throw sqlException;
-        }
+        SQLException sqlException = new SQLException(e.toString());
+        sqlException.initCause(e);
+        throw sqlException;    }
     }
 
-    public XADataSource getDataSource() throws SQLException {
-        if (jdbcLogger.logger.isTraceEnabled()) {
-            jdbcLogger.logger.trace("IndirectRecoverableConnection.getDataSource ()");
-        }
-
-        return _theDataSource;
+    public XADataSource getDataSource () throws SQLException
+    {
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.trace("IndirectRecoverableConnection.getDataSource ()");
     }
 
-    public boolean inuse() {
-        return (boolean) (_theXAResource != null);
+    return _theDataSource;
     }
 
-    public String user() {
-        return _user;
+    public boolean inuse ()
+    {
+    return (boolean) (_theXAResource != null);
     }
 
-    public String password() {
-        return _passwd;
+    public String user ()
+    {
+    return _user;
     }
 
-    public String url() {
-        return _dbName;
+    public String password ()
+    {
+    return _passwd;
     }
 
-    public String dynamicClass() {
+    public String url ()
+    {
+    return _dbName;
+    }
+
+    public String dynamicClass ()
+    {
+    return "";
+    }
+
+    public String dataSourceName ()
+    {
+    if (_theDataSource != null)
+        return _theDataSource.toString();
+    else
         return "";
     }
 
-    public String dataSourceName() {
-        if (_theDataSource != null)
-            return _theDataSource.toString();
+    public Transaction transaction ()
+    {
+    return _theTransaction;
+    }
+
+    public void setModifier (ConnectionModifier cm)
+    {
+    _theModifier = cm;
+
+    if (_theModifier != null)
+        _dbName = _theModifier.initialise(_dbName);
+    }
+    
+    private final void createDataSource () throws SQLException
+    {
+    try
+    {
+        if (_theDataSource == null)
+        {
+            Hashtable env = jdbcPropertyManager.getJDBCEnvironmentBean().getJndiProperties();
+            Context ctx = new InitialContext(env);
+            _theDataSource = (XADataSource) ctx.lookup(_dbName);
+        }
+
+        if (_theDataSource == null) {
+            throw new SQLException(jdbcLogger.i18NLogger.get_jndierror());
+        }
+    }
+    catch (SQLException ex)
+    {
+        throw ex;
+    }
+    catch (Exception e)
+    {
+        jdbcLogger.logger.error(e);
+
+        SQLException sqlException = new SQLException(e.toString());
+        sqlException.initCause(e);
+        throw sqlException;    }
+    }
+
+    private final void createConnection () throws SQLException
+    {
+    try
+    {
+        if (_theDataSource == null)
+        createDataSource();
+
+        if ((_user == null) && (_passwd == null))
+        _theConnection = _theDataSource.getXAConnection();
         else
-            return "";
+        _theConnection = _theDataSource.getXAConnection(_user, _passwd);
     }
-
-    public Transaction transaction() {
-        return _theTransaction;
+    catch (SQLException ex)
+    {
+        throw ex;
     }
+    catch (Exception e)
+    {
+        e.printStackTrace();
 
-    public void setModifier(ConnectionModifier cm) {
-        _theModifier = cm;
-
-        if (_theModifier != null)
-            _dbName = _theModifier.initialise(_dbName);
-    }
-
-    private final void createDataSource() throws SQLException {
-        try {
-            if (_theDataSource == null) {
-                Hashtable env = jdbcPropertyManager.getJDBCEnvironmentBean().getJndiProperties();
-                Context ctx = new InitialContext(env);
-                _theDataSource = (XADataSource) ctx.lookup(_dbName);
-            }
-
-            if (_theDataSource == null) {
-                throw new SQLException(jdbcLogger.i18NLogger.get_jndierror());
-            }
-        } catch (SQLException ex) {
-            throw ex;
-        } catch (Exception e) {
-            jdbcLogger.logger.error(e);
-
-            SQLException sqlException = new SQLException(e.toString());
-            sqlException.initCause(e);
-            throw sqlException;
-        }
-    }
-
-    private final void createConnection() throws SQLException {
-        try {
-            if (_theDataSource == null)
-                createDataSource();
-
-            if ((_user == null) && (_passwd == null))
-                _theConnection = _theDataSource.getXAConnection();
-            else
-                _theConnection = _theDataSource.getXAConnection(_user, _passwd);
-        } catch (SQLException ex) {
-            throw ex;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            SQLException sqlException = new SQLException(e.toString());
-            sqlException.initCause(e);
-            throw sqlException;
-        }
+        SQLException sqlException = new SQLException(e.toString());
+        sqlException.initCause(e);
+        throw sqlException;    }
     }
 
     /*
      * Warning; roadworks ahead!!
      *
      * For some reasons JNDI uses different property names internally for
-     * specifying things like the initial context to those it expects users to
-     * manipulate. Why?! There are some really stupid people at Sun!!
+     * specifying things like the initial context to those it expects
+     * users to manipulate. Why?! There are some really stupid people
+     * at Sun!!
      */
 
-    private final String translate(String name) {
-        try {
-            if (name.equals("Context.APPLET"))
-                return Context.APPLET;
-            if (name.equals("Context.AUTHORITATIVE"))
-                return Context.AUTHORITATIVE;
-            if (name.equals("Context.BATCHSIZE"))
-                return Context.BATCHSIZE;
-            if (name.equals("Context.DNS_URL"))
-                return Context.DNS_URL;
-            if (name.equals("Context.INITIAL_CONTEXT_FACTORY"))
-                return Context.INITIAL_CONTEXT_FACTORY;
-            if (name.equals("Context.LANGUAGE"))
-                return Context.LANGUAGE;
-            if (name.equals("Context.OBJECT_FACTORIES"))
-                return Context.OBJECT_FACTORIES;
-            if (name.equals("Context.PROVIDER_URL"))
-                return Context.PROVIDER_URL;
-            if (name.equals("Context.REFERRAL"))
-                return Context.REFERRAL;
-            if (name.equals("Context.SECURITY_AUTHENTICATION"))
-                return Context.SECURITY_AUTHENTICATION;
-            if (name.equals("Context.SECURITY_CREDENTIALS"))
-                return Context.SECURITY_CREDENTIALS;
-            if (name.equals("Context.SECURITY_PRINCIPAL"))
-                return Context.SECURITY_PRINCIPAL;
-            if (name.equals("Context.SECURITY_PROTOCOL"))
-                return Context.SECURITY_PROTOCOL;
-            if (name.equals("Context.STATE_FACTORIES"))
-                return Context.STATE_FACTORIES;
-            if (name.equals("Context.URL_PKG_PREFIXES"))
-                return Context.URL_PKG_PREFIXES;
-        } catch (NullPointerException ex) {
-            // name is null
-        }
-
-        return name;
+    private final String translate (String name)
+    {
+    try
+    {
+        if (name.equals("Context.APPLET"))
+        return Context.APPLET;
+        if (name.equals("Context.AUTHORITATIVE"))
+        return Context.AUTHORITATIVE;
+        if (name.equals("Context.BATCHSIZE"))
+        return Context.BATCHSIZE;
+        if (name.equals("Context.DNS_URL"))
+        return Context.DNS_URL;
+        if (name.equals("Context.INITIAL_CONTEXT_FACTORY"))
+        return Context.INITIAL_CONTEXT_FACTORY;
+        if (name.equals("Context.LANGUAGE"))
+        return Context.LANGUAGE;
+        if (name.equals("Context.OBJECT_FACTORIES"))
+        return Context.OBJECT_FACTORIES;
+        if (name.equals("Context.PROVIDER_URL"))
+        return Context.PROVIDER_URL;
+        if (name.equals("Context.REFERRAL"))
+        return Context.REFERRAL;
+        if (name.equals("Context.SECURITY_AUTHENTICATION"))
+        return Context.SECURITY_AUTHENTICATION;
+        if (name.equals("Context.SECURITY_CREDENTIALS"))
+        return Context.SECURITY_CREDENTIALS;
+        if (name.equals("Context.SECURITY_PRINCIPAL"))
+        return Context.SECURITY_PRINCIPAL;
+        if (name.equals("Context.SECURITY_PROTOCOL"))
+        return Context.SECURITY_PROTOCOL;
+        if (name.equals("Context.STATE_FACTORIES"))
+        return Context.STATE_FACTORIES;
+        if (name.equals("Context.URL_PKG_PREFIXES"))
+        return Context.URL_PKG_PREFIXES;
+    }
+    catch (NullPointerException ex)
+    {
+        // name is null
     }
 
-    private String _dbName;
-    private String _user;
-    private String _passwd;
-    private XAConnection _theConnection;
-    private XADataSource _theDataSource;
-    private XAResource _theXAResource;
+    return name;
+    }
+
+    private String                        _dbName;
+    private String                        _user;
+    private String                        _passwd;
+    private XAConnection                  _theConnection;
+    private XADataSource                  _theDataSource;
+    private XAResource                    _theXAResource;
     private javax.transaction.Transaction _theTransaction;
-    private ConnectionImple _theArjunaConnection;
-    private ConnectionModifier _theModifier;
+    private ConnectionImple               _theArjunaConnection;
+    private ConnectionModifier            _theModifier;
 
 }

@@ -45,50 +45,61 @@ import com.arjuna.orbportability.RootOA;
 import com.arjuna.orbportability.common.opPropertyManager;
 import com.arjuna.orbportability.internal.utils.PostInitLoader;
 
-public class ORBSetupTest {
+public class ORBSetupTest
+{
     private final static String ORB_NAME = "testorb";
 
     @Test
-    public void test() {
+    public void test()
+    {
         boolean staticSet = false;
         ORB myORB = null;
         RootOA myOA = null;
 
-        Map<String, String> properties = opPropertyManager.getOrbPortabilityEnvironmentBean()
-                .getOrbInitializationProperties();
+        Map<String, String> properties = opPropertyManager.getOrbPortabilityEnvironmentBean().getOrbInitializationProperties();
 
-        properties.put(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_NAME),
-                "com.arjuna.ats.jts.utils.ORBSetup");
+        properties.put( PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_NAME), "com.arjuna.ats.jts.utils.ORBSetup");
 
         opPropertyManager.getOrbPortabilityEnvironmentBean().setOrbInitializationProperties(properties);
 
-        try {
+        try
+        {
             myORB = ORB.getInstance(ORB_NAME);
             myOA = OA.getRootOA(myORB);
 
-            if (staticSet) {
+            if (staticSet)
+            {
                 ORBManager.setORB(myORB);
             }
 
-            try {
-                myORB.initORB(new String[]{}, null);
+            try
+            {
+                myORB.initORB(new String[] {}, null);
                 myOA.initOA();
 
                 assertEquals(myORB, ORBManager.getORB());
-            } catch (FatalError e) {
-                if (staticSet) {
+            }
+            catch (FatalError e)
+            {
+                if (staticSet)
+                {
                     System.out.println("FatalError thrown as expected");
-                } else {
-                    fail("Error: " + e);
+                }
+                else
+                {
+                    fail("Error: "+e);
                     e.printStackTrace(System.err);
                 }
             }
 
             myOA.destroy();
             myORB.destroy();
-        } catch (Throwable e) {
-            fail("Error: " + e);
+        }
+        catch (Throwable e)
+        {
+            fail("Error: "+e);
             e.printStackTrace(System.err);
         }
     }
 }
+

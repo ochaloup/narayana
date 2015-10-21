@@ -56,22 +56,24 @@ package org.jboss.jbossts.qa.CrashRecovery05Servers;
  * $Id: Server08.java,v 1.4 2003/07/15 15:33:12 jcoleman Exp $
  */
 
+
 import org.jboss.jbossts.qa.CrashRecovery05.*;
 import org.jboss.jbossts.qa.CrashRecovery05Impls.AfterCrashServiceImpl02;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server08 {
-    public static void main(String args[]) {
-        try {
+public class Server08
+{
+    public static void main(String args[])
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
-            AfterCrashServiceImpl02 afterCrashServiceImpl1 = new AfterCrashServiceImpl02(
-                    args[args.length - 3].hashCode(), 0);
-            AfterCrashServiceImpl02 afterCrashServiceImpl2 = new AfterCrashServiceImpl02(
-                    args[args.length - 3].hashCode(), 1);
+            AfterCrashServiceImpl02 afterCrashServiceImpl1 = new AfterCrashServiceImpl02(args[args.length - 3].hashCode(), 0);
+            AfterCrashServiceImpl02 afterCrashServiceImpl2 = new AfterCrashServiceImpl02(args[args.length - 3].hashCode(), 1);
 
             AfterCrashServicePOATie servant1 = new AfterCrashServicePOATie(afterCrashServiceImpl1);
             AfterCrashServicePOATie servant2 = new AfterCrashServicePOATie(afterCrashServiceImpl2);
@@ -88,9 +90,12 @@ public class Server08 {
             System.out.println("Ready");
 
             ORBInterface.run();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Server08.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
+

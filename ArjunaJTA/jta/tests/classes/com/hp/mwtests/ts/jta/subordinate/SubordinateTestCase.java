@@ -43,18 +43,19 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManag
 import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.TransactionImple;
 import com.arjuna.ats.jta.xa.XidImple;
 
-public class SubordinateTestCase {
-    // This test class is subclassed by the JTAX version of the tests, so we
-    // isolate
-    // the module specific tx creation code to this function, which then gets
-    // overridden.
+public class SubordinateTestCase
+{
+    // This test class is subclassed by the JTAX version of the tests, so we isolate
+    // the module specific tx creation code to this function, which then gets overridden.
     public SubordinateTransaction createTransaction() {
         return new TransactionImple(0); // implicit begin
     }
 
     @Test
-    public void testCleanupCommit() throws Exception {
-        for (int i = 0; i < 1000; i++) {
+    public void testCleanupCommit () throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
             final SubordinateTransaction tm = createTransaction();
 
             assertEquals(TwoPhaseOutcome.PREPARE_READONLY, tm.doPrepare());
@@ -65,8 +66,10 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testCleanupRollback() throws Exception {
-        for (int i = 0; i < 1000; i++) {
+    public void testCleanupRollback () throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
             final SubordinateTransaction tm = createTransaction();
 
             tm.doRollback();
@@ -76,8 +79,10 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testCleanupSecondPhaseRollback() throws Exception {
-        for (int i = 0; i < 1000; i++) {
+    public void testCleanupSecondPhaseRollback () throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
             final SubordinateTransaction tm = createTransaction();
 
             assertEquals(TwoPhaseOutcome.PREPARE_READONLY, tm.doPrepare());
@@ -88,8 +93,10 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testCleanupOnePhaseCommit() throws Exception {
-        for (int i = 0; i < 1000; i++) {
+    public void testCleanupOnePhaseCommit () throws Exception
+    {
+        for (int i = 0; i < 1000; i++)
+        {
             final SubordinateTransaction tm = createTransaction();
 
             tm.doOnePhaseCommit();
@@ -101,7 +108,8 @@ public class SubordinateTestCase {
     /////////////
 
     @Test
-    public void testOnePhaseCommitSync() throws Exception {
+    public void testOnePhaseCommitSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -112,7 +120,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncViaXATerminator() throws Exception {
+    public void testOnePhaseCommitSyncViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -125,7 +134,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncWithRollbackOnly() throws Exception {
+    public void testOnePhaseCommitSyncWithRollbackOnly() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -133,7 +143,7 @@ public class SubordinateTestCase {
         try {
             tm.doOnePhaseCommit();
             fail("did not get expected rollback exception");
-        } catch (RollbackException e) {
+        } catch(RollbackException e) {
             // expected - we tried to commit a rollbackonly tx.
         }
         assertFalse(sync.isBeforeCompletionDone());
@@ -142,7 +152,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncWithRollbackOnlyViaXATerminator() throws Exception {
+    public void testOnePhaseCommitSyncWithRollbackOnlyViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -151,9 +162,9 @@ public class SubordinateTestCase {
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
         try {
             xaTerminator.commit(xid, true);
-            ((TransactionImple) t).doOnePhaseCommit();
+            ((TransactionImple)t).doOnePhaseCommit();
             fail("did not get expected rollback exception");
-        } catch (XAException e) {
+        } catch(XAException e) {
             assertEquals("javax.transaction.RollbackException", e.getCause().getClass().getName());
             assertEquals(XAException.XA_RBROLLBACK, e.errorCode);
             // expected - we tried to commit a rollbackonly tx.
@@ -164,7 +175,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testRollbackSync() throws Exception {
+    public void testRollbackSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -175,7 +187,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testRollbackSyncViaXATerminator() throws Exception {
+    public void testRollbackSyncViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -188,7 +201,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSync() throws Exception {
+    public void testTwoPhaseCommitSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -200,7 +214,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncViaXATerminator() throws Exception {
+    public void testTwoPhaseCommitSyncViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -214,7 +229,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithXAOK() throws Exception {
+    public void testTwoPhaseCommitSyncWithXAOK() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -229,7 +245,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithXAOKViaXATerminator() throws Exception {
+    public void testTwoPhaseCommitSyncWithXAOKViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -246,7 +263,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithRollbackOnly() throws Exception {
+    public void testTwoPhaseCommitSyncWithRollbackOnly() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -259,7 +277,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithRollbackOnlyViaXATerminator() throws Exception {
+    public void testTwoPhaseCommitSyncWithRollbackOnlyViaXATerminator() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -269,12 +288,11 @@ public class SubordinateTestCase {
 
         try {
             xaTerminator.prepare(xid);
-        } catch (XAException e) {
+        } catch(XAException e) {
             assertEquals(XAException.XA_RBROLLBACK, e.errorCode);
             // expected - we tried to prepare a rollbackonly tx.
         }
-        // no need to call rollback - the XA_RBROLLBACK code indicates its been
-        // done.
+        // no need to call rollback - the XA_RBROLLBACK code indicates its been done.
         assertFalse(sync.isBeforeCompletionDone());
         assertTrue(sync.isAfterCompletionDone());
         assertEquals(javax.transaction.Status.STATUS_ROLLEDBACK, t.getStatus());
@@ -283,7 +301,8 @@ public class SubordinateTestCase {
     /////////////
 
     @Test
-    public void testOnePhaseCommitSyncWithSeparateSync() throws Exception {
+    public void testOnePhaseCommitSyncWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -295,13 +314,14 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncViaXATerminatorWithSeparateSync() throws Exception {
+    public void testOnePhaseCommitSyncViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
         t.registerSynchronization(sync);
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
         xaTerminator.commit(xid, true);
         assertTrue(sync.isBeforeCompletionDone());
@@ -310,7 +330,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncWithRollbackOnlyWithSeparateSync() throws Exception {
+    public void testOnePhaseCommitSyncWithRollbackOnlyWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -319,7 +340,7 @@ public class SubordinateTestCase {
         try {
             tm.doOnePhaseCommit();
             fail("did not get expected rollback exception");
-        } catch (RollbackException e) {
+        } catch(RollbackException e) {
             // expected - we tried to commit a rollbackonly tx.
         }
         assertTrue(sync.isBeforeCompletionDone());
@@ -328,20 +349,21 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testOnePhaseCommitSyncWithRollbackOnlyViaXATerminatorWithSeparateSync() throws Exception {
+    public void testOnePhaseCommitSyncWithRollbackOnlyViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
         t.registerSynchronization(sync);
         t.setRollbackOnly();
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
         try {
             xaTerminator.commit(xid, true);
-            ((TransactionImple) t).doOnePhaseCommit();
+            ((TransactionImple)t).doOnePhaseCommit();
             fail("did not get expected rollback exception");
-        } catch (XAException e) {
+        } catch(XAException e) {
             assertEquals("javax.transaction.RollbackException", e.getCause().getClass().getName());
             assertEquals(XAException.XA_RBROLLBACK, e.errorCode);
             // expected - we tried to commit a rollbackonly tx.
@@ -352,7 +374,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testRollbackSyncWithSeparateSync() throws Exception {
+    public void testRollbackSyncWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -364,13 +387,14 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testRollbackSyncViaXATerminatorWithSeparateSync() throws Exception {
+    public void testRollbackSyncViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
         t.registerSynchronization(sync);
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
         xaTerminator.rollback(xid);
         assertTrue(sync.isBeforeCompletionDone());
@@ -379,7 +403,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -392,13 +417,14 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncViaXATerminatorWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
         t.registerSynchronization(sync);
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
         assertEquals(XAResource.XA_RDONLY, xaTerminator.prepare(xid));
         // don't call commit for read only case
@@ -408,7 +434,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithXAOKWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncWithXAOKWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -424,7 +451,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithXAOKViaXATerminatorWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncWithXAOKViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
@@ -433,7 +461,7 @@ public class SubordinateTestCase {
         xaResource.setPrepareReturnValue(XAResource.XA_OK);
         t.enlistResource(xaResource);
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
         assertEquals(XAResource.XA_OK, xaTerminator.prepare(xid));
         xaTerminator.commit(xid, false);
@@ -443,7 +471,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithRollbackOnlyWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncWithRollbackOnlyWithSeparateSync() throws Exception
+    {
         final SubordinateTransaction tm = createTransaction();
         final TestSynchronization sync = new TestSynchronization();
         tm.registerSynchronization(sync);
@@ -457,31 +486,32 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testTwoPhaseCommitSyncWithRollbackOnlyViaXATerminatorWithSeparateSync() throws Exception {
+    public void testTwoPhaseCommitSyncWithRollbackOnlyViaXATerminatorWithSeparateSync() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
         final TestSynchronization sync = new TestSynchronization();
         t.registerSynchronization(sync);
         t.setRollbackOnly();
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions) xaTerminator;
+        final XATerminatorExtensions xaTerminatorExtensions = (XATerminatorExtensions)xaTerminator;
         xaTerminatorExtensions.beforeCompletion(xid);
 
         try {
             xaTerminator.prepare(xid);
-        } catch (XAException e) {
+        } catch(XAException e) {
             assertEquals(XAException.XA_RBROLLBACK, e.errorCode);
             // expected - we tried to prepare a rollbackonly tx.
         }
-        // no need to call rollback - the XA_RBROLLBACK code indicates its been
-        // done.
+        // no need to call rollback - the XA_RBROLLBACK code indicates its been done.
         assertTrue(sync.isBeforeCompletionDone());
         assertTrue(sync.isAfterCompletionDone());
         assertEquals(javax.transaction.Status.STATUS_ROLLEDBACK, t.getStatus());
     }
 
     @Test
-    public void testFailOnCommitOnePhase() throws Exception {
+    public void testFailOnCommitOnePhase () throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
@@ -489,18 +519,18 @@ public class SubordinateTestCase {
         // provoke commit into failing with TwoPhaseOutcome.FINISH_ERROR
         // warning: this is sensitive to the impl exception handling in
         // XAResourceRecord.topLevelCommit
-        xaResource.setCommitException(new XAException(XAException.XA_HEURRB)); // should
-                                                                                // cause
-                                                                                // an
-                                                                                // exception!
+        xaResource.setCommitException(new XAException(XAException.XA_HEURRB));  // should cause an exception!
 
         t.enlistResource(xaResource);
 
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
 
-        try {
+        try
+        {
             xaTerminator.commit(xid, true);
-        } catch (final XAException ex) {
+        }
+        catch (final XAException ex)
+        {
             // success!
 
             return;
@@ -510,7 +540,8 @@ public class SubordinateTestCase {
     }
 
     @Test
-    public void testFailOnCommitRetry() throws Exception {
+    public void testFailOnCommitRetry () throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
@@ -525,18 +556,18 @@ public class SubordinateTestCase {
         xaTerminator.prepare(xid);
 
         /*
-         * This should not cause problems. The transaction really has committed,
-         * or will once recovery kicks off. So nothing for the parent to do. The
-         * subordinate log will maintain enough information to drive recovery
-         * locally if we get to the point of issuing a commit call from parent
-         * to child.
+         * This should not cause problems. The transaction really has committed, or will once
+         * recovery kicks off. So nothing for the parent to do. The subordinate log will
+         * maintain enough information to drive recovery locally if we get to the point of
+         * issuing a commit call from parent to child.
          */
 
         xaTerminator.commit(xid, false);
     }
 
     @Test
-    public void testFailOnCommit() throws Exception {
+    public void testFailOnCommit() throws Exception
+    {
         final Xid xid = new XidImple(new Uid());
         final Transaction t = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
@@ -544,21 +575,19 @@ public class SubordinateTestCase {
         // provoke commit into failing with TwoPhaseOutcome.FINISH_ERROR
         // warning: this is sensitive to the impl exception handling in
         // XAResourceRecord.topLevelCommit
-        xaResource.setCommitException(new XAException(XAException.XA_HEURHAZ)); // throw
-                                                                                // a
-                                                                                // little
-                                                                                // spice
-                                                                                // into
-                                                                                // things!
+        xaResource.setCommitException(new XAException(XAException.XA_HEURHAZ));  // throw a little spice into things!
 
         t.enlistResource(xaResource);
 
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
 
-        try {
+        try
+        {
             xaTerminator.prepare(xid);
             xaTerminator.commit(xid, false);
-        } catch (final XAException ex) {
+        }
+        catch (final XAException ex)
+        {
             // success!!
 
             return;

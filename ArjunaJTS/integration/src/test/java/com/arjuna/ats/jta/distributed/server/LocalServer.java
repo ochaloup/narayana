@@ -37,9 +37,8 @@ import com.arjuna.ats.arjuna.common.CoreEnvironmentBeanException;
 
 public interface LocalServer {
 
-    public void initialise(LookupProvider lookupProvider, String nodeName, int portOffset, String[] clusterBuddies,
-            ClassLoader classLoaderForTransactionManager) throws CoreEnvironmentBeanException, IOException,
-            SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException;
+    public void initialise(LookupProvider lookupProvider, String nodeName, int portOffset, String[] clusterBuddies, ClassLoader classLoaderForTransactionManager)
+            throws CoreEnvironmentBeanException, IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException;
 
     public ClassLoader getClassLoader();
 
@@ -55,8 +54,8 @@ public interface LocalServer {
 
     public void removeRootTransaction(Xid toMigrate);
 
-    public Xid locateOrImportTransactionThenResumeIt(int remainingTimeout, Xid toImport)
-            throws XAException, InvalidTransactionException, IllegalStateException, SystemException, IOException;
+    public Xid locateOrImportTransactionThenResumeIt(int remainingTimeout, Xid toImport) throws XAException, InvalidTransactionException,
+            IllegalStateException, SystemException, IOException;
 
     public RemoteServer connectTo();
 

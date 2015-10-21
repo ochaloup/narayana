@@ -46,16 +46,19 @@ import org.omg.CosTransactions.Control;
 import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.internal.jts.orbspecific.TransactionFactoryImple;
 
-public class Performance2 {
+public class Performance2
+{
     @Test
-    public void test() {
+    public void test()
+    {
         int numberOfCalls = 1000;
         int warmUpCount = 10;
         int numberOfThreads = 1;
         int batchSize = numberOfCalls;
 
-        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1").maxTestTime(0L)
-                .numberOfCalls(numberOfCalls).numberOfThreads(numberOfThreads).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(getClass().getName() + "_test1")
+                .maxTestTime(0L).numberOfCalls(numberOfCalls)
+                .numberOfThreads(numberOfThreads).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker, worker);
 
         Assert.assertNull("Test exception: " + measurement.getException(), measurement.getException());
@@ -63,8 +66,7 @@ public class Performance2 {
         Assert.assertFalse(measurement.getInfo(), measurement.shouldFail());
 
         System.out.printf("%s%n", measurement.getInfo());
-        System.out.println(
-                "Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
+        System.out.println("Average time for empty transaction = " + measurement.getTotalMillis() / (float) numberOfCalls);
         System.out.printf("Transactions per second = %f%n", measurement.getThroughput());
     }
 
@@ -103,3 +105,4 @@ public class Performance2 {
         }
     };
 }
+

@@ -19,9 +19,8 @@ public class SpecQuickstartTwoService implements Service {
         X_C_TYPE ptr = (X_C_TYPE) svcinfo.getBuffer();
 
         /*
-         * Parse input string, ptr->input, and retrieve records. Return 10
-         * records at a time to client. Records are placed in ptr->output, an
-         * array of account records.
+         * Parse input string, ptr->input, and retrieve records. Return 10 records at a time to client. Records are placed in
+         * ptr->output, an array of account records.
          */
         for (int i = 0; i < 5; i++) {
             /* gather from DBMS next 10 records into ptr->output array */

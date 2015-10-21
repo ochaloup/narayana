@@ -28,9 +28,11 @@ import com.arjuna.ats.jts.OTSManager;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 
-public class NestedOnePhaseTrx extends PerformanceTest {
-    protected void work() throws Exception {
-        ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
+public class NestedOnePhaseTrx extends PerformanceTest
+{
+    protected void work() throws Exception
+    {
+        ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
         OA oa = OA.getRootOA(orb);
 
         String ref1 = getServiceConfig(0);
@@ -51,11 +53,14 @@ public class NestedOnePhaseTrx extends PerformanceTest {
         // nested commit
         OTSManager.get_current().commit(true);
 
-        if (true) {
+        if ( true )
+        {
             // top level commit
             OTSManager.get_current().commit(true);
-        } else {
-            // top level rollback
+        }
+        else
+        {
+             // top level rollback
             OTSManager.get_current().rollback();
         }
     }

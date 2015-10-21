@@ -51,6 +51,7 @@ public abstract class CompensatableTest {
     @Inject
     StereotypeBean stereotypeBean;
 
+
     @Before
     public void before() {
 
@@ -149,7 +150,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithMandatory(null);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            // expected
+            //expected
             Assert.assertTrue(e.getCause() instanceof TransactionRequiredException);
 
         }
@@ -244,7 +245,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithNever();
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            // expected
+            //expected
             Assert.assertTrue(e.getCause() instanceof InvalidTransactionException);
         }
 
@@ -272,7 +273,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithCLassLevelDefault();
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            // expected
+            //expected
             Assert.assertTrue(e.getCause() instanceof InvalidTransactionException);
         }
 
@@ -292,7 +293,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefault(null, new TestRuntimeException());
             Assert.fail("Expected TestRuntimeException to be thrown, but it was not");
         } catch (TestRuntimeException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(false);
@@ -317,14 +318,14 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefault(null, new TestRuntimeException());
             Assert.fail("Expected TestRuntimeException to be thrown, but it was not");
         } catch (TestRuntimeException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(true);
         try {
             completeBusinessActivity();
         } catch (TransactionCompensatedException e) {
-            // expected
+            //expected
         }
         Utills.assertTransactionActive(false);
 
@@ -346,7 +347,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefault(null, new TestException());
             Assert.fail("Expected TestException to be thrown, but it was not");
         } catch (TestException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(false);
@@ -371,7 +372,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefault(null, new TestException());
             Assert.fail("Expected TestException to be thrown, but it was not");
         } catch (TestException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(true);
@@ -396,7 +397,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefaultAndCancelOn(null, new TestException());
             Assert.fail("Expected TestException to be thrown, but it was not");
         } catch (TestException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(false);
@@ -404,8 +405,7 @@ public abstract class CompensatableTest {
         Assert.assertTrue(DummyCompensationHandler1.getCalled());
         Assert.assertFalse(DummyConfirmationHandler1.getCalled());
 
-        // Different than RuntimeException because cancelOn exceptions are
-        // handled by CompensationInterceptorBase
+        // Different than RuntimeException because cancelOn exceptions are handled by CompensationInterceptorBase
         Assert.assertTrue(DummyCompensationHandler2.getCalled());
         Assert.assertFalse(DummyConfirmationHandler2.getCalled());
     }
@@ -421,7 +421,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefaultAndDontCancelOn(null, new TestRuntimeException());
             Assert.fail("Expected TestRuntimeException to be thrown, but it was not");
         } catch (TestRuntimeException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(false);
@@ -429,8 +429,7 @@ public abstract class CompensatableTest {
         Assert.assertFalse(DummyCompensationHandler1.getCalled());
         Assert.assertTrue(DummyConfirmationHandler1.getCalled());
 
-        // Second participant was compensated because RuntimeException was
-        // handled by the participant handler first.
+        // Second participant was compensated because RuntimeException was handled by the participant handler first.
         Assert.assertFalse(DummyCompensationHandler2.getCalled());
         Assert.assertFalse(DummyConfirmationHandler2.getCalled());
     }
@@ -446,7 +445,7 @@ public abstract class CompensatableTest {
             testTransactionalBean.invokeWithDefaultAndDoAndDontCancelOn(null, new TestException());
             Assert.fail("Expected TestException to be thrown, but it was not");
         } catch (TestException e) {
-            // expected
+            //expected
         }
 
         Utills.assertTransactionActive(false);

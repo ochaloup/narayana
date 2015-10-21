@@ -41,18 +41,24 @@ import com.arjuna.mw.wsas.exceptions.SystemException;
  * @since 1.0.
  */
 
-public class BegunFailedException extends SystemException {
+public class BegunFailedException extends SystemException
+{
 
-    public BegunFailedException() {
-        super();
+    public BegunFailedException ()
+    {
+    super();
     }
 
-    public BegunFailedException(String s) {
-        super(s);
+    public BegunFailedException (String s)
+    {
+    super(s);
     }
 
-    public BegunFailedException(String s, int errorcode) {
-        super(s, errorcode);
+    public BegunFailedException (String s, int errorcode)
+    {
+    super(s, errorcode);
     }
-
+    
 }
+
+

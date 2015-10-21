@@ -28,26 +28,30 @@ package com.arjuna.mw.wscf.model.sagas.exceptions;
 
 import com.arjuna.mw.wsas.exceptions.SystemException;
 
+
 /**
- * A fail occurred during a Business Agreement cancel operation -- only applies
- * in WSBA 1.1.
+ * A fail occurred during a Business Agreement cancel operation -- only applies in WSBA 1.1.
  *
  * @author Andrew Dinn(adinn@redhat.com)
  * @version $Id:$
  */
 
-public class CancelFailedException extends SystemException {
+public class CancelFailedException extends SystemException
+{
 
-    public CancelFailedException() {
-        super();
+    public CancelFailedException()
+    {
+    super();
     }
 
-    public CancelFailedException(String s) {
-        super(s);
+    public CancelFailedException(String s)
+    {
+    super(s);
     }
 
-    public CancelFailedException(String s, int errorcode) {
-        super(s, errorcode);
+    public CancelFailedException(String s, int errorcode)
+    {
+    super(s, errorcode);
     }
 
 }

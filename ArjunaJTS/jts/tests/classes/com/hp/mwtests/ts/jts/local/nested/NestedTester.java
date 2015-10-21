@@ -46,9 +46,11 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.DemoResource;
 import com.hp.mwtests.ts.jts.orbspecific.resources.DemoSubTranResource;
 import com.hp.mwtests.ts.jts.utils.ResourceTrace;
 
-public class NestedTester {
+public class NestedTester
+{
     @Test
-    public void test() {
+    public void test()
+    {
         boolean registerSubtran = false;
         boolean doAbort = false;
 
@@ -57,12 +59,13 @@ public class NestedTester {
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
 
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -86,49 +89,71 @@ public class NestedTester {
             System.out.println("committing second nested transaction");
             current.commit(true);
 
-            if (!doAbort) {
+            if (!doAbort)
+            {
                 System.out.println("committing top-level transaction");
                 current.commit(true);
-            } else {
+            }
+            else
+            {
                 System.out.println("aborting top-level transaction");
                 current.rollback();
             }
 
             System.out.println("Test completed successfully.");
 
-            if ((!doAbort) && (!registerSubtran) && (sr.getNumberOfSubtransactionsRolledBack() == 0)
-                    && (sr.getNumberOfSubtransactionsCommitted() == 1)
-                    && (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTracePrepareCommit)
-                    && (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTracePrepareCommit)) {
-                // assertSuccess();
-            } else {
-                if ((doAbort) && (!registerSubtran) && (sr.getNumberOfSubtransactionsRolledBack() == 0)
-                        && (sr.getNumberOfSubtransactionsCommitted() == 1)
-                        && (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback)
-                        && (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback)) {
-                    // assertSuccess();
-                } else {
-                    if ((!doAbort) && (registerSubtran) && (sr.getNumberOfSubtransactionsRolledBack() == 0)
-                            && (sr.getNumberOfSubtransactionsCommitted() == 1)
-                            && (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceNone)
-                            && (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceCommitOnePhase)) {
-                        // assertSuccess();
-                    } else {
-                        if ((doAbort) && (registerSubtran) && (sr.getNumberOfSubtransactionsRolledBack() == 0)
-                                && (sr.getNumberOfSubtransactionsCommitted() == 1)
-                                && (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceNone)
-                                && (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback)) {
-                            // assertSuccess();
-                        } else
+            if ( (!doAbort) && (!registerSubtran) &&
+                    (sr.getNumberOfSubtransactionsRolledBack() == 0) &&
+                    (sr.getNumberOfSubtransactionsCommitted() == 1) &&
+                    (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTracePrepareCommit) &&
+                    (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTracePrepareCommit) )
+            {
+                //assertSuccess();
+            }
+            else
+            {
+                if ( (doAbort) && (!registerSubtran) &&
+                        (sr.getNumberOfSubtransactionsRolledBack()==0) &&
+                        (sr.getNumberOfSubtransactionsCommitted()==1) &&
+                        (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback) &&
+                        (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback) )
+                {
+                    //assertSuccess();
+                }
+                else
+                {
+                    if ( (!doAbort) && (registerSubtran) &&
+                            (sr.getNumberOfSubtransactionsRolledBack()==0) &&
+                            (sr.getNumberOfSubtransactionsCommitted()==1) &&
+                            (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceNone) &&
+                            (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceCommitOnePhase) )
+                    {
+                        //assertSuccess();
+                    }
+                    else
+                    {
+                        if ( (doAbort) && (registerSubtran) &&
+                                (sr.getNumberOfSubtransactionsRolledBack()==0) &&
+                                (sr.getNumberOfSubtransactionsCommitted()==1) &&
+                                (sr.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceNone) &&
+                                (r.getResourceTrace().getTrace() == ResourceTrace.ResourceTraceRollback) )
+                        {
+                            //assertSuccess();
+                        }
+                        else
                             fail();
                     }
                 }
             }
-        } catch (UserException e) {
-            fail("Caught UserException: " + e);
+        }
+        catch (UserException e)
+        {
+            fail("Caught UserException: "+e);
             e.printStackTrace(System.err);
-        } catch (SystemException e) {
-            fail("Caught SystemException: " + e);
+        }
+        catch (SystemException e)
+        {
+            fail("Caught SystemException: "+e);
             e.printStackTrace(System.err);
         }
 
@@ -139,3 +164,4 @@ public class NestedTester {
         myORB.shutdown();
     }
 }
+

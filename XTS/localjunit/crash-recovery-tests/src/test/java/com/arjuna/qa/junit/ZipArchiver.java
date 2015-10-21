@@ -58,8 +58,8 @@ public final class ZipArchiver {
         }
     }
 
-    private void archiveFile(final File sourceFile, final ZipOutputStream targetOutputStream, final ZipEntry zipEntry)
-            throws IOException {
+    private void archiveFile(final File sourceFile, final ZipOutputStream targetOutputStream,
+            final ZipEntry zipEntry) throws IOException {
 
         if (sourceFile.isDirectory()) {
             archiveDirectory(sourceFile, targetOutputStream, zipEntry);

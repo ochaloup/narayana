@@ -39,16 +39,19 @@ import com.arjuna.ats.jta.xa.XidImple;
 
 /**
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: XAUtils.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: XAUtils.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 3.3.
  */
 
-public class XAUtils {
+public class XAUtils
+{
 
-    public static final boolean mustEndSuspendedRMs(XAResource res) {
+    public static final boolean mustEndSuspendedRMs (XAResource res)
+    {
         boolean end = false;
 
-        if (res != null) {
+        if (res != null)
+        {
             String name = res.getClass().getName().toLowerCase();
 
             if (name.indexOf(XAUtils.ORACLE) != -1)
@@ -58,10 +61,12 @@ public class XAUtils {
         return end;
     }
 
-    public static final boolean canOptimizeDelist(XAResource res) {
+    public static final boolean canOptimizeDelist (XAResource res)
+    {
         boolean optimize = true;
 
-        if (res != null) {
+        if (res != null)
+        {
             String name = res.getClass().getName().toLowerCase();
 
             if (name.indexOf(XAUtils.ORACLE) != -1)
@@ -71,10 +76,11 @@ public class XAUtils {
         return optimize;
     }
 
-    public static final String getXANodeName(Xid xid) {
+    public static final String getXANodeName (Xid xid)
+    {
         XidImple xidImple;
-        if (xid instanceof XidImple) {
-            xidImple = (XidImple) xid;
+        if(xid instanceof XidImple) {
+            xidImple = (XidImple)xid;
         } else {
             xidImple = new XidImple(xid);
         }

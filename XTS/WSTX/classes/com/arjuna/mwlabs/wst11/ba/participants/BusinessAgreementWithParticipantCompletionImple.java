@@ -58,88 +58,119 @@ import java.io.IOException;
  * @since 1.0.
  */
 
-public class BusinessAgreementWithParticipantCompletionImple
-        implements
-            com.arjuna.mw.wscf.model.sagas.participants.Participant {
+public class BusinessAgreementWithParticipantCompletionImple implements
+        com.arjuna.mw.wscf.model.sagas.participants.Participant
+{
     /**
-     * this constructor installs a participant manager which routes messages via
-     * the current activity
-     * 
+     * this constructor installs a participant manager which routes messages via the current activity
      * @param resource
      * @param id
      */
     public BusinessAgreementWithParticipantCompletionImple(
-            BusinessAgreementWithParticipantCompletionParticipant resource, String id) {
-        this(new BAParticipantManagerImple(id), resource, id);
+            BusinessAgreementWithParticipantCompletionParticipant resource,
+            String id)
+    {
+        this(new BAParticipantManagerImple(id), resource,  id);
     }
 
     /**
      * this constructor installs the supplied participant manager
-     * 
      * @param participantManager
      * @param resource
      * @param id
      */
-    public BusinessAgreementWithParticipantCompletionImple(BAParticipantManager participantManager,
-            BusinessAgreementWithParticipantCompletionParticipant resource, String id) {
+    public BusinessAgreementWithParticipantCompletionImple(
+            BAParticipantManager participantManager,
+            BusinessAgreementWithParticipantCompletionParticipant resource,
+            String id)
+    {
         _baParticipantManager = participantManager;
         _resource = resource;
         _identifier = id;
     }
 
     /**
-     * this constructor is used during recovery and does not install a
-     * participant manager. the resource and identifier will be initialised by
-     * loading saved state
+     * this constructor is used during recovery and does not install a participant manager. the resource
+     * and identifier will be initialised by loading saved state
      */
-    public BusinessAgreementWithParticipantCompletionImple() {
+    public BusinessAgreementWithParticipantCompletionImple()
+    {
         _resource = null;
         _identifier = null;
         _baParticipantManager = null;
     }
 
-    public void close() throws InvalidParticipantException, WrongStateException, SystemException {
-        try {
-            if (_resource != null) {
+    public void close () throws InvalidParticipantException,
+            WrongStateException, SystemException
+    {
+        try
+        {
+            if (_resource != null)
+            {
                 _resource.close();
-            } else
+            }
+            else
                 throw new InvalidParticipantException();
-        } catch (com.arjuna.wst.WrongStateException ex) {
+        }
+        catch (com.arjuna.wst.WrongStateException ex)
+        {
             throw new WrongStateException(ex.toString());
-        } catch (com.arjuna.wst.SystemException ex) {
+        }
+        catch (com.arjuna.wst.SystemException ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
 
-    public void cancel()
-            throws CancelFailedException, InvalidParticipantException, WrongStateException, SystemException {
-        try {
-            if (_resource != null) {
+    public void cancel () throws CancelFailedException, InvalidParticipantException,
+            WrongStateException, SystemException
+    {
+        try
+        {
+            if (_resource != null)
+            {
                 _resource.cancel();
-            } else
+            }
+            else
                 throw new InvalidParticipantException();
-        } catch (com.arjuna.wst.WrongStateException ex) {
+        }
+        catch (com.arjuna.wst.WrongStateException ex)
+        {
             throw new WrongStateException(ex.toString());
-        } catch (com.arjuna.wst.FaultedException ex) {
+        }
+        catch (com.arjuna.wst.FaultedException ex)
+        {
             // we can see this in 1.1
             throw new CancelFailedException(ex.toString());
-        } catch (com.arjuna.wst.SystemException ex) {
+        }
+        catch (com.arjuna.wst.SystemException ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
 
-    public void compensate()
-            throws CompensateFailedException, InvalidParticipantException, WrongStateException, SystemException {
-        try {
-            if (_resource != null) {
+    public void compensate () throws CompensateFailedException,
+            InvalidParticipantException, WrongStateException, SystemException
+    {
+        try
+        {
+            if (_resource != null)
+            {
                 _resource.compensate();
-            } else
+            }
+            else
                 throw new InvalidParticipantException();
-        } catch (com.arjuna.wst.FaultedException ex) {
+        }
+        catch (com.arjuna.wst.FaultedException ex)
+        {
             throw new CompensateFailedException();
-        } catch (com.arjuna.wst.WrongStateException ex) {
+        }
+        catch (com.arjuna.wst.WrongStateException ex)
+        {
             throw new WrongStateException(ex.toString());
-        } catch (com.arjuna.wst.SystemException ex) {
+        }
+        catch (com.arjuna.wst.SystemException ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
@@ -148,13 +179,19 @@ public class BusinessAgreementWithParticipantCompletionImple
      * @return the status value.
      */
 
-    public String status() throws SystemException {
-        try {
-            if (_resource != null) {
+    public String status () throws SystemException
+    {
+        try
+        {
+            if (_resource != null)
+            {
                 return _resource.status();
-            } else
+            }
+            else
                 throw new SystemException("InvalidParticipant");
-        } catch (com.arjuna.wst.SystemException ex) {
+        }
+        catch (com.arjuna.wst.SystemException ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
@@ -170,51 +207,64 @@ public class BusinessAgreementWithParticipantCompletionImple
      *                Thrown in the event of a general fault.
      */
 
-    public void forget() throws InvalidParticipantException, WrongStateException, SystemException {
+    public void forget () throws InvalidParticipantException,
+            WrongStateException, SystemException
+    {
         // not supported by the IBM protocol.
     }
 
-    public void unknown() throws SystemException {
+    public void unknown () throws SystemException
+    {
         /*
          * If the transaction is unknown, then we assume it cancelled.
          */
 
-        try {
+        try
+        {
             cancel();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             // TODO
         }
     }
 
-    public String id() throws SystemException {
+    public String id () throws SystemException
+    {
         return _identifier;
     }
 
-    public final BAParticipantManager participantManager() {
+    public final BAParticipantManager participantManager ()
+    {
         return _baParticipantManager;
     }
 
-    public boolean save_state(OutputObjectState os) {
+    public boolean save_state (OutputObjectState os)
+    {
         try {
             os.packString(_identifier);
         } catch (IOException e) {
             return false;
         }
-        return PersistableParticipantHelper.save_state(os, _resource);
+        return PersistableParticipantHelper.save_state(os, _resource) ;
     }
 
-    public boolean restore_state(InputObjectState is) {
+    public boolean restore_state (InputObjectState is)
+    {
         try {
             _identifier = is.unpackString();
         } catch (IOException e) {
             return false;
         }
-        final Object resource = PersistableParticipantHelper.restore_state(is);
-        if (resource != null) {
-            _resource = (BusinessAgreementWithParticipantCompletionParticipant) resource;
-            return true;
-        } else {
-            return false;
+        final Object resource = PersistableParticipantHelper.restore_state(is) ;
+        if (resource != null)
+        {
+            _resource = (BusinessAgreementWithParticipantCompletionParticipant)resource ;
+            return true ;
+        }
+        else
+        {
+            return false ;
         }
     }
 

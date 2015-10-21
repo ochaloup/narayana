@@ -21,24 +21,29 @@ public class AddParticipantTest {
     }
 
     @Test
-    public void testAddParticipant() throws Exception {
+    public void testAddParticipant()
+            throws Exception
+            {
         System.out.println("Running test : " + this.getClass().getName());
 
         CoordinatorManager cm = CoordinatorManagerFactory.coordinatorManager();
 
-        try {
+        try
+        {
             cm.begin("Sagas11HLS");
 
             cm.enlistParticipant(new SagasParticipant(null));
 
-            System.out.println("Started: " + cm.identifier() + "\n");
+            System.out.println("Started: "+cm.identifier()+"\n");
 
             cm.complete();
 
             cm.close();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSCF11TestUtils.cleanup(cm);
             throw ex;
         }
-    }
+            }
 }

@@ -39,17 +39,21 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class Unknown implements Status {
+public class Unknown implements Status
+{
 
-    public static Unknown instance() {
-        return _instance;
+    public static Unknown instance ()
+    {
+    return _instance;
     }
 
-    public String toString() {
-        return "Status.Unknown";
+    public String toString ()
+    {
+    return "Status.Unknown";
     }
 
-    private Unknown() {
+    private Unknown ()
+    {
     }
 
     private static final Unknown _instance = new Unknown();

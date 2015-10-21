@@ -40,10 +40,10 @@ import com.arjuna.ats.txoj.LockManager;
 public interface txojI18NLogger {
 
     /*
-     * Message IDs are unique and non-recyclable. Don't change the purpose of
-     * existing messages. (tweak the message text or params for clarification if
-     * you like). Allocate new messages by following instructions at the bottom
-     * of the file.
+        Message IDs are unique and non-recyclable.
+        Don't change the purpose of existing messages.
+          (tweak the message text or params for clarification if you like).
+        Allocate new messages by following instructions at the bottom of the file.
      */
 
     @Message(id = 15001, value = "LockManagerFriend.getLink", format = MESSAGE_FORMAT)
@@ -54,45 +54,37 @@ public interface txojI18NLogger {
     @LogMessage(level = WARN)
     public void warn_lmf2(@Cause() Throwable arg0);
 
-    // @Message(id = 15003, value = "RecoveredTransactionalObject created for
-    // {0}", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_1(String arg0);
+//    @Message(id = 15003, value = "RecoveredTransactionalObject created for {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_1(String arg0);
 
     @Message(id = 15004, value = "Object store exception on committing {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_RecoveredTransactionalObject_10(Uid arg0, @Cause() Throwable arg1);
 
-    // @Message(id = 15005, value = "TO held by transaction {0}", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_2(String arg0);
+//    @Message(id = 15005, value = "TO held by transaction {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_2(String arg0);
 
-    // @Message(id = 15006, value = "transaction status {0}", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_3(String arg0);
+//    @Message(id = 15006, value = "transaction status {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_3(String arg0);
 
-    // @Message(id = 15007, value = "transaction Status from original
-    // application {0} and inactive: {1}", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_4(String arg0,
-    // String arg1);
+//    @Message(id = 15007, value = "transaction Status from original application {0} and inactive: {1}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_4(String arg0, String arg1);
 
-    // @Message(id = 15008, value = "RecoveredTransactionalObject.replayPhase2 -
-    // cannot find/no holding transaction", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_5();
+//    @Message(id = 15008, value = "RecoveredTransactionalObject.replayPhase2 - cannot find/no holding transaction", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_5();
 
     @Message(id = 15009, value = "RecoveredTransactionalObject tried to access object store", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_RecoveredTransactionalObject_6(@Cause() Throwable arg0);
 
-    // @Message(id = 15010, value =
-    // "RecoveredTransactionalObject::findHoldingTransaction - uid is {0}",
-    // format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_RecoveredTransactionalObject_7(String arg0);
+//    @Message(id = 15010, value = "RecoveredTransactionalObject::findHoldingTransaction - uid is {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_RecoveredTransactionalObject_7(String arg0);
 
     @Message(id = 15011, value = "RecoveredTransactionalObject::findHoldingTransaction - exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -102,48 +94,40 @@ public interface txojI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_RecoveredTransactionalObject_9(Uid arg0, @Cause() Throwable arg1);
 
-    // @Message(id = 15013, value = "TORecoveryModule created", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_TORecoveryModule_1();
+//    @Message(id = 15013, value = "TORecoveryModule created", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_TORecoveryModule_1();
 
-    // @Message(id = 15014, value = "TORecoveryModule created with {0}", format
-    // = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_TORecoveryModule_2(String arg0);
+//    @Message(id = 15014, value = "TORecoveryModule created with {0}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_TORecoveryModule_2(String arg0);
 
-    // @Message(id = 15015, value = "TORecoveryModule - first pass", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = INFO)
-    // public void info_recovery_TORecoveryModule_3();
+//    @Message(id = 15015, value = "TORecoveryModule - first pass", format = MESSAGE_FORMAT)
+//    @LogMessage(level = INFO)
+//    public void info_recovery_TORecoveryModule_3();
 
-    // @Message(id = 15016, value = "TO currently uncommitted {0} is a {1}",
-    // format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_TORecoveryModule_4(String arg0, String arg1);
+//    @Message(id = 15016, value = "TO currently uncommitted {0} is a {1}", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_TORecoveryModule_4(String arg0, String arg1);
 
     @Message(id = 15017, value = "TORecoveryModule: searching for TOs:", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_TORecoveryModule_5(@Cause() Throwable arg0);
 
-    // @Message(id = 15018, value = "TORecoveryModule - second pass", format =
-    // MESSAGE_FORMAT)
-    // @LogMessage(level = INFO)
-    // public void info_recovery_TORecoveryModule_6();
+//    @Message(id = 15018, value = "TORecoveryModule - second pass", format = MESSAGE_FORMAT)
+//    @LogMessage(level = INFO)
+//    public void info_recovery_TORecoveryModule_6();
 
-    // @Message(id = 15019, value = "TORecoveryModule.periodicWork(): Object
-    // ({0}, {1}) is no longer uncommitted.", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_TORecoveryModule_7(String arg0, String arg1);
+//    @Message(id = 15019, value = "TORecoveryModule.periodicWork(): Object ({0}, {1}) is no longer uncommitted.", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_TORecoveryModule_7(String arg0, String arg1);
 
-    // @Message(id = 15020, value = "TORecoveryModule.periodicWork(): Object
-    // ({0}, {1}) no longer exists.", format = MESSAGE_FORMAT)
-    // @LogMessage(level = WARN)
-    // public void warn_recovery_TORecoveryModule_8(String arg0, String arg1);
+//    @Message(id = 15020, value = "TORecoveryModule.periodicWork(): Object ({0}, {1}) no longer exists.", format = MESSAGE_FORMAT)
+//    @LogMessage(level = WARN)
+//    public void warn_recovery_TORecoveryModule_8(String arg0, String arg1);
 
-    // @Message(id = 15021, value = "TORecoveryModule - could not create
-    // ObjectStore instance!", format = MESSAGE_FORMAT)
-    // public String get_recovery_TORecoveryModule_osproblem();
+//    @Message(id = 15021, value = "TORecoveryModule - could not create ObjectStore instance!", format = MESSAGE_FORMAT)
+//    public String get_recovery_TORecoveryModule_osproblem();
 
     @Message(id = 15022, value = "CadaverLockRecord::nestedAbort - no Current!", format = MESSAGE_FORMAT)
     public String get_CadaverLockRecord_1();
@@ -234,22 +218,22 @@ public interface txojI18NLogger {
     public void warn_LockRecord_7(String arg0, Uid arg1);
 
     @Message(id = 15050, value = "OptimisticLockRecord.topLevelPrepare state check failed for {0} will force rollback.", format = MESSAGE_FORMAT)
-    @LogMessage(level = WARN)
-    public void warn_OptimisticLockRecord_1(LockManager man);
-
+        @LogMessage(level = WARN)
+        public void warn_OptimisticLockRecord_1(LockManager man);
+    
     @Message(id = 15051, value = "OptimisticLockRecord.topLevelCommit state check failed for {0} will force rollback.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_OptimisticLockRecord_2(LockManager man);
 
     /*
-     * Allocate new messages directly above this notice. - id: use the next id
-     * number in sequence. Don't reuse ids. The first two digits of the
-     * id(XXyyy) denote the module all message in this file should have the same
-     * prefix. - value: default (English) version of the log message. - level:
-     * according to severity semantics defined at
-     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
-     * i18n. Everything else MUST be i18n. By convention methods with String
-     * return type have prefix get_, all others are log methods and have prefix
-     * <level>_
-     */
+        Allocate new messages directly above this notice.
+          - id: use the next id number in sequence. Don't reuse ids.
+          The first two digits of the id(XXyyy) denote the module
+            all message in this file should have the same prefix.
+          - value: default (English) version of the log message.
+          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
+          Debug and trace don't get i18n. Everything else MUST be i18n.
+          By convention methods with String return type have prefix get_,
+            all others are log methods and have prefix <level>_
+    */
 }

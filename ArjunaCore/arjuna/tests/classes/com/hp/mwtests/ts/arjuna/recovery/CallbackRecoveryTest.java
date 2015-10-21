@@ -39,14 +39,17 @@ import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryScan;
 
-class RecoveryScanImple implements RecoveryScan {
-    public synchronized void completed() {
+class RecoveryScanImple implements RecoveryScan
+{
+    public synchronized void completed()
+    {
         passed = true;
         notify();
         notified = true;
     }
 
-    public synchronized void waitForCompleted(int msecs_timeout) {
+    public synchronized void waitForCompleted(int msecs_timeout)
+    {
         if (!notified) {
             try {
                 wait(msecs_timeout);
@@ -60,26 +63,28 @@ class RecoveryScanImple implements RecoveryScan {
     private boolean notified = false;
 }
 
-public class CallbackRecoveryTest {
+public class CallbackRecoveryTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
-
+        
         RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
         DummyRecoveryModule module = new DummyRecoveryModule();
         RecoveryScanImple rs = new RecoveryScanImple();
 
         // make sure no other modules registered for this test
-
+        
         manager.removeAllModules(false);
-
+        
         manager.addModule(module);
 
         manager.scan(rs);
 
         /*
-         * the 30 second wait timeout here is just in case something is not
-         * working. the scan should finish almost straight away
+         * the 30 second wait timeout here is just in case something is not working. the scan should
+         * finish almost straight away
          */
         rs.waitForCompleted(30 * 1000);
 

@@ -39,16 +39,20 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  *
  * @author Richard Begg (richard_begg@hp.com)
  */
-public class arjPropertyManager {
-    public static CoreEnvironmentBean getCoreEnvironmentBean() {
+public class arjPropertyManager
+{
+    public static CoreEnvironmentBean getCoreEnvironmentBean()
+    {
         return BeanPopulator.getDefaultInstance(CoreEnvironmentBean.class);
     }
 
-    public static CoordinatorEnvironmentBean getCoordinatorEnvironmentBean() {
+    public static CoordinatorEnvironmentBean getCoordinatorEnvironmentBean()
+    {
         return BeanPopulator.getDefaultInstance(CoordinatorEnvironmentBean.class);
     }
 
-    public static ObjectStoreEnvironmentBean getObjectStoreEnvironmentBean() {
+    public static ObjectStoreEnvironmentBean getObjectStoreEnvironmentBean()
+    {
         return BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class);
     }
 }

@@ -48,12 +48,11 @@ import java.util.Set;
 import java.util.Vector;
 
 /**
- * Tests the scenario when transaction manager crashes after all resources were
- * committed, but before object store was updated.
+ * Tests the scenario when transaction manager crashes after all resources were committed,
+ * but before object store was updated.
  *
- * In such scenario, XAResourceWrapper resources with not empty JNDI name should
- * be removed from the object store. The rest of the resources, should be kept
- * in the object store for the administrator to handle.
+ * In such scenario, XAResourceWrapper resources with not empty JNDI name should be removed from the object store.
+ * The rest of the resources, should be kept in the object store for the administrator to handle.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -75,14 +74,16 @@ public class CrashAfterResourcesCommitTest {
         }
 
         jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecordWrappingPluginClassName(
-                "com.hp.mwtests.ts.jta.recovery.TestXAResourceRecordWrappingPlugin");
-        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(
-                Arrays.asList("com.hp.mwtests.ts.jta.recovery.TestXAResourceRecovery"));
+                "com.hp.mwtests.ts.jta.recovery.TestXAResourceRecordWrappingPlugin"
+        );
+        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(Arrays.asList(
+                "com.hp.mwtests.ts.jta.recovery.TestXAResourceRecovery"
+        ));
 
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryModuleClassNames(
-                Arrays.asList("com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
-                        "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule"));
+        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryModuleClassNames(Arrays.asList(
+                "com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule",
+                "com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule"));
 
         ATOMIC_ACTION_TYPE = new AtomicAction().type();
     }
@@ -104,13 +105,17 @@ public class CrashAfterResourcesCommitTest {
     /**
      * Enlists two XAResourceWrapper resources to the transaction.
      *
-     * Both resources should be marked as contacted during the recovery. And
-     * transaction record should be removed.
+     * Both resources should be marked as contacted during the recovery. And transaction record should be removed.
      *
      * @throws Exception
      */
     @Test
-    @BMRule(name = "Don't clean TM log after commit", targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "updateState", targetLocation = "AT ENTRY", condition = "!flagged(\"testTwoXAResourceWrappers\")", action = "flag(\"testTwoXAResourceWrappers\"); return")
+    @BMRule(name = "Don't clean TM log after commit",
+        targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction",
+        targetMethod = "updateState",
+        targetLocation = "AT ENTRY",
+        condition = "!flagged(\"testTwoXAResourceWrappers\")",
+        action = "flag(\"testTwoXAResourceWrappers\"); return")
     public void testTwoXAResourceWrappers() throws Exception {
         final TestXAResourceWrapper firstXAResourceWrapper = new TestXAResourceWrapper("first", "first", "first");
         final TestXAResourceWrapper secondXAResourceWrapper = new TestXAResourceWrapper("second", "second", "second");
@@ -141,13 +146,17 @@ public class CrashAfterResourcesCommitTest {
     /**
      * Enlists one XAResource and one XAResourceWrapper resources.
      *
-     * XAResourceWrapper resource should be marked as contacted. Transaction
-     * record should still be in the object store.
+     * XAResourceWrapper resource should be marked as contacted. Transaction record should still be in the object store.
      *
      * @throws Exception
      */
     @Test
-    @BMRule(name = "Don't clean TM log after commit", targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "updateState", targetLocation = "AT ENTRY", condition = "!flagged(\"testXAResourceAndXAResourceWrapper\")", action = "flag(\"testXAResourceAndXAResourceWrapper\"); return")
+    @BMRule(name = "Don't clean TM log after commit",
+            targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction",
+            targetMethod = "updateState",
+            targetLocation = "AT ENTRY",
+            condition = "!flagged(\"testXAResourceAndXAResourceWrapper\")",
+            action = "flag(\"testXAResourceAndXAResourceWrapper\"); return")
     public void testXAResourceAndXAResourceWrapper() throws Exception {
         final TestXAResource xaResource = new TestXAResource();
         final TestXAResourceWrapper xaResourceWrapper = new TestXAResourceWrapper("first", "first", "first");
@@ -177,13 +186,17 @@ public class CrashAfterResourcesCommitTest {
     /**
      * Enlists two XAResource resources.
      *
-     * Transaction record should still be in the object store. And no resources
-     * marked as contacted.
+     * Transaction record should still be in the object store. And no resources marked as contacted.
      *
      * @throws Exception
      */
     @Test
-    @BMRule(name = "Don't clean TM log after commit", targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "updateState", targetLocation = "AT ENTRY", condition = "!flagged(\"testTwoXAResources\")", action = "flag(\"testTwoXAResources\"); return")
+    @BMRule(name = "Don't clean TM log after commit",
+            targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction",
+            targetMethod = "updateState",
+            targetLocation = "AT ENTRY",
+            condition = "!flagged(\"testTwoXAResources\")",
+            action = "flag(\"testTwoXAResources\"); return")
     public void testTwoXAResources() throws Exception {
         final TestXAResource firstXAResource = new TestXAResource();
         final TestXAResource secondXAResource = new TestXAResource();

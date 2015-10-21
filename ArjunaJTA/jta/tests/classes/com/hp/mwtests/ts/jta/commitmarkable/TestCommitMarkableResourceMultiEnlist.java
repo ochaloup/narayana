@@ -41,7 +41,8 @@ public class TestCommitMarkableResourceMultiEnlist {
     @Before
     public void setup() throws Exception {
 
-        resetPropertiesFile = System.getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
+        resetPropertiesFile = System
+                .getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
         if (resetPropertiesFile == null) {
             System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
                     "commitmarkableresourcejbossts-properties.xml");
@@ -52,24 +53,29 @@ public class TestCommitMarkableResourceMultiEnlist {
     @After
     public void tearDown() {
         if (resetPropertiesFile != null) {
-            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", resetPropertiesFile);
+            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
+                    resetPropertiesFile);
         } else {
             System.clearProperty("com.arjuna.ats.arjuna.common.propertiesFile");
         }
     }
 
     @Test
-    public void testFailDoubleEnlist()
-            throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SQLException {
+    public void testFailDoubleEnlist() throws NotSupportedException,
+            SystemException, IllegalStateException, RollbackException,
+            SQLException {
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE");
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.begin();
 
-        tm.getTransaction().enlistResource(new JDBCConnectableResource(dataSource.getConnection()));
-        if (tm.getTransaction().enlistResource(new JDBCConnectableResource(dataSource.getConnection()))) {
+        tm.getTransaction().enlistResource(
+                new JDBCConnectableResource(dataSource.getConnection()));
+        if (tm.getTransaction().enlistResource(
+                new JDBCConnectableResource(dataSource.getConnection()))) {
             fail();
         }
 

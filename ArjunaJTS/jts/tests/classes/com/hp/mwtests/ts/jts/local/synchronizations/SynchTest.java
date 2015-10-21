@@ -48,16 +48,19 @@ import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.demosync;
 import com.hp.mwtests.ts.jts.orbspecific.resources.tranobject_i;
 
-public class SynchTest {
+public class SynchTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         org.omg.CosTransactions.Status status = Status.StatusUnknown;
         tranobject_i localObject = null;
         demosync sync = null;
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             ServerORB orb = new ServerORB();
 
             myORB = orb.getORB();
@@ -79,28 +82,38 @@ public class SynchTest {
             coord.register_resource(localObject.getReference());
             coord.register_synchronization(sync.getReference());
 
-            try {
+            try
+            {
                 current.commit(true);
-            } catch (TRANSACTION_ROLLEDBACK e1) {
+            }
+            catch (TRANSACTION_ROLLEDBACK  e1)
+            {
                 System.out.println("Transaction rolledback");
             }
 
-            try {
+            try
+            {
                 status = coord.get_status();
-            } catch (SystemException ex) {
+            }
+            catch (SystemException ex)
+            {
                 // assume reference no longer valid!
 
                 status = Status.StatusUnknown;
             }
-        } catch (UserException e1) {
-            fail("Caught UserException: " + e1);
+        }
+        catch (UserException e1)
+        {
+            fail("Caught UserException: "+e1);
             e1.printStackTrace();
-        } catch (SystemException e2) {
-            fail("Caught SystemException: " + e2);
+        }
+        catch (SystemException e2)
+        {
+            fail("Caught SystemException: " +e2);
             e2.printStackTrace();
         }
 
-        System.out.print("Final action status: " + com.arjuna.ats.jts.utils.Utility.stringStatus(status));
+        System.out.print("Final action status: "+com.arjuna.ats.jts.utils.Utility.stringStatus(status));
         System.out.println("\nTest completed successfully.");
 
         myOA.shutdownObject(sync);
@@ -109,10 +122,11 @@ public class SynchTest {
         myOA.destroy();
         myORB.shutdown();
     }
-
-    public static void main(String[] args) {
+    
+    public static void main (String[] args)
+    {
         SynchTest obj = new SynchTest();
-
+        
         obj.test();
     }
 }

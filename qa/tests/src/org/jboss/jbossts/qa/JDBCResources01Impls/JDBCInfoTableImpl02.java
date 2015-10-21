@@ -40,24 +40,31 @@ import org.omg.CosTransactions.Status;
 import java.sql.*;
 import java.util.Properties;
 
-public class JDBCInfoTableImpl02 implements InfoTableOperations {
-    public JDBCInfoTableImpl02(String databaseURL, String databaseUser, String databasePassword,
-            String databaseDynamicClass, int timeout) throws InvocationException {
+public class JDBCInfoTableImpl02 implements InfoTableOperations
+{
+    public JDBCInfoTableImpl02(String databaseURL, String databaseUser, String databasePassword, String databaseDynamicClass, int timeout)
+            throws InvocationException
+    {
         _databaseUser = databaseUser;
         Connection connection = null;
 
-        if ("true".equals(System.getProperty("qa.debug"))) {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
-            if (databaseDynamicClass != null) {
+        try
+        {
+            if (databaseDynamicClass != null)
+            {
                 _databaseURL = databaseURL;
 
                 _databaseProperties = new Properties();
                 _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
                 _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.password, databasePassword);
                 _databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
-            } else {
+            }
+            else
+            {
                 _databaseURL = databaseURL;
                 _databaseUser = databaseUser;
                 _databasePassword = databasePassword;
@@ -65,60 +72,81 @@ public class JDBCInfoTableImpl02 implements InfoTableOperations {
             }
             _databaseTimeout = timeout;
 
-            // create first connection to get metadata
-            if (_databaseProperties != null) {
+            //create first connection to get metadata
+            if (_databaseProperties != null)
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
 
             DatabaseMetaData dbmd = connection.getMetaData();
-            if (dbmd.getDatabaseProductName().startsWith("Microsoft")) {
+            if (dbmd.getDatabaseProductName().startsWith("Microsoft"))
+            {
                 _useTimeout = true;
             }
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCInfoTableImpl02.JDBCInfoTableImpl02: " + exception);
             exception.printStackTrace(System.err);
             throw new InvocationException();
-        } finally {
-            if ("true".equals(System.getProperty("qa.debug"))) {
+        }
+        finally
+        {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Closing connection");
             }
-            try {
-                if (connection != null) {
+            try
+            {
+                if (connection != null)
+                {
                     connection.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void insert(String name, String value) throws InvocationException {
+    public void insert(String name, String value)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
 
-        if ("true".equals(System.getProperty("qa.debug"))) {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
-            System.err.println(
-                    "02------------------ doing insert (" + name + "," + value + ") -----------------------------");
+        try
+        {
+            System.err.println("02------------------ doing insert (" + name + "," + value + ") -----------------------------");
             System.err.println("Current Status = " + OTS.current().get_status().value());
-            if (_databaseProperties != null) {
+            if (_databaseProperties != null)
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
@@ -128,175 +156,229 @@ public class JDBCInfoTableImpl02 implements InfoTableOperations {
             ///////////////////////
 
             statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT count(*) FROM " + tableName);
+            ResultSet resultSet = statement.executeQuery("SELECT count(*) FROM "+tableName);
             resultSet.next();
-            System.out.println("jjh: " + resultSet.getString(1));
+            System.out.println("jjh: "+resultSet.getString(1));
             resultSet.close();
-            resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-            while (resultSet.next()) {
-                System.out.println("jjh: " + resultSet.getString(1) + " " + resultSet.getString(2));
+            resultSet = statement.executeQuery("SELECT * FROM "+tableName);
+            while(resultSet.next()) {
+                System.out.println("jjh: "+resultSet.getString(1)+" "+resultSet.getString(2));
             }
             resultSet.close();
             ///////////////////////
 
-            // statement = connection.createStatement();
-            if (_useTimeout) {
+
+//            statement = connection.createStatement();
+            if (_useTimeout)
+            {
                 statement.setQueryTimeout(_databaseTimeout);
             }
-
-            // String tableName = JDBCProfileStore.getTableName(_databaseUser,
-            // "Infotable");
+            
+//            String tableName = JDBCProfileStore.getTableName(_databaseUser, "Infotable");
 
             System.err.println("INSERT INTO " + tableName + " VALUES(\'" + name + "\', \'" + value + "\')");
             statement.executeUpdate("INSERT INTO " + tableName + " VALUES(\'" + name + "\', \'" + value + "\')");
 
             ///////////////////////
 
-            resultSet = statement.executeQuery("SELECT count(*) FROM " + tableName);
+            resultSet = statement.executeQuery("SELECT count(*) FROM "+tableName);
             resultSet.next();
-            System.out.println("jjh: " + resultSet.getString(1));
+            System.out.println("jjh: "+resultSet.getString(1));
             resultSet.close();
-            resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-            while (resultSet.next()) {
-                System.out.println("jjh: " + resultSet.getString(1) + " " + resultSet.getString(2));
+            resultSet = statement.executeQuery("SELECT * FROM "+tableName);
+            while(resultSet.next()) {
+                System.out.println("jjh: "+resultSet.getString(1)+" "+resultSet.getString(2));
             }
             resultSet.close();
             ///////////////////////
 
-        } catch (Exception exception) {
+
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCInfoTableImpl02.insert: " + exception);
             exception.printStackTrace(System.err);
             throw new InvocationException();
-        } finally {
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
-                if ("true".equals(System.getProperty("qa.debug"))) {
+        }
+        finally
+        {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
+            {
+                if ("true".equals(System.getProperty("qa.debug")))
+                {
                     System.err.println("Performing explicit commit for non-transaction operation");
                 }
 
-                try {
+                try
+                {
                     connection.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Closing connection");
             }
-            try {
-                if (statement != null) {
+            try
+            {
+                if (statement != null)
+                {
                     statement.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try {
-                if (connection != null) {
+            try
+            {
+                if (connection != null)
+                {
                     connection.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void update(String name, String value) throws InvocationException {
+    public void update(String name, String value)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
 
-        if ("true".equals(System.getProperty("qa.debug"))) {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
-            System.err.println(
-                    "02------------------ doing update (" + name + "," + value + ") -----------------------------");
+        try
+        {
+            System.err.println("02------------------ doing update (" + name + "," + value + ") -----------------------------");
             System.err.println("Current Status = " + OTS.current().get_status().value());
-            if (_databaseProperties != null) {
+            if (_databaseProperties != null)
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
 
             statement = connection.createStatement();
-            if (_useTimeout) {
+            if (_useTimeout)
+            {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
             String tableName = JDBCProfileStore.getTableName(_databaseUser, "Infotable");
-
+            
             System.err.println("UPDATE " + tableName + " SET Value = \'" + value + "\' WHERE Name = \'" + name + "\'");
-            statement.executeUpdate(
-                    "UPDATE " + tableName + " SET Value = \'" + value + "\' WHERE Name = \'" + name + "\'");
+            statement.executeUpdate("UPDATE " + tableName + " SET Value = \'" + value + "\' WHERE Name = \'" + name + "\'");
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCInfoTableImpl02.update: " + exception);
             exception.printStackTrace(System.err);
             throw new InvocationException();
-        } finally {
-            if ("true".equals(System.getProperty("qa.debug"))) {
+        }
+        finally
+        {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Performing explicit commit for non-transaction operation");
             }
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
-                try {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
+            {
+                try
+                {
                     connection.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Closing connection");
             }
-            try {
-                if (statement != null) {
+            try
+            {
+                if (statement != null)
+                {
                     statement.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try {
-                if (connection != null) {
+            try
+            {
+                if (connection != null)
+                {
                     connection.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void select(String name, StringHolder value) throws InvocationException {
+    public void select(String name, StringHolder value)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
 
-        if ("true".equals(System.getProperty("qa.debug"))) {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
+        try
+        {
             System.err.println("02------------------ doing select (" + name + ") -----------------------------");
             System.err.println("Current Status = " + OTS.current().get_status().value());
-            if (_databaseProperties != null) {
+            if (_databaseProperties != null)
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
 
             statement = connection.createStatement();
-            if (_useTimeout) {
+            if (_useTimeout)
+            {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
@@ -304,136 +386,195 @@ public class JDBCInfoTableImpl02 implements InfoTableOperations {
 
             ///////////////////////
 
-            resultSet = statement.executeQuery("SELECT count(*) FROM " + tableName);
+            resultSet = statement.executeQuery("SELECT count(*) FROM "+tableName);
             resultSet.next();
-            System.out.println("jjh: " + resultSet.getString(1));
+            System.out.println("jjh: "+resultSet.getString(1));
             resultSet.close();
-            resultSet = statement.executeQuery("SELECT * FROM " + tableName);
-            while (resultSet.next()) {
-                System.out.println("jjh: " + resultSet.getString(1) + " " + resultSet.getString(2));
+            resultSet = statement.executeQuery("SELECT * FROM "+tableName);
+            while(resultSet.next()) {
+                System.out.println("jjh: "+resultSet.getString(1)+" "+resultSet.getString(2));
             }
-
+           
             ///////////////////////
 
+
+
+
+
+
+
+
+            
             System.err.println("SELECT Value FROM " + tableName + " WHERE Name = \'" + name + "\'");
             resultSet = statement.executeQuery("SELECT Value FROM " + tableName + " WHERE Name = \'" + name + "\'");
 
-            if (!resultSet.next()) {
+            if (!resultSet.next())
+            {
                 throw new Exception("Result set is empty - expected a row");
             }
             value.value = resultSet.getString("Value");
-            if (resultSet.next()) {
+            if (resultSet.next())
+            {
                 throw new Exception("Result set is not empty - didn't expect a row");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCInfoTableImpl02.select: " + exception);
             exception.printStackTrace(System.err);
             throw new InvocationException();
-        } finally {
-            if ("true".equals(System.getProperty("qa.debug"))) {
+        }
+        finally
+        {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Performing explicit commit for non-transaction operation");
             }
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
-                try {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
+            {
+                try
+                {
                     connection.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Closing connection");
             }
-            try {
-                if (resultSet != null) {
+            try
+            {
+                if (resultSet != null)
+                {
                     resultSet.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try {
-                if (statement != null) {
+            try
+            {
+                if (statement != null)
+                {
                     statement.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try {
-                if (connection != null) {
+            try
+            {
+                if (connection != null)
+                {
                     connection.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void delete(String name) throws InvocationException {
+    public void delete(String name)
+            throws InvocationException
+    {
         Connection connection = null;
         Statement statement = null;
 
-        if ("true".equals(System.getProperty("qa.debug"))) {
+        if ("true".equals(System.getProperty("qa.debug")))
+        {
             System.err.println("Setting up connection");
         }
-        try {
+        try
+        {
             System.err.println("02------------------ doing delete (" + name + ") -----------------------------");
             System.err.println("Current Status = " + OTS.current().get_status().value());
-            if (_databaseProperties != null) {
+            if (_databaseProperties != null)
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(_databaseURL, _databaseUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
 
             statement = connection.createStatement();
-            if (_useTimeout) {
+            if (_useTimeout)
+            {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
             String tableName = JDBCProfileStore.getTableName(_databaseUser, "Infotable");
-
+            
             System.err.println("DELETE FROM " + tableName + " WHERE Name = \'" + name + "\'");
             statement.executeUpdate("DELETE FROM " + tableName + " WHERE Name = \'" + name + "\'");
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("JDBCInfoTableImpl02.delete: " + exception);
             exception.printStackTrace(System.err);
             throw new InvocationException();
-        } finally {
-            if ("true".equals(System.getProperty("qa.debug"))) {
+        }
+        finally
+        {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Performing explicit commit for non-transaction operation");
             }
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
-                try {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
+            {
+                try
+                {
                     connection.commit();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug"))) {
+            if ("true".equals(System.getProperty("qa.debug")))
+            {
                 System.err.println("Closing connection");
             }
-            try {
-                if (statement != null) {
+            try
+            {
+                if (statement != null)
+                {
                     statement.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try {
-                if (connection != null) {
+            try
+            {
+                if (connection != null)
+                {
                     connection.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }

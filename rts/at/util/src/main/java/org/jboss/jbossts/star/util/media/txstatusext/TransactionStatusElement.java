@@ -23,5 +23,19 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 @XmlEnum(String.class)
 public enum TransactionStatusElement {
-    TransactionRollbackOnly, TransactionRollingBack, TransactionRolledBack, TransactionCommitting, TransactionCommitted, TransactionHeuristicRollback, TransactionHeuristicCommit, TransactionHeuristicHazard, TransactionHeuristicMixed, TransactionPreparing, TransactionPrepared, TransactionActive, TransactionCommittedOnePhase, TransactionReadOnly, TransactionStatusNone
+    TransactionRollbackOnly,
+    TransactionRollingBack,
+    TransactionRolledBack,
+    TransactionCommitting,
+    TransactionCommitted,
+    TransactionHeuristicRollback,
+    TransactionHeuristicCommit,
+    TransactionHeuristicHazard,
+    TransactionHeuristicMixed,
+    TransactionPreparing,
+    TransactionPrepared,
+    TransactionActive,
+    TransactionCommittedOnePhase,
+    TransactionReadOnly,
+    TransactionStatusNone
 }

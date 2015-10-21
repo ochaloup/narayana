@@ -44,44 +44,53 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class SuspendResume {
+public class SuspendResume
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
+
 
         CurrentImple current = OTSImpleManager.current();
         Control myControl = null;
 
         System.out.println("Beginning transaction.");
 
-        try {
+        try
+        {
             current.begin();
 
             myControl = current.get_control();
 
-            assertNotNull(myControl);
-        } catch (Exception sysEx) {
+            assertNotNull( myControl );
+        }
+        catch (Exception sysEx)
+        {
             sysEx.printStackTrace(System.err);
             fail();
         }
 
         System.out.println("Committing transaction.");
 
-        try {
+        try
+        {
             current.commit(true);
 
             current.resume(myControl);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             fail("commit error: " + e);
             e.printStackTrace(System.err);
         }

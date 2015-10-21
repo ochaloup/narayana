@@ -39,8 +39,7 @@ public final class ParticipantResource {
     private static final Logger LOG = Logger.getLogger(ParticipantResource.class);
 
     @HEAD
-    public Response getTerminatorUrl(@PathParam("participantId") final String participantId,
-            @Context final UriInfo uriInfo) {
+    public Response getTerminatorUrl(@PathParam("participantId") final String participantId, @Context final UriInfo uriInfo) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("HEAD request on ParticipantResource. ParticipantId: " + participantId);
         }
@@ -125,8 +124,7 @@ public final class ParticipantResource {
             }
 
             commitOnePhase(participantInformation);
-            return Response.ok().entity(TxSupport.toStatusContent(TxStatus.TransactionCommittedOnePhase.name()))
-                    .build();
+            return Response.ok().entity(TxSupport.toStatusContent(TxStatus.TransactionCommittedOnePhase.name())).build();
 
         } else if (TxStatus.isAbort(status)) {
             rollback(participantInformation);
@@ -310,8 +308,7 @@ public final class ParticipantResource {
         } else if (vote instanceof ReadOnly) {
             response = Response.ok().entity(TxSupport.toStatusContent(TxStatus.TransactionReadOnly.name())).build();
         } else {
-            response = Response.status(409).entity(TxSupport.toStatusContent(TxStatus.TransactionRolledBack.name()))
-                    .build();
+            response = Response.status(409).entity(TxSupport.toStatusContent(TxStatus.TransactionRolledBack.name())).build();
         }
 
         return response;

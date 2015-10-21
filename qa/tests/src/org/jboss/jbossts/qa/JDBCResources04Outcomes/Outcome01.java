@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.JDBCResources04Outcomes;
  * $Id: Outcome01.java,v 1.2 2003/06/26 11:44:15 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.JDBCResources04.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -63,9 +64,12 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Outcome01 {
-    public static void main(String[] args) {
-        try {
+public class Outcome01
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -78,7 +82,8 @@ public class Outcome01 {
 
             OTS.current().begin();
 
-            for (int index = 0; correct && (index < maxIndex); index++) {
+            for (int index = 0; correct && (index < maxIndex); index++)
+            {
                 String name = "Name_" + index;
                 IntHolder valueHolder = new IntHolder();
 
@@ -89,21 +94,29 @@ public class Outcome01 {
 
             OTS.current().commit(true);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Outcome01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Outcome01.main: " + exception);
             exception.printStackTrace(System.err);
         }

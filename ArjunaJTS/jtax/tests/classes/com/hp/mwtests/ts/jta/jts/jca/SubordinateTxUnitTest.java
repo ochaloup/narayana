@@ -46,55 +46,68 @@ import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionIm
 import com.arjuna.ats.jta.xa.XidImple;
 import com.hp.mwtests.ts.jta.jts.common.TestBase;
 
-class DummySubordinateAtomicTransaction extends SubordinateAtomicTransaction {
-    public DummySubordinateAtomicTransaction() {
+class DummySubordinateAtomicTransaction extends SubordinateAtomicTransaction
+{
+    public DummySubordinateAtomicTransaction ()
+    {
         super(new Uid());
     }
-
-    public boolean checkForCurrent() {
+    
+    public boolean checkForCurrent ()
+    {
         return super.checkForCurrent();
     }
 }
 
-public class SubordinateTxUnitTest extends TestBase {
+
+public class SubordinateTxUnitTest extends TestBase
+{
     @Test
-    public void testTransactionImple() throws Exception {
+    public void testTransactionImple () throws Exception
+    {
         TransactionImple tx = new TransactionImple(new Uid());
         TransactionImple dummy = new TransactionImple(new Uid());
-
+        
         tx.recordTransaction();
-
+        
         assertFalse(tx.equals(dummy));
-
+        
         assertTrue(tx.toString() != null);
-
+        
         tx.recover();
     }
-
+    
     @Test
-    public void testAtomicTransaction() throws Exception {
+    public void testAtomicTransaction () throws Exception
+    {
         XidImple xid = new XidImple(new Uid());
         SubordinateAtomicTransaction saa1 = new SubordinateAtomicTransaction(new Uid());
         SubordinateAtomicTransaction saa2 = new SubordinateAtomicTransaction(new Uid(), xid, 0);
-
+        
         assertEquals(saa2.getXid(), xid);
-
-        try {
+        
+        try
+        {
             saa2.end(true);
-
+            
             fail();
-        } catch (final WrongTransaction ex) {
         }
-
-        try {
+        catch (final WrongTransaction ex)
+        {
+        }
+        
+        try
+        {
             saa2.abort();
-
+            
             fail();
-        } catch (final WrongTransaction ex) {
         }
-
+        catch (final WrongTransaction ex)
+        {
+        }
+        
         DummySubordinateAtomicTransaction dsat = new DummySubordinateAtomicTransaction();
-
+        
         assertFalse(dsat.checkForCurrent());
     }
 }

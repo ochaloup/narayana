@@ -37,24 +37,31 @@ import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 
-public class TxStoreLog {
+public class TxStoreLog
+{
 
-    public static boolean getTransactions(InputObjectState os) {
-        return getTransactions(os, StateStatus.OS_UNKNOWN);
+    public static boolean getTransactions (InputObjectState os)
+    {
+    return getTransactions(os, StateStatus.OS_UNKNOWN);
+    }
+ 
+    public static boolean getTransactions (InputObjectState os, int status)
+    {
+    RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
+
+    try
+    {
+        return recoveryStore.allObjUids(com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple.typeName(), os, status);
+    }
+    catch (NullPointerException ex)
+    {
+    }
+    catch (ObjectStoreException e)
+    {
+        e.printStackTrace();
     }
 
-    public static boolean getTransactions(InputObjectState os, int status) {
-        RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
-
-        try {
-            return recoveryStore.allObjUids(
-                    com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple.typeName(), os, status);
-        } catch (NullPointerException ex) {
-        } catch (ObjectStoreException e) {
-            e.printStackTrace();
-        }
-
-        return false;
+    return false;
     }
 
 }

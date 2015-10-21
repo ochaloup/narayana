@@ -55,9 +55,11 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.AtomicResource;
 
-public class RCTest {
+public class RCTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         boolean shouldCommit = true;
 
         boolean passed = false;
@@ -65,11 +67,12 @@ public class RCTest {
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -85,7 +88,7 @@ public class RCTest {
 
             Control myControl = current.get_control();
 
-            assertNotNull(myControl);
+            assertNotNull( myControl );
 
             System.out.println("getting coordinator");
 
@@ -97,31 +100,40 @@ public class RCTest {
 
             RecoveryCoordinator rc = null;
 
-            try {
+            try
+            {
                 rc = coord.register_resource(atomicObject);
-            } catch (Exception ex) {
-                fail("Failed to register resources: " + ex);
+            }
+            catch (Exception ex)
+            {
+                fail("Failed to register resources: "+ex);
                 ex.printStackTrace();
             }
 
             if (rc == null)
                 System.out.println("No recovery coordinator reference.");
-            else {
+            else
+            {
                 Status s = Status.StatusUnknown;
 
-                try {
+                try
+                {
                     System.out.println("Attempting to use recovery coordinator.");
 
                     s = rc.replay_completion(atomicObject);
-                } catch (NotPrepared e) {
+                }
+                catch (NotPrepared e)
+                {
                     s = Status.StatusActive;
-                } catch (Exception ex) {
-                    fail("Caught: " + ex);
+                }
+                catch (Exception ex)
+                {
+                    fail("Caught: "+ex);
 
                     ex.printStackTrace();
                 }
 
-                System.out.println("Got: " + com.arjuna.ats.jts.utils.Utility.stringStatus(s));
+                System.out.println("Got: "+com.arjuna.ats.jts.utils.Utility.stringStatus(s));
 
                 if (s == Status.StatusActive)
                     passed = true;
@@ -136,54 +148,75 @@ public class RCTest {
 
             if (rc == null)
                 System.out.println("No recovery coordinator reference.");
-            else {
+            else
+            {
                 Status s = Status.StatusUnknown;
 
-                try {
+                try
+                {
                     System.out.println("Attempting to use recovery coordinator.");
 
                     s = rc.replay_completion(atomicObject);
-                } catch (NotPrepared e) {
+                }
+                catch (NotPrepared e)
+                {
                     s = Status.StatusActive;
-                } catch (Exception ex) {
-                    fail("Caught: " + ex);
+                }
+                catch (Exception ex)
+                {
+                    fail("Caught: "+ex);
                 }
 
-                System.out.println("Got: " + com.arjuna.ats.jts.utils.Utility.stringStatus(s));
+                System.out.println("Got: "+com.arjuna.ats.jts.utils.Utility.stringStatus(s));
 
                 if (passed && (s == Status.StatusRolledBack))
                     passed = true;
                 else
                     passed = false;
             }
-        } catch (TRANSACTION_ROLLEDBACK e1) {
+        }
+        catch (TRANSACTION_ROLLEDBACK  e1)
+        {
             System.out.println("\nTransaction RolledBack exception");
-        } catch (HeuristicMixed e2) {
+        }
+        catch (HeuristicMixed e2)
+        {
             System.out.println("\nTransaction HeuristicMixed exception");
-        } catch (HeuristicHazard e3) {
+        }
+        catch (HeuristicHazard e3)
+        {
             System.out.println("\nTransaction HeuristicHazard exception");
-        } catch (Exception e4) {
-            System.out.println("Caught unexpected exception: " + e4);
+        }
+        catch (Exception e4)
+        {
+            System.out.println("Caught unexpected exception: "+e4);
         }
 
         System.out.println("Trying to determing final transaction outcome.");
 
         org.omg.CosTransactions.Status status = Status.StatusUnknown;
 
-        try {
-            if (coord != null) {
+        try
+        {
+            if (coord != null)
+            {
                 status = coord.get_status();
 
                 coord = null;
-            } else
+            }
+            else
                 System.out.println("\nCould not determine action status.");
-        } catch (SystemException ex1) {
+        }
+        catch (SystemException ex1)
+        {
             // assume invalid reference - tx may have been garbage collected
-        } catch (Exception e5) {
-            System.out.println("Caught unexpected exception:" + e5);
+        }
+        catch (Exception e5)
+        {
+            System.out.println("Caught unexpected exception:" +e5);
         }
 
-        System.out.println("\nFinal action status: " + com.arjuna.ats.jts.utils.Utility.stringStatus(status));
+        System.out.println("\nFinal action status: "+com.arjuna.ats.jts.utils.Utility.stringStatus(status));
 
         assertTrue(passed);
 

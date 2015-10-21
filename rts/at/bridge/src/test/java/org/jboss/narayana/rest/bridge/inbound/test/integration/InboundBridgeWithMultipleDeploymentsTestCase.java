@@ -122,6 +122,7 @@ public class InboundBridgeWithMultipleDeploymentsTestCase extends AbstractTestCa
         }
     }
 
+
     @Test
     public void testRollbackWithTwoParticipants() throws Exception {
         txSupport.startTx();

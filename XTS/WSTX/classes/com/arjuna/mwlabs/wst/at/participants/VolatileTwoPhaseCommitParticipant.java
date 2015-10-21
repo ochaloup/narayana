@@ -49,9 +49,11 @@ import com.arjuna.mw.wsas.exceptions.WrongStateException;
  * @since 1.0.
  */
 
-public class VolatileTwoPhaseCommitParticipant implements Synchronization {
+public class VolatileTwoPhaseCommitParticipant implements Synchronization
+{
 
-    public VolatileTwoPhaseCommitParticipant(Volatile2PCParticipant resource) {
+    public VolatileTwoPhaseCommitParticipant (Volatile2PCParticipant resource)
+    {
         _resource = resource;
     }
 
@@ -63,25 +65,36 @@ public class VolatileTwoPhaseCommitParticipant implements Synchronization {
      *                transaction to roll back.
      */
 
-    public void beforeCompletion() throws SystemException {
-        try {
-            if (_resource != null) {
+    public void beforeCompletion () throws SystemException
+    {
+        try
+        {
+            if (_resource != null)
+            {
                 // com.arjuna.mw.wst.vote.Vote vt = _resource.prepare();
                 com.arjuna.wst.Vote vt = _resource.prepare();
 
                 if (vt instanceof com.arjuna.wst.ReadOnly)
                     _readonly = true;
-                else {
-                    if (vt instanceof com.arjuna.wst.Prepared) {
+                else
+                {
+                    if (vt instanceof com.arjuna.wst.Prepared)
+                    {
                         // do nothing
-                    } else
+                    }
+                    else
                         throw new SystemException();
                 }
-            } else
+            }
+            else
                 throw new SystemException();
-        } catch (SystemException ex) {
+        }
+        catch (SystemException ex)
+        {
             throw ex;
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             throw new SystemException(ex.toString());
         }
     }
@@ -98,74 +111,96 @@ public class VolatileTwoPhaseCommitParticipant implements Synchronization {
      *                outcome of the transaction.
      */
 
-    public void afterCompletion(int status) throws SystemException {
-        if (!_readonly) {
-            try {
-                switch (status) {
-                    case CoordinationResult.CONFIRMED :
-                        confirm();
-                        break;
-                    default :
-                        cancel();
-                        break;
+    public void afterCompletion (int status) throws SystemException
+    {
+        if (!_readonly)
+        {
+            try
+            {
+                switch (status)
+                {
+                case CoordinationResult.CONFIRMED:
+                    confirm();
+                    break;
+                default:
+                    cancel();
+                    break;
                 }
-            } catch (SystemException ex) {
+            }
+            catch (SystemException ex)
+            {
                 throw ex;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw new SystemException(ex.toString());
             }
         }
     }
 
-    private final void confirm() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, HeuristicCancelException, SystemException {
-        if (_resource != null) {
-            try {
+    private final void confirm () throws InvalidParticipantException,
+            WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, HeuristicCancelException, SystemException
+    {
+        if (_resource != null)
+        {
+            try
+            {
                 _resource.commit();
             }
             // catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
-            catch (com.arjuna.wst.WrongStateException ex) {
+            catch (com.arjuna.wst.WrongStateException ex)
+            {
                 throw new WrongStateException(ex.toString());
             }
             /*
-             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex)
-             * { throw new HeuristicHazardException(ex.toString()); } catch
+             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex) {
+             * throw new HeuristicHazardException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicMixedException ex) { throw
              * new HeuristicMixedException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicRollbackException ex) {
              * throw new HeuristicCancelException(ex.toString()); }
              */
             // catch (com.arjuna.mw.wst.exceptions.SystemException ex)
-            catch (com.arjuna.wst.SystemException ex) {
+            catch (com.arjuna.wst.SystemException ex)
+            {
                 throw new SystemException(ex.toString());
             }
-        } else
+        }
+        else
             throw new InvalidParticipantException();
     }
 
-    private final void cancel() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, HeuristicConfirmException, SystemException {
-        if (_resource != null) {
-            try {
+    private final void cancel () throws InvalidParticipantException,
+            WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, HeuristicConfirmException, SystemException
+    {
+        if (_resource != null)
+        {
+            try
+            {
                 _resource.rollback();
             }
             // catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
-            catch (com.arjuna.wst.WrongStateException ex) {
+            catch (com.arjuna.wst.WrongStateException ex)
+            {
                 throw new WrongStateException(ex.toString());
             }
             /*
-             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex)
-             * { throw new HeuristicHazardException(ex.toString()); } catch
+             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex) {
+             * throw new HeuristicHazardException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicMixedException ex) { throw
              * new HeuristicMixedException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicCommitException ex) {
              * throw new HeuristicConfirmException(ex.toString()); }
              */
             // catch (com.arjuna.mw.wst.exceptions.SystemException ex)
-            catch (com.arjuna.wst.SystemException ex) {
+            catch (com.arjuna.wst.SystemException ex)
+            {
                 throw new SystemException(ex.toString());
             }
-        } else
+        }
+        else
             throw new InvalidParticipantException();
     }
 

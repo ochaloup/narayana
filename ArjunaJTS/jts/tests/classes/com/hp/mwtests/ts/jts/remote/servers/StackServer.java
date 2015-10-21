@@ -39,29 +39,33 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.StackImple;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-public class StackServer {
-    public static void main(String[] args) throws Exception {
+public class StackServer
+{
+   public static void main(String[] args) throws Exception
+    {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
 
         String refFile = args[0];
 
-        stackPOATie theStack = new stackPOATie(new StackImple());
+        stackPOATie theStack = new stackPOATie (new StackImple());
 
         myOA.objectIsReady(theStack);
 
         Services serv = new Services(myORB);
 
-        try {
-            TestUtility.registerService(refFile,
-                    myORB.orb().object_to_string(stackHelper.narrow(myOA.corbaReference(theStack))));
+        try
+        {
+            TestUtility.registerService(refFile, myORB.orb().object_to_string(stackHelper.narrow(myOA.corbaReference(theStack))));
 
             System.out.println("Ready");
 
             myOA.run();
-        } catch (Exception e) {
-            TestUtility.fail("StackServer caught exception: " + e);
+        }
+        catch (Exception e)
+        {
+            TestUtility.fail("StackServer caught exception: "+e);
         }
 
         myOA.shutdownObject(theStack);
@@ -69,3 +73,4 @@ public class StackServer {
         System.out.println("**StackServer exiting**");
     }
 }
+

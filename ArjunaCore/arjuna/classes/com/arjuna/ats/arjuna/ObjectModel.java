@@ -42,7 +42,8 @@ import java.io.PrintWriter;
  * @since JTS 1.0.
  */
 
-public class ObjectModel {
+public class ObjectModel
+{
 
     /**
      * In the SINGLE model, it is assumed that only a single instance of the
@@ -54,28 +55,31 @@ public class ObjectModel {
 
     /**
      * In the MULTIPLE model, it is assumed that multiple instances of the
-     * object may exist in different JVMs concurrently, or within the same JVM
-     * if each thread gets its own instance.
+     * object may exist in different JVMs concurrently, or within the same
+     * JVM if each thread gets its own instance.
      */
 
     public static final int MULTIPLE = 1;
 
-    public static String stringForm(int os) {
-        switch (os) {
-            case SINGLE :
-                return "SINGLE";
-            case MULTIPLE :
-                return "MULTIPLE";
-            default :
-                return "Unknown";
+    public static String stringForm (int os)
+    {
+        switch (os)
+        {
+        case SINGLE:
+            return "SINGLE";
+        case MULTIPLE:
+            return "MULTIPLE";
+        default:
+            return "Unknown";
         }
     }
-
+    
     /**
      * Print out a human-readable form of the model type.
      */
 
-    public static void print(PrintWriter strm, int os) {
+    public static void print (PrintWriter strm, int os)
+    {
         strm.print(stringForm(os));
     }
 

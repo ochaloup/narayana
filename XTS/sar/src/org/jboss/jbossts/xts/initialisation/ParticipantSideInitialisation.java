@@ -10,8 +10,10 @@ import org.jboss.jbossts.xts.recovery.participant.ParticipantRecoveryInitialisat
 /**
  * A class used to perform all 1.1 participant side initialisation
  */
-public class ParticipantSideInitialisation implements XTSInitialisation {
-    public void startup() throws Exception {
+public class ParticipantSideInitialisation implements XTSInitialisation
+{
+    public void startup() throws Exception
+    {
         // there is no WS-C coordinator startup
 
         // run WS-T startup code
@@ -34,7 +36,8 @@ public class ParticipantSideInitialisation implements XTSInitialisation {
         ParticipantRecoveryInitialisation.startup();
     }
 
-    public void shutdown() throws Exception {
+    public void shutdown() throws Exception
+    {
         // run recovery shutdown code
 
         ParticipantRecoveryInitialisation.shutdown();

@@ -72,28 +72,37 @@ public class JTSSynchronizationTest {
         Map<String, String> map = new HashMap<String, String>();
         map.put("com.arjuna.orbportability.orb.PreInit1",
                 "com.arjuna.ats.internal.jts.context.ContextPropagationManager");
-        map.put("com.arjuna.orbportability.orb.PostInit", "com.arjuna.ats.jts.utils.ORBSetup");
-        map.put("com.arjuna.orbportability.orb.PostInit2", "com.arjuna.ats.internal.jts.recovery.RecoveryInit");
-        map.put("com.arjuna.orbportability.orb.PostSet1", "com.arjuna.ats.jts.utils.ORBSetup");
-        opPropertyManager.getOrbPortabilityEnvironmentBean().setOrbInitializationProperties(map);
+        map.put("com.arjuna.orbportability.orb.PostInit",
+                "com.arjuna.ats.jts.utils.ORBSetup");
+        map.put("com.arjuna.orbportability.orb.PostInit2",
+                "com.arjuna.ats.internal.jts.recovery.RecoveryInit");
+        map.put("com.arjuna.orbportability.orb.PostSet1",
+                "com.arjuna.ats.jts.utils.ORBSetup");
+        opPropertyManager.getOrbPortabilityEnvironmentBean()
+                .setOrbInitializationProperties(map);
 
         ORB myORB = ORB.getInstance("test");
         RootOA myOA = OA.getRootOA(myORB);
         final Properties initORBProperties = new Properties();
         initORBProperties.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
-        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort",
-                "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
-        myORB.initORB(new String[]{}, initORBProperties);
+        initORBProperties.setProperty(
+                "com.sun.CORBA.POA.ORBPersistentServerPort", ""
+                        + jtsPropertyManager.getJTSEnvironmentBean()
+                                .getRecoveryManagerPort());
+        myORB.initORB(new String[] {}, initORBProperties);
         myOA.initOA();
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryActivatorClassNames(
-                Arrays.asList(new String[]{"com.arjuna.ats.internal.jts.orbspecific.recovery.RecoveryEnablement"}));
+        recoveryPropertyManager
+                .getRecoveryEnvironmentBean()
+                .setRecoveryActivatorClassNames(
+                        Arrays.asList(new String[] { "com.arjuna.ats.internal.jts.orbspecific.recovery.RecoveryEnablement" }));
         final TransactionSynchronizationRegistry tsr = new com.arjuna.ats.internal.jta.transaction.jts.TransactionSynchronizationRegistryImple();
 
         new RecoveryManagerImple(false);
-        final javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        final javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         tm.getStatus();
 
@@ -124,9 +133,10 @@ public class JTSSynchronizationTest {
                     assertTrue(tm.getStatus() == arg0);
                     Transaction transaction2 = tm.getTransaction();
                     assertTrue(transaction == transaction2);
-                } catch (SystemException | IllegalStateException | SecurityException | InvalidTransactionException
-                        | NotSupportedException | RollbackException | HeuristicMixedException
-                        | HeuristicRollbackException e) {
+                } catch (SystemException | IllegalStateException
+                        | SecurityException | InvalidTransactionException
+                        | NotSupportedException | RollbackException
+                        | HeuristicMixedException | HeuristicRollbackException e) {
                     failed = true;
                     e.printStackTrace();
                 }

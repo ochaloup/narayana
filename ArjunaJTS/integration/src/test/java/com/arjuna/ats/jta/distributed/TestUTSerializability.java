@@ -33,8 +33,7 @@ public class TestUTSerializability {
         // validate that ut can be bound to a JNDI context
         context.rebind("ut", ut);
 
-        // validate that the instance that was bound is the same as the
-        // ServerVMClientUserTransaction singleton
+        // validate that the instance that was bound is the same as the ServerVMClientUserTransaction singleton
         Object boundUT = context.lookup("ut");
 
         assertNotNull(boundUT);

@@ -24,29 +24,34 @@ import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.CrashRecovery.impl.CrashSe
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client001b extends BaseTestClient {
-    public static void main(String[] args) {
+public class Client001b extends BaseTestClient
+{
+    public static void main(String[] args)
+    {
         Client001b test = new Client001b(args);
     }
 
-    private Client001b(String[] args) {
+    private Client001b(String[] args)
+    {
         super(args);
     }
 
-    public void Test() {
-        try {
+    public void Test()
+    {
+        try
+        {
             setNumberOfCalls(5);
             setNumberOfResources(4);
             setCrashPoint(3);
             setCrashType(2);
             setUniquePrefix(1);
 
-            // create new container object
+            //create new container object
             CrashService01 mService = new CrashService01(mNumberOfResources);
-            // create crash record so it is processed first
+            //create crash record so it is processed first
             mService.createCrashRecord(mCrashPoint, mCrashType);
 
-            // start transaction and do work
+            //start transaction    and do work
             startTx();
             mService.setupOper(getUniquePrefix());
             mService.doWork(mMaxIteration);
@@ -55,10 +60,11 @@ public class Client001b extends BaseTestClient {
 
             commit();
 
-            // we do not need to do anything else it should finish here if not
-            // print failed
+            //we do not need to do anything else it should finish here if not print failed
             Fail();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Fail("Error in Client001b.test() :", e);
         }
     }

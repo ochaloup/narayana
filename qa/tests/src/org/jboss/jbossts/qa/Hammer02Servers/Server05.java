@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.Hammer02Servers;
  * $Id: Server05.java,v 1.2 2003/06/26 11:44:02 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Hammer02.*;
 import org.jboss.jbossts.qa.Hammer02Impls.JDBCMatrixImpl01;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
@@ -63,16 +64,20 @@ import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server05 {
-    public static void main(String args[]) {
-        try {
+public class Server05
+{
+    public static void main(String args[])
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 2];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++) {
+            for (int index = 0; index < numberOfDrivers; index++)
+            {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -83,8 +88,7 @@ public class Server05 {
             String databasePassword = JDBCProfileStore.databasePassword(profileName);
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
-            JDBCMatrixImpl01 jdbcMatrixImpl = new JDBCMatrixImpl01(16, 16, databaseURL, databaseUser, databasePassword,
-                    databaseDynamicClass);
+            JDBCMatrixImpl01 jdbcMatrixImpl = new JDBCMatrixImpl01(16, 16, databaseURL, databaseUser, databasePassword, databaseDynamicClass);
             MatrixPOATie servant = new MatrixPOATie(jdbcMatrixImpl);
 
             OAInterface.objectIsReady(servant);
@@ -95,8 +99,11 @@ public class Server05 {
             System.out.println("Ready");
 
             ORBInterface.run();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Server05.main: " + exception);
         }
     }
 }
+

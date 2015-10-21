@@ -37,7 +37,7 @@ public class TestXAResource implements XAResource {
     }
 
     public Xid[] recover(int flag) throws XAException {
-        return new Xid[]{xid};
+        return new Xid[] { xid };
     }
 
     public boolean isSameRM(XAResource xares) throws XAException {

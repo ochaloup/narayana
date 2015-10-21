@@ -25,14 +25,19 @@ import com.arjuna.wsas.tests.arq.WarDeployment;
 
 @RunWith(Arquillian.class)
 public class Context1Test {
-
+    
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoHLS.class, DemoSOAPContextImple.class, WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                DemoHLS.class,
+                DemoSOAPContextImple.class,
+                WSASTestUtils.class);
     }
 
     @Test
-    public void testContext1() throws Exception {
+    public void testContext1()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
         DemoHLS demoHLS = new DemoHLS();
         HLS[] currentHLS = ActivityManagerFactory.activityManager().allHighLevelServices();
@@ -40,7 +45,8 @@ public class Context1Test {
         for (HLS hls : currentHLS) {
             ActivityManagerFactory.activityManager().removeHLS(hls);
         }
-        try {
+        try
+        {
             ActivityManagerFactory.activityManager().addHLS(demoHLS);
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -51,11 +57,11 @@ public class Context1Test {
 
             ua.start(coordinationType);
 
-            System.out.println("Started: " + ua.activityName());
+            System.out.println("Started: "+ua.activityName());
 
             ua.start(coordinationType);
 
-            System.out.println("Started: " + ua.activityName() + "\n");
+            System.out.println("Started: "+ua.activityName()+"\n");
 
             ContextManager contextManager = new ContextManager();
             Context theContext = contextManager.context(coordinationType);
@@ -68,7 +74,7 @@ public class Context1Test {
                 fail("Demo context not found");
             }
 
-            ((SOAPContext) theContext).serialiseToElement(root);
+            ((SOAPContext)theContext).serialiseToElement(root);
 
             System.out.println("Context is " + root.getTextContent());
 
@@ -90,7 +96,8 @@ public class Context1Test {
             root = doc.createElement("Context1-test");
             doc.appendChild(root);
 
-            ((SOAPContext) theContext).serialiseToElement(root);
+
+            ((SOAPContext)theContext).serialiseToElement(root);
 
             System.out.println("Context is " + root.getTextContent());
 
@@ -103,7 +110,9 @@ public class Context1Test {
             if (theContext != null) {
                 fail("Demo context not removed");
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSASTestUtils.cleanup(ua);
             throw ex;
         } finally {
@@ -122,5 +131,5 @@ public class Context1Test {
                 // ignore this
             }
         }
-    }
+            }
 }

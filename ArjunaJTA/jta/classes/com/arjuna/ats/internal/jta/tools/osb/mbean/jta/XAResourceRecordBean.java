@@ -38,12 +38,10 @@ import java.io.IOException;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
- *             names in order to provide a better separation between public and
- *             internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * provide a better separation between public and internal classes.
  */
-@Deprecated // in order to provide a better separation between public and
-            // internal classes.
+@Deprecated // in order to provide a better separation between public and internal classes.
 public class XAResourceRecordBean extends LogRecordWrapper implements XAResourceRecordBeanMBean {
     String className = "unavailable";
     String eisProductName = "unavailable";
@@ -104,21 +102,11 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
         return ok;
     }
 
-    public String getClassName() {
-        return className;
-    }
-    public String getEisProductName() {
-        return eisProductName;
-    }
-    public String getEisProductVersion() {
-        return eisProductVersion;
-    }
-    public String getJndiName() {
-        return jndiName;
-    }
-    public int getTimeout() {
-        return timeout;
-    }
+    public String getClassName() { return className; }
+    public String getEisProductName() { return eisProductName; }
+    public String getEisProductVersion() { return eisProductVersion; }
+    public String getJndiName() { return jndiName; }
+    public int getTimeout() { return timeout; }
 
     @Override
     public String getHeuristicStatus() {
@@ -147,8 +135,7 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
     }
 
     /**
-     * Extension of an XAResource record for exposing the underlying XAResource
-     * which is protected
+     * Extension of an XAResource record for exposing the underlying XAResource which is protected
      */
     public class JTAXAResourceRecordWrapper extends com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecord {
         XidImple xidImple = null;

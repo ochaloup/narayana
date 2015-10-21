@@ -55,14 +55,14 @@ import com.arjuna.mw.wscf.exceptions.*;
 
 /**
  * This class represents a specific coordination instance. It inherits from
- * ArjunaCore TwoPhaseCoordinator so we can do the prepare and commit when a BA
- * client close is requested and have it roll back if anything goes wrong. The
- * BA client cancel request maps through to TwoPhaseCoordinator cancel which
+ * ArjunaCore TwoPhaseCoordinator so we can do the prepare and commit when a
+ * BA client close is requested and have it roll back if anything goes wrong.
+ * The BA client cancel request maps through to TwoPhaseCoordinator cancel which
  * also does what we need. Although we inherit synchronization support from
  * TwoPhaseCoordinator it is not used by the BA code.
  *
- * This class also exposes a separate complete method which implements the
- * deprectaed BA client complete operation allowing coordinator completion
+ * This class also exposes a separate complete method which implements
+ * the deprectaed BA client complete operation allowing coordinator completion
  * participants to be notified that they complete. This is pretty much redundant
  * as complete gets called at close anyway.
  * 
@@ -72,7 +72,8 @@ import com.arjuna.mw.wscf.exceptions.*;
  * 
  */
 
-public class BACoordinator extends TwoPhaseCoordinator {
+public class BACoordinator extends TwoPhaseCoordinator
+{
 
     private final static int DELISTED = 0;
 
@@ -80,13 +81,15 @@ public class BACoordinator extends TwoPhaseCoordinator {
 
     private final static int FAILED = 2;
 
-    public BACoordinator() {
+    public BACoordinator()
+    {
         super();
 
         _theId = new CoordinatorIdImple(get_uid());
     }
 
-    public BACoordinator(Uid recovery) {
+    public BACoordinator(Uid recovery)
+    {
         super(recovery);
 
         _theId = new CoordinatorIdImple(get_uid());
@@ -113,36 +116,38 @@ public class BACoordinator extends TwoPhaseCoordinator {
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate(CompletionStatus cs)
-            throws WrongStateException, ProtocolViolationException, SystemException {
+    public Outcome coordinate (CompletionStatus cs) throws WrongStateException,
+            ProtocolViolationException, SystemException
+    {
         return null;
     }
 
     /**
-     * ensure all ParticipantCompletion participants have completed and then
-     * send a complete message to any remaining CoordinatorCompletion
-     * participants.
-     * 
-     * @throws WrongStateException
-     *             if the transaction is neither RUNNING nor PREPARED
-     * @throws SystemException
-     *             if there are incomplete ParticipantCompletion participants or
-     *             if one of the CoordinatorCompletion participants fails to
-     *             complete.
+     * ensure all ParticipantCompletion participants have completed and then send a complete message to
+     * any remaining CoordinatorCompletion participants.
+     * @throws WrongStateException if the transaction is neither RUNNING nor PREPARED
+     * @throws SystemException if there are incomplete ParticipantCompletion participants or if one of the
+     * CoordinatorCompletion participants fails to complete.
      */
-    public synchronized void complete() throws WrongStateException, SystemException {
+    public synchronized void complete () throws WrongStateException,
+            SystemException
+    {
         int status = status();
 
-        if (status == ActionStatus.RUNNING) {
+        if (status == ActionStatus.RUNNING)
+        {
             // check that all ParticipantCompletion participants have completed
             // throwing a wobbly if not
 
-            if (pendingList != null) {
+            if (pendingList != null)
+            {
                 RecordListIterator iter = new RecordListIterator(pendingList);
                 AbstractRecord absRec = iter.iterate();
 
-                while (absRec != null) {
-                    if (absRec instanceof ParticipantRecord) {
+                while (absRec != null)
+                {
+                    if (absRec instanceof ParticipantRecord)
+                    {
                         ParticipantRecord pr = (ParticipantRecord) absRec;
 
                         if (!pr.complete()) {
@@ -160,40 +165,39 @@ public class BACoordinator extends TwoPhaseCoordinator {
                     absRec = iter.iterate();
                 }
             }
-        } else {
+        }
+        else
+        {
             throw new WrongStateException();
         }
     }
 
     /**
      * close the activity
-     * 
      * @return the outcome of the close
      * @throws SystemException
      */
-    public int close() throws SystemException {
-        // we need to make sure all coordinator completion aprticipants ahve
-        // completed
+    public int close () throws SystemException
+    {
+        // we need to make sure all coordinator completion aprticipants ahve completed
         try {
             complete();
         } catch (Exception e) {
             // carry on as end will catch any further problems
         }
 
-        // now call end(). if any of the participant completion participants are
-        // not
-        // completed they will throw a WrongStateException during prepare
-        // leading to rollback
+        // now call end(). if any of the participant completion participants are not
+        // completed they will throw a WrongStateException during prepare leading to rollback
 
         return end(true);
     }
 
     /**
      * cancel the activity
-     * 
      * @return the outcome of the cancel
      */
-    public int cancel() {
+    public int cancel ()
+    {
         return super.cancel();
     }
 
@@ -214,16 +218,17 @@ public class BACoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void enlistParticipant(Participant act)
-            throws WrongStateException, DuplicateParticipantException, InvalidParticipantException, SystemException {
-        if (act == null)
-            throw new InvalidParticipantException();
+    public void enlistParticipant (Participant act) throws WrongStateException,
+            DuplicateParticipantException, InvalidParticipantException,
+            SystemException
+    {
+        if (act == null) throw new InvalidParticipantException();
 
-        AbstractRecord rec = new ParticipantRecord((Participant) act, new Uid());
+        AbstractRecord rec = new ParticipantRecord((Participant)act, new Uid());
 
-        if (add(rec) != AddOutcome.AR_ADDED)
-            throw new WrongStateException();
-        else {
+        if (add(rec) != AddOutcome.AR_ADDED) throw new WrongStateException();
+        else
+        {
             /*
              * Presume nothing protocol, so we need to write the intentions list
              * every time a participant is added.
@@ -232,8 +237,7 @@ public class BACoordinator extends TwoPhaseCoordinator {
     }
 
     /**
-     * Remove the specified participant from the coordinator's list. this is the
-     * target of the
+     * Remove the specified participant from the coordinator's list. this is the target of the
      * 
      * @exception InvalidParticipantException
      *                Thrown if the participant is not known of by the
@@ -245,87 +249,98 @@ public class BACoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public synchronized void delistParticipant(String participantId)
-            throws InvalidParticipantException, WrongStateException, SystemException {
+    public synchronized void delistParticipant (String participantId)
+            throws InvalidParticipantException, WrongStateException,
+            SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
 
         int status = status();
         // exit is only legitimate when the TX is in these states
         switch (status) {
-            case ActionStatus.RUNNING :
-            case ActionStatus.ABORT_ONLY :
+            case ActionStatus.RUNNING:
+            case ActionStatus.ABORT_ONLY:
                 changeParticipantStatus(participantId, DELISTED);
                 break;
-            default :
-                throw new WrongStateException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
+            default:
+                throw new WrongStateException(
+                        wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
         }
     }
 
-    public synchronized void participantCompleted(String participantId)
-            throws InvalidParticipantException, WrongStateException, SystemException {
+    public synchronized void participantCompleted (String participantId)
+            throws InvalidParticipantException, WrongStateException,
+            SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
 
         int status = status();
         // completed is only legitimate when the TX is in these states
         switch (status) {
-            case ActionStatus.ABORTED :
+            case ActionStatus.ABORTED:
                 break;
-            case ActionStatus.RUNNING :
-            case ActionStatus.ABORT_ONLY :
+            case ActionStatus.RUNNING:
+            case ActionStatus.ABORT_ONLY:
                 changeParticipantStatus(participantId, COMPLETED);
                 break;
-            default :
-                throw new WrongStateException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
+            default:
+                throw new WrongStateException(
+                        wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
         }
     }
 
-    public synchronized void participantFaulted(String participantId)
-            throws InvalidParticipantException, SystemException {
+    public synchronized void participantFaulted (String participantId)
+            throws InvalidParticipantException, SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
 
         int status = status();
         // faulted is only legitimate when the TX is in these states
         switch (status) {
-            case ActionStatus.RUNNING :
-                // if a participant notifies this then we need to mark the
-                // transaction as abort only
+            case ActionStatus.RUNNING:
+                // if a participant notifies this then we need to mark the transaction as abort only
                 preventCommit();
                 // !!! deliberate drop through !!!
-            case ActionStatus.ABORT_ONLY :
-            case ActionStatus.COMMITTING :
-            case ActionStatus.COMMITTED : // this can happen during recovery
-                                            // processing
-            case ActionStatus.ABORTING :
+            case ActionStatus.ABORT_ONLY:
+            case ActionStatus.COMMITTING:
+            case ActionStatus.COMMITTED:    // this can happen during recovery processing
+            case ActionStatus.ABORTING:
                 changeParticipantStatus(participantId, FAILED);
                 break;
-            default :
-                throw new SystemException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
+            default:
+                throw new SystemException(
+                        wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
         }
     }
 
     // n.b. this is only appropriate for the 1.1 protocol
 
-    public synchronized void participantCannotComplete(String participantId)
-            throws InvalidParticipantException, WrongStateException, SystemException {
+    public synchronized void participantCannotComplete (String participantId)
+            throws InvalidParticipantException, WrongStateException, SystemException
+    {
         if (participantId == null)
-            throw new SystemException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
+            throw new SystemException(
+                    wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_2());
 
         int status = status();
         // cannot complete is only legitimate when the TX is in these states
         switch (status) {
-            case ActionStatus.RUNNING :
-                // if a participant notifies this then we need to mark the
-                // transaction as abort only
+            case ActionStatus.RUNNING:
+                // if a participant notifies this then we need to mark the transaction as abort only
                 preventCommit();
                 // !!! deliberate drop through !!!
-            case ActionStatus.ABORT_ONLY :
+            case ActionStatus.ABORT_ONLY:
                 changeParticipantStatus(participantId, DELISTED);
                 break;
-            default :
-                throw new WrongStateException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
+            default:
+                throw new WrongStateException(
+                        wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_3());
         }
     }
 
@@ -333,8 +348,7 @@ public class BACoordinator extends TwoPhaseCoordinator {
      * Enrol the specified synchronization with the coordinator associated with
      * the current thread.
      *
-     * @param act
-     *            The synchronization to add.
+     * @param act The synchronization to add.
      *
      * @exception WrongStateException
      *                Thrown if the coordinator is not in a state that allows
@@ -349,8 +363,10 @@ public class BACoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void enlistSynchronization(Synchronization act) throws WrongStateException,
-            DuplicateSynchronizationException, InvalidSynchronizationException, SystemException {
+    public void enlistSynchronization (Synchronization act)
+            throws WrongStateException, DuplicateSynchronizationException,
+            InvalidSynchronizationException, SystemException
+    {
         if (act == null)
             throw new InvalidSynchronizationException();
 
@@ -374,12 +390,15 @@ public class BACoordinator extends TwoPhaseCoordinator {
      *                Thrown if any other error occurs.
      */
 
-    public void delistSynchronization(Synchronization act)
-            throws InvalidSynchronizationException, WrongStateException, SystemException {
+    public void delistSynchronization (Synchronization act)
+            throws InvalidSynchronizationException, WrongStateException,
+            SystemException
+    {
         if (act == null)
             throw new InvalidSynchronizationException();
         else
-            throw new WrongStateException(wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_4());
+            throw new WrongStateException(
+                    wscfLogger.i18NLogger.get_model_sagas_arjunacore_BACoordinator_4());
     }
 
     /**
@@ -390,7 +409,8 @@ public class BACoordinator extends TwoPhaseCoordinator {
      *         the current coordinator.
      */
 
-    public Qualifier[] qualifiers() throws SystemException {
+    public Qualifier[] qualifiers () throws SystemException
+    {
         return null;
     }
 
@@ -401,16 +421,19 @@ public class BACoordinator extends TwoPhaseCoordinator {
      * @return The unique identity of the current coordinator.
      */
 
-    public CoordinatorId identifier() throws SystemException {
+    public CoordinatorId identifier () throws SystemException
+    {
         return _theId;
     }
 
-    public String type() {
+    public String type ()
+    {
         return "/StateManager/BasicAction/AtomicAction/Sagas/BACoordinator";
     }
 
-    private final void changeParticipantStatus(String participantId, int status)
-            throws InvalidParticipantException, SystemException {
+    private final void changeParticipantStatus (String participantId, int status)
+            throws InvalidParticipantException, SystemException
+    {
         /*
          * Transaction is active, so we can look at the pendingList only.
          */
@@ -419,17 +442,22 @@ public class BACoordinator extends TwoPhaseCoordinator {
         // could come in late
         boolean found = false;
 
-        if (pendingList != null) {
+        if (pendingList != null)
+        {
             RecordListIterator iter = new RecordListIterator(pendingList);
             AbstractRecord absRec = iter.iterate();
 
-            try {
-                while ((absRec != null) && !found) {
-                    if (absRec instanceof ParticipantRecord) {
+            try
+            {
+                while ((absRec != null) && !found)
+                {
+                    if (absRec instanceof ParticipantRecord)
+                    {
                         ParticipantRecord pr = (ParticipantRecord) absRec;
                         Participant participant = (Participant) pr.value();
 
-                        if (participantId.equals(participant.id())) {
+                        if (participantId.equals(participant.id()))
+                        {
                             found = true;
 
                             if (status == DELISTED) {
@@ -444,13 +472,14 @@ public class BACoordinator extends TwoPhaseCoordinator {
 
                     absRec = iter.iterate();
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw new SystemException(ex.toString());
             }
         }
 
-        if (!found)
-            throw new InvalidParticipantException();
+        if (!found) throw new InvalidParticipantException();
     }
 
     private CoordinatorIdImple _theId;

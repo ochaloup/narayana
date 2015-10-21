@@ -29,11 +29,12 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Completion Initiator service
- * 
  * @author kevin
  */
-public class CompletionInitiatorInitialisation {
-    public static void startup() {
+public class CompletionInitiatorInitialisation
+{
+    public static void startup()
+    {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -44,6 +45,7 @@ public class CompletionInitiatorInitialisation {
         if (clientServiceURLPath == null) {
             clientServiceURLPath = "/ws-t11-client";
         }
+
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -57,22 +59,20 @@ public class CompletionInitiatorInitialisation {
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" + bindAddress + ":" + bindPort + clientServiceURLPath;
+        final String baseUri = "http://" +  bindAddress + ":" + bindPort + clientServiceURLPath;
         final String uri = baseUri + "/" + AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME;
-        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + clientServiceURLPath;
+        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + clientServiceURLPath;
         final String secureUri = secureBaseUri + "/" + AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, uri);
-        serviceRegistry.registerSecureServiceProvider(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME,
-                secureUri);
+        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, uri) ;
+        serviceRegistry.registerSecureServiceProvider(AtomicTransactionConstants.COMPLETION_INITIATOR_SERVICE_NAME, secureUri) ;
     }
 
     /**
      * The context is about to be destroyed.
-     * 
-     * @param servletContextEvent
-     *            The servlet context event.
+     * @param servletContextEvent The servlet context event.
      */
-    public static void shutdwon() {
+    public static void shutdwon()
+    {
     }
 }

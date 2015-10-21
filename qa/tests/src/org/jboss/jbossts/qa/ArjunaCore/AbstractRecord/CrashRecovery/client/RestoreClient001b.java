@@ -23,17 +23,22 @@ package org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.CrashRecovery.client;
 import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.impl.Service01;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 
-public class RestoreClient001b extends BaseTestClient {
-    public static void main(String[] args) {
+public class RestoreClient001b extends BaseTestClient
+{
+    public static void main(String[] args)
+    {
         RestoreClient001b test = new RestoreClient001b(args);
     }
 
-    private RestoreClient001b(String[] args) {
+    private RestoreClient001b(String[] args)
+    {
         super(args);
     }
 
-    public void Test() {
-        try {
+    public void Test()
+    {
+        try
+        {
             setNumberOfCalls(3);
             setNumberOfResources(2);
             setUniquePrefix(1);
@@ -43,13 +48,15 @@ public class RestoreClient001b extends BaseTestClient {
             startTx();
             mService.setupOper();
             mService.doWork(mMaxIteration);
-            // comit transaction
+            //comit transaction
             commit();
 
             mService.storeUIDs(getUniquePrefix());
 
             qaAssert(mCorrect);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Fail("Error in RestoreClient001b.test() :", e);
         }
     }

@@ -29,8 +29,10 @@
 
 package org.jboss.jbossts.qa.Utils;
 
-public class RemoveObjectUidStore {
-    public static void main(String[] args) {
+public class RemoveObjectUidStore
+{
+    public static void main(String[] args)
+    {
         ObjectUidStore.remove();
 
         System.out.println("Passed");

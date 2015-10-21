@@ -42,12 +42,12 @@ public class TransportFactory {
         log.debug("Creating Transportfactory: " + this);
         this.properties = properties;
 
-        try {
+        try{
             socketserver = SocketServer.getInstance(properties);
         } catch (IOException e) {
             throw new ConfigurationException("Could not create socket server", e);
         }
-
+        
         log.debug("Created SocketServer");
     }
 
@@ -85,7 +85,7 @@ public class TransportFactory {
             transports.clear();
             closed = true;
         }
-        if (socketserver != null) {
+        if(socketserver != null) {
             SocketServer.discardInstance();
         }
         log.debug("Closed factory: " + getClass().getName());

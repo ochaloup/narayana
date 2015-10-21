@@ -58,28 +58,33 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-class FakeCheckedAction extends CheckedAction {
-    public void check(boolean isCommit, Uid actUid, Hashtable list) {
+class FakeCheckedAction extends CheckedAction
+{
+    public void check (boolean isCommit, Uid actUid, Hashtable list)
+    {
         called = true;
     }
-
+    
     public boolean called = false;
 }
 
-public class TerminationTest {
+public class TerminationTest
+{
     @Test
-    public void test() {
+    public void test()
+    {
         boolean commit = true;
 
         Control myControl = null;
         ORB myORB = null;
         RootOA myOA = null;
 
-        try {
+        try
+        {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[]{}, null);
+            myORB.initORB(new String[] {}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -91,18 +96,22 @@ public class TerminationTest {
 
             myControl = theOTS.create(2);
 
-            assertNotNull(myControl);
+            assertNotNull( myControl );
 
             Terminator handle = myControl.get_terminator();
 
-            try {
+            try
+            {
                 System.out.println("Sleeping for 5 seconds.");
 
                 Thread.sleep(5000);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
 
-            if (handle != null) {
+            if (handle != null)
+            {
                 System.out.print("Attempting to ");
 
                 if (commit)
@@ -120,44 +129,56 @@ public class TerminationTest {
                 System.out.println("\nNow attempting to destroy transaction. Should fail!");
 
                 OTSManager.destroyControl(myControl);
-            } else
+            }
+            else
                 System.err.println("No transaction terminator!");
-        } catch (UserException e) {
-            System.err.println("Caught UserException: " + e);
-        } catch (SystemException e) {
-            System.err.println("Caught SystemException: " + e);
+        }
+        catch (UserException e)
+        {
+            System.err.println("Caught UserException: "+e);
+        }
+        catch (SystemException e)
+        {
+            System.err.println("Caught SystemException: "+e);
 
-            try {
+            try
+            {
                 Coordinator coord = myControl.get_coordinator();
                 Status s = coord.get_status();
 
-                System.err.println("Transaction status: " + com.arjuna.ats.jts.utils.Utility.stringStatus(s));
+                System.err.println("Transaction status: "+com.arjuna.ats.jts.utils.Utility.stringStatus(s));
 
                 coord = null;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
             }
         }
 
-        try {
+        try
+        {
             CurrentImple current = OTSImpleManager.current();
             FakeCheckedAction act = new FakeCheckedAction();
-
+            
             current.set_timeout(2);
             current.setCheckedAction(act);
 
             assertEquals(act, current.getCheckedAction());
-
+            
             System.out.println("\nNow creating current transaction with 2 second timeout.");
 
             current.begin();
 
             myControl = current.get_control();
 
-            try {
+            try
+            {
                 System.out.println("Sleeping for 5 seconds.");
 
                 Thread.sleep(5000);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
 
             System.out.print("Attempting to ");
@@ -173,23 +194,30 @@ public class TerminationTest {
                 current.rollback();
 
             assertFalse(commit);
-
+            
             assertTrue(act.called);
-        } catch (UserException e) {
-            System.err.println("Caught UserException: " + e);
+        }
+        catch (UserException e)
+        {
+            System.err.println("Caught UserException: "+e);
             System.out.println("Test did not completed successfully.");
-        } catch (SystemException e) {
-            System.err.println("Caught SystemException: " + e);
+        }
+        catch (SystemException e)
+        {
+            System.err.println("Caught SystemException: "+e);
 
-            try {
+            try
+            {
                 Coordinator coord = myControl.get_coordinator();
                 Status s = coord.get_status();
 
-                System.err.println("Transaction status: " + com.arjuna.ats.jts.utils.Utility.stringStatus(s));
+                System.err.println("Transaction status: "+com.arjuna.ats.jts.utils.Utility.stringStatus(s));
 
                 myControl = null;
                 coord = null;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
             }
 
             System.out.println("Test completed successfully.");

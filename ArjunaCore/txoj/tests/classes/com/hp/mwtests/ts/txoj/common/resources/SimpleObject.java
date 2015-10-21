@@ -31,26 +31,32 @@
 
 package com.hp.mwtests.ts.txoj.common.resources;
 
-public class SimpleObject {
+public class SimpleObject
+{
 
-    public SimpleObject() {
-        state = 0;
+public SimpleObject ()
+    {
+    state = 0;
 
-        System.out.println("Created simple object.");
+    System.out.println("Created simple object.");
+    }
+    
+public void incr (int value)
+    {
+    state += value;
+    }
+    
+public void set (int value)
+    {
+    state = value;
     }
 
-    public void incr(int value) {
-        state += value;
+public int get ()
+    {
+    return state;
     }
 
-    public void set(int value) {
-        state = value;
-    }
-
-    public int get() {
-        return state;
-    }
-
-    private int state;
-
+private int state;
+    
 };
+

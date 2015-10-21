@@ -28,7 +28,7 @@
  *
  * $Id: Connection.java 2342 2006-03-30 13:06:17Z  $
  */
-
+ 
 package com.arjuna.ats.internal.arjuna.recovery;
 
 import java.io.IOException;
@@ -39,72 +39,80 @@ import java.net.Socket;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.recovery.Service;
 
-public class Connection extends Thread {
-    /**
-     * Takes socket and service to execute.
-     */
+public class Connection extends Thread
+{
+   /**
+    * Takes socket and service to execute.
+    */
 
-    public Connection(Socket server_socket, Service service) {
-        this(server_socket, service, null);
-    }
-
-    /**
-     * Takes socket and service to execute and a callback to run when processing
-     * of the connection has completed
-     */
-
-    public Connection(Socket server_socket, Service service, Callback callback) {
-        super("Server.Connection:" + server_socket.getInetAddress().getHostAddress() + ":" + server_socket.getPort());
-
-        _server_socket = server_socket;
-
-        try {
-            _server_socket.setSoTimeout(0);
-        } catch (java.net.SocketException ex) {
-            tsLogger.i18NLogger.warn_recovery_Connection_2();
-        }
-
-        _service = service;
-
-        _callback = callback;
-    }
+   public Connection( Socket server_socket, Service service)
+   {
+       this(server_socket, service, null);
+   }
 
     /**
-     * Obtains input and output streams and executes work required by the
-     * service.
+     * Takes socket and service to execute and a callback to run when processing of the connection has completed
      */
 
-    public void run() {
-        try {
-            InputStream is = _server_socket.getInputStream();
-            OutputStream os = _server_socket.getOutputStream();
+    public Connection( Socket server_socket, Service service, Callback callback )
+   {
+      super( "Server.Connection:" + server_socket.getInetAddress().getHostAddress() + ":" + server_socket.getPort() );
+              
+      _server_socket = server_socket;
 
-            _service.doWork(is, os);
-        } catch (IOException ex) {
-            tsLogger.i18NLogger.warn_recovery_Connection_1();
-        } finally {
+      try
+      {
+      _server_socket.setSoTimeout(0);
+      }
+      catch (java.net.SocketException ex) {
+          tsLogger.i18NLogger.warn_recovery_Connection_2();
+      }
 
-            // run the callback to notify completion of processing for this
-            // connection
+      _service = service;
 
-            if (_callback != null) {
-                _callback.run();
-            }
-        }
-    }
+       _callback = callback;
+   }
+   
+   /**
+    * Obtains input and output streams and executes work
+    * required by the service.
+    */
 
-    // What client (RecoveryManager) talks to.
-    private Socket _server_socket;
+   public void run()
+   {
+      try
+      {
+         InputStream  is = _server_socket.getInputStream();
+         OutputStream os = _server_socket.getOutputStream();
 
-    // What Service is provided to the client(RecoveryManager).
-    private Service _service;
+         _service.doWork ( is, os );
+      }
+      catch ( IOException ex ) {
+          tsLogger.i18NLogger.warn_recovery_Connection_1();
+      }
+      finally
+      {
 
-    private Callback _callback;
+      // run the callback to notify completion of processing for this connection
 
-    // abstract class instantiated by clients to allow notification that a
-    // connection has been closed
+      if (_callback != null) {
+          _callback.run();
+      }
+      }
+   }
 
-    public static abstract class Callback {
-        abstract void run();
-    }
+   // What client (RecoveryManager) talks to.
+   private Socket  _server_socket;
+   
+   // What Service is provided to the client(RecoveryManager).
+   private Service _service;
+
+   private Callback _callback;
+
+    // abstract class instantiated by clients to allow notification that a connection has been closed
+    
+   public static abstract class Callback
+   {
+       abstract void run();
+   }
 }

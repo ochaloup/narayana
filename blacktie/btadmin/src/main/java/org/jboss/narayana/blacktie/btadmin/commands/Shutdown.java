@@ -36,9 +36,8 @@ import org.jboss.narayana.blacktie.jatmibroker.core.conf.Machine;
 import org.jboss.narayana.blacktie.jatmibroker.core.conf.Server;
 
 /**
- * The shutdown command will shutdown the server specified. This method is
- * non-blocking, i.e. the server is requested to shutdown, it will still be
- * alive possibly
+ * The shutdown command will shutdown the server specified. This method is non-blocking, i.e. the server is requested to
+ * shutdown, it will still be alive possibly
  */
 public class Shutdown implements Command {
     /**
@@ -127,20 +126,18 @@ public class Shutdown implements Command {
                     log.info("Server shutdown successfully: " + name + " with id: " + id);
                     log.info("waiting for " + name + ":" + id + " shutdown complete");
                     for (int i = 0; i < numChecks; i++) {
-                        if (checkServerAlive(name, id)) {
-                            try {
+                        if(checkServerAlive(name, id)) {
+                            try{
                                 Thread.sleep(checkPeriodMillis);
-                            } catch (Exception e) {
-                            }
-                            log.info(name + ":" + id + " is still alive, sleeping for a further " + checkPeriodMillis
-                                    + "ms");
-                        } else {
+                            } catch (Exception e) {}
+                            log.info(name + ":" + id + " is still alive, sleeping for a further " + checkPeriodMillis + "ms");
+                        }  else {
                             log.info(name + ":" + id + " shutdown complete");
                             shutdown = true;
                             break;
                         }
                     }
-                    if (shutdown == false) {
+                    if(shutdown == false) {
                         log.error(name + ":" + id + " has not shutdown complete");
                         throw new CommandFailedException(-1);
                     }
@@ -160,20 +157,19 @@ public class Shutdown implements Command {
         String cmd = null;
         ProcessBuilder pb = null;
         boolean toReturn = false;
-        if (OS.indexOf("linux") >= 0) {
+        if(OS.indexOf("linux") >= 0){
             log.debug(OS + " check for linux");
-            if (id != 0) {
+            if(id != 0) {
                 cmd = "ps -ef | grep \"\\\\-i " + id + " \\\\-s " + name + "\" | grep -v grep";
             } else {
                 cmd = "ps -ef | grep \"\\\\-s " + name + "\" | grep -v grep";
             }
             log.debug(cmd);
             pb = new ProcessBuilder("/bin/sh", "-c", cmd);
-        } else if (OS.indexOf("win") >= 0) {
+        } else if(OS.indexOf("win") >= 0) {
             log.debug(OS + " check for windows ");
-            if (id != 0) {
-                cmd = "wmic process get commandline | findstr /c:\"\\-i " + id + " \\-s " + name
-                        + "\" | findstr /v findstr";
+            if(id != 0) {
+                cmd = "wmic process get commandline | findstr /c:\"\\-i " + id + " \\-s " + name + "\" | findstr /v findstr";
             } else {
                 cmd = "wmic process get commandline | findstr /c:\"\\-s " + name + "\" | findstr /v findstr";
             }
@@ -186,19 +182,19 @@ public class Shutdown implements Command {
 
         try {
             Process p = pb.start();
-            if (OS.indexOf("win") >= 0) {
-                // wmic is blocking for stdin. so we need to close it.
+            if(OS.indexOf("win") >= 0) {
+                //wmic is blocking for stdin. so we need to close it.
                 p.getOutputStream().close();
             }
             p.waitFor();
-            if (p.exitValue() == 0) {
+            if(p.exitValue() == 0) {
                 log.debug("check cmd " + cmd + " output");
                 InputStream is = p.getInputStream();
                 BufferedReader ein = new BufferedReader(new InputStreamReader(is));
                 String res = ein.readLine();
-                if (res != null) {
+                if(res != null) {
                     log.debug("cmd " + cmd + " output: " + res);
-                    toReturn = true;
+                    toReturn = true; 
                 }
                 is.close();
             }

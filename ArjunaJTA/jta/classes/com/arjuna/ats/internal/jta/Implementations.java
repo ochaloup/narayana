@@ -37,47 +37,58 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 import com.arjuna.ats.internal.jta.resources.arjunacore.CommitMarkableResourceRecord;
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecord;
 
-class CommitMarkableResourceRecordMap implements RecordTypeMap {
+class CommitMarkableResourceRecordMap implements RecordTypeMap
+{
     @SuppressWarnings("unchecked")
-    public Class getRecordClass() {
+    public Class getRecordClass ()
+    {
         return CommitMarkableResourceRecord.class;
     }
-
-    public int getType() {
+    
+    public int getType ()
+    {
         return RecordType.COMMITMARKABLERESOURCE;
     }
 }
 
-class XAResourceRecordMap implements RecordTypeMap {
+class XAResourceRecordMap implements RecordTypeMap
+{
     @SuppressWarnings("unchecked")
-    public Class getRecordClass() {
+    public Class getRecordClass ()
+    {
         return XAResourceRecord.class;
     }
-
-    public int getType() {
+    
+    public int getType ()
+    {
         return RecordType.JTA_RECORD;
     }
 }
 
-public class Implementations {
-    public static synchronized boolean added() {
-        return _added;
+public class Implementations
+{
+    public static synchronized boolean added ()
+    {
+    return _added;
+    }
+    
+    public static synchronized void initialise ()
+    {
+    if (!_added)
+    {
+        /*
+         * Now add various abstract records which crash recovery needs.
+         */
+
+        RecordTypeManager.manager().add(new CommitMarkableResourceRecordMap());
+        RecordTypeManager.manager().add(new XAResourceRecordMap());
+        
+        _added = true;
+    }
     }
 
-    public static synchronized void initialise() {
-        if (!_added) {
-            /*
-             * Now add various abstract records which crash recovery needs.
-             */
-
-            RecordTypeManager.manager().add(new CommitMarkableResourceRecordMap());
-            RecordTypeManager.manager().add(new XAResourceRecordMap());
-
-            _added = true;
-        }
-    }
-
-    private Implementations() {
+    private Implementations ()
+    {
     }
 
     private static boolean _added = false;
@@ -85,8 +96,9 @@ public class Implementations {
     /**
      * Static block triggers initialization of XAResourceRecordMap.
      */
-    static {
-        initialise();
+    static
+    {
+    initialise();
     }
-
+    
 }

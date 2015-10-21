@@ -27,7 +27,8 @@ import java.util.Hashtable;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface JDBCEnvironmentBeanMBean {
+public interface JDBCEnvironmentBeanMBean
+{
     int getIsolationLevel();
 
     public Hashtable getJndiProperties();

@@ -54,13 +54,14 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
             + " -Dcom.arjuna.ats.arjuna.recovery.periodicRecoveryPeriod=" + RECOVERY_PERIOD;
 
     private static final String BYTEMAN_ARGUMENTS = "-Dorg.jboss.byteman.verbose"
-            + " -Djboss.modules.system.pkgs=org.jboss.byteman" + " -Dorg.jboss.byteman.transform.all"
+            + " -Djboss.modules.system.pkgs=org.jboss.byteman"
+            + " -Dorg.jboss.byteman.transform.all"
             + " -javaagent:../lib/byteman.jar=script:scripts/@BMScript@.btm,boot:../lib/byteman.jar,listener:true";
 
     @Deployment(name = DEPLOYMENT_NAME, testable = false, managed = false)
     public static WebArchive createTestArchive() {
-        return getEmptyWebArchive().addClasses(RestATManagementResource.class, LoggingXAResource.class,
-                SimpleInboundBridgeResource.class, LoggingRestATResource.class)
+        return getEmptyWebArchive()
+                .addClasses(RestATManagementResource.class, LoggingXAResource.class, SimpleInboundBridgeResource.class, LoggingRestATResource.class)
                 .addAsWebInfResource("web.xml", "web.xml");
     }
 
@@ -72,8 +73,7 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
 
     @Test
     public void testCrashAfterPrepareInParticipantResource() throws Exception {
-        startContainer(
-                VM_ARGUMENTS + " " + BYTEMAN_ARGUMENTS.replace("@BMScript@", "CrashAfterPrepareInParticipantResource"));
+        startContainer(VM_ARGUMENTS + " " + BYTEMAN_ARGUMENTS.replace("@BMScript@", "CrashAfterPrepareInParticipantResource"));
         txSupport.startTx();
 
         enlistRestATParticipant(LOGGING_REST_AT_RESOURCE_URL);
@@ -83,8 +83,7 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
             txSupport.commitTx();
             Assert.fail("Container was not killed.");
         } catch (HttpResponseException e) {
-            // After crash participant won't return any response and exception
-            // will be thrown.
+            // After crash participant won't return any response and exception will be thrown.
         }
 
         restartContainer(VM_ARGUMENTS);
@@ -114,8 +113,7 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
             txSupport.commitTx();
             Assert.fail("Container was not killed.");
         } catch (HttpResponseException e) {
-            // After crash participant won't return any response and exception
-            // will be thrown.
+            // After crash participant won't return any response and exception will be thrown.
         }
 
         restartContainer(VM_ARGUMENTS);
@@ -129,8 +127,7 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
             try {
                 // Updates coordinator's active transactions list
                 txSupport.getTransactions();
-                // After successful recovery transaction is removed and 404 is
-                // returned.
+                // After successful recovery transaction is removed and 404 is returned.
                 status = txSupport.getTransactionInfo().getStatus();
             } catch (HttpResponseException e) {
             }
@@ -143,10 +140,9 @@ public class InboundBridgeRecoveryTestCase extends AbstractTestCase {
 
     private JSONArray getParticipantsInformation() {
         try {
-            final String response = ClientBuilder.newClient()
-                    .target(DEPLOYMENT_URL + "/" + RestATManagementResource.BASE_URL_SEGMENT + "/"
-                            + RestATManagementResource.PARTICIPANTS_URL_SEGMENT)
-                    .request().get(String.class);
+            final String response = ClientBuilder.newClient().target(DEPLOYMENT_URL + "/"
+                    + RestATManagementResource.BASE_URL_SEGMENT + "/"
+                    + RestATManagementResource.PARTICIPANTS_URL_SEGMENT).request().get(String.class);
             return new JSONArray(response);
         } catch (Exception e) {
             e.printStackTrace();

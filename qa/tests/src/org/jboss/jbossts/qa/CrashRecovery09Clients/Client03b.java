@@ -56,6 +56,7 @@ package org.jboss.jbossts.qa.CrashRecovery09Clients;
  * $Id: Client03b.java,v 1.2 2003/06/26 11:43:43 rbegg Exp $
  */
 
+
 import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import org.jboss.jbossts.qa.CrashRecovery09.*;
@@ -65,9 +66,12 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client03b {
-    public static void main(String[] args) {
-        try {
+public class Client03b
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -91,24 +95,29 @@ public class Client03b {
             service1.set(1);
             service2.set(1);
 
-            correct = (BasicAction.Current().add(new StartCrashAbstractRecordImpl(
-                    StartCrashAbstractRecordImpl.CRASH_IN_COMMIT)) == AddOutcome.AR_ADDED);
+            correct = (BasicAction.Current().add(new StartCrashAbstractRecordImpl(StartCrashAbstractRecordImpl.CRASH_IN_COMMIT)) == AddOutcome.AR_ADDED);
 
-            if (correct) {
+            if (correct)
+            {
                 OTS.current().commit(true);
             }
 
             System.out.println("Failed");
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client03b.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client03b.main: " + exception);
             exception.printStackTrace(System.err);
         }

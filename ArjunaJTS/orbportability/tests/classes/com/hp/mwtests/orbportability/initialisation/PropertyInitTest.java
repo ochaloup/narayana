@@ -47,34 +47,33 @@ import com.hp.mwtests.orbportability.initialisation.preinit.AllPreInitialisation
 import com.hp.mwtests.orbportability.initialisation.preinit.PreInitialisation;
 import com.hp.mwtests.orbportability.initialisation.preinit.PreInitialisation2;
 
-public class PropertyInitTest {
-    private static String ORB_INSTANCE_NAME = "orb_instance_1";
-    private static String ORB_INSTANCE_NAME_2 = "orb_instance_2";
+public class PropertyInitTest
+{
+    private static String   ORB_INSTANCE_NAME = "orb_instance_1";
+    private static String   ORB_INSTANCE_NAME_2 = "orb_instance_2";
 
     @Test
-    public void test() {
+    public void test()
+    {
         Properties testProps = System.getProperties();
 
         testProps.setProperty(PreInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb"),
                 "com.hp.mwtests.orbportability.initialisation.preinit.AllPreInitialisation");
         testProps.setProperty(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb"),
                 "com.hp.mwtests.orbportability.initialisation.postinit.AllPostInitialisation");
-        testProps.setProperty(PreInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_INSTANCE_NAME),
+        testProps.setProperty(PreInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb",ORB_INSTANCE_NAME),
                 "com.hp.mwtests.orbportability.initialisation.preinit.PreInitialisation");
-        testProps.setProperty(
-                PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_INSTANCE_NAME),
+        testProps.setProperty(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb",ORB_INSTANCE_NAME),
                 "com.hp.mwtests.orbportability.initialisation.postinit.PostInitialisation");
-        testProps.setProperty(
-                PreInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_INSTANCE_NAME_2),
+        testProps.setProperty(PreInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb",ORB_INSTANCE_NAME_2),
                 "com.hp.mwtests.orbportability.initialisation.preinit.PreInitialisation2");
-        testProps.setProperty(
-                PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb", ORB_INSTANCE_NAME_2),
+        testProps.setProperty(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb",ORB_INSTANCE_NAME_2),
                 "com.hp.mwtests.orbportability.initialisation.postinit.PostInitialisation2");
 
         System.setProperties(testProps);
 
         ORB orb = ORB.getInstance(ORB_INSTANCE_NAME);
-        orb.initORB(new String[]{}, null);
+        orb.initORB(new String[] {}, null);
 
         assertTrue(PreInitialisation._called);
 
@@ -87,8 +86,9 @@ public class PropertyInitTest {
         assertTrue(AllPreInitialisation._called);
 
         assertTrue(AllPostInitialisation._called);
-
-        try {
+        
+        try
+        {
             /**
              * Reset called flags on All ORB instance pre-initialisation
              */
@@ -96,10 +96,12 @@ public class PropertyInitTest {
             AllPostInitialisation._called = false;
             orb = ORB.getInstance(ORB_INSTANCE_NAME_2);
             System.out.println("Initialising Second ORB Instance");
-            orb.initORB(new String[]{}, null);
-        } catch (Exception e) {
+            orb.initORB(new String[] {}, null);
+        }
+        catch (Exception e)
+        {
             e.printStackTrace(System.err);
-            fail("ERROR - " + e);
+            fail("ERROR - "+e);
         }
 
         assertTrue(PreInitialisation2._called);
@@ -110,10 +112,13 @@ public class PropertyInitTest {
 
         assertTrue(AllPostInitialisation._called);
 
-        try {
+        try
+        {
             orb.destroy();
-        } catch (Exception e) {
-            fail("ERROR - " + e);
+        }
+        catch (Exception e)
+        {
+            fail("ERROR - "+e);
             e.printStackTrace(System.err);
         }
     }

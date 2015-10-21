@@ -37,9 +37,11 @@ import javax.transaction.Status;
 
 import org.junit.Test;
 
-public class JTAAbort {
+public class JTAAbort
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();

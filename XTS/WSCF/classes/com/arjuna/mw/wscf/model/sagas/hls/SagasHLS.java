@@ -42,12 +42,14 @@ import com.arjuna.mw.wscf.api.UserCoordinatorService;
  * @since 1.0.
  */
 
-public interface SagasHLS extends HLS {
-
-    public UserCoordinatorService coordinatorService();
-
-    public UserCoordinator userCoordinator();
-
-    public CoordinatorManager coordinatorManager();
+public interface SagasHLS extends HLS
+{
+    
+    public UserCoordinatorService coordinatorService ();
+    
+    public UserCoordinator userCoordinator ();
+    
+    public CoordinatorManager coordinatorManager ();
 
 }
+

@@ -26,9 +26,9 @@ import java.lang.annotation.*;
 /**
  * Grab a write lock for this method.
  * 
- * If no other annotation appears to override this, then all transactional
- * object methods will be assumed to modify the state, i.e., WriteLock is the
- * default value.
+ * If no other annotation appears to override this, then
+ * all transactional object methods will be assumed to modify
+ * the state, i.e., WriteLock is the default value.
  * 
  * @author marklittle
  */
@@ -36,7 +36,8 @@ import java.lang.annotation.*;
 // TODO lock priority rules
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Inherited
-public @interface WriteLock {
+public @interface WriteLock
+{
 }

@@ -21,28 +21,32 @@
 package com.arjuna.mw.wsas.exceptions;
 
 /**
- * Marker interface for exceptions e.g. timeouts, in the client/server
- * communication.
+ * Marker interface for exceptions e.g. timeouts, in the client/server communication.
  */
 public class SystemCommunicationException extends SystemException {
 
-    public SystemCommunicationException() {
+    public SystemCommunicationException ()
+    {
         super();
     }
 
-    public SystemCommunicationException(String s) {
+    public SystemCommunicationException (String s)
+    {
         super(s);
     }
 
-    public SystemCommunicationException(String s, int errorcode) {
+    public SystemCommunicationException (String s, int errorcode)
+    {
         super(s, errorcode);
     }
 
-    public SystemCommunicationException(String reason, Object obj) {
+    public SystemCommunicationException (String reason, Object obj)
+    {
         super(reason, obj);
     }
 
-    public SystemCommunicationException(Object ex) {
+    public SystemCommunicationException (Object ex)
+    {
         super(ex);
     }
 

@@ -37,10 +37,9 @@ public class TestServiceClient implements TestService {
     public TestServiceClient() throws Exception {
 
         URLUtils urlUtils = new URLUtils();
-        URL wsdlLocation = new URL(
-                urlUtils.getBaseUrl() + ":" + urlUtils.getBasePort() + "/test/TestServiceService/TestService?wsdl");
-        QName serviceName = new QName("http://www.jboss.com/functional/compensations/distributed/",
-                "TestServiceService");
+        URL wsdlLocation = new URL(urlUtils.getBaseUrl() + ":" + urlUtils.getBasePort()
+                + "/test/TestServiceService/TestService?wsdl");
+        QName serviceName = new QName("http://www.jboss.com/functional/compensations/distributed/", "TestServiceService");
         QName portName = new QName("http://www.jboss.com/functional/compensations/distributed/", "TestServiceService");
 
         Service service = Service.create(wsdlLocation, serviceName);
@@ -85,3 +84,4 @@ public class TestServiceClient implements TestService {
         return testService.wasTransactionConfirmedHandlerInvoked();
     }
 }
+

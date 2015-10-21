@@ -64,12 +64,11 @@ public class CommandHandler implements java.lang.reflect.InvocationHandler {
         // Obtain the JMXURL from the btconfig.xml
         XMLParser.loadProperties("btconfig.xsd", "btconfig.xml", prop);
 
-        administrationProxy = (BlacktieAdministration) Proxy.newProxyInstance(
-                Thread.currentThread().getContextClassLoader(), new Class[]{BlacktieAdministration.class}, this);
+        administrationProxy = (BlacktieAdministration) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                new Class[] { BlacktieAdministration.class }, this);
     }
 
-    public int handleCommand(String[] args)
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public int handleCommand(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         int exitStatus = -1;
         if (args.length < 1 || args[0] == null || args[0].trim().length() == 0) {
             log.error("No command was provided");
@@ -102,8 +101,7 @@ public class CommandHandler implements java.lang.reflect.InvocationHandler {
             // Check if the number of parameters is in an expected range
             if (commandArgs.length > expectedArgsLength || commandArgs.length < expectedArgsLength - optionalArgs) {
                 if (optionalArgs == 0) {
-                    log.trace("Arguments incompatible, expected " + expectedArgsLength + ", received: "
-                            + commandArgs.length);
+                    log.trace("Arguments incompatible, expected " + expectedArgsLength + ", received: " + commandArgs.length);
                 } else {
                     log.trace("Arguments incompatible, expected at least " + optionalArgs + " and no more than "
                             + expectedArgsLength + ", received: " + commandArgs.length);
@@ -135,8 +133,8 @@ public class CommandHandler implements java.lang.reflect.InvocationHandler {
         return exitStatus;
     }
 
-    public static Command loadCommand(String commandName)
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public static Command loadCommand(String commandName) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
         String firstLetter = commandName.substring(0, 1);
         String remainder = commandName.substring(1);
         String capitalized = firstLetter.toUpperCase() + remainder;
@@ -190,7 +188,8 @@ public class CommandHandler implements java.lang.reflect.InvocationHandler {
         X_OCTET rcvbuf = (X_OCTET) received.getBuffer();
 
         Class<?> returnType = method.getReturnType();
-        byte[] byteArray = rcvbuf.getByteArray();;
+        byte[] byteArray = rcvbuf.getByteArray();
+        ;
         if (returnType == Boolean.class) {
             if (byteArray[0] == 1) {
                 return true;

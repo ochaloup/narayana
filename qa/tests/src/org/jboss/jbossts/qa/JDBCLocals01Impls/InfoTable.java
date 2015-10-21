@@ -31,7 +31,8 @@
 
 package org.jboss.jbossts.qa.JDBCLocals01Impls;
 
-public interface InfoTable {
+public interface InfoTable
+{
     public void insert(String name, String value) throws Exception;
 
     public void update(String name, String value) throws Exception;
@@ -40,3 +41,4 @@ public interface InfoTable {
 
     public void delete(String name) throws Exception;
 }
+

@@ -88,13 +88,14 @@ import com.arjuna.ats.jta.xa.XidImple;
 import com.arjuna.ats.jts.utils.Utility;
 import com.arjuna.common.internal.util.ClassloadingUtility;
 
-public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA {
+public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA
+{
 
     public static final int XACONNECTION = 0;
 
-    private static final Uid START_XARESOURCE = Uid.minUid();
+    private static final Uid START_XARESOURCE = Uid.minUid() ;
 
-    private static final Uid END_XARESOURCE = Uid.maxUid();
+    private static final Uid END_XARESOURCE = Uid.maxUid() ;
 
     /**
      * The params represent specific parameters we need to recreate the
@@ -104,7 +105,9 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * Could also use it to pass other information, such as the readonly flag.
      */
 
-    public XAResourceRecord(TransactionImple tx, XAResource res, Xid xid, Object[] params) {
+    public XAResourceRecord(TransactionImple tx, XAResource res, Xid xid,
+            Object[] params)
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.XAResourceRecord ( " + xid + " )");
         }
@@ -115,8 +118,10 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
         _valid = true;
 
-        if (params != null) {
-            if (params.length >= XACONNECTION) {
+        if (params != null)
+        {
+            if (params.length >= XACONNECTION)
+            {
                 if (params[XACONNECTION] instanceof RecoverableXAConnection)
                     _recoveryObject = (RecoverableXAConnection) params[XACONNECTION];
             }
@@ -139,48 +144,57 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
     }
 
     // for recovery only!
-
-    public XAResourceRecord() {
+    
+    public XAResourceRecord ()
+    {
         _theXAResource = null;
-        _recoveryObject = null;
-        _tranID = null;
+            _recoveryObject = null;
+            _tranID = null;
 
-        _valid = true;
+            _valid = true;
 
-        _prepared = true;
-        _committed = false;
-        _heuristic = TwoPhaseOutcome.FINISH_OK;
-        _participantStore = null;
-        _theUid = new Uid();
-        _theReference = null;
-        _recoveryCoordinator = null;
+            _prepared = true;
+            _committed = false;
+            _heuristic = TwoPhaseOutcome.FINISH_OK;
+            _participantStore = null;
+            _theUid = new Uid();
+            _theReference = null;
+            _recoveryCoordinator = null;
     }
-
-    public final Uid get_uid() {
+    
+    public final Uid get_uid()
+    {
         return _theUid;
     }
 
-    public final synchronized org.omg.CosTransactions.Resource getResource() {
-        if (_theReference == null) {
+    public final synchronized org.omg.CosTransactions.Resource getResource()
+    {
+        if (_theReference == null)
+        {
             ORBManager.getPOA().objectIsReady(this);
 
-            _theReference = org.omg.CosTransactions.ResourceHelper.narrow(ORBManager.getPOA().corbaReference(this));
+            _theReference = org.omg.CosTransactions.ResourceHelper
+                    .narrow(ORBManager.getPOA().corbaReference(this));
         }
 
         return _theReference;
     }
 
-    public final Xid getXid() {
+    public final Xid getXid()
+    {
         return _tranID;
     }
 
-    public org.omg.CosTransactions.Vote prepare()
-            throws HeuristicMixed, HeuristicHazard, org.omg.CORBA.SystemException {
+
+    public org.omg.CosTransactions.Vote prepare() throws HeuristicMixed,
+            HeuristicHazard, org.omg.CORBA.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.prepare for " + _tranID);
         }
 
-        if (!_valid || (_theXAResource == null) || (_tranID == null)) {
+        if (!_valid || (_theXAResource == null) || (_tranID == null))
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_nulltransaction("XAResourceRecord.prepare");
 
             removeConnection();
@@ -188,7 +202,8 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             return Vote.VoteRollback;
         }
 
-        try {
+        try
+        {
             /*
              * Window of vulnerability versus performance trade-off: if we
              * create the resource log here then we slow things down in the case
@@ -209,28 +224,35 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
              * notices that there is no log entry for it.
              */
 
-            if (endAssociation()) {
+            if (endAssociation())
+            {
                 _theXAResource.end(_tranID, XAResource.TMSUCCESS);
             }
 
-            if (_theXAResource.prepare(_tranID) == XAResource.XA_RDONLY) {
+            if (_theXAResource.prepare(_tranID) == XAResource.XA_RDONLY)
+            {
                 removeConnection();
 
                 return Vote.VoteReadOnly;
-            } else {
+            }
+            else
+            {
                 if (createState())
                     return Vote.VoteCommit;
                 else
                     return Vote.VoteRollback;
             }
-        } catch (XAException e1) {
+        }
+        catch (XAException e1)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_preparefailed(_theXAResource.toString(),
                     XAHelper.xidToString(_tranID), XAHelper.printXAErrorCode(e1), e1);
 
             if (jtaxLogger.logger.isTraceEnabled()) {
                 jtaxLogger.logger.tracef(
-                        "XAResourceRecord.prepare exception %s resource_trace: txn uid=%s " + "resource uid=%s\n",
-                        XAHelper.printXAErrorCode(e1), _tranID, get_uid());
+                    "XAResourceRecord.prepare exception %s resource_trace: txn uid=%s " +
+                    "resource uid=%s\n",
+                    XAHelper.printXAErrorCode(e1), _tranID, get_uid());
             }
 
             /*
@@ -241,29 +263,28 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             if (_rollbackOptimization) // won't have rollback called on it
                 removeConnection();
 
-            switch (e1.errorCode) {
-                case XAException.XAER_RMERR :
-                case XAException.XAER_RMFAIL :
-                case XAException.XA_RBROLLBACK :
-                case XAException.XA_RBEND :
-                case XAException.XA_RBCOMMFAIL :
-                case XAException.XA_RBDEADLOCK :
-                case XAException.XA_RBINTEGRITY :
-                case XAException.XA_RBOTHER :
-                case XAException.XA_RBPROTO :
-                case XAException.XA_RBTIMEOUT :
-                case XAException.XAER_INVAL :
-                case XAException.XAER_PROTO :
-                case XAException.XAER_NOTA : // resource may have arbitrarily
-                                                // rolled back (shouldn't, but
-                                                // ...)
-                    return Vote.VoteRollback;
-                default :
-                    throw new HeuristicHazard(); // we're not really sure
-                                                    // (shouldn't get here
-                                                    // though).
+            switch (e1.errorCode)
+            {
+            case XAException.XAER_RMERR:
+            case XAException.XAER_RMFAIL:
+            case XAException.XA_RBROLLBACK:
+            case XAException.XA_RBEND:
+            case XAException.XA_RBCOMMFAIL:
+            case XAException.XA_RBDEADLOCK:
+            case XAException.XA_RBINTEGRITY:
+            case XAException.XA_RBOTHER:
+            case XAException.XA_RBPROTO:
+            case XAException.XA_RBTIMEOUT:
+            case XAException.XAER_INVAL:
+            case XAException.XAER_PROTO:
+            case XAException.XAER_NOTA: // resource may have arbitrarily rolled back (shouldn't, but ...)
+                return Vote.VoteRollback;
+            default:
+                throw new HeuristicHazard(); // we're not really sure (shouldn't get here though).
             }
-        } catch (Exception e2) {
+        }
+        catch (Exception e2)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_preparefailed(_theXAResource.toString(),
                     XAHelper.xidToString(_tranID), "-", e2);
 
@@ -274,13 +295,16 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         }
     }
 
-    public void rollback() throws org.omg.CORBA.SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
+    public void rollback() throws org.omg.CORBA.SystemException,
+            HeuristicCommit, HeuristicMixed, HeuristicHazard
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.rollback for " + _tranID);
         }
 
         if (_theTransaction != null
-                && _theTransaction.getXAResourceState(_theXAResource) == TxInfo.OPTIMIZED_ROLLBACK) {
+                && _theTransaction.getXAResourceState(_theXAResource) == TxInfo.OPTIMIZED_ROLLBACK)
+        {
             /*
              * Already rolledback during delist.
              */
@@ -288,109 +312,135 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             return;
         }
 
-        if (!_valid || (_tranID == null)) {
+        if (!_valid || (_tranID == null))
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_nulltransaction("XAResourceRecord.rollback");
-        } else {
-            if (_theXAResource != null) {
-                switch (_heuristic) {
-                    case TwoPhaseOutcome.HEURISTIC_HAZARD :
-                        throw new org.omg.CosTransactions.HeuristicHazard();
-                    case TwoPhaseOutcome.HEURISTIC_MIXED :
-                        throw new org.omg.CosTransactions.HeuristicMixed();
-                    default :
-                        break;
+        }
+        else
+        {
+            if (_theXAResource != null)
+            {
+                switch (_heuristic)
+                {
+                case TwoPhaseOutcome.HEURISTIC_HAZARD:
+                    throw new org.omg.CosTransactions.HeuristicHazard();
+                case TwoPhaseOutcome.HEURISTIC_MIXED:
+                    throw new org.omg.CosTransactions.HeuristicMixed();
+                default:
+                    break;
                 }
 
-                try {
-                    if (!_prepared) {
-                        if (endAssociation()) {
+                try
+                {
+                    if (!_prepared)
+                    {
+                        if (endAssociation())
+                        {
                             _theXAResource.end(_tranID, XAResource.TMFAIL);
                         }
                     }
-                } catch (XAException e1) {
-                    if ((e1.errorCode >= XAException.XA_RBBASE) && (e1.errorCode < XAException.XA_RBEND)) {
-                        /*
-                         * Has been marked as rollback-only. We still need to
-                         * call rollback.
-                         */
-                    } else if ((e1.errorCode == XAException.XAER_RMERR) || (e1.errorCode == XAException.XAER_RMFAIL)) {
-                        try {
-                            _theXAResource.rollback(_tranID);
-                        } catch (XAException e2) {
-                            jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_xaerror(
-                                    "XAResourceRecord.rollback", XAHelper.printXAErrorCode(e2),
-                                    _theXAResource.toString(), XAHelper.xidToString(_tranID), e2);
+                }
+                catch (XAException e1)
+                {
+                    if ((e1.errorCode >= XAException.XA_RBBASE)
+                        && (e1.errorCode < XAException.XA_RBEND))
+                    {
+                    /*
+                     * Has been marked as rollback-only. We still
+                     * need to call rollback.
+                     */
+                    } else if ((e1.errorCode == XAException.XAER_RMERR) || (e1.errorCode == XAException.XAER_RMFAIL)){
+                            try {
+                                    _theXAResource.rollback(_tranID);
+                            } catch (XAException e2)
+                            {    
+                                        jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_xaerror("XAResourceRecord.rollback",
+                                XAHelper.printXAErrorCode(e2), _theXAResource.toString(), XAHelper.xidToString(_tranID), e2);
 
-                            removeConnection();
+                                            removeConnection();
 
-                            throw new UNKNOWN();
-                        }
-                    } else {
-                        removeConnection();
+                                            throw new UNKNOWN();
+                            }
+                    }
+                    else
+                    {
+                    removeConnection();
 
-                        throw new UNKNOWN();
+                    throw new UNKNOWN();
                     }
                 }
 
-                try {
+                try
+                {
                     _theXAResource.rollback(_tranID);
-                } catch (XAException e1) {
-                    if (notAProblem(e1, false)) {
+                }
+                catch (XAException e1)
+                {
+                    if (notAProblem(e1, false))
+                    {
                         // some other thread got there first (probably)
-                    } else {
+                    }
+                    else
+                    {
                         jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_xaerror("XAResourceRecord.rollback",
-                                XAHelper.printXAErrorCode(e1), _theXAResource.toString(), XAHelper.xidToString(_tranID),
-                                e1);
+                                XAHelper.printXAErrorCode(e1), _theXAResource.toString(), XAHelper.xidToString(_tranID), e1);
 
                         if (jtaxLogger.logger.isTraceEnabled()) {
                             jtaxLogger.logger.tracef(
-                                    "XAResourceRecord.rollback exception %s " + "resource_trace: "
-                                            + "txn uid=%s resource uid=%s\n",
-                                    XAHelper.printXAErrorCode(e1), _tranID, get_uid());
+                                "XAResourceRecord.rollback exception %s " +
+                                "resource_trace: " +
+                                "txn uid=%s resource uid=%s\n",
+                                XAHelper.printXAErrorCode(e1), _tranID,
+                                get_uid());
                         }
 
-                        switch (e1.errorCode) {
-                            case XAException.XAER_RMERR :
-                                if (!_prepared)
-                                    break; // just do the finally block
-                            case XAException.XA_HEURHAZ :
-                                updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
+                        switch (e1.errorCode)
+                        {
+                        case XAException.XAER_RMERR:
+                            if (!_prepared)
+                                break; // just do the finally block
+                        case XAException.XA_HEURHAZ:
+                            updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
 
+                            throw new org.omg.CosTransactions.HeuristicHazard();
+                        case XAException.XA_HEURCOM:
+                            updateState(TwoPhaseOutcome.HEURISTIC_COMMIT);
+
+                            throw new org.omg.CosTransactions.HeuristicCommit();
+                        case XAException.XA_HEURMIX:
+                            updateState(TwoPhaseOutcome.HEURISTIC_MIXED);
+
+                            throw new org.omg.CosTransactions.HeuristicMixed();
+                        case XAException.XA_HEURRB: // forget?
+                        case XAException.XA_RBROLLBACK:
+                        case XAException.XA_RBEND:
+                        case XAException.XA_RBCOMMFAIL:
+                        case XAException.XA_RBDEADLOCK:
+                        case XAException.XA_RBINTEGRITY:
+                        case XAException.XA_RBOTHER:
+                        case XAException.XA_RBPROTO:
+                        case XAException.XA_RBTIMEOUT:
+                            destroyState();
+                            break;
+                        default:
+                            destroyState();
+
+                            if (_prepared)
                                 throw new org.omg.CosTransactions.HeuristicHazard();
-                            case XAException.XA_HEURCOM :
-                                updateState(TwoPhaseOutcome.HEURISTIC_COMMIT);
-
-                                throw new org.omg.CosTransactions.HeuristicCommit();
-                            case XAException.XA_HEURMIX :
-                                updateState(TwoPhaseOutcome.HEURISTIC_MIXED);
-
-                                throw new org.omg.CosTransactions.HeuristicMixed();
-                            case XAException.XA_HEURRB : // forget?
-                            case XAException.XA_RBROLLBACK :
-                            case XAException.XA_RBEND :
-                            case XAException.XA_RBCOMMFAIL :
-                            case XAException.XA_RBDEADLOCK :
-                            case XAException.XA_RBINTEGRITY :
-                            case XAException.XA_RBOTHER :
-                            case XAException.XA_RBPROTO :
-                            case XAException.XA_RBTIMEOUT :
-                                destroyState();
-                                break;
-                            default :
-                                destroyState();
-
-                                if (_prepared)
-                                    throw new org.omg.CosTransactions.HeuristicHazard();
-                                else
-                                    throw new UNKNOWN();
+                            else
+                                throw new UNKNOWN();
                         }
                     }
-                } catch (Exception e2) {
+                }
+                catch (Exception e2)
+                {
                     jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_generror("XAResourceRecord.rollback",
                             _theXAResource.toString(), XAHelper.xidToString(_tranID), e2);
 
                     throw new UNKNOWN();
-                } finally {
+                }
+                finally
+                {
                     if (_prepared)
                         destroyState();
                     else
@@ -400,56 +450,69 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         }
     }
 
-    public void commit()
-            throws org.omg.CORBA.SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+    public void commit() throws org.omg.CORBA.SystemException, NotPrepared,
+            HeuristicRollback, HeuristicMixed, HeuristicHazard
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.commit for " + _tranID);
         }
 
-        if (_tranID == null) {
+        if (_tranID == null)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_nulltransaction("XAResourceRecord.commit");
-        } else {
-            if ((_theXAResource != null) && (!_committed)) {
-                switch (_heuristic) {
-                    case TwoPhaseOutcome.HEURISTIC_HAZARD :
-                        throw new org.omg.CosTransactions.HeuristicHazard();
-                    case TwoPhaseOutcome.HEURISTIC_MIXED :
-                        throw new org.omg.CosTransactions.HeuristicMixed();
-                    case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
-                        throw new org.omg.CosTransactions.HeuristicRollback();
-                    default :
-                        break;
+        }
+        else
+        {
+            if ((_theXAResource != null) && (!_committed))
+            {
+                switch (_heuristic)
+                {
+                case TwoPhaseOutcome.HEURISTIC_HAZARD:
+                    throw new org.omg.CosTransactions.HeuristicHazard();
+                case TwoPhaseOutcome.HEURISTIC_MIXED:
+                    throw new org.omg.CosTransactions.HeuristicMixed();
+                case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
+                    throw new org.omg.CosTransactions.HeuristicRollback();
+                default:
+                    break;
                 }
 
                 if (!_prepared)
                     throw new NotPrepared();
 
-                try {
-                    if (!_committed) {
+                try
+                {
+                    if (!_committed)
+                    {
                         _committed = true;
 
                         _theXAResource.commit(_tranID, false);
 
                         destroyState();
                     }
-                } catch (XAException e1) {
+                }
+                catch (XAException e1)
+                {
                     e1.printStackTrace();
 
-                    if (notAProblem(e1, true)) {
+                    if (notAProblem(e1, true))
+                    {
                         // some other thread got there first (probably)
                         destroyState();
-                    } else {
+                    }
+                    else
+                    {
                         _committed = false;
 
                         jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_xaerror("XAResourceRecord.commit",
-                                XAHelper.printXAErrorCode(e1), _theXAResource.toString(), XAHelper.xidToString(_tranID),
-                                e1);
+                                XAHelper.printXAErrorCode(e1), _theXAResource.toString(), XAHelper.xidToString(_tranID), e1);
 
                         if (jtaxLogger.logger.isTraceEnabled()) {
                             jtaxLogger.logger.tracef(
-                                    "XAResourceRecord.commit exception %s "
-                                            + "resource_trace: txn uid=%s resource uid=%s\n",
-                                    XAHelper.printXAErrorCode(e1), _tranID, get_uid());
+                                "XAResourceRecord.commit exception %s " +
+                                "resource_trace: txn uid=%s resource uid=%s\n",
+                                XAHelper.printXAErrorCode(e1), _tranID,
+                                get_uid());
                         }
                         /*
                          * XA_HEURHAZ, XA_HEURCOM, XA_HEURRB, XA_HEURMIX,
@@ -457,127 +520,140 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                          * XAER_PROTO.
                          */
 
-                        switch (e1.errorCode) {
+                        switch (e1.errorCode)
+                        {
 
-                            case XAException.XA_HEURHAZ :
-                                updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
+                        case XAException.XA_HEURHAZ:
+                            updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
 
-                                throw new org.omg.CosTransactions.HeuristicHazard();
-                            case XAException.XA_HEURCOM : // what about forget?
-                                                            // OTS doesn't
-                                                            // support this code
-                                                            // here.
-                                destroyState();
-                                break;
-                            case XAException.XA_HEURRB :
-                            case XAException.XA_RBROLLBACK :
-                            case XAException.XA_RBCOMMFAIL :
-                            case XAException.XA_RBDEADLOCK :
-                            case XAException.XA_RBINTEGRITY :
-                            case XAException.XA_RBOTHER :
-                            case XAException.XA_RBPROTO :
-                            case XAException.XA_RBTIMEOUT :
-                            case XAException.XA_RBTRANSIENT :
-                            case XAException.XAER_RMERR :
-                                updateState(TwoPhaseOutcome.HEURISTIC_ROLLBACK);
+                            throw new org.omg.CosTransactions.HeuristicHazard();
+                        case XAException.XA_HEURCOM:  // what about forget? OTS doesn't support this code here.
+                            destroyState();
+                            break;
+                        case XAException.XA_HEURRB:
+                        case XAException.XA_RBROLLBACK:
+                        case XAException.XA_RBCOMMFAIL:
+                        case XAException.XA_RBDEADLOCK:
+                        case XAException.XA_RBINTEGRITY:
+                        case XAException.XA_RBOTHER:
+                        case XAException.XA_RBPROTO:
+                        case XAException.XA_RBTIMEOUT:
+                        case XAException.XA_RBTRANSIENT:
+                        case XAException.XAER_RMERR:
+                            updateState(TwoPhaseOutcome.HEURISTIC_ROLLBACK);
 
-                                throw new org.omg.CosTransactions.HeuristicRollback();
-                            case XAException.XA_HEURMIX :
-                                updateState(TwoPhaseOutcome.HEURISTIC_MIXED);
+                            throw new org.omg.CosTransactions.HeuristicRollback();
+                        case XAException.XA_HEURMIX:
+                            updateState(TwoPhaseOutcome.HEURISTIC_MIXED);
 
-                                throw new org.omg.CosTransactions.HeuristicMixed();
+                            throw new org.omg.CosTransactions.HeuristicMixed();
 
-                            case XAException.XAER_NOTA :
-                                // RM unexpectedly lost track of the tx, outcome
-                                // is uncertain
-                                updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
-                                throw new org.omg.CosTransactions.HeuristicHazard();
-                            case XAException.XAER_PROTO :
-                                // presumed abort (or we could be really
-                                // paranoid and throw a heuristic)
-                                throw new TRANSACTION_ROLLEDBACK();
+                        case XAException.XAER_NOTA:
+                            // RM unexpectedly lost track of the tx, outcome is uncertain
+                            updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
+                            throw new org.omg.CosTransactions.HeuristicHazard();
+                        case XAException.XAER_PROTO:
+                            // presumed abort (or we could be really paranoid and throw a heuristic)
+                            throw new TRANSACTION_ROLLEDBACK();
 
-                            case XAException.XA_RETRY :
-                            case XAException.XAER_RMFAIL :
-                                _committed = true; // remember for recovery
-                                                    // later.
-                                throw new UNKNOWN(); // will cause log to be
-                                                        // rewritten.
-                            case XAException.XAER_INVAL : // resource manager
-                                                            // failed, did it
-                                                            // rollback?
-                            default :
-                                throw new org.omg.CosTransactions.HeuristicHazard();
+                        case XAException.XA_RETRY:
+                        case XAException.XAER_RMFAIL:
+                            _committed = true;  // remember for recovery later.
+                            throw new UNKNOWN();  // will cause log to be rewritten.
+                        case XAException.XAER_INVAL: // resource manager failed, did it rollback?
+                        default:
+                            throw new org.omg.CosTransactions.HeuristicHazard();
                         }
                     }
-                } catch (Exception e2) {
+                }
+                catch (Exception e2)
+                {
                     _committed = false;
 
                     jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_generror("XAResourceRecord.commit",
                             _theXAResource.toString(), XAHelper.xidToString(_tranID), e2);
 
                     throw new UNKNOWN();
-                } finally {
+                }
+                finally
+                {
                     removeConnection();
                 }
             }
         }
     }
 
-    public org.omg.CosTransactions.Vote prepare_subtransaction() throws SystemException {
+    public org.omg.CosTransactions.Vote prepare_subtransaction()
+            throws SystemException
+    {
         return Vote.VoteRollback; // shouldn't be possible!
     }
 
-    public void commit_subtransaction(Coordinator parent) throws SystemException {
+    public void commit_subtransaction(Coordinator parent)
+            throws SystemException
+    {
         throw new UNKNOWN();
     }
 
-    public void rollback_subtransaction() throws SystemException {
+    public void rollback_subtransaction() throws SystemException
+    {
         throw new UNKNOWN();
     }
 
-    public int type_id() throws SystemException {
+    public int type_id() throws SystemException
+    {
         return RecordType.JTAX_RECORD;
     }
 
-    public String uid() throws SystemException {
+    public String uid() throws SystemException
+    {
         if (_cachedUidStringForm == null)
             _cachedUidStringForm = _theUid.stringForm();
 
         return _cachedUidStringForm;
     }
 
-    public boolean propagateOnAbort() throws SystemException {
+    public boolean propagateOnAbort() throws SystemException
+    {
         return false;
     }
 
-    public boolean propagateOnCommit() throws SystemException {
+    public boolean propagateOnCommit() throws SystemException
+    {
         return false; // nesting not supported
     }
 
-    public boolean saveRecord() throws SystemException {
+    public boolean saveRecord() throws SystemException
+    {
         return true;
     }
 
-    public void merge(OTSAbstractRecord record) throws SystemException {
+    public void merge(OTSAbstractRecord record) throws SystemException
+    {
     }
 
-    public void alter(OTSAbstractRecord record) throws SystemException {
+    public void alter(OTSAbstractRecord record) throws SystemException
+    {
     }
 
-    public boolean shouldAdd(OTSAbstractRecord record) throws SystemException {
+    public boolean shouldAdd(OTSAbstractRecord record) throws SystemException
+    {
         return false;
     }
 
-    public boolean shouldAlter(OTSAbstractRecord record) throws SystemException {
+    public boolean shouldAlter(OTSAbstractRecord record) throws SystemException
+    {
         return false;
     }
 
-    public boolean shouldMerge(OTSAbstractRecord record) throws SystemException {
+    public boolean shouldMerge(OTSAbstractRecord record) throws SystemException
+    {
         return false;
     }
 
-    public boolean shouldReplace(OTSAbstractRecord record) throws SystemException {
+    public boolean shouldReplace(OTSAbstractRecord record)
+            throws SystemException
+    {
         return false;
     }
 
@@ -586,7 +662,8 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * rollback? It normally is, but may be overridden in recovery.
      */
 
-    protected boolean notAProblem(XAException ex, boolean commit) {
+    protected boolean notAProblem(XAException ex, boolean commit)
+    {
         return XAResourceErrorHandler.notAProblem(_theXAResource, ex, commit);
     }
 
@@ -597,76 +674,88 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * coordinator, since it will not have an intentions list anyway.
      */
 
-    public void commit_one_phase() throws HeuristicHazard, org.omg.CORBA.SystemException {
+    public void commit_one_phase() throws HeuristicHazard,
+            org.omg.CORBA.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.commit_one_phase for " + _tranID);
         }
 
-        if (_tranID == null) {
-            jtaxLogger.i18NLogger
-                    .warn_jtax_resources_jts_orbspecific_nulltransaction("XAResourceRecord.commit_one_phase");
+        if (_tranID == null)
+        {
+            jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_nulltransaction("XAResourceRecord.commit_one_phase");
 
             throw new TRANSACTION_ROLLEDBACK();
-        } else {
-            if (_theXAResource != null) {
-                try {
-                    switch (_heuristic) {
-                        case TwoPhaseOutcome.HEURISTIC_HAZARD :
-                            throw new org.omg.CosTransactions.HeuristicHazard();
-                        default :
-                            break;
+        }
+        else
+        {
+            if (_theXAResource != null)
+            {
+                try
+                {
+                    switch (_heuristic)
+                    {
+                    case TwoPhaseOutcome.HEURISTIC_HAZARD:
+                        throw new org.omg.CosTransactions.HeuristicHazard();
+                    default:
+                        break;
                     }
 
                     /*
-                     * TODO in Oracle, the end is not required. Is this common
-                     * to other RM implementations?
+                     * TODO in Oracle, the end is not required. Is this
+                     * common to other RM implementations?
                      */
 
                     boolean commit = true;
                     XAException endRBOnly = null;
 
-                    try {
-                        if (endAssociation()) {
+                    try
+                    {
+                        if (endAssociation())
+                        {
                             _theXAResource.end(_tranID, XAResource.TMSUCCESS);
                         }
-                    } catch (XAException e1) {
+                    }
+                    catch (XAException e1)
+                    {
                         /*
-                         * Now it's not legal to return a heuristic from end,
-                         * but apparently Oracle does
-                         * (http://jira.jboss.com/jira/browse/JBTM-343) Since
-                         * this is 1PC we can call forget: the outcome of the
+                         * Now it's not legal to return a heuristic from end, but
+                         * apparently Oracle does (http://jira.jboss.com/jira/browse/JBTM-343)
+                         * Since this is 1PC we can call forget: the outcome of the
                          * transaction is the outcome of the participant.
                          */
 
-                        switch (e1.errorCode) {
-                            case XAException.XA_HEURHAZ :
-                            case XAException.XA_HEURMIX :
-                            case XAException.XA_HEURCOM :
-                            case XAException.XA_HEURRB :
-                                throw e1;
-                            case XAException.XA_RBROLLBACK :
-                            case XAException.XA_RBCOMMFAIL :
-                            case XAException.XA_RBDEADLOCK :
-                            case XAException.XA_RBINTEGRITY :
-                            case XAException.XA_RBOTHER :
-                            case XAException.XA_RBPROTO :
-                            case XAException.XA_RBTIMEOUT :
-                            case XAException.XA_RBTRANSIENT :
-                                /*
-                                 * Has been marked as rollback-only. We still
-                                 * need to call rollback.
-                                 */
-                                endRBOnly = e1;
-                                commit = false;
-                                break;
-                            case XAException.XAER_RMERR :
-                            case XAException.XAER_NOTA :
-                            case XAException.XAER_PROTO :
-                            case XAException.XAER_INVAL :
-                            case XAException.XAER_RMFAIL :
-                            default : {
-                                throw new UNKNOWN();
-                            }
+                        switch (e1.errorCode)
+                        {
+                        case XAException.XA_HEURHAZ:
+                        case XAException.XA_HEURMIX:
+                        case XAException.XA_HEURCOM:
+                        case XAException.XA_HEURRB:
+                            throw e1;
+                        case XAException.XA_RBROLLBACK:
+                        case XAException.XA_RBCOMMFAIL:
+                        case XAException.XA_RBDEADLOCK:
+                        case XAException.XA_RBINTEGRITY:
+                        case XAException.XA_RBOTHER:
+                        case XAException.XA_RBPROTO:
+                        case XAException.XA_RBTIMEOUT:
+                        case XAException.XA_RBTRANSIENT:
+                            /*
+                             * Has been marked as rollback-only. We still
+                             * need to call rollback.
+                             */
+                            endRBOnly = e1;
+                            commit = false;
+                            break;
+                        case XAException.XAER_RMERR:
+                        case XAException.XAER_NOTA:
+                        case XAException.XAER_PROTO:
+                        case XAException.XAER_INVAL:
+                        case XAException.XAER_RMFAIL:
+                        default:
+                        {
+                            throw new UNKNOWN();
+                        }
                         }
                     }
 
@@ -676,116 +765,127 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                         _theXAResource.rollback(_tranID);
                         throw endRBOnly;
                     }
-                } catch (XAException e1) {
+                }
+                catch (XAException e1)
+                {
                     /*
                      * XA_HEURHAZ, XA_HEURCOM, XA_HEURRB, XA_HEURMIX,
                      * XAER_RMERR, XAER_RMFAIL, XAER_NOTA, XAER_INVAL, or
                      * XAER_PROTO. XA_RB*
                      */
 
-                    if ((e1.errorCode >= XAException.XA_RBBASE) && (e1.errorCode <= XAException.XA_RBEND)) {
+                    if ((e1.errorCode >= XAException.XA_RBBASE)
+                            && (e1.errorCode <= XAException.XA_RBEND))
+                    {
                         throw new TRANSACTION_ROLLEDBACK();
                     }
 
-                    switch (e1.errorCode) {
-                        case XAException.XA_HEURHAZ :
-                        case XAException.XA_HEURMIX :
-                            updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
+                    switch (e1.errorCode)
+                    {
+                    case XAException.XA_HEURHAZ:
+                    case XAException.XA_HEURMIX:
+                        updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
 
-                            throw new org.omg.CosTransactions.HeuristicHazard();
-                        case XAException.XA_HEURCOM :
-                            handleForget();
-                            break;
-                        case XAException.XA_HEURRB :
-                            handleForget();
-                            throw new TRANSACTION_ROLLEDBACK();
-                        case XAException.XA_RBROLLBACK :
-                        case XAException.XA_RBCOMMFAIL :
-                        case XAException.XA_RBDEADLOCK :
-                        case XAException.XA_RBINTEGRITY :
-                        case XAException.XA_RBOTHER :
-                        case XAException.XA_RBPROTO :
-                        case XAException.XA_RBTIMEOUT :
-                        case XAException.XA_RBTRANSIENT :
-                        case XAException.XAER_RMERR :
-                            throw new TRANSACTION_ROLLEDBACK();
-                        case XAException.XAER_NOTA :
-                            // RM unexpectedly lost track of the tx, outcome is
-                            // uncertain
-                            updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
-                            throw new org.omg.CosTransactions.HeuristicHazard();
-                        case XAException.XAER_PROTO :
-                        case XAException.XA_RETRY : // not allowed to be thrown
-                                                    // here by XA specification!
-                            // presumed abort (or we could be really paranoid
-                            // and throw a heuristic)
-                            throw new TRANSACTION_ROLLEDBACK();
+                        throw new org.omg.CosTransactions.HeuristicHazard();
+                    case XAException.XA_HEURCOM:
+                        handleForget() ;
+                        break;
+                    case XAException.XA_HEURRB:
+                           handleForget() ;
+                           throw new TRANSACTION_ROLLEDBACK();
+                    case XAException.XA_RBROLLBACK:
+                    case XAException.XA_RBCOMMFAIL:
+                    case XAException.XA_RBDEADLOCK:
+                    case XAException.XA_RBINTEGRITY:
+                    case XAException.XA_RBOTHER:
+                    case XAException.XA_RBPROTO:
+                    case XAException.XA_RBTIMEOUT:
+                    case XAException.XA_RBTRANSIENT:
+                    case XAException.XAER_RMERR:
+                        throw new TRANSACTION_ROLLEDBACK();
+                    case XAException.XAER_NOTA:
+                        // RM unexpectedly lost track of the tx, outcome is uncertain
+                        updateState(TwoPhaseOutcome.HEURISTIC_HAZARD);
+                        throw new org.omg.CosTransactions.HeuristicHazard();
+                    case XAException.XAER_PROTO:
+                    case XAException.XA_RETRY:  // not allowed to be thrown here by XA specification!
+                        // presumed abort (or we could be really paranoid and throw a heuristic)
+                        throw new TRANSACTION_ROLLEDBACK();
 
-                        case XAException.XAER_INVAL : // resource manager
-                                                        // failed, did it
-                                                        // rollback?
-                            throw new org.omg.CosTransactions.HeuristicHazard();
-                        case XAException.XAER_RMFAIL : // This was modified as
-                                                        // part of JBTM-XYZ -
-                                                        // although RMFAIL is
-                                                        // not clear there is a
-                                                        // rollback/commit we
-                                                        // are flagging this to
-                                                        // the user
-                            throw new org.omg.CosTransactions.HeuristicHazard();
-                        default :
-                            _committed = true; // will cause log to be rewritten
+                    case XAException.XAER_INVAL: // resource manager failed, did it rollback?
+                        throw new org.omg.CosTransactions.HeuristicHazard();
+                    case XAException.XAER_RMFAIL: // This was modified as part of JBTM-XYZ - although RMFAIL is not clear there is a rollback/commit we are flagging this to the user
+                        throw new org.omg.CosTransactions.HeuristicHazard();
+                    default:
+                        _committed = true;  // will cause log to be rewritten
 
-                            throw new UNKNOWN();
+                    throw new UNKNOWN();
                     }
-                } catch (SystemException ex) {
+                }
+                catch (SystemException ex)
+                {
                     ex.printStackTrace();
 
                     throw ex;
-                } catch (org.omg.CosTransactions.HeuristicHazard ex) {
+                }
+                catch (org.omg.CosTransactions.HeuristicHazard ex)
+                {
                     throw ex;
-                } catch (Exception e2) {
+                }
+                catch (Exception e2)
+                {
                     jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_coperror(e2);
 
                     throw new UNKNOWN();
-                } finally {
+                }
+                finally
+                {
                     removeConnection();
                 }
-            } else
+            }
+            else
                 throw new TRANSACTION_ROLLEDBACK();
         }
     }
 
-    public void forget() throws org.omg.CORBA.SystemException {
+    public void forget() throws org.omg.CORBA.SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.forget for " + _tranID);
         }
 
-        handleForget();
+        handleForget() ;
 
         destroyState();
 
         removeConnection();
     }
 
-    private void handleForget() {
-        if ((_theXAResource != null) && (_tranID != null)) {
+    private void handleForget()
+    {
+        if ((_theXAResource != null) && (_tranID != null))
+        {
             _heuristic = TwoPhaseOutcome.FINISH_OK;
-
-            try {
+            
+            try
+            {
                 _theXAResource.forget(_tranID);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
             }
         }
     }
 
-    public boolean saveState(OutputObjectState os) {
+    public boolean saveState(OutputObjectState os)
+    {
         boolean res = false;
 
-        try {
+        try
+        {
             os.packInt(_heuristic);
             os.packBoolean(_committed);
-
+            
             /*
              * Since we don't know what type of Xid we are using, leave it up to
              * XID to pack.
@@ -797,34 +897,43 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
              * If no recovery object set then rely upon object serialisation!
              */
 
-            if (_recoveryObject == null) {
+            if (_recoveryObject == null)
+            {
                 os.packInt(RecoverableXAConnection.OBJECT_RECOVERY);
 
-                if (_theXAResource instanceof Serializable) {
-                    try {
-                        ByteArrayOutputStream s = new ByteArrayOutputStream();
-                        ObjectOutputStream o = new ObjectOutputStream(s);
+                                if (_theXAResource instanceof Serializable)
+                                {
+                        try
+                        {
+                            ByteArrayOutputStream s = new ByteArrayOutputStream();
+                            ObjectOutputStream o = new ObjectOutputStream(s);
 
-                        o.writeObject(_theXAResource);
-                        o.close();
+                            o.writeObject(_theXAResource);
+                            o.close();
 
-                        os.packBoolean(true);
+                            os.packBoolean(true);
+                            
+                            String name = _theXAResource.getClass().getName();
+                            os.packString(name);
 
-                        String name = _theXAResource.getClass().getName();
-                        os.packString(name);
+                            os.packBytes(s.toByteArray());
+                        }
+                        catch (NotSerializableException ex)
+                        {
+                            jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_saveState();
 
-                        os.packBytes(s.toByteArray());
-                    } catch (NotSerializableException ex) {
-                        jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_saveState();
+                            return false;
+                        }
+                                }
+                                else
+                                {
+                                    // have to rely upon XAResource.recover!
 
-                        return false;
-                    }
-                } else {
-                    // have to rely upon XAResource.recover!
-
-                    os.packBoolean(false);
-                }
-            } else {
+                                    os.packBoolean(false);
+                                }
+            }
+            else
+            {
                 os.packInt(RecoverableXAConnection.AUTO_RECOVERY);
                 os.packString(_recoveryObject.getClass().getName());
 
@@ -833,10 +942,12 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
             if (_recoveryCoordinator == null)
                 os.packBoolean(false);
-            else {
+            else
+            {
                 os.packBoolean(true);
 
-                String ior = ORBManager.getORB().orb().object_to_string(_recoveryCoordinator);
+                String ior = ORBManager.getORB().orb().object_to_string(
+                        _recoveryCoordinator);
 
                 os.packString(ior);
 
@@ -844,7 +955,9 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             }
 
             res = true;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
 
             res = false;
@@ -853,10 +966,12 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         return res;
     }
 
-    public boolean restoreState(InputObjectState os) {
+    public boolean restoreState(InputObjectState os)
+    {
         boolean res = false;
 
-        try {
+        try
+        {
             _heuristic = os.unpackInt();
             _committed = os.unpackBoolean();
 
@@ -865,11 +980,14 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             _theXAResource = null;
             _recoveryObject = null;
 
-            if (os.unpackInt() == RecoverableXAConnection.OBJECT_RECOVERY) {
+            if (os.unpackInt() == RecoverableXAConnection.OBJECT_RECOVERY)
+            {
                 boolean haveXAResource = os.unpackBoolean();
 
-                if (haveXAResource) {
-                    try {
+                if (haveXAResource)
+                {
+                    try
+                    {
                         // Read the classname of the serialized XAResource
                         String className = os.unpackString();
 
@@ -878,8 +996,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                         ByteArrayInputStream s = new ByteArrayInputStream(b);
                         ObjectInputStream o = new ObjectInputStream(s);
 
-                        // Give the list of deserializers a chance to
-                        // deserialize the record
+                        // Give the list of deserializers a chance to deserialize the record
                         boolean deserialized = false;
                         Iterator<SerializableXAResourceDeserializer> iterator = getXAResourceDeserializers().iterator();
                         while (iterator.hasNext()) {
@@ -901,7 +1018,9 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                         if (jtaxLogger.logger.isTraceEnabled()) {
                             jtaxLogger.logger.trace("XAResourceRecord.restore_state - XAResource de-serialized");
                         }
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         // not serializable in the first place!
 
                         jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_restoreerror1(ex);
@@ -909,87 +1028,104 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                         return false;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 String creatorName = os.unpackString();
 
-                _recoveryObject = ClassloadingUtility.loadAndInstantiateClass(RecoverableXAConnection.class,
-                        creatorName, null);
-                if (_recoveryObject == null) {
+                _recoveryObject = ClassloadingUtility.loadAndInstantiateClass(RecoverableXAConnection.class, creatorName, null);
+                if(_recoveryObject == null) {
                     throw new ClassNotFoundException();
                 }
 
                 _recoveryObject.unpackFrom(os);
                 _theXAResource = _recoveryObject.getResource();
 
-                if (_theXAResource == null) {
-                    jtaxLogger.i18NLogger
-                            .warn_jtax_resources_jts_orbspecific_norecoveryxa(XAHelper.xidToString(_tranID));
+                if (_theXAResource == null)
+                {
+                    jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_norecoveryxa(XAHelper.xidToString(_tranID));
                 }
 
                 if (jtaxLogger.logger.isTraceEnabled()) {
-                    jtaxLogger.logger.trace("XAResourceRecord.restore_state - XAResource got from " + creatorName);
+                    jtaxLogger.logger.trace("XAResourceRecord.restore_state - XAResource got from "
+                            + creatorName);
                 }
             }
 
             boolean haveRecCoord = os.unpackBoolean();
 
-            if (haveRecCoord) {
+            if (haveRecCoord)
+            {
                 String ior = os.unpackString();
 
                 if (ior == null)
                     return false;
-                else {
-                    org.omg.CORBA.Object objRef = ORBManager.getORB().orb().string_to_object(ior);
+                else
+                {
+                    org.omg.CORBA.Object objRef = ORBManager.getORB().orb()
+                            .string_to_object(ior);
 
-                    _recoveryCoordinator = RecoveryCoordinatorHelper.narrow(objRef);
+                    _recoveryCoordinator = RecoveryCoordinatorHelper
+                            .narrow(objRef);
                 }
-            } else
+            }
+            else
                 _recoveryCoordinator = null;
 
             res = true;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_restoreerror2(e);
 
             res = false;
-        } finally {
+        }
+        finally
+        {
             /*
-             * If we're here then we've restored enough to print data on this
-             * instance.
-             */
-
-            if (_heuristic != TwoPhaseOutcome.FINISH_OK) {
-                jtaxLogger.logger.warn("XAResourceRecord restored heuristic instance: " + this);
-            }
+                 * If we're here then we've restored enough to print data on
+                 * this instance.
+                 */
+                
+                if (_heuristic != TwoPhaseOutcome.FINISH_OK)
+                {
+                    jtaxLogger.logger.warn("XAResourceRecord restored heuristic instance: "+this); 
+                }
         }
 
         return res;
     }
 
-    public String type() {
+    public String type()
+    {
         return XAResourceRecord.typeName();
     }
 
-    public static String typeName() {
+    public static String typeName()
+    {
         return "/CosTransactions/XAResourceRecord";
     }
 
-    public final void setRecoveryCoordinator(RecoveryCoordinator recCoord) {
+    public final void setRecoveryCoordinator(RecoveryCoordinator recCoord)
+    {
         _recoveryCoordinator = recCoord;
     }
 
     /**
      * @deprecated Only used in tests
      */
-    public final RecoveryCoordinator getRecoveryCoordinator() {
+    public final RecoveryCoordinator getRecoveryCoordinator()
+    {
         return _recoveryCoordinator;
     }
-
-    public String toString() {
-        return "XAResourceRecord < resource:" + _theXAResource + ", txid:" + _tranID + ", heuristic"
-                + TwoPhaseOutcome.stringForm(_heuristic) + " " + super.toString() + " >";
+    
+    public String toString ()
+    {
+        return "XAResourceRecord < resource:"+_theXAResource+", txid:"+_tranID+", heuristic"+TwoPhaseOutcome.stringForm(_heuristic)+" "+super.toString()+" >";
     }
 
-    protected XAResourceRecord(Uid u) {
+    protected XAResourceRecord(Uid u)
+    {
         _theXAResource = null;
         _recoveryObject = null;
         _tranID = null;
@@ -1010,39 +1146,50 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * For those objects where the original XAResource could not be saved.
      */
 
-    protected synchronized void setXAResource(XAResource res) {
+    protected synchronized void setXAResource(XAResource res)
+    {
         _theXAResource = res;
     }
 
-    protected int recover() {
+    protected int recover()
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.recover");
         }
 
-        if (_valid) {
+        if (_valid)
+        {
             org.omg.CosTransactions.Status s = org.omg.CosTransactions.Status.StatusUnknown;
 
-            try {
+            try
+            {
                 // force tx to rollback if not prepared
 
                 s = _recoveryCoordinator.replay_completion(getResource());
-            } catch (OBJECT_NOT_EXIST ex) {
-                // no coordinator, so presumed abort unless we have better
-                // information.
+            }
+            catch (OBJECT_NOT_EXIST ex)
+            {
+                // no coordinator, so presumed abort unless we have better information.
 
                 if (_committed)
                     s = org.omg.CosTransactions.Status.StatusCommitted;
                 else
-                    s = org.omg.CosTransactions.Status.StatusRolledBack;
-            } catch (NotPrepared ex1) {
+                s = org.omg.CosTransactions.Status.StatusRolledBack;
+            }
+            catch (NotPrepared ex1)
+            {
                 jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_notprepared("XAResourceRecord");
 
                 return XARecoveryResource.TRANSACTION_NOT_PREPARED;
-            } catch (java.lang.NullPointerException ne) {
+            }
+            catch (java.lang.NullPointerException ne)
+            {
                 /*
                  * No recovery coordinator!
                  */
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 /*
                  * Unknown error, so better to do nothing at this stage.
                  */
@@ -1053,39 +1200,41 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             }
 
             if (jtaxLogger.logger.isTraceEnabled()) {
-                jtaxLogger.logger.trace("XAResourceRecord.recover got status: " + Utility.stringStatus(s));
+                jtaxLogger.logger.trace("XAResourceRecord.recover got status: "
+                        + Utility.stringStatus(s));
             }
 
             boolean doCommit = false;
 
-            switch (s.value()) {
-                case org.omg.CosTransactions.Status._StatusUnknown :
-                    // some problem occurred
+            switch (s.value())
+            {
+            case org.omg.CosTransactions.Status._StatusUnknown:
+                // some problem occurred
 
-                    return XARecoveryResource.FAILED_TO_RECOVER;
-                case org.omg.CosTransactions.Status._StatusMarkedRollback :
-                case org.omg.CosTransactions.Status._StatusRollingBack :
-                    // we should be told eventually, so wait
+                return XARecoveryResource.FAILED_TO_RECOVER;
+            case org.omg.CosTransactions.Status._StatusMarkedRollback:
+            case org.omg.CosTransactions.Status._StatusRollingBack:
+                // we should be told eventually, so wait
 
-                    return XARecoveryResource.WAITING_FOR_RECOVERY;
-                case org.omg.CosTransactions.Status._StatusCommitted :
+                return XARecoveryResource.WAITING_FOR_RECOVERY;
+            case org.omg.CosTransactions.Status._StatusCommitted:
 
-                    doCommit = true;
-                    break;
-                case org.omg.CosTransactions.Status._StatusRolledBack :
-                case org.omg.CosTransactions.Status._StatusNoTransaction :
-                    // presumed abort
+                doCommit = true;
+                break;
+            case org.omg.CosTransactions.Status._StatusRolledBack:
+            case org.omg.CosTransactions.Status._StatusNoTransaction:
+                // presumed abort
 
-                    doCommit = false;
-                    break;
-                case org.omg.CosTransactions.Status._StatusCommitting :
-                    // leave it for now as we'll be driven top-down soon
+                doCommit = false;
+                break;
+            case org.omg.CosTransactions.Status._StatusCommitting:
+                // leave it for now as we'll be driven top-down soon
 
-                    return XARecoveryResource.WAITING_FOR_RECOVERY;
-                default :
-                    // wait
+                return XARecoveryResource.WAITING_FOR_RECOVERY;
+            default:
+                // wait
 
-                    return XARecoveryResource.FAILED_TO_RECOVER;
+                return XARecoveryResource.FAILED_TO_RECOVER;
             }
 
             return doRecovery(doCommit);
@@ -1094,35 +1243,46 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         return XARecoveryResource.FAILED_TO_RECOVER;
     }
 
-    private final void setObjectStore() {
+    private final void setObjectStore()
+    {
         if (_participantStore == null)
             _participantStore = StoreManager.getParticipantStore();
     }
 
-    private final boolean createState() {
+    private final boolean createState()
+    {
         setObjectStore();
 
-        if ((_theXAResource != null) && (_tranID != null) && (_participantStore != null)) {
+        if ((_theXAResource != null) && (_tranID != null)
+                && (_participantStore != null))
+        {
             OutputObjectState os = new OutputObjectState();
 
-            if (saveState(os)) {
-                try {
+            if (saveState(os))
+            {
+                try
+                {
                     _valid = _participantStore.write_committed(_theUid, type(), os);
                     _prepared = true;
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_createstate();
 
                     _valid = false;
                 }
-            } else
+            }
+            else
                 _valid = false;
-        } else
+        }
+        else
             _valid = false;
 
         return _valid;
     }
 
-    private final boolean updateState(int h) {
+    private final boolean updateState(int h)
+    {
         setObjectStore();
 
         if (_prepared) // only need do if we have prepared
@@ -1131,13 +1291,19 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
             _heuristic = h;
 
-            if (saveState(os)) {
-                try {
+            if (saveState(os))
+            {
+                try
+                {
                     _valid = _participantStore.write_committed(_theUid, type(), os);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     _valid = false;
                 }
-            } else {
+            }
+            else
+            {
                 jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_updatestate();
 
                 _valid = false;
@@ -1147,36 +1313,47 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         return _valid;
     }
 
-    private final boolean loadState() {
+    private final boolean loadState()
+    {
         setObjectStore();
 
         InputObjectState os = null;
 
-        try {
+        try
+        {
             os = _participantStore.read_committed(_theUid, type());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_loadstateread(e);
 
             os = null;
         }
 
-        if (os != null) {
+        if (os != null)
+        {
             _valid = restoreState(os);
 
             os = null;
-        } else
+        }
+        else
             _valid = false;
 
         return _valid;
     }
 
-    private final boolean destroyState() {
+    private final boolean destroyState()
+    {
         setObjectStore();
 
-        if (_prepared && _valid) {
-            try {
+        if (_prepared && _valid)
+        {
+            try
+            {
                 _valid = _participantStore.remove_committed(_theUid, type());
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 tsLogger.i18NLogger.warn_objectstore_remove_state_exception(e);
 
                 _valid = false;
@@ -1189,14 +1366,16 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         return _valid;
     }
 
-    private final void removeConnection() {
+    private final void removeConnection()
+    {
         /*
          * Should only be called once. Remove the connection so that user can
          * reuse the driver as though it were fresh (e.g., can do read only
          * optimisation).
          */
 
-        if (_recoveryObject != null) {
+        if (_recoveryObject != null)
+        {
             _recoveryObject.close();
             _recoveryObject = null;
         }
@@ -1204,25 +1383,32 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         if (_theTransaction != null)
             _theTransaction = null;
 
-        try {
-            if (_theReference != null) {
+        try
+        {
+            if (_theReference != null)
+            {
                 ORBManager.getPOA().shutdownObject(this);
                 _theReference = null;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_remconn(e);
         }
     }
 
-    private final int doRecovery(boolean commit) {
+    private final int doRecovery(boolean commit)
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("XAResourceRecord.doRecovery ( " + commit + " )");
         }
 
         int result = XARecoveryResource.FAILED_TO_RECOVER;
 
-        if ((_theXAResource != null) && (_tranID != null)) {
-            try {
+        if ((_theXAResource != null) && (_tranID != null))
+        {
+            try
+            {
                 if (commit) {
                     jtaxLogger.i18NLogger.info_jtax_recovery_jts_orbspecific_commit(XAHelper.xidToString(_tranID));
                     commit();
@@ -1233,9 +1419,10 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                 // if those succeed, they will have removed any persistent state
 
                 result = XARecoveryResource.RECOVERED_OK;
-            } catch (Exception e2) {
-                jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_recfailed(((commit) ? "commit" : "rollback"),
-                        e2);
+            }
+            catch (Exception e2)
+            {
+                jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_recfailed(((commit) ? "commit" : "rollback"), e2);
             }
         }
 
@@ -1247,17 +1434,20 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * with the thread, i.e., has end already been called on it?
      */
 
-    private final boolean endAssociation() {
-        if (_doEnd && _theTransaction != null) {
-            if (_theTransaction.getXAResourceState(_theXAResource) == TxInfo.ASSOCIATED) {
+    private final boolean endAssociation()
+    {
+        if (_doEnd && _theTransaction != null)
+        {
+            if (_theTransaction.getXAResourceState(_theXAResource) == TxInfo.ASSOCIATED)
+            {
                 // end has been called so we don't need to do it next time
 
                 _doEnd = false;
                 return true;
             }
         }
-        // else if (_theTransaction == null)
-        // _doEnd = false; // recovery mode
+//        else if (_theTransaction == null)
+//            _doEnd = false; // recovery mode
 
         return false;
     }
@@ -1274,8 +1464,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             for (RecoveryModule recoveryModule : RecoveryManager.manager().getModules()) {
                 if (recoveryModule instanceof XARecoveryModule) {
                     XARecoveryModule xaRecoveryModule = (XARecoveryModule) recoveryModule;
-                    serializableXAResourceDeserializers
-                            .addAll(xaRecoveryModule.getSeriablizableXAResourceDeserializers());
+                    serializableXAResourceDeserializers.addAll(xaRecoveryModule.getSeriablizableXAResourceDeserializers());
                     return serializableXAResourceDeserializers;
                 }
             }
@@ -1283,7 +1472,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
         }
         return serializableXAResourceDeserializers;
     }
-
+    
     protected XAResource _theXAResource;
 
     private RecoverableXAConnection _recoveryObject;
@@ -1303,8 +1492,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
     private String _cachedUidStringForm;
 
-    private static boolean _rollbackOptimization = jtaPropertyManager.getJTAEnvironmentBean()
-            .isXaRollbackOptimization();
-
+    private static boolean _rollbackOptimization = jtaPropertyManager.getJTAEnvironmentBean().isXaRollbackOptimization();
+    
     private List<SerializableXAResourceDeserializer> serializableXAResourceDeserializers;
 }

@@ -30,11 +30,13 @@ import org.junit.Test;
 
 import com.arjuna.ats.internal.jta.resources.errorhandlers.tibco;
 
-public class ErrorHandlerUnitTest {
+public class ErrorHandlerUnitTest
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         tibco tc = new tibco();
-
+        
         assertFalse(tc.notAProblem(new XAException(), false));
         assertEquals(tc.getXAResourceName(), "");
     }

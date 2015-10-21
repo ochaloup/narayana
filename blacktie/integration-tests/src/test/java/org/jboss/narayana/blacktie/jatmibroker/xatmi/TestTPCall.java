@@ -82,8 +82,7 @@ public class TestTPCall extends TestCase {
         assertTrue(Arrays.equals(received, expected));
     }
 
-    public void test_tpcall_x_octet_after_delay()
-            throws ConnectionException, InterruptedException, ConfigurationException {
+    public void test_tpcall_x_octet_after_delay() throws ConnectionException, InterruptedException, ConfigurationException {
         log.info("TestTPCall::test_tpcall_x_octet_after_delay");
         server.tpadvertisetpcallXOctet();
         Thread.currentThread().sleep(3000);

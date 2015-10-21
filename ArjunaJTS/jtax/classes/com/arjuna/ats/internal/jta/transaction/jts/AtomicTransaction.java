@@ -54,25 +54,28 @@ import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
  * imported transactions.
  * 
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: AtomicTransaction.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: AtomicTransaction.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 3.0.
  */
 
-public class AtomicTransaction extends com.arjuna.ats.jts.extensions.AtomicTransaction {
+public class AtomicTransaction extends
+        com.arjuna.ats.jts.extensions.AtomicTransaction
+{
 
-    public AtomicTransaction() {
+    public AtomicTransaction ()
+    {
         super();
     }
 
-    public AtomicTransaction(ControlWrapper tx) {
+    public AtomicTransaction (ControlWrapper tx)
+    {
         super(tx);
     }
 
     /*
      * public synchronized void begin () throws SubtransactionsUnavailable,
      * SystemException { if (jtaxLogger.loggerI18N.isWarnEnabled()) {
-     * jtaxLogger.loggerI18N.warn(
-     * "com.arjuna.ats.internal.jta.transaction.jts.atomictxnobegin"); }
+     * jtaxLogger.loggerI18N.warn("com.arjuna.ats.internal.jta.transaction.jts.atomictxnobegin"); }
      * 
      * throw new INVALID_TRANSACTION(ExceptionCodes.ALREADY_BEGUN,
      * CompletionStatus.COMPLETED_NO); }
@@ -82,43 +85,60 @@ public class AtomicTransaction extends com.arjuna.ats.jts.extensions.AtomicTrans
      * Does not change thread-to-tx association as base class commit does.
      */
 
-    public synchronized void end(boolean report_heuristics)
-            throws NoTransaction, HeuristicMixed, HeuristicHazard, WrongTransaction, SystemException {
+    public synchronized void end (boolean report_heuristics)
+            throws NoTransaction, HeuristicMixed, HeuristicHazard,
+            WrongTransaction, SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("AtomicTransaction::end ( " + report_heuristics + " ) for " + _theAction);
+            jtaxLogger.logger.trace("AtomicTransaction::end ( "
+                    + report_heuristics + " ) for " + _theAction);
         }
 
-        if (_theAction == null) {
+        if (_theAction == null)
+        {
             throw new NoTransaction();
         }
 
-        try {
+        try
+        {
             _theAction.commit(report_heuristics);
 
             _theStatus = Status.StatusCommitted;
-        } catch (Unavailable e) {
+        }
+        catch (Unavailable e)
+        {
             _theStatus = Status.StatusNoTransaction;
 
             throw new NoTransaction();
-        } catch (HeuristicMixed e) {
+        }
+        catch (HeuristicMixed e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } catch (HeuristicHazard e) {
+        }
+        catch (HeuristicHazard e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } catch (TRANSACTION_ROLLEDBACK e) {
+        }
+        catch (TRANSACTION_ROLLEDBACK e)
+        {
             _theStatus = Status.StatusRolledBack;
 
             throw e;
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } finally {
+        }
+        finally
+        {
             // now remove it from the reaper
-
+            
             TransactionReaper.transactionReaper().remove(_theAction);
         }
     }
@@ -127,41 +147,56 @@ public class AtomicTransaction extends com.arjuna.ats.jts.extensions.AtomicTrans
      * Does not change thread-to-tx association as base class rollback does.
      */
 
-    public synchronized void abort() throws NoTransaction, WrongTransaction, SystemException {
+    public synchronized void abort () throws NoTransaction, WrongTransaction,
+            SystemException
+    {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("AtomicTransaction::abort for " + _theAction);
+            jtaxLogger.logger.trace("AtomicTransaction::abort for "
+                    + _theAction);
         }
 
-        if (_theAction == null) {
+        if (_theAction == null)
+        {
             throw new NoTransaction();
         }
 
-        try {
+        try
+        {
             _theAction.rollback();
-        } catch (Unavailable e) {
-            _theStatus = Status.StatusNoTransaction; // unknown?
+        }
+        catch (Unavailable e)
+        {
+            _theStatus = Status.StatusNoTransaction;  // unknown?
 
             throw new NoTransaction();
-        } catch (TRANSACTION_ROLLEDBACK e) {
+        }
+        catch (TRANSACTION_ROLLEDBACK e)
+        {
             _theStatus = Status.StatusRolledBack;
 
             throw e;
-        } catch (SystemException e) {
+        }
+        catch (SystemException e)
+        {
             _theStatus = getStatus();
 
             throw e;
-        } finally {
+        }
+        finally
+        {
             // now remove it from the reaper
-
+            
             TransactionReaper.transactionReaper().remove(_theAction);
         }
     }
 
-    public final ControlWrapper getControlWrapper() {
+    public final ControlWrapper getControlWrapper ()
+    {
         return _theAction;
     }
 
-    public final Xid get_xid(boolean branch) throws SystemException {
+    public final Xid get_xid (boolean branch) throws SystemException
+    {
         ControlImple controlImple = _theAction.getImple();
         if (controlImple != null) {
             return XidUtils.getXid(controlImple.get_uid(), branch);

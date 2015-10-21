@@ -65,80 +65,97 @@ public class EnduranceTest extends BaseWSCTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(TestActivationCoordinatorProcessor.class,
-                TestRegistrationCoordinatorProcessor.class, CreateCoordinationContextDetails.class,
+        return WarDeployment.getDeployment(
+                TestActivationCoordinatorProcessor.class,
+                TestRegistrationCoordinatorProcessor.class,
+                CreateCoordinationContextDetails.class,
                 RegisterDetails.class);
     }
 
-    private ActivationCoordinatorProcessor origActivationCoordinatorProcessor;
-    private RegistrationCoordinatorProcessor origRegistrationCoordinatorProcessor;
+    private ActivationCoordinatorProcessor origActivationCoordinatorProcessor ;
+    private RegistrationCoordinatorProcessor origRegistrationCoordinatorProcessor ;
 
-    private TestActivationCoordinatorProcessor testActivationCoordinatorProcessor = new TestActivationCoordinatorProcessor();
+    private TestActivationCoordinatorProcessor testActivationCoordinatorProcessor = new TestActivationCoordinatorProcessor() ;
 
-    private TestRegistrationCoordinatorProcessor testRegistrationCoordinatorProcessor = new TestRegistrationCoordinatorProcessor();
+    private TestRegistrationCoordinatorProcessor testRegistrationCoordinatorProcessor = new TestRegistrationCoordinatorProcessor() ;
 
     private static final long TEST_DURATION = 30 * 1000;
 
     @Before
-    public void setUp() throws Exception {
-        origActivationCoordinatorProcessor = ActivationCoordinatorProcessor
-                .setCoordinator(testActivationCoordinatorProcessor);
+    public void setUp()
+            throws Exception
+            {
+        origActivationCoordinatorProcessor = ActivationCoordinatorProcessor.setCoordinator(testActivationCoordinatorProcessor) ;
 
-        origRegistrationCoordinatorProcessor = RegistrationCoordinatorProcessor
-                .setCoordinator(testRegistrationCoordinatorProcessor);
-    }
+        origRegistrationCoordinatorProcessor = RegistrationCoordinatorProcessor.setCoordinator(testRegistrationCoordinatorProcessor) ;
+            }
 
     @Test
-    public void testCreateCoordinationContextRequest() throws Exception {
+    public void testCreateCoordinationContextRequest()
+            throws Exception
+            {
         long startTime = System.currentTimeMillis();
 
         int dialogIdentifierNumber = 0;
-        while ((System.currentTimeMillis() - startTime) < TEST_DURATION) {
+        while ((System.currentTimeMillis() - startTime) < TEST_DURATION)
+        {
             doCreateCoordinationContextRequest(Integer.toString(dialogIdentifierNumber));
             dialogIdentifierNumber++;
         }
-    }
+            }
 
     @Test
-    public void testCreateCoordinationContextError() throws Exception {
+    public void testCreateCoordinationContextError()
+            throws Exception
+            {
         long startTime = System.currentTimeMillis();
 
         int dialogIdentifierNumber = 0;
-        while ((System.currentTimeMillis() - startTime) < TEST_DURATION) {
+        while ((System.currentTimeMillis() - startTime) < TEST_DURATION)
+        {
             doCreateCoordinationContextError(Integer.toString(dialogIdentifierNumber));
             dialogIdentifierNumber++;
         }
-    }
+            }
 
     @Test
-    public void testRegisterRequest() throws Exception {
+    public void testRegisterRequest()
+            throws Exception
+            {
         long startTime = System.currentTimeMillis();
 
         int dialogIdentifierNumber = 0;
-        while ((System.currentTimeMillis() - startTime) < TEST_DURATION) {
+        while ((System.currentTimeMillis() - startTime) < TEST_DURATION)
+        {
             doRegisterRequest(Integer.toString(dialogIdentifierNumber));
             dialogIdentifierNumber++;
         }
-    }
+            }
 
     @Test
-    public void testRegisterError() throws Exception {
+    public void testRegisterError()
+            throws Exception
+            {
         long startTime = System.currentTimeMillis();
 
         int dialogIdentifierNumber = 0;
-        while ((System.currentTimeMillis() - startTime) < TEST_DURATION) {
+        while ((System.currentTimeMillis() - startTime) < TEST_DURATION)
+        {
             doRegisterError(Integer.toString(dialogIdentifierNumber), dialogIdentifierNumber % 3);
             dialogIdentifierNumber++;
         }
-    }
+            }
 
     @Test
-    public void testEachInTurn() throws Exception {
+    public void testEachInTurn()
+            throws Exception
+            {
         long startTime = System.currentTimeMillis();
 
-        int count = 0;
+        int count                  = 0;
         int dialogIdentifierNumber = 0;
-        while ((System.currentTimeMillis() - startTime) < TEST_DURATION) {
+        while ((System.currentTimeMillis() - startTime) < TEST_DURATION)
+        {
             if (count == 0)
                 doCreateCoordinationContextRequest(Integer.toString(dialogIdentifierNumber));
             else if (count == 1)
@@ -151,24 +168,25 @@ public class EnduranceTest extends BaseWSCTest {
             count = (count + 1) % 4;
             dialogIdentifierNumber++;
         }
-    }
+            }
 
-    public void doCreateCoordinationContextRequest(final String messageId) throws Exception {
-        final String coordinationType = TestUtil.COORDINATION_TYPE;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil11.activationCoordinatorService, messageId);
-        CreateCoordinationContextResponseType response = ActivationCoordinatorClient.getClient()
-                .sendCreateCoordination(map, coordinationType, null, null);
+    public void doCreateCoordinationContextRequest(final String messageId)
+            throws Exception
+            {
+        final String coordinationType = TestUtil.COORDINATION_TYPE ;
+        final MAP map = AddressingHelper.createRequestContext(TestUtil11.activationCoordinatorService, messageId) ;
+        CreateCoordinationContextResponseType response =
+                ActivationCoordinatorClient.getClient().sendCreateCoordination(map, coordinationType, null, null) ;
 
-        final CreateCoordinationContextDetails details = testActivationCoordinatorProcessor
-                .getCreateCoordinationContextDetails(messageId, 10000);
-        final CreateCoordinationContextType requestCreateCoordinationContext = details.getCreateCoordinationContext();
-        final MAP requestMap = details.getMAP();
+        final CreateCoordinationContextDetails details = testActivationCoordinatorProcessor.getCreateCoordinationContextDetails(messageId, 10000) ;
+        final CreateCoordinationContextType requestCreateCoordinationContext = details.getCreateCoordinationContext() ;
+        final MAP requestMap = details.getMAP() ;
 
         assertEquals(requestMap.getTo(), TestUtil11.activationCoordinatorService);
         assertEquals(requestMap.getMessageID(), messageId);
 
-        assertNull(requestCreateCoordinationContext.getExpires());
-        assertNull(requestCreateCoordinationContext.getCurrentContext());
+        assertNull(requestCreateCoordinationContext.getExpires()) ;
+        assertNull(requestCreateCoordinationContext.getCurrentContext()) ;
         assertEquals(requestCreateCoordinationContext.getCoordinationType(), coordinationType);
 
         CoordinationContext context = response.getCoordinationContext();
@@ -176,114 +194,109 @@ public class EnduranceTest extends BaseWSCTest {
         assertNull(context.getExpires());
         assertEquals(context.getCoordinationType(), coordinationType);
         assertNotNull(context.getIdentifier());
-    }
+            }
 
-    public void doCreateCoordinationContextError(final String messageId) throws Exception {
+    public void doCreateCoordinationContextError(final String messageId)
+            throws Exception
+            {
         final String coordinationType = TestUtil.INVALID_CREATE_PARAMETERS_COORDINATION_TYPE;
         try {
-            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageId,
-                    coordinationType, null, null);
+            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageId, coordinationType, null, null) ;
         } catch (InvalidCreateParametersException icpe) {
-            final CreateCoordinationContextDetails details = testActivationCoordinatorProcessor
-                    .getCreateCoordinationContextDetails(messageId, 10000);
-            final CreateCoordinationContextType requestCreateCoordinationContext = details
-                    .getCreateCoordinationContext();
-            final MAP requestMap = details.getMAP();
+            final CreateCoordinationContextDetails details = testActivationCoordinatorProcessor.getCreateCoordinationContextDetails(messageId, 10000) ;
+            final CreateCoordinationContextType requestCreateCoordinationContext = details.getCreateCoordinationContext() ;
+            final MAP requestMap = details.getMAP() ;
             assertEquals(requestMap.getTo(), TestUtil11.activationCoordinatorService);
             assertEquals(requestMap.getMessageID(), messageId);
 
-            assertNull(requestCreateCoordinationContext.getExpires());
-            assertNull(requestCreateCoordinationContext.getCurrentContext());
+            assertNull(requestCreateCoordinationContext.getExpires()) ;
+            assertNull(requestCreateCoordinationContext.getCurrentContext()) ;
             assertEquals(requestCreateCoordinationContext.getCoordinationType(), coordinationType);
             return;
         }
         fail("expected invalid create parameters exception");
-    }
+            }
 
-    public void doRegisterRequest(final String messageId) throws Exception {
-        final String protocolIdentifier = TestUtil.PROTOCOL_IDENTIFIER;
-        final W3CEndpointReference participantProtocolService = TestUtil11
-                .getProtocolParticipantEndpoint("participant");
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+    public void doRegisterRequest(final String messageId)
+            throws Exception
+            {
+        final String protocolIdentifier = TestUtil.PROTOCOL_IDENTIFIER ;
+        final W3CEndpointReference participantProtocolService = TestUtil11.getProtocolParticipantEndpoint("participant");
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
-        coordinationContext.setIdentifier(identifierInstance);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
+        coordinationContext.setIdentifier(identifierInstance) ;
         identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
 
-        W3CEndpointReference coordinator = RegistrationCoordinator.register(coordinationContext, messageId,
-                participantProtocolService, protocolIdentifier);
+        W3CEndpointReference coordinator = RegistrationCoordinator.register(coordinationContext, messageId, participantProtocolService, protocolIdentifier) ;
 
-        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000);
-        final RegisterType requestRegister = details.getRegister();
-        final MAP requestMap = details.getMAP();
-        final ArjunaContext requestArjunaContext = details.getArjunaContext();
+        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000) ;
+        final RegisterType requestRegister = details.getRegister() ;
+        final MAP requestMap = details.getMAP() ;
+        final ArjunaContext requestArjunaContext = details.getArjunaContext() ;
 
         assertEquals(requestMap.getTo(), TestUtil11.registrationCoordinatorService);
         assertEquals(requestMap.getMessageID(), messageId);
 
-        assertNotNull(requestArjunaContext);
-        assertEquals(requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier(),
-                identifierInstance.getValue());
+        assertNotNull(requestArjunaContext) ;
+        assertEquals(requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier(), identifierInstance.getValue()) ;
 
-        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier());
-        assertNotNull(protocolIdentifier, requestRegister.getParticipantProtocolService());
+        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier()) ;
+        assertNotNull(protocolIdentifier, requestRegister.getParticipantProtocolService()) ;
 
         assertNotNull(coordinator);
-    }
+            }
 
-    public void doRegisterError(final String messageId, int count) throws Exception {
+    public void doRegisterError(final String messageId, int count)
+            throws Exception
+            {
         final String protocolIdentifier;
-        final W3CEndpointReference participantProtocolService = TestUtil11
-                .getProtocolParticipantEndpoint("participant");
-        final CoordinationContextType coordinationContext = new CoordinationContextType();
+        final W3CEndpointReference participantProtocolService = TestUtil11.getProtocolParticipantEndpoint("participant");
+        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
         CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
-        coordinationContext.setIdentifier(identifierInstance);
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
+        coordinationContext.setIdentifier(identifierInstance) ;
         identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
 
         W3CEndpointReference coordinator = null;
 
         switch (count) {
-            case 0 :
+            case 0:
                 protocolIdentifier = TestUtil.INVALID_PROTOCOL_PROTOCOL_IDENTIFIER;
                 try {
-                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId,
-                            participantProtocolService, protocolIdentifier);
+                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId, participantProtocolService, protocolIdentifier) ;
                 } catch (InvalidProtocolException ipe) {
                 }
                 if (coordinator != null) {
                     fail("expected invalid protocol exception");
                 }
                 break;
-            case 1 :
+            case 1:
                 protocolIdentifier = TestUtil.INVALID_STATE_PROTOCOL_IDENTIFIER;
                 try {
-                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId,
-                            participantProtocolService, protocolIdentifier);
+                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId, participantProtocolService, protocolIdentifier) ;
                 } catch (InvalidStateException ise) {
                 }
                 if (coordinator != null) {
                     fail("expected invalid state exception");
                 }
                 break;
-            case 3 :
+            case 3:
                 protocolIdentifier = TestUtil.NO_ACTIVITY_PROTOCOL_IDENTIFIER;
                 try {
-                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId,
-                            participantProtocolService, protocolIdentifier);
+                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId, participantProtocolService, protocolIdentifier) ;
                 } catch (CannotRegisterException cre) {
                 }
                 if (coordinator != null) {
                     fail("expected cannot register exception");
                 }
                 break;
-            default :
+            default:
                 protocolIdentifier = TestUtil.ALREADY_REGISTERED_PROTOCOL_IDENTIFIER;
                 try {
-                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId,
-                            participantProtocolService, protocolIdentifier);
+                    coordinator = RegistrationCoordinator.register(coordinationContext, messageId, participantProtocolService, protocolIdentifier) ;
                 } catch (CannotRegisterException cre) {
                 }
                 if (coordinator != null) {
@@ -292,30 +305,31 @@ public class EnduranceTest extends BaseWSCTest {
                 break;
         }
 
-        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000);
-        final RegisterType requestRegister = details.getRegister();
-        final MAP requestMap = details.getMAP();
-        final ArjunaContext requestArjunaContext = details.getArjunaContext();
+        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000) ;
+        final RegisterType requestRegister = details.getRegister() ;
+        final MAP requestMap = details.getMAP() ;
+        final ArjunaContext requestArjunaContext = details.getArjunaContext() ;
 
         assertEquals(requestMap.getTo(), TestUtil11.registrationCoordinatorService);
         assertEquals(requestMap.getMessageID(), messageId);
 
-        assertNotNull(requestArjunaContext);
-        assertEquals(requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier(),
-                identifierInstance.getValue());;
+        assertNotNull(requestArjunaContext) ;
+        assertEquals(requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier(), identifierInstance.getValue()); ;
 
-        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier());
-        assertNotNull(protocolIdentifier, requestRegister.getParticipantProtocolService());
-    }
+        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier()) ;
+        assertNotNull(protocolIdentifier, requestRegister.getParticipantProtocolService()) ;
+            }
 
     @After
-    public void tearDown() throws Exception {
-        ActivationCoordinatorProcessor.setCoordinator(origActivationCoordinatorProcessor);
-        origActivationCoordinatorProcessor = null;
-        testActivationCoordinatorProcessor = null;
+    public void tearDown()
+            throws Exception
+            {
+        ActivationCoordinatorProcessor.setCoordinator(origActivationCoordinatorProcessor) ;
+        origActivationCoordinatorProcessor = null ;
+        testActivationCoordinatorProcessor = null ;
 
-        RegistrationCoordinatorProcessor.setCoordinator(origRegistrationCoordinatorProcessor);
-        origRegistrationCoordinatorProcessor = null;
-        testRegistrationCoordinatorProcessor = null;
-    }
+        RegistrationCoordinatorProcessor.setCoordinator(origRegistrationCoordinatorProcessor) ;
+        origRegistrationCoordinatorProcessor = null ;
+        testRegistrationCoordinatorProcessor = null ;
+            }
 }

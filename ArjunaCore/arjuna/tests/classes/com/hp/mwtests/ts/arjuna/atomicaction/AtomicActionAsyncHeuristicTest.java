@@ -25,7 +25,8 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class AtomicActionAsyncHeuristicTest extends AtomicActionTestBase {
+public class AtomicActionAsyncHeuristicTest extends AtomicActionTestBase
+{
     @BeforeClass
     public static void init() {
         AtomicActionTestBase.init(true);
@@ -35,9 +36,7 @@ public class AtomicActionAsyncHeuristicTest extends AtomicActionTestBase {
 
     /**
      * Verifies that action participants are notified of heuristic outcomes.
-     * This test runs with synchronous commits. For other heuristic test
-     * configurations:
-     * 
+     * This test runs with synchronous commits. For other heuristic test configurations:
      * @see com.hp.mwtests.ts.arjuna.atomicaction.AtomicActionSyncTest#testHeuristicNotification1()
      * @see com.hp.mwtests.ts.arjuna.atomicaction.AtomicActionSyncTest#testHeuristicNotification2()
      * @see AtomicActionAsyncTest#testHeuristicNotification()

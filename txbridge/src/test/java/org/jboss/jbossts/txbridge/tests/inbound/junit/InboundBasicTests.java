@@ -40,8 +40,7 @@ import javax.transaction.xa.XAResource;
 import java.net.URL;
 
 /**
- * Basic (i.e. non-crashrec) test cases for the inbound side of the transaction
- * bridge.
+ * Basic (i.e. non-crashrec) test cases for the inbound side of the transaction bridge.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-05
  * @author Ivo Studensky (istudens@redhat.com)
@@ -62,11 +61,13 @@ public class InboundBasicTests extends AbstractBasicTests {
         return getInboundClientArchive();
     }
 
+
     @ArquillianResource
     private ContainerController controller;
 
     private InstrumentedClass instrumentedTestSynchronization;
     private InstrumentedClass instrumentedTestXAResource;
+
 
     @Before
     public void setUp() throws Exception {
@@ -78,8 +79,7 @@ public class InboundBasicTests extends AbstractBasicTests {
         instrumentedTestSynchronization = instrumentor.instrumentClass(TestSynchronization.class);
         instrumentedTestXAResource = instrumentor.instrumentClass(TestXAResource.class);
 
-        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing",
-                "$0.enlistSynchronization(1), $0.enlistXAResource(1)");
+        instrumentor.injectOnCall(TestServiceImpl.class, "doNothing", "$0.enlistSynchronization(1), $0.enlistXAResource(1)");
     }
 
     @After
@@ -89,6 +89,7 @@ public class InboundBasicTests extends AbstractBasicTests {
         // shut down the appserver
         controller.stop(CONTAINER);
     }
+
 
     @Test
     @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)
@@ -125,8 +126,7 @@ public class InboundBasicTests extends AbstractBasicTests {
     @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)
     public void testBeforeCompletionFailure(@ArquillianResource URL baseURL) throws Exception {
 
-        instrumentor.injectFault(TestSynchronization.class, "beforeCompletion", RuntimeException.class,
-                new Object[]{"injected BeforeCompletion fault"});
+        instrumentor.injectFault(TestSynchronization.class, "beforeCompletion", RuntimeException.class, new Object[]{"injected BeforeCompletion fault"});
 
         instrumentor.injectOnCall(TestClient.class, "terminateTransaction", "$2 = true"); // shouldCommit=true
 
@@ -164,8 +164,7 @@ public class InboundBasicTests extends AbstractBasicTests {
     @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)
     public void testPrepareFailure(@ArquillianResource URL baseURL) throws Exception {
 
-        instrumentor.injectFault(TestXAResource.class, "prepare", XAException.class,
-                new Object[]{XAException.XA_RBROLLBACK});
+        instrumentor.injectFault(TestXAResource.class, "prepare", XAException.class, new Object[]{XAException.XA_RBROLLBACK});
 
         instrumentor.injectOnCall(TestClient.class, "terminateTransaction", "$2 = true"); // shouldCommit=true
 
@@ -177,9 +176,8 @@ public class InboundBasicTests extends AbstractBasicTests {
 
         instrumentedTestXAResource.assertKnownInstances(1);
 
-        // instrumentedTestXAResource.assertMethodNotCalled("rollback");
-        // TODO hmm, XA_RBROLLBACK winds up on pending list, so is called at
-        // abortPhase2. bug?
+        //instrumentedTestXAResource.assertMethodNotCalled("rollback");
+        // TODO hmm, XA_RBROLLBACK winds up on pending list, so is called at abortPhase2. bug?
 
         instrumentedTestXAResource.assertMethodNotCalled("commit");
 

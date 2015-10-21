@@ -10,6 +10,7 @@ import javax.transaction.TransactionManager;
  */
 public class Utills {
 
+
     public static void assertTransactionActive(boolean expectActive) throws Exception {
 
         final Transaction tx = getCurrentTransaction();
@@ -27,14 +28,12 @@ public class Utills {
 
     public static void assertSameTransaction(Transaction expectedTransaction) throws Exception {
 
-        Assert.assertTrue("Expected transaction to be the same, but it wasn't",
-                expectedTransaction == getCurrentTransaction());
+        Assert.assertTrue("Expected transaction to be the same, but it wasn't", expectedTransaction == getCurrentTransaction());
     }
 
     public static void assertDifferentTransaction(Transaction expectedTransaction) throws Exception {
 
-        Assert.assertFalse("Expected transaction to be different, but it wasn't",
-                expectedTransaction == getCurrentTransaction());
+        Assert.assertFalse("Expected transaction to be different, but it wasn't", expectedTransaction == getCurrentTransaction());
     }
 
     public static TransactionManager getTransactionManager() {

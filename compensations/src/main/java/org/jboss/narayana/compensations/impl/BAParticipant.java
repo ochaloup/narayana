@@ -27,6 +27,7 @@ package org.jboss.narayana.compensations.impl;
  */
 public interface BAParticipant {
 
+
     public void confirmCompleted(boolean confirmed);
 
     public void close() throws Exception;

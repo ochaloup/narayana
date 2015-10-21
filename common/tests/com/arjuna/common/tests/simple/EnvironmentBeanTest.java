@@ -47,7 +47,8 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest {
+public class EnvironmentBeanTest
+{
     @Test
     public void beanPopulatorTestWithDummies() throws Exception {
 
@@ -60,41 +61,39 @@ public class EnvironmentBeanTest {
 
         Set<Object> expectedKeys = testBean.getProperties().keySet();
 
-        assertTrue(testProperties.usedKeys.containsAll(expectedKeys));
+        assertTrue( testProperties.usedKeys.containsAll(expectedKeys) );
     }
 
     ///////////////////////////////////////////////
 
     public static void testBeanByReflection(Object environmentBean) throws Exception {
 
-        for (Field field : environmentBean.getClass().getDeclaredFields()) {
+        for(Field field : environmentBean.getClass().getDeclaredFields()) {
             Class type = field.getType();
 
-            String setterMethodName = "set" + capitalizeFirstLetter(field.getName());
+            String setterMethodName = "set"+capitalizeFirstLetter(field.getName());
             Method setter;
             try {
-                setter = environmentBean.getClass().getMethod(setterMethodName, new Class[]{field.getType()});
-            } catch (NoSuchMethodException e) {
-                continue; // emma code coverage tool adds fields to instrumented
-                            // classes - ignore them.
+                setter = environmentBean.getClass().getMethod(setterMethodName, new Class[] {field.getType()});
+            } catch(NoSuchMethodException e) {
+                continue; // emma code coverage tool adds fields to instrumented classes - ignore them.
             }
 
             String getterMethodName;
             Method getter = null;
-            if (field.getType().equals(Boolean.TYPE)) {
-                getterMethodName = "is" + capitalizeFirstLetter(field.getName());
+            if(field.getType().equals(Boolean.TYPE)) {
+                getterMethodName = "is"+capitalizeFirstLetter(field.getName());
                 try {
-                    getter = environmentBean.getClass().getMethod(getterMethodName, new Class[]{});
-                } catch (NoSuchMethodException e) {
-                }
+                    getter = environmentBean.getClass().getMethod(getterMethodName, new Class[] {});
+                } catch (NoSuchMethodException e) {}
             }
 
-            if (getter == null) {
-                getterMethodName = "get" + capitalizeFirstLetter(field.getName());
-                getter = environmentBean.getClass().getMethod(getterMethodName, new Class[]{});
+            if(getter == null) {
+                getterMethodName = "get"+capitalizeFirstLetter(field.getName());
+                getter = environmentBean.getClass().getMethod(getterMethodName, new Class[] {});
             }
 
-            if (field.getType().getName().startsWith("java.util")) {
+            if(field.getType().getName().startsWith("java.util")) {
                 handleGroupProperty(environmentBean, field, setter, getter);
             } else {
                 handleSimpleProperty(environmentBean, field, setter, getter);
@@ -103,118 +102,123 @@ public class EnvironmentBeanTest {
 
     }
 
-    private static void handleGroupProperty(Object bean, Field field, Method setter, Method getter) throws Exception {
+    private static void handleGroupProperty(Object bean, Field field, Method setter, Method getter)
+        throws Exception
+    {
         Object inputValue = null;
 
-        if (java.util.Map.class.isAssignableFrom(field.getType())) {
+        if(java.util.Map.class.isAssignableFrom(field.getType())) {
 
-            inputValue = new HashMap<String, String>();
-            ((Map) inputValue).put("testKey", "testValue");
+            inputValue = new HashMap<String,String>();
+            ((Map)inputValue).put("testKey", "testValue");
 
         } else {
 
             inputValue = new ArrayList<String>();
-            ((List) inputValue).add("1");
-
+            ((List)inputValue).add("1");
+            
         }
 
-        setter.invoke(bean, new Object[]{inputValue});
+        setter.invoke(bean, new Object[] {inputValue});
 
-        Object outputValue = getter.invoke(bean, new Object[]{});
+        Object outputValue = getter.invoke(bean, new Object[] {});
 
         assertEquals(inputValue, outputValue);
         assertNotSame(inputValue, outputValue);
 
-        setter.invoke(bean, new Object[]{null});
-        outputValue = getter.invoke(bean, new Object[]{});
+        setter.invoke(bean, new Object[] {null});
+        outputValue = getter.invoke(bean, new Object[] {});
         assertNotNull(outputValue);
 
-        if (outputValue instanceof Collection) {
-            assertTrue(((Collection) outputValue).isEmpty());
+        if(outputValue instanceof Collection) {
+            assertTrue(((Collection)outputValue).isEmpty());
         } else {
-            assertTrue(((Map) outputValue).isEmpty());
+            assertTrue(((Map)outputValue).isEmpty());
         }
 
-        // TODO if collection type is an interface (but how to know?) test
-        // matched Instance|ClassNames field sync.
+        // TODO if collection type is an interface (but how to know?) test matched Instance|ClassNames field sync. 
 
     }
 
-    private static void handleSimpleProperty(Object bean, Field field, Method setter, Method getter) throws Exception {
+    private static void handleSimpleProperty(Object bean, Field field, Method setter, Method getter)
+            throws Exception
+    {
         Object inputValue = null;
 
-        if (field.getType().equals(Boolean.TYPE)) {
+        if(field.getType().equals(Boolean.TYPE)) {
 
             inputValue = Boolean.TRUE;
-            setter.invoke(bean, new Object[]{inputValue});
+            setter.invoke(bean, new Object[]{ inputValue });
 
-        } else if (field.getType().equals(String.class)) {
+        } else if(field.getType().equals(String.class)) {
 
             inputValue = "inputValue";
-            setter.invoke(bean, new Object[]{inputValue});
+            setter.invoke(bean, new Object[] {inputValue});
 
-        } else if (field.getType().equals(Long.TYPE)) {
+        } else if(field.getType().equals(Long.TYPE)) {
 
             inputValue = new Long(1001);
-            setter.invoke(bean, new Object[]{inputValue});
+            setter.invoke(bean, new Object[] {inputValue});
 
-        } else if (field.getType().equals(Integer.TYPE)) {
+        } else if(field.getType().equals(Integer.TYPE)) {
 
             inputValue = new Integer(1001);
-            setter.invoke(bean, new Object[]{inputValue});
+            setter.invoke(bean, new Object[] {inputValue});
 
-        } else if (field.getType().toString().startsWith("interface ")) {
+        } else if(field.getType().toString().startsWith("interface ")) {
 
             handleInterfaceField(bean, field, setter, getter);
             return;
 
-        } else if (field.getType().toString().equals("class java.lang.Class")) {
+        } else if(field.getType().toString().equals("class java.lang.Class")) {
             // ignore for now, no easy way to test
         } else {
-            throw new Exception("unknown field type " + field.getType());
+            throw new Exception("unknown field type "+field.getType());
         }
 
-        Object outputValue = getter.invoke(bean, new Object[]{});
+        Object outputValue = getter.invoke(bean, new Object[] {});
 
         assertEquals(inputValue, outputValue);
     }
 
     private static String capitalizeFirstLetter(String string) {
-        return (string.length() > 0) ? (Character.toUpperCase(string.charAt(0)) + string.substring(1)) : string;
+        return (string.length()>0) ? (Character.toUpperCase(string.charAt(0))+string.substring(1)) : string;
     }
 
-    private static void handleInterfaceField(Object bean, Field field, Method setter, Method getter) throws Exception {
+    private static void handleInterfaceField(Object bean, Field field, Method setter, Method getter)
+            throws Exception
+    {
         Class interfaceType = field.getType();
 
-        String setterMethodName = setter.getName() + "ClassName";
-        Method classNameSetter = bean.getClass().getMethod(setterMethodName, new Class[]{String.class});
+        String setterMethodName = setter.getName()+"ClassName";
+        Method classNameSetter = bean.getClass().getMethod(setterMethodName, new Class[] {String.class});
 
-        String getterMethodName = getter.getName() + "ClassName";
-        Method classNameGetter = bean.getClass().getMethod(getterMethodName, new Class[]{});
+        String getterMethodName = getter.getName()+"ClassName";
+        Method classNameGetter = bean.getClass().getMethod(getterMethodName, new Class[] {});
 
         ///////
 
         InvocationHandler invocationHandler = new DummyInvocationhandler();
-        Object proxy = Proxy.newProxyInstance(interfaceType.getClassLoader(), new Class[]{interfaceType},
-                invocationHandler);
+        Object proxy = Proxy.newProxyInstance(interfaceType.getClassLoader(), new Class[] { interfaceType }, invocationHandler);
 
-        setter.invoke(bean, new Object[]{proxy}); // setFoo()
-        assertSame(getter.invoke(bean, new Object[]{}), proxy); // getFoo
+        setter.invoke(bean, new Object[] { proxy }); // setFoo()
+        assertSame(getter.invoke(bean, new Object[] {}), proxy); // getFoo
 
-        setter.invoke(bean, new Object[]{null}); // setFoo()
-        assertNull(getter.invoke(bean, new Object[]{})); // getFoo
-        assertNull(classNameGetter.invoke(bean, new Object[]{})); // getFooClassName
+        setter.invoke(bean, new Object[] { null }); // setFoo()
+        assertNull(getter.invoke(bean, new Object[] {})); // getFoo
+        assertNull(classNameGetter.invoke(bean, new Object[] {})); // getFooClassName
 
         String bogusClassName = "bogusClassName";
-        classNameSetter.invoke(bean, new Object[]{bogusClassName});
-        assertNull(getter.invoke(bean, new Object[]{}));
-        assertEquals(bogusClassName, classNameGetter.invoke(bean, new Object[]{}));
+        classNameSetter.invoke(bean, new Object[] { bogusClassName });
+        assertNull(getter.invoke(bean, new Object[] {}));
+        assertEquals(bogusClassName, classNameGetter.invoke(bean, new Object[] {}));
     }
 
     private static class DummyInvocationhandler implements InvocationHandler {
 
         @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+        {
             return null;
         }
     }

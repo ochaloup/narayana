@@ -43,9 +43,11 @@ import com.arjuna.ats.jta.xa.XATxConverter;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com), 2010-03
  */
-public class XAResourceOrphanFilterTest {
+public class XAResourceOrphanFilterTest
+{
     @Test
-    public void testJTANodeNameXAResourceOrphanFilter() {
+    public void testJTANodeNameXAResourceOrphanFilter()
+    {
         XAResourceOrphanFilter orphanFilter = new JTANodeNameXAResourceOrphanFilter();
 
         Xid notJTAFormatId = XATxConverter.getXid(new Uid(), false, 0);
@@ -55,13 +57,13 @@ public class XAResourceOrphanFilterTest {
         recoveryNodes.add("1");
         jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(recoveryNodes);
 
-        String notRecoverableNodeName = "2";
+        String notRecoverableNodeName ="2";
         TxControl.setXANodeName(notRecoverableNodeName);
         Xid jtaNotRecoverableNodeName = XATxConverter.getXid(new Uid(), false, XATxConverter.FORMAT_ID);
 
         assertEquals(XAResourceOrphanFilter.Vote.ABSTAIN, orphanFilter.checkXid(jtaNotRecoverableNodeName));
 
-        String recoverableNodeName = "1";
+        String recoverableNodeName ="1";
         TxControl.setXANodeName(recoverableNodeName);
         Xid jtaRecoverableNodeName = XATxConverter.getXid(new Uid(), false, XATxConverter.FORMAT_ID);
 
@@ -76,7 +78,8 @@ public class XAResourceOrphanFilterTest {
     }
 
     @Test
-    public void testJTATransactionLogOrphanFilter() {
+    public void testJTATransactionLogOrphanFilter()
+    {
         XAResourceOrphanFilter orphanFilter = new JTATransactionLogXAResourceOrphanFilter();
 
         Xid notJTAFormatId = XATxConverter.getXid(new Uid(), false, 0);

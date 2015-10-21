@@ -52,7 +52,8 @@ import java.util.Stack;
  * @since 1.0.
  */
 
-public class FailureHLS implements HLS {
+public class FailureHLS implements HLS
+{
     private Stack<GlobalId> _id;
 
     public static final int BEGUN_FAIL = 0;
@@ -62,120 +63,138 @@ public class FailureHLS implements HLS {
     public static final int COMPLETED_FAIL = 4;
     public static final int CONTEXT_FAIL = 5;
     public static final int NO_FAIL = 10;
-
-    public FailureHLS() {
-        this(FailureHLS.NO_FAIL);
+    
+    public FailureHLS ()
+    {
+    this(FailureHLS.NO_FAIL);
     }
 
-    public FailureHLS(int failPoint) {
-        _failPoint = failPoint;
-        _id = new Stack<GlobalId>();
+    public FailureHLS (int failPoint)
+    {
+    _failPoint = failPoint;
+    _id = new Stack<GlobalId>();
     }
-
+    
     /**
      * An activity has begun and is active on the current thread.
      */
 
-    public void begun() throws SystemException {
-        if (_failPoint == FailureHLS.BEGUN_FAIL)
-            throw new SystemException();
+    public void begun () throws SystemException
+    {
+    if (_failPoint == FailureHLS.BEGUN_FAIL)
+        throw new SystemException();
+    
+    try
+    {
+        GlobalId activityId = UserActivityFactory.userActivity().activityId();
 
-        try {
-            GlobalId activityId = UserActivityFactory.userActivity().activityId();
+        _id.push(activityId);
 
-            _id.push(activityId);
-
-            System.out.println("FailureHLS.begun " + activityId);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        System.out.println("FailureHLS.begun "+activityId);
+    }
+    catch (Exception ex)
+    {
+        ex.printStackTrace();
+    }
     }
 
     /**
      * The current activity is completing with the specified completion status.
      *
-     * @param cs
-     *            cs The completion status to use.
+     * @param cs cs The completion status to use.
      *
-     * @return The result of terminating the relationship of this HLS and the
-     *         current activity.
+     * @return The result of terminating the relationship of this HLS and
+     * the current activity.
      */
 
-    public Outcome complete(CompletionStatus cs) throws SystemException {
-        if (_failPoint == FailureHLS.COMPLETE_FAIL)
-            throw new SystemException();
+    public Outcome complete (CompletionStatus cs) throws SystemException
+    {
+    if (_failPoint == FailureHLS.COMPLETE_FAIL)
+        throw new SystemException();
 
-        try {
-            System.out.println("FailureHLS.complete ( " + cs + " ) " + UserActivityFactory.userActivity().activityId());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return null;
+    try
+    {
+        System.out.println("FailureHLS.complete ( "+cs+" ) "+ UserActivityFactory.userActivity().activityId());
     }
+    catch (Exception ex)
+    {
+        ex.printStackTrace();
+    }
+
+    return null;
+    }    
 
     /**
-     * The activity has been suspended. How does the HLS know which activity has
-     * been suspended? It must remember what its notion of current is.
+     * The activity has been suspended. How does the HLS know which activity
+     * has been suspended? It must remember what its notion of current is.
      */
 
-    public void suspended() throws SystemException {
-        if (_failPoint == FailureHLS.SUSPENDED_FAIL)
-            throw new SystemException();
+    public void suspended () throws SystemException
+    {
+    if (_failPoint == FailureHLS.SUSPENDED_FAIL)
+        throw new SystemException();
 
-        System.out.println("FailureHLS.suspended");
-    }
+    System.out.println("FailureHLS.suspended");
+    }    
 
     /**
      * The activity has been resumed on the current thread.
      */
 
-    public void resumed() throws SystemException {
-        if (_failPoint == FailureHLS.RESUMED_FAIL)
-            throw new SystemException();
+    public void resumed () throws SystemException
+    {
+    if (_failPoint == FailureHLS.RESUMED_FAIL)
+        throw new SystemException();
 
-        System.out.println("FailureHLS.resumed");
-    }
+    System.out.println("FailureHLS.resumed");
+    }    
 
     /**
-     * The activity has completed and is no longer active on the current thread.
+     * The activity has completed and is no longer active on the current
+     * thread.
      */
 
-    public void completed() throws SystemException {
-        if (_failPoint == FailureHLS.COMPLETED_FAIL)
-            throw new SystemException();
+    public void completed () throws SystemException
+    {
+    if (_failPoint == FailureHLS.COMPLETED_FAIL)
+        throw new SystemException();
 
-        try {
-            System.out.println("FailureHLS.completed " + UserActivityFactory.userActivity().activityId());
-            if (!_id.isEmpty()) {
-                _id.pop();
-            }
-        } catch (NoActivityException ex) {
-            ex.printStackTrace();
+    try
+    {
+        System.out.println("FailureHLS.completed " + UserActivityFactory.userActivity().activityId());
+        if (!_id.isEmpty()) {
+            _id.pop();
         }
     }
+    catch (NoActivityException ex)
+    {
+        ex.printStackTrace();
+    }
+    }        
 
     /**
      * The HLS name.
      */
 
-    public String identity() throws SystemException {
-        return "FailureHLS";
+    public String identity () throws SystemException
+    {
+    return "FailureHLS";
     }
 
     /**
      * The activity service maintains a priority ordered list of HLS
-     * implementations. If an HLS wishes to be ordered based on priority then it
-     * can return a non-negative value: the higher the value, the higher the
-     * priority and hence the earlier in the list of HLSes it will appear (and
-     * be used in).
+     * implementations. If an HLS wishes to be ordered based on priority
+     * then it can return a non-negative value: the higher the value,
+     * the higher the priority and hence the earlier in the list of HLSes
+     * it will appear (and be used in).
      *
      * @return a positive value for the priority for this HLS, or zero/negative
-     *         if the order is not important.
+     * if the order is not important.
      */
 
-    public int priority() throws SystemException {
-        return 0;
+    public int priority () throws SystemException
+    {
+    return 0;
     }
 
     /**
@@ -185,23 +204,24 @@ public class FailureHLS implements HLS {
      * @return a context object or null if no augmentation is necessary.
      */
 
-    public Context context() throws SystemException {
-        if (_failPoint == FailureHLS.CONTEXT_FAIL)
-            throw new SystemException();
+    public Context context () throws SystemException
+    {
+    if (_failPoint == FailureHLS.CONTEXT_FAIL)
+        throw new SystemException();
 
-        if (_id.isEmpty()) {
-            throw new SystemException("request for context when inactive");
-        }
+    if (_id.isEmpty()) {
+        throw new SystemException("request for context when inactive");
+    }
 
-        try {
-            System.out.println("DemoHLS.context " + UserActivityFactory.userActivity().activityId());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    try {
+    System.out.println("DemoHLS.context "+ UserActivityFactory.userActivity().activityId());
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
 
-        return new DemoSOAPContextImple(identity() + "_" + _id.size());
+    return new DemoSOAPContextImple(identity() + "_" + _id.size());
     }
 
     private int _failPoint;
-
+    
 }

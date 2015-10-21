@@ -41,9 +41,11 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class DestroyTest {
+public class DestroyTest
+{
     @Test
-    public void test() throws TestException {
+    public void test() throws TestException
+    {
         AtomicObject atomicObject = new AtomicObject();
         Uid u = atomicObject.get_uid();
         AtomicAction a = new AtomicAction();
@@ -57,17 +59,20 @@ public class DestroyTest {
         a.commit();
 
         atomicObject = new AtomicObject(u);
-
+        
         int val;
-
-        try {
+        
+        try
+        {
             val = atomicObject.get();
-        } catch (final TestException ex) {
-            // activate should fail so setlock should fail
-
-            val = -2; // differentiate between -1
         }
-
+        catch (final TestException ex)
+        {
+            // activate should fail so setlock should fail
+            
+            val = -2;  // differentiate between -1
+        }
+        
         assertEquals(-2, val);
     }
 }

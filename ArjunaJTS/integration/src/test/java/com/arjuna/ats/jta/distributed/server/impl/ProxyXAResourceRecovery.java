@@ -40,7 +40,7 @@ public class ProxyXAResourceRecovery implements XAResourceRecovery {
 
     @Override
     public XAResource[] getXAResources() {
-        return resources.toArray(new XAResource[]{});
+        return resources.toArray(new XAResource[] {});
     }
 
 }

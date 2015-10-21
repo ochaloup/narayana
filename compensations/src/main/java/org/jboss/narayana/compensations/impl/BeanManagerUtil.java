@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 public class BeanManagerUtil {
 
+
     public static BeanManager getBeanManager() {
 
         return CDI.current().getBeanManager();
@@ -17,8 +18,7 @@ public class BeanManagerUtil {
 
         Iterator<Bean<?>> iter = bm.getBeans(clazz).iterator();
         if (!iter.hasNext()) {
-            throw new IllegalStateException(
-                    "CDI BeanManager cannot find an instance of requested type " + clazz.getName());
+            throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type " + clazz.getName());
         }
         Bean<T> bean = (Bean<T>) iter.next();
         CreationalContext<T> ctx = bm.createCreationalContext(bean);

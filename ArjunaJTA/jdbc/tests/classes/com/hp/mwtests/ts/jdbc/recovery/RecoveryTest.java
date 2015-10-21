@@ -100,7 +100,8 @@ public class RecoveryTest {
         {
 
             Connection conn = DriverManager.getConnection(url, dbProperties);
-            javax.transaction.TransactionManager tx = com.arjuna.ats.jta.TransactionManager.transactionManager();
+            javax.transaction.TransactionManager tx = com.arjuna.ats.jta.TransactionManager
+                    .transactionManager();
 
             tx.begin();
             tx.getTransaction().enlistResource(new DummyXAResource());
@@ -143,7 +144,8 @@ public class RecoveryTest {
                 @Override
                 public XAResource[] getXAResources() throws Exception {
 
-                    return new XAResource[]{ds.getXAConnection().getXAResource()};
+                    return new XAResource[] { ds.getXAConnection()
+                            .getXAResource() };
                 }
             });
 

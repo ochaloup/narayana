@@ -42,19 +42,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class HeuristicHazard implements Status {
+public class HeuristicHazard implements Status
+{
 
-    public static HeuristicHazard instance() {
-        return _instance;
+    public static HeuristicHazard instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.twophase.status.HeuristicHazard";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.twophase.status.HeuristicHazard";
-    }
-
-    private HeuristicHazard() {
+    private HeuristicHazard ()
+    {
     }
 
     private static final HeuristicHazard _instance = new HeuristicHazard();
-
+    
 }

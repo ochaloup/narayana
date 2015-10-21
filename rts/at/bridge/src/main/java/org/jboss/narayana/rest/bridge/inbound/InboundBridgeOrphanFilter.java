@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import javax.transaction.xa.Xid;
 
+
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
@@ -45,17 +46,16 @@ public class InboundBridgeOrphanFilter implements XAResourceOrphanFilter {
     private static final Logger LOG = Logger.getLogger(InboundBridgeOrphanFilter.class);
 
     /**
-     * Called by the XARecoveryModule for each in-doubt Xid. Implementations
-     * should return Vote.ROLLBACK if they recognize the xid and believe it
-     * should be aborted. Vote.LEAVE_ALONE if they recognize the xid and do not
-     * want the XARecovery module to roll it back. Vote.ABSTAIN if they do not
-     * recognize the xid. Each registered XAResourceOrphanFilter will be
-     * consulted before any rollback on each recovery pass, so they may change
-     * their mind over time e.g. if new information becomes available due to
-     * other recovery activity.
+     * Called by the XARecoveryModule for each in-doubt Xid.
+     * Implementations should return
+     *   Vote.ROLLBACK if they recognize the xid and believe it should be aborted.
+     *   Vote.LEAVE_ALONE if they recognize the xid and do not want the XARecovery module to roll it back.
+     *   Vote.ABSTAIN if they do not recognize the xid.
+     * Each registered XAResourceOrphanFilter will be consulted before any rollback on each recovery pass,
+     * so they may change their mind over time e.g. if new information becomes available due to other recovery
+     * activity.
      *
-     * @param xid
-     *            The in-doubt xid.
+     * @param xid The in-doubt xid.
      * @return a Vote in accordance with the guidelines above.
      */
     @Override

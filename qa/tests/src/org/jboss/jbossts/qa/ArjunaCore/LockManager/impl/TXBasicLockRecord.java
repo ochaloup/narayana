@@ -34,70 +34,89 @@ import org.jboss.jbossts.qa.Utils.JVMStats;
 /**
  * Simple record used to test AtomicAction
  */
-public class TXBasicLockRecord extends BasicLockRecord {
-    public TXBasicLockRecord() {
+public class TXBasicLockRecord extends BasicLockRecord
+{
+    public TXBasicLockRecord()
+    {
         super(ObjectType.ANDPERSISTENT);
     }
 
-    protected TXBasicLockRecord(Uid storeUid, int ot) {
+    protected TXBasicLockRecord(Uid storeUid, int ot)
+    {
         super(storeUid, ot);
     }
 
-    public TXBasicLockRecord(int id) {
+    public TXBasicLockRecord(int id)
+    {
         super(ObjectType.ANDPERSISTENT);
         mId = id;
     }
 
-    public TXBasicLockRecord(Uid oldId) {
+    public TXBasicLockRecord(Uid oldId)
+    {
         super(oldId, ObjectType.ANDPERSISTENT);
     }
 
-    public int increase() {
+    public int increase()
+    {
         return increase(0);
     }
 
-    public int increase(int retry) {
+    public int increase(int retry)
+    {
         return increase(retry, 0);
     }
 
     private long timeOfLastWaiting = 0;
 
     /**
-     * We will start a subtrancastion during the increase to see what effet this
-     * has.
+     * We will start a subtrancastion during the increase to see what effet this has.
      *
      * @return +1 if tx was committed, 0 if tx was not committed
      */
-    public int increase(int retry, int wait_time) {
+    public int increase(int retry, int wait_time)
+    {
         int returnValue = 0;
         AtomicAction a = new AtomicAction();
         a.begin();
-        try {
+        try
+        {
             int locking_result = LockResult.REFUSED;
             int locking_attempt_count = 0;
-            do {
+            do
+            {
                 locking_result = setlock(new Lock(LockMode.WRITE), retry, wait_time);
 
-                if (locking_result == LockResult.GRANTED) {
+                if (locking_result == LockResult.GRANTED)
+                {
                     mValue++;
-                } else {
+                }
+                else
+                {
                     locking_attempt_count++;
                 }
 
-                if (timeOfLastWaiting < (System.currentTimeMillis() - 15000)) {
+                if (timeOfLastWaiting < (System.currentTimeMillis() - 15000))
+                {
                     System.out.println("Thread: [" + Thread.currentThread() + "]");
                     timeOfLastWaiting = System.currentTimeMillis();
                 }
-            } while ((locking_result != LockResult.GRANTED) && (locking_attempt_count < mLimit));
+            }
+            while ((locking_result != LockResult.GRANTED) && (locking_attempt_count < mLimit));
 
-            if (locking_result != LockResult.GRANTED) {
+            if (locking_result != LockResult.GRANTED)
+            {
                 qautil.qadebug("trying to get lock for " + mLimit + "th time");
                 a.abort();
-            } else {
+            }
+            else
+            {
                 a.commit();
                 returnValue = 1;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             a.abort();
             qautil.debug("exception in increase method ", e);
         }
@@ -107,39 +126,51 @@ public class TXBasicLockRecord extends BasicLockRecord {
     /**
      * Call to getValue with default value of 10 for retry time.
      */
-    public int getValue() {
+    public int getValue()
+    {
         return getValue(1);
     }
 
-    public int getValue(int retry) {
+    public int getValue(int retry)
+    {
         return getValue(retry, 10);
     }
 
-    public int getValue(int retry, int wait_time) {
+    public int getValue(int retry, int wait_time)
+    {
         int return_value = 0;
 
         AtomicAction a = new AtomicAction();
         a.begin();
-        try {
+        try
+        {
             int locking_result = LockResult.REFUSED;
             int locking_attempt_count = 0;
 
-            do {
+            do
+            {
                 locking_result = setlock(new Lock(LockMode.READ), retry, wait_time);
 
-                if (locking_result == LockResult.GRANTED) {
+                if (locking_result == LockResult.GRANTED)
+                {
                     return_value = mValue;
-                } else {
+                }
+                else
+                {
                     locking_attempt_count++;
                 }
-            } while ((locking_result != LockResult.GRANTED) && (locking_attempt_count < mLimit));
+            }
+            while ((locking_result != LockResult.GRANTED) && (locking_attempt_count < mLimit));
 
-            if (locking_result != LockResult.GRANTED) {
+            if (locking_result != LockResult.GRANTED)
+            {
                 qautil.qadebug("trying to get lock for " + mLimit + "th time");
             }
 
             a.commit();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             a.abort();
             qautil.debug("exception in get method ", e);
         }
@@ -150,34 +181,44 @@ public class TXBasicLockRecord extends BasicLockRecord {
     /**
      * Method used to check for any memory leaks.
      */
-    public int getMemory() {
+    public int getMemory()
+    {
         return (int) JVMStats.getMemory();
     }
 
-    public boolean save_state(OutputObjectState objectState, int objectType) {
+    public boolean save_state(OutputObjectState objectState, int objectType)
+    {
         super.save_state(objectState, objectType);
-        try {
+        try
+        {
             objectState.packInt(mValue);
             return true;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             qautil.debug("TXBasicLockRecord.save_state: ", exception);
             return false;
         }
     }
 
-    public boolean restore_state(InputObjectState objectState, int objectType) {
+    public boolean restore_state(InputObjectState objectState, int objectType)
+    {
         qautil.qadebug("restore state of " + this + " = " + mValue);
         super.restore_state(objectState, objectType);
-        try {
+        try
+        {
             mValue = objectState.unpackInt();
             return true;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             qautil.debug("TXBasicLockRecord.restore_state: ", exception);
             return false;
         }
     }
 
-    public String type() {
+    public String type()
+    {
         return "/StateManager/LockManager/TXBasicLockRecord";
     }
 
@@ -185,3 +226,4 @@ public class TXBasicLockRecord extends BasicLockRecord {
     private int mLimit = 1000;
     private int mId = 0;
 }
+

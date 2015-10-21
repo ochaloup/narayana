@@ -30,19 +30,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @deprecated The TXFramework API will be removed. The
- *             org.jboss.narayana.compensations API should be used instead. The
- *             new API is superior for these reasons:
- *             <p/>
- *             i) offers a higher level API; ii) The API very closely matches
- *             that of JTA, making it easier for developers to learn, iii) It
- *             works for non-distributed transactions as well as distributed
- *             transactions. iv) It is CDI based so only needs a CDI container
- *             to run, rather than a full Java EE server.
- *             <p/>
- *             Class level annotation used to declare that a participant service
- *             will participate in lifecycle processing for WSBA business
- *             activity transactions.
+ * @deprecated The TXFramework API will be removed. The org.jboss.narayana.compensations API should be used instead.
+ * The new API is superior for these reasons:
+ * <p/>
+ * i) offers a higher level API;
+ * ii) The API very closely matches that of JTA, making it easier for developers to learn,
+ * iii) It works for non-distributed transactions as well as distributed transactions.
+ * iv) It is CDI based so only needs a CDI container to run, rather than a full Java EE server.
+ * <p/>
+ * Class level annotation used to declare that  a participant service will participate in lifecycle
+ * processing for WSBA business activity transactions.
  */
 @Deprecated
 @Retention(RetentionPolicy.RUNTIME)
@@ -50,8 +47,7 @@ import java.lang.annotation.Target;
 public @interface Compensatable {
 
     /**
-     * the specific WSBA completion protocol which should be used for a WSBA
-     * service participant
+     * the specific WSBA completion protocol which should be used for a WSBA service participant
      *
      * @return the type of completion to execute (coordinator or participant)
      */

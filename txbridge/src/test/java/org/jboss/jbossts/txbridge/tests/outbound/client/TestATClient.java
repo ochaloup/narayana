@@ -82,18 +82,16 @@ public class TestATClient extends HttpServlet {
             Context ic = new InitialContext();
             userTransaction = (UserTransaction) ic.lookup("java:comp/UserTransaction");
 
-            wsatServiceWsdlLocation = new URL(
-                    "http://" + getLocalHost() + ":8080/txbridge-outbound-tests-service/TestATServiceImpl?wsdl");
-            simpleServiceWsdlLocation = new URL(
-                    "http://" + getLocalHost() + ":8080/txbridge-outbound-tests-service/TestNonATServiceImpl?wsdl");
+            wsatServiceWsdlLocation = new URL("http://" + getLocalHost()
+                    + ":8080/txbridge-outbound-tests-service/TestATServiceImpl?wsdl");
+            simpleServiceWsdlLocation = new URL("http://" + getLocalHost()
+                    + ":8080/txbridge-outbound-tests-service/TestNonATServiceImpl?wsdl");
         } catch (Exception e) {
             throw new ServletException(e);
         }
 
-        wsatServiceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/",
-                "TestATServiceImplService");
-        simpleServiceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/",
-                "TestNonATServiceImplService");
+        wsatServiceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/", "TestATServiceImplService");
+        simpleServiceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/", "TestNonATServiceImplService");
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -115,9 +113,8 @@ public class TestATClient extends HttpServlet {
     }
 
     /**
-     * NOTE: explicit checking of the client type is needed, because manually
-     * added handlers require active transaction in order to make successful web
-     * service call.
+     * NOTE: explicit checking of the client type is needed, because manually added handlers require active transaction in order
+     * to make successful web service call.
      *
      * @param service
      * @param isTransaction
@@ -166,26 +163,26 @@ public class TestATClient extends HttpServlet {
         return invocations;
     }
 
-    private CommonTestService getServiceByClientType(int type, boolean isWSATService,
-            boolean isJTAOverWSATFeatureEnabled, boolean isWSTXFeatureEnabled) {
+    private CommonTestService getServiceByClientType(int type, boolean isWSATService, boolean isJTAOverWSATFeatureEnabled,
+            boolean isWSTXFeatureEnabled) {
 
         switch (type) {
-            case CLIENT_WITHOUT_FEATURES :
+            case CLIENT_WITHOUT_FEATURES:
                 return getServiceWithoutFeatures(isWSATService);
 
-            case CLIENT_WITH_JTA_FEATURE :
+            case CLIENT_WITH_JTA_FEATURE:
                 return getServiceWithJTAOverWSATFeature(isWSATService, isJTAOverWSATFeatureEnabled);
 
-            case CLIENT_WITH_WSTX_FEATURE :
+            case CLIENT_WITH_WSTX_FEATURE:
                 return null;
 
-            case CLIENT_WITH_BOTH_FEATURES :
+            case CLIENT_WITH_BOTH_FEATURES:
                 return getServiceWithBothFeatures(isWSATService, isJTAOverWSATFeatureEnabled, isWSTXFeatureEnabled);
 
-            case CLIENT_WITH_MANUAL_HANDLERS :
+            case CLIENT_WITH_MANUAL_HANDLERS:
                 return getServiceWithManualHandlers(isWSATService);
 
-            default :
+            default:
                 throw new RuntimeException("Invalid client type");
         }
     }
@@ -204,8 +201,7 @@ public class TestATClient extends HttpServlet {
         return testService;
     }
 
-    private CommonTestService getServiceWithJTAOverWSATFeature(boolean isWSATService,
-            boolean isJTAOverWSATFeatureEnabled) {
+    private CommonTestService getServiceWithJTAOverWSATFeature(boolean isWSATService, boolean isJTAOverWSATFeatureEnabled) {
         CommonTestService testService;
 
         if (isWSATService) {

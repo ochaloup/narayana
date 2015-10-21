@@ -40,16 +40,19 @@ import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 import com.hp.mwtests.ts.txoj.common.resources.RecoverableObject;
 
-public class PerformanceTest2 extends PerformanceTestBase {
+public class PerformanceTest2 extends PerformanceTestBase
+{
     @Test
-    public void recoverableTest() {
+    public void recoverableTest()
+    {
         long iters = 1000;
 
         RecoverableObject foo = new RecoverableObject();
         AtomicAction A = null;
         long t1 = System.currentTimeMillis();
 
-        for (int c = 0; c < iters; c++) {
+        for (int c = 0; c < iters; c++)
+        {
             A = new AtomicAction();
 
             A.begin();
@@ -63,15 +66,18 @@ public class PerformanceTest2 extends PerformanceTestBase {
     }
 
     @Test
-    public void persistentTest() {
+    public void persistentTest()
+    {
         long iters = 1000;
 
         AtomicObject foo = new AtomicObject();
         AtomicAction A = null;
         long t1 = System.currentTimeMillis();
 
-        try {
-            for (int c = 0; c < iters; c++) {
+        try
+        {
+            for (int c = 0; c < iters; c++)
+            {
                 A = new AtomicAction();
 
                 A.begin();
@@ -80,7 +86,9 @@ public class PerformanceTest2 extends PerformanceTestBase {
 
                 A.commit();
             }
-        } catch (TestException e) {
+        }
+        catch (TestException e)
+        {
             if (A != null)
                 A.abort();
 

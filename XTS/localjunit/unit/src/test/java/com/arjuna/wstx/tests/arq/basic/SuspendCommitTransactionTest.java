@@ -21,7 +21,9 @@ public class SuspendCommitTransactionTest {
     }
 
     @Test
-    public void testSuspendCommitTransaction() throws Exception {
+    public void testSuspendCommitTransaction()
+            throws Exception
+            {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
 
@@ -30,19 +32,21 @@ public class SuspendCommitTransactionTest {
         try {
             TxContext ctx = tm.suspend();
 
-            System.out.println("Suspended: " + ctx);
-        } catch (Exception eouter) {
+            System.out.println("Suspended: "+ctx);
+        }  catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch (Exception einner) {
+            } catch(Exception einner) {
             }
             throw eouter;
         }
 
         try {
             ut.commit();
-        } catch (WrongStateException ex) {
+        }
+        catch (WrongStateException ex)
+        {
             // we should arrive here
         }
-    }
+            }
 }

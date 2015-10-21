@@ -47,170 +47,194 @@ import com.arjuna.ats.jts.logging.jtsLogger;
 import com.arjuna.ats.jts.utils.Utility;
 
 /**
- * This class is a plug-in module for the recovery manager. This is a generic
- * class from which TopLevel and Server transaction recovery modules inherit.
+ * This class is a plug-in module for the recovery manager.  This is a
+ * generic class from which TopLevel and Server transaction recovery
+ * modules inherit.
  *
  * This class does not implement {@link com.arjuna.CosRecovery.RecoveryModule}
  * (the plug-in definition) itself - this is left to the subclass.
  *
  */
-public abstract class TransactionRecoveryModule {
-    public TransactionRecoveryModule() {
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("TransactionRecoveryModule created");
-        }
+public abstract class TransactionRecoveryModule
+{
+    public TransactionRecoveryModule ()
+    {
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("TransactionRecoveryModule created");
+    }
 
-        if (_recoveryStore == null) {
-            _recoveryStore = StoreManager.getRecoveryStore();
-        }
+    if (_recoveryStore == null)
+    {
+        _recoveryStore = StoreManager.getRecoveryStore();
+    }
     }
 
     /**
      * This is called periodically by the RecoveryManager
      */
-    protected void periodicWorkFirstPass() {
+    protected void periodicWorkFirstPass ()
+    {
         jtsLogger.i18NLogger.info_recovery_transactions_TransactionRecoveryModule_11();
-        // Sanity check - make sure we know what type of transaction we're
-        // looking for
-        if (_transactionType == null) {
-            jtsLogger.i18NLogger.warn_recovery_transactions_TransactionRecoveryModule_2();
-            return;
+    // Sanity check - make sure we know what type of transaction we're looking for
+    if (_transactionType == null) {
+        jtsLogger.i18NLogger.warn_recovery_transactions_TransactionRecoveryModule_2();
+        return;
+    }
+
+    // Build a Vector of transaction Uids found in the ObjectStore
+    _transactionUidVector = new Vector();
+    InputObjectState uids = new InputObjectState();
+
+    boolean anyTransactions = false;
+
+    try
+    {
+        if (jtsLogger.logger.isDebugEnabled()) {
+            jtsLogger.logger.debug("TransactionRecoveryModule: scanning for "+_transactionType);
         }
 
-        // Build a Vector of transaction Uids found in the ObjectStore
-        _transactionUidVector = new Vector();
-        InputObjectState uids = new InputObjectState();
+        anyTransactions = _recoveryStore.allObjUids(_transactionType, uids);
+    }
+    catch (ObjectStoreException e1)
+    {
+        jtsLogger.i18NLogger.warn_recovery_transactions_TransactionRecoveryModule_4(e1);
+    }
 
-        boolean anyTransactions = false;
+    if (anyTransactions)
+    {
+        Uid theUid = null;
 
-        try {
+        boolean moreUids = true;
+
+        while (moreUids)
+        {
+        try
+        {
+            theUid = UidHelper.unpackFrom(uids);
+
+            if (theUid.equals(Uid.nullUid()))
+            {
+            moreUids = false;
+            }
+            else
+            {
+            Uid newUid = new Uid (theUid);
+
             if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("TransactionRecoveryModule: scanning for " + _transactionType);
+                jtsLogger.logger.debug("found transaction "+newUid);
             }
-
-            anyTransactions = _recoveryStore.allObjUids(_transactionType, uids);
-        } catch (ObjectStoreException e1) {
-            jtsLogger.i18NLogger.warn_recovery_transactions_TransactionRecoveryModule_4(e1);
-        }
-
-        if (anyTransactions) {
-            Uid theUid = null;
-
-            boolean moreUids = true;
-
-            while (moreUids) {
-                try {
-                    theUid = UidHelper.unpackFrom(uids);
-
-                    if (theUid.equals(Uid.nullUid())) {
-                        moreUids = false;
-                    } else {
-                        Uid newUid = new Uid(theUid);
-
-                        if (jtsLogger.logger.isDebugEnabled()) {
-                            jtsLogger.logger.debug("found transaction " + newUid);
-                        }
-                        _transactionUidVector.addElement(newUid);
-                    }
-                } catch (Exception e2) {
-                    moreUids = false;
-                }
+            _transactionUidVector.addElement(newUid);
             }
         }
+        catch (Exception e2)
+        {
+            moreUids = false;
+        }
+        }
+    }
     }
 
     /*
-     * We may have caught some transactions in flight that are going to complete
-     * normally. We'll wait a short time before rechecking if they are still
-     * around. If so, we process them.
+     * We may have caught some transactions in flight that are
+     * going to complete normally. We'll wait a short time
+     * before rechecking if they are still around. If so, we
+     * process them.
      */
 
-    protected void periodicWorkSecondPass() {
+    protected void periodicWorkSecondPass ()
+    {
         jtsLogger.i18NLogger.info_recovery_transactions_TransactionRecoveryModule_12();
 
-        // Process the Vector of transaction Uids
-        Enumeration transactionUidEnum = _transactionUidVector.elements();
-        while (transactionUidEnum.hasMoreElements()) {
-            Uid currentUid = (Uid) transactionUidEnum.nextElement();
+    // Process the Vector of transaction Uids
+    Enumeration transactionUidEnum = _transactionUidVector.elements();
+    while (transactionUidEnum.hasMoreElements())
+    {
+        Uid currentUid = (Uid) transactionUidEnum.nextElement();
 
-            try {
-                // Is the intentions list still there? Is this the best way to
-                // check?
-                if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
-                    jtsLogger.i18NLogger.info_recovery_transactions_TransactionRecoveryModule_6(currentUid);
+        try
+        {
+        // Is the intentions list still there? Is this the best way to check?
+        if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN)
+        {
+            jtsLogger.i18NLogger.info_recovery_transactions_TransactionRecoveryModule_6(currentUid);
 
-                    recoverTransaction(currentUid);
-                } else {
-                    // Transaction has gone away - probably completed normally
-                    if (jtsLogger.logger.isDebugEnabled()) {
-                        jtsLogger.logger.debug("Transaction " + currentUid + " in state unknown (?)");
-                    }
-                }
-            } catch (ObjectStoreException e4) {
-                // Transaction has gone away - probably completed normally
-
-                if (jtsLogger.logger.isDebugEnabled()) {
-                    jtsLogger.logger.debug("Transaction " + currentUid + " is not in object store - assumed completed");
-                }
+            recoverTransaction(currentUid);
+        } else {
+            // Transaction has gone away - probably completed normally
+            if (jtsLogger.logger.isDebugEnabled()) {
+                jtsLogger.logger.debug("Transaction "+currentUid+" in state unknown (?)");
             }
         }
+        }
+        catch (ObjectStoreException e4)
+        {
+        // Transaction has gone away - probably completed normally
+    
+        if (jtsLogger.logger.isDebugEnabled()) {
+            jtsLogger.logger.debug("Transaction "+currentUid+" is not in object store - assumed completed");
+        }
+        }
+    }
     }
 
     /**
      * Set-up routine
      */
-    protected void initialise() {
+    protected void initialise ()
+    {
 
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("TransactionRecoveryModule.initialise()");
-        }
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("TransactionRecoveryModule.initialise()");
+    }
     }
 
-    private void recoverTransaction(Uid tranUid)
-    // protected void recoverTransaction (Uid tranUid)
+    private void recoverTransaction (Uid tranUid)
+    //protected void recoverTransaction (Uid tranUid)
+    {
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("TransactionRecoveryModule.recoverTransaction(" + tranUid + ")");
+    }
+    
+    Status currentStatus = Status.StatusUnknown;
+
+    CachedRecoveredTransaction cachedRecoveredTransaction = new CachedRecoveredTransaction (tranUid, _transactionType);
+
+    currentStatus = cachedRecoveredTransaction.get_status();
+
+    if (jtsLogger.logger.isDebugEnabled()) {
+        jtsLogger.logger.debug("Activated transaction "+tranUid+" status = "+Utility.stringStatus(currentStatus));
+    }
+
+    // but first check that the original transaction isn't in mid-flight
+    if ( cachedRecoveredTransaction.originalBusy() ) 
     {
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("TransactionRecoveryModule.recoverTransaction(" + tranUid + ")");
+            jtsLogger.logger.debug("Transaction "+tranUid+" still busy");
         }
-
-        Status currentStatus = Status.StatusUnknown;
-
-        CachedRecoveredTransaction cachedRecoveredTransaction = new CachedRecoveredTransaction(tranUid,
-                _transactionType);
-
-        currentStatus = cachedRecoveredTransaction.get_status();
-
-        if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger
-                    .debug("Activated transaction " + tranUid + " status = " + Utility.stringStatus(currentStatus));
-        }
-
-        // but first check that the original transaction isn't in mid-flight
-        if (cachedRecoveredTransaction.originalBusy()) {
-            if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("Transaction " + tranUid + " still busy");
-            }
-            return;
-        }
-
-        cachedRecoveredTransaction.replayPhase2();
-        cachedRecoveredTransaction = null;
+        return;
+    }
+        
+    cachedRecoveredTransaction.replayPhase2();
+    cachedRecoveredTransaction = null;
     }
 
-    protected String _transactionType = null;
-    // private static ObjectStore _recoveryStore = null;
+    protected String       _transactionType = null;
+    //private static ObjectStore _recoveryStore = null;
 
-    // private Vector _transactionUidVector;
+    //private Vector         _transactionUidVector;
 
     protected static RecoveryStore _recoveryStore = null;
 
-    protected Vector _transactionUidVector;
+    protected Vector         _transactionUidVector;
+
 
     /*
      * Read the properties to set the configurable options
      */
-    static {
-        // TBD: Inventory.inventory().addToList(new
-        // OTS_RecoveryResourceRecordSetup());
+    static
+    {
+     // TBD: Inventory.inventory().addToList(new OTS_RecoveryResourceRecordSetup());
     }
 };
+
+

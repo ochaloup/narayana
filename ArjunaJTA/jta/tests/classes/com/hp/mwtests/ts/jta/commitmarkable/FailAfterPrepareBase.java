@@ -52,7 +52,8 @@ public class FailAfterPrepareBase extends TestCommitMarkableResourceBase {
 
     protected Uid generateCMRRecord(final DataSource dataSource) throws Exception {
 
-        ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+        ((JdbcDataSource) dataSource)
+                .setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
 
         // Test code
         Utils.createTables(dataSource.getConnection());
@@ -72,14 +73,14 @@ public class FailAfterPrepareBase extends TestCommitMarkableResourceBase {
                 if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                     recoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
                 } else if (m instanceof XARecoveryModule) {
-                    XARecoveryModule xarm = (XARecoveryModule) m;
+                    XARecoveryModule  xarm = (XARecoveryModule) m;
                     xarm.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
                         public boolean initialise(String p) throws Exception {
                             return true;
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[]{xaResource};
+                            return new XAResource[] {xaResource};
                         }
                     });
                 }
@@ -101,14 +102,16 @@ public class FailAfterPrepareBase extends TestCommitMarkableResourceBase {
 
                     Connection localJDBCConnection = dataSource.getConnection();
                     localJDBCConnection.setAutoCommit(false);
-                    nonXAResource = new JDBCConnectableResource(localJDBCConnection);
+                    nonXAResource = new JDBCConnectableResource(
+                            localJDBCConnection);
                     tm.getTransaction().enlistResource(nonXAResource);
 
                     xaResource = new SimpleXAResource();
                     tm.getTransaction().enlistResource(xaResource);
 
-                    localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
-                    uids[0] = ((TransactionImple) tm.getTransaction()).get_uid();
+                    localJDBCConnection.createStatement().execute(
+                            "INSERT INTO foo (bar) VALUES (1)");
+                    uids[0] = ((TransactionImple)tm.getTransaction()).get_uid();
                     tm.commit();
                 } catch (ExecuteException t) {
                 } catch (Exception t) {
@@ -137,7 +140,8 @@ public class FailAfterPrepareBase extends TestCommitMarkableResourceBase {
 
         // Now we need to correctly complete the transaction
         manager.scan();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
+                committed));
         // Now we need to correctly complete the transaction
         manager.scan();
 

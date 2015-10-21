@@ -69,7 +69,7 @@ import com.arjuna.ats.jts.utils.Utility;
  * instances of this class to drive the server-side protocol.
  * 
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ServerTransaction.java 2342 2006-03-30 13:06:17Z $
+ * @version $Id: ServerTransaction.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
  */
 
@@ -78,18 +78,24 @@ import com.arjuna.ats.jts.utils.Utility;
  * should be assigned to at most one resource.
  */
 
-public class ServerTransaction extends ArjunaTransactionImple {
+public class ServerTransaction extends ArjunaTransactionImple
+{
 
-    public ServerTransaction(Uid actUid, Control myParent) {
+    public ServerTransaction (Uid actUid, Control myParent)
+    {
         this(actUid, myParent, null);
     }
 
-    public ServerTransaction(Uid actUid, Control myParent, ArjunaTransactionImple parentImpl) {
+    public ServerTransaction (Uid actUid, Control myParent, ArjunaTransactionImple parentImpl)
+    {
         super(actUid, myParent, parentImpl);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( " + actUid + ", Control myParent, "
-                    + ((parentImpl != null) ? parentImpl.get_uid() : Uid.nullUid()) + " )");
+            jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( "
+                    + actUid
+                    + ", Control myParent, "
+                    + ((parentImpl != null) ? parentImpl.get_uid()
+                    : Uid.nullUid()) + " )");
         }
 
         _savingUid = new Uid();
@@ -100,14 +106,17 @@ public class ServerTransaction extends ArjunaTransactionImple {
     }
 
     @Override
-    public void finalize() {
+    public void finalize ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction.finalize ( " + get_uid() + " )");
+            jtsLogger.logger.trace("ServerTransaction.finalize ( "
+                    + get_uid() + " )");
         }
 
         _savingUid = null;
 
-        if (_sync != null) {
+        if (_sync != null)
+        {
             _sync.destroy();
             _sync = null;
         }
@@ -121,17 +130,21 @@ public class ServerTransaction extends ArjunaTransactionImple {
         super.finalizeInternal();
     }
 
-    public String type() {
+    public String type ()
+    {
         return typeName();
     }
 
-    public Uid getSavingUid() {
+    public Uid getSavingUid ()
+    {
         return _savingUid;
     }
 
-    public final int doPrepare() {
+    public final int doPrepare ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction::doPrepare ( " + get_uid() + " )");
+            jtsLogger.logger.trace("ServerTransaction::doPrepare ( "
+                    + get_uid() + " )");
         }
 
         /*
@@ -140,8 +153,9 @@ public class ServerTransaction extends ArjunaTransactionImple {
 
         org.omg.CosTransactions.Status s = get_status();
 
-        if ((s != org.omg.CosTransactions.Status.StatusActive)
-                && (s != org.omg.CosTransactions.Status.StatusMarkedRollback)) {
+        if ((s != org.omg.CosTransactions.Status.StatusActive) &&
+                (s != org.omg.CosTransactions.Status.StatusMarkedRollback))
+        {
             return TwoPhaseOutcome.INVALID_TRANSACTION;
         }
 
@@ -152,34 +166,38 @@ public class ServerTransaction extends ArjunaTransactionImple {
          * before_completions will not have been called yet. So, do it now.
          */
 
-        if (!_interposedSynch) {
-            if ((s != org.omg.CosTransactions.Status.StatusMarkedRollback)
-                    || TxControl.isBeforeCompletionWhenRollbackOnly()) {
-                try {
-                    doBeforeCompletion();
-                } catch (Exception e) {
-                    /*
-                     * Transaction will have been put into a state which forces
-                     * it to rollback, so do nothing here.
-                     */
-                }
+        if (!_interposedSynch)
+        {
+            if ((s != org.omg.CosTransactions.Status.StatusMarkedRollback) || TxControl.isBeforeCompletionWhenRollbackOnly())
+            {
+            try
+            {
+                doBeforeCompletion();
+            }
+            catch (Exception e)
+            {
+                /*
+                 * Transaction will have been put into a state which forces it
+                 * to rollback, so do nothing here.
+                 */
+            }            
             }
         }
 
         if (!_beforeCompleted && (_sync != null)) {
             /*
-             * Synchronizations should have been called by now if we have them!
-             */
+                * Synchronizations should have been called by now if we have them!
+                */
 
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_syncerror("ServerTransaction.doPrepare");
 
             /*
-             * Prevent commit!
-             */
+                * Prevent commit!
+                */
 
             super.preventCommit();
         }
-
+                  
         int res = super.prepare(true);
 
         /*
@@ -190,20 +208,24 @@ public class ServerTransaction extends ArjunaTransactionImple {
          * protocol completes.
          */
 
-        if (res == TwoPhaseOutcome.PREPARE_READONLY) {
+        if (res == TwoPhaseOutcome.PREPARE_READONLY)
+        {
             doPhase2Commit();
         }
 
         return res;
     }
 
-    public final void doForget() {
+    public final void doForget ()
+    {
         super.destroyAction();
     }
 
-    public final int doPhase2Commit() {
+    public final int doPhase2Commit ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction::doPhase2Commit ( " + get_uid() + " )");
+            jtsLogger.logger.trace("ServerTransaction::doPhase2Commit ( "
+                    + get_uid() + " )");
         }
 
         /*
@@ -213,8 +235,7 @@ public class ServerTransaction extends ArjunaTransactionImple {
         org.omg.CosTransactions.Status s = get_status();
 
         if (s != org.omg.CosTransactions.Status.StatusPrepared) {
-            jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_txnotprepared(
-                    "ServerTransaction.doPhase2Commit", Utility.stringStatus(s));
+            jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_txnotprepared("ServerTransaction.doPhase2Commit", Utility.stringStatus(s));
 
             return finalStatus();
         }
@@ -225,9 +246,12 @@ public class ServerTransaction extends ArjunaTransactionImple {
          * Now do after completion stuff.
          */
 
-        try {
+        try
+        {
             doAfterCompletion(get_status());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
         }
 
         if (parentTransaction != null)
@@ -240,49 +264,56 @@ public class ServerTransaction extends ArjunaTransactionImple {
         return finalStatus();
     }
 
-    public final int doPhase2Abort() {
+    public final int doPhase2Abort ()
+    {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction::doPhase2Abort ( " + get_uid() + " )");
+            jtsLogger.logger.trace("ServerTransaction::doPhase2Abort ( "
+                    + get_uid() + " )");
         }
 
         /*
          * If the transaction has already terminated, then return the status. If
-         * there hasn't been a heuristic outcome then we try to massage the
-         * result to be consistent with what the caller expects: the fact that
-         * the transaction is marked as committed during prepare without any
-         * problems means that the intentions lists are zero so it's fine to say
-         * that it aborted instead.
+         * there hasn't been a heuristic outcome then we try to massage the result
+         * to be consistent with what the caller expects: the fact that the
+         * transaction is marked as committed during prepare without any problems means
+         * that the intentions lists are zero so it's fine to say that it aborted instead.
          */
 
         org.omg.CosTransactions.Status s = get_status();
 
         if ((s == org.omg.CosTransactions.Status.StatusCommitted)
-                || (s == org.omg.CosTransactions.Status.StatusRolledBack)) {
+                || (s == org.omg.CosTransactions.Status.StatusRolledBack))
+        {
             int status = finalStatus();
-
-            switch (status) {
-                case ActionStatus.COMMITTED :
-                case ActionStatus.COMMITTING :
-                case ActionStatus.ABORTED :
-                case ActionStatus.ABORTING :
-                    return ActionStatus.ABORTED;
-                default :
-                    return status;
+            
+            switch (status)
+            {
+            case ActionStatus.COMMITTED:
+            case ActionStatus.COMMITTING:
+            case ActionStatus.ABORTED:
+            case ActionStatus.ABORTING:
+                return ActionStatus.ABORTED;
+            default:
+                return status;
             }
         }
 
         super.phase2Abort(true);
-
+        
         /*
          * Now do after completion stuff.
          */
 
-        try {
+        try
+        {
             doAfterCompletion(get_status());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
         }
 
-        if (parentTransaction != null) {
+        if (parentTransaction != null)
+        {
             parentTransaction.removeChildAction(this);
         }
 
@@ -297,30 +328,37 @@ public class ServerTransaction extends ArjunaTransactionImple {
      * Called for one-phase commit.
      */
 
-    public void doCommit(boolean report_heuristics) throws HeuristicHazard, SystemException {
+    public void doCommit (boolean report_heuristics) throws HeuristicHazard,
+            SystemException
+    {
         int outcome = super.status();
 
-        if ((outcome == ActionStatus.RUNNING) || (outcome == ActionStatus.ABORT_ONLY)) // have
-                                                                                        // we
-                                                                                        // already
-                                                                                        // been
-                                                                                        // committed?
+        if ((outcome == ActionStatus.RUNNING)
+                || (outcome == ActionStatus.ABORT_ONLY)) // have we already been
+                                                         // committed?
         {
-            if (!_interposedSynch) {
-                if ((outcome != ActionStatus.ABORT_ONLY) || TxControl.isBeforeCompletionWhenRollbackOnly()) {
-                    try {
-                        doBeforeCompletion();
-                    } catch (Exception e) {
-                        /*
-                         * Transaction will have been put into a state which
-                         * forces it to rollback, so do nothing here.
-                         */
-                    }
+            if (!_interposedSynch)
+            {
+                if ((outcome != ActionStatus.ABORT_ONLY) || TxControl.isBeforeCompletionWhenRollbackOnly())
+                {
+                try
+                {
+                    doBeforeCompletion();
+                }
+                catch (Exception e)
+                {
+                    /*
+                     * Transaction will have been put into a state which forces
+                     * it to rollback, so do nothing here.
+                     */
+                }            
                 }
             }
 
             outcome = super.End(report_heuristics);
-        } else {
+        }
+        else
+        {
             /*
              * Differentiate between us committing the transaction and some
              * other thread doing it.
@@ -329,16 +367,20 @@ public class ServerTransaction extends ArjunaTransactionImple {
             if (parentTransaction != null)
                 parentTransaction.removeChildAction(this);
 
-            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION, CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION,
+                    CompletionStatus.COMPLETED_NO);
         }
 
         /*
          * Now do after completion stuff.
          */
 
-        try {
+        try
+        {
             doAfterCompletion(get_status());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
         }
 
         if (parentTransaction != null)
@@ -346,22 +388,25 @@ public class ServerTransaction extends ArjunaTransactionImple {
 
         super.destroyAction();
 
-        switch (outcome) {
-            case ActionStatus.COMMITTED :
-            case ActionStatus.H_COMMIT :
-            case ActionStatus.COMMITTING : // in case asynchronous commit!
-                return;
-            case ActionStatus.ABORTING :
-            case ActionStatus.ABORTED :
-            case ActionStatus.H_ROLLBACK :
-                throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT, CompletionStatus.COMPLETED_NO);
-            case ActionStatus.H_HAZARD :
-            default :
-                throw new HeuristicHazard();
+        switch (outcome)
+        {
+        case ActionStatus.COMMITTED:
+        case ActionStatus.H_COMMIT:
+        case ActionStatus.COMMITTING: // in case asynchronous commit!
+            return;
+        case ActionStatus.ABORTING:
+        case ActionStatus.ABORTED:
+        case ActionStatus.H_ROLLBACK:
+            throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT,
+                    CompletionStatus.COMPLETED_NO);
+        case ActionStatus.H_HAZARD:
+        default:
+            throw new HeuristicHazard();
         }
     }
 
-    public void rollback() throws SystemException {
+    public void rollback () throws SystemException
+    {
         super.rollback();
     }
 
@@ -389,19 +434,24 @@ public class ServerTransaction extends ArjunaTransactionImple {
      * call to after_completion.
      */
 
-    public synchronized void register_synchronization(Synchronization theSync)
-            throws Inactive, SynchronizationUnavailable, SystemException {
+    public synchronized void register_synchronization (Synchronization theSync)
+            throws Inactive, SynchronizationUnavailable, SystemException
+    {
         if (!is_top_level_transaction()) // are we a top-level transaction?
         {
             throw new SynchronizationUnavailable();
-        } else {
+        }
+        else
+        {
             /*
              * If we support interposed synchronizations then add one now,
              * otherwise just add all synchronizations locally.
              */
 
-            if (_interposedSynch) {
-                if (_sync == null) {
+            if (_interposedSynch)
+            {
+                if (_sync == null)
+                {
                     _sync = new ServerSynchronization(this);
 
                     Coordinator realCoord = null;
@@ -410,27 +460,42 @@ public class ServerTransaction extends ArjunaTransactionImple {
                      * First register interposed-synchronization.
                      */
 
-                    try {
+                    try
+                    {
                         ServerControl control = (ServerControl) super.controlHandle;
 
-                        if (controlHandle != null) {
+                        if (controlHandle != null)
+                        {
                             realCoord = control.originalCoordinator();
 
-                            if (realCoord != null) {
+                            if (realCoord != null)
+                            {
                                 realCoord.register_synchronization(_sync.getSynchronization());
-                            } else
-                                throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION, CompletionStatus.COMPLETED_NO);
-                        } else
-                            throw new BAD_OPERATION(ExceptionCodes.NO_TRANSACTION, CompletionStatus.COMPLETED_NO);
-                    } catch (Inactive e1) {
+                            }
+                            else
+                                throw new BAD_OPERATION(
+                                        ExceptionCodes.NO_TRANSACTION,
+                                        CompletionStatus.COMPLETED_NO);
+                        }
+                        else
+                            throw new BAD_OPERATION(
+                                    ExceptionCodes.NO_TRANSACTION,
+                                    CompletionStatus.COMPLETED_NO);
+                    }
+                    catch (Inactive e1)
+                    {
                         realCoord = null;
 
                         throw e1;
-                    } catch (SynchronizationUnavailable e2) {
+                    }
+                    catch (SynchronizationUnavailable e2)
+                    {
                         realCoord = null;
 
                         throw e2;
-                    } catch (SystemException e3) {
+                    }
+                    catch (SystemException e3)
+                    {
                         realCoord = null;
 
                         throw e3;
@@ -453,23 +518,29 @@ public class ServerTransaction extends ArjunaTransactionImple {
      * ArjunaTransactionImple available to ServerSynchronization.
      */
 
-    public void doBeforeCompletion() throws SystemException {
-        if (!_beforeCompleted) {
-            _beforeCompleted = true;
+    public void doBeforeCompletion () throws SystemException
+    {
+        if (!_beforeCompleted)
+        {
+        _beforeCompleted = true;
 
-            super.doBeforeCompletion();
+        super.doBeforeCompletion();
         }
     }
 
-    public void doAfterCompletion(org.omg.CosTransactions.Status s) throws SystemException {
+    public void doAfterCompletion (org.omg.CosTransactions.Status s)
+            throws SystemException
+    {
         super.doAfterCompletion(s);
     }
 
-    public static String typeName() {
+    public static String typeName ()
+    {
         return "/StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/ServerTransaction";
     }
 
-    public final synchronized void setRecoveryCoordinator(RecoveryCoordinator recCoord) {
+    public final synchronized void setRecoveryCoordinator (RecoveryCoordinator recCoord)
+    {
         _recoveryCoordinator = recCoord;
     }
 
@@ -478,50 +549,64 @@ public class ServerTransaction extends ArjunaTransactionImple {
      * coordinator reference, so save it away.
      */
 
-    public boolean save_state(OutputObjectState os, int ot) {
-        try {
-            if (_recoveryCoordinator != null) {
+    public boolean save_state (OutputObjectState os, int ot)
+    {
+        try
+        {
+            if (_recoveryCoordinator != null)
+            {
                 os.packBoolean(true);
                 os.packString(ORBManager.getORB().orb().object_to_string(_recoveryCoordinator));
-            } else
+            }
+            else
                 os.packBoolean(false);
 
             return super.save_state(os, ot);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.save_state", e);
         }
 
         return false;
     }
 
-    public boolean restore_state(InputObjectState os, int ot) {
-        try {
+    public boolean restore_state (InputObjectState os, int ot)
+    {
+        try
+        {
             boolean haveRecCoord = os.unpackBoolean();
 
-            if (haveRecCoord) {
-                try {
+            if (haveRecCoord)
+            {
+                try
+                {
                     String ior = os.unpackString();
                     org.omg.CORBA.Object objRef = ORBManager.getORB().orb().string_to_object(ior);
                     _recoveryCoordinator = RecoveryCoordinatorHelper.narrow(objRef);
-                } catch (Exception e) {
-                    jtsLogger.i18NLogger
-                            .warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state", e);
+                }
+                catch (Exception e)
+                {
+                    jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state", e);
 
                     return false;
                 }
-            } else
+            }
+            else
                 _recoveryCoordinator = null;
 
             return super.restore_state(os, ot);
-        } catch (IOException ex) {
-            jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state",
-                    ex);
+        }
+        catch (IOException ex)
+        {
+            jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state", ex);
         }
 
         return false;
     }
 
-    public String toString() {
+    public String toString ()
+    {
         return "ServerTransaction < " + get_uid() + " >";
     }
 
@@ -530,15 +615,17 @@ public class ServerTransaction extends ArjunaTransactionImple {
      * this transaction's log is stored in. It is not the identity of the
      * transaction!
      * 
-     * Therefore you may pass nullUid to the base transaction and rely on
-     * activating the transaction state to set up the transaction id.
+     * Therefore you may pass nullUid to the base transaction and rely on activating the
+     * transaction state to set up the transaction id.
      */
 
-    protected ServerTransaction(Uid recoveringActUid) {
+    protected ServerTransaction (Uid recoveringActUid)
+    {
         super(recoveringActUid);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( " + recoveringActUid + " )");
+            jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( "
+                    + recoveringActUid + " )");
         }
 
         _savingUid = recoveringActUid;
@@ -548,26 +635,29 @@ public class ServerTransaction extends ArjunaTransactionImple {
         _prepState = ActionStatus.COMMITTING;
     }
 
-    protected final synchronized int preparedStatus() {
+    protected final synchronized int preparedStatus ()
+    {
         return _prepState;
     }
 
-    private final int finalStatus() {
+    private final int finalStatus ()
+    {
         int heuristic = super.getHeuristicDecision();
 
-        switch (heuristic) {
-            case TwoPhaseOutcome.PREPARE_OK :
-            case TwoPhaseOutcome.FINISH_OK :
-                return super.status();
-            case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
-                return ActionStatus.H_ROLLBACK;
-            case TwoPhaseOutcome.HEURISTIC_COMMIT :
-                return ActionStatus.H_COMMIT;
-            case TwoPhaseOutcome.HEURISTIC_MIXED :
-                return ActionStatus.H_MIXED;
-            case TwoPhaseOutcome.HEURISTIC_HAZARD :
-            default :
-                return ActionStatus.H_HAZARD;
+        switch (heuristic)
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+        case TwoPhaseOutcome.FINISH_OK:
+            return super.status();
+        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
+            return ActionStatus.H_ROLLBACK;
+        case TwoPhaseOutcome.HEURISTIC_COMMIT:
+            return ActionStatus.H_COMMIT;
+        case TwoPhaseOutcome.HEURISTIC_MIXED:
+            return ActionStatus.H_MIXED;
+        case TwoPhaseOutcome.HEURISTIC_HAZARD:
+        default:
+            return ActionStatus.H_HAZARD;
         }
     }
 

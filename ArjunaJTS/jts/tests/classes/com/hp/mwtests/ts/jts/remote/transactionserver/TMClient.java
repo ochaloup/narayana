@@ -48,20 +48,23 @@ import com.arjuna.orbportability.Services;
 import com.hp.mwtests.ts.jts.TestModule.HammerHelper;
 import com.hp.mwtests.ts.jts.orbspecific.resources.DistributedHammerWorker1;
 
-public class TMClient {
+public class TMClient
+{
     @Test
-    public void test() throws Exception {
+    public void test() throws Exception
+    {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[]{}, null);
+        myORB.initORB(new String[] {}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
+
 
         TransactionFactory theOTS = null;
         Control topLevelControl = null;
@@ -69,7 +72,8 @@ public class TMClient {
         String server = "/tmp/hammer1.ref";
         boolean slave = false;
 
-        if (System.getProperty("os.name").startsWith("Windows")) {
+        if (System.getProperty("os.name").startsWith("Windows"))
+        {
             server = "C:\\temp\\hammer1.ref";
         }
 
@@ -77,7 +81,8 @@ public class TMClient {
 
         int resolver = Services.getResolver();
 
-        try {
+        try
+        {
             String[] params = new String[1];
 
             params[0] = Services.otsKind;
@@ -86,37 +91,49 @@ public class TMClient {
 
             params = null;
             theOTS = TransactionFactoryHelper.narrow(obj);
-        } catch (Exception e) {
-            fail("Unexpected bind exception: " + e);
+        }
+        catch (Exception e)
+        {
+            fail("Unexpected bind exception: "+e);
             e.printStackTrace(System.err);
         }
 
         System.out.println("Creating transaction.");
 
-        try {
+        try
+        {
             topLevelControl = theOTS.create(0);
-        } catch (Exception e) {
-            fail("Create call failed: " + e);
+        }
+        catch (Exception e)
+        {
+            fail("Create call failed: "+e);
             e.printStackTrace(System.err);
         }
 
         System.out.println("Creating subtransaction.");
 
-        try {
+        try
+        {
             nestedControl = topLevelControl.get_coordinator().create_subtransaction();
-        } catch (Exception e) {
-            System.err.println("Subtransaction create call failed: " + e);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Subtransaction create call failed: "+e);
 
-            try {
+            try
+            {
                 topLevelControl.get_terminator().rollback();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
             }
 
             e.printStackTrace(System.err);
             fail();
         }
 
-        try {
+        try
+        {
             DistributedHammerWorker1.hammerObject_1 = HammerHelper.narrow(serv.getService(server, null, Services.FILE));
 
             if (!DistributedHammerWorker1.hammerObject_1.incr(1, nestedControl))
@@ -130,7 +147,8 @@ public class TMClient {
 
             nestedControl.get_terminator().rollback();
 
-            if (!slave) {
+            if (!slave)
+            {
                 System.out.println("master sleeping again.");
 
                 Thread.sleep(20000);
@@ -140,11 +158,13 @@ public class TMClient {
 
             org.omg.CosTransactions.PropagationContext ctx = topLevelControl.get_coordinator().get_txcontext();
 
-            assertTrue(DistributedHammerWorker1.hammerObject_1.get(value, topLevelControl));
+            assertTrue( DistributedHammerWorker1.hammerObject_1.get(value, topLevelControl) );
 
             topLevelControl.get_terminator().rollback();
-        } catch (Exception e) {
-            fail("TMClient: " + e);
+        }
+        catch (Exception e)
+        {
+            fail("TMClient: "+e);
             e.printStackTrace(System.err);
         }
 

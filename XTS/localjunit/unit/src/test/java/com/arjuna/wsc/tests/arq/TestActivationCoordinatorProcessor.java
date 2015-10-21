@@ -41,30 +41,32 @@ import com.arjuna.webservices11.wscoor.processors.ActivationCoordinatorProcessor
 import com.arjuna.wsc.tests.TestUtil;
 import com.arjuna.wsc.tests.TestUtil11;
 
-public class TestActivationCoordinatorProcessor extends ActivationCoordinatorProcessor {
-    private Map<String, CreateCoordinationContextDetails> messageIdMap = new HashMap<String, CreateCoordinationContextDetails>();
+public class TestActivationCoordinatorProcessor extends
+        ActivationCoordinatorProcessor
+{
+    private Map<String, CreateCoordinationContextDetails> messageIdMap = new HashMap<String, CreateCoordinationContextDetails>() ;
 
-    public CreateCoordinationContextResponseType createCoordinationContext(
-            final CreateCoordinationContextType createCoordinationContext, final MAP map, boolean isSecure) {
-        final String messageId = map.getMessageID();
-        synchronized (messageIdMap) {
-            messageIdMap.put(messageId, new CreateCoordinationContextDetails(createCoordinationContext, map));
-            messageIdMap.notifyAll();
+    public CreateCoordinationContextResponseType createCoordinationContext(final CreateCoordinationContextType createCoordinationContext,
+        final MAP map, boolean isSecure)
+    {
+        final String messageId = map.getMessageID() ;
+        synchronized(messageIdMap)
+        {
+            messageIdMap.put(messageId, new CreateCoordinationContextDetails(createCoordinationContext, map)) ;
+            messageIdMap.notifyAll() ;
         }
         String coordinationType = createCoordinationContext.getCoordinationType();
         if (TestUtil.INVALID_CREATE_PARAMETERS_COORDINATION_TYPE.equals(coordinationType)) {
             try {
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
-                        CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME);
-                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME)
-                        .addTextNode("Invalid create parameters");
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME);
+                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME).addTextNode("Invalid create parameters");
                 throw new SOAPFaultException(soapFault);
             } catch (Throwable th) {
                 throw new ProtocolException(th);
             }
         }
-
+        
         // we have to return a value so lets cook one up
 
         CreateCoordinationContextResponseType createCoordinationContextResponseType = new CreateCoordinationContextResponseType();
@@ -86,52 +88,62 @@ public class TestActivationCoordinatorProcessor extends ActivationCoordinatorPro
         return createCoordinationContextResponseType;
     }
 
-    public CreateCoordinationContextDetails getCreateCoordinationContextDetails(final String messageId, long timeout) {
-        final long endTime = System.currentTimeMillis() + timeout;
-        synchronized (messageIdMap) {
-            long now = System.currentTimeMillis();
-            while (now < endTime) {
-                final CreateCoordinationContextDetails details = (CreateCoordinationContextDetails) messageIdMap
-                        .remove(messageId);
-                if (details != null) {
-                    return details;
+    public CreateCoordinationContextDetails getCreateCoordinationContextDetails(final String messageId, long timeout)
+    {
+        final long endTime = System.currentTimeMillis() + timeout ;
+        synchronized(messageIdMap)
+        {
+            long now = System.currentTimeMillis() ;
+            while(now < endTime)
+            {
+                final CreateCoordinationContextDetails details = (CreateCoordinationContextDetails)messageIdMap.remove(messageId) ;
+                if (details != null)
+                {
+                    return details ;
                 }
-                try {
-                    messageIdMap.wait(endTime - now);
-                } catch (final InterruptedException ie) {
-                } // ignore
-                now = System.currentTimeMillis();
+                try
+                {
+                    messageIdMap.wait(endTime - now) ;
+                }
+                catch (final InterruptedException ie) {} // ignore
+                now = System.currentTimeMillis() ;
             }
-            final CreateCoordinationContextDetails details = (CreateCoordinationContextDetails) messageIdMap
-                    .remove(messageId);
-            if (details != null) {
-                return details;
+            final CreateCoordinationContextDetails details = (CreateCoordinationContextDetails)messageIdMap.remove(messageId) ;
+            if (details != null)
+            {
+                return details ;
             }
         }
-        throw new NullPointerException("Timeout occurred waiting for id: " + messageId);
+        throw new NullPointerException("Timeout occurred waiting for id: " + messageId) ;
     }
 
-    public static class CreateCoordinationContextDetails {
-        private final CreateCoordinationContextType createCoordinationContext;
-        private final MAP map;
+    public static class CreateCoordinationContextDetails
+    {
+        private final CreateCoordinationContextType createCoordinationContext ;
+        private final MAP map ;
 
-        CreateCoordinationContextDetails(final CreateCoordinationContextType createCoordinationContext, final MAP map) {
-            this.createCoordinationContext = createCoordinationContext;
-            this.map = map;
+        CreateCoordinationContextDetails(final CreateCoordinationContextType createCoordinationContext,
+            final MAP map)
+        {
+            this.createCoordinationContext = createCoordinationContext ;
+            this.map = map ;
         }
 
-        public CreateCoordinationContextType getCreateCoordinationContext() {
-            return createCoordinationContext;
+        public CreateCoordinationContextType getCreateCoordinationContext()
+        {
+            return createCoordinationContext ;
         }
 
-        public MAP getMAP() {
-            return map;
+        public MAP getMAP()
+        {
+            return map ;
         }
     }
 
     private static int nextIdentifier = 0;
 
-    private synchronized String nextIdentifier() {
+    private synchronized String nextIdentifier()
+    {
         int value = nextIdentifier++;
 
         return Integer.toString(value);

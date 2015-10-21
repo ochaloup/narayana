@@ -53,8 +53,7 @@ public class PropertiesFactoryStax extends AbstractPropertiesFactory {
             });
             XMLStreamReader parser = inputFactory.createXMLStreamReader(is);
             /*
-             * xml looks like this <entry
-             * key="CoreEnvironmentBean.nodeIdentifier">1</entry>
+             * xml looks like this <entry key="CoreEnvironmentBean.nodeIdentifier">1</entry>
              */
             int event = -1;
             while (true) {
@@ -66,8 +65,7 @@ public class PropertiesFactoryStax extends AbstractPropertiesFactory {
                     String key = parser.getAttributeValue(0);
                     StringBuffer buffer = new StringBuffer();
                     event = parser.next();
-                    for (; event == XMLStreamConstants.CHARACTERS
-                            || event == XMLStreamConstants.COMMENT; event = parser.next()) {
+                    for (; event == XMLStreamConstants.CHARACTERS || event == XMLStreamConstants.COMMENT; event = parser.next()) {
                         if (event != XMLStreamConstants.COMMENT) {
                             String nextText = parser.getText();
                             buffer.append(nextText);

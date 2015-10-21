@@ -21,11 +21,14 @@ public class ContextTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(WSASTestUtils.class);
+        return WarDeployment.getDeployment(
+                WSASTestUtils.class);
     }
 
     @Test
-    public void testContext() throws Exception {
+    public void testContext()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
         HLS[] currentHLS = ActivityManagerFactory.activityManager().allHighLevelServices();
 
@@ -33,20 +36,21 @@ public class ContextTest {
             ActivityManagerFactory.activityManager().removeHLS(hls);
         }
 
-        try {
+        try
+        {
             ua.start("dummy");
 
-            System.out.println("Started: " + ua.activityName());
+            System.out.println("Started: "+ua.activityName());
 
             ua.start("dummy");
 
-            System.out.println("Started: " + ua.activityName());
+            System.out.println("Started: "+ua.activityName());
 
             ContextManager manager = new ContextManager();
             com.arjuna.mw.wsas.context.Context context = manager.context("dummy");
 
             if (context != null) {
-                fail("Context not null: " + context);
+                fail("Context not null: "+ context);
             }
         } finally {
             try {
@@ -58,5 +62,5 @@ public class ContextTest {
             }
             WSASTestUtils.cleanup(ua);
         }
-    }
+            }
 }

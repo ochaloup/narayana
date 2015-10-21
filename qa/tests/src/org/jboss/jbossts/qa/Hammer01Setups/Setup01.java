@@ -58,6 +58,7 @@ package org.jboss.jbossts.qa.Hammer01Setups;
  * $Id: Setup01.java,v 1.3 2003/09/04 09:38:30 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.Hammer01.*;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -68,18 +69,22 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class Setup01 {
-    public static void main(String[] args) {
+public class Setup01
+{
+    public static void main(String[] args)
+    {
         boolean success = false;
 
-        try {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++) {
+            for (int index = 0; index < numberOfDrivers; index++)
+            {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -91,7 +96,8 @@ public class Setup01 {
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null) {
+            if (databaseDynamicClass != null)
+            {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -99,7 +105,9 @@ public class Setup01 {
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            } else {
+            }
+            else
+            {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -110,14 +118,17 @@ public class Setup01 {
             int width = 16;
             int height = 16;
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (y < (height / 2)) {
-                        statement.executeUpdate(
-                                "INSERT INTO " + databaseUser + "_Matrix VALUES(\'" + x + "\', \'" + y + "\', \'0\')");
-                    } else {
-                        statement.executeUpdate(
-                                "INSERT INTO " + databaseUser + "_Matrix VALUES(\'" + x + "\', \'" + y + "\', \'1\')");
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (y < (height / 2))
+                    {
+                        statement.executeUpdate("INSERT INTO " + databaseUser + "_Matrix VALUES(\'" + x + "\', \'" + y + "\', \'0\')");
+                    }
+                    else
+                    {
+                        statement.executeUpdate("INSERT INTO " + databaseUser + "_Matrix VALUES(\'" + x + "\', \'" + y + "\', \'1\')");
                     }
                 }
             }
@@ -126,15 +137,20 @@ public class Setup01 {
             connection.close();
 
             success = true;
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Setup01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Setup01.main: " + exception);
             exception.printStackTrace(System.err);
 

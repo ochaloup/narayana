@@ -41,19 +41,23 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Closed implements Status {
+public class Closed implements Status
+{
 
-    public static Closed instance() {
-        return _instance;
+    public static Closed instance ()
+    {
+    return _instance;
+    }
+    
+    public String toString ()
+    {
+    return "org.w3c.wscf.sagas.status.Closed";
     }
 
-    public String toString() {
-        return "org.w3c.wscf.sagas.status.Closed";
-    }
-
-    private Closed() {
+    private Closed ()
+    {
     }
 
     private static final Closed _instance = new Closed();
-
+    
 }

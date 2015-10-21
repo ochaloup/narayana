@@ -29,22 +29,27 @@ public class Context2Test {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(DemoHLS.class, FailureHLS.class, DemoSOAPContextImple.class,
+        return WarDeployment.getDeployment(
+                DemoHLS.class,
+                FailureHLS.class,
+                DemoSOAPContextImple.class,
                 WSASTestUtils.class);
     }
 
     @Test
-    public void testContext2() throws Exception {
+    public void testContext2()
+            throws Exception
+            {
         UserActivity ua = UserActivityFactory.userActivity();
         DemoHLS demoHLS = new DemoHLS();
-        FailureHLS failureHLS = new FailureHLS(); // this constructor means it
-                                                    // will not fail
+        FailureHLS failureHLS = new FailureHLS(); // this constructor means it will not fail
         HLS[] currentHLS = ActivityManagerFactory.activityManager().allHighLevelServices();
 
         for (HLS hls : currentHLS) {
             ActivityManagerFactory.activityManager().removeHLS(hls);
         }
-        try {
+        try
+        {
             ActivityManagerFactory.activityManager().addHLS(demoHLS);
             ActivityManagerFactory.activityManager().addHLS(failureHLS);
 
@@ -58,11 +63,11 @@ public class Context2Test {
 
             ua.start(demoServiceType);
 
-            System.out.println("Started: " + ua.activityName());
+            System.out.println("Started: "+ua.activityName());
 
             ua.start(failureServiceType);
 
-            System.out.println("Started: " + ua.activityName() + "\n");
+            System.out.println("Started: "+ua.activityName()+"\n");
 
             String currentServiceType = ua.serviceType();
 
@@ -90,7 +95,7 @@ public class Context2Test {
                 fail("Failure context not found");
             }
 
-            ((SOAPContext) failureServiceContext).serialiseToElement(root);
+            ((SOAPContext)failureServiceContext).serialiseToElement(root);
 
             System.out.println("Faiure Context is " + root.getTextContent());
 
@@ -119,14 +124,16 @@ public class Context2Test {
                 fail("Demo context not found");
             }
 
-            ((SOAPContext) demoServiceContext).serialiseToElement(root);
+            ((SOAPContext)demoServiceContext).serialiseToElement(root);
 
             System.out.println("Demo Context is " + root.getTextContent());
 
             ua.end();
 
             System.out.println("\nFinished parent activity.\n");
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             WSASTestUtils.cleanup(ua);
             throw ex;
         } finally {
@@ -152,5 +159,6 @@ public class Context2Test {
                 // ignore this
             }
         }
-    }
+            }
 }
+

@@ -1,8 +1,7 @@
 package org.jboss.narayana.blacktie.jatmibroker.xatmi;
 
 /**
- * This is the exception that is raised if a response condition needs to be
- * notified to the client.
+ * This is the exception that is raised if a response condition needs to be notified to the client.
  */
 public class ResponseException extends ConnectionException {
     /**
@@ -28,16 +27,11 @@ public class ResponseException extends ConnectionException {
     /**
      * An exception for reporting events
      * 
-     * @param tperrno
-     *            This will always be TPEEVENT
-     * @param string
-     *            The message
-     * @param event
-     *            The event may be any from Connection
-     * @param received
-     *            A received buffer
-     * @param rcode
-     *            The rcode in case of TPFAIL
+     * @param tperrno This will always be TPEEVENT
+     * @param string The message
+     * @param event The event may be any from Connection
+     * @param received A received buffer
+     * @param rcode The rcode in case of TPFAIL
      */
     public ResponseException(int tperrno, String string, long event, int rcode, Buffer received) {
         super(tperrno, string);

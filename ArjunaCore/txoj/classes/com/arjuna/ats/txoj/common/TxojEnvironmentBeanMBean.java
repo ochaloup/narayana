@@ -21,12 +21,12 @@
 package com.arjuna.ats.txoj.common;
 
 /**
- * A JMX MBean interface containing configuration for the transactional object
- * system.
+ * A JMX MBean interface containing configuration for the transactional object system.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface TxojEnvironmentBeanMBean {
+public interface TxojEnvironmentBeanMBean
+{
     @Deprecated
     String getLockStoreDir();
 

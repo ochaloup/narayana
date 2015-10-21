@@ -60,6 +60,7 @@ public final class InboundBridge implements XAResource, SerializableXAResourceDe
      */
     private String enlistmentUrl;
 
+
     /**
      * Empty constructor for serialisation.
      */
@@ -267,8 +268,8 @@ public final class InboundBridge implements XAResource, SerializableXAResourceDe
     }
 
     /**
-     * Following methods are not really used. They are required because
-     * InboundBridge has to implement XAResource interface for recovery.
+     * Following methods are not really used. They are required because InboundBridge has to implement XAResource interface for
+     * recovery.
      */
 
     @Override

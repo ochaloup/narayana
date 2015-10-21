@@ -69,7 +69,9 @@ import com.arjuna.ats.jts.utils.Utility;
  * @version $Id: RecoveredServerTransaction.java 2342 2006-03-30 13:06:17Z $
  */
 
-public class RecoveredServerTransaction extends ServerTransaction implements RecoveringTransaction {
+public class RecoveredServerTransaction extends ServerTransaction implements
+        RecoveringTransaction
+{
     /**
      * actionUid is the local transaction identification for the remote
      * transaction - the name of the store entry which contains the state of the
@@ -77,7 +79,8 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * we activate the transaction.
      */
 
-    public RecoveredServerTransaction(Uid actionUid) {
+    public RecoveredServerTransaction(Uid actionUid)
+    {
         this(actionUid, "");
     }
 
@@ -88,11 +91,12 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * we activate the transaction.
      */
 
-    public RecoveredServerTransaction(Uid actionUid, String changedTypeName) {
+    public RecoveredServerTransaction(Uid actionUid, String changedTypeName)
+    {
         super(actionUid);
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredServerTransaction " + getSavingUid() + " created");
+            jtsLogger.logger.debug("RecoveredServerTransaction "+getSavingUid()+" created");
         }
 
         // Don't bother trying to activate a transaction that isn't in
@@ -101,18 +105,22 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
 
         String effectiveTypeName = typeName();
 
-        if (changedTypeName.length() < 1) {
+        if (changedTypeName.length() < 1)
+        {
             _typeName = null;
-        } else {
+        }
+        else
+        {
             _typeName = changedTypeName;
             effectiveTypeName = changedTypeName;
         }
 
         _originalProcessUid = new Uid(Uid.nullUid());
 
-        try {
-            if ((StoreManager.getRecoveryStore().currentState(getSavingUid(),
-                    effectiveTypeName) != StateStatus.OS_UNKNOWN)) {
+        try
+        {
+            if ((StoreManager.getRecoveryStore().currentState(getSavingUid(), effectiveTypeName) != StateStatus.OS_UNKNOWN))
+            {
                 /*
                  * By activating the state we get the actual transaction id and
                  * process id, which are needed for recovery purposes.
@@ -124,7 +132,8 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
                     jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_2(getSavingUid());
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_2(getSavingUid());
         }
 
@@ -136,7 +145,8 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * transaction then we return whatever the transaction reports otherwise we
      * return RolledBack as we're using presumed abort.
      */
-    public synchronized Status get_status() throws SystemException {
+    public synchronized Status get_status () throws SystemException
+    {
         if (_txStatus != Status.StatusUnknown)
             return _txStatus;
 
@@ -155,7 +165,8 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * used to replace a Resource that has failed and cannot be recovered on
      * it's original IOR.
      */
-    public void addResourceRecord(Uid rcUid, Resource r) {
+    public void addResourceRecord (Uid rcUid, Resource r)
+    {
         Coordinator coord = null;
         AbstractRecord corbaRec = createOTSRecord(true, r, coord, rcUid);
 
@@ -165,17 +176,18 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
     /**
      * Causes phase 2 of the commit protocol to be replayed.
      */
-    public void replayPhase2() {
+    public void replayPhase2 ()
+    {
         _recoveryStatus = RecoveryStatus.REPLAYING;
 
         Status theStatus = get_status();
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2(" + get_uid() + ") - status = "
-                    + Utility.stringStatus(theStatus));
+            jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2("+get_uid()+") - status = "+Utility.stringStatus(theStatus));
         }
 
-        if (theStatus == Status.StatusPrepared) {
+        if (theStatus == Status.StatusPrepared)
+        {
             /*
              * We need to get the status from the our parent transaction in the
              * interposition hierarchy.
@@ -183,42 +195,51 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
             theStatus = getStatusFromParent();
 
             if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2(" + get_uid() + ") -"
-                        + " status after contacting parent = " + Utility.stringStatus(theStatus));
+                jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2("+get_uid()+") -" +
+                        " status after contacting parent = "+ Utility.stringStatus(theStatus));
             }
         }
 
-        if ((theStatus == Status.StatusCommitting) || (theStatus == Status.StatusCommitted)) {
+        if ((theStatus == Status.StatusCommitting)
+                || (theStatus == Status.StatusCommitted))
+        {
             phase2Commit(_reportHeuristics);
 
             _recoveryStatus = RecoveryStatus.REPLAYED;
 
             _txStatus = Status.StatusCommitted;
-        } else if ((theStatus == Status.StatusRolledBack) || (theStatus == Status.StatusRollingBack)
-                || (theStatus == Status.StatusMarkedRollback) || (theStatus == Status.StatusNoTransaction)) {
+        }
+        else if ((theStatus == Status.StatusRolledBack)
+                || (theStatus == Status.StatusRollingBack)
+                || (theStatus == Status.StatusMarkedRollback)
+                || (theStatus == Status.StatusNoTransaction))
+        {
             phase2Abort(_reportHeuristics);
 
             _recoveryStatus = RecoveryStatus.REPLAYED;
 
             _txStatus = Status.StatusRolledBack;
-        } else if (theStatus == Status.StatusUnknown) {
+        }
+        else if (theStatus == Status.StatusUnknown)
+        {
             jtsLogger.i18NLogger.info_recovery_transactions_RecoveredServerTransaction_6(get_uid());
             _recoveryStatus = RecoveryStatus.REPLAY_FAILED;
-        } else {
-            jtsLogger.i18NLogger
-                    .warn_recovery_transactions_RecoveredServerTransaction_7(Utility.stringStatus(theStatus));
+        }
+        else {
+            jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_7(Utility.stringStatus(theStatus));
             _recoveryStatus = RecoveryStatus.REPLAY_FAILED;
         }
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2: (" + get_uid() + ") finished");
+            jtsLogger.logger.debug("RecoveredServerTransaction.replayPhase2: ("+get_uid()+") finished");
         }
     }
 
     /**
      * Get the status of recovery for this transaction
      */
-    public int getRecoveryStatus() {
+    public int getRecoveryStatus ()
+    {
         return _recoveryStatus;
     }
 
@@ -227,9 +248,12 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * get_uid and not getSavingUid
      */
 
-    public Status getOriginalStatus() {
-        if (_recoveryStatus != RecoveryStatus.ACTIVATE_FAILED) {
-            try {
+    public Status getOriginalStatus ()
+    {
+        if (_recoveryStatus != RecoveryStatus.ACTIVATE_FAILED)
+        {
+            try
+            {
                 /*
                  * Remember to get the status on the actual global transaction
                  * and not on the local branch, i.e., use get_uid and not
@@ -237,49 +261,58 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
                  */
 
                 return StatusChecker.get_status(get_uid(), _originalProcessUid);
-            } catch (Inactive ex) {
+            }
+            catch (Inactive ex)
+            {
                 // shouldn't happen!!
 
                 return Status.StatusUnknown;
             }
-        } else {
+        }
+        else
+        {
             // if it can't be activated, we cant get the process uid
             return Status.StatusUnknown;
         }
 
     }
 
-    private Status getStatusFromParent() {
+    private Status getStatusFromParent ()
+    {
         org.omg.CosTransactions.Status theStatus = org.omg.CosTransactions.Status.StatusUnknown;
 
         int not_exist_count; // This variable is applied with Orbix
 
-        if ((super._recoveryCoordinator != null) && (get_status() == org.omg.CosTransactions.Status.StatusPrepared)) {
+        if ((super._recoveryCoordinator != null)
+                && (get_status() == org.omg.CosTransactions.Status.StatusPrepared))
+        {
             ServerControl sc = new ServerControl((ServerTransaction) this);
-            ServerRecoveryTopLevelAction tla = new ServerRecoveryTopLevelAction(sc);
+            ServerRecoveryTopLevelAction tla = new ServerRecoveryTopLevelAction(
+                    sc);
 
-            if (tla.valid()) {
-                try {
-                    theStatus = super._recoveryCoordinator.replay_completion(tla.getReference());
+            if (tla.valid())
+            {
+                try
+                {
+                    theStatus = super._recoveryCoordinator
+                            .replay_completion(tla.getReference());
 
                     if (jtsLogger.logger.isDebugEnabled()) {
-                        jtsLogger.logger
-                                .debug("RecoveredServerTransaction.getStatusFromParent - replay_completion status = "
-                                        + Utility.stringStatus(theStatus));
+                        jtsLogger.logger.debug("RecoveredServerTransaction.getStatusFromParent - replay_completion status = "+Utility.stringStatus(theStatus));
                     }
                 }
 
                 catch (TRANSIENT ex_trans) {
                     /*
-                     * A failure that might not occur again if the request is
-                     * retried. Not definite.
+                     * A failure that might not occur again if the request is retried. Not definite.
                      */
-
+                    
                     jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_10(get_uid());
                     theStatus = Status.StatusUnknown;
                 }
                 // What here what should be done for Orbix2000
-                catch (OBJECT_NOT_EXIST ex) {
+                catch (OBJECT_NOT_EXIST ex)
+                {
                     // i believe this state should be notran - ots explicitly
                     // objnotexist is
                     // rollback
@@ -290,17 +323,20 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
                     // org.omg.CosTransactions.Status.StatusNoTransaction;
 
                     if (jtsLogger.logger.isDebugEnabled()) {
-                        jtsLogger.logger.debug("RecoveredServerTransaction.getStatusFromParent -"
-                                + " replay_completion got object_not_exist = " + Utility.stringStatus(theStatus));
+                        jtsLogger.logger.debug("RecoveredServerTransaction.getStatusFromParent -" +
+                                " replay_completion got object_not_exist = "+Utility.stringStatus(theStatus));
                     }
-                } catch (NotPrepared ex1) {
+                }
+                catch (NotPrepared ex1) {
                     jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_12();
                     theStatus = Status.StatusActive;
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     // Unknown error, so better to do nothing at this stage.
                     jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_13(e);
                 }
-            } else {
+            }
+            else {
                 jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredServerTransaction_14(get_uid());
             }
 
@@ -311,41 +347,53 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
 
             sc = null;
             tla = null;
-        } else {
+        }
+        else
+        {
             if (jtsLogger.logger.isDebugEnabled()) {
-                jtsLogger.logger.debug(
-                        "RecoveredServerTransaction:getStatusFromParent - " + "no recovcoord or status not prepared");
+                jtsLogger.logger.debug("RecoveredServerTransaction:getStatusFromParent - " +
+                        "no recovcoord or status not prepared");
             }
         }
 
         return theStatus;
     }
 
-    public boolean allCompleted() {
+    public boolean allCompleted ()
+    {
         // return (boolean) (_recoveryStatus == RecoveryStatus.REPLAYED);
 
         return false;
     }
 
-    public String type() {
-        if (_typeName == null) {
+    public String type ()
+    {
+        if (_typeName == null)
+        {
             return super.type();
-        } else {
+        }
+        else
+        {
             return _typeName;
         }
     }
 
-    public void removeOldStoreEntry() {
-        try {
+    public void removeOldStoreEntry ()
+    {
+        try
+        {
             getStore().remove_committed(getSavingUid(), super.type());
-        } catch (ObjectStoreException ex) {
+        }
+        catch (ObjectStoreException ex)
+        {
             jtsLogger.i18NLogger.warn_recoveredServerTransaction_removeOldStoreEntry(ex);
         }
     }
 
-    public boolean assumeComplete() {
+    public boolean assumeComplete ()
+    {
         final int heuristicDecision = getHeuristicDecision();
-
+        
         if (heuristicDecision == TwoPhaseOutcome.HEURISTIC_COMMIT
                 || heuristicDecision == TwoPhaseOutcome.HEURISTIC_HAZARD
                 || heuristicDecision == TwoPhaseOutcome.HEURISTIC_MIXED
@@ -353,9 +401,9 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
 
             _typeName = AssumedCompleteHeuristicServerTransaction.typeName();
         } else {
-            _typeName = AssumedCompleteServerTransaction.typeName();
+            _typeName = AssumedCompleteServerTransaction.typeName();          
         }
-
+    
         return true;
     }
 
@@ -366,7 +414,9 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * @since JTS 2.1.
      */
 
-    protected void packHeader(OutputObjectState os, Header hdr) throws IOException {
+    protected void packHeader (OutputObjectState os, Header hdr)
+            throws IOException
+    {
         /*
          * If there is a transaction present than pack the process Uid of this
          * JVM and the tx id. Otherwise pack a null Uid.
@@ -382,35 +432,43 @@ public class RecoveredServerTransaction extends ServerTransaction implements Rec
      * @since JTS 2.1.
      */
 
-    protected void unpackHeader(InputObjectState os, Header hdr) throws IOException {
+    protected void unpackHeader (InputObjectState os, Header hdr)
+            throws IOException
+    {   
         super.unpackHeader(os, hdr);
-
-        // super.objectUid = hdr.getTxId();
+        
+        //super.objectUid = hdr.getTxId();
         _originalProcessUid = hdr.getProcessId();
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredServerTransaction.unpackHeader - txid = " + get_uid()
-                    + " and processUid = " + _originalProcessUid);
+            jtsLogger.logger.debug("RecoveredServerTransaction.unpackHeader - txid = " +
+                    get_uid() + " and processUid = "+_originalProcessUid);
         }
     }
 
-    public boolean save_state(OutputObjectState objectState, int ot) {
+    public boolean save_state (OutputObjectState objectState, int ot)
+    {
         // do the other stuff
         boolean result = super.save_state(objectState, ot);
 
         // iff assumed complete, include the time (this should happen only once)
-        if (_typeName != null && result) {
+        if (_typeName != null && result)
+        {
             Date lastActiveTime = new Date();
-            try {
+            try
+            {
                 objectState.packLong(lastActiveTime.getTime());
-            } catch (java.io.IOException ex) {
+            }
+            catch (java.io.IOException ex)
+            {
             }
         }
         return result;
     }
 
     /** do not admit to being inactive */
-    public Date getLastActiveTime() {
+    public Date getLastActiveTime ()
+    {
         return null;
     }
 

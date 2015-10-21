@@ -38,13 +38,12 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction, enlists a participant with a web service with
- * instructions to prepare and commit without errot then gets the web service to
- * start a subordinate transaction and enlist several participants for a second
- * web service in the subtransaction also with instructions to prepare and
- * commit without error
+ * Starts a transaction, enlists a participant with a web service with instructions to prepare and commit
+ * without errot then gets the web service to start a subordinate transaction and enlist several participants
+ * for a second web service in the subtransaction also with instructions to prepare and commit without error
  */
-public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest {
+public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest
+{
     public void run() {
 
         try {
@@ -122,8 +121,7 @@ public class MultiParticipantPrepareAndCommitTest extends XTSServiceTestBase imp
             return;
         }
 
-        // now commit the transaction which should also commit the
-        // subtransaction
+        // now commit the transaction which should also commit the subtransaction
 
         try {
             tx.commit();

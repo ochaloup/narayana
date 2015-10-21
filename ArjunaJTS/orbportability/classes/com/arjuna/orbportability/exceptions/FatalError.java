@@ -31,14 +31,17 @@
 
 package com.arjuna.orbportability.exceptions;
 
-public class FatalError extends Error {
+public class FatalError extends Error
+{
     static final long serialVersionUID = -9060909679329943146L;
 
-    public FatalError() {
+    public FatalError()
+    {
         super();
     }
 
-    public FatalError(String s) {
+    public FatalError(String s)
+    {
         super(s);
     }
 }

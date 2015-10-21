@@ -60,30 +60,34 @@ import com.arjuna.common.util.propertyservice.PropertiesFactory;
  * The db parameters specified in the property file are assumed to be in the
  * format:
  *
- * <properties> <entry key="DB_X_DatabaseUser">username</entry>
- * <entry key="DB_X_DatabasePassword">password"</entry>
- * <entry key="DB_X_DatabaseDynamicClass">DynamicClass</entry>
- * <entry key="DB_X_DatabaseURL">theURL</entry> </properties>
+ *   <properties>
+ *     <entry key="DB_X_DatabaseUser">username</entry>
+ *     <entry key="DB_X_DatabasePassword">password"</entry>
+ *     <entry key="DB_X_DatabaseDynamicClass">DynamicClass</entry>
+ *     <entry key="DB_X_DatabaseURL">theURL</entry>
+ *   </properties>
  *
- * where X is the number of the connection information, starting from 1. The
- * DynamicClass is optional. If not present, JNDI will be used for resolving the
- * DatabaseURL value into a XADataSource.
+ * where X is the number of the connection information, starting from 1.
+ * The DynamicClass is optional. If not present, JNDI will be used for resolving
+ * the DatabaseURL value into a XADataSource.
  *
  * <properties depends="arjuna" name="jta">
- * <property name="com.arjuna.ats.jta.recovery.XAResourceRecovery1" value=
- * "com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;jbossts-properties.xml[;X]"/>
+ *   <property name="com.arjuna.ats.jta.recovery.XAResourceRecovery1"
+ *      value="com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;jbossts-properties.xml[;X]"/>
  *
  * @since JTS 2.1.
  */
 
-public class BasicXARecovery implements XAResourceRecovery {
+public class BasicXARecovery implements XAResourceRecovery
+{
     /*
      * Some XAResourceRecovery implementations will do their startup work here,
      * and then do little or nothing in setDetails. Since this one needs to know
      * dynamic class name, the constructor does nothing.
      */
 
-    public BasicXARecovery() throws SQLException {
+    public BasicXARecovery () throws SQLException
+    {
         if (jdbcLogger.logger.isDebugEnabled()) {
             jdbcLogger.logger.debug("BasicXARecovery ()");
         }
@@ -99,7 +103,8 @@ public class BasicXARecovery implements XAResourceRecovery {
      * password, etc. can be read.
      */
 
-    public boolean initialise(String parameter) throws SQLException {
+    public boolean initialise (String parameter) throws SQLException
+    {
         if (jdbcLogger.logger.isDebugEnabled()) {
             jdbcLogger.logger.debug("BasicXARecovery.setDetail(" + parameter + ")");
         }
@@ -110,21 +115,29 @@ public class BasicXARecovery implements XAResourceRecovery {
         int breakPosition = parameter.indexOf(BREAKCHARACTER);
         String fileName = parameter;
 
-        if (breakPosition != -1) {
+        if (breakPosition != -1)
+        {
             fileName = parameter.substring(0, breakPosition - 1);
 
-            try {
-                numberOfConnections = Integer.parseInt(parameter.substring(breakPosition + 1));
-            } catch (NumberFormatException e) {
+            try
+            {
+                numberOfConnections = Integer.parseInt(parameter
+                        .substring(breakPosition + 1));
+            }
+            catch (NumberFormatException e)
+            {
                 jdbcLogger.i18NLogger.warn_recovery_basic_initexp(e);
 
                 return false;
             }
         }
 
-        try {
+        try
+        {
             props = PropertiesFactory.getPropertiesFromFile(fileName, BasicXARecovery.class.getClassLoader());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jdbcLogger.i18NLogger.warn_recovery_basic_initexp(e);
 
             return false;
@@ -137,15 +150,18 @@ public class BasicXARecovery implements XAResourceRecovery {
         return true;
     }
 
-    public synchronized XAResource getXAResource() throws SQLException {
+    public synchronized XAResource getXAResource () throws SQLException
+    {
         JDBC2RecoveryConnection conn = null;
 
-        if (hasMoreResources()) {
+        if (hasMoreResources())
+        {
             connectionIndex++;
 
             conn = getConnection();
 
-            if (conn == null) {
+            if (conn == null)
+            {
                 jdbcLogger.i18NLogger.warn_recovery_basic_xarec("BasicXARecovery.getConnection -");
             }
         }
@@ -153,14 +169,17 @@ public class BasicXARecovery implements XAResourceRecovery {
         return conn.recoveryConnection().getConnection().getXAResource();
     }
 
-    public synchronized boolean hasMoreResources() {
+    public synchronized boolean hasMoreResources ()
+    {
         if (connectionIndex == numberOfConnections)
             return false;
         else
             return true;
     }
 
-    private final JDBC2RecoveryConnection getConnection() throws SQLException {
+    private final JDBC2RecoveryConnection getConnection ()
+            throws SQLException
+    {
         String number = new String("" + connectionIndex);
         String url = new String(dbTag + number + urlTag);
         String password = new String(dbTag + number + passwordTag);
@@ -173,7 +192,8 @@ public class BasicXARecovery implements XAResourceRecovery {
         String thePassword = props.getProperty(password);
         String theURL = props.getProperty(url);
 
-        if (theUser != null) {
+        if (theUser != null)
+        {
             dbProperties.put(TransactionalDriver.userName, theUser);
             dbProperties.put(TransactionalDriver.password, thePassword);
 
@@ -183,7 +203,8 @@ public class BasicXARecovery implements XAResourceRecovery {
                 dbProperties.put(TransactionalDriver.dynamicClass, dc);
 
             return new JDBC2RecoveryConnection(theURL, dbProperties);
-        } else
+        }
+        else
             return null;
     }
 

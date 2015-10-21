@@ -36,7 +36,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class NarayanaComparison extends Product {
-    final static String outerClassName = ProductComparison.class.getName();
+    final static String outerClassName =  ProductComparison.class.getName();
     private static Map<String, Double> productMetrics;
     final static String nameOfMetric = outerClassName + METHOD_SEP + "Narayana";
 
@@ -78,10 +78,8 @@ public class NarayanaComparison extends Product {
 
     @AfterClass
     public static void afterClass() throws IOException {
-        Map<String, Double> newMetrics = new RegressionChecker()
-                .getMatchingMetrics(ProductComparison.getMetricPrefix() + ".*");
-        Map<String, String> failures = new HashMap<>(); // metric name -> reason
-                                                        // for failure
+        Map<String, Double> newMetrics = new RegressionChecker().getMatchingMetrics(ProductComparison.getMetricPrefix() + ".*");
+        Map<String, String> failures = new HashMap<>(); // metric name -> reason for failure
         Double variance = 1.1;
         StringBuilder sb = new StringBuilder("Performance Regressions:%n");
 
@@ -89,27 +87,16 @@ public class NarayanaComparison extends Product {
             String metricName = entry.getKey();
 
             if (!productMetrics.containsKey(metricName))
-                continue; // there is no previous value to use for regression
-                            // checks
+                continue; // there is no previous value to use for regression checks
 
-            Double canonicalValue = productMetrics.get(metricName); // the
-                                                                    // previous
-                                                                    // (best)
-                                                                    // value
-            Double headRoom = Math.abs(productMetrics.get(metricName) * (variance - 1)); // the
-                                                                                            // leeway
-                                                                                            // either
-                                                                                            // side
-                                                                                            // of
-                                                                                            // the
-                                                                                            // best
-                                                                                            // value
+            Double canonicalValue = productMetrics.get(metricName); // the previous (best) value
+            Double headRoom = Math.abs(productMetrics.get(metricName) * (variance - 1)); // the leeway either side of the best value
             Double difference = (entry.getValue() - canonicalValue) / canonicalValue * 100;
             boolean withinTolerance = (entry.getValue() >= canonicalValue - headRoom);
 
             if (!withinTolerance) {
                 String s = String.format("%s: %f%% performance %s (%f versus %f) (variance=%f headroom=%f)%n",
-                        metricName, difference, "regression", entry.getValue(), canonicalValue, variance, headRoom);
+                    metricName, difference,  "regression", entry.getValue(), canonicalValue, variance, headRoom);
 
                 failures.put(metricName, s);
                 sb.append(s);

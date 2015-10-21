@@ -56,15 +56,19 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client06.java,v 1.2 2003/06/26 11:43:11 rbegg Exp $
  */
 
+
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client06 {
-    public static void main(String[] args) {
-        try {
+public class Client06
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -76,7 +80,8 @@ public class Client06 {
 
             int numberOfCalls = 10;
 
-            for (int index = 0; index < numberOfCalls; index++) {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 pinger.hit(index, ponger, pinger, null);
             }
 
@@ -86,21 +91,29 @@ public class Client06 {
             IntHolder pongerValue = new IntHolder();
             ponger.get(pongerValue, null);
 
-            if ((pingerValue.value == (numberOfCalls / 2)) && (pongerValue.value == (numberOfCalls / 2))) {
+            if ((pingerValue.value == (numberOfCalls / 2)) && (pongerValue.value == (numberOfCalls / 2)))
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.out.println("Failed");
             System.err.println("Client06.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try {
+        try
+        {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("Client06.main: " + exception);
             exception.printStackTrace(System.err);
         }

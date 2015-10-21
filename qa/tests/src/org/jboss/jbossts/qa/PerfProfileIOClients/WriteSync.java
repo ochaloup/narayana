@@ -36,9 +36,12 @@ import java.io.FileDescriptor;
 import java.io.RandomAccessFile;
 import java.util.Date;
 
-public class WriteSync {
-    public static void main(String[] args) {
-        try {
+public class WriteSync
+{
+    public static void main(String[] args)
+    {
+        try
+        {
             String prefix = args[args.length - 3];
             int numberOfCalls = Integer.parseInt(args[args.length - 2]);
             int blockSize = Integer.parseInt(args[args.length - 1]);
@@ -52,7 +55,8 @@ public class WriteSync {
 
             Date start = new Date();
 
-            for (int index = 0; index < numberOfCalls; index++) {
+            for (int index = 0; index < numberOfCalls; index++)
+            {
                 randomAccessFile.write(block);
                 fileDescriptor.sync();
             }
@@ -69,12 +73,17 @@ public class WriteSync {
 
             correct = PerformanceProfileStore.checkPerformance(prefix + "_WriteSync", operationDuration);
 
-            if (correct) {
+            if (correct)
+            {
                 System.out.println("Passed");
-            } else {
+            }
+            else
+            {
                 System.out.println("Failed");
             }
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             System.err.println("WriteSync.main: " + exception);
             System.out.println("Failed");
         }

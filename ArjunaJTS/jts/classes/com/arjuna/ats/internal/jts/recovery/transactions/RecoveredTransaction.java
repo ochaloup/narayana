@@ -64,16 +64,20 @@ import com.arjuna.ats.jts.utils.Utility;
  * @version $Id: RecoveredTransaction.java 2342 2006-03-30 13:06:17Z $
  */
 
-public class RecoveredTransaction extends ArjunaTransactionImple implements RecoveringTransaction {
-    public RecoveredTransaction(Uid actionUid) {
+public class RecoveredTransaction extends ArjunaTransactionImple implements
+        RecoveringTransaction
+{
+    public RecoveredTransaction(Uid actionUid)
+    {
         this(actionUid, "");
     }
 
-    public RecoveredTransaction(Uid actionUid, String changedTypeName) {
+    public RecoveredTransaction(Uid actionUid, String changedTypeName)
+    {
         super(actionUid);
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredTransaction " + get_uid() + " created");
+            jtsLogger.logger.debug("RecoveredTransaction "+get_uid()+" created");
         }
 
         // Don't bother trying to activate a transaction that isn't in
@@ -82,25 +86,31 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
 
         String effectiveTypeName = typeName();
 
-        if (changedTypeName.length() < 1) {
+        if (changedTypeName.length() < 1)
+        {
             _typeName = null;
-        } else {
+        }
+        else
+        {
             _typeName = changedTypeName;
             effectiveTypeName = changedTypeName;
         }
 
         _originalProcessUid = new Uid(Uid.nullUid());
 
-        try {
-            if ((StoreManager.getRecoveryStore().currentState(actionUid,
-                    effectiveTypeName) != StateStatus.OS_UNKNOWN)) {
+        try
+        {
+            if ((StoreManager.getRecoveryStore().currentState(actionUid, effectiveTypeName) != StateStatus.OS_UNKNOWN))
+            {
                 if (activate())
                     _recoveryStatus = RecoveryStatus.ACTIVATED;
                 else {
                     jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredTransaction_2(actionUid);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredTransaction_3(actionUid, e);
         }
 
@@ -112,7 +122,8 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * transaction then we return whatever the transaction reports otherwise we
      * return RolledBack as we're using presumed abort.
      */
-    public synchronized Status get_status() throws SystemException {
+    public synchronized Status get_status () throws SystemException
+    {
         if (_txStatus != Status.StatusUnknown)
             return _txStatus;
 
@@ -127,18 +138,25 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
     }
 
     /**
-    *
-    */
-    public Status getOriginalStatus() {
-        if (_recoveryStatus != RecoveryStatus.ACTIVATE_FAILED) {
-            try {
+ *
+ */
+    public Status getOriginalStatus ()
+    {
+        if (_recoveryStatus != RecoveryStatus.ACTIVATE_FAILED)
+        {
+            try
+            {
                 return StatusChecker.get_status(get_uid(), _originalProcessUid);
-            } catch (Inactive ex) {
+            }
+            catch (Inactive ex)
+            {
                 // shouldn't happen!
 
                 return Status.StatusUnknown;
             }
-        } else {
+        }
+        else
+        {
             // if it can't be activated, we can't get the process uid
             return Status.StatusUnknown;
         }
@@ -151,7 +169,8 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * it's original IOR.
      */
 
-    public void addResourceRecord(Uid rcUid, Resource r) {
+    public void addResourceRecord (Uid rcUid, Resource r)
+    {
         Coordinator coord = null;
         AbstractRecord corbaRec = createOTSRecord(true, r, coord, rcUid);
 
@@ -162,45 +181,51 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * Causes phase 2 of the commit protocol to be replayed.
      */
 
-    public void replayPhase2() {
+    public void replayPhase2 ()
+    {
         _recoveryStatus = RecoveryStatus.REPLAYING;
 
         Status theStatus = get_status();
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredTransaction.replayPhase2 (" + get_uid() + ") - status = "
-                    + Utility.stringStatus(theStatus));
+            jtsLogger.logger.debug("RecoveredTransaction.replayPhase2 ("+get_uid()+") - status = "+Utility.stringStatus(theStatus));
         }
 
-        if ((theStatus == Status.StatusPrepared) || (theStatus == Status.StatusCommitting)
-                || (theStatus == Status.StatusCommitted)) {
+        if ((theStatus == Status.StatusPrepared)
+                || (theStatus == Status.StatusCommitting)
+                || (theStatus == Status.StatusCommitted))
+        {
             phase2Commit(_reportHeuristics);
 
             _recoveryStatus = RecoveryStatus.REPLAYED;
 
             _txStatus = Status.StatusCommitted;
-        } else if ((theStatus == Status.StatusRolledBack) || (theStatus == Status.StatusRollingBack)
-                || (theStatus == Status.StatusMarkedRollback)) {
+        }
+        else if ((theStatus == Status.StatusRolledBack)
+                || (theStatus == Status.StatusRollingBack)
+                || (theStatus == Status.StatusMarkedRollback))
+        {
             phase2Abort(_reportHeuristics);
 
             _recoveryStatus = RecoveryStatus.REPLAYED;
 
             _txStatus = Status.StatusRolledBack;
-        } else {
+        }
+        else {
             jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredTransaction_6(Utility.stringStatus(theStatus));
             _recoveryStatus = RecoveryStatus.REPLAY_FAILED;
         }
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug("RecoveredTransaction.replayPhase2 (" + get_uid() + ") - status = "
-                    + Utility.stringStatus(theStatus));
+            jtsLogger.logger.debug("RecoveredTransaction.replayPhase2 ("+get_uid()+") - status = "+Utility.stringStatus(theStatus));
         }
     }
 
     /**
      * Get the status of recovery for this transaction
      */
-    public int getRecoveryStatus() {
+    public int getRecoveryStatus ()
+    {
         return _recoveryStatus;
     }
 
@@ -213,8 +238,10 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * recovery.
      */
 
-    public boolean allCompleted() {
-        synchronized (this) {
+    public boolean allCompleted ()
+    {
+        synchronized (this)
+        {
             if ((super.preparedList != null) && (super.preparedList.size() > 0))
                 return false;
 
@@ -224,32 +251,41 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
             if ((super.pendingList != null) && (super.pendingList.size() > 0))
                 return false;
 
-            if ((super.heuristicList != null) && (super.heuristicList.size() > 0))
+            if ((super.heuristicList != null)
+                    && (super.heuristicList.size() > 0))
                 return false;
 
             return true;
         }
     }
 
-    public String type() {
-        if (_typeName == null) {
+    public String type ()
+    {
+        if (_typeName == null)
+        {
             return super.type();
-        } else {
+        }
+        else
+        {
             return _typeName;
         }
     }
 
-    public void removeOldStoreEntry() {
-        try {
+    public void removeOldStoreEntry ()
+    {
+        try
+        {
             getStore().remove_committed(get_uid(), super.type());
-        } catch (ObjectStoreException ex) {
+        }
+        catch (ObjectStoreException ex) {
             jtsLogger.i18NLogger.warn_recovery_transactions_RecoveredTransaction_8(ex);
         }
     }
 
-    public boolean assumeComplete() {
+    public boolean assumeComplete ()
+    {
         final int heuristicDecision = getHeuristicDecision();
-
+        
         if (heuristicDecision == TwoPhaseOutcome.HEURISTIC_COMMIT
                 || heuristicDecision == TwoPhaseOutcome.HEURISTIC_HAZARD
                 || heuristicDecision == TwoPhaseOutcome.HEURISTIC_MIXED
@@ -257,9 +293,9 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
 
             _typeName = AssumedCompleteHeuristicTransaction.typeName();
         } else {
-            _typeName = AssumedCompleteTransaction.typeName();
+            _typeName = AssumedCompleteTransaction.typeName();            
         }
-
+    
         return true;
     }
 
@@ -270,7 +306,9 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * @since JTS 2.1.
      */
 
-    protected void packHeader(OutputObjectState os, Header hdr) throws IOException {
+    protected void packHeader (OutputObjectState os, Header hdr)
+            throws IOException
+    {
         /*
          * If there is a transaction present than pack the process Uid of this
          * JVM and the tx id. Otherwise pack a null Uid.
@@ -286,29 +324,37 @@ public class RecoveredTransaction extends ArjunaTransactionImple implements Reco
      * @since JTS 2.1.
      */
 
-    protected void unpackHeader(InputObjectState os, Header hdr) throws IOException {
+    protected void unpackHeader (InputObjectState os, Header hdr)
+            throws IOException
+    {
         super.unpackHeader(os, hdr);
-
+        
         _originalProcessUid = hdr.getProcessId();
     }
 
-    public boolean save_state(OutputObjectState objectState, int ot) {
+    public boolean save_state (OutputObjectState objectState, int ot)
+    {
         // do the other stuff
         boolean result = super.save_state(objectState, ot);
 
         // iff assumed complete, include the time (this should happen only once)
-        if (_typeName != null && result) {
+        if (_typeName != null && result)
+        {
             Date lastActiveTime = new Date();
-            try {
+            try
+            {
                 objectState.packLong(lastActiveTime.getTime());
-            } catch (java.io.IOException ex) {
+            }
+            catch (java.io.IOException ex)
+            {
             }
         }
         return result;
     }
 
     /** do not admit to being inactive */
-    public Date getLastActiveTime() {
+    public Date getLastActiveTime ()
+    {
         return null;
     }
 

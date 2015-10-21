@@ -57,199 +57,168 @@ import com.arjuna.mw.wsas.exceptions.InvalidActivityException;
  * @since 1.0.
  */
 
-public interface UserCoordinator {
+public interface UserCoordinator
+{
 
     /**
-     * Start a new activity. If there is already an activity associated with the
-     * thread then it will be nested. An implementation specific timeout will be
-     * associated with the activity (which may be no timeout).
+     * Start a new activity. If there is already an activity associated
+     * with the thread then it will be nested. An implementation specific
+     * timeout will be associated with the activity (which may be no
+     * timeout).
      *
-     * @exception WrongStateException
-     *                Thrown if the any currently associated activity is in a
-     *                state that does not allow a new activity to be enlisted.
-     * @exception SystemException
-     *                Thrown in any other situation.
+     * @exception WrongStateException Thrown if the any currently associated
+     * activity is in a state that does not allow a new activity to be
+     * enlisted.
+     * @exception SystemException Thrown in any other situation.
      */
 
-    public void begin(String coordinationType) throws WrongStateException, SystemException;
+    public void begin (String coordinationType) throws WrongStateException, SystemException;
 
     /**
-     * Start a new activity. If there is already an activity associated with the
-     * thread then it will be nested. If the activity is still active when the
-     * specified timeout elapses, it will be terminated.
+     * Start a new activity. If there is already an activity associated
+     * with the thread then it will be nested. If the activity is still
+     * active when the specified timeout elapses, it will be terminated.
      *
-     * @param timeout
-     *            The timeout associated with the activity (in seconds). If the
-     *            activity has not been terminated by the time this period
-     *            elapses, then it will automatically be terminated.
-     * @exception WrongStateException
-     *                Thrown if the currently associated activity is in a state
-     *                that does not allow a new activity to be enlisted as a
-     *                child.
-     * @exception InvalidTimeoutException
-     *                Thrown if the specified timeout is invalid within the
-     *                current working environment.
-     * @exception SystemException
-     *                Thrown in any other situation.
+     * @param timeout The timeout associated with the activity (in
+     * seconds). If the activity has not been terminated by the time this
+     * period elapses, then it will automatically be terminated.
+     * @exception WrongStateException Thrown if the currently associated
+     * activity is in a state that does not allow a new activity to be
+     * enlisted as a child.
+     * @exception InvalidTimeoutException Thrown if the specified timeout is
+     * invalid within the current working environment.
+     * @exception SystemException Thrown in any other situation.
      */
 
-    public void begin(String coordinationType, int timeout)
-            throws WrongStateException, InvalidTimeoutException, SystemException;
+    public void begin (String coordinationType, int timeout) throws WrongStateException, InvalidTimeoutException, SystemException;
 
     /**
      * Confirm the current activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is invalid in the execution
-     *                environment.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed in the status requested.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is
+     * invalid in the execution environment.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed in the status requested.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      */
 
-    public void close() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorCancelledException, NoPermissionException, SystemException;
+    public void close () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, CoordinatorCancelledException, NoPermissionException, SystemException;
 
     /**
      * Cancel the activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is invalid in the execution
-     *                environment.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed, or is incompatible with the
-     *                completion status provided.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is
+     * invalid in the execution environment.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed, or is incompatible with the
+     * completion status provided.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      *
      * @see com.arjuna.mw.wsas.activity.Outcome
      */
 
-    public void cancel() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, CoordinatorConfirmedException, NoPermissionException, SystemException;
+    public void cancel () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, CoordinatorConfirmedException, NoPermissionException, SystemException;
 
     /**
      * Complete the activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the current activity is invalid in the execution
-     *                environment.
-     * @exception WrongStateException
-     *                Thrown if the current activity is not in a state that
-     *                allows it to be completed, or is incompatible with the
-     *                completion status provided.
-     * @exception ProtocolViolationException
-     *                Thrown if the a violation of the activity service or HLS
-     *                protocol occurs.
-     * @exception NoPermissionException
-     *                Thrown if the invoking thread does not have permission to
-     *                terminate the transaction.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception InvalidActivityException Thrown if the current activity is
+     * invalid in the execution environment.
+     * @exception WrongStateException Thrown if the current activity is not in a
+     * state that allows it to be completed, or is incompatible with the
+     * completion status provided.
+     * @exception ProtocolViolationException Thrown if the a violation of the
+     * activity service or HLS protocol occurs.
+     * @exception NoPermissionException Thrown if the invoking thread does
+     * not have permission to terminate the transaction.
+     * @exception SystemException Thrown if some other error occurred.
      *
      * @see com.arjuna.mw.wsas.activity.Outcome
      */
 
-    public void complete() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
-            NoCoordinatorException, NoPermissionException, SystemException;
+    public void complete () throws InvalidActivityException, WrongStateException, ProtocolViolationException, NoCoordinatorException, NoPermissionException, SystemException;
 
     /**
      * Set the termination status for the current activity to cancel only.
      *
-     * @exception WrongStateException
-     *                Thrown if the completion status is incompatible with the
-     *                current state of the activity.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception WrongStateException Thrown if the completion status is
+     * incompatible with the current state of the activity.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void setCancelOnly() throws NoCoordinatorException, WrongStateException, SystemException;
+    public void setCancelOnly () throws NoCoordinatorException, WrongStateException, SystemException;
 
     /**
      * Get the timeout value currently associated with activities.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return the timeout value in seconds, or 0 if no application specified
-     *         timeout has been provided.
+     * timeout has been provided.
      */
 
-    public int getTimeout() throws SystemException;
+    public int getTimeout () throws SystemException;
 
     /**
      * Set the timeout to be associated with all subsequently created
-     * activities. A default value of 0 is automatically associated with each
-     * thread and this means that no application specified timeout is set for
-     * activities.
+     * activities. A default value of 0 is automatically associated with
+     * each thread and this means that no application specified timeout is
+     * set for activities.
      *
-     * @param timeout
-     *            The timeout (in seconds) to associate with all subsequently
-     *            created activities. This value must be 0 or greater.
+     * @param timeout The timeout (in seconds) to associate with all
+     * subsequently created activities. This value must be 0 or greater.
      *
-     * @exception InvalidTimeoutException
-     *                Thrown if the timeout value provided is negative, too
-     *                large, or if timeouts are simply not supported by the
-     *                activity implementation.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception InvalidTimeoutException Thrown if the timeout value provided
+     * is negative, too large, or if timeouts are simply not supported by
+     * the activity implementation.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void setTimeout(int timeout) throws InvalidTimeoutException, SystemException;
+    public void setTimeout (int timeout) throws InvalidTimeoutException, SystemException;
 
     /**
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
-     * @return the status of the current activity. If there is no activity
-     *         associated with the thread then NoActivity will be returned.
+     * @return the status of the current activity. If there is no
+     * activity associated with the thread then NoActivity
+     * will be returned.
      *
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status() throws SystemException;
-
+    public com.arjuna.mw.wsas.status.Status status () throws SystemException;
+    
     /**
-     * @exception NoActivityException
-     *                Thrown if there is no activity associated with the
-     *                invoking thread.
-     * @exception SystemException
-     *                Thrown if some other error occurred.
+     * @exception NoActivityException Thrown if there is no activity
+     * associated with the invoking thread.
+     * @exception SystemException Thrown if some other error occurred.
      *
-     * @return the unique coordinator id for the current coordinator. This may
-     *         or may not be the same as the activity id.
+     * @return the unique coordinator id for the current coordinator. This
+     * may or may not be the same as the activity id.
      */
 
-    public CoordinatorId identifier() throws NoActivityException, SystemException;
+    public CoordinatorId identifier () throws NoActivityException, SystemException;
 
     /**
      * Suspend the current activity from this thread and return the token
      * representing the context, if any, or null otherwise. Once called, the
      * thread will have no activities associated with it.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      *
      * @return the token representing the current context, if any, or null
-     *         otherwise.
+     * otherwise.
      */
 
-    public ActivityHierarchy suspend() throws SystemException;
+    public ActivityHierarchy suspend () throws SystemException;
 
     /**
      * Given a token representing a context, associate it with the current
@@ -257,27 +226,25 @@ public interface UserCoordinator {
      * activities that it may already be associated with. If the parameter is
      * null then the thread is associated with no activity.
      *
-     * @param tx
-     *            The activity to associate with this thread. This may be null
-     *            in which case the current thread becomes associated with no
-     *            activity.
+     * @param tx The activity to associate with this thread. This
+     * may be null in which case the current thread becomes associated with
+     * no activity.
      *
-     * @exception InvalidActivityException
-     *                Thrown if the activity handle is invalid in this context.
-     * @exception SystemException
-     *                Thrown if any other error occurs.
+     * @exception InvalidActivityException Thrown if the activity handle
+     * is invalid in this context.
+     * @exception SystemException Thrown if any other error occurs.
      */
 
-    public void resume(ActivityHierarchy tx) throws InvalidActivityException, SystemException;
+    public void resume (ActivityHierarchy tx) throws InvalidActivityException, SystemException;
 
     /**
-     * @return the token representing the current activity context hierarchy, or
-     *         null if there is none associated with the invoking thread.
+     * @return the token representing the current activity context hierarchy,
+     * or null if there is none associated with the invoking thread.
      *
-     * @exception SystemException
-     *                Thrown if any error occurs.
+     * @exception SystemException Thrown if any error occurs.
      */
 
-    public ActivityHierarchy currentActivity() throws SystemException;
-
+    public ActivityHierarchy currentActivity () throws SystemException;
+    
 }
+
