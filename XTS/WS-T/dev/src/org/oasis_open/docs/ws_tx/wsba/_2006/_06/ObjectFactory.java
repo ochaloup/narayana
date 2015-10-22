@@ -6,19 +6,16 @@ import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
-
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the org.oasis_open.docs.ws_tx.wsba._2006._06 package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
- * provided in this class.
+ * This object contains factory methods for each Java content interface and Java
+ * element interface generated in the org.oasis_open.docs.ws_tx.wsba._2006._06
+ * package.
+ * <p>
+ * An ObjectFactory allows you to programatically construct new instances of the
+ * Java representation for XML content. The Java representation of XML content
+ * can consist of schema derived interfaces and classes representing the binding
+ * of schema type definitions, element declarations and model groups. Factory
+ * methods for each of these are provided in this class.
  * 
  */
 @XmlRegistry
@@ -31,18 +28,26 @@ public class ObjectFactory {
     private final static QName _Exited_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Exited");
     private final static QName _Complete_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Complete");
     private final static QName _Failed_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Failed");
-    private final static QName _Compensate_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Compensate");
-    private final static QName _CannotComplete_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "CannotComplete");
-    private final static QName _Completed_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Completed");
+    private final static QName _Compensate_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "Compensate");
+    private final static QName _CannotComplete_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "CannotComplete");
+    private final static QName _Completed_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "Completed");
     private final static QName _Closed_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Closed");
-    private final static QName _Compensated_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Compensated");
+    private final static QName _Compensated_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "Compensated");
     private final static QName _Exit_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Exit");
     private final static QName _Fail_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "Fail");
-    private final static QName _GetStatus_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "GetStatus");
-    private final static QName _NotCompleted_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06", "NotCompleted");
+    private final static QName _GetStatus_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "GetStatus");
+    private final static QName _NotCompleted_QNAME = new QName("http://docs.oasis-open.org/ws-tx/wsba/2006/06",
+            "NotCompleted");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.oasis_open.docs.ws_tx.wsba._2006._06
+     * Create a new ObjectFactory that can be used to create new instances of
+     * schema derived classes for package:
+     * org.oasis_open.docs.ws_tx.wsba._2006._06
      * 
      */
     public ObjectFactory() {
@@ -89,7 +94,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Canceled")
@@ -98,7 +104,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Cancel")
@@ -107,7 +114,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StatusType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StatusType
+     * }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Status")
@@ -116,7 +124,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Close")
@@ -125,7 +134,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Exited")
@@ -134,7 +144,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Complete")
@@ -143,7 +154,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Failed")
@@ -152,7 +164,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Compensate")
@@ -161,7 +174,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "CannotComplete")
@@ -170,7 +184,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Completed")
@@ -179,7 +194,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Closed")
@@ -188,7 +204,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Compensated")
@@ -197,7 +214,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Exit")
@@ -206,7 +224,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ExceptionType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExceptionType
+     * }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "Fail")
@@ -215,7 +234,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "GetStatus")
@@ -224,7 +244,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link NotificationType }{@code >}}
+     * Create an instance of {@link JAXBElement
+     * }{@code <}{@link NotificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://docs.oasis-open.org/ws-tx/wsba/2006/06", name = "NotCompleted")

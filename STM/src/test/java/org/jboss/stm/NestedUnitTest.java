@@ -51,67 +51,59 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class NestedUnitTest extends TestCase
-{
+public class NestedUnitTest extends TestCase {
     @Transactional
-    public interface Counter
-    {
-        public boolean increment (boolean inTransaction);
-        public int count ();
-        public boolean checkTransactionId (AtomicAction tx);
+    public interface Counter {
+        public boolean increment(boolean inTransaction);
+        public int count();
+        public boolean checkTransactionId(AtomicAction tx);
     }
-    
+
     @Nested
-    public class CounterImple implements Counter
-    {
+    public class CounterImple implements Counter {
         @ReadLock
-        public int count ()
-        {
+        public int count() {
             return _count;
         }
 
         @WriteLock
-        public boolean increment (boolean inTransaction)
-        {
+        public boolean increment(boolean inTransaction) {
             if (inTransaction && (AtomicAction.Current() == null))
                 return false;
-            
+
             _count++;
-            
+
             return true;
         }
-        
+
         @ReadLock
-        public boolean checkTransactionId (AtomicAction tx)
-        {
+        public boolean checkTransactionId(AtomicAction tx) {
             return (tx.equals(AtomicAction.Current()));
         }
-        
+
         private int _count = 0;
     }
-    
-    public void testNested () throws Exception
-    {
+
+    public void testNested() throws Exception {
         Counter dt2 = new RecoverableContainer<Counter>().enlist(new CounterImple());
         AtomicAction A = new AtomicAction();
-        
+
         A.begin();
-        
+
         dt2.increment(true);
-        
+
         assertFalse(dt2.checkTransactionId(A));
 
         A.abort();
-        
+
         assertTrue(dt2.count() == 0);
     }
-    
-    public void testTopLevel () throws Exception
-    {
+
+    public void testTopLevel() throws Exception {
         Counter dt2 = new RecoverableContainer<Counter>().enlist(new CounterImple());
-        
+
         assertTrue(dt2.increment(true));
-        
+
         assertTrue(dt2.count() == 1);
     }
 }

@@ -38,23 +38,17 @@ import static org.junit.Assert.fail;
 import com.arjuna.ats.internal.jts.lifecycle.ShutdownOTS;
 import com.arjuna.ats.internal.jts.lifecycle.StartupOTS;
 
-public class StartStopUnitTest
-{
+public class StartStopUnitTest {
     @Test
-    public void run() throws Exception
-    {
+    public void run() throws Exception {
         StartupOTS start = new StartupOTS();
         ShutdownOTS shutdown = new ShutdownOTS();
-        
-        try
-        {
+
+        try {
             shutdown.work();
- 
+
             fail();
-        }
-        catch (final Throwable ex)
-        {
+        } catch (final Throwable ex) {
         }
     }
 }
-

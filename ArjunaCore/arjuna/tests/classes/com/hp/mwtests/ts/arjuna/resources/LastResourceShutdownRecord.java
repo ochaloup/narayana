@@ -11,8 +11,7 @@ import com.arjuna.ats.internal.arjuna.abstractrecords.LastResourceRecord;
 
 import java.io.PrintWriter;
 
-public class LastResourceShutdownRecord extends LastResourceRecord
-{
+public class LastResourceShutdownRecord extends LastResourceRecord {
     private final boolean failInPrepare;
 
     public LastResourceShutdownRecord(OnePhaseResource onePhaseResource) {
@@ -24,8 +23,7 @@ public class LastResourceShutdownRecord extends LastResourceRecord
         this.failInPrepare = failInPrepare;
     }
 
-    public int topLevelPrepare()
-    {
+    public int topLevelPrepare() {
         if (failInPrepare) {
             super.topLevelAbort();
             return TwoPhaseOutcome.PREPARE_NOTOK;
@@ -34,17 +32,13 @@ public class LastResourceShutdownRecord extends LastResourceRecord
         }
     }
 
-    public void print(PrintWriter strm)
-    {
+    public void print(PrintWriter strm) {
         strm.println("LastResourceShutdownRecord for:");
         super.print(strm);
     }
 
-    public String type()
-    {
+    public String type() {
         return "/StateManager/AbstractRecord/LastResourceShutdownRecord";
     }
 
 }
-
-

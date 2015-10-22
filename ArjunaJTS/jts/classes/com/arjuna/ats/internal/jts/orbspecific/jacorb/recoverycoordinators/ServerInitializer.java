@@ -37,17 +37,13 @@ import org.omg.PortableInterceptor.ORBInitializer;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
 /**
- * This class registers the ServerForwardInterceptor 
- * with the ORB.
+ * This class registers the ServerForwardInterceptor with the ORB.
  *
  * @author Malik Saheb
  *
  */
 
-public class ServerInitializer 
-    extends org.omg.CORBA.LocalObject 
-    implements ORBInitializer
-{
+public class ServerInitializer extends org.omg.CORBA.LocalObject implements ORBInitializer {
 
     static com.arjuna.orbportability.ORB myORB = null;
 
@@ -55,23 +51,19 @@ public class ServerInitializer
     }
 
     /**
-     * This method resolves the NameService and registers the 
-     * interceptor.
+     * This method resolves the NameService and registers the interceptor.
      */
 
-    public void post_init(ORBInitInfo info) 
-    {
-        try
-        {
-        org.omg.CORBA.ORB theORB = ((org.jacorb.orb.portableInterceptor.ORBInitInfoImpl)info).getORB();
-        
-        info.add_server_request_interceptor (new ServerRecoveryInterceptor(theORB));
-        }
-        catch (Exception e) {
+    public void post_init(ORBInitInfo info) {
+        try {
+            org.omg.CORBA.ORB theORB = ((org.jacorb.orb.portableInterceptor.ORBInitInfoImpl) info).getORB();
+
+            info.add_server_request_interceptor(new ServerRecoveryInterceptor(theORB));
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_orbspecific_jacorb_recoverycoordinators_ServerInitializer_1(e);
         }
     }
 
-    public void pre_init(ORBInitInfo info) {    
+    public void pre_init(ORBInitInfo info) {
     }
 } // ServerInitializer

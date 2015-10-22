@@ -43,17 +43,14 @@ import com.arjuna.ats.jts.*;
 import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 
-public class SingleResourceRegistration extends PerfTestInterfacePOA
-{
-    public void work() throws PerfTestException
-    {
-        try
-        {
+public class SingleResourceRegistration extends PerfTestInterfacePOA {
+    public void work() throws PerfTestException {
+        try {
             /**
              * Retrieve ORB and OA references
              */
-            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
-            OA oa = OA.getRootOA( orb );
+            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
+            OA oa = OA.getRootOA(orb);
 
             Control control = OTSManager.get_current().get_control();
             Coordinator coordinator = control.get_coordinator();
@@ -64,9 +61,7 @@ public class SingleResourceRegistration extends PerfTestInterfacePOA
             Resource res = ResourceHelper.narrow(oa.corbaReference(resource));
 
             coordinator.register_resource(res);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace(System.err);
             throw new PerfTestException();
         }

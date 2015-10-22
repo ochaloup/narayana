@@ -34,42 +34,34 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
-public class IDLBuildListElement extends Task
-{
+public class IDLBuildListElement extends Task {
     protected String _source = null;
     protected String _package = "";
     protected String _mapping = "";
 
-    public void initialise(Project p)
-    {
+    public void initialise(Project p) {
         setProject(p);
     }
 
-    public void setSrc(String src)
-    {
+    public void setSrc(String src) {
         _source = src;
     }
 
-    public void setPackage(String pckg)
-    {
+    public void setPackage(String pckg) {
         _package = pckg;
     }
 
-    public void setMappings(String mapping)
-    {
+    public void setMappings(String mapping) {
         _mapping = mapping;
     }
 
-    public void execute() throws BuildException
-    {
-        if (_source == null)
-        {
+    public void execute() throws BuildException {
+        if (_source == null) {
             throw new BuildException("Attribute 'src' not specified in idl build list element");
         }
     }
 
-    public String toString()
-    {
+    public String toString() {
         return ("<'" + _source + "','" + _package + "','" + _mapping + "'>");
     }
 }

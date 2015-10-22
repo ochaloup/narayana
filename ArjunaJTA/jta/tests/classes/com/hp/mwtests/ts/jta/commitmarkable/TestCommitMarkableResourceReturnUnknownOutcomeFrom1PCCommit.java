@@ -79,7 +79,8 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
 
         resetPropertiesFile = System.getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
         if (resetPropertiesFile == null) {
-            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "commitmarkableresourcejbossts-properties.xml");
+            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
+                    "commitmarkableresourcejbossts-properties.xml");
         }
         manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
     }
@@ -99,7 +100,8 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
 
     @Test
     public void testRMFAILAfterCommit() throws Exception {
-        jtaPropertyManager.getJTAEnvironmentBean().setNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches(false);
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches(false);
         final JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
         // Test code
@@ -127,7 +129,7 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[] { xaResource };
+                            return new XAResource[]{xaResource};
                         }
                     });
                 }
@@ -192,7 +194,8 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
 
     @Test
     public void testRMFAILAfterNoCommit() throws Exception {
-        jtaPropertyManager.getJTAEnvironmentBean().setNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches(false);
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches(false);
         final JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
         // Test code
@@ -220,7 +223,7 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
                         }
 
                         public XAResource[] getXAResources() throws Exception {
-                            return new XAResource[] { xaResource };
+                            return new XAResource[]{xaResource};
                         }
                     });
                 }

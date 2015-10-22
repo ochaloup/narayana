@@ -39,24 +39,18 @@ package com.arjuna.mw.wsas.exceptions;
  * @since 1.0.
  */
 
-public class InvalidHLSException extends WSASException
-{
+public class InvalidHLSException extends WSASException {
 
-    public InvalidHLSException ()
-    {
-    super();
+    public InvalidHLSException() {
+        super();
     }
 
-    public InvalidHLSException (String s)
-    {
-    super(s);
+    public InvalidHLSException(String s) {
+        super(s);
     }
 
-    public InvalidHLSException (String s, int errorcode)
-    {
-    super(s, errorcode);
+    public InvalidHLSException(String s, int errorcode) {
+        super(s, errorcode);
     }
-    
+
 }
-
-

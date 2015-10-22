@@ -38,48 +38,40 @@ import java.io.File;
  * $Id: RegisterOTSServer.java,v 1.2 2003/06/26 11:45:07 rbegg Exp $
  */
 
-public class RegisterOTSServer2
-{
+public class RegisterOTSServer2 {
     public final static String NAME_SERVICE_BIND_NAME_PROPERTY = "ots.server.bindname";
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         String bindName = System.getProperty(NAME_SERVICE_BIND_NAME_PROPERTY);
 
-        if (bindName != null)
-        {
+        if (bindName != null) {
             System.out.println("Registering OTS Server '" + bindName + "'");
 
-            try
-            {
+            try {
                 ORBInterface.initORB(args, null);
 
                 String[] transactionFactoryParams = new String[1];
                 transactionFactoryParams[0] = ORBServices.otsKind;
 
-                TransactionFactory transactionFactory = TransactionFactoryHelper.narrow(ORBServices.getService(ORBServices.transactionService, transactionFactoryParams));
+                TransactionFactory transactionFactory = TransactionFactoryHelper
+                        .narrow(ORBServices.getService(ORBServices.transactionService, transactionFactoryParams));
 
                 registerService(bindName, ORBInterface.orb().object_to_string(transactionFactory));
 
                 System.out.println("Ready");
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace(System.err);
                 System.out.println("Failed");
             }
-        }
-        else
-        {
+        } else {
             System.out.println("Bind name '" + NAME_SERVICE_BIND_NAME_PROPERTY + "' not specified");
             System.out.println("Failed");
         }
     }
 
-    public static void registerService(String name, String ior) throws IOException
-    {
+    public static void registerService(String name, String ior) throws IOException {
         File file = new File(name);
-        if(file.getParentFile() != null) {
+        if (file.getParentFile() != null) {
             file.getParentFile().mkdirs();
         }
         FileOutputStream fout = new FileOutputStream(file);

@@ -38,11 +38,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlist a single participants for each of several web services with instructions to
- * prepare and commit without error
+ * Starts a transaction and enlist a single participants for each of several web
+ * services with instructions to prepare and commit without error
  */
-public class MultiServicePrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest
-{
+public class MultiServicePrepareAndCommitTest extends XTSServiceTestBase implements XTSServiceTest {
     public void run() {
 
         // wait a while so the service has time to start
@@ -79,7 +78,6 @@ public class MultiServicePrepareAndCommitTest extends XTSServiceTestBase impleme
 
         UserTransaction tx = UserTransactionFactory.userTransaction();
 
-
         // start the transaction
 
         try {
@@ -95,7 +93,7 @@ public class MultiServicePrepareAndCommitTest extends XTSServiceTestBase impleme
             return;
         }
 
-        // invoke the service and tell it to prepare and  commit
+        // invoke the service and tell it to prepare and commit
         List<String> commands = new ArrayList<String>();
         List<String> results = new ArrayList<String>();
 

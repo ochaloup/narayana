@@ -12,12 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * manager allowing XTS coordinator recovery modules to be registered at startup and unregistered at shutdown.
+ * manager allowing XTS coordinator recovery modules to be registered at startup
+ * and unregistered at shutdown.
  */
-public class CoordinatorRecoveryInitialisation
-{
+public class CoordinatorRecoveryInitialisation {
     /**
-     * the list of XTS recovery modules actually registered with the JBossTS recovery manager
+     * the list of XTS recovery modules actually registered with the JBossTS
+     * recovery manager
      */
     private static List<XTSRecoveryModule> recoveryModules = new ArrayList<XTSRecoveryModule>();
 
@@ -27,10 +28,10 @@ public class CoordinatorRecoveryInitialisation
 
     private static boolean initialised = false;
     /**
-     * initialisation routine which registers all configured XTS recovery modules
+     * initialisation routine which registers all configured XTS recovery
+     * modules
      */
-    public static void startup()
-    {
+    public static void startup() {
         if (initialised) {
             return;
         }
@@ -40,15 +41,15 @@ public class CoordinatorRecoveryInitialisation
         List<String> modules = recoveryEnvironmentBean.getCoordinatorRecoveryModules();
         Iterator<String> iterator = modules.iterator();
 
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             String className = (String) iterator.next();
             Class<?> clazz = null;
 
             try {
                 clazz = CoordinatorRecoveryInitialisation.class.getClassLoader().loadClass(className);
             } catch (ClassNotFoundException cnfe) {
-                RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_1(className, cnfe);
+                RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_1(className,
+                        cnfe);
                 continue;
             }
 
@@ -56,16 +57,17 @@ public class CoordinatorRecoveryInitialisation
                 RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_2(className);
                 continue;
             }
-            
+
             try {
-                XTSRecoveryModule module = (XTSRecoveryModule)clazz.newInstance();
+                XTSRecoveryModule module = (XTSRecoveryModule) clazz.newInstance();
                 module.install();
                 RecoveryManager.manager().addModule(module);
                 recoveryModules.add(module);
             } catch (InstantiationException ie) {
                 RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_3(className, ie);
             } catch (IllegalAccessException iae) {
-                RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_4(className, iae);
+                RecoveryLogger.i18NLogger.error_recovery_coordinator_CoordinatorRecoveryInitialisation_4(className,
+                        iae);
             }
         }
 
@@ -75,12 +77,11 @@ public class CoordinatorRecoveryInitialisation
     /**
      * shutdown routine which removes all installed recovery modules
      */
-    public static void shutdown()
-    {
+    public static void shutdown() {
         if (!initialised) {
             return;
         }
-        
+
         Iterator<XTSRecoveryModule> iterator = recoveryModules.iterator();
 
         while (iterator.hasNext()) {
@@ -90,7 +91,7 @@ public class CoordinatorRecoveryInitialisation
         }
 
         recoveryModules.clear();
-        
+
         initialised = false;
     }
 }

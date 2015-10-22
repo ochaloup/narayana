@@ -12,23 +12,21 @@ import com.arjuna.wscf.tests.WarDeployment;
 
 @RunWith(Arquillian.class)
 public class BeginCancelTest {
-    
+
     @Deployment
     public static WebArchive createDeployment() {
         return WarDeployment.getDeployment();
     }
-    
+
     @Test
-    public void testBeginCancel()
-            throws Exception
-    {
+    public void testBeginCancel() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
         ua.begin("TwoPhase11HLS");
 
-        System.out.println("Started: "+ua.identifier()+"\n");
+        System.out.println("Started: " + ua.identifier() + "\n");
 
         ua.cancel();
 

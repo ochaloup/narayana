@@ -18,15 +18,13 @@
  * (C) 2010
  * @author JBoss Inc.
  */
- package org.jboss.jbossts.star.provider;
+package org.jboss.jbossts.star.provider;
 
 /**
  * transaction status exception
  */
-public class TransactionStatusException extends RuntimeException
-{
-    public TransactionStatusException(String message)
-    {
+public class TransactionStatusException extends RuntimeException {
+    public TransactionStatusException(String message) {
         super(message);
     }
 }

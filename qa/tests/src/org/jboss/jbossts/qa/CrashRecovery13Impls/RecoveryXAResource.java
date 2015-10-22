@@ -39,13 +39,10 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-public class RecoveryXAResource implements XAResource
-{
+public class RecoveryXAResource implements XAResource {
 
-    public RecoveryXAResource()
-    {
-        if (xids == null)
-        {
+    public RecoveryXAResource() {
+        if (xids == null) {
             xids = new Xid[2];
 
             AtomicAction a = new AtomicAction();
@@ -64,48 +61,38 @@ public class RecoveryXAResource implements XAResource
         }
     }
 
-    public void commit(Xid xid, boolean onePhase) throws XAException
-    {
+    public void commit(Xid xid, boolean onePhase) throws XAException {
     }
 
-    public void end(Xid xid, int flags) throws XAException
-    {
+    public void end(Xid xid, int flags) throws XAException {
     }
 
-    public void forget(Xid xid) throws XAException
-    {
+    public void forget(Xid xid) throws XAException {
     }
 
-    public int getTransactionTimeout() throws XAException
-    {
+    public int getTransactionTimeout() throws XAException {
         return 0;
     }
 
-    public int prepare(Xid xid) throws XAException
-    {
+    public int prepare(Xid xid) throws XAException {
         return XAResource.XA_OK;
     }
 
-    public Xid[] recover(int flag) throws XAException
-    {
+    public Xid[] recover(int flag) throws XAException {
         return xids;
     }
 
-    public void rollback(Xid xid) throws XAException
-    {
+    public void rollback(Xid xid) throws XAException {
     }
 
-    public boolean setTransactionTimeout(int seconds) throws XAException
-    {
+    public boolean setTransactionTimeout(int seconds) throws XAException {
         return true;
     }
 
-    public void start(Xid xid, int flags) throws XAException
-    {
+    public void start(Xid xid, int flags) throws XAException {
     }
 
-    public boolean isSameRM(XAResource xares) throws XAException
-    {
+    public boolean isSameRM(XAResource xares) throws XAException {
         return (xares == this);
     }
 

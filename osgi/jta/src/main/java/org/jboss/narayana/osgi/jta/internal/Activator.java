@@ -30,15 +30,14 @@ import javax.transaction.TransactionManager;
 public class Activator implements BundleActivator {
     private ServiceRegistration transactionManagerReg;
 
-
     public void start(BundleContext context) {
         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 
-            // Register the TransactionManager service if is not already available
-            if (context.getServiceReference(TransactionManager.class.getName()) == null)
-            {
+            // Register the TransactionManager service if is not already
+            // available
+            if (context.getServiceReference(TransactionManager.class.getName()) == null) {
                 TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                 transactionManagerReg = context.registerService(TransactionManager.class.getName(), tm, null);
             }
@@ -47,7 +46,6 @@ public class Activator implements BundleActivator {
             Thread.currentThread().setContextClassLoader(ctxLoader);
         }
     }
-
 
     public void stop(BundleContext context) {
         if (transactionManagerReg != null) {

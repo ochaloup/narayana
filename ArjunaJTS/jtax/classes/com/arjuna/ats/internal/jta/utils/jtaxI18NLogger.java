@@ -38,10 +38,10 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface jtaxI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 24001, value = "XA recovery committing {0}", format = MESSAGE_FORMAT)
@@ -52,9 +52,11 @@ public interface jtaxI18NLogger {
     @LogMessage(level = INFO)
     public void info_jtax_recovery_jts_orbspecific_rollback(String arg0);
 
-//    @Message(id = 24003, value = "{0} caught exception during construction: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_resources_jts_orbspecific_consterror(String arg0, String arg1);
+    // @Message(id = 24003, value = "{0} caught exception during construction:
+    // {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_resources_jts_orbspecific_consterror(String arg0,
+    // String arg1);
 
     @Message(id = 24004, value = "Caught the following error while trying to single phase complete resource", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -66,7 +68,8 @@ public interface jtaxI18NLogger {
 
     @Message(id = 24006, value = "{0} caused an error from resource {1} in transaction {2}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_jtax_resources_jts_orbspecific_generror(String arg0, String arg1, String arg2, @Cause() Throwable arg3);
+    public void warn_jtax_resources_jts_orbspecific_generror(String arg0, String arg1, String arg2,
+            @Cause() Throwable arg3);
 
     @Message(id = 24007, value = "You have chosen to disable the Multiple Last Resources warning. You will see it only once.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -102,7 +105,8 @@ public interface jtaxI18NLogger {
 
     @Message(id = 24015, value = "XAResource prepare failed on resource {0} for transaction {1} with: {2}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_jtax_resources_jts_orbspecific_preparefailed(String arg0, String arg1, String arg2, @Cause() Throwable arg3);
+    public void warn_jtax_resources_jts_orbspecific_preparefailed(String arg0, String arg1, String arg2,
+            @Cause() Throwable arg3);
 
     @Message(id = 24016, value = "Recovery of resource failed when trying to call {0} got exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -134,7 +138,8 @@ public interface jtaxI18NLogger {
 
     @Message(id = 24023, value = "{0} caused an XA error: {1} from resource {2} in transaction {3}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_jtax_resources_jts_orbspecific_xaerror(String arg0, String arg1, String arg2, String arg3, @Cause() Throwable arg4);
+    public void warn_jtax_resources_jts_orbspecific_xaerror(String arg0, String arg1, String arg2, String arg3,
+            @Cause() Throwable arg4);
 
     @Message(id = 24024, value = "thread is already associated with a transaction and subtransaction support is not enabled!", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_alreadyassociated();
@@ -156,9 +161,10 @@ public interface jtaxI18NLogger {
     @Message(id = 24029, value = "Transaction is not active.", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_inactivetx();
 
-//    @Message(id = 24030, value = "invalid transaction!", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_transaction_jts_invalidtx();
+    // @Message(id = 24030, value = "invalid transaction!", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_transaction_jts_invalidtx();
 
     @Message(id = 24031, value = "Invalid transaction.", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_invalidtx2();
@@ -186,16 +192,18 @@ public interface jtaxI18NLogger {
     @Message(id = 24038, value = "no transaction! Caught:", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_notxe();
 
-//    @Message(id = 24039, value = "No such transaction.", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_transaction_jts_nox();
+    // @Message(id = 24039, value = "No such transaction.", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_transaction_jts_nox();
 
     @Message(id = 24040, value = "paramater is null!", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_nullparam();
 
-//    @Message(id = 24041, value = "{0} could not register transaction: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_transaction_jts_regerror(String arg0, String arg1);
+    // @Message(id = 24041, value = "{0} could not register transaction: {1}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_transaction_jts_regerror(String arg0, String arg1);
 
     @Message(id = 24042, value = "is already suspended!", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_ressusp();
@@ -208,17 +216,19 @@ public interface jtaxI18NLogger {
     @LogMessage(level = WARN)
     public void warn_jtax_transaction_jts_rollbackerror(String arg0, @Cause() Throwable arg1);
 
-//    @Message(id = 24045, value = "setRollbackOnly called from:", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_transaction_jts_setrollback();
+    // @Message(id = 24045, value = "setRollbackOnly called from:", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_transaction_jts_setrollback();
 
     @Message(id = 24046, value = "{0} returned XA error {1} for transaction {2}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_jtax_transaction_jts_starterror(String arg0, String arg1, String arg2, @Cause() Throwable arg3);
 
-//    @Message(id = 24047, value = "Not allowed to terminate subordinate transaction directly.", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_jtax_transaction_jts_subordinate_invalidstate();
+    // @Message(id = 24047, value = "Not allowed to terminate subordinate
+    // transaction directly.", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_jtax_transaction_jts_subordinate_invalidstate();
 
     @Message(id = 24048, value = "Synchronizations are not allowed!", format = MESSAGE_FORMAT)
     public String get_jtax_transaction_jts_syncerror();
@@ -257,14 +267,14 @@ public interface jtaxI18NLogger {
     public void warn_jtax_transaction_jts_timeouterror(String arg0, String arg1, String arg2, @Cause() Throwable arg3);
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
-    */
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
+     */
 }

@@ -41,32 +41,29 @@ import org.junit.Test;
 import com.arjuna.ats.internal.jts.orbspecific.recovery.RecoveryEnablement;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class RecoveryEnablementUnitTest extends TestBase
-{ 
+public class RecoveryEnablementUnitTest extends TestBase {
     public void beforeSetupClass() {
         // persistent POAs can't be anonymous, need a name:
         System.setProperty("jacorb.implname", "arjuna");
     }
-    
+
     @After
     public void tearDown() {
         System.clearProperty("jacorb.implname");
     }
 
-
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         ORBManager.reset();
 
         RecoveryEnablement rec = new RecoveryEnablement();
-        
+
         assertTrue(rec.startRCservice());
-        
+
         RecoveryEnablement.isNotANormalProcess();
-        
+
         assertFalse(RecoveryEnablement.isNormalProcess());
-        
+
         assertTrue(RecoveryEnablement.getRecoveryManagerTag() != null);
     }
 }

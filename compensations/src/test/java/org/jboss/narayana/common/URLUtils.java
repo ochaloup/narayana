@@ -11,7 +11,8 @@ public final class URLUtils {
 
         if (baseAddress == null) {
             baseAddress = "http://localhost";
-        } else if (!baseAddress.toLowerCase().startsWith("http://") && !baseAddress.toLowerCase().startsWith("https://")) {
+        } else if (!baseAddress.toLowerCase().startsWith("http://")
+                && !baseAddress.toLowerCase().startsWith("https://")) {
             baseAddress = "http://" + baseAddress;
         }
 

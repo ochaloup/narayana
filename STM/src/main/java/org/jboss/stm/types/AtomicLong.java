@@ -28,23 +28,22 @@ import org.jboss.stm.annotations.WriteLock;
 // TODO maybe pull all of this into a separate jar
 
 @Transactional
-public interface AtomicLong
-{
+public interface AtomicLong {
     @WriteLock
-    public void set (long val);
-    
+    public void set(long val);
+
     @ReadLock
-    public long get ();
-    
+    public long get();
+
     @WriteLock
-    public AtomicLong increment ();
-    
+    public AtomicLong increment();
+
     @WriteLock
-    public AtomicLong decrement ();
-    
+    public AtomicLong decrement();
+
     @WriteLock
-    public AtomicLong add (AtomicLong obj);
-    
+    public AtomicLong add(AtomicLong obj);
+
     @WriteLock
-    public AtomicLong subtract (AtomicLong obj);
+    public AtomicLong subtract(AtomicLong obj);
 }

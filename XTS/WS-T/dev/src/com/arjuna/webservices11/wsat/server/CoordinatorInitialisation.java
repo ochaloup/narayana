@@ -29,12 +29,11 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Coordinator service
+ * 
  * @author kevin
  */
-public class CoordinatorInitialisation
-{
-    public static void startup()
-    {
+public class CoordinatorInitialisation {
+    public static void startup() {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -45,7 +44,6 @@ public class CoordinatorInitialisation
         if (coordinatorServiceURLPath == null) {
             coordinatorServiceURLPath = "/ws-t11-coordinator";
         }
-
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -59,16 +57,15 @@ public class CoordinatorInitialisation
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" +  bindAddress + ":" + bindPort + coordinatorServiceURLPath;
+        final String baseUri = "http://" + bindAddress + ":" + bindPort + coordinatorServiceURLPath;
         final String uri = baseUri + "/" + AtomicTransactionConstants.COORDINATOR_SERVICE_NAME;
-        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
+        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
         final String secureUri = secureBaseUri + "/" + AtomicTransactionConstants.COORDINATOR_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, uri) ;
-        serviceRegistry.registerSecureServiceProvider(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, secureUri) ;
+        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, uri);
+        serviceRegistry.registerSecureServiceProvider(AtomicTransactionConstants.COORDINATOR_SERVICE_NAME, secureUri);
     }
 
-    public static void shutdown()
-    {
+    public static void shutdown() {
     }
 }

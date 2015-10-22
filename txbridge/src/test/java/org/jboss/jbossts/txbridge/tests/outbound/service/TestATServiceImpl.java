@@ -50,7 +50,8 @@ public class TestATServiceImpl {
     public void doNothing() {
         try {
             TransactionManager transactionManager = TransactionManagerFactory.transactionManager();
-            transactionManager.enlistForDurableTwoPhase(new TestATServiceParticipant(), "testServiceAT:" + UUID.randomUUID());
+            transactionManager.enlistForDurableTwoPhase(new TestATServiceParticipant(),
+                    "testServiceAT:" + UUID.randomUUID());
         } catch (UnknownTransactionException e) {
             // Ignore if no transaction
         } catch (Exception e) {

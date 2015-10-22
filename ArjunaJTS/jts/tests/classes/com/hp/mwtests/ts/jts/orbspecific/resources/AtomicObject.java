@@ -45,185 +45,148 @@ import com.arjuna.ats.txoj.LockMode;
 import com.arjuna.ats.txoj.LockResult;
 import com.hp.mwtests.ts.jts.exceptions.TestException;
 
-public class AtomicObject extends LockManager
-{
+public class AtomicObject extends LockManager {
 
-    public AtomicObject ()
-    {
-    super(ObjectType.ANDPERSISTENT);
+    public AtomicObject() {
+        super(ObjectType.ANDPERSISTENT);
 
-    CurrentImple current = OTSImpleManager.current();
+        CurrentImple current = OTSImpleManager.current();
 
-    _value = 0;
-
-    try
-    {
-        current.begin();
-
-        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
-        {
         _value = 0;
 
-        current.commit(false);
+        try {
+            current.begin();
+
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+                _value = 0;
+
+                current.commit(false);
+            } else
+                current.rollback();
+        } catch (Exception e) {
+            System.out.println("AtomicObject " + e);
         }
-        else
-        current.rollback();
-    }
-    catch (Exception e)
-    {
-        System.out.println("AtomicObject "+e);
-    }
     }
 
-    public AtomicObject (Uid u)
-    {
-    super(u);
+    public AtomicObject(Uid u) {
+        super(u);
     }
 
-    public void finalize () throws Throwable
-    {
-    super.terminate();
-    super.finalize();
+    public void finalize() throws Throwable {
+        super.terminate();
+        super.finalize();
     }
 
-    public synchronized boolean incr (int value)
-    {
-    boolean res = false;
-    CurrentImple current = OTSImpleManager.current();
+    public synchronized boolean incr(int value) {
+        boolean res = false;
+        CurrentImple current = OTSImpleManager.current();
 
-    try
-    {
-        current.begin();
+        try {
+            current.begin();
 
-        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
-        {
-        _value = _value + value;
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+                _value = _value + value;
 
-        current.commit(false);
-        res = true;
+                current.commit(false);
+                res = true;
+            } else
+                current.rollback();
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
+
+            res = false;
         }
-        else
-        current.rollback();
-    }
-    catch (Exception e)
-    {
-        System.out.println(e);
-        e.printStackTrace();
 
-        res = false;
+        return res;
     }
 
-    return res;
-    }
+    public synchronized boolean set(int value) {
+        boolean res = false;
+        CurrentImple current = OTSImpleManager.current();
 
-    public synchronized boolean set (int value)
-    {
-    boolean res = false;
-    CurrentImple current = OTSImpleManager.current();    
+        try {
+            current.begin();
 
-    try
-    {
-        current.begin();
+            if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED) {
+                _value = value;
 
-        if (setlock(new Lock(LockMode.WRITE), 0) == LockResult.GRANTED)
-        {
-        _value = value;
+                current.commit(false);
+                res = true;
+            } else
+                current.rollback();
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
 
-        current.commit(false);
-        res = true;
+            res = false;
         }
-        else
-        current.rollback();
-    }
-    catch (Exception e)
-    {
-        System.out.println(e);
-        e.printStackTrace();
 
-        res = false;
+        return res;
     }
 
-    return res;
-    }
+    public synchronized int get() throws TestException {
+        boolean res = false;
+        CurrentImple current = OTSImpleManager.current();
+        int value = -1;
 
-    public synchronized int get () throws TestException
-    {
-    boolean res = false;
-    CurrentImple current = OTSImpleManager.current();    
-    int value = -1;
+        try {
+            current.begin();
 
-    try
-    {
-        current.begin();
+            if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED) {
+                value = _value;
 
-        if (setlock(new Lock(LockMode.READ), 0) == LockResult.GRANTED)
-        {
-        value = _value;
+                current.commit(false);
+                res = true;
+            } else
+                current.rollback();
+        } catch (Exception e) {
+            System.out.println(e);
+            e.printStackTrace();
 
-        current.commit(false);
-        res = true;
+            res = false;
         }
+
+        if (!res)
+            throw new TestException();
         else
-        current.rollback();
-    }
-    catch (Exception e)
-    {
-        System.out.println(e);
-        e.printStackTrace();
-
-        res = false;
+            return value;
     }
 
-    if (!res)
-        throw new TestException();
-    else
-        return value;
+    public boolean save_state(OutputObjectState os, int t) {
+        boolean result = super.save_state(os, t);
+
+        if (!result)
+            return false;
+
+        try {
+            os.packInt(_value);
+        } catch (IOException e) {
+            result = false;
+        }
+
+        return result;
     }
 
-    public boolean save_state (OutputObjectState os, int t)
-    {
-    boolean result = super.save_state(os, t);
+    public boolean restore_state(InputObjectState os, int t) {
+        boolean result = super.restore_state(os, t);
 
-    if (!result)
-        return false;
+        if (!result)
+            return false;
 
-    try
-    {
-        os.packInt(_value);
-    }
-    catch (IOException e)
-    {
-        result = false;
-    }
+        try {
+            _value = os.unpackInt();
+        } catch (IOException e) {
+            result = false;
+        }
 
-    return result;
+        return result;
     }
 
-    public boolean restore_state (InputObjectState os, int t)
-    {
-    boolean result = super.restore_state(os, t);
-
-    if (!result)
-        return false;
-
-    try
-    {
-        _value = os.unpackInt();
-    }
-    catch (IOException e)
-    {
-        result = false;
-    }
-
-    return result;
-    }
-
-    public String type ()
-    {
-    return "/StateManager/LockManager/AtomicObject";
+    public String type() {
+        return "/StateManager/LockManager/AtomicObject";
     }
 
     private int _value;
 
 }
-

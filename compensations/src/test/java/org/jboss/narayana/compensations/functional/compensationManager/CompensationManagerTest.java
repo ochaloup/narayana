@@ -39,7 +39,6 @@ import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
 
-
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
@@ -48,7 +47,6 @@ public abstract class CompensationManagerTest {
 
     @Inject
     CompensationManagerService compensationManagerService;
-
 
     @After
     public void tearDown() {
@@ -69,7 +67,6 @@ public abstract class CompensationManagerTest {
         DummyConfirmationHandler2.reset();
     }
 
-
     @Test
     public void testSimple() throws Exception {
 
@@ -77,13 +74,12 @@ public abstract class CompensationManagerTest {
             compensationManagerService.doWork();
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
         } catch (MyRuntimeException e) {
-            //expected
+            // expected
         }
 
         Assert.assertEquals(false, DummyCompensationHandler1.getCalled());
         Assert.assertEquals(false, DummyConfirmationHandler1.getCalled());
     }
-
 
     @Test
     public void testNested() throws Exception {
@@ -94,7 +90,7 @@ public abstract class CompensationManagerTest {
             compensationManagerService.doWorkRecursively();
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
         } catch (TransactionCompensatedException e) {
-            //expected
+            // expected
         }
 
         Assert.assertEquals(true, DummyCompensationHandler1.getCalled());
@@ -104,7 +100,6 @@ public abstract class CompensationManagerTest {
         Assert.assertEquals(false, DummyConfirmationHandler2.getCalled());
     }
 
-
     @Test
     public void testSimpleCompensateIfFail() throws Exception {
 
@@ -112,13 +107,12 @@ public abstract class CompensationManagerTest {
             compensationManagerService.doWorkCompensateIfFail();
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
         } catch (MyRuntimeException e) {
-            //expected
+            // expected
         }
 
         Assert.assertEquals(false, DummyCompensationHandler1.getCalled());
         Assert.assertEquals(false, DummyConfirmationHandler1.getCalled());
     }
-
 
     @Test
     public void testNestedCancelOnFailureWithFailure() throws Exception {
@@ -129,7 +123,7 @@ public abstract class CompensationManagerTest {
             compensationManagerService.doWorkRecursivelyCompensateIfFail(true);
             Assert.fail("Expected TransactionRolledBackException to be thrown, but it was not");
         } catch (TransactionCompensatedException e) {
-            //expected
+            // expected
         }
 
         Assert.assertEquals(true, DummyCompensationHandler1.getCalled());

@@ -25,16 +25,15 @@ import javax.xml.namespace.QName;
 /**
  * Interface containing WS-Coordination constants.
  */
-public interface CoordinationConstants
-{
+public interface CoordinationConstants {
     /**
      * The Namespace.
      */
-    public String WSCOOR_NAMESPACE = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06" ;
+    public String WSCOOR_NAMESPACE = "http://docs.oasis-open.org/ws-tx/wscoor/2006/06";
     /**
      * The namespace prefix.
      */
-    public String WSCOOR_PREFIX = "wscoor" ;
+    public String WSCOOR_PREFIX = "wscoor";
 
     public String REGISTRATION_SERVICE_NAME = "RegistrationService";
 
@@ -44,196 +43,215 @@ public interface CoordinationConstants
 
     public String REGISTRATION_ENDPOINT_NAME = "RegistrationPortType";
 
-    public QName REGISTRATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, REGISTRATION_SERVICE_NAME, WSCOOR_PREFIX) ;;
+    public QName REGISTRATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, REGISTRATION_SERVICE_NAME, WSCOOR_PREFIX);;
 
-    public QName ACTIVATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, ACTIVATION_SERVICE_NAME, WSCOOR_PREFIX) ;;
+    public QName ACTIVATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, ACTIVATION_SERVICE_NAME, WSCOOR_PREFIX);;
 
-    public QName ACTIVATION_ENDPOINT_QNAME = new QName(WSCOOR_NAMESPACE, ACTIVATION_ENDPOINT_NAME, WSCOOR_PREFIX) ;;
+    public QName ACTIVATION_ENDPOINT_QNAME = new QName(WSCOOR_NAMESPACE, ACTIVATION_ENDPOINT_NAME, WSCOOR_PREFIX);;
 
-    public QName REGISTRATION_ENDPOINT_QNAME = new QName(WSCOOR_NAMESPACE, REGISTRATION_ENDPOINT_NAME, WSCOOR_PREFIX) ;;
+    public QName REGISTRATION_ENDPOINT_QNAME = new QName(WSCOOR_NAMESPACE, REGISTRATION_ENDPOINT_NAME, WSCOOR_PREFIX);;
     /**
      * The Expires element.
      */
-    public String WSCOOR_ELEMENT_EXPIRES = "Expires" ;
+    public String WSCOOR_ELEMENT_EXPIRES = "Expires";
     /**
      * The Expires QName.
      */
-    public QName WSCOOR_ELEMENT_EXPIRES_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_EXPIRES, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_EXPIRES_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_EXPIRES, WSCOOR_PREFIX);
+
     /**
      * The Identifier element.
      */
-    public String WSCOOR_ELEMENT_IDENTIFIER = "Identifier" ;
+    public String WSCOOR_ELEMENT_IDENTIFIER = "Identifier";
     /**
      * The Identifier QName.
      */
-    public QName WSCOOR_ELEMENT_IDENTIFIER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_IDENTIFIER, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_IDENTIFIER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_IDENTIFIER,
+            WSCOOR_PREFIX);
+
     /**
      * The RegistrationService element.
      */
-    public String WSCOOR_ELEMENT_REGISTRATION_SERVICE = "RegistrationService" ;
+    public String WSCOOR_ELEMENT_REGISTRATION_SERVICE = "RegistrationService";
     /**
      * The RegistrationService QName.
      */
-    public QName WSCOOR_ELEMENT_REGISTRATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_REGISTRATION_SERVICE, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_REGISTRATION_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_REGISTRATION_SERVICE, WSCOOR_PREFIX);
+
     /**
      * The CoordinationContext element.
      */
-    public String WSCOOR_ELEMENT_COORDINATION_CONTEXT = "CoordinationContext" ;
+    public String WSCOOR_ELEMENT_COORDINATION_CONTEXT = "CoordinationContext";
     /**
      * The CoordinationContext QName.
      */
-    public QName WSCOOR_ELEMENT_COORDINATION_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_COORDINATION_CONTEXT, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_COORDINATION_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_COORDINATION_CONTEXT, WSCOOR_PREFIX);
+
     /**
      * The CurrentContext element.
      */
-    public String WSCOOR_ELEMENT_CURRENT_CONTEXT = "CurrentContext" ;
+    public String WSCOOR_ELEMENT_CURRENT_CONTEXT = "CurrentContext";
     /**
      * The CurrentContext QName.
      */
-    public QName WSCOOR_ELEMENT_CURRENT_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_CURRENT_CONTEXT, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_CURRENT_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_CURRENT_CONTEXT,
+            WSCOOR_PREFIX);
+
     /**
      * The CoordinationType element.
      */
-    public String WSCOOR_ELEMENT_COORDINATION_TYPE = "CoordinationType" ;
+    public String WSCOOR_ELEMENT_COORDINATION_TYPE = "CoordinationType";
     /**
      * The CoordinationType QName.
      */
-    public QName WSCOOR_ELEMENT_COORDINATION_TYPE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_COORDINATION_TYPE, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_COORDINATION_TYPE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_COORDINATION_TYPE,
+            WSCOOR_PREFIX);
+
     /**
      * The CreateCoordinationContext element.
      */
-    public String WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT = "CreateCoordinationContext" ;
+    public String WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT = "CreateCoordinationContext";
     /**
      * The CreateCoordinationContext QName.
      */
-    public QName WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT, WSCOOR_PREFIX);
     /**
      * The CreateCoordinationContext Action.
      */
-    public String WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT ;
-    
+    public String WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT = WSCOOR_NAMESPACE + "/"
+            + WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT;
+
     /**
      * The CreateCoordinationContextResponse element.
      */
-    public String WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE = "CreateCoordinationContextResponse" ;
+    public String WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE = "CreateCoordinationContextResponse";
     /**
      * The CreateCoordinationContextResponse QName.
      */
-    public QName WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE, WSCOOR_PREFIX);
     /**
      * The CreateCoordinationContextResponse Action.
      */
-    public String WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT_RESPONSE = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE ;
+    public String WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT_RESPONSE = WSCOOR_NAMESPACE + "/"
+            + WSCOOR_ELEMENT_CREATE_COORDINATION_CONTEXT_RESPONSE;
 
     /**
      * The ProtocolIdentifier element.
      */
-    public String WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER = "ProtocolIdentifier" ;
+    public String WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER = "ProtocolIdentifier";
     /**
      * The ProtocolIdentifier QName.
      */
-    public QName WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_PROTOCOL_IDENTIFIER, WSCOOR_PREFIX);
+
     /**
      * The ParticipantProtocolService element.
      */
-    public String WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE = "ParticipantProtocolService" ;
+    public String WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE = "ParticipantProtocolService";
     /**
      * The ParticipantProtocolService QName.
      */
-    public QName WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_PARTICIPANT_PROTOCOL_SERVICE, WSCOOR_PREFIX);
+
     /**
      * The Register element.
      */
-    public String WSCOOR_ELEMENT_REGISTER = "Register" ;
+    public String WSCOOR_ELEMENT_REGISTER = "Register";
     /**
      * The Register QName.
      */
-    public QName WSCOOR_ELEMENT_REGISTER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_REGISTER, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ELEMENT_REGISTER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_REGISTER, WSCOOR_PREFIX);
     /**
      * The Register Action.
      */
-    public String WSCOOR_ACTION_REGISTER = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_REGISTER ;
-    
+    public String WSCOOR_ACTION_REGISTER = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_REGISTER;
+
     /**
      * The CoordinatorProtocolService element.
      */
-    public String WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE = "CoordinatorProtocolService" ;
+    public String WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE = "CoordinatorProtocolService";
     /**
      * The CoordinatorProtocolService QName.
      */
-    public QName WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE, WSCOOR_PREFIX) ;
-    
+    public QName WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ELEMENT_COORDINATOR_PROTOCOL_SERVICE, WSCOOR_PREFIX);
+
     /**
      * The RegisterResponse element.
      */
-    public String WSCOOR_ELEMENT_REGISTER_RESPONSE = "RegisterResponse" ;
+    public String WSCOOR_ELEMENT_REGISTER_RESPONSE = "RegisterResponse";
     /**
      * The RegisterResponse QName.
      */
-    public QName WSCOOR_ELEMENT_REGISTER_RESPONSE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_REGISTER_RESPONSE, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ELEMENT_REGISTER_RESPONSE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ELEMENT_REGISTER_RESPONSE,
+            WSCOOR_PREFIX);
     /**
      * The Register Action.
      */
-    public String WSCOOR_ACTION_REGISTER_RESPONSE = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_REGISTER_RESPONSE ;
-    
+    public String WSCOOR_ACTION_REGISTER_RESPONSE = WSCOOR_NAMESPACE + "/" + WSCOOR_ELEMENT_REGISTER_RESPONSE;
+
     /**
      * The Fault Action.
      */
-    public String WSCOOR_ACTION_FAULT = WSCOOR_NAMESPACE + "/fault" ;
+    public String WSCOOR_ACTION_FAULT = WSCOOR_NAMESPACE + "/fault";
     /**
      * The CannotRegister error code.
      */
-    public String WSCOOR_ERROR_CODE_CANNOT_REGISTER = "CannotRegister" ;
+    public String WSCOOR_ERROR_CODE_CANNOT_REGISTER = "CannotRegister";
     /**
      * The CannotRegister error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_CANNOT_REGISTER, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ERROR_CODE_CANNOT_REGISTER, WSCOOR_PREFIX);
     /**
      * The CannotCreateContext error code.
      */
-    public String WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT = "CannotCreateContext" ;
+    public String WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT = "CannotCreateContext";
     /**
      * The CannotCreateContext error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ERROR_CODE_CANNOT_CREATE_CONTEXT, WSCOOR_PREFIX);
     /**
      * The InvalidParameters error code.
      */
-    public String WSCOOR_ERROR_CODE_INVALID_PARAMETERS = "InvalidParameters" ;
+    public String WSCOOR_ERROR_CODE_INVALID_PARAMETERS = "InvalidParameters";
     /**
      * The InvalidParameters error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_INVALID_PARAMETERS, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ERROR_CODE_INVALID_PARAMETERS, WSCOOR_PREFIX);
     /**
      * The InvalidProtocol error code.
      */
-    public String WSCOOR_ERROR_CODE_INVALID_PROTOCOL = "InvalidProtocol" ;
+    public String WSCOOR_ERROR_CODE_INVALID_PROTOCOL = "InvalidProtocol";
     /**
      * The InvalidProtocol error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_INVALID_PROTOCOL, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME = new QName(WSCOOR_NAMESPACE,
+            WSCOOR_ERROR_CODE_INVALID_PROTOCOL, WSCOOR_PREFIX);
     /**
      * The InvalidState error code.
      */
-    public String WSCOOR_ERROR_CODE_INVALID_STATE = "InvalidState" ;
+    public String WSCOOR_ERROR_CODE_INVALID_STATE = "InvalidState";
     /**
      * The InvalidState error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_INVALID_STATE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_INVALID_STATE, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_INVALID_STATE_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_INVALID_STATE,
+            WSCOOR_PREFIX);
     /**
      * The unexpected exception error code.
      */
-    public String WSCOOR_ERROR_CODE_EXCEPTION = "Exception" ;
+    public String WSCOOR_ERROR_CODE_EXCEPTION = "Exception";
     /**
      * The NoActivity error code QName.
      */
-    public QName WSCOOR_ERROR_CODE_EXCEPTION_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_EXCEPTION, WSCOOR_PREFIX) ;
+    public QName WSCOOR_ERROR_CODE_EXCEPTION_QNAME = new QName(WSCOOR_NAMESPACE, WSCOOR_ERROR_CODE_EXCEPTION,
+            WSCOOR_PREFIX);
 }

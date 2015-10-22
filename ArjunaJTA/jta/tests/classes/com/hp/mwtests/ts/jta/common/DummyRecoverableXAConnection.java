@@ -31,75 +31,62 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.jta.xa.RecoverableXAConnection;
 
-public class DummyRecoverableXAConnection implements RecoverableXAConnection
-{
+public class DummyRecoverableXAConnection implements RecoverableXAConnection {
 
-    public void close ()
-    {
+    public void close() {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public void closeCloseCurrentConnection () throws SQLException
-    {
+    public void closeCloseCurrentConnection() throws SQLException {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public XAConnection getConnection () throws SQLException
-    {
+    public XAConnection getConnection() throws SQLException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public XAConnection getCurrentConnection () throws SQLException
-    {
+    public XAConnection getCurrentConnection() throws SQLException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public XADataSource getDataSource () throws SQLException
-    {
+    public XADataSource getDataSource() throws SQLException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public XAResource getResource () throws SQLException
-    {
+    public XAResource getResource() throws SQLException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public boolean inuse ()
-    {
+    public boolean inuse() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean packInto (OutputObjectState os)
-    {
+    public boolean packInto(OutputObjectState os) {
         return true;
     }
 
-    public void reset ()
-    {
+    public void reset() {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public boolean setTransaction (Transaction tx)
-    {
+    public boolean setTransaction(Transaction tx) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean unpackFrom (InputObjectState os)
-    {
+    public boolean unpackFrom(InputObjectState os) {
         return true;
     }
 
-    public boolean validTransaction (Transaction tx)
-    {
+    public boolean validTransaction(Transaction tx) {
         // TODO Auto-generated method stub
         return false;
     }

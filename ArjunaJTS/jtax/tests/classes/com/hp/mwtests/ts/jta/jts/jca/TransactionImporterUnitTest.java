@@ -39,61 +39,44 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.jts.jca.TransactionImporterImple;
 import com.hp.mwtests.ts.jta.jts.common.TestBase;
 
-public class TransactionImporterUnitTest extends TestBase
-{
+public class TransactionImporterUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         TransactionImporterImple importer = new TransactionImporterImple();
-        
-        try
-        {
+
+        try {
             importer.importTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.recoverTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.recoverTransaction(new Uid());
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.getImportedTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.removeImportedTransaction(null);
-            
+
             fail();
-        }
-        catch (final IllegalArgumentException ex)
-        {
+        } catch (final IllegalArgumentException ex) {
         }
     }
 }

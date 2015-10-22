@@ -33,10 +33,12 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class UidWrapper {
     private static final ThreadLocal<String> recordWrapperTypeName = new ThreadLocal<String>();
 
@@ -67,14 +69,16 @@ public class UidWrapper {
         this(browser, beantype, ostype, className, uid, true);
     }
 
-    public UidWrapper(ObjStoreBrowser browser, String beantype, String ostype, String className, Uid uid, boolean allowRegistration) {
+    public UidWrapper(ObjStoreBrowser browser, String beantype, String ostype, String className, Uid uid,
+            boolean allowRegistration) {
         this.browser = browser;
         this.ostype = ostype;
         this.beantype = beantype;
         this.className = className;
         this.uid = uid;
         this.tstamp = 0L;
-        this.name = "jboss.jta:type=ObjectStore,itype=" + ostype + ",uid=" + uid.fileStringForm(); // + ",participant=false";
+        this.name = "jboss.jta:type=ObjectStore,itype=" + ostype + ",uid=" + uid.fileStringForm(); // +
+                                                                                                    // ",participant=false";
         this.registered = false;
         this.allowRegistration = allowRegistration;
     }
@@ -126,8 +130,9 @@ public class UidWrapper {
     }
 
     /**
-     * The timestamp represent the time (in milliseconds) when the bean was registered.
-     * It is used for deciding when a bean needs unregistering.
+     * The timestamp represent the time (in milliseconds) when the bean was
+     * registered. It is used for deciding when a bean needs unregistering.
+     * 
      * @return the timestamp
      */
     public long getTimestamp() {
@@ -148,8 +153,10 @@ public class UidWrapper {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         UidWrapper that = (UidWrapper) o;
 
@@ -164,11 +171,7 @@ public class UidWrapper {
 
     @Override
     public String toString() {
-        return "UidWrapper{" +
-                "ostype='" + ostype + '\'' +
-                ", uid=" + uid +
-                ", tstamp=" + tstamp +
-                '}';
+        return "UidWrapper{" + "ostype='" + ostype + '\'' + ", uid=" + uid + ", tstamp=" + tstamp + '}';
     }
 
     public StringBuilder toString(String prefix, StringBuilder sb) {
@@ -180,8 +183,10 @@ public class UidWrapper {
     }
 
     /**
-     * Construct an MBean to represent this ObjectStore record. The bean type used
-     * for construct the MBean is provided in the configuration of the @see ObjStoreBrowser
+     * Construct an MBean to represent this ObjectStore record. The bean type
+     * used for construct the MBean is provided in the configuration of the @see
+     * ObjStoreBrowser
+     * 
      * @return the mbean representation
      */
     public OSEntryBean createMBean() {
@@ -189,9 +194,13 @@ public class UidWrapper {
             Class<OSEntryBean> cl = (Class<OSEntryBean>) Class.forName(beantype);
             Constructor<OSEntryBean> constructor = cl.getConstructor(UidWrapper.class);
             mbean = constructor.newInstance(this);
-        } catch (Throwable e) { // ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException
+        } catch (Throwable e) { // ClassNotFoundException,
+                                // NoSuchMethodException,
+                                // InvocationTargetException,
+                                // IllegalAccessException,
+                                // InstantiationException
             tsLogger.i18NLogger.info_osb_MBeanCtorFail(e);
-            mbean = new OSEntryBean(this);           
+            mbean = new OSEntryBean(this);
         }
 
         mbean.activate();

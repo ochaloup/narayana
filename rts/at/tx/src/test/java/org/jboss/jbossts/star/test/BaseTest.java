@@ -106,19 +106,17 @@ public class BaseTest {
         TXN_MGR_URL = txnMgrUrl;
     }
 
-    protected static void startUndertow(Class<?> ... classes) throws Exception
-    {
+    protected static void startUndertow(Class<?>... classes) throws Exception {
         undertow = new UndertowJaxrsServer();
 
         undertow.start(Undertow.builder().addHttpListener(PORT, "localhost"));
 
-        undertow.deploy(new TMApplication(classes));//, SURL + "tx/");
+        undertow.deploy(new TMApplication(classes));// , SURL + "tx/");
 
         System.out.printf("server is ready:");
     }
 
-    protected static void startRestEasy(Class<?> ... classes) throws Exception
-    {
+    protected static void startRestEasy(Class<?>... classes) throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(PORT);
         server.start();
@@ -148,23 +146,28 @@ public class BaseTest {
 
         initParams.put("com.sun.jersey.config.property.packages", packages);
         initParams.put(ServerProperties.PROVIDER_PACKAGES, packages);
-//        initParams.put(ServerProperties.PROVIDER_PACKAGES, Coordinator.class.getPackage().getName());
+        // initParams.put(ServerProperties.PROVIDER_PACKAGES,
+        // Coordinator.class.getPackage().getName());
 
         try {
             if (USE_SSL) {
-                URI baseUri= UriBuilder.fromUri(SURL).build();
+                URI baseUri = UriBuilder.fromUri(SURL).build();
                 String trustStoreFile = System.getProperty("javax.net.ssl.trustStore");
                 String trustStorePswd = System.getProperty("javax.net.ssl.trustStorePassword");
 
                 if (trustStoreFile == null || trustStorePswd == null)
-                    throw new IllegalArgumentException("Please set SSL javax.net.ssl.trustStore and javax.net.ssl.trustStorePassword to use SPDY suppport");
-                grizzlyServer = SpdyEnabledHttpServer.create(baseUri, initParams, trustStoreFile, trustStorePswd, 50, USE_SPDY);
+                    throw new IllegalArgumentException(
+                            "Please set SSL javax.net.ssl.trustStore and javax.net.ssl.trustStorePassword to use SPDY suppport");
+                grizzlyServer = SpdyEnabledHttpServer.create(baseUri, initParams, trustStoreFile, trustStorePswd, 50,
+                        USE_SPDY);
             } else {
-               URI baseUri= UriBuilder.fromUri(SURL).build();
-//                threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
+                URI baseUri = UriBuilder.fromUri(SURL).build();
+                // threadSelector = GrizzlyWebContainerFactory.create(baseUri,
+                // initParams);
 
-                final ResourceConfig resourceConfig = new ResourceConfig();//Coordinator.class);
-                resourceConfig.packages("org.jboss.jbossts.star.service", "org.jboss.jbossts.star.provider", "org.jboss.jbossts.star.test");
+                final ResourceConfig resourceConfig = new ResourceConfig();// Coordinator.class);
+                resourceConfig.packages("org.jboss.jbossts.star.service", "org.jboss.jbossts.star.provider",
+                        "org.jboss.jbossts.star.test");
                 grizzlyServer = GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
 
             }
@@ -173,7 +176,7 @@ public class BaseTest {
         }
     }
 
-    public static void startContainer(String txnMgrUrl, String packages, Class<?> ... classes) throws Exception {
+    public static void startContainer(String txnMgrUrl, String packages, Class<?>... classes) throws Exception {
         TxSupport.setTxnMgrUrl(txnMgrUrl);
 
         if (USE_SPDY)
@@ -195,12 +198,13 @@ public class BaseTest {
             spdyClient = new OkHttpClient();
 
             try {
-                //sslContext = getSSLContext();
+                // sslContext = getSSLContext();
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(null, null, null);
                 spdyClient.setSslSocketFactory(sslContext.getSocketFactory());
             } catch (Exception e) {
-                throw new AssertionError(); // The system has no TLS. Just give up.
+                throw new AssertionError(); // The system has no TLS. Just give
+                                            // up.
             }
         }
 
@@ -271,7 +275,7 @@ public class BaseTest {
 
     @AfterClass
     public static void afterClass() throws Exception {
-        if (undertow !=null) {
+        if (undertow != null) {
             undertow.stop();
             undertow = null;
         }
@@ -296,18 +300,15 @@ public class BaseTest {
     }
 
     @Test
-    public void nullTest() throws Exception
-    {
+    public void nullTest() throws Exception {
         // need at least one test
     }
 
-    protected String enlistResource(TxSupport txn, String pUrl)
-    {
+    protected String enlistResource(TxSupport txn, String pUrl) {
         return txn.enlistTestResource(pUrl, false);
     }
 
-    private StringBuilder getResourceUpdateUrl(String pUrl, String pid, String name, String value)
-    {
+    private StringBuilder getResourceUpdateUrl(String pUrl, String pid, String name, String value) {
         StringBuilder sb = new StringBuilder(pUrl);
 
         if (pid != null)
@@ -325,28 +326,32 @@ public class BaseTest {
 
     /**
      * Modify a transactional participant
-     * @param txn the transaction
-     * @param pUrl the  transactional participant
-     * @param pid an id
-     * @param name name of a property to update
-     * @param value the new value of the property
+     * 
+     * @param txn
+     *            the transaction
+     * @param pUrl
+     *            the transactional participant
+     * @param pid
+     *            an id
+     * @param name
+     *            name of a property to update
+     * @param value
+     *            the new value of the property
      * @return the response body
      */
-    protected String modifyResource(TxSupport txn, String pUrl, String pid, String name, String value)
-    {
-        // tell the resource to modify some data and pass the transaction enlistment url along with the request
-        return txn.httpRequest(new int[] {HttpURLConnection.HTTP_OK},
+    protected String modifyResource(TxSupport txn, String pUrl, String pid, String name, String value) {
+        // tell the resource to modify some data and pass the transaction
+        // enlistment url along with the request
+        return txn.httpRequest(new int[]{HttpURLConnection.HTTP_OK},
                 getResourceUpdateUrl(pUrl, pid, name, value).toString(), "GET", TxMediaType.PLAIN_MEDIA_TYPE);
     }
 
-    protected String getResourceProperty(TxSupport txn, String pUrl, String pid, String name)
-    {
-        return txn.httpRequest(new int[] {HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NO_CONTENT},
+    protected String getResourceProperty(TxSupport txn, String pUrl, String pid, String name) {
+        return txn.httpRequest(new int[]{HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NO_CONTENT},
                 getResourceUpdateUrl(pUrl, pid, name, null).toString(), "GET", TxMediaType.PLAIN_MEDIA_TYPE);
     }
 
-    private static class Work
-    {
+    private static class Work {
         String id;
         String tid;
         String uri;
@@ -372,8 +377,8 @@ public class BaseTest {
             this.enlistUrl = enlistUrl;
             this.recoveryUrl = recoveryUrl;
             this.fault = fault;
-            this.oldState = new HashMap<String, String> ();
-            this.newState = new HashMap<String, String> ();
+            this.oldState = new HashMap<String, String>();
+            this.newState = new HashMap<String, String>();
         }
 
         public void start() {
@@ -395,37 +400,38 @@ public class BaseTest {
     }
 
     @Path(PSEGMENT)
-    public static class TransactionalResource
-    {
+    public static class TransactionalResource {
         private static int pid = 0;
-        static Map<String, Work> faults = new HashMap<String, Work> ();
+        static Map<String, Work> faults = new HashMap<String, Work>();
 
         public Work makeWork(TxSupport txn, String baseURI, String id, String txId, String enlistUrl,
-                             boolean twoPhaseAware, boolean isVolatile, String recoveryUrl, String fault) {
-            String linkHeader = twoPhaseAware ?
-                    txn.makeTwoPhaseAwareParticipantLinkHeader(baseURI, isVolatile, id, txId) :
-                    txn.makeTwoPhaseUnAwareParticipantLinkHeader(baseURI, isVolatile, id, txId, true);
+                boolean twoPhaseAware, boolean isVolatile, String recoveryUrl, String fault) {
+            String linkHeader = twoPhaseAware
+                    ? txn.makeTwoPhaseAwareParticipantLinkHeader(baseURI, isVolatile, id, txId)
+                    : txn.makeTwoPhaseUnAwareParticipantLinkHeader(baseURI, isVolatile, id, txId, true);
 
             return new Work(id, txId, baseURI + '/' + id, linkHeader, enlistUrl, recoveryUrl, fault);
         }
 
-        private String moveParticipant(Work work, String nid, String register,
-                                       boolean twoPhaseAware, boolean isVolatile) {
+        private String moveParticipant(Work work, String nid, String register, boolean twoPhaseAware,
+                boolean isVolatile) {
             TxSupport txn = new TxSupport();
 
             faults.remove(work.id);
-            work = makeWork(txn, PURL, nid, work.tid, work.enlistUrl,
-                    twoPhaseAware, isVolatile, work.recoveryUrl, work.fault);
+            work = makeWork(txn, PURL, nid, work.tid, work.enlistUrl, twoPhaseAware, isVolatile, work.recoveryUrl,
+                    work.fault);
             faults.put(nid, work);
-            // if register is true then tell the transaction manager about the new location - otherwise the old
-            // URIs will be used for transaction termination. This is used to test that the coordinator uses
+            // if register is true then tell the transaction manager about the
+            // new location - otherwise the old
+            // URIs will be used for transaction termination. This is used to
+            // test that the coordinator uses
             // the recovery URI correctly
             if ("true".equals(register)) {
-                Map<String, String> reqHeaders = new HashMap<String, String> ();
+                Map<String, String> reqHeaders = new HashMap<String, String>();
 
                 reqHeaders.put("Link", work.pLinks);
-                txn.httpRequest(new int[] {HttpURLConnection.HTTP_OK}, work.recoveryUrl, "PUT", TxMediaType.POST_MEDIA_TYPE, null,
-                        null, reqHeaders);
+                txn.httpRequest(new int[]{HttpURLConnection.HTTP_OK}, work.recoveryUrl, "PUT",
+                        TxMediaType.POST_MEDIA_TYPE, null, null, reqHeaders);
             }
 
             return nid;
@@ -433,17 +439,14 @@ public class BaseTest {
 
         @SuppressWarnings({"UnusedDeclaration"})
         @GET
-        public String getBasic(@Context UriInfo info,
-                               @QueryParam("pId") @DefaultValue("")String pId,
-                               @QueryParam("context") @DefaultValue("")String ctx,
-                               @QueryParam("name") @DefaultValue("")String name,
-                               @QueryParam("value") @DefaultValue("")String value,
-                               @QueryParam("query") @DefaultValue("pUrl") String query,
-                               @QueryParam("arg") @DefaultValue("") String arg,
-                               @QueryParam("twoPhaseAware") @DefaultValue("true") String twoPhaseAware,
-                               @QueryParam("isVolatile") @DefaultValue("false") String isVolatileParticipant,
-                               @QueryParam("register") @DefaultValue("true") String register)
-        {
+        public String getBasic(@Context UriInfo info, @QueryParam("pId") @DefaultValue("") String pId,
+                @QueryParam("context") @DefaultValue("") String ctx, @QueryParam("name") @DefaultValue("") String name,
+                @QueryParam("value") @DefaultValue("") String value,
+                @QueryParam("query") @DefaultValue("pUrl") String query,
+                @QueryParam("arg") @DefaultValue("") String arg,
+                @QueryParam("twoPhaseAware") @DefaultValue("true") String twoPhaseAware,
+                @QueryParam("isVolatile") @DefaultValue("false") String isVolatileParticipant,
+                @QueryParam("register") @DefaultValue("true") String register) {
             Work work = faults.get(pId);
             String res = null;
             boolean isVolatile = "true".equals(isVolatileParticipant);
@@ -451,9 +454,9 @@ public class BaseTest {
 
             if (name.length() != 0) {
                 if (value.length() != 0) {
-                    if (work == null){
-                        work = makeWork(new TxSupport(), TxSupport.extractUri(info), String.valueOf(++pid),
-                                null, null, isTwoPhaseAware, isVolatile, null, null);
+                    if (work == null) {
+                        work = makeWork(new TxSupport(), TxSupport.extractUri(info), String.valueOf(++pid), null, null,
+                                isTwoPhaseAware, isVolatile, null, null);
                         work.oldState.put(name, value);
                         faults.put(work.id, work);
                         return work.id;
@@ -480,7 +483,6 @@ public class BaseTest {
                 }
             }
 
-
             if (work == null)
                 throw new WebApplicationException(HttpURLConnection.HTTP_NOT_FOUND);
 
@@ -498,28 +500,30 @@ public class BaseTest {
 
         @POST
         @Produces(TxMediaType.PLAIN_MEDIA_TYPE)
-        public String enlist(@Context UriInfo info, @QueryParam("pId") @DefaultValue("")String pId,
-                             @QueryParam("fault") @DefaultValue("")String fault,
-                             @QueryParam("twoPhaseAware") @DefaultValue("true")String twoPhaseAware,
-                             @QueryParam("isVolatile") @DefaultValue("false")String isVolatile,
-                             String enlistUrl) throws IOException {
+        public String enlist(@Context UriInfo info, @QueryParam("pId") @DefaultValue("") String pId,
+                @QueryParam("fault") @DefaultValue("") String fault,
+                @QueryParam("twoPhaseAware") @DefaultValue("true") String twoPhaseAware,
+                @QueryParam("isVolatile") @DefaultValue("false") String isVolatile, String enlistUrl)
+                throws IOException {
             Work work = faults.get(pId);
             TxSupport txn = new TxSupport();
             String txId = enlistUrl.substring(enlistUrl.lastIndexOf('/') + 1);
             boolean isTwoPhaseAware = "true".equals(twoPhaseAware);
             boolean isVolatileParticipant = "true".equals(isVolatile);
-            String vRegistration = null; // URI for registering with the volatile phase
-            String vParticipantLink = null;  // URI for handling pre and post 2PC phases
+            String vRegistration = null; // URI for registering with the
+                                            // volatile phase
+            String vParticipantLink = null; // URI for handling pre and post 2PC
+                                            // phases
             String path = TxSupport.extractUri(info);
 
             if (work == null) {
                 int id = ++pid;
 
-                work = makeWork(txn, path, String.valueOf(id), txId, enlistUrl,
-                        isTwoPhaseAware, isVolatileParticipant, null, fault);
+                work = makeWork(txn, path, String.valueOf(id), txId, enlistUrl, isTwoPhaseAware, isVolatileParticipant,
+                        null, fault);
             } else {
-                Work newWork = makeWork(txn, path, work.id, txId, enlistUrl,
-                        isTwoPhaseAware, isVolatileParticipant, null, fault);
+                Work newWork = makeWork(txn, path, work.id, txId, enlistUrl, isTwoPhaseAware, isVolatileParticipant,
+                        null, fault);
                 newWork.oldState = work.oldState;
                 newWork.newState = work.newState;
                 work = newWork;
@@ -534,10 +538,10 @@ public class BaseTest {
                 enlistUrl = urls[0];
                 vRegistration = urls[1];
 
-                String vParticipant = new StringBuilder(path).append('/').append(work.id)
-                        .append('/').append(txId).append('/').append("vp").toString();
-                vParticipantLink = txn.addLink2(
-                        new StringBuilder(), TxLinkNames.VOLATILE_PARTICIPANT, vParticipant,true).toString();
+                String vParticipant = new StringBuilder(path).append('/').append(work.id).append('/').append(txId)
+                        .append('/').append("vp").toString();
+                vParticipantLink = txn
+                        .addLink2(new StringBuilder(), TxLinkNames.VOLATILE_PARTICIPANT, vParticipant, true).toString();
             }
 
             try {
@@ -561,11 +565,11 @@ public class BaseTest {
         @POST
         @Produces(TxMediaType.PLAIN_MEDIA_TYPE)
         @Path(NO_RESPONSE_SEGMENT)
-        public String enlistNoResponseParticipant(@Context UriInfo info, @QueryParam("pId") @DefaultValue("")String pId,
-                             @QueryParam("fault") @DefaultValue("")String fault,
-                             @QueryParam("twoPhaseAware") @DefaultValue("true")String twoPhaseAware,
-                             @QueryParam("isVolatile") @DefaultValue("false")String isVolatile,
-                             String enlistUrl) throws IOException {
+        public String enlistNoResponseParticipant(@Context UriInfo info,
+                @QueryParam("pId") @DefaultValue("") String pId, @QueryParam("fault") @DefaultValue("") String fault,
+                @QueryParam("twoPhaseAware") @DefaultValue("true") String twoPhaseAware,
+                @QueryParam("isVolatile") @DefaultValue("false") String isVolatile, String enlistUrl)
+                throws IOException {
 
             return enlist(info, pId, fault, twoPhaseAware, isVolatile, enlistUrl);
         }
@@ -573,18 +577,16 @@ public class BaseTest {
         @SuppressWarnings({"UnusedDeclaration"})
         @PUT
         @Path("{pId}/{tId}/vp")
-        public Response directSynchronizations(@PathParam("pId") @DefaultValue("")String pId,
-                                               @PathParam("tId") @DefaultValue("")String tId,
-                                               String content) {
+        public Response directSynchronizations(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             return synchronizations(pId, tId, content);
         }
 
         @SuppressWarnings({"UnusedDeclaration"})
         @PUT
         @Path("{pId}/{tId}/volatile-participant")
-        public Response synchronizations(@PathParam("pId") @DefaultValue("")String pId,
-                                         @PathParam("tId") @DefaultValue("")String tId,
-                                         String content) {
+        public Response synchronizations(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             Work work = faults.get(pId);
             TxStatus txStatus;
             int vStatus;
@@ -615,12 +617,11 @@ public class BaseTest {
         @SuppressWarnings({"UnusedDeclaration"})
         @PUT
         @Path("{pId}/{tId}/terminator")
-        public Response terminate(@PathParam("pId") @DefaultValue("")String pId,
-                                  @PathParam("tId") @DefaultValue("")String tId,
-                                  String content) {
+        public Response terminate(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             TxStatus status = TxSupport.toTxStatus(content);
 
-            //String status = TxSupport.getStatus(content);
+            // String status = TxSupport.getStatus(content);
             Work work = faults.get(pId);
 
             if (work == null)
@@ -630,12 +631,13 @@ public class BaseTest {
 
             if (status.isPrepare()) {
                 if ("READONLY".equals(fault)) {
-//                    faults.remove(pId);
+                    // faults.remove(pId);
                     work.status = TxStatus.TransactionReadOnly.name();
                 } else if ("PREPARE_FAIL".equals(fault)) {
-//                    faults.remove(pId);
+                    // faults.remove(pId);
                     return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
-                    //throw new WebApplicationException(HttpURLConnection.HTTP_CONFLICT);
+                    // throw new
+                    // WebApplicationException(HttpURLConnection.HTTP_CONFLICT);
                 } else {
                     if ("PDELAY".equals(fault)) {
                         try {
@@ -663,7 +665,8 @@ public class BaseTest {
                             // ok
                         }
                     }
-                    work.status = status.isCommitOnePhase() ? TxStatus.TransactionCommittedOnePhase.name()
+                    work.status = status.isCommitOnePhase()
+                            ? TxStatus.TransactionCommittedOnePhase.name()
                             : TxStatus.TransactionCommitted.name();
 
                     work.end(true);
@@ -685,22 +688,22 @@ public class BaseTest {
                     }
                     work.status = TxStatus.TransactionRolledBack.name();
                     work.end(false);
-//                    faults.remove(pId);
+                    // faults.remove(pId);
                 }
             } else {
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
-                //throw new WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
+                // throw new
+                // WebApplicationException(HttpURLConnection.HTTP_BAD_REQUEST);
             }
 
-            //return TxSupport.toStatusContent(work.status);
+            // return TxSupport.toStatusContent(work.status);
             return Response.ok(TxSupport.toStatusContent(work.status)).build();
         }
 
         @PUT
         @Path(NO_RESPONSE_SEGMENT + "/{pId}/{tId}/terminator")
-        public Response terminateWithoutResponse(@PathParam("pId") @DefaultValue("")String pId,
-                                  @PathParam("tId") @DefaultValue("")String tId,
-                                  String content) {
+        public Response terminateWithoutResponse(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
 
             Response response = terminate(pId, tId, content);
 
@@ -709,7 +712,8 @@ public class BaseTest {
 
         @PUT
         @Path("{pId}/{tId}/prepare")
-        public Response prepare(@PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId, String content) {
+        public Response prepare(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             Work work = faults.get(pId);
             if (work != null)
                 work.prepareCnt += 1;
@@ -718,7 +722,8 @@ public class BaseTest {
 
         @PUT
         @Path("{pId}/{tId}/commit")
-        public Response commit(@PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId, String content) {
+        public Response commit(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             Work work = faults.get(pId);
             if (work != null)
                 work.commitCnt += 1;
@@ -727,7 +732,8 @@ public class BaseTest {
 
         @PUT
         @Path("{pId}/{tId}/rollback")
-        public Response rollback(@PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId, String content) {
+        public Response rollback(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             Work work = faults.get(pId);
             if (work != null)
                 work.rollbackCnt += 1;
@@ -736,7 +742,8 @@ public class BaseTest {
 
         @PUT
         @Path("{pId}/{tId}/commit-one-phase")
-        public Response commmitOnePhase(@PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId, String content) {
+        public Response commmitOnePhase(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId, String content) {
             Work work = faults.get(pId);
             if (work != null)
                 work.commmitOnePhaseCnt += 1;
@@ -746,7 +753,8 @@ public class BaseTest {
         @SuppressWarnings({"UnusedDeclaration"})
         @HEAD
         @Path("{pId}/{tId}/participant")
-        public Response getTerminator(@Context UriInfo info, @PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId) {
+        public Response getTerminator(@Context UriInfo info, @PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId) {
             Work work = faults.get(pId);
 
             if (work == null)
@@ -762,7 +770,8 @@ public class BaseTest {
         @SuppressWarnings({"UnusedDeclaration"})
         @GET
         @Path("{pId}/{tId}/participant")
-        public String getStatus(@PathParam("pId") @DefaultValue("")String pId, @PathParam("tId") @DefaultValue("")String tId) {
+        public String getStatus(@PathParam("pId") @DefaultValue("") String pId,
+                @PathParam("tId") @DefaultValue("") String tId) {
             Work work = faults.get(pId);
 
             if (work == null)

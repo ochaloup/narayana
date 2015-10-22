@@ -31,8 +31,7 @@ import com.arjuna.ats.txoj.common.TxojEnvironmentBean;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest
-{
+public class EnvironmentBeanTest {
     @Test
     public void testTxojEnvironmentBean() throws Exception {
         HashMap map;

@@ -70,20 +70,17 @@ import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 import com.arjuna.ats.jta.xa.XidImple;
 import com.hp.mwtests.ts.jta.common.RecoveryXAResource;
 
-public class XARecoveryModuleUnitTest
-{
+public class XARecoveryModuleUnitTest {
     @Test
-    public void testNull ()
-    {
+    public void testNull() {
         XARecoveryModule xarm = new XARecoveryModule();
-        
+
         xarm.periodicWorkFirstPass();
         xarm.periodicWorkSecondPass();
-        
+
         assertNotNull(xarm.id());
     }
 
-    
     @Test
     public void testRecoverFromMultipleXAResourceRecovery() throws Exception {
         // Make sure the file doesn't exist
@@ -93,37 +90,37 @@ public class XARecoveryModuleUnitTest
 
         AtomicAction aa = new AtomicAction();
         aa.begin();
-        assertEquals(AddOutcome.AR_ADDED, aa.add(new XAResourceRecord(null, new XARRTestResource(), new XidImple(aa), null)));
+        assertEquals(AddOutcome.AR_ADDED,
+                aa.add(new XAResourceRecord(null, new XARRTestResource(), new XidImple(aa), null)));
 
         Class c = BasicAction.class;
         Method method = c.getDeclaredMethod("prepare", boolean.class);
         method.setAccessible(true);
-        int result = (Integer) method.invoke(aa, new Object[] { true });
+        int result = (Integer) method.invoke(aa, new Object[]{true});
         assertEquals(result, TwoPhaseOutcome.PREPARE_OK);
 
         // Make sure the file exists
         assertTrue(new File("XARR.txt").exists());
 
-//        AtomicActionRecoveryModule aaRecoveryModule = new AtomicActionRecoveryModule();
-//        aaRecoveryModule.periodicWorkFirstPass();
-//        aaRecoveryModule.periodicWorkSecondPass();
+        // AtomicActionRecoveryModule aaRecoveryModule = new
+        // AtomicActionRecoveryModule();
+        // aaRecoveryModule.periodicWorkFirstPass();
+        // aaRecoveryModule.periodicWorkSecondPass();
 
         RecordTypeManager.manager().add(new RecordTypeMap() {
-                @SuppressWarnings("unchecked")
-                public Class getRecordClass ()
-                {
-                    return XAResourceRecord.class;
-                }
-                
-                public int getType ()
-                {
-                    return RecordType.JTA_RECORD;
-                }
+            @SuppressWarnings("unchecked")
+            public Class getRecordClass() {
+                return XAResourceRecord.class;
+            }
+
+            public int getType() {
+                return RecordType.JTA_RECORD;
+            }
         });
-        
+
         List<String> xarn = new ArrayList<String>();
         xarn.add(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES);
-        
+
         jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(xarn);
         XARecoveryModule xaRecoveryModule = new XARecoveryModule();
         Field safetyIntervalMillis = RecoveryXids.class.getDeclaredField("safetyIntervalMillis");
@@ -131,103 +128,102 @@ public class XARecoveryModuleUnitTest
         safetyIntervalMillis.set(null, 0);
         xaRecoveryModule.addXAResourceRecoveryHelper(new XARROne());
         xaRecoveryModule.addXAResourceRecoveryHelper(new XARRTwo());
-        xaRecoveryModule.addXAResourceOrphanFilter(new com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter());
-        xaRecoveryModule.addXAResourceOrphanFilter(new com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter());
+        xaRecoveryModule.addXAResourceOrphanFilter(
+                new com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter());
+        xaRecoveryModule.addXAResourceOrphanFilter(
+                new com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter());
         RecoveryManager.manager().addModule(xaRecoveryModule);
-        
-        
-        // This is done rather than using the AtomicActionRecoveryModule as the transaction is inflight
+
+        // This is done rather than using the AtomicActionRecoveryModule as the
+        // transaction is inflight
         RecoverAtomicAction rcvAtomicAction = new RecoverAtomicAction(aa.get_uid(), ActionStatus.COMMITTED);
         rcvAtomicAction.replayPhase2();
-        
+
         // The XARM would execute next
         xaRecoveryModule.periodicWorkFirstPass();
         xaRecoveryModule.periodicWorkSecondPass();
 
         // Make sure the file doesn't exist
         assertFalse(new File("XARR.txt").exists());
-        
+
         aa.abort();
     }
-    
+
     @Test
-    public void testRecover () throws Exception
-    {
+    public void testRecover() throws Exception {
         ArrayList<String> r = new ArrayList<String>();
         TransactionImple tx = new TransactionImple(0);
-        
+
         assertTrue(tx.enlistResource(new RecoveryXAResource()));
-        
+
         assertEquals(tx.doPrepare(), TwoPhaseOutcome.PREPARE_OK);
-        
+
         r.add("com.hp.mwtests.ts.jta.recovery.DummyXARecoveryResource");
 
         jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(r);
-        
+
         XARecoveryModule xarm = new XARecoveryModule();
 
-        assertNull(xarm.getNewXAResource( new XAResourceRecord(null, null, new XidImple(), null) ));
-        
-        for (int i = 0; i < 11; i++)
-        {
+        assertNull(xarm.getNewXAResource(new XAResourceRecord(null, null, new XidImple(), null)));
+
+        for (int i = 0; i < 11; i++) {
             xarm.periodicWorkFirstPass();
             xarm.periodicWorkSecondPass();
         }
-        
-        assertTrue(xarm.getNewXAResource(  new XAResourceRecord(null, null, new XidImple(new Uid()), null) ) == null);
-        
-        assertNull(xarm.getNewXAResource( new XAResourceRecord(null, null, new XidImple(), null) ));
+
+        assertTrue(xarm.getNewXAResource(new XAResourceRecord(null, null, new XidImple(new Uid()), null)) == null);
+
+        assertNull(xarm.getNewXAResource(new XAResourceRecord(null, null, new XidImple(), null)));
     }
-    
+
     @Test
-    public void testFailures () throws Exception
-    {
-        XARecoveryModule xarm = new XARecoveryModule();       
+    public void testFailures() throws Exception {
+        XARecoveryModule xarm = new XARecoveryModule();
         Class[] parameterTypes = new Class[2];
         Uid u = new Uid();
         Xid x = new XidImple();
-        
+
         parameterTypes[0] = Xid.class;
         parameterTypes[1] = Uid.class;
-      
+
         Method m = xarm.getClass().getDeclaredMethod("addFailure", parameterTypes);
         m.setAccessible(true);
-      
+
         Object[] parameters = new Object[2];
         parameters[0] = x;
         parameters[1] = u;
-      
+
         m.invoke(xarm, parameters);
-        
+
         parameterTypes = new Class[1];
         parameterTypes[0] = Xid.class;
-        
+
         parameters = new Object[1];
         parameters[0] = x;
-        
+
         m = xarm.getClass().getDeclaredMethod("previousFailure", parameterTypes);
         m.setAccessible(true);
-        
+
         Uid ret = (Uid) m.invoke(xarm, parameters);
-        
+
         assertEquals(ret, u);
-        
+
         parameterTypes = new Class[2];
         parameterTypes[0] = Xid.class;
         parameterTypes[1] = Uid.class;
-        
+
         parameters = new Object[2];
         parameters[0] = x;
         parameters[1] = u;
-        
+
         m = xarm.getClass().getDeclaredMethod("removeFailure", parameterTypes);
         m.setAccessible(true);
-        
+
         m.invoke(xarm, parameters);
-               
+
         m = xarm.getClass().getDeclaredMethod("clearAllFailures", (Class[]) null);
         m.setAccessible(true);
-        
+
         m.invoke(xarm, (Object[]) null);
     }
 
@@ -243,15 +239,15 @@ public class XARecoveryModuleUnitTest
 
     class DummyXAResourceRecoveryHelper implements XAResourceRecoveryHelper {
         @Override
-        public boolean initialise(String p) throws Exception
-        {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
+        public boolean initialise(String p) throws Exception {
+            return false; // To change body of implemented methods use File |
+                            // Settings | File Templates.
         }
 
         @Override
-        public XAResource[] getXAResources() throws Exception
-        {
-            return new XAResource[0];  //To change body of implemented methods use File | Settings | File Templates.
+        public XAResource[] getXAResources() throws Exception {
+            return new XAResource[0]; // To change body of implemented methods
+                                        // use File | Settings | File Templates.
         }
     }
 
@@ -264,49 +260,45 @@ public class XARecoveryModuleUnitTest
         xaRecoveryModule.addXAResourceOrphanFilter(xaResourceOrphanFilter);
         xaRecoveryModule.removeXAResourceOrphanFilter(xaResourceOrphanFilter);
     }
-    
+
     @Test
-    public void testXAResourceOrphanFilter () throws Exception
-    {
-        XAResourceOrphanFilter xaResourceOrphanFilter = new DummyXAResourceOrphanFilter(XAResourceOrphanFilter.Vote.ROLLBACK);
-    
+    public void testXAResourceOrphanFilter() throws Exception {
+        XAResourceOrphanFilter xaResourceOrphanFilter = new DummyXAResourceOrphanFilter(
+                XAResourceOrphanFilter.Vote.ROLLBACK);
+
         XARecoveryModule xarm = new XARecoveryModule();
-        
+
         xarm.addXAResourceOrphanFilter(xaResourceOrphanFilter);
-        
+
         Class[] parameterTypes = new Class[2];
-        
+
         parameterTypes[0] = XAResource.class;
         parameterTypes[1] = Xid.class;
-        
+
         Method m = xarm.getClass().getDeclaredMethod("handleOrphan", parameterTypes);
         m.setAccessible(true);
-        
+
         Object[] parameters = new Object[2];
         parameters[0] = new RecoveryXAResource();
         parameters[1] = new XidImple();
-        
+
         m.invoke(xarm, parameters);
     }
 
-    class DummyXAResourceOrphanFilter implements XAResourceOrphanFilter
-    {
-        public DummyXAResourceOrphanFilter ()
-        {
+    class DummyXAResourceOrphanFilter implements XAResourceOrphanFilter {
+        public DummyXAResourceOrphanFilter() {
             _vote = null;
         }
-        
-        public DummyXAResourceOrphanFilter (Vote v)
-        {
+
+        public DummyXAResourceOrphanFilter(Vote v) {
             _vote = v;
         }
-        
+
         @Override
-        public Vote checkXid(Xid xid)
-        {
+        public Vote checkXid(Xid xid) {
             return _vote;
         }
-        
+
         private Vote _vote;
     }
 }

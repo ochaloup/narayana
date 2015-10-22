@@ -29,14 +29,11 @@ import com.arjuna.wst.WrongStateException;
 /**
  * The commit volatile 2PC participant
  */
-public class CommitVolatile2PCParticipant extends ParticipantAdapter implements Volatile2PCParticipant
-{
+public class CommitVolatile2PCParticipant extends ParticipantAdapter implements Volatile2PCParticipant {
     /**
      * Vote to prepare.
      */
-    public Vote prepare()
-        throws WrongStateException, SystemException
-    {
-        return new Prepared() ;
-    }    
+    public Vote prepare() throws WrongStateException, SystemException {
+        return new Prepared();
+    }
 }

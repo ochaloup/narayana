@@ -17,32 +17,29 @@ public class RollbackExceptionInRollbackTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoDurableParticipant.class,
-                FailureParticipant.class);
+        return WarDeployment.getDeployment(DemoDurableParticipant.class, FailureParticipant.class);
     }
 
     @Test
-    public void testRollbackExceptionInRollback()
-            throws Exception
-            {
+    public void testRollbackExceptionInRollback() throws Exception {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
-        FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_ROLLBACK, FailureParticipant.WRONG_STATE);
+        FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_ROLLBACK,
+                FailureParticipant.WRONG_STATE);
         DemoDurableParticipant p2 = new DemoDurableParticipant();
 
         ut.begin();
         try {
             tm.enlistForDurableTwoPhase(p1, "failure");
             tm.enlistForDurableTwoPhase(p2, p2.identifier());
-        }  catch (Exception eouter) {
+        } catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
 
         ut.rollback();
-            }
+    }
 }

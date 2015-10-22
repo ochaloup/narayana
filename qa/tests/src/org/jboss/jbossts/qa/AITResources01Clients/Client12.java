@@ -69,16 +69,12 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client12.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.*;
 
-public class Client12
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client12 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -91,21 +87,17 @@ public class Client12
             float serverIncreaseThreshold;
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2])) {
                 clientIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultClientIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 clientIncreaseThreshold = Float.parseFloat(args[args.length - 2]);
             }
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1])) {
                 serverIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultServerIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 serverIncreaseThreshold = Float.parseFloat(args[args.length - 1]);
             }
@@ -115,10 +107,8 @@ public class Client12
             int clientMemory0 = (int) JVMStats.getMemory();
             int serverMemory0 = pingPong.getMemory();
 
-            for (int index0 = 0; index0 < numberOfCalls; index0++)
-            {
-                for (int index1 = 0; index1 <= index0; index1++)
-                {
+            for (int index0 = 0; index0 < numberOfCalls; index0++) {
+                for (int index1 = 0; index1 <= index0; index1++) {
                     pingPong.bad_hit(index0, index1, pingPong, pingPong);
                 }
             }
@@ -137,29 +127,21 @@ public class Client12
             System.err.println("Server percentage memory increase: " + (float) (100.0 * serverMemoryIncrease) + "%");
             System.err.println("Server memory increase per call  : " + (serverMemory1 - serverMemory0) / numberOfCalls);
 
-            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < clientIncreaseThreshold))
-            {
+            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < clientIncreaseThreshold)) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client12.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client12.main: " + exception);
             exception.printStackTrace(System.err);
         }

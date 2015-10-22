@@ -40,11 +40,9 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class ReactivateUnitTest
-{
+public class ReactivateUnitTest {
     @Test
-    public void test()
-    {
+    public void test() {
         try {
             AtomicObject obj = new AtomicObject();
             Uid objRef = obj.get_uid();
@@ -66,9 +64,7 @@ public class ReactivateUnitTest
             assertEquals(1234, recObj.get());
 
             B.abort();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             fail(ex.toString());
         }
     }

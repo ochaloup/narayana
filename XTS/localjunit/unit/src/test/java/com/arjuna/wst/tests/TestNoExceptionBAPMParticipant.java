@@ -33,12 +33,9 @@ import com.arjuna.wst.UnknownTransactionException;
 
 import javax.xml.namespace.QName;
 
-public class TestNoExceptionBAPMParticipant implements BAParticipantManager
-{
+public class TestNoExceptionBAPMParticipant implements BAParticipantManager {
 
-    public void completed ()
-        throws WrongStateException, SystemException
-    {
+    public void completed() throws WrongStateException, SystemException {
     }
 
     /**
@@ -55,18 +52,12 @@ public class TestNoExceptionBAPMParticipant implements BAParticipantManager
     public void fail(QName exceptionIdentifier) throws SystemException {
     }
 
-    public void exit ()
-        throws WrongStateException, SystemException
-    {
+    public void exit() throws WrongStateException, SystemException {
     }
 
-    public void unknown ()
-        throws SystemException
-    {
+    public void unknown() throws SystemException {
     }
 
-    public void error ()
-        throws SystemException
-    {
+    public void error() throws SystemException {
     }
 }

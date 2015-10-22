@@ -46,76 +46,74 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 /**
  * The Terminator Participant processor.
+ * 
  * @author kevin
  *
  */
-public class TerminationCoordinatorRPCProcessorImpl extends TerminationCoordinatorRPCProcessor
-{
+public class TerminationCoordinatorRPCProcessorImpl extends TerminationCoordinatorRPCProcessor {
     /**
      * Cancel.
-     * @param cancel The cancel notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param cancel
+     *            The cancel notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public void cancel(final NotificationType cancel, final MAP map, final ArjunaContext arjunaContext)
-    {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
-        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor().getParticipant(instanceIdentifier) ;
+    public void cancel(final NotificationType cancel, final MAP map, final ArjunaContext arjunaContext) {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
+        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor()
+                .getParticipant(instanceIdentifier);
 
-        try
-        {
-            if (participant != null)
-            {
-                try
-                {
-                    participant.cancel() ;
-                }
-                catch (FaultedException fm)
-                {
+        try {
+            if (participant != null) {
+                try {
+                    participant.cancel();
+                } catch (FaultedException fm) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME);
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME);
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final UnknownTransactionException ute)
-                {
+                } catch (final UnknownTransactionException ute) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_1());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                            .addTextNode(
+                                    WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_1());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final SystemException se)
-                {
+                } catch (final SystemException se) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_2());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_2());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final Throwable th)
-                {
-                    if (WSTLogger.logger.isTraceEnabled())
-                    {
-                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th) ;
+                } catch (final Throwable th) {
+                    if (WSTLogger.logger.isTraceEnabled()) {
+                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th);
                     }
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_2());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_2());
                     throw new SOAPFaultException(soapFault);
                 }
-            }
-            else
-            {
-                if (WSTLogger.logger.isTraceEnabled())
-                {
-                    WSTLogger.logger.tracev("Cancel called on unknown participant: {0}", new Object[] {instanceIdentifier}) ;
+            } else {
+                if (WSTLogger.logger.isTraceEnabled()) {
+                    WSTLogger.logger.tracev("Cancel called on unknown participant: {0}",
+                            new Object[]{instanceIdentifier});
                 }
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_5());
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                        ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                        .addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_5());
                 throw new SOAPFaultException(soapFault);
             }
-        }
-        catch (SOAPException se)
-        {
+        } catch (SOAPException se) {
             se.printStackTrace(System.err);
             throw new ProtocolException(se);
         }
@@ -123,65 +121,67 @@ public class TerminationCoordinatorRPCProcessorImpl extends TerminationCoordinat
 
     /**
      * Close.
-     * @param close The close notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param close
+     *            The close notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public void close(final NotificationType close, final MAP map, final ArjunaContext arjunaContext)
-    {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
-        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor().getParticipant(instanceIdentifier) ;
+    public void close(final NotificationType close, final MAP map, final ArjunaContext arjunaContext) {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
+        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor()
+                .getParticipant(instanceIdentifier);
 
-        try
-        {
-            if (participant != null)
-            {
-                try
-                {
-                    participant.close() ;
-                }
-                catch (final UnknownTransactionException ute)
-                {
+        try {
+            if (participant != null) {
+                try {
+                    participant.close();
+                } catch (final UnknownTransactionException ute) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_6());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                            .addTextNode(
+                                    WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_6());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final TransactionRolledBackException trbe)
-                {
+                } catch (final TransactionRolledBackException trbe) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.TRANSACTIONROLLEDBACK_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_7());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.TRANSACTIONROLLEDBACK_ERROR_CODE_QNAME)
+                            .addTextNode(
+                                    WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_7());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final SystemException se)
-                {
+                } catch (final SystemException se) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_8());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_8());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final Throwable th)
-                {
-                    if (WSTLogger.logger.isTraceEnabled())
-                    {
-                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th) ;
+                } catch (final Throwable th) {
+                    if (WSTLogger.logger.isTraceEnabled()) {
+                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th);
                     }
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_8());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_8());
                     throw new SOAPFaultException(soapFault);
                 }
-            }
-            else
-            {
-                if (WSTLogger.logger.isTraceEnabled())
-                {
-                    WSTLogger.logger.tracev("Close called on unknown participant: {0}", new Object[] {instanceIdentifier}) ;
+            } else {
+                if (WSTLogger.logger.isTraceEnabled()) {
+                    WSTLogger.logger.tracev("Close called on unknown participant: {0}",
+                            new Object[]{instanceIdentifier});
                 }
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_6());
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                        ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                        .addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_6());
                 throw new SOAPFaultException(soapFault);
             }
         } catch (SOAPException se) {
@@ -192,67 +192,67 @@ public class TerminationCoordinatorRPCProcessorImpl extends TerminationCoordinat
 
     /**
      * Complete.
-     * @param complete The complete notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param complete
+     *            The complete notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public void complete(final NotificationType complete, final MAP map,
-        final ArjunaContext arjunaContext)
-    {
-        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
-        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor().getParticipant(instanceIdentifier) ;
+    public void complete(final NotificationType complete, final MAP map, final ArjunaContext arjunaContext) {
+        final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
+        final BusinessActivityTerminator participant = TerminationCoordinatorProcessor.getProcessor()
+                .getParticipant(instanceIdentifier);
 
         try {
-            if (participant != null)
-            {
+            if (participant != null) {
                 W3CEndpointReference endpoint = participant.getEndpoint();
 
-                final String messageId = MessageId.getMessageId() ;
-                try
-                {
-                    participant.complete() ;
-                }
-                catch (FaultedException fm)
-                {
+                final String messageId = MessageId.getMessageId();
+                try {
+                    participant.complete();
+                } catch (FaultedException fm) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME);
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME);
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final UnknownTransactionException ute)
-                {
+                } catch (final UnknownTransactionException ute) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_12());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                            .addTextNode(
+                                    WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_12());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final SystemException se)
-                {
+                } catch (final SystemException se) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_13());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_13());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final Throwable th)
-                {
-                    if (WSTLogger.logger.isTraceEnabled())
-                    {
-                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th) ;
+                } catch (final Throwable th) {
+                    if (WSTLogger.logger.isTraceEnabled()) {
+                        WSTLogger.logger.tracev("Unexpected exception thrown from close:", th);
                     }
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(), ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
-                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_13());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_RECEIVER.getValue(),
+                            ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME);
+                    soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME).addTextNode(
+                            WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_13());
                     throw new SOAPFaultException(soapFault);
                 }
-            }
-            else
-            {
-                if (WSTLogger.logger.isTraceEnabled())
-                {
-                    WSTLogger.logger.tracev("Complete called on unknown participant: {0}", new Object[] {instanceIdentifier}) ;
+            } else {
+                if (WSTLogger.logger.isTraceEnabled()) {
+                    WSTLogger.logger.tracev("Complete called on unknown participant: {0}",
+                            new Object[]{instanceIdentifier});
                 }
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
-                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME).addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_12());
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                        ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME);
+                soapFault.addDetail().addDetailEntry(ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME)
+                        .addTextNode(WSTLogger.i18NLogger.get_wst11_messaging_TerminationCoordinatorProcessorImpl_12());
                 throw new SOAPFaultException(soapFault);
             }
         } catch (SOAPException se) {

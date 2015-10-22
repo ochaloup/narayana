@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.RawResources02Servers;
  * $Id: Server03.java,v 1.2 2003/06/26 11:44:59 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawResources02.*;
 import org.jboss.jbossts.qa.RawResources02Impls.ServiceImpl01;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server03
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server03 {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -94,12 +90,9 @@ public class Server03
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server03.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
-

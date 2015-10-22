@@ -42,95 +42,60 @@ import com.arjuna.ats.arjuna.tools.osb.util.JMXServer;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
-    private static final String SUBORDINATE_AA_TYPE =
-            "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA";
+    private static final String SUBORDINATE_AA_TYPE = "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA";
 
     private static OSBTypeHandler[] defaultOsbTypes = {
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.recovery.arjunacore.RecoverConnectableAtomicAction",
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.recovery.arjunacore.RecoverConnectableAtomicAction",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.RecoverConnectableAtomicActionBean",
-                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicActionConnectable",
-                    null
-            ),
-            new OSBTypeHandler(
-                    false,
+                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicActionConnectable", null),
+            new OSBTypeHandler(false,
                     "com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction",
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.SubordinateActionBean",
-                    SUBORDINATE_AA_TYPE,
-                    null
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.arjuna.AtomicAction",
+                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jta.SubordinateActionBean", SUBORDINATE_AA_TYPE, null),
+            new OSBTypeHandler(true, "com.arjuna.ats.arjuna.AtomicAction",
                     "com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean",
-                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction",
-                    null
-            ),
-    };
+                    "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction", null),};
 
     private static OSBTypeHandler[] defaultJTSOsbTypes = {
-            new OSBTypeHandler(
-                    true,
-                    false,
+            new OSBTypeHandler(true, false,
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper",
-                    "CosTransactions/XAResourceRecord",
-                    null
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper",
+                    "CosTransactions/XAResourceRecord", null),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ArjunaTransactionImpleWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
-                    "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple",
-                    null
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
+                    "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple", null),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
                     "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/ServerTransaction",
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
+                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
                     "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/AssumedCompleteServerTransaction",
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.RecoveredTransactionWrapper",
+                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.RecoveredTransactionWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
                     "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/AssumedCompleteHeuristicTransaction",
-                    null
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
+                    null),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
                     "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/AssumedCompleteHeuristicServerTransaction",
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"
-            ),
-            new OSBTypeHandler(
-                    true,
-                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.RecoveredTransactionWrapper",
+                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.ServerTransactionHeaderReader"),
+            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.RecoveredTransactionWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSActionBean",
                     "StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/AssumedCompleteTransaction",
-                    null
-            )
-    };
+                    null)};
 
     private static Map<String, OSBTypeHandler> osbTypeMap = new HashMap<String, OSBTypeHandler>();
 
-    // A system property for defining extra bean types for instrumenting object store types
+    // A system property for defining extra bean types for instrumenting object
+    // store types
     // The format is OSType1=BeanType1,OSType2=BeanType2,etc
     public static final String OBJ_STORE_BROWSER_HANDLERS = "com.arjuna.ats.arjuna.tools.osb.mbean.ObjStoreBrowserHandlers";
     private static final String STORE_MBEAN_NAME = "jboss.jta:type=ObjectStore";
@@ -141,23 +106,21 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         return (osbType != null) ? osbType.getHeaderStateReader() : null;
     }
 
-    private Map<String, List<UidWrapper>> registeredMBeans = new HashMap<String, List<UidWrapper>> ();;
+    private Map<String, List<UidWrapper>> registeredMBeans = new HashMap<String, List<UidWrapper>>();;
     private boolean exposeAllLogs = false;
 
     /**
      * Initialise the MBean
      */
-    public void start()
-    {
+    public void start() {
         JMXServer.getAgent().registerMBean(STORE_MBEAN_NAME, this);
     }
 
     /**
-     * Unregister all MBeans representing objects in the ObjectStore
-     * represented by this MBean
+     * Unregister all MBeans representing objects in the ObjectStore represented
+     * by this MBean
      */
-    public void stop()
-    {
+    public void stop() {
         unregisterMBeans();
 
         JMXServer.getAgent().unregisterMBean(STORE_MBEAN_NAME);
@@ -185,20 +148,24 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
     }
 
     /**
-     * This method is deprecated in favour of @setType
-     * The issue with this method is there is no mechanism for determining which class
-     * is responsible for a given OS type.
+     * This method is deprecated in favour of @setType The issue with this
+     * method is there is no mechanism for determining which class is
+     * responsible for a given OS type.
      *
      * Define which object store types will registered as MBeans
-     * @param types the list of ObjectStore types that can be represented
-     * as MBeans
+     * 
+     * @param types
+     *            the list of ObjectStore types that can be represented as
+     *            MBeans
      */
     @Deprecated
     public void setTypes(Map<String, String> types) {
     }
 
     /**
-     * Tell the browser which beans to use for particular Object Store Action type
+     * Tell the browser which beans to use for particular Object Store Action
+     * type
+     * 
      * @param osTypeClassName
      * @param beanTypeClassName
      * @return whether the type was set OK
@@ -217,15 +184,18 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
             return true;
         } catch (Exception e) {
             if (tsLogger.logger.isDebugEnabled())
-                tsLogger.logger.debug("Invalid class type in system property ObjStoreBrowserHandlers: " + osTypeClassName);
+                tsLogger.logger
+                        .debug("Invalid class type in system property ObjStoreBrowserHandlers: " + osTypeClassName);
 
             return false;
         }
     }
 
     /**
-     * @param handler specification for handling object store types
-     * @return the previous value associated with type handler, or null if there was no previous handler.
+     * @param handler
+     *            specification for handling object store types
+     * @return the previous value associated with type handler, or null if there
+     *         was no previous handler.
      */
     public OSBTypeHandler registerHandler(OSBTypeHandler handler) {
         return osbTypeMap.put(handler.getTypeName(), handler);
@@ -246,10 +216,11 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
             arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreDir(logDir);
 
         if (tsLogger.logger.isTraceEnabled())
-            tsLogger.logger.trace("ObjectStoreDir: " + arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir());
+            tsLogger.logger
+                    .trace("ObjectStoreDir: " + arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir());
 
-        setExposeAllRecordsAsMBeans(arjPropertyManager.
-            getObjectStoreEnvironmentBean().getExposeAllLogRecordsAsMBeans());
+        setExposeAllRecordsAsMBeans(
+                arjPropertyManager.getObjectStoreEnvironmentBean().getExposeAllLogRecordsAsMBeans());
 
         for (OSBTypeHandler osbType : defaultOsbTypes)
             osbTypeMap.put(osbType.getTypeName(), osbType);
@@ -270,7 +241,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     /**
      * Dump info about all registered MBeans
-     * @param sb a buffer to contain the result
+     * 
+     * @param sb
+     *            a buffer to contain the result
      * @return the passed in buffer
      */
     public StringBuilder dump(StringBuilder sb) {
@@ -286,9 +259,11 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     /**
      * See if the given uid has previously been registered as an MBean
-     * @param uid the unique id representing an ObjectStore entry
-     * @return the MBean wrapper corresponding to the requested Uid (or null
-     * if it hasn't been registered)
+     * 
+     * @param uid
+     *            the unique id representing an ObjectStore entry
+     * @return the MBean wrapper corresponding to the requested Uid (or null if
+     *         it hasn't been registered)
      */
     public UidWrapper findUid(Uid uid) {
         for (Map.Entry<String, List<UidWrapper>> typeEntry : registeredMBeans.entrySet())
@@ -301,8 +276,11 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     /**
      * Find the registered beand corresponding to a uid.
-     * @deprecated use {@link #findUid(com.arjuna.ats.arjuna.common.Uid)} ()} instead.
-     * @param uid the uid
+     * 
+     * @deprecated use {@link #findUid(com.arjuna.ats.arjuna.common.Uid)} ()}
+     *             instead.
+     * @param uid
+     *            the uid
      * @return the registered bean or null if the Uid is not registered
      */
     @Deprecated
@@ -336,7 +314,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
         if (!enable) {
             for (List<UidWrapper> uids : registeredMBeans.values()) {
-                for (Iterator<UidWrapper> i = uids.iterator(); i.hasNext(); ) {
+                for (Iterator<UidWrapper> i = uids.iterator(); i.hasNext();) {
                     UidWrapper w = i.next();
                     if (osbType.getRecordClass().equals(w.getClassName())) {
                         i.remove();
@@ -353,7 +331,10 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     /**
      * Update registered MBeans based on the current set of Uids.
-     * @param allCurrUids any registered MBeans not in this collection will be deregistered
+     * 
+     * @param allCurrUids
+     *            any registered MBeans not in this collection will be
+     *            deregistered
      */
     private void unregisterRemovedUids(Map<String, Collection<Uid>> allCurrUids) {
 
@@ -380,8 +361,8 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
     }
 
     /**
-     * See if any new MBeans need to be registered or if any existing MBeans no longer exist
-     * as ObjectStore entries.
+     * See if any new MBeans need to be registered or if any existing MBeans no
+     * longer exist as ObjectStore entries.
      */
     public synchronized void probe() {
         Map<String, Collection<Uid>> currUidsForType = new HashMap<String, Collection<Uid>>();
@@ -389,8 +370,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         for (String type : getTypes())
             currUidsForType.put(type, getUids(type));
 
-        // if there are any beans in registeredMBeans that don't appear in new list and unregister them
-        unregisterRemovedUids(currUidsForType); //unregisterMBeans();
+        // if there are any beans in registeredMBeans that don't appear in new
+        // list and unregister them
+        unregisterRemovedUids(currUidsForType); // unregisterMBeans();
 
         for (Map.Entry<String, Collection<Uid>> e : currUidsForType.entrySet()) {
             String type = e.getKey();
@@ -404,7 +386,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
             for (Uid uid : e.getValue()) {
                 if (!isRegistered(type, uid)) {
-                    UidWrapper w = createBean(uid, type); // can return null if type isn't instrumented
+                    UidWrapper w = createBean(uid, type); // can return null if
+                                                            // type isn't
+                                                            // instrumented
 
                     if (w != null)
                         beans.add(w);
@@ -413,9 +397,10 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         }
 
         /*
-         * now create the actual MBeans - we create all the UidWrappers before registering because
-         * the process of creating a bean can call back into the browser to probe for a particular type
-         * (see for example com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean
+         * now create the actual MBeans - we create all the UidWrappers before
+         * registering because the process of creating a bean can call back into
+         * the browser to probe for a particular type (see for example
+         * com.arjuna.ats.arjuna.tools.osb.mbean.ActionBean
          */
         registerMBeans();
     }
@@ -423,7 +408,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
     /**
      * Register new MBeans of the requested type (or unregister ones whose
      * corresponding ObjectStore entry has been removed)
-     * @param type the ObjectStore entry type
+     * 
+     * @param type
+     *            the ObjectStore entry type
      * @return the list of MBeans representing the requested ObjectStore type
      */
     public List<UidWrapper> probe(String type) {
@@ -434,7 +421,7 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
 
     private UidWrapper createBean(Uid uid, String type) {
         OSBTypeHandler osbType = osbTypeMap.get(type);
-        //boolean enabled = osbType == null || osbType.isEnabled();
+        // boolean enabled = osbType == null || osbType.isEnabled();
         boolean registerBean = osbType != null && osbType.isAllowRegistration();
 
         if (osbType == null && !exposeAllLogs)
@@ -443,8 +430,8 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         if (exposeAllLogs)
             registerBean = true;
 
-//        if (osbType != null && !osbType.enabled)
-//            return null;
+        // if (osbType != null && !osbType.enabled)
+        // return null;
 
         String beanType = osbType == null ? OSEntryBean.class.getName() : osbType.getBeanClass();
         String stateType = osbType == null ? null : osbType.getRecordClass();
@@ -505,7 +492,8 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
             }
         } catch (ObjectStoreException e) {
             if (tsLogger.logger.isTraceEnabled())
-                tsLogger.logger.trace(e.toString());        }
+                tsLogger.logger.trace(e.toString());
+        }
 
         return allTypes;
     }

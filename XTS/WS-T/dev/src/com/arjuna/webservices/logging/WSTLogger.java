@@ -33,8 +33,7 @@ package com.arjuna.webservices.logging;
 
 import org.jboss.logging.Logger;
 
-public class WSTLogger
-{
+public class WSTLogger {
     public static final Logger logger = Logger.getLogger("com.arjuna.wst");
     public static final wstI18NLogger i18NLogger = Logger.getMessageLogger(wstI18NLogger.class, "com.arjuna.wst");
 }

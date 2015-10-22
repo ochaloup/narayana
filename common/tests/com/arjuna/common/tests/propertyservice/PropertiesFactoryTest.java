@@ -48,9 +48,11 @@ public final class PropertiesFactoryTest {
         expectedProperties.put("CoordinatorEnvironmentBean.commitOnePhase", "YES");
         expectedProperties.put("ObjectStoreEnvironmentBean.objectStoreDir", "PutObjectStoreDirHere");
         expectedProperties.put("CoreEnvironmentBean.socketProcessIdPort", "0");
-        expectedProperties.put("RecoveryEnvironmentBean.recoveryModuleClassNames", "com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule\n" +
-                "        com.arjuna.ats.internal.txoj.recovery.TORecoveryModule");
-        expectedProperties.put("RecoveryEnvironmentBean.expiryScannerClassNames", "com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner");
+        expectedProperties.put("RecoveryEnvironmentBean.recoveryModuleClassNames",
+                "com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule\n"
+                        + "        com.arjuna.ats.internal.txoj.recovery.TORecoveryModule");
+        expectedProperties.put("RecoveryEnvironmentBean.expiryScannerClassNames",
+                "com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner");
         expectedProperties.put("RecoveryEnvironmentBean.recoveryPort", "4712");
         expectedProperties.put("RecoveryEnvironmentBean.recoveryAddress", "");
 

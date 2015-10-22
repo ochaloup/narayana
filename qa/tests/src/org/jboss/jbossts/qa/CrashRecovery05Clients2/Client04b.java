@@ -56,27 +56,25 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients2;
  * $Id: Client04b.java,v 1.2 2003/06/26 11:43:31 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery05.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client04b
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client04b {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
-            BeforeCrashService service1 = BeforeCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR1));
+            BeforeCrashService service1 = BeforeCrashServiceHelper
+                    .narrow(ORBInterface.orb().string_to_object(serviceIOR1));
 
             String serviceIOR2 = ServerIORStore.loadIOR(args[args.length - 1]);
-            BeforeCrashService service2 = BeforeCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR2));
+            BeforeCrashService service2 = BeforeCrashServiceHelper
+                    .narrow(ORBInterface.orb().string_to_object(serviceIOR2));
 
             ResourceBehavior[] resourceBehaviors1 = new ResourceBehavior[1];
             resourceBehaviors1[0] = new ResourceBehavior();
@@ -98,29 +96,21 @@ public class Client04b
 
             OTS.current().commit(false);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client04b.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client04b.main: " + exception);
             exception.printStackTrace(System.err);
         }

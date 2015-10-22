@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.CurrentTests01;
  * $Id: Test36.java,v 1.2 2003/06/26 11:43:53 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
@@ -66,93 +65,69 @@ import org.omg.CosTransactions.NoTransaction;
 /**
  * Test to see if stop start of orb causes any problems
  */
-public class Test36
-{
-    public static void main(String[] args)
-    {
+public class Test36 {
+    public static void main(String[] args) {
         boolean correct = true;
-        try
-        {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             Current current = OTS.get_current();
 
-            try
-            {
+            try {
                 current.commit(true);
                 correct = false;
-            }
-            catch (NoTransaction noTransaction)
-            {
+            } catch (NoTransaction noTransaction) {
             }
 
-            if (!correct)
-            {
+            if (!correct) {
                 System.out.println("Failed");
                 return;
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Test036.main: " + exception);
             exception.printStackTrace(System.err);
             return;
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Test036.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        //now do the test again and see what happens
+        // now do the test again and see what happens
 
-        try
-        {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             Current current = OTS.get_current();
 
-            try
-            {
+            try {
                 current.commit(true);
                 correct = false;
-            }
-            catch (NoTransaction noTransaction)
-            {
+            } catch (NoTransaction noTransaction) {
             }
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Test036.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Test01.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -52,67 +52,63 @@ public class CompletionParticipantTest extends BaseWSTTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                TestCompletionCoordinatorProcessor.class,
+        return WarDeployment.getDeployment(TestCompletionCoordinatorProcessor.class,
                 CompletionCoordinatorDetails.class);
     }
 
-    private CompletionCoordinatorProcessor origCompletionCoordinatorProcessor ;
+    private CompletionCoordinatorProcessor origCompletionCoordinatorProcessor;
 
-    private TestCompletionCoordinatorProcessor testCompletionCoordinatorProcessor = new TestCompletionCoordinatorProcessor() ;
+    private TestCompletionCoordinatorProcessor testCompletionCoordinatorProcessor = new TestCompletionCoordinatorProcessor();
 
     @Before
-    public void setUp()
-            throws Exception
-            {
-        origCompletionCoordinatorProcessor = CompletionCoordinatorProcessor.setProcessor(testCompletionCoordinatorProcessor) ;
-            }
-    
-    @Test
-    public void testSendCommit()
-            throws Exception
-            {
-        final String messageId = "testSendCommit" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionCoordinatorServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1") ;
-        final W3CEndpointReference endpoint = TestUtil.getCompletionCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
-
-        CompletionCoordinatorClient.getClient().sendCommit(endpoint, map, new InstanceIdentifier("sender")) ;
-
-        final CompletionCoordinatorDetails details = testCompletionCoordinatorProcessor.getCompletionCoordinatorDetails(messageId, 10000) ;
-
-        assertTrue(details.hasCommit()) ;
-
-        checkDetails(details, true, true, messageId, instanceIdentifier);
-            }
+    public void setUp() throws Exception {
+        origCompletionCoordinatorProcessor = CompletionCoordinatorProcessor
+                .setProcessor(testCompletionCoordinatorProcessor);
+    }
 
     @Test
-    public void testSendRollback()
-            throws Exception
-            {
-        final String messageId = "testSendRollback" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionCoordinatorServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2") ;
-        final W3CEndpointReference endpoint = TestUtil.getCompletionCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+    public void testSendCommit() throws Exception {
+        final String messageId = "testSendCommit";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionCoordinatorServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1");
+        final W3CEndpointReference endpoint = TestUtil
+                .getCompletionCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
 
-        CompletionCoordinatorClient.getClient().sendRollback(endpoint, map, new InstanceIdentifier("sender")) ;
+        CompletionCoordinatorClient.getClient().sendCommit(endpoint, map, new InstanceIdentifier("sender"));
 
-        final CompletionCoordinatorDetails details = testCompletionCoordinatorProcessor.getCompletionCoordinatorDetails(messageId, 10000) ;
+        final CompletionCoordinatorDetails details = testCompletionCoordinatorProcessor
+                .getCompletionCoordinatorDetails(messageId, 10000);
 
-        assertTrue(details.hasRollback()) ;
+        assertTrue(details.hasCommit());
 
         checkDetails(details, true, true, messageId, instanceIdentifier);
-            }
+    }
+
+    @Test
+    public void testSendRollback() throws Exception {
+        final String messageId = "testSendRollback";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.completionCoordinatorServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2");
+        final W3CEndpointReference endpoint = TestUtil
+                .getCompletionCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+
+        CompletionCoordinatorClient.getClient().sendRollback(endpoint, map, new InstanceIdentifier("sender"));
+
+        final CompletionCoordinatorDetails details = testCompletionCoordinatorProcessor
+                .getCompletionCoordinatorDetails(messageId, 10000);
+
+        assertTrue(details.hasRollback());
+
+        checkDetails(details, true, true, messageId, instanceIdentifier);
+    }
 
     @After
-    public void tearDown()
-            throws Exception
-            {
-        CompletionCoordinatorProcessor.setProcessor(origCompletionCoordinatorProcessor) ;
-            }
+    public void tearDown() throws Exception {
+        CompletionCoordinatorProcessor.setProcessor(origCompletionCoordinatorProcessor);
+    }
 
-    private void checkDetails(CompletionCoordinatorDetails details, boolean hasFrom, boolean hasFaultTo, String messageId, InstanceIdentifier instanceIdentifier)
-    {
+    private void checkDetails(CompletionCoordinatorDetails details, boolean hasFrom, boolean hasFaultTo,
+            String messageId, InstanceIdentifier instanceIdentifier) {
         MAP inMAP = details.getMAP();
         ArjunaContext inArjunaContext = details.getArjunaContext();
 
@@ -138,7 +134,8 @@ public class CompletionParticipantTest extends BaseWSTTest {
             assertNull(inArjunaContext);
         } else {
             assertNotNull(inArjunaContext);
-            assertEquals(instanceIdentifier.getInstanceIdentifier(), inArjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
+            assertEquals(instanceIdentifier.getInstanceIdentifier(),
+                    inArjunaContext.getInstanceIdentifier().getInstanceIdentifier());
         }
     }
 }

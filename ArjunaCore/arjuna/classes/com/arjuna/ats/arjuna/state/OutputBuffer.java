@@ -48,26 +48,21 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
  * @since JTS 1.0.
  */
 
-public class OutputBuffer
-{
+public class OutputBuffer {
 
     /**
      * Create a new buffer.
      */
 
-    public OutputBuffer()
-    {
+    public OutputBuffer() {
         _valid = true;
 
-        try
-        {
+        try {
             _outputStream = new ByteArrayOutputStream();
             _output = new DataOutputStream(_outputStream);
 
             initBuffer();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             _valid = false;
         }
     }
@@ -77,19 +72,15 @@ public class OutputBuffer
      * internal byte array will be automatically increased in size.
      */
 
-    public OutputBuffer(int buffSize)
-    {
+    public OutputBuffer(int buffSize) {
         _valid = true;
 
-        try
-        {
+        try {
             _outputStream = new ByteArrayOutputStream(buffSize);
             _output = new DataOutputStream(_outputStream);
 
             initBuffer();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             _valid = false;
         }
     }
@@ -98,25 +89,19 @@ public class OutputBuffer
      * Create a new buffer using the provided byte array.
      */
 
-    public OutputBuffer(byte[] b)
-    {
+    public OutputBuffer(byte[] b) {
         _valid = true;
 
-        try
-        {
+        try {
             _outputStream = new ByteArrayOutputStream(0);
             _output = new DataOutputStream(_outputStream);
 
             _outputStream.write(b, 0, b.length);
 
             initBuffer();
-        }
-        catch (final NullPointerException ex)
-        {
+        } catch (final NullPointerException ex) {
             _valid = false;
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             _valid = false;
         }
     }
@@ -126,8 +111,7 @@ public class OutputBuffer
      * provided buffer.
      */
 
-    public OutputBuffer(OutputBuffer copyFrom)
-    {
+    public OutputBuffer(OutputBuffer copyFrom) {
         _valid = true;
         _outputStream = null;
         _output = null;
@@ -139,8 +123,7 @@ public class OutputBuffer
      * Is the buffer valid?
      */
 
-    public final synchronized boolean valid ()
-    {
+    public final synchronized boolean valid() {
         return _valid;
     }
 
@@ -148,17 +131,13 @@ public class OutputBuffer
      * Return the byte array used to store data types.
      */
 
-    public final synchronized byte[] buffer ()
-    {
-        try
-        {
+    public final synchronized byte[] buffer() {
+        try {
             _output.flush();
-        }
-        catch (final IOException ex)
-        {
+        } catch (final IOException ex) {
             // ignore?
         }
-        
+
         return _outputStream.toByteArray();
     }
 
@@ -166,8 +145,7 @@ public class OutputBuffer
      * Return the length of the byte array being used to store data types.
      */
 
-    public final synchronized int length ()
-    {
+    public final synchronized int length() {
         return _outputStream.size();
     }
 
@@ -175,23 +153,18 @@ public class OutputBuffer
      * Copy the provided OutputBuffer and overwrite the current instance.
      */
 
-    public synchronized void copy (OutputBuffer b)
-    {
-        if (b._valid)
-        {
+    public synchronized void copy(OutputBuffer b) {
+        if (b._valid) {
             _valid = true;
 
-            try
-            {
+            try {
                 _outputStream = new ByteArrayOutputStream(b.length());
                 _output = new DataOutputStream(_outputStream);
 
                 _outputStream.write(b.buffer(), 0, b.length());
 
                 initBuffer();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 _valid = false;
             }
         }
@@ -201,8 +174,7 @@ public class OutputBuffer
      * Clear the OutputBuffer and rewind the pack pointer.
      */
 
-    public final synchronized void reset () throws IOException
-    {
+    public final synchronized void reset() throws IOException {
         _outputStream.reset();
         initBuffer();
     }
@@ -211,8 +183,7 @@ public class OutputBuffer
      * Pack a byte. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packByte (byte b) throws IOException
-    {
+    public final synchronized void packByte(byte b) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_1());
 
@@ -224,15 +195,13 @@ public class OutputBuffer
      * thrown.
      */
 
-    public final synchronized void packBytes (byte[] b) throws IOException
-    {
+    public final synchronized void packBytes(byte[] b) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_2());
 
         packInt(b.length);
 
-        if (b.length > 0)
-        {
+        if (b.length > 0) {
             _output.write(b, 0, b.length);
             realign(b.length);
         }
@@ -242,8 +211,7 @@ public class OutputBuffer
      * Pack the boolean. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packBoolean (boolean b) throws IOException
-    {
+    public final synchronized void packBoolean(boolean b) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_3());
 
@@ -262,8 +230,7 @@ public class OutputBuffer
      * thrown.
      */
 
-    public final synchronized void packChar (char c) throws IOException
-    {
+    public final synchronized void packChar(char c) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_4());
 
@@ -274,8 +241,7 @@ public class OutputBuffer
      * Pack the short. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packShort (short s) throws IOException
-    {
+    public final synchronized void packShort(short s) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_5());
 
@@ -286,8 +252,7 @@ public class OutputBuffer
      * Pack the integer. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packInt (int i) throws IOException
-    {
+    public final synchronized void packInt(int i) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_6());
 
@@ -302,8 +267,7 @@ public class OutputBuffer
      * Pack the long. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packLong (long l) throws IOException
-    {
+    public final synchronized void packLong(long l) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_7());
 
@@ -318,8 +282,7 @@ public class OutputBuffer
      * Pack the float. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packFloat (float f) throws IOException
-    {
+    public final synchronized void packFloat(float f) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_8());
 
@@ -334,8 +297,7 @@ public class OutputBuffer
      * Pack the double. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packDouble (double d) throws IOException
-    {
+    public final synchronized void packDouble(double d) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_9());
 
@@ -352,16 +314,14 @@ public class OutputBuffer
      * object. If the buffer is invalid then an IOException is thrown.
      */
 
-    public final synchronized void packString (String s) throws IOException
-    {
+    public final synchronized void packString(String s) throws IOException {
         if (!_valid)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_10());
 
         int sz = 0;
         String dummy = null;
 
-        if (s != null)
-        {
+        if (s != null) {
             sz = s.length() + 1;
             dummy = s + '\0';
 
@@ -371,8 +331,7 @@ public class OutputBuffer
 
         _valid = false;
 
-        if (sz > 0)
-        {
+        if (sz > 0) {
             byte[] bytes = dummy.getBytes();
             _output.write(bytes, 0, bytes.length);
             realign(bytes.length);
@@ -386,13 +345,11 @@ public class OutputBuffer
      * IOException is thrown.
      */
 
-    public synchronized void packInto (OutputBuffer buff) throws IOException
-    {
+    public synchronized void packInto(OutputBuffer buff) throws IOException {
         if (buff == null)
             throw new IOException(tsLogger.i18NLogger.get_state_OutputBuffer_11());
 
-        if (_valid)
-        {
+        if (_valid) {
             /*
              * pack number of bytes and then pack each byte separately.
              */
@@ -405,18 +362,15 @@ public class OutputBuffer
      * Print out information about this instance.
      */
 
-    public void print (PrintWriter strm)
-    {
-        if (_valid)
-        {
+    public void print(PrintWriter strm) {
+        if (_valid) {
             strm.println("OutputBuffer : \n");
 
             byte[] b = buffer();
 
             for (int i = 0; i < b.length; i++)
                 strm.write((char) b[i]);
-        }
-        else
+        } else
             strm.println("OutputBuffer : invalid.");
     }
 
@@ -424,20 +378,16 @@ public class OutputBuffer
      * Reset the pack pointer.
      */
 
-    public final boolean rewrite ()
-    {
+    public final boolean rewrite() {
         if (!_valid)
             return false;
 
-        try
-        {
+        try {
             _outputStream = new ByteArrayOutputStream();
             _output = new DataOutputStream(_outputStream);
 
             initBuffer();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             _valid = false;
         }
 
@@ -448,20 +398,16 @@ public class OutputBuffer
      * 1 = 3
      */
 
-    private final void realign (int amount) throws IOException
-    {
-        if ((amount % OutputBuffer.ALIGNMENT) > 0)
-        {
-            int excess = OutputBuffer.ALIGNMENT
-                    - (amount % OutputBuffer.ALIGNMENT);
+    private final void realign(int amount) throws IOException {
+        if ((amount % OutputBuffer.ALIGNMENT) > 0) {
+            int excess = OutputBuffer.ALIGNMENT - (amount % OutputBuffer.ALIGNMENT);
 
             for (int i = 0; i < excess; i++)
                 _output.write(_byte, 0, 1);
         }
     }
 
-    private final void initBuffer () throws IOException
-    {
+    private final void initBuffer() throws IOException {
         String version = "#BE";
 
         _output.writeBytes(version);

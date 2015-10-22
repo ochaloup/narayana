@@ -20,8 +20,7 @@
  */
 package org.jboss.jbossts.qa.junit.testgroup;
 
-public class TestGroup_jdbcresources01_oracle_thin_jndi extends TestGroup_jdbcresources01_abstract
-{
+public class TestGroup_jdbcresources01_oracle_thin_jndi extends TestGroup_jdbcresources01_abstract {
     public String getTestGroupName() {
         return "jdbcresources01_oracle_thin_jndi";
     }

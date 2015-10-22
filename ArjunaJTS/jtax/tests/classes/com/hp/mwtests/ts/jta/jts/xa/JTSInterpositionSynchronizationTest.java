@@ -81,14 +81,13 @@ public class JTSInterpositionSynchronizationTest {
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        originalValue = jtsPropertyManager.getJTSEnvironmentBean()
-                .isSupportInterposedSynchronization();
+        originalValue = jtsPropertyManager.getJTSEnvironmentBean().isSupportInterposedSynchronization();
     }
 
     @After
@@ -102,13 +101,11 @@ public class JTSInterpositionSynchronizationTest {
             // will not
         }
         emptyObjectStore();
-        jtsPropertyManager.getJTSEnvironmentBean()
-                .setSupportInterposedSynchronization(originalValue);
+        jtsPropertyManager.getJTSEnvironmentBean().setSupportInterposedSynchronization(originalValue);
     }
 
     private void emptyObjectStore() {
-        String objectStoreDirName = arjPropertyManager
-                .getObjectStoreEnvironmentBean().getObjectStoreDir();
+        String objectStoreDirName = arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir();
 
         System.out.printf("Emptying %s\n", objectStoreDirName);
 
@@ -118,12 +115,9 @@ public class JTSInterpositionSynchronizationTest {
     }
 
     public void removeContents(File directory) {
-        if ((directory != null) && directory.isDirectory()
-                && (!directory.getName().equals(""))
-                && (!directory.getName().equals("/"))
-                && (!directory.getName().equals("\\"))
-                && (!directory.getName().equals("."))
-                && (!directory.getName().equals(".."))) {
+        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
+                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
+                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
             File[] contents = directory.listFiles();
 
             for (int index = 0; index < contents.length; index++) {
@@ -141,22 +135,14 @@ public class JTSInterpositionSynchronizationTest {
     public void test() throws Exception {
         InterpositionCreator creator = new InterpositionCreator();
 
-        jtaPropertyManager
-                .getJTAEnvironmentBean()
-                .setTransactionManagerClassName(
-                        com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class
-                                .getName());
-        jtaPropertyManager
-                .getJTAEnvironmentBean()
-                .setUserTransactionClassName(
-                        com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class
-                                .getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
-        jtsPropertyManager.getJTSEnvironmentBean()
-                .setSupportInterposedSynchronization(true);
+        jtsPropertyManager.getJTSEnvironmentBean().setSupportInterposedSynchronization(true);
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.setTransactionTimeout(1000000);
         tm.begin();
@@ -237,31 +223,29 @@ public class JTSInterpositionSynchronizationTest {
         assertTrue(recreate != null);
 
         Object remove = ControlImple.allControls.remove(get_uid);
-        ServerControl sc = new ServerControl(get_uid, get_control, null,
-                cont.get_coordinator(), cont.get_terminator());
+        ServerControl sc = new ServerControl(get_uid, get_control, null, cont.get_coordinator(), cont.get_terminator());
         ControlImple.allControls.put(get_uid, remove);
         ServerTopLevelAction serverTopLevelAction = new ServerTopLevelAction(sc);
 
-        sc.getImplHandle().register_synchronization(
-                new ManagedSynchronizationImple(new Synchronization() {
+        sc.getImplHandle().register_synchronization(new ManagedSynchronizationImple(new Synchronization() {
 
-                    @Override
-                    public void beforeCompletion() {
-                        beforeCompletionCalled = true;
-                    }
+            @Override
+            public void beforeCompletion() {
+                beforeCompletionCalled = true;
+            }
 
-                    @Override
-                    public void afterCompletion(int status) {
-                        afterCompletionCalled = true;
-                    }
-                }).getSynchronization());
+            @Override
+            public void afterCompletion(int status) {
+                afterCompletionCalled = true;
+            }
+        }).getSynchronization());
 
         transaction.commit();
 
         assertTrue(prepareCalled == true);
         assertTrue(beforeCompletionCalled);
         assertTrue(afterCompletionCalled);
-        assertTrue(beforeCompletionCalledFirst == jtsPropertyManager
-                .getJTSEnvironmentBean().isSupportInterposedSynchronization());
+        assertTrue(beforeCompletionCalledFirst == jtsPropertyManager.getJTSEnvironmentBean()
+                .isSupportInterposedSynchronization());
     }
 }

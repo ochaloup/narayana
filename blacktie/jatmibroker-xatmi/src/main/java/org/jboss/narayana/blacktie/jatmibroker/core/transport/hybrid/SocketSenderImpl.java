@@ -51,19 +51,20 @@ public class SocketSenderImpl implements Sender {
         this.addr = addr;
         String[] s = addr.split(":");
 
-        try{
+        try {
             socket = new Socket(s[0], Integer.parseInt(s[1]));
             sid = Integer.parseInt(s[2]);
-            outs =  new DataOutputStream(socket.getOutputStream());
+            outs = new DataOutputStream(socket.getOutputStream());
             this.closed = false;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new ConnectionException(Connection.TPEPROTO, "connect to " + addr + " failed with " + e);
         }
         log.debug("create socket sender for " + addr);
     }
 
     public SocketSenderImpl(Socket endpoint, String replyTo) throws ConnectionException {
-        log.debug("create socket sender with receiver endpoint " + endpoint.getRemoteSocketAddress() + " " + endpoint.getLocalPort());
+        log.debug("create socket sender with receiver endpoint " + endpoint.getRemoteSocketAddress() + " "
+                + endpoint.getLocalPort());
         this.socket = endpoint;
         try {
             this.outs = new DataOutputStream(socket.getOutputStream());
@@ -115,21 +116,20 @@ public class SocketSenderImpl implements Sender {
         }
         try {
             StringBuffer buffer = new StringBuffer();
-            buffer.append(sid).append("\n").append(correlationId).append("\n").append(rcode).append("\n").
-            append(toSend.length).append("\n").append(flags).append("\n").
-            append(rval).append("\n").append(toReplyTo).append("\n").
-            append(type).append("\n").append(subtype).append("\n");
+            buffer.append(sid).append("\n").append(correlationId).append("\n").append(rcode).append("\n")
+                    .append(toSend.length).append("\n").append(flags).append("\n").append(rval).append("\n")
+                    .append(toReplyTo).append("\n").append(type).append("\n").append(subtype).append("\n");
 
             int sendlen = buffer.length() + toSend.length;
             log.debug("send on " + socket + " len is " + sendlen + " and buffer is " + buffer);
-            //log.debug(buffer);
-            //log.info("toSend[0] is " + toSend[0]);
+            // log.debug(buffer);
+            // log.info("toSend[0] is " + toSend[0]);
 
             try {
-                outs.writeInt(sendlen);         
+                outs.writeInt(sendlen);
                 outs.write(buffer.toString().getBytes(), 0, buffer.length());
                 outs.write(toSend, 0, toSend.length);
-            } catch (SocketException e)  {
+            } catch (SocketException e) {
                 // The socket might be closed by service side
                 log.warn("socket send with " + e);
             }

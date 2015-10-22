@@ -36,32 +36,27 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
  * $Id: ActivateDestroyTest1.java,v 1.2 2003/12/01 13:37:53 nmcl Exp $
  */
 
-public class ActivateDestroyTest1 extends BaseTestClient
-{
-    public static void main(String[] args)
-    {
+public class ActivateDestroyTest1 extends BaseTestClient {
+    public static void main(String[] args) {
         /*
-        * Default intentions list is to order by Uid (improves
-        * performance). But for this test we need to order by type.
-        */
+         * Default intentions list is to order by Uid (improves performance).
+         * But for this test we need to order by type.
+         */
         arjPropertyManager.getCoordinatorEnvironmentBean().setAlternativeRecordOrdering(true);
 
         ActivateDestroyTest1 test = new ActivateDestroyTest1(args);
     }
 
-    private ActivateDestroyTest1(String[] args)
-    {
+    private ActivateDestroyTest1(String[] args) {
         super(args);
     }
 
-    public void Test()
-    {
+    public void Test() {
         /** Set argument relative positions **/
         setNumberOfCalls(2);
         setNumberOfResources(1);
 
-        try
-        {
+        try {
 
             BasicLockRecord basicRecord = new BasicLockRecord();
 
@@ -81,9 +76,7 @@ public class ActivateDestroyTest1 extends BaseTestClient
             this.commit();
 
             this.Fail();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Fail("Error doing work", e);
         }
     }

@@ -43,11 +43,9 @@ import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.DemoResource;
 import com.hp.mwtests.ts.jts.orbspecific.resources.heuristic;
 
-public class AsyncTest
-{
+public class AsyncTest {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         boolean errorp = false;
         boolean errorc = false;
 
@@ -63,10 +61,8 @@ public class AsyncTest
 
             current.begin();
 
-            for (int j = 0; j < 100; j++)
-            {
-                if ((j == 10) && (errorp || errorc))
-                {
+            for (int j = 0; j < 100; j++) {
+                if ((j == 10) && (errorp || errorc)) {
                     boolean heuristicPrepare = errorp;
                     heuristic h = new heuristic(heuristicPrepare);
 
@@ -86,10 +82,8 @@ public class AsyncTest
             current.commit(false);
 
             System.out.println("Test completed.");
-        }
-        catch (org.omg.CORBA.TRANSACTION_ROLLEDBACK e)
-        {
-            System.out.println("Caught exception: "+e);
+        } catch (org.omg.CORBA.TRANSACTION_ROLLEDBACK e) {
+            System.out.println("Caught exception: " + e);
 
             assertTrue(errorp || errorc);
 
@@ -98,17 +92,13 @@ public class AsyncTest
         myOA.destroy();
         myORB.shutdown();
     }
-    
-    public static void main (String[] args)
-    {
+
+    public static void main(String[] args) {
         AsyncTest obj = new AsyncTest();
-        
-        try
-        {
+
+        try {
             obj.test();
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
             ex.printStackTrace();
         }
     }

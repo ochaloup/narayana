@@ -62,7 +62,8 @@ public final class RecoveryManager {
 
     public void persistParticipantInformation(final ParticipantInformation participantInformation) {
         if (LOG.isTraceEnabled()) {
-            LOG.trace("RecoveryManager.persistParticipantInformation: participantInformation=" + participantInformation);
+            LOG.trace(
+                    "RecoveryManager.persistParticipantInformation: participantInformation=" + participantInformation);
         }
 
         if (!isRecoverableParticipant(participantInformation.getParticipant())) {
@@ -122,7 +123,7 @@ public final class RecoveryManager {
         }
 
         // Shouldn't happen
-        return new byte[] {};
+        return new byte[]{};
     }
 
     private byte[] serializeParticipant(final Serializable participant) throws IOException {
@@ -151,8 +152,8 @@ public final class RecoveryManager {
                                 recoveryStore, uid);
 
                         if (participantInformation != null) {
-                            ParticipantsContainer.getInstance().addParticipantInformation(
-                                    participantInformation.getId(), participantInformation);
+                            ParticipantsContainer.getInstance()
+                                    .addParticipantInformation(participantInformation.getId(), participantInformation);
                         }
                     }
                 }
@@ -169,7 +170,8 @@ public final class RecoveryManager {
     private ParticipantInformation recreateParticipantInformation(final RecoveryStore recoveryStore, final Uid uid)
             throws ObjectStoreException, IOException {
 
-        final InputObjectState inputObjectState = recoveryStore.read_committed(uid, PARTICIPANT_INFORMATION_RECORD_TYPE);
+        final InputObjectState inputObjectState = recoveryStore.read_committed(uid,
+                PARTICIPANT_INFORMATION_RECORD_TYPE);
         final String id = inputObjectState.unpackString();
 
         if (ParticipantsContainer.getInstance().getParticipantInformation(id) != null) {
@@ -200,7 +202,8 @@ public final class RecoveryManager {
             try {
                 participant.rollback();
                 removeParticipantInformation(participantInformation);
-                // TODO is it OK to leave participant not rolled back in case of Exception?
+                // TODO is it OK to leave participant not rolled back in case of
+                // Exception?
             } catch (HeuristicException e) {
                 LOG.warn(e.getMessage(), e);
             } catch (ParticipantException e) {

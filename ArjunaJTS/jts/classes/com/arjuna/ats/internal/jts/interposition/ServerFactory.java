@@ -58,31 +58,25 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * This is a server-side factory used for creating server transactions.
  * 
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ServerFactory.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: ServerFactory.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.2.4.
  */
 
-public class ServerFactory
-{
+public class ServerFactory {
 
     /**
      * @return the server transaction status.
      * @since JTS 2.1.1.
      */
 
-    public static org.omg.CosTransactions.Status getCurrentStatus (Uid uid)
-            throws SystemException
-    {
+    public static org.omg.CosTransactions.Status getCurrentStatus(Uid uid) throws SystemException {
         if (!uid.valid())
             throw new BAD_PARAM();
-        else
-        {
-            try
-            {
+        else {
+            try {
                 ControlImple ctx = null;
 
-                synchronized (ServerControl.allServerControls)
-                {
+                synchronized (ServerControl.allServerControls) {
                     ctx = (ServerControl) ServerControl.allServerControls.get(uid);
                 }
 
@@ -100,16 +94,13 @@ public class ServerFactory
                  * isn't there now it won't be there at all.
                  */
 
-                if (ctx == null)
-                {
+                if (ctx == null) {
                     Enumeration e = ServerControl.allServerControls.elements();
 
-                    while (e.hasMoreElements())
-                    {
+                    while (e.hasMoreElements()) {
                         ctx = (ServerControl) e.nextElement();
 
-                        if (ctx.getImplHandle().getSavingUid().equals(uid))
-                        {
+                        if (ctx.getImplHandle().getSavingUid().equals(uid)) {
                             break;
                         }
                     }
@@ -119,12 +110,9 @@ public class ServerFactory
                     return ctx.getImplHandle().get_status();
                 else
                     throw new NoTransaction();
-            }
-            catch (NoTransaction ex)
-            {
+            } catch (NoTransaction ex) {
                 return org.omg.CosTransactions.Status.StatusNoTransaction;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 jtsLogger.i18NLogger.warn_interposition_sfcaught("ServerFactory.getCurrentStatus", uid, e);
 
                 return Status.StatusUnknown;
@@ -138,31 +126,23 @@ public class ServerFactory
      * @since JTS 2.1.1.
      */
 
-    public static org.omg.CosTransactions.Status getStatus (Uid u)
-            throws NoTransaction, SystemException
-    {
+    public static org.omg.CosTransactions.Status getStatus(Uid u) throws NoTransaction, SystemException {
         org.omg.CosTransactions.Status s = org.omg.CosTransactions.Status.StatusUnknown;
 
-        try
-        {
+        try {
             s = getCurrentStatus(u);
-        }
-        catch (SystemException e2)
-        {
+        } catch (SystemException e2) {
             throw e2;
-        }
-        catch (Exception e3) {
+        } catch (Exception e3) {
             jtsLogger.i18NLogger.warn_interposition_sfcaught("ServerFactory.getStatus", u, e3);
 
             return Status.StatusUnknown;
         }
 
         if ((s == org.omg.CosTransactions.Status.StatusUnknown)
-                || (s == org.omg.CosTransactions.Status.StatusNoTransaction))
-        {
+                || (s == org.omg.CosTransactions.Status.StatusNoTransaction)) {
             return getOSStatus(u);
-        }
-        else
+        } else
             return s;
     }
 
@@ -172,21 +152,17 @@ public class ServerFactory
      * @since JTS 2.1.1.
      */
 
-    public static org.omg.CosTransactions.Status getOSStatus (Uid u)
-            throws NoTransaction, SystemException
-    {
+    public static org.omg.CosTransactions.Status getOSStatus(Uid u) throws NoTransaction, SystemException {
         org.omg.CosTransactions.Status s = org.omg.CosTransactions.Status.StatusUnknown;
 
         if (!u.valid())
             throw new BAD_PARAM();
-        else
-        {
+        else {
             // if here then it is not active, so look in the object store
 
             RecoveryStore store = StoreManager.getRecoveryStore();
 
-            try
-            {
+            try {
                 /*
                  * Do we need to search server transactions too? Possibly not,
                  * since an interposed coordinator can never always say with
@@ -195,23 +171,21 @@ public class ServerFactory
 
                 int status = store.currentState(u, ServerTransaction.typeName());
 
-                switch (status)
-                {
-                case StateStatus.OS_UNKNOWN:
-                    return getHeuristicStatus(u, store);
-                case StateStatus.OS_COMMITTED:
-                    return org.omg.CosTransactions.Status.StatusCommitted;
-                case StateStatus.OS_UNCOMMITTED:
-                    return org.omg.CosTransactions.Status.StatusPrepared;
-                case StateStatus.OS_HIDDEN:
-                case StateStatus.OS_COMMITTED_HIDDEN:
-                case StateStatus.OS_UNCOMMITTED_HIDDEN:
-                    return org.omg.CosTransactions.Status.StatusPrepared;
-                default:
-                    return org.omg.CosTransactions.Status.StatusUnknown;
+                switch (status) {
+                    case StateStatus.OS_UNKNOWN :
+                        return getHeuristicStatus(u, store);
+                    case StateStatus.OS_COMMITTED :
+                        return org.omg.CosTransactions.Status.StatusCommitted;
+                    case StateStatus.OS_UNCOMMITTED :
+                        return org.omg.CosTransactions.Status.StatusPrepared;
+                    case StateStatus.OS_HIDDEN :
+                    case StateStatus.OS_COMMITTED_HIDDEN :
+                    case StateStatus.OS_UNCOMMITTED_HIDDEN :
+                        return org.omg.CosTransactions.Status.StatusPrepared;
+                    default :
+                        return org.omg.CosTransactions.Status.StatusUnknown;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 jtsLogger.i18NLogger.warn_interposition_sfcaught("ServerFactory.getStatus", u, e);
 
                 return Status.StatusUnknown;
@@ -219,10 +193,9 @@ public class ServerFactory
         }
     }
 
-    public static ServerControl create_transaction (Uid u, Control parentControl, ArjunaTransactionImple parentImpl, Coordinator realCoord, Terminator realTerm, int time_out)
-    {
-        ServerControl tranControl = new ServerControl(u, parentControl,
-                parentImpl, realCoord, realTerm);
+    public static ServerControl create_transaction(Uid u, Control parentControl, ArjunaTransactionImple parentImpl,
+            Coordinator realCoord, Terminator realTerm, int time_out) {
+        ServerControl tranControl = new ServerControl(u, parentControl, parentImpl, realCoord, realTerm);
 
         /*
          * We can't just add server transactions to the reaper list directly
@@ -231,8 +204,7 @@ public class ServerFactory
          * interposition classes we add the hierarchy to the reaper list.
          */
 
-        if ((time_out != 0) && (parentImpl == null))
-        {
+        if ((time_out != 0) && (parentImpl == null)) {
             TransactionReaper reaper = TransactionReaper.transactionReaper();
 
             reaper.insert(new ServerControlWrapper((ControlImple) tranControl), time_out);
@@ -241,8 +213,8 @@ public class ServerFactory
         return tranControl;
     }
 
-    public static ServerControl create_subtransaction (Uid actUid, Coordinator realCoord, Terminator realTerm, ServerControl parent)
-    {
+    public static ServerControl create_subtransaction(Uid actUid, Coordinator realCoord, Terminator realTerm,
+            ServerControl parent) {
         if (parent == null) {
             jtsLogger.i18NLogger.warn_interposition_sfnoparent("ServerFactory.create_subtransaction");
 
@@ -251,52 +223,43 @@ public class ServerFactory
 
         ServerControl toReturn = null;
 
-        try
-        {
+        try {
             Control handle = parent.getControl();
             ArjunaTransactionImple tranHandle = parent.getImplHandle();
 
-            toReturn = new ServerControl(actUid, handle, tranHandle, realCoord,
-                    realTerm);
+            toReturn = new ServerControl(actUid, handle, tranHandle, realCoord, realTerm);
 
             handle = null;
             tranHandle = null;
-        }
-        catch (Exception e)
-        {
-            if (toReturn != null)
-            {
-                try
-                {
+        } catch (Exception e) {
+            if (toReturn != null) {
+                try {
                     toReturn.destroy(); // will delete itself
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                 }
             }
         }
 
         return toReturn;
     }
-    
+
     private static org.omg.CosTransactions.Status getHeuristicStatus(final Uid uid, final RecoveryStore recoveryStore)
-            throws ObjectStoreException
-    {
+            throws ObjectStoreException {
         final int status = recoveryStore.currentState(uid, AssumedCompleteHeuristicServerTransaction.typeName());
 
         switch (status) {
-        case StateStatus.OS_UNKNOWN:
-            return org.omg.CosTransactions.Status.StatusNoTransaction;
-        case StateStatus.OS_COMMITTED:
-            return org.omg.CosTransactions.Status.StatusCommitted;
-        case StateStatus.OS_UNCOMMITTED:
-            return org.omg.CosTransactions.Status.StatusPrepared;
-        case StateStatus.OS_HIDDEN:
-        case StateStatus.OS_COMMITTED_HIDDEN:
-        case StateStatus.OS_UNCOMMITTED_HIDDEN:
-            return org.omg.CosTransactions.Status.StatusPrepared;
-        default:
-            return org.omg.CosTransactions.Status.StatusUnknown;
+            case StateStatus.OS_UNKNOWN :
+                return org.omg.CosTransactions.Status.StatusNoTransaction;
+            case StateStatus.OS_COMMITTED :
+                return org.omg.CosTransactions.Status.StatusCommitted;
+            case StateStatus.OS_UNCOMMITTED :
+                return org.omg.CosTransactions.Status.StatusPrepared;
+            case StateStatus.OS_HIDDEN :
+            case StateStatus.OS_COMMITTED_HIDDEN :
+            case StateStatus.OS_UNCOMMITTED_HIDDEN :
+                return org.omg.CosTransactions.Status.StatusPrepared;
+            default :
+                return org.omg.CosTransactions.Status.StatusUnknown;
         }
     }
 

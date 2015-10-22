@@ -58,11 +58,10 @@ import com.arjuna.common.util.propertyservice.PropertiesFactory;
  * the same property file.
  */
 
-public class JDBCXARecovery implements XAResourceRecovery
-{
+public class JDBCXARecovery implements XAResourceRecovery {
     public static final String DATABASE_JNDI_NAME = "DatabaseJNDIName";
-    public static final String USER_NAME          = "UserName";
-    public static final String PASSWORD           = "Password";
+    public static final String USER_NAME = "UserName";
+    public static final String PASSWORD = "Password";
 
     /*
      * Some XAResourceRecovery implementations will do their startup work here,
@@ -70,42 +69,35 @@ public class JDBCXARecovery implements XAResourceRecovery
      * dynamic class name, the constructor does nothing.
      */
 
-    public JDBCXARecovery()
-        throws SQLException
-    {
+    public JDBCXARecovery() throws SQLException {
         if (jdbcLogger.logger.isDebugEnabled())
             jdbcLogger.logger.debug("JDBCXARecovery()");
 
-        _props                   = null;
-        _hasMoreResources        = false;
+        _props = null;
+        _hasMoreResources = false;
         _connectionEventListener = new LocalConnectionEventListener();
     }
 
     /**
      * The recovery module will have chopped off this class name already. The
-     * parameter should specify a property file from which the jndi name, user name,
-     * password can be read.
+     * parameter should specify a property file from which the jndi name, user
+     * name, password can be read.
      */
 
-    public boolean initialise(String parameter)
-        throws SQLException
-    {
+    public boolean initialise(String parameter) throws SQLException {
         if (jdbcLogger.logger.isDebugEnabled())
             jdbcLogger.logger.debug("JDBCXARecovery.initialise(" + parameter + ")");
 
         if (parameter == null)
             return false;
 
-        try
-        {
+        try {
             _props = PropertiesFactory.getPropertiesFromFile(parameter, JDBCXARecovery.class.getClassLoader());
 
-            _dbName   = _props.getProperty(DATABASE_JNDI_NAME);
-            _user     = _props.getProperty(USER_NAME);
+            _dbName = _props.getProperty(DATABASE_JNDI_NAME);
+            _user = _props.getProperty(USER_NAME);
             _password = _props.getProperty(PASSWORD);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jdbcLogger.i18NLogger.warn_recovery_xa_initexp(e);
 
             return false;
@@ -114,33 +106,25 @@ public class JDBCXARecovery implements XAResourceRecovery
         return true;
     }
 
-    public synchronized XAResource getXAResource()
-        throws SQLException
-    {
+    public synchronized XAResource getXAResource() throws SQLException {
         createConnection();
 
         return _connection.getXAResource();
     }
 
-    public boolean hasMoreResources()
-    {
+    public boolean hasMoreResources() {
         if (_dataSource == null)
-            try
-            {
+            try {
                 createDataSource();
-            }
-            catch (SQLException sqlException)
-            {
+            } catch (SQLException sqlException) {
                 return false;
             }
 
-        if (_dataSource != null)
-        {
-            _hasMoreResources = ! _hasMoreResources;
+        if (_dataSource != null) {
+            _hasMoreResources = !_hasMoreResources;
 
             return _hasMoreResources;
-        }
-        else
+        } else
             return false;
     }
 
@@ -149,13 +133,9 @@ public class JDBCXARecovery implements XAResourceRecovery
      * property file provided at input to this instance.
      */
 
-    private final void createDataSource()
-        throws SQLException
-    {
-        try
-        {
-            if (_dataSource == null)
-            {
+    private final void createDataSource() throws SQLException {
+        try {
+            if (_dataSource == null) {
                 Hashtable env = jdbcPropertyManager.getJDBCEnvironmentBean().getJndiProperties();
                 Context context = new InitialContext(env);
                 _dataSource = (XADataSource) context.lookup(_dbName);
@@ -163,15 +143,11 @@ public class JDBCXARecovery implements XAResourceRecovery
                 if (_dataSource == null)
                     throw new SQLException(jdbcLogger.i18NLogger.get_xa_recjndierror());
             }
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             ex.printStackTrace();
 
             throw ex;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
 
             SQLException sqlException = new SQLException(e.toString());
@@ -184,16 +160,12 @@ public class JDBCXARecovery implements XAResourceRecovery
      * Create the XAConnection from the XADataSource.
      */
 
-    private final void createConnection()
-        throws SQLException
-    {
-        try
-        {
+    private final void createConnection() throws SQLException {
+        try {
             if (_dataSource == null)
                 createDataSource();
 
-            if (_connection == null)
-            {
+            if (_connection == null) {
                 if ((_user == null) && (_password == null))
                     _connection = _dataSource.getXAConnection();
                 else
@@ -201,15 +173,11 @@ public class JDBCXARecovery implements XAResourceRecovery
 
                 _connection.addConnectionEventListener(_connectionEventListener);
             }
-        }
-        catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             ex.printStackTrace();
 
             throw ex;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
 
             SQLException sqlException = new SQLException(e.toString());
@@ -218,27 +186,24 @@ public class JDBCXARecovery implements XAResourceRecovery
         }
     }
 
-    private class LocalConnectionEventListener implements ConnectionEventListener
-    {
-        public void connectionErrorOccurred(ConnectionEvent connectionEvent)
-        {
+    private class LocalConnectionEventListener implements ConnectionEventListener {
+        public void connectionErrorOccurred(ConnectionEvent connectionEvent) {
             _connection.removeConnectionEventListener(_connectionEventListener);
             _connection = null;
         }
 
-        public void connectionClosed(ConnectionEvent connectionEvent)
-        {
+        public void connectionClosed(ConnectionEvent connectionEvent) {
             _connection.removeConnectionEventListener(_connectionEventListener);
             _connection = null;
         }
     }
 
-    private XAConnection                 _connection;
-    private XADataSource                 _dataSource;
+    private XAConnection _connection;
+    private XADataSource _dataSource;
     private LocalConnectionEventListener _connectionEventListener;
-    private Properties                   _props;
-    private String                       _dbName;
-    private String                       _user;
-    private String                       _password;
-    private boolean                      _hasMoreResources;
+    private Properties _props;
+    private String _dbName;
+    private String _user;
+    private String _password;
+    private boolean _hasMoreResources;
 }

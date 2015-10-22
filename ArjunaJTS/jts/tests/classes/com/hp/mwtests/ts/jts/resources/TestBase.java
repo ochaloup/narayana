@@ -43,43 +43,42 @@ import com.arjuna.orbportability.RootOA;
 
 import java.io.File;
 
-public class TestBase
-{  
-    public void beforeSetupClass() {} 
-    
+public class TestBase {
+    public void beforeSetupClass() {
+    }
+
     @Before
-    public void setUp () throws Exception
-    {
+    public void setUp() throws Exception {
         beforeSetupClass();
         emptyObjectStore();
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
     }
-    
+
     @After
-    public void tearDown () throws Exception
-    {
+    public void tearDown() throws Exception {
         myOA.destroy();
         myORB.shutdown();
         // JBTM-1829 as the orbportability version of shutdown does not wait for
-        // completion some jacorb tests will fail due to possible race conditions
+        // completion some jacorb tests will fail due to possible race
+        // conditions
         try {
             myORB.orb().shutdown(true);
         } catch (BAD_INV_ORDER bio) {
-            // ignore - jacorb can tolerate the second call to shutdown, IDLJ will not
+            // ignore - jacorb can tolerate the second call to shutdown, IDLJ
+            // will not
         }
         emptyObjectStore();
     }
 
-    private void emptyObjectStore()
-    {
+    private void emptyObjectStore() {
         String objectStoreDirName = arjPropertyManager.getObjectStoreEnvironmentBean().getObjectStoreDir();
 
         System.out.printf("Emptying %s\n", objectStoreDirName);
@@ -89,27 +88,17 @@ public class TestBase
         removeContents(objectStoreDir);
     }
 
-    public void removeContents(File directory)
-    {
-        if ((directory != null) &&
-                directory.isDirectory() &&
-                (!directory.getName().equals("")) &&
-                (!directory.getName().equals("/")) &&
-                (!directory.getName().equals("\\")) &&
-                (!directory.getName().equals(".")) &&
-                (!directory.getName().equals("..")))
-        {
+    public void removeContents(File directory) {
+        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
+                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
+                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
             File[] contents = directory.listFiles();
 
-            for (int index = 0; index < contents.length; index++)
-            {
-                if (contents[index].isDirectory())
-                {
+            for (int index = 0; index < contents.length; index++) {
+                if (contents[index].isDirectory()) {
                     removeContents(contents[index]);
                     contents[index].delete();
-                }
-                else
-                {
+                } else {
                     contents[index].delete();
                 }
             }

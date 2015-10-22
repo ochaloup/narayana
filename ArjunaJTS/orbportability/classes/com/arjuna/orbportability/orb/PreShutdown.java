@@ -41,19 +41,16 @@
 
 package com.arjuna.orbportability.orb;
 
-public abstract class PreShutdown extends Shutdown
-{
-    
-public abstract void work ();
+public abstract class PreShutdown extends Shutdown {
 
-protected PreShutdown ()
-    {
-    super("PreShutdown");
+    public abstract void work();
+
+    protected PreShutdown() {
+        super("PreShutdown");
     }
-    
-protected PreShutdown (String name)
-    {
-    super(name);
+
+    protected PreShutdown(String name) {
+        super(name);
     };
 
 };

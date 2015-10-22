@@ -36,17 +36,21 @@ import org.jboss.narayana.compensations.impl.ParticipantImpl;
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
-public class RemoteParticipant implements BAParticipant, BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant {
+public class RemoteParticipant
+        implements
+            BAParticipant,
+            BusinessAgreementWithParticipantCompletionParticipant,
+            ConfirmCompletedParticipant {
 
     private ParticipantImpl participant;
 
     public RemoteParticipant(Class<? extends CompensationHandler> compensationHandlerClass,
-                             Class<? extends ConfirmationHandler> confirmationHandlerClass,
-                             Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
 
-        participant = new ParticipantImpl(compensationHandlerClass, confirmationHandlerClass, transactionLoggedHandlerClass, currentTX);
+        participant = new ParticipantImpl(compensationHandlerClass, confirmationHandlerClass,
+                transactionLoggedHandlerClass, currentTX);
     }
-
 
     @Override
     public void confirmCompleted(boolean confirmed) {
@@ -62,7 +66,7 @@ public class RemoteParticipant implements BAParticipant, BusinessAgreementWithPa
 
     @Override
     public void cancel() throws FaultedException, WrongStateException, SystemException {
-        //TODO: Do nothing?
+        // TODO: Do nothing?
     }
 
     @Override
@@ -73,7 +77,7 @@ public class RemoteParticipant implements BAParticipant, BusinessAgreementWithPa
 
     @Override
     public String status() throws SystemException {
-        //TODO: what to do here?
+        // TODO: what to do here?
         return null;
     }
 

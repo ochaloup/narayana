@@ -31,11 +31,8 @@
 
 package com.arjuna.mw.wst11;
 
-
-public class TransactionManagerFactory
-{
-    public static TransactionManager transactionManager ()
-    {
-        return TransactionManager.getTransactionManager() ;
+public class TransactionManagerFactory {
+    public static TransactionManager transactionManager() {
+        return TransactionManager.getTransactionManager();
     }
 }

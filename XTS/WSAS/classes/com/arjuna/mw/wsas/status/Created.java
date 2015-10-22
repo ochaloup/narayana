@@ -39,21 +39,17 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class Created implements Status
-{
+public class Created implements Status {
 
-    public static Created instance ()
-    {
-    return _instance;
+    public static Created instance() {
+        return _instance;
     }
 
-    public String toString ()
-    {
-    return "Status.Created";
+    public String toString() {
+        return "Status.Created";
     }
 
-    private Created ()
-    {
+    private Created() {
     }
 
     private static final Created _instance = new Created();

@@ -26,8 +26,7 @@ import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 /**
  * Simple test to see if Properties are being loaded correctly
  */
-public class UtilityTest
-{
+public class UtilityTest {
     /**
      * Global varable for test result
      */
@@ -36,54 +35,38 @@ public class UtilityTest
     /**
      * Simple test to see if utiity methods are working correctly.
      */
-    public static void main(String[] args)
-    {
-        if (args.length != 2)
-        {
+    public static void main(String[] args) {
+        if (args.length != 2) {
             finishTest(false);
             qautil.debug("incorrect number of args");
             System.exit(0);
         }
 
-        if (args[0].equals("int"))
-        {
+        if (args[0].equals("int")) {
             intTest(args[1]);
-        }
-        else
-        {
+        } else {
             longTest(args[1]);
         }
     }
 
     /**
-     * Main test bolck for checking function inttohexstring and
-     * back to int.
+     * Main test bolck for checking function inttohexstring and back to int.
      */
-    public static void intTest(String intvalue)
-    {
+    public static void intTest(String intvalue) {
         int passedValue = 0;
         String hexReturnValue = "";
         int intReturnValue = 0;
 
-        if (intvalue.equals("max") || intvalue.equals("min"))
-        {
-            if (intvalue.equals("max"))
-            {
+        if (intvalue.equals("max") || intvalue.equals("min")) {
+            if (intvalue.equals("max")) {
                 passedValue = Integer.MAX_VALUE;
-            }
-            else
-            {
+            } else {
                 passedValue = Integer.MIN_VALUE;
             }
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 passedValue = Integer.parseInt(intvalue);
-            }
-            catch (NumberFormatException nfe)
-            {
+            } catch (NumberFormatException nfe) {
                 mCorrect = false;
                 qautil.debug("Exception in parseInt: ", nfe);
             }
@@ -97,8 +80,7 @@ public class UtilityTest
 
         qautil.qadebug("Int from Hex = " + intReturnValue);
 
-        if (intReturnValue != passedValue)
-        {
+        if (intReturnValue != passedValue) {
             mCorrect = false;
             qautil.debug("Final value does not equal original value");
         }
@@ -107,34 +89,23 @@ public class UtilityTest
     }
 
     /**
-     * Main test bolck for checking function longtohexstring and
-     * back to long.
+     * Main test bolck for checking function longtohexstring and back to long.
      */
-    public static void longTest(String longvalue)
-    {
+    public static void longTest(String longvalue) {
         long passedValue = 0;
         String hexReturnValue = "";
         long longReturnValue = 0;
 
-        if (longvalue.equals("max") || longvalue.equals("min"))
-        {
-            if (longvalue.equals("max"))
-            {
+        if (longvalue.equals("max") || longvalue.equals("min")) {
+            if (longvalue.equals("max")) {
                 passedValue = Long.MAX_VALUE;
-            }
-            else
-            {
+            } else {
                 passedValue = Long.MIN_VALUE;
             }
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 passedValue = Long.parseLong(longvalue);
-            }
-            catch (NumberFormatException nfe)
-            {
+            } catch (NumberFormatException nfe) {
                 mCorrect = false;
                 qautil.debug("Exception in parseInt: ", nfe);
             }
@@ -148,8 +119,7 @@ public class UtilityTest
 
         qautil.qadebug("Long from Hex = " + longReturnValue);
 
-        if (longReturnValue != passedValue)
-        {
+        if (longReturnValue != passedValue) {
             mCorrect = false;
             qautil.debug("Final value does not equal original value");
         }
@@ -160,14 +130,10 @@ public class UtilityTest
     /**
      * Simple method for printing result.
      */
-    public static void finishTest(boolean result)
-    {
-        if (result)
-        {
+    public static void finishTest(boolean result) {
+        if (result) {
             System.out.println("Passed");
-        }
-        else
-        {
+        } else {
             System.out.println("Failed");
         }
     }

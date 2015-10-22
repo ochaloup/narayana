@@ -41,11 +41,9 @@ import com.arjuna.ats.internal.arjuna.abstractrecords.LastResourceRecord;
 import com.hp.mwtests.ts.arjuna.resources.OnePhase;
 import com.hp.mwtests.ts.arjuna.resources.ShutdownRecord;
 
-public class LastResource
-{
+public class LastResource {
     @Test
-    public void run()
-    {
+    public void run() {
         AtomicAction A = new AtomicAction();
         OnePhase opRes = new OnePhase();
 
@@ -53,7 +51,7 @@ public class LastResource
         A.add(new LastResourceRecord(opRes));
         A.add(new ShutdownRecord(ShutdownRecord.FAIL_IN_PREPARE));
         A.commit();
-        
+
         assertEquals(OnePhase.ROLLEDBACK, opRes.status());
 
         A = new AtomicAction();
@@ -63,14 +61,14 @@ public class LastResource
         A.add(new LastResourceRecord(opRes));
         A.add(new ShutdownRecord(ShutdownRecord.FAIL_IN_COMMIT));
         A.commit();
-        
+
         assertEquals(OnePhase.COMMITTED, opRes.status());
 
         A = new AtomicAction();
         A.begin();
         A.add(new LastResourceRecord(new OnePhase()));
-        
-        assertEquals(AddOutcome.AR_DUPLICATE, A.add(new LastResourceRecord(new OnePhase())) );
+
+        assertEquals(AddOutcome.AR_DUPLICATE, A.add(new LastResourceRecord(new OnePhase())));
 
         A.abort();
     }

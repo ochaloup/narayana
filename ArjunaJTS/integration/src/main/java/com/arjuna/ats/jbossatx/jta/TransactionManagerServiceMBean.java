@@ -43,10 +43,10 @@ import java.net.InetAddress;
  * The MBean interface for the TransactionManager JBoss service.
  *
  * @author Richard A. Begg (richard.begg@arjuna.com)
- * @version $Id: TransactionManagerServiceMBean.java,v 1.3 2005/06/17 10:53:51 kconner Exp $
+ * @version $Id: TransactionManagerServiceMBean.java,v 1.3 2005/06/17 10:53:51
+ *          kconner Exp $
  */
-public interface TransactionManagerServiceMBean
-{
+public interface TransactionManagerServiceMBean {
     /**
      * Retrieve a reference to the JTA transaction manager.
      *
@@ -59,7 +59,7 @@ public interface TransactionManagerServiceMBean
      *
      * @return the XA Terminator
      */
-    public JBossXATerminator getXATerminator() ;
+    public JBossXATerminator getXATerminator();
 
     /**
      * Retrieve a reference to the JTA user transaction manager.
@@ -76,15 +76,16 @@ public interface TransactionManagerServiceMBean
     public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry();
 
     /**
-     * This method has been put in here so that it is compatible with the JBoss standard Transaction Manager.
-     * As we do not support exception formatters just display a warning for the moment.
+     * This method has been put in here so that it is compatible with the JBoss
+     * standard Transaction Manager. As we do not support exception formatters
+     * just display a warning for the moment.
      */
     public void registerXAExceptionFormatter(Class c, XAExceptionFormatter f);
 
     /**
-     * This method has been put in here so that it is compatible with the JBoss standard Transaction Manager.
-     * As we do not support exception formatters just display a warning for the moment.
+     * This method has been put in here so that it is compatible with the JBoss
+     * standard Transaction Manager. As we do not support exception formatters
+     * just display a warning for the moment.
      */
     public void unregisterXAExceptionFormatter(Class c);
 }
-

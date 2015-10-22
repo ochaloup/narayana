@@ -47,10 +47,9 @@ public class PerformanceTest extends BaseTest {
         int threadCount = 10;
         int batchSize = 50;
 
-        Measurement measurement = new Measurement.Builder(metricName)
-                .maxTestTime(0L).numberOfCalls(callCount)
-                .numberOfThreads(threadCount).batchSize(batchSize)
-                .numberOfWarmupCalls(warmUpCount).build().measure(new RTSWorker());
+        Measurement measurement = new Measurement.Builder(metricName).maxTestTime(0L).numberOfCalls(callCount)
+                .numberOfThreads(threadCount).batchSize(batchSize).numberOfWarmupCalls(warmUpCount).build()
+                .measure(new RTSWorker());
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());
         Assert.assertFalse(measurement.getInfo(), measurement.shouldFail());
@@ -72,7 +71,8 @@ public class PerformanceTest extends BaseTest {
 
             txn.startTx();
 
-            for (int i = 0; i < pid.length; i++) { txn.enlistTestResource(pUrl, false);
+            for (int i = 0; i < pid.length; i++) {
+                txn.enlistTestResource(pUrl, false);
                 enlistResource(txn, pUrl + "?pId=" + pid[i]);
 
                 modifyResource(txn, pUrl, pid[i], "p1", "v2");

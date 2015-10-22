@@ -42,8 +42,7 @@ package com.arjuna.ats.jta.exceptions;
  * @since JTS 1.2.4.
  */
 
-public class RollbackException extends IllegalStateException
-{
+public class RollbackException extends IllegalStateException {
     static final long serialVersionUID = -2708657802308998286L;
 
     /**
@@ -51,8 +50,7 @@ public class RollbackException extends IllegalStateException
      * The cause is not initialized, and may subsequently be initialized by a
      * call to {@link #initCause}.
      */
-    public RollbackException()
-    {
+    public RollbackException() {
         super();
     }
 
@@ -65,8 +63,7 @@ public class RollbackException extends IllegalStateException
      *            the detail message. The detail message is saved for later
      *            retrieval by the {@link #getMessage()} method.
      */
-    public RollbackException(String message)
-    {
+    public RollbackException(String message) {
         super(message);
     }
 
@@ -86,8 +83,7 @@ public class RollbackException extends IllegalStateException
      *            unknown.)
      * @since 1.4
      */
-    public RollbackException(String message, Throwable cause)
-    {
+    public RollbackException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -106,8 +102,7 @@ public class RollbackException extends IllegalStateException
      *            unknown.)
      * @since 1.4
      */
-    public RollbackException(Throwable cause)
-    {
+    public RollbackException(Throwable cause) {
         super(cause);
     }
 }

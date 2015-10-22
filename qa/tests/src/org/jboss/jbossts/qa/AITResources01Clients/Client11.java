@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client11.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client11
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client11 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -80,10 +76,8 @@ public class Client11
 
             int numberOfCalls = 10;
 
-            for (int index0 = 0; index0 < numberOfCalls; index0++)
-            {
-                for (int index1 = 0; index1 <= index0; index1++)
-                {
+            for (int index0 = 0; index0 < numberOfCalls; index0++) {
+                for (int index1 = 0; index1 <= index0; index1++) {
                     pinger.bad_hit(index0, index1, ponger, pinger);
                 }
             }
@@ -94,29 +88,21 @@ public class Client11
             IntHolder pongerValue = new IntHolder();
             ponger.get(pongerValue);
 
-            if ((pingerValue.value == 0) && (pongerValue.value == 0))
-            {
+            if ((pingerValue.value == 0) && (pongerValue.value == 0)) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client11.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client11.main: " + exception);
             exception.printStackTrace(System.err);
         }

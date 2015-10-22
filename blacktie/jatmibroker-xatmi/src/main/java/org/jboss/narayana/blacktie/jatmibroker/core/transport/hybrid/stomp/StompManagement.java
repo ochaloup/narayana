@@ -47,8 +47,8 @@ public class StompManagement {
         }
     }
 
-    public static Socket connect(String host, int port, String username, String password) throws IOException,
-            ConnectionException {
+    public static Socket connect(String host, int port, String username, String password)
+            throws IOException, ConnectionException {
         Socket socket = new Socket(host, port);
         InputStream inputStream = socket.getInputStream();
         OutputStream outputStream = socket.getOutputStream();
@@ -82,8 +82,8 @@ public class StompManagement {
                 outputStream.write(EOL);
             }
             outputStream.write(EOL);
-            
-            if(message.getBody() != null) {
+
+            if (message.getBody() != null) {
                 outputStream.write(message.getBody());
             }
             outputStream.write(EOM);

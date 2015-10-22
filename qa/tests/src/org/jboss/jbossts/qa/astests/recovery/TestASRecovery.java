@@ -26,16 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper class for manually starting a transaction and enlisting various resources
- * and synchronizations.
+ * Helper class for manually starting a transaction and enlisting various
+ * resources and synchronizations.
  */
-public class TestASRecovery
-{
-    List<ASTestResource> resources = new ArrayList<ASTestResource> ();
+public class TestASRecovery {
+    List<ASTestResource> resources = new ArrayList<ASTestResource>();
     private boolean expectException;
 
-    public void addResource(ASFailureSpec spec)
-    {
+    public void addResource(ASFailureSpec spec) {
         resources.add(new ASTestResource(spec));
     }
 
@@ -43,27 +41,19 @@ public class TestASRecovery
      * See if there are any faults that should be injected before starting the
      * commit protocol
      */
-    private void preCommit()
-    {
-        for (ASTestResource spec : resources)
-        {
+    private void preCommit() {
+        for (ASTestResource spec : resources) {
             if (spec.isPreCommit())
-                try
-                {
+                try {
                     spec.applySpec("Pre commit", true);
-                }
-                catch (XAException ignore)
-                {
+                } catch (XAException ignore) {
                 }
         }
     }
 
-    public boolean startTest(Transaction tx)
-    {
-        try
-        {
-            for (ASTestResource res : resources)
-            {
+    public boolean startTest(Transaction tx) {
+        try {
+            for (ASTestResource res : resources) {
                 System.out.println("Enlisting " + res);
 
                 if (res.isXAResource())
@@ -78,41 +68,32 @@ public class TestASRecovery
             preCommit();
 
             return true;
-        }
-        catch (RollbackException e)
-        {
+        } catch (RollbackException e) {
             e.printStackTrace();
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             e.printStackTrace();
         }
 
         return false;
     }
 
-    public boolean startTest()
-    {
+    public boolean startTest() {
         UserTransaction ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
-        try
-        {
+        try {
             ut.begin();
 
             if (!startTest(com.arjuna.ats.jta.TransactionManager.transactionManager().getTransaction()))
                 ut.rollback();
-            else
-            {                
+            else {
                 ut.commit();
-                
+
                 return !expectException;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             if (expectException)
                 return true; // TODO should check each specific exception type
-            
+
             e.printStackTrace();
         }
 

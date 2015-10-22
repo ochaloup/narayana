@@ -32,10 +32,9 @@
 package com.arjuna.wst;
 
 /**
- * ReadOnly: does not need to be informed of the transaction outcome as no
- * state updates were made.
+ * ReadOnly: does not need to be informed of the transaction outcome as no state
+ * updates were made.
  */
 
-public class ReadOnly implements Vote
-{
+public class ReadOnly implements Vote {
 }

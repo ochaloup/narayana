@@ -34,11 +34,10 @@ package com.arjuna.wst;
 /**
  */
 
-public interface CompletionCoordinatorParticipant
-{
+public interface CompletionCoordinatorParticipant {
 
-    public void commit () throws TransactionRolledBackException, UnknownTransactionException, SystemException;
-    
-    public void rollback () throws UnknownTransactionException, SystemException;
-    
+    public void commit() throws TransactionRolledBackException, UnknownTransactionException, SystemException;
+
+    public void rollback() throws UnknownTransactionException, SystemException;
+
 }

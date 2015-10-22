@@ -39,23 +39,19 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class Active implements Status
-{
+public class Active implements Status {
 
-    public static Active instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "Status.Active";
+    public static Active instance() {
+        return _instance;
     }
 
-    private Active ()
-    {
+    public String toString() {
+        return "Status.Active";
+    }
+
+    private Active() {
     }
 
     private static final Active _instance = new Active();
-    
+
 }

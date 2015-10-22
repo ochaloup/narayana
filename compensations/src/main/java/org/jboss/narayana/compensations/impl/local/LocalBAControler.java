@@ -80,7 +80,6 @@ public class LocalBAControler implements BAControler {
         CoordinatorManagerFactory.coordinatorManager().resume((ActivityHierarchy) context);
     }
 
-
     @Override
     public Object getCurrentTransaction() throws Exception {
 
@@ -88,11 +87,13 @@ public class LocalBAControler implements BAControler {
     }
 
     @Override
-    public ParticipantManager enlist(Class<? extends CompensationHandler> compensationHandlerClass, Class<? extends ConfirmationHandler> confirmationHandlerClass, Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception {
-
+    public ParticipantManager enlist(Class<? extends CompensationHandler> compensationHandlerClass,
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception {
 
         String participantId = String.valueOf(UUID.randomUUID());
-        LocalParticipant participant = new LocalParticipant(compensationHandlerClass, confirmationHandlerClass, transactionLoggedHandlerClass, getCurrentTransaction(), participantId);
+        LocalParticipant participant = new LocalParticipant(compensationHandlerClass, confirmationHandlerClass,
+                transactionLoggedHandlerClass, getCurrentTransaction(), participantId);
 
         CoordinatorManagerFactory.coordinatorManager().enlistParticipant(participant);
 

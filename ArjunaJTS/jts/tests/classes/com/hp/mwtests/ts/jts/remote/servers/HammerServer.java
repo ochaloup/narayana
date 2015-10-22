@@ -39,11 +39,8 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.HammerObject;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-
-public class HammerServer
-{
-    public static void main(String[] args) throws Exception
-    {
+public class HammerServer {
+    public static void main(String[] args) throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -56,20 +53,18 @@ public class HammerServer
 
         Services serv = new Services(myORB);
 
-        try
-        {
-            TestUtility.registerService( refFile, myORB.orb().object_to_string(HammerHelper.narrow(myOA.corbaReference(theObject))) );
+        try {
+            TestUtility.registerService(refFile,
+                    myORB.orb().object_to_string(HammerHelper.narrow(myOA.corbaReference(theObject))));
 
-            System.out.println("\nIOR file: "+refFile);
+            System.out.println("\nIOR file: " + refFile);
 
             System.out.println("Ready");
 
-            //assertReady();
+            // assertReady();
             myOA.run();
-        }
-        catch (Exception e)
-        {
-            //fail("HammerServer caught exception: "+e);
+        } catch (Exception e) {
+            // fail("HammerServer caught exception: "+e);
             e.printStackTrace(System.err);
         }
 
@@ -78,4 +73,3 @@ public class HammerServer
         System.out.println("**HammerServer exiting**");
     }
 }
-

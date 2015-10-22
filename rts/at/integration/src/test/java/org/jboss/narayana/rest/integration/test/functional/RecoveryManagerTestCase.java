@@ -25,8 +25,8 @@ public class RecoveryManagerTestCase {
         final LoggingParticipant loggingParticipantBefore = new LoggingParticipant(new Prepared());
         loggingParticipantBefore.commit();
 
-        final ParticipantInformation participantInformationBefore = new ParticipantInformation(participantId, APPLICATION_ID + "1",
-                "", loggingParticipantBefore, TxStatus.TransactionCommitted.name());
+        final ParticipantInformation participantInformationBefore = new ParticipantInformation(participantId,
+                APPLICATION_ID + "1", "", loggingParticipantBefore, TxStatus.TransactionCommitted.name());
 
         ParticipantsContainer.getInstance().clear();
         ParticipantsManagerFactory.getInstance().setBaseUrl("");

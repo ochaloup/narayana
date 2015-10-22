@@ -42,11 +42,9 @@ import com.arjuna.ats.arjuna.ObjectModel;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class ObjectModelTest
-{
+public class ObjectModelTest {
     @Test
-    public void testSINGLE() throws IOException, TestException
-    {
+    public void testSINGLE() throws IOException, TestException {
         AtomicObject obj = new AtomicObject(ObjectModel.SINGLE);
         AtomicAction A = new AtomicAction();
 
@@ -58,10 +56,9 @@ public class ObjectModelTest
 
         assertEquals(1234, obj.get());
     }
-    
+
     @Test
-    public void testMULTIPLE() throws IOException, TestException
-    {
+    public void testMULTIPLE() throws IOException, TestException {
         AtomicObject obj1 = new AtomicObject(ObjectModel.MULTIPLE);
         AtomicObject obj2 = new AtomicObject(obj1.get_uid(), ObjectModel.MULTIPLE);
         AtomicAction A = new AtomicAction();

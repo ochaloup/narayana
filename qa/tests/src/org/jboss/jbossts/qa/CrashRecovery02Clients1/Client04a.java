@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.CrashRecovery02Clients1;
  * $Id: Client04a.java,v 1.2 2003/06/26 11:43:18 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client04a
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client04a {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -96,29 +92,21 @@ public class Client04a
 
             correct = correct && (resourceTrace == ResourceTrace.ResourceTraceRollback);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client04a.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client04a.main: " + exception);
             exception.printStackTrace(System.err);
         }

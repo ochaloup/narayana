@@ -46,7 +46,7 @@ public abstract class AbstractIntegrationTestCase {
     public void after() {
         try {
             txSupport.rollbackTx();
-        } catch (Throwable t){
+        } catch (Throwable t) {
         }
     }
 
@@ -90,8 +90,8 @@ public abstract class AbstractIntegrationTestCase {
         if (jbossHome == null) {
             Assert.fail("$JBOSS_HOME not set");
         } else {
-            final File objectStore = new File(jbossHome + File.separator + "standalone" + File.separator + "data" + File.separator
-                    + "tx-object-store");
+            final File objectStore = new File(jbossHome + File.separator + "standalone" + File.separator + "data"
+                    + File.separator + "tx-object-store");
 
             if (objectStore.exists()) {
                 if (!deleteDirectory(objectStore)) {
@@ -122,7 +122,8 @@ public abstract class AbstractIntegrationTestCase {
 
         if (baseAddress == null) {
             baseAddress = "http://localhost";
-        } else if (!baseAddress.toLowerCase().startsWith("http://") && !baseAddress.toLowerCase().startsWith("https://")) {
+        } else if (!baseAddress.toLowerCase().startsWith("http://")
+                && !baseAddress.toLowerCase().startsWith("https://")) {
             baseAddress = "http://" + baseAddress;
         }
 

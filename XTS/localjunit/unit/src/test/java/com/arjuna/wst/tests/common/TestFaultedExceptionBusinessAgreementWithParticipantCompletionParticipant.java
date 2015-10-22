@@ -32,37 +32,31 @@ import com.arjuna.wst.Status;
 import com.arjuna.wst.SystemException;
 import com.arjuna.wst.WrongStateException;
 
-public class TestFaultedExceptionBusinessAgreementWithParticipantCompletionParticipant implements BusinessAgreementWithParticipantCompletionParticipant
-{
+public class TestFaultedExceptionBusinessAgreementWithParticipantCompletionParticipant
+        implements
+            BusinessAgreementWithParticipantCompletionParticipant {
 
-    public void close () throws WrongStateException, SystemException
-    {
-    }
-    
-    public void cancel () throws WrongStateException, SystemException
-    {
+    public void close() throws WrongStateException, SystemException {
     }
 
-    public void compensate () throws FaultedException, WrongStateException, SystemException
-    {
-    throw new FaultedException();
+    public void cancel() throws WrongStateException, SystemException {
     }
 
-    public String status () throws SystemException
-    {
-    return Status.STATUS_ACTIVE;
-    }
-    
-    public void forget () throws WrongStateException, SystemException
-    {
+    public void compensate() throws FaultedException, WrongStateException, SystemException {
+        throw new FaultedException();
     }
 
-    public void unknown () throws SystemException
-    {
+    public String status() throws SystemException {
+        return Status.STATUS_ACTIVE;
     }
 
-    public void error () throws SystemException
-    {
+    public void forget() throws WrongStateException, SystemException {
+    }
+
+    public void unknown() throws SystemException {
+    }
+
+    public void error() throws SystemException {
     }
 
 }

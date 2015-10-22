@@ -69,16 +69,12 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client03.java,v 1.2 2003/06/26 11:43:10 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.*;
 
-public class Client03
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client03 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -91,21 +87,17 @@ public class Client03
             float serverIncreaseThreshold;
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2])) {
                 clientIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultClientIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 clientIncreaseThreshold = Float.parseFloat(args[args.length - 2]);
             }
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1])) {
                 serverIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultServerIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 serverIncreaseThreshold = Float.parseFloat(args[args.length - 1]);
             }
@@ -115,8 +107,7 @@ public class Client03
             int clientMemory0 = (int) JVMStats.getMemory();
             int serverMemory0 = counter.getMemory();
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 counter.increase(null);
             }
 
@@ -134,29 +125,21 @@ public class Client03
             System.err.println("Server percentage memory increase: " + (float) (100.0 * serverMemoryIncrease) + "%");
             System.err.println("Server memory increase per call  : " + (serverMemory1 - serverMemory0) / numberOfCalls);
 
-            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < serverIncreaseThreshold))
-            {
+            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < serverIncreaseThreshold)) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client03.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client03.main: " + exception);
             exception.printStackTrace(System.err);
         }

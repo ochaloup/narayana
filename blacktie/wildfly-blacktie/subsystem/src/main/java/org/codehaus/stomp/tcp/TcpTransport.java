@@ -127,7 +127,7 @@ public class TcpTransport implements Runnable {
     }
 
     public void start() throws IOException, URISyntaxException, IllegalArgumentException, IllegalAccessException,
-    InvocationTargetException {
+            InvocationTargetException {
         if (started.compareAndSet(false, true)) {
             connect();
 
@@ -155,8 +155,8 @@ public class TcpTransport implements Runnable {
         }
     }
 
-    protected void connect() throws IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException,
-    URISyntaxException {
+    protected void connect() throws IOException, IllegalArgumentException, IllegalAccessException,
+            InvocationTargetException, URISyntaxException {
 
         if (socket == null && socketFactory == null) {
             throw new IllegalStateException("Cannot connect if the socket or socketFactory have not been set");
@@ -166,7 +166,8 @@ public class TcpTransport implements Runnable {
         InetSocketAddress remoteAddress = null;
 
         if (localLocation != null) {
-            localAddress = new InetSocketAddress(InetAddress.getByName(localLocation.getHost()), localLocation.getPort());
+            localAddress = new InetSocketAddress(InetAddress.getByName(localLocation.getHost()),
+                    localLocation.getPort());
         }
 
         if (remoteLocation != null) {
@@ -200,9 +201,13 @@ public class TcpTransport implements Runnable {
             }
         }
 
-        // TcpBufferedInputStream buffIn = new TcpBufferedInputStream(socket.getInputStream(), ioBufferSize);
-        this.dataIn = new DataInputStream(socket.getInputStream());// new DataInputStream(buffIn);
-        // TcpBufferedOutputStream buffOut = new TcpBufferedOutputStream(socket.getOutputStream(), ioBufferSize);
-        this.dataOut = new DataOutputStream(socket.getOutputStream());// new DataOutputStream(buffOut);
+        // TcpBufferedInputStream buffIn = new
+        // TcpBufferedInputStream(socket.getInputStream(), ioBufferSize);
+        this.dataIn = new DataInputStream(socket.getInputStream());// new
+                                                                    // DataInputStream(buffIn);
+        // TcpBufferedOutputStream buffOut = new
+        // TcpBufferedOutputStream(socket.getOutputStream(), ioBufferSize);
+        this.dataOut = new DataOutputStream(socket.getOutputStream());// new
+                                                                        // DataOutputStream(buffOut);
     }
 }

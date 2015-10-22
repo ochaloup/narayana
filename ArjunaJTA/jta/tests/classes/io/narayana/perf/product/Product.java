@@ -49,9 +49,8 @@ public abstract class Product {
 
         ProductWorker worker = new ProductWorker(prod);
 
-        Measurement measurement = new Measurement.Builder(prod.getNameOfMetric())
-                .maxTestTime(0L).numberOfCalls(numberOfTransactions)
-                .numberOfThreads(threads).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(prod.getNameOfMetric()).maxTestTime(0L)
+                .numberOfCalls(numberOfTransactions).numberOfThreads(threads).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker, worker);
 
         measurements.put(prod.getNameOfMetric(), measurement);

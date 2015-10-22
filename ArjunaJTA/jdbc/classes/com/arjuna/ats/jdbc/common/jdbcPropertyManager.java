@@ -35,10 +35,8 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 /**
  * Property manager wrapper for the JDBC module.
  */
-public class jdbcPropertyManager
-{
-    public static JDBCEnvironmentBean getJDBCEnvironmentBean()
-    {
+public class jdbcPropertyManager {
+    public static JDBCEnvironmentBean getJDBCEnvironmentBean() {
         return BeanPopulator.getDefaultInstance(JDBCEnvironmentBean.class);
     }
 }

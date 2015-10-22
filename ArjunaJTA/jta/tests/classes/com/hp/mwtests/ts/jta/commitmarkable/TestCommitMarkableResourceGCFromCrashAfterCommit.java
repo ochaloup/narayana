@@ -40,14 +40,12 @@ import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.CommitMarkableResourceRecordRecoveryModule;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceGCFromCrashAfterCommit extends
-        TestCommitMarkableResourceBase {
+public class TestCommitMarkableResourceGCFromCrashAfterCommit extends TestCommitMarkableResourceBase {
 
     @Test
     public void testFailAfterCommitH2() throws Exception {
         final DataSource dataSource = new JdbcDataSource();
-        ((JdbcDataSource) dataSource)
-                .setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+        ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
 
         // Test code
         Utils.createTables(dataSource.getConnection());
@@ -70,34 +68,29 @@ public class TestCommitMarkableResourceGCFromCrashAfterCommit extends
             }
         }
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
         Connection localJDBCConnection = dataSource.getConnection();
         localJDBCConnection.setAutoCommit(false);
-        XAResource nonXAResource = new JDBCConnectableResource(
-                localJDBCConnection);
+        XAResource nonXAResource = new JDBCConnectableResource(localJDBCConnection);
         tm.getTransaction().enlistResource(nonXAResource);
 
         XAResource xaResource = new SimpleXAResource();
         tm.getTransaction().enlistResource(xaResource);
 
-        localJDBCConnection.createStatement().execute(
-                "INSERT INTO foo (bar) VALUES (1)");
+        localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
 
         tm.commit();
 
-        Xid committed = ((JDBCConnectableResource) nonXAResource)
-                .getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
         assertNotNull(committed);
         // The recovery module has to perform lookups
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Check if the item is still in the db
         recoveryModule.periodicWorkFirstPass();
         recoveryModule.periodicWorkSecondPass();
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
-                committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
     }
 }

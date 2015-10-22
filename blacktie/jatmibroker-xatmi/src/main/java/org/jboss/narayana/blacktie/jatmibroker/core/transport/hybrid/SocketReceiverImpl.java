@@ -61,14 +61,15 @@ public class SocketReceiverImpl implements Receiver, Runnable {
     private boolean closed;
     private String replyto;
 
-    public SocketReceiverImpl(SocketServer server, Properties properties, int cd,
-            ResponseMonitor responseMonitor, EventListener eventListener) throws ConnectionException {
+    public SocketReceiverImpl(SocketServer server, Properties properties, int cd, ResponseMonitor responseMonitor,
+            EventListener eventListener) throws ConnectionException {
         log.debug("create socket receiver with server");
         this.server = server;
         this.responseMonitor = responseMonitor;
         this.eventListener = eventListener;
         this.cd = cd;
-        this.replyto = new StringBuffer().append(server.getAddr()).append(":").append(server.getPort()).append(":").append(cd).toString();
+        this.replyto = new StringBuffer().append(server.getAddr()).append(":").append(server.getPort()).append(":")
+                .append(cd).toString();
 
         timeout = Integer.parseInt(properties.getProperty("ReceiveTimeout")) * 1000
                 + Integer.parseInt(properties.getProperty("TimeToLive")) * 1000;
@@ -78,7 +79,8 @@ public class SocketReceiverImpl implements Receiver, Runnable {
     }
 
     public SocketReceiverImpl(Socket socket, String replyto, Properties properties) {
-        log.debug("create socket receiver with socket: " + socket.getRemoteSocketAddress() + " " + socket.getLocalPort());
+        log.debug(
+                "create socket receiver with socket: " + socket.getRemoteSocketAddress() + " " + socket.getLocalPort());
         this.socket = socket;
         this.replyto = replyto;
         this.data = new ArrayList<Message>();
@@ -99,25 +101,25 @@ public class SocketReceiverImpl implements Receiver, Runnable {
         return cd;
     }
 
-    public Message receive(long flags) throws ConnectionException {    
+    public Message receive(long flags) throws ConnectionException {
         if (closed) {
             throw new ConnectionException(Connection.TPEPROTO, "Receiver already closed");
         }
         Message message = null;
         if ((flags & Connection.TPNOBLOCK) != Connection.TPNOBLOCK) {
-            if(server != null) {
+            if (server != null) {
                 message = server.receiveMessage(cd, determineTimeout(flags));
-            } else if(socket != null) {
+            } else if (socket != null) {
                 synchronized (this) {
                     if ((flags & Connection.TPNOBLOCK) != Connection.TPNOBLOCK) {
-                        if(data.isEmpty()) {
+                        if (data.isEmpty()) {
                             try {
                                 wait(determineTimeout(flags));
                             } catch (InterruptedException e) {
                             }
-                        }                  
+                        }
                     }
-                    if(!data.isEmpty()) {
+                    if (!data.isEmpty()) {
                         message = data.remove(0);
                     }
                 }
@@ -125,7 +127,7 @@ public class SocketReceiverImpl implements Receiver, Runnable {
         } else {
             log.debug("Not waiting for the response, hope its there!");
         }
-        if(message == null && (flags & Connection.TPNOBLOCK) == Connection.TPNOBLOCK) {
+        if (message == null && (flags & Connection.TPNOBLOCK) == Connection.TPNOBLOCK) {
             throw new ConnectionException(Connection.TPEBLOCK, "Did not receive a message");
         } else if (message == null) {
             if (JtsTransactionImple.hasTransaction()) {
@@ -181,10 +183,10 @@ public class SocketReceiverImpl implements Receiver, Runnable {
     }
 
     public void close() throws ConnectionException {
-        if(server != null && cd != -1) {
+        if (server != null && cd != -1) {
             server.unregister(cd);
         }
-        if(thread != null) {
+        if (thread != null) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -192,7 +194,7 @@ public class SocketReceiverImpl implements Receiver, Runnable {
             }
         }
 
-        if(socket != null) {
+        if (socket != null) {
             try {
                 socket.shutdownInput();
             } catch (SocketException e) {
@@ -216,17 +218,17 @@ public class SocketReceiverImpl implements Receiver, Runnable {
             DataInputStream ins = new DataInputStream(socket.getInputStream());
 
             int size;
-            while((size = ins.readInt()) != -1) {
+            while ((size = ins.readInt()) != -1) {
                 Message message = new Message();
 
                 byte[] buf = new byte[size];
                 int readn = 0;
                 int remain = size;
-                while(remain > 0) {
+                while (remain > 0) {
                     int n;
                     n = ins.read(buf, readn, remain);
 
-                    if(n != -1) {
+                    if (n != -1) {
                         remain -= n;
                         readn += n;
                     } else {
@@ -235,7 +237,7 @@ public class SocketReceiverImpl implements Receiver, Runnable {
                     }
                 }
 
-                if(remain == 0) {
+                if (remain == 0) {
                     log.debug("receive from " + socket + " and size is " + size + " buffer is " + buf);
                     String[] s = new String(buf).split("\n");
 
@@ -268,7 +270,7 @@ public class SocketReceiverImpl implements Receiver, Runnable {
                     message.data = new byte[message.len];
                     System.arraycopy(buf, size - message.len, message.data, 0, message.len);
                     log.debug("data is " + new String(message.data));
-                    synchronized(this) {
+                    synchronized (this) {
                         if (eventListener != null) {
                             log.debug("Event listener will be called back");
                             if (message.rval == EventListener.DISCON_CODE) {
@@ -293,14 +295,15 @@ public class SocketReceiverImpl implements Receiver, Runnable {
         } catch (SocketException e) {
         } catch (IOException e) {
             log.error("receiver " + socket + " run failed with " + e);
-        }    
+        }
     }
 
     public Object getEndpoint() throws ConnectionException {
-        if(socket != null) {
+        if (socket != null) {
             return socket;
-        } else if(server != null && cd != -1){
+        } else if (server != null && cd != -1) {
             return server.getClientSocket(cd);
-        } else return null;
+        } else
+            return null;
     }
 }

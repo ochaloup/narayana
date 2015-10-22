@@ -39,10 +39,10 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface orbportabilityI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 21001, value = "{0} caught exception whilst initialising Object Adapter.", format = MESSAGE_FORMAT)
@@ -68,37 +68,43 @@ public interface orbportabilityI18NLogger {
     @Message(id = 21006, value = "OA.initPOA called without initialised ORB.", format = MESSAGE_FORMAT)
     public String get_OA_uninitialsedorb();
 
-//    @Message(id = 21007, value = "Cannot find default ORB configuration file {0} in the classpath", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_ORB_cannotfinddefaultorbconfig(String arg0);
+    // @Message(id = 21007, value = "Cannot find default ORB configuration file
+    // {0} in the classpath", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_ORB_cannotfinddefaultorbconfig(String arg0);
 
-//    @Message(id = 21008, value = "{0} caught exception: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_ORB_caughtexception(String arg0, String arg1);
+    // @Message(id = 21008, value = "{0} caught exception: {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_ORB_caughtexception(String arg0, String arg1);
 
-//    @Message(id = 21009, value = "The ORB configuration specified in {0} is invalid: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_ORB_invalidorbconfig(String arg0, String arg1);
+    // @Message(id = 21009, value = "The ORB configuration specified in {0} is
+    // invalid: {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_ORB_invalidorbconfig(String arg0, String arg1);
 
     @Message(id = 21010, value = "ORBInfo ORB specific class creation failed with exception", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
     public void fatal_ORBInfo_creationfailed(@Cause() Throwable arg0);
 
-//    @Message(id = 21011, value = "ORBInfo ORB specific class creation failed - unable to find supported ORB", format = MESSAGE_FORMAT)
-//    @LogMessage(level = FATAL)
-//    public void fatal_ORBInfo_unsupportedorb(@Cause() Throwable arg0);
+    // @Message(id = 21011, value = "ORBInfo ORB specific class creation failed
+    // - unable to find supported ORB", format = MESSAGE_FORMAT)
+    // @LogMessage(level = FATAL)
+    // public void fatal_ORBInfo_unsupportedorb(@Cause() Throwable arg0);
 
-//    @Message(id = 21012, value = "{0} - could not open config file: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_Services_openfailure(String arg0, String arg1);
+    // @Message(id = 21012, value = "{0} - could not open config file: {1}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_Services_openfailure(String arg0, String arg1);
 
     @Message(id = 21013, value = "{0} - {1} option not supported by ORB.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_Services_optionnotsupported(String arg0, String arg1);
 
-//    @Message(id = 21014, value = "Services.getService - resolve_initial_references on {0} failed: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_Services_resolvereffailed(String arg0, String arg1);
+    // @Message(id = 21014, value = "Services.getService -
+    // resolve_initial_references on {0} failed: {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_Services_resolvereffailed(String arg0, String arg1);
 
     @Message(id = 21015, value = "Services.getService - could not find service: {0} in configuration file: {1}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -120,25 +126,30 @@ public interface orbportabilityI18NLogger {
     @LogMessage(level = WARN)
     public void warn_common_Configuration_bindDefault_invalidbind(String arg0);
 
-//    @Message(id = 21020, value = "{0} - caught exception for {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_event_EventManager_caughtexceptionfor(String arg0, String arg1, @Cause() Throwable arg2);
+    // @Message(id = 21020, value = "{0} - caught exception for {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_event_EventManager_caughtexceptionfor(String arg0,
+    // String arg1, @Cause() Throwable arg2);
 
     @Message(id = 21021, value = "{0} - for: {1} threw exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_event_EventManager_forhandlethrewexception(String arg0, String arg1, @Cause() Throwable arg2);
 
-//    @Message(id = 21022, value = "{0} - no value for: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_event_EventManager_novalue(String arg0, String arg1);
+    // @Message(id = 21022, value = "{0} - no value for: {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_event_EventManager_novalue(String arg0, String arg1);
 
     @Message(id = 21023, value = "{0} called without root POA.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_internal_orbspecific_oa_implementations(String arg0);
 
-//    @Message(id = 21024, value = "{0} - could not find class {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_internal_utils_InitLoader_couldnotfindclass(String arg0, String arg1);
+    // @Message(id = 21024, value = "{0} - could not find class {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_internal_utils_InitLoader_couldnotfindclass(String arg0,
+    // String arg1);
 
     @Message(id = 21025, value = "Exception whilst loading {1}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -152,30 +163,34 @@ public interface orbportabilityI18NLogger {
     @LogMessage(level = INFO)
     public void info_internal_utils_InitLoader_loading(String arg0, String arg1);
 
-//    @Message(id = 21028, value = "OA ORB specific class creation failed with: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_oa_core_OA_caughtexception(String arg0);
+    // @Message(id = 21028, value = "OA ORB specific class creation failed with:
+    // {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_oa_core_OA_caughtexception(String arg0);
 
-//    @Message(id = 21029, value = "OA ORB specific class creation failed - unable to find supported ORB", format = MESSAGE_FORMAT)
-//    public String get_oa_core_OA_nosupportedorb();
+    // @Message(id = 21029, value = "OA ORB specific class creation failed -
+    // unable to find supported ORB", format = MESSAGE_FORMAT)
+    // public String get_oa_core_OA_nosupportedorb();
 
-//    @Message(id = 21030, value = "ORB specific class creation failed with: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orb_core_ORB_caughtexception(String arg0);
+    // @Message(id = 21030, value = "ORB specific class creation failed with:
+    // {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_orb_core_ORB_caughtexception(String arg0);
 
-//    @Message(id = 21031, value = "ORB specific class creation failed - unable to find supported ORB", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orb_core_ORB_unsupportedorb();
+    // @Message(id = 21031, value = "ORB specific class creation failed - unable
+    // to find supported ORB", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_orb_core_ORB_unsupportedorb();
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
-    */
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
+     */
 }

@@ -29,14 +29,11 @@ import com.arjuna.wst.WrongStateException;
 /**
  * The VolatileAndDurable durable 2PC participant
  */
-public class VolatileAndDurableDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant
-{
+public class VolatileAndDurableDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant {
     /**
      * Vote to prepare.
      */
-    public Vote prepare()
-        throws WrongStateException, SystemException
-    {
-        return new Prepared() ;
-    }    
+    public Vote prepare() throws WrongStateException, SystemException {
+        return new Prepared();
+    }
 }

@@ -36,12 +36,9 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.StringHolder;
 
-public class Client05
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client05 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -52,17 +49,13 @@ public class Client05
 
             OTS.current().begin();
 
-            for (int index = 0; index < 10; index++)
-            {
+            for (int index = 0; index < 10; index++) {
                 String name = "Name_" + index;
                 String value = "Value_" + index;
 
-                try
-                {
+                try {
                     infoTable.insert(name, value, OTS.current().get_control());
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     correct = false;
                     System.err.println("Error in insert : " + e);
                     e.printStackTrace(System.err);
@@ -73,42 +66,32 @@ public class Client05
 
             OTS.current().begin();
 
-            try
-            {
+            try {
                 infoTable.update("Name_4", "Value_6", OTS.current().get_control());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring error in update : " + e);
                 e.printStackTrace(System.err);
             }
 
             OTS.current().commit(true);
 
-            try
-            {
+            try {
                 infoTable.update("Name_4", "Value_4", OTS.current().get_control());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring error in update : " + e);
                 e.printStackTrace(System.err);
             }
 
             OTS.current().begin();
 
-            for (int index = 0; correct && (index < 10); index++)
-            {
+            for (int index = 0; correct && (index < 10); index++) {
                 String name = "Name_" + index;
                 String value = "Value_" + index;
                 StringHolder valueHolder = new StringHolder();
 
-                try
-                {
+                try {
                     infoTable.select(name, valueHolder, OTS.current().get_control());
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Error in select : " + e);
                     e.printStackTrace(System.err);
                 }
@@ -117,45 +100,31 @@ public class Client05
 
             OTS.current().commit(true);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
-        }
-        finally
-        {
-// code change to stop database locking
-            try
-            {
-                if (OTS.current().get_control() != null)
-                {
+        } finally {
+            // code change to stop database locking
+            try {
+                if (OTS.current().get_control() != null) {
                     OTS.current().rollback();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Finally has caught exception");
                 e.printStackTrace(System.err);
             }
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
         }

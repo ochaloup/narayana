@@ -45,110 +45,93 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.Subordinat
 import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple;
 import com.arjuna.ats.jta.exceptions.InvalidTerminationStateException;
 
-class DummyTransactionImple extends TransactionImple
-{
-    public DummyTransactionImple()
-    {
+class DummyTransactionImple extends TransactionImple {
+    public DummyTransactionImple() {
         super(0);
     }
-    
-    protected void commitAndDisassociate () throws javax.transaction.RollbackException, javax.transaction.HeuristicMixedException, javax.transaction.HeuristicRollbackException, java.lang.SecurityException, javax.transaction.SystemException, java.lang.IllegalStateException
-    {
+
+    protected void commitAndDisassociate() throws javax.transaction.RollbackException,
+            javax.transaction.HeuristicMixedException, javax.transaction.HeuristicRollbackException,
+            java.lang.SecurityException, javax.transaction.SystemException, java.lang.IllegalStateException {
         super.commitAndDisassociate();
     }
 
-    protected void rollbackAndDisassociate () throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException
-    {
+    protected void rollbackAndDisassociate()
+            throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException {
         super.rollbackAndDisassociate();
     }
 }
 
-public class SubordinateTxUnitTest
-{
+public class SubordinateTxUnitTest {
     @Test
-    public void testTransactionImple () throws Exception
-    {
+    public void testTransactionImple() throws Exception {
         TransactionImple tx = new TransactionImple(0);
         TransactionImple dummy = new TransactionImple(0);
-        
+
         assertFalse(tx.equals(dummy));
-        
-        try
-        {
+
+        try {
             tx.commit();
-            
+
             fail();
+        } catch (final IllegalStateException ex) {
         }
-        catch (final IllegalStateException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             tx.rollback();
-            
+
             fail();
+        } catch (InvalidTerminationStateException ex) {
         }
-        catch (InvalidTerminationStateException ex)
-        {
-        }
-        
+
         assertEquals(tx.doPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
-        
+
         tx.doCommit();
-        
+
         dummy.doRollback();
-        
+
         tx = new TransactionImple(10);
-        
+
         tx.doOnePhaseCommit();
         tx.doForget();
-        
+
         tx.doBeforeCompletion();
-        
+
         assertTrue(tx.toString() != null);
         assertTrue(tx.activated());
     }
-    
+
     @Test
-    public void testAtomicAction () throws Exception
-    {
+    public void testAtomicAction() throws Exception {
         SubordinateAtomicAction saa = new SubordinateAtomicAction();
         AtomicAction A = new AtomicAction();
-        
+
         assertEquals(saa.commit(), ActionStatus.INVALID);
         assertEquals(saa.abort(), ActionStatus.INVALID);
-        
+
         assertTrue(saa.type() != A.type());
-        
+
         assertTrue(saa.activated());
-        
+
         saa.doForget();
     }
-    
+
     @Test
-    public void testError () throws Exception
-    {
+    public void testError() throws Exception {
         DummyTransactionImple dti = new DummyTransactionImple();
-        
-        try
-        {
+
+        try {
             dti.commitAndDisassociate();
-            
+
             fail();
+        } catch (final InvalidTerminationStateException ex) {
         }
-        catch (final InvalidTerminationStateException ex)
-        {   
-        }
-        
-        try
-        {
+
+        try {
             dti.rollbackAndDisassociate();
-            
+
             fail();
-        }
-        catch (final InvalidTerminationStateException ex)
-        {
+        } catch (final InvalidTerminationStateException ex) {
         }
     }
 }

@@ -25,8 +25,8 @@ package org.jboss.jbossts.txbridge.outbound;
 import javax.xml.ws.handler.MessageContext;
 
 /**
- * This handler is used when <code>default-context-propagation</code> is enabled. It handles every message unless
- * JTAOverWSATFeature is disabled.
+ * This handler is used when <code>default-context-propagation</code> is
+ * enabled. It handles every message unless JTAOverWSATFeature is disabled.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  *
@@ -37,7 +37,8 @@ public class EnabledJTAOverWSATHandler<C extends MessageContext> extends Abstrac
     /**
      * @see org.jboss.jbossts.txbridge.outbound.AbstractJTAOverWSATHandler#isContextPropagationEnabled(MessageContext)
      *
-     * @return false if JTAOverWSATFeature is present and is disabled, true otherwise.
+     * @return false if JTAOverWSATFeature is present and is disabled, true
+     *         otherwise.
      */
     @Override
     protected boolean isContextPropagationEnabled(C context) {

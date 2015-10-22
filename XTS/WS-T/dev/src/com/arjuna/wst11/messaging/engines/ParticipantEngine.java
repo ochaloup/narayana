@@ -26,34 +26,34 @@ import java.util.TimerTask;
 
 /**
  * The participant state engine
+ * 
  * @author kevin
  */
-public class ParticipantEngine implements ParticipantInboundEvents
-{
+public class ParticipantEngine implements ParticipantInboundEvents {
     /**
      * The associated participant
      */
-    private final Participant participant ;
+    private final Participant participant;
     /**
      * The participant id.
      */
-    private final String id ;
+    private final String id;
     /**
      * The coordinator endpoint reference.
      */
-    private final W3CEndpointReference coordinator ;
+    private final W3CEndpointReference coordinator;
     /**
      * The current state.
      */
-    private State state ;
+    private State state;
     /**
      * The associated timer task or null.
      */
-    private TimerTask timerTask ;
+    private TimerTask timerTask;
 
     /**
-     * the time which will elapse before the next message resend. this is incrementally increased
-     * until it reaches RESEND_PERIOD_MAX
+     * the time which will elapse before the next message resend. this is
+     * incrementally increased until it reaches RESEND_PERIOD_MAX
      */
     private long resendPeriod;
 
@@ -63,10 +63,11 @@ public class ParticipantEngine implements ParticipantInboundEvents
     private long initialResendPeriod;
 
     /**
-     * the maximum period we will allow between resends. n.b. the coordinator uses the value returned
-     * by getTransportTimeout as the limit for how long it waits for a response. however, we can still
-     * employ a max resend period in excess of this value. if a message comes in after the coordinator
-     * has given up it will catch it on the next retry.
+     * the maximum period we will allow between resends. n.b. the coordinator
+     * uses the value returned by getTransportTimeout as the limit for how long
+     * it waits for a response. however, we can still employ a max resend period
+     * in excess of this value. if a message comes in after the coordinator has
+     * given up it will catch it on the next retry.
      */
     private long maxResendPeriod;
 
@@ -76,34 +77,43 @@ public class ParticipantEngine implements ParticipantInboundEvents
     private boolean recovered;
 
     /**
-     * true if this participant's recovery details have been logged to disk otherwise false
+     * true if this participant's recovery details have been logged to disk
+     * otherwise false
      */
     private boolean persisted;
 
     /**
      * Construct the initial engine for the participant.
-     * @param participant The participant.
-     * @param id The participant id.
-     * @param coordinator The coordinator endpoint reference.
+     * 
+     * @param participant
+     *            The participant.
+     * @param id
+     *            The participant id.
+     * @param coordinator
+     *            The coordinator endpoint reference.
      */
-    public ParticipantEngine(final Participant participant, final String id, final W3CEndpointReference coordinator)
-    {
-        this(participant, id, State.STATE_ACTIVE, coordinator, false) ;
+    public ParticipantEngine(final Participant participant, final String id, final W3CEndpointReference coordinator) {
+        this(participant, id, State.STATE_ACTIVE, coordinator, false);
     }
 
     /**
      * Construct the engine for the participant in a specified state.
-     * @param participant The participant.
-     * @param id The participant id.
-     * @param state The initial state.
-     * @param coordinator The coordinator endpoint reference.
+     * 
+     * @param participant
+     *            The participant.
+     * @param id
+     *            The participant id.
+     * @param state
+     *            The initial state.
+     * @param coordinator
+     *            The coordinator endpoint reference.
      */
-    public ParticipantEngine(final Participant participant, final String id, final State state, final W3CEndpointReference coordinator, final boolean recovered)
-    {
-        this.participant = participant ;
-        this.id = id ;
-        this.state = state ;
-        this.coordinator = coordinator ;
+    public ParticipantEngine(final Participant participant, final String id, final State state,
+            final W3CEndpointReference coordinator, final boolean recovered) {
+        this.participant = participant;
+        this.id = id;
+        this.state = state;
+        this.coordinator = coordinator;
         this.recovered = recovered;
         this.persisted = recovered;
         this.initialResendPeriod = TransportTimer.getTransportPeriod();
@@ -113,151 +123,143 @@ public class ParticipantEngine implements ParticipantInboundEvents
 
     /**
      * Handle the commit event.
-     * @param commit The commit notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param commit
+     *            The commit notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      *
-     * None -&gt; None (send committed)
-     * Active -&gt; Aborting (do nothing)
-     * Preparing -&gt; Aborting (do nothing)
-     * PreparedSuccess -&gt; Committing (initiate commit)
-     * Committing -&gt; Committing (do nothing)
-     * Aborting -&gt; Aborting (do nothing)
+     *            None -&gt; None (send committed) Active -&gt; Aborting (do
+     *            nothing) Preparing -&gt; Aborting (do nothing) PreparedSuccess
+     *            -&gt; Committing (initiate commit) Committing -&gt; Committing
+     *            (do nothing) Aborting -&gt; Aborting (do nothing)
      */
-    public void commit(final Notification commit, final MAP map, final ArjunaContext arjunaContext)
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
-            if (current == State.STATE_PREPARED_SUCCESS)
-            {
-                state = State.STATE_COMMITTING ;
-                if (timerTask != null)
-                {
-                    timerTask.cancel() ;
+    public void commit(final Notification commit, final MAP map, final ArjunaContext arjunaContext) {
+        final State current;
+        synchronized (this) {
+            current = state;
+            if (current == State.STATE_PREPARED_SUCCESS) {
+                state = State.STATE_COMMITTING;
+                if (timerTask != null) {
+                    timerTask.cancel();
                 }
-            }
-            else if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING))
-            {
-                state = State.STATE_ABORTING ;
+            } else if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)) {
+                state = State.STATE_ABORTING;
             }
         }
 
-        if (current == State.STATE_PREPARED_SUCCESS)
-        {
-            executeCommit() ;
-        }
-        else if (current == null)
-        {
-            sendCommitted() ;
+        if (current == State.STATE_PREPARED_SUCCESS) {
+            executeCommit();
+        } else if (current == null) {
+            sendCommitted();
         }
     }
 
     /**
      * Handle the prepare event.
-     * @param prepare The prepare notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param prepare
+     *            The prepare notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      *
-     * None -&gt; None (send aborted)
-     * Active -&gt; Preparing (execute prepare)
-     * Preparing -&gt; Preparing (do nothing)
-     * PreparedSuccess -&gt; PreparedSuccess (resend prepared)
-     * Committing -&gt; Committing (ignore)
-     * Aborting -&gt; Aborting (send aborted and forget)
+     *            None -&gt; None (send aborted) Active -&gt; Preparing (execute
+     *            prepare) Preparing -&gt; Preparing (do nothing)
+     *            PreparedSuccess -&gt; PreparedSuccess (resend prepared)
+     *            Committing -&gt; Committing (ignore) Aborting -&gt; Aborting
+     *            (send aborted and forget)
      */
-    public void prepare(final Notification prepare, final MAP map, final ArjunaContext arjunaContext)
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
-            if (current == State.STATE_ACTIVE)
-            {
-                state = State.STATE_PREPARING ;
+    public void prepare(final Notification prepare, final MAP map, final ArjunaContext arjunaContext) {
+        final State current;
+        synchronized (this) {
+            current = state;
+            if (current == State.STATE_ACTIVE) {
+                state = State.STATE_PREPARING;
             }
         }
 
-        if (current == State.STATE_ACTIVE)
-        {
-            executePrepare() ;
-        }
-        else if (current == State.STATE_PREPARED_SUCCESS)
-        {
-            sendPrepared() ;
-        }
-        else if ((current == State.STATE_ABORTING) || (current == null))
-        {
-            sendAborted() ;
-            forget() ;
+        if (current == State.STATE_ACTIVE) {
+            executePrepare();
+        } else if (current == State.STATE_PREPARED_SUCCESS) {
+            sendPrepared();
+        } else if ((current == State.STATE_ABORTING) || (current == null)) {
+            sendAborted();
+            forget();
         }
     }
 
     /**
      * Handle the rollback event.
-     * @param rollback The rollback notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param rollback
+     *            The rollback notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      *
-     * None -&gt; None (send aborted)
-     * Active -&gt; Aborting (execute rollback, send aborted and forget)
-     * Preparing -&gt; Aborting (execute rollback, send aborted and forget)
-     * PreparedSuccess -&gt; Aborting (execute rollback, send aborted and forget)
-     * Committing -&gt; Committing (ignore)
-     * Aborting -&gt; Aborting (send aborted and forget)
+     *            None -&gt; None (send aborted) Active -&gt; Aborting (execute
+     *            rollback, send aborted and forget) Preparing -&gt; Aborting
+     *            (execute rollback, send aborted and forget) PreparedSuccess
+     *            -&gt; Aborting (execute rollback, send aborted and forget)
+     *            Committing -&gt; Committing (ignore) Aborting -&gt; Aborting
+     *            (send aborted and forget)
      *
      */
-    public void rollback(final Notification rollback, final MAP map, final ArjunaContext arjunaContext)
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
+    public void rollback(final Notification rollback, final MAP map, final ArjunaContext arjunaContext) {
+        final State current;
+        synchronized (this) {
+            current = state;
 
-            if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING) ||
-                (current == State.STATE_PREPARED_SUCCESS))
-            {
-                state = State.STATE_ABORTING ;
+            if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)
+                    || (current == State.STATE_PREPARED_SUCCESS)) {
+                state = State.STATE_ABORTING;
             }
         }
 
-        if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING) ||
-            (current == State.STATE_PREPARED_SUCCESS))
-        {
-            // n.b. if state is PREPARING the participant may still be in the middle
-            // of prepare or may even be told to prepare after this is called. according
-            // to the spec that is not our lookout. however, rollback should only get
+        if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)
+                || (current == State.STATE_PREPARED_SUCCESS)) {
+            // n.b. if state is PREPARING the participant may still be in the
+            // middle
+            // of prepare or may even be told to prepare after this is called.
+            // according
+            // to the spec that is not our lookout. however, rollback should
+            // only get
             // called once here.
 
-            if (!executeRollback())
-            {
-                synchronized (this)
-                {
+            if (!executeRollback()) {
+                synchronized (this) {
                     state = current;
                 }
-                return ;
+                return;
             }
 
-            // if the participant managed to persist the log record then we should try
-            // to delete it. note that persisted can only be set to true by the PREPARING
-            // thread. if it detects a transtiion to ABORTING while it is doing the log write
+            // if the participant managed to persist the log record then we
+            // should try
+            // to delete it. note that persisted can only be set to true by the
+            // PREPARING
+            // thread. if it detects a transtiion to ABORTING while it is doing
+            // the log write
             // it will clear up itself.
 
             if (persisted && participant instanceof Durable2PCParticipant) {
-                // if we cannot delete the participant we effectively drop the rollback message
+                // if we cannot delete the participant we effectively drop the
+                // rollback message
                 // here in the hope that we have better luck next time..
                 if (!XTSATRecoveryManager.getRecoveryManager().deleteParticipantRecoveryRecord(id)) {
-                    // hmm, could not delete entry -- leave it so we can maybe retry later
+                    // hmm, could not delete entry -- leave it so we can maybe
+                    // retry later
                     WSTLogger.i18NLogger.warn_wst11_messaging_engines_ParticipantEngine_rollback_1(id);
                 }
             }
 
-            sendAborted() ;
-            forget() ;
-        }
-        else if (current != State.STATE_ABORTING)
-        {
+            sendAborted();
+            forget();
+        } else if (current != State.STATE_ABORTING) {
             sendAborted();
         }
     }
@@ -265,103 +267,94 @@ public class ParticipantEngine implements ParticipantInboundEvents
     /**
      * Handle the early rollback event.
      *
-     * None -&gt; None
-     * Active -&gt; Aborting (execute rollback, send aborted and forget)
-     * Preparing -&gt; Aborting (execute rollback, send aborted and forget)
-     * PreparedSuccess -&gt; PreparedSuccess
-     * Committing -&gt; Committing
+     * None -&gt; None Active -&gt; Aborting (execute rollback, send aborted and
+     * forget) Preparing -&gt; Aborting (execute rollback, send aborted and
+     * forget) PreparedSuccess -&gt; PreparedSuccess Committing -&gt; Committing
      * Aborting -&gt; Aborting
      */
-    public void earlyRollback()
-    {
-        rollbackDecision() ;
+    public void earlyRollback() {
+        rollbackDecision();
     }
 
     /**
      * Handle the early readonly event.
      *
-     * None -&gt; None
-     * Active -&gt; None (send ReadOnly)
-     * Preparing -&gt; None (send ReadOnly)
-     * PreparedSuccess -&gt; PreparedSuccess
-     * Committing -&gt; Committing
-     * Aborting -&gt; Aborting
+     * None -&gt; None Active -&gt; None (send ReadOnly) Preparing -&gt; None
+     * (send ReadOnly) PreparedSuccess -&gt; PreparedSuccess Committing -&gt;
+     * Committing Aborting -&gt; Aborting
      */
-    public void earlyReadonly()
-    {
-        readOnlyDecision() ;
+    public void earlyReadonly() {
+        readOnlyDecision();
     }
 
     /**
      * Handle the recovery event.
      *
-     * None -&gt; None
-     * Active -&gt; Active
-     * Preparing -&gt; Preparing
-     * Committing -&gt; Committing
-     * PreparedSuccess -&gt; PreparedSuccess (resend Prepared)
+     * None -&gt; None Active -&gt; Active Preparing -&gt; Preparing Committing
+     * -&gt; Committing PreparedSuccess -&gt; PreparedSuccess (resend Prepared)
      * Aborting -&gt; Aborting
      */
-    public void recovery()
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
+    public void recovery() {
+        final State current;
+        synchronized (this) {
+            current = state;
         }
 
-        if (current == State.STATE_PREPARED_SUCCESS)
-        {
-            sendPrepared() ;
+        if (current == State.STATE_PREPARED_SUCCESS) {
+            sendPrepared();
         }
     }
 
     /**
      * Handle the soap fault event.
-     * @param soapFault The soap fault.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param soapFault
+     *            The soap fault.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      *
      */
-    public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext)
-    {
-        if (WSTLogger.logger.isTraceEnabled())
-        {
-            final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
-            final SoapFaultType soapFaultType = soapFault.getSoapFaultType() ;
-            final QName subCode = soapFault.getSubcode() ;
-            WSTLogger.logger.tracev("Unexpected SOAP fault for participant {0}: {1} {2}", new Object[] {instanceIdentifier, soapFaultType, subCode}) ;
+    public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext) {
+        if (WSTLogger.logger.isTraceEnabled()) {
+            final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
+            final SoapFaultType soapFaultType = soapFault.getSoapFaultType();
+            final QName subCode = soapFault.getSubcode();
+            WSTLogger.logger.tracev("Unexpected SOAP fault for participant {0}: {1} {2}",
+                    new Object[]{instanceIdentifier, soapFaultType, subCode});
         }
 
         QName subcode = soapFault.getSubcode();
 
-        if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME.equals(subcode) ||
-                AtomicTransactionConstants.WSAT_ERROR_CODE_INCONSISTENT_INTERNAL_STATE_QNAME.equals(subcode) ||
-                AtomicTransactionConstants.WSAT_ERROR_CODE_UNKNOWN_TRANSACTION_QNAME.equals(subcode))
-        {
-            final SoapFaultType soapFaultType = soapFault.getSoapFaultType() ;
-            final QName subCode = soapFault.getSubcode() ;
-            WSTLogger.i18NLogger.error_wst11_messaging_engines_ParticipantEngine_soapFault_2(id, soapFaultType.toString(), subCode);
+        if (CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME.equals(subcode)
+                || AtomicTransactionConstants.WSAT_ERROR_CODE_INCONSISTENT_INTERNAL_STATE_QNAME.equals(subcode)
+                || AtomicTransactionConstants.WSAT_ERROR_CODE_UNKNOWN_TRANSACTION_QNAME.equals(subcode)) {
+            final SoapFaultType soapFaultType = soapFault.getSoapFaultType();
+            final QName subCode = soapFault.getSubcode();
+            WSTLogger.i18NLogger.error_wst11_messaging_engines_ParticipantEngine_soapFault_2(id,
+                    soapFaultType.toString(), subCode);
 
-            // unrecoverable error -- forget this participant and delete any persistent
-            //  record of it
-            final State current ;
+            // unrecoverable error -- forget this participant and delete any
+            // persistent
+            // record of it
+            final State current;
 
-            synchronized(this)
-            {
+            synchronized (this) {
                 current = state;
                 state = null;
             }
 
-            if (current == State.STATE_PREPARED_SUCCESS &&
-                    AtomicTransactionConstants.WSAT_ERROR_CODE_UNKNOWN_TRANSACTION_QNAME.equals(subcode)) {
+            if (current == State.STATE_PREPARED_SUCCESS
+                    && AtomicTransactionConstants.WSAT_ERROR_CODE_UNKNOWN_TRANSACTION_QNAME.equals(subcode)) {
                 // we need to tell this participant to roll back
                 executeRollback();
             }
 
             if (persisted && participant instanceof Durable2PCParticipant) {
-                // remove any durable participant recovery record from the persistent store
-                Durable2PCParticipant durableParticipant =(Durable2PCParticipant) participant;
+                // remove any durable participant recovery record from the
+                // persistent store
+                Durable2PCParticipant durableParticipant = (Durable2PCParticipant) participant;
 
                 // if we cannot delete the participant we record an error here
                 if (!XTSATRecoveryManager.getRecoveryManager().deleteParticipantRecoveryRecord(id)) {
@@ -370,45 +363,48 @@ public class ParticipantEngine implements ParticipantInboundEvents
                 }
             }
 
-            forget() ;
+            forget();
         }
     }
 
     /**
      * Handle the commit decision event.
      *
-     * Preparing -&gt; PreparedSuccess (send Prepared)
-     * Committing -&gt; null (send committed and forget)
+     * Preparing -&gt; PreparedSuccess (send Prepared) Committing -&gt; null
+     * (send committed and forget)
      */
-    private void commitDecision()
-    {
-        State current ;
-        boolean rollbackRequired  = false;
-        boolean deleteRequired  = false;
+    private void commitDecision() {
+        State current;
+        boolean rollbackRequired = false;
+        boolean deleteRequired = false;
 
-        synchronized(this)
-        {
-            current = state ;
+        synchronized (this) {
+            current = state;
         }
 
-        if (current == State.STATE_PREPARING)
-        {
-            // ok, we need to write the recovery details to log and send prepared.
-            // if we cannot write the log then we have to rollback the participant
-            //  and send aborted.
+        if (current == State.STATE_PREPARING) {
+            // ok, we need to write the recovery details to log and send
+            // prepared.
+            // if we cannot write the log then we have to rollback the
+            // participant
+            // and send aborted.
             if (participant instanceof Durable2PCParticipant) {
-                // write a durable participant recovery record to the persistent store
-                Durable2PCParticipant durableParticipant =(Durable2PCParticipant) participant;
+                // write a durable participant recovery record to the persistent
+                // store
+                Durable2PCParticipant durableParticipant = (Durable2PCParticipant) participant;
 
-                ATParticipantRecoveryRecord recoveryRecord = new ATParticipantRecoveryRecord(id, durableParticipant, coordinator);
+                ATParticipantRecoveryRecord recoveryRecord = new ATParticipantRecoveryRecord(id, durableParticipant,
+                        coordinator);
 
                 if (!XTSATRecoveryManager.getRecoveryManager().writeParticipantRecoveryRecord(recoveryRecord)) {
-                    // we need to rollback and send aborted unless some other thread
-                    //gets there first
+                    // we need to rollback and send aborted unless some other
+                    // thread
+                    // gets there first
                     rollbackRequired = true;
                 }
             }
-            // recheck state in case a rollback or readonly came in while we were writing the
+            // recheck state in case a rollback or readonly came in while we
+            // were writing the
             // log record
 
             synchronized (this) {
@@ -416,27 +412,32 @@ public class ParticipantEngine implements ParticipantInboundEvents
 
                 if (current == State.STATE_PREPARING) {
                     if (rollbackRequired) {
-                        // if we change state to aborting then we are responsible for
-                        // calling rollback and sending aborted but we have no log record
+                        // if we change state to aborting then we are
+                        // responsible for
+                        // calling rollback and sending aborted but we have no
+                        // log record
                         // to delete
                         state = State.STATE_ABORTING;
                     } else {
                         state = State.STATE_PREPARED_SUCCESS;
-                        // this ensures any subsequent commit or rollback deletes the log record
+                        // this ensures any subsequent commit or rollback
+                        // deletes the log record
                         // so we still have no log record to delete here
                         persisted = true;
                     }
                 } else if (!rollbackRequired) {
-                    // an incoming rollback or readonly changed the state to aborted or null so
-                    // it will already have performed a rollback if required but we need to
-                    // delete the log record since the rollback/readonly thread did not know
+                    // an incoming rollback or readonly changed the state to
+                    // aborted or null so
+                    // it will already have performed a rollback if required but
+                    // we need to
+                    // delete the log record since the rollback/readonly thread
+                    // did not know
                     // about it
                     deleteRequired = true;
                 }
             }
 
-            if (rollbackRequired)
-            {
+            if (rollbackRequired) {
                 // we need to do the rollback and send aborted
 
                 executeRollback();
@@ -444,7 +445,8 @@ public class ParticipantEngine implements ParticipantInboundEvents
                 sendAborted();
                 forget();
             } else if (deleteRequired) {
-                // just try to delete the log entry -- any required aborted has already been sent
+                // just try to delete the log entry -- any required aborted has
+                // already been sent
 
                 if (!XTSATRecoveryManager.getRecoveryManager().deleteParticipantRecoveryRecord(id)) {
                     // hmm, could not delete entry log warning
@@ -452,23 +454,24 @@ public class ParticipantEngine implements ParticipantInboundEvents
                 }
             } else {
                 // whew got through -- send a prepared
-                sendPrepared() ;
+                sendPrepared();
             }
-        }
-        else if (current == State.STATE_COMMITTING)
-        {
+        } else if (current == State.STATE_COMMITTING) {
             if (persisted && participant instanceof Durable2PCParticipant) {
-                // remove any durable participant recovery record from the persistent store
-                Durable2PCParticipant durableParticipant =(Durable2PCParticipant) participant;
+                // remove any durable participant recovery record from the
+                // persistent store
+                Durable2PCParticipant durableParticipant = (Durable2PCParticipant) participant;
 
-                // if we cannot delete the participant we effectively drop the commit message
+                // if we cannot delete the participant we effectively drop the
+                // commit message
                 // here in the hope that we have better luck next time.
                 if (!XTSATRecoveryManager.getRecoveryManager().deleteParticipantRecoveryRecord(id)) {
                     // hmm, could not delete entry -- log a warning
                     WSTLogger.i18NLogger.warn_wst11_messaging_engines_ParticipantEngine_commitDecision_3(id);
-                    // now revert back to PREPARED_SUCCESS and drop message awaiting a retry
+                    // now revert back to PREPARED_SUCCESS and drop message
+                    // awaiting a retry
 
-                    synchronized(this) {
+                    synchronized (this) {
                         state = State.STATE_PREPARED_SUCCESS;
                     }
 
@@ -476,58 +479,49 @@ public class ParticipantEngine implements ParticipantInboundEvents
                 }
             }
 
-            sendCommitted() ;
-            forget() ;
+            sendCommitted();
+            forget();
         }
     }
 
     /**
      * Handle the readOnly decision event.
      *
-     * Active -&gt; None (send ReadOnly)
-     * Preparing -&gt; None (send ReadOnly)
+     * Active -&gt; None (send ReadOnly) Preparing -&gt; None (send ReadOnly)
      */
-    private void readOnlyDecision()
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
-            if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING))
-            {
-            state = null ;
+    private void readOnlyDecision() {
+        final State current;
+        synchronized (this) {
+            current = state;
+            if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)) {
+                state = null;
             }
         }
 
-        if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING))
-        {
-            sendReadOnly() ;
-            forget() ;
+        if ((current == State.STATE_ACTIVE) || (current == State.STATE_PREPARING)) {
+            sendReadOnly();
+            forget();
         }
     }
 
     /**
      * Handle the rollback decision event.
      *
-     * Active -&gt; Aborting (send aborted)
-     * Preparing -&gt; Aborting (send aborted)
+     * Active -&gt; Aborting (send aborted) Preparing -&gt; Aborting (send
+     * aborted)
      */
-    private void rollbackDecision()
-    {
-        final State current ;
-        synchronized(this)
-        {
-            current = state ;
-            if ((current == State.STATE_PREPARING) || (current == State.STATE_ACTIVE))
-            {
-                state = State.STATE_ABORTING ;
+    private void rollbackDecision() {
+        final State current;
+        synchronized (this) {
+            current = state;
+            if ((current == State.STATE_PREPARING) || (current == State.STATE_ACTIVE)) {
+                state = State.STATE_ABORTING;
             }
         }
 
-        if ((current == State.STATE_PREPARING) || (current == State.STATE_ACTIVE))
-        {
-            sendAborted() ;
-            forget() ;
+        if ((current == State.STATE_PREPARING) || (current == State.STATE_ACTIVE)) {
+            sendAborted();
+            forget();
         }
     }
 
@@ -536,13 +530,12 @@ public class ParticipantEngine implements ParticipantInboundEvents
      *
      * PreparedSuccess -&gt; PreparedSuccess (resend Prepared)
      */
-    private void commsTimeout(TimerTask caller)
-    {
-        final State current ;
-        synchronized(this)
-        {
+    private void commsTimeout(TimerTask caller) {
+        final State current;
+        synchronized (this) {
             if (!timerTask.equals(caller)) {
-                // the timer was cancelled but it went off before it could be cancelled
+                // the timer was cancelled but it went off before it could be
+                // cancelled
 
                 return;
             }
@@ -550,18 +543,18 @@ public class ParticipantEngine implements ParticipantInboundEvents
             // double the resend period up to our maximum limit
 
             if (resendPeriod < maxResendPeriod) {
-                resendPeriod = resendPeriod * 14 / 10; // approximately doubles every two resends
+                resendPeriod = resendPeriod * 14 / 10; // approximately doubles
+                                                        // every two resends
 
                 if (resendPeriod > maxResendPeriod) {
                     resendPeriod = maxResendPeriod;
                 }
             }
-            current = state ;
+            current = state;
         }
 
-        if (current == State.STATE_PREPARED_SUCCESS)
-        {
-            sendPrepared() ;
+        if (current == State.STATE_PREPARED_SUCCESS) {
+            sendPrepared();
         }
     }
 
@@ -569,20 +562,14 @@ public class ParticipantEngine implements ParticipantInboundEvents
      * Execute the commit transition.
      *
      */
-    private void executeCommit()
-    {
-        try
-        {
-            participant.commit() ;
-            commitDecision() ;
-        }
-        catch (final Throwable th)
-        {
-            synchronized(this)
-            {
-                if (state == State.STATE_COMMITTING)
-                {
-                    state = State.STATE_PREPARED_SUCCESS ;
+    private void executeCommit() {
+        try {
+            participant.commit();
+            commitDecision();
+        } catch (final Throwable th) {
+            synchronized (this) {
+                if (state == State.STATE_COMMITTING) {
+                    state = State.STATE_PREPARED_SUCCESS;
                 }
             }
 
@@ -598,113 +585,85 @@ public class ParticipantEngine implements ParticipantInboundEvents
      * Execute the rollback transition.
      *
      */
-    private boolean executeRollback()
-    {
-        try
-        {
-            participant.rollback() ;
-        }
-        catch (final SystemException se)
-        {
+    private boolean executeRollback() {
+        try {
+            participant.rollback();
+        } catch (final SystemException se) {
             WSTLogger.i18NLogger.warn_messaging_engines_ParticipantEngine_executeRollback_1(se);
 
             if (WSTLogger.logger.isTraceEnabled()) {
                 WSTLogger.logger.tracev(se, "SystemException thrown from rollback");
             }
 
-            return false ;
-        }
-        catch (final Throwable th)
-        {
+            return false;
+        } catch (final Throwable th) {
             WSTLogger.i18NLogger.warn_messaging_engines_ParticipantEngine_executeRollback_2(th);
 
             if (WSTLogger.logger.isTraceEnabled()) {
                 WSTLogger.logger.tracev(th, "Unexpected exception thrown from rollback");
             }
         }
-        return true ;
+        return true;
     }
 
     /**
      * Execute the prepare transition.
      *
      */
-    private void executePrepare()
-    {
-        final Vote vote ;
-        try
-        {
+    private void executePrepare() {
+        final Vote vote;
+        try {
             vote = participant.prepare();
-        }
-        catch (final SystemException se)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception from participant prepare", se) ;
+        } catch (final SystemException se) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception from participant prepare", se);
             }
-            return ;
-        }
-        catch (final Throwable th)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception from participant prepare", th) ;
+            return;
+        } catch (final Throwable th) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception from participant prepare", th);
             }
-            rollbackDecision() ;
-            return ;
+            rollbackDecision();
+            return;
         }
 
-        if (vote instanceof Prepared)
-        {
-            commitDecision() ;
-        }
-        else if (vote instanceof ReadOnly)
-        {
-            readOnlyDecision() ;
-        }
-        else if (vote instanceof Aborted)
-        {
-            rollbackDecision() ;
-        }
-        else
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected result from participant prepare: {0}", new Object[] {(vote == null ? "null" : vote.getClass().getName())});
+        if (vote instanceof Prepared) {
+            commitDecision();
+        } else if (vote instanceof ReadOnly) {
+            readOnlyDecision();
+        } else if (vote instanceof Aborted) {
+            rollbackDecision();
+        } else {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected result from participant prepare: {0}",
+                        new Object[]{(vote == null ? "null" : vote.getClass().getName())});
             }
-            rollbackDecision() ;
+            rollbackDecision();
         }
     }
 
     /**
      * Forget the current participant.
      */
-    private void forget()
-    {
-        synchronized(this)
-        {
-            state = null ;
+    private void forget() {
+        synchronized (this) {
+            state = null;
         }
-        ParticipantProcessor.getProcessor().deactivateParticipant(this) ;
+        ParticipantProcessor.getProcessor().deactivateParticipant(this);
     }
 
     /**
      * Send the committed message.
      *
      */
-    private void sendCommitted()
-    {
-        final MAP responseAddressingContext = createContext() ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id) ;
-        try
-        {
-            CoordinatorClient.getClient().sendCommitted(coordinator, responseAddressingContext, instanceIdentifier) ;
-        }
-        catch (final Throwable th)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception while sending Committed", th) ;
+    private void sendCommitted() {
+        final MAP responseAddressingContext = createContext();
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id);
+        try {
+            CoordinatorClient.getClient().sendCommitted(coordinator, responseAddressingContext, instanceIdentifier);
+        } catch (final Throwable th) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception while sending Committed", th);
             }
         }
     }
@@ -713,45 +672,42 @@ public class ParticipantEngine implements ParticipantInboundEvents
      * Send the prepared message.
      *
      */
-    private void sendPrepared()
-    {
+    private void sendPrepared() {
         sendPrepared(false);
     }
 
     /**
      * Send the prepared message.
      *
-     * @param timedOut true if this is in response to a comms timeout
+     * @param timedOut
+     *            true if this is in response to a comms timeout
      */
-    private void sendPrepared(boolean timedOut)
-    {
-        final MAP responseAddressingContext = createContext() ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id) ;
-        try
-        {
-            CoordinatorClient.getClient().sendPrepared(coordinator, responseAddressingContext, instanceIdentifier) ;
-        }
-        catch (final Throwable th)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception while sending Prepared", th) ;
+    private void sendPrepared(boolean timedOut) {
+        final MAP responseAddressingContext = createContext();
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id);
+        try {
+            CoordinatorClient.getClient().sendPrepared(coordinator, responseAddressingContext, instanceIdentifier);
+        } catch (final Throwable th) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception while sending Prepared", th);
             }
         }
 
         updateResendPeriod(timedOut);
 
-        initiateTimer() ;
+        initiateTimer();
     }
 
-    private synchronized void updateResendPeriod(boolean timedOut)
-    {
-        // if we timed out then we multiply the resend period by ~= sqrt(2) up to the maximum
+    private synchronized void updateResendPeriod(boolean timedOut) {
+        // if we timed out then we multiply the resend period by ~= sqrt(2) up
+        // to the maximum
         // if not we make sure it is reset to the initial period
 
         if (timedOut) {
             if (resendPeriod < maxResendPeriod) {
-                long newPeriod  = resendPeriod * 14 / 10;  // approximately doubles every two resends
+                long newPeriod = resendPeriod * 14 / 10; // approximately
+                                                            // doubles every two
+                                                            // resends
 
                 if (newPeriod > maxResendPeriod) {
                     newPeriod = maxResendPeriod;
@@ -769,19 +725,14 @@ public class ParticipantEngine implements ParticipantInboundEvents
      * Send the aborted message.
      *
      */
-    private void sendAborted()
-    {
-        final MAP responseAddressingContext = createContext() ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id) ;
-        try
-        {
-            CoordinatorClient.getClient().sendAborted(coordinator, responseAddressingContext, instanceIdentifier) ;
-        }
-        catch (final Throwable th)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception while sending Aborted", th) ;
+    private void sendAborted() {
+        final MAP responseAddressingContext = createContext();
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id);
+        try {
+            CoordinatorClient.getClient().sendAborted(coordinator, responseAddressingContext, instanceIdentifier);
+        } catch (final Throwable th) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception while sending Aborted", th);
             }
         }
     }
@@ -790,19 +741,14 @@ public class ParticipantEngine implements ParticipantInboundEvents
      * Send the read only message.
      *
      */
-    private void sendReadOnly()
-    {
-        final MAP responseAddressingContext = createContext() ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id) ;
-        try
-        {
-            CoordinatorClient.getClient().sendReadOnly(coordinator, responseAddressingContext, instanceIdentifier) ;
-        }
-        catch (final Throwable th)
-        {
-            if (WSTLogger.logger.isTraceEnabled())
-            {
-                WSTLogger.logger.tracev("Unexpected exception while sending ReadOnly", th) ;
+    private void sendReadOnly() {
+        final MAP responseAddressingContext = createContext();
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier(id);
+        try {
+            CoordinatorClient.getClient().sendReadOnly(coordinator, responseAddressingContext, instanceIdentifier);
+        } catch (final Throwable th) {
+            if (WSTLogger.logger.isTraceEnabled()) {
+                WSTLogger.logger.tracev("Unexpected exception while sending ReadOnly", th);
             }
         }
     }
@@ -810,67 +756,61 @@ public class ParticipantEngine implements ParticipantInboundEvents
     /**
      * Initiate the timer.
      */
-    private synchronized void initiateTimer()
-    {
-        if (timerTask != null)
-        {
-            timerTask.cancel() ;
+    private synchronized void initiateTimer() {
+        if (timerTask != null) {
+            timerTask.cancel();
         }
 
-        if (state == State.STATE_PREPARED_SUCCESS)
-        {
+        if (state == State.STATE_PREPARED_SUCCESS) {
             timerTask = new TimerTask() {
                 public void run() {
-                    commsTimeout(this) ;
+                    commsTimeout(this);
                 }
-            } ;
-            TransportTimer.getTimer().schedule(timerTask, resendPeriod) ;
-        }
-        else
-        {
-            timerTask = null ;
+            };
+            TransportTimer.getTimer().schedule(timerTask, resendPeriod);
+        } else {
+            timerTask = null;
         }
     }
 
     /**
      * Create a response context from the incoming context.
+     * 
      * @return The addressing context.
      */
-    private MAP createContext()
-    {
-        final String messageId = MessageId.getMessageId() ;
-        return AddressingHelper.createNotificationContext(messageId) ;
-    }
-    
-    /**
-     * Get the coordinator id.
-     * @return The coordinator id.
-     */
-    public String getId()
-    {
-        return id ;
+    private MAP createContext() {
+        final String messageId = MessageId.getMessageId();
+        return AddressingHelper.createNotificationContext(messageId);
     }
 
-    public W3CEndpointReference getCoordinator()
-    {
+    /**
+     * Get the coordinator id.
+     * 
+     * @return The coordinator id.
+     */
+    public String getId() {
+        return id;
+    }
+
+    public W3CEndpointReference getCoordinator() {
         return coordinator;
     }
 
     /**
      * Is the participant persisted to disk?
+     * 
      * @return true if persisted, false otherwise.
      */
-    public boolean isPersisted()
-    {
-        return persisted ;
+    public boolean isPersisted() {
+        return persisted;
     }
 
     /**
      * Is the participant recovered?
+     * 
      * @return true if recovered, false otherwise.
      */
-    public boolean isRecovered()
-    {
-        return recovered ;
+    public boolean isRecovered() {
+        return recovered;
     }
 }

@@ -45,44 +45,33 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-class TWorker extends Thread
-{
-    public TWorker (javax.transaction.Transaction tx, TWorker driver)
-    {
+class TWorker extends Thread {
+    public TWorker(javax.transaction.Transaction tx, TWorker driver) {
         _tx = tx;
         _success = true;
         _driver = driver;
     }
 
-    public void run ()
-    {
+    public void run() {
         TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
-        try
-        {
+        try {
             tm.resume(_tx);
 
-            if (_driver != null)
-            {
-                try
-                {
+            if (_driver != null) {
+                try {
                     _driver.join();
-                }
-                catch (final Exception ex)
-                {
+                } catch (final Exception ex) {
                 }
             }
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
             ex.printStackTrace();
 
             _success = false;
         }
     }
 
-    public final boolean success ()
-    {
+    public final boolean success() {
         return _success;
     }
 
@@ -91,31 +80,29 @@ class TWorker extends Thread
     private TWorker _driver;
 }
 
-public class ThreadedCommit
-{
+public class ThreadedCommit {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
-        if (tm != null)
-        {
+        if (tm != null) {
             System.out.println("Starting top-level transaction.");
 
             tm.begin();
@@ -131,11 +118,9 @@ public class ThreadedCommit
             worker1.join();
             worker2.join();
 
-            assertTrue( worker1.success() );
-            assertTrue( worker2.success() );
-        }
-        else
-        {
+            assertTrue(worker1.success());
+            assertTrue(worker2.success());
+        } else {
             fail("Error - could not get transaction manager!");
         }
 

@@ -43,8 +43,7 @@ import javax.transaction.xa.Xid;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.TransactionImple;
 
-public class TransactionImporterImple implements TransactionImporter
-{
+public class TransactionImporterImple implements TransactionImporter {
 
     /**
      * Create a subordinate transaction associated with the global transaction
@@ -59,9 +58,7 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public SubordinateTransaction importTransaction(Xid xid)
-            throws XAException
-    {
+    public SubordinateTransaction importTransaction(Xid xid) throws XAException {
         return importTransaction(xid, 0);
     }
 
@@ -80,9 +77,7 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public SubordinateTransaction importTransaction(Xid xid, int timeout)
-            throws XAException
-    {
+    public SubordinateTransaction importTransaction(Xid xid, int timeout) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -92,10 +87,9 @@ public class TransactionImporterImple implements TransactionImporter
 
         TransactionImple imported = (TransactionImple) getImportedTransaction(xid);
 
-        if (imported == null)
-        {
+        if (imported == null) {
             imported = new TransactionImple(timeout, xid);
-            
+
             _transactions.put(new SubordinateXidImple(imported.baseXid()), imported);
         }
 
@@ -111,9 +105,7 @@ public class TransactionImporterImple implements TransactionImporter
      * @throws javax.transaction.xa.XAException
      */
 
-    public TransactionImple recoverTransaction(Uid actId)
-            throws XAException
-    {
+    public TransactionImple recoverTransaction(Uid actId) throws XAException {
         if (actId == null)
             throw new IllegalArgumentException();
 
@@ -121,7 +113,7 @@ public class TransactionImporterImple implements TransactionImporter
 
         if (recovered.baseXid() == null)
             throw new IllegalArgumentException();
-        
+
         /*
          * Is the transaction already in the list? This may be the case because
          * we scan the object store periodically and may get Uids to recover for
@@ -129,20 +121,16 @@ public class TransactionImporterImple implements TransactionImporter
          * recovery. In which case, we need to ignore them.
          */
 
-        TransactionImple tx = (TransactionImple) _transactions.get(recovered
-                .baseXid());
+        TransactionImple tx = (TransactionImple) _transactions.get(recovered.baseXid());
 
-        if (tx == null)
-        {
+        if (tx == null) {
 
             Xid baseXid = recovered.baseXid();
             _transactions.put(new SubordinateXidImple(baseXid), recovered);
             recovered.recordTransaction();
 
             return recovered;
-        }
-        else
-        {
+        } else {
             return tx;
         }
     }
@@ -161,9 +149,7 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public SubordinateTransaction getImportedTransaction(Xid xid)
-            throws XAException
-    {
+    public SubordinateTransaction getImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -171,7 +157,7 @@ public class TransactionImporterImple implements TransactionImporter
 
         if (tx == null)
             return null;
-        
+
         // https://issues.jboss.org/browse/JBTM-927
         try {
             if (tx.getStatus() == javax.transaction.Status.STATUS_ROLLEDBACK) {
@@ -182,13 +168,11 @@ public class TransactionImporterImple implements TransactionImporter
             throw new XAException(XAException.XA_RBROLLBACK);
         }
 
-        if (!tx.activated())
-        {
+        if (!tx.activated()) {
             tx.recover();
 
             return tx;
-        }
-        else
+        } else
             return tx;
     }
 
@@ -202,14 +186,13 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public void removeImportedTransaction(Xid xid) throws XAException
-    {
+    public void removeImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
         _transactions.remove(new SubordinateXidImple(xid));
     }
-    
+
     public Set<Xid> getInflightXids(String parentNodeName) {
         Iterator<TransactionImple> iterator = _transactions.values().iterator();
         Set<Xid> toReturn = new HashSet<Xid>();
@@ -224,4 +207,3 @@ public class TransactionImporterImple implements TransactionImporter
 
     private static ConcurrentHashMap<SubordinateXidImple, TransactionImple> _transactions = new ConcurrentHashMap<SubordinateXidImple, TransactionImple>();
 }
-

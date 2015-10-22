@@ -26,8 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceFailAfterCommit extends
-        FailAfterCommitBase {
+public class TestCommitMarkableResourceFailAfterCommit extends FailAfterCommitBase {
 
     @Test
     @BMScript("commitMarkableResourceFailAfterCommit")

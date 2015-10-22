@@ -26,20 +26,25 @@ import org.jboss.ws.api.addressing.MAP;
 
 /**
  * The callback for the initiator client.
+ * 
  * @author kevin
  */
-public abstract class ATInitiatorCallback extends Callback
-{
+public abstract class ATInitiatorCallback extends Callback {
     /**
      * A response.
-     * @param map The current addressing context.
+     * 
+     * @param map
+     *            The current addressing context.
      */
-    public abstract void response(final MAP map) ;
+    public abstract void response(final MAP map);
 
     /**
      * A SOAP fault response.
-     * @param soapFault The SOAP fault response.
-     * @param map The current addressing context.
+     * 
+     * @param soapFault
+     *            The SOAP fault response.
+     * @param map
+     *            The current addressing context.
      */
-    public abstract void soapFault(final SoapFault soapFault, final MAP map) ;
+    public abstract void soapFault(final SoapFault soapFault, final MAP map);
 }

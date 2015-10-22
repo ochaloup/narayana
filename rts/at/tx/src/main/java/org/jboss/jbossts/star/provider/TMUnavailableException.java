@@ -18,15 +18,13 @@
  * (C) 2010
  * @author JBoss Inc.
  */
- package org.jboss.jbossts.star.provider;
+package org.jboss.jbossts.star.provider;
 
 /**
  * Unable to contact the REST based Transaction Coordinator
  */
-public class TMUnavailableException extends RuntimeException
-{
-    public TMUnavailableException(String message)
-    {
+public class TMUnavailableException extends RuntimeException {
+    public TMUnavailableException(String message) {
         super(message);
     }
 }

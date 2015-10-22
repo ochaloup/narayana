@@ -43,21 +43,19 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.ServerControl;
 import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.strict.ServerStrictTopLevelAction;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
-public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
-{
+public class ServerOSITopLevelAction extends ServerStrictTopLevelAction {
 
     /*
      * The ServerTopLevelAction is responsible for registering this resource
      * with its parent.
      */
 
-    public ServerOSITopLevelAction(ServerControl control, boolean doRegister)
-    {
+    public ServerOSITopLevelAction(ServerControl control, boolean doRegister) {
         super(control, doRegister);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerOSITopLevelAction::ServerOSITopLevelAction ( ServerControl, "
-                    + doRegister + " )");
+            jtsLogger.logger
+                    .trace("ServerOSITopLevelAction::ServerOSITopLevelAction ( ServerControl, " + doRegister + " )");
         }
     }
 
@@ -65,9 +63,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
      * Will only be called by the remote top-level transaction.
      */
 
-    public org.omg.CosTransactions.Vote prepare () throws HeuristicMixed,
-            HeuristicHazard, SystemException
-    {
+    public org.omg.CosTransactions.Vote prepare() throws HeuristicMixed, HeuristicHazard, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerOSITopLevelAction::prepare for " + _theUid);
         }
@@ -82,9 +78,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
         return super.prepare();
     }
 
-    public void rollback () throws SystemException, HeuristicCommit,
-            HeuristicMixed, HeuristicHazard
-    {
+    public void rollback() throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerOSITopLevelAction::rollback for " + _theUid);
         }
@@ -94,9 +88,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
         super.rollback();
     }
 
-    public void commit () throws SystemException, NotPrepared,
-            HeuristicRollback, HeuristicMixed, HeuristicHazard
-    {
+    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerOSITopLevelAction::commit for " + _theUid);
         }
@@ -106,8 +98,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
         super.commit();
     }
 
-    public void forget () throws SystemException
-    {
+    public void forget() throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerOSITopLevelAction::forget for " + _theUid);
         }
@@ -122,8 +113,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
      * that we can use it - we may have many locally registered resources.
      */
 
-    public void commit_one_phase () throws HeuristicHazard, SystemException
-    {
+    public void commit_one_phase() throws HeuristicHazard, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerOSITopLevelAction::commit_one_phase for " + _theUid);
         }
@@ -133,8 +123,7 @@ public class ServerOSITopLevelAction extends ServerStrictTopLevelAction
         super.commit_one_phase();
     }
 
-    public String type ()
-    {
+    public String type() {
         return "/Resources/Arjuna/ServerTopLevelAction/ServerOSITopLevelAction";
     }
 

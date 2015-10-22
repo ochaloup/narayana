@@ -40,33 +40,27 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeManager;
 import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 import com.arjuna.ats.internal.arjuna.abstractrecords.PersistenceRecord;
 
+class DummyMap implements RecordTypeMap {
 
-class DummyMap implements RecordTypeMap
-{
-
-    public Class<? extends AbstractRecord> getRecordClass ()
-    {
+    public Class<? extends AbstractRecord> getRecordClass() {
         return PersistenceRecord.class;
     }
 
-    public int getType ()
-    {
+    public int getType() {
         // TODO Auto-generated method stub
         return 0;
     }
-    
+
 }
-public class RecordTypeManagerUnitTest
-{
+public class RecordTypeManagerUnitTest {
     @Test
-    public void test()
-    {
+    public void test() {
         DummyMap map = new DummyMap();
         RecordTypeManager.manager().add(map);
-        
+
         assertEquals(RecordTypeManager.manager().getClass(0), PersistenceRecord.class);
         assertEquals(RecordTypeManager.manager().getType(PersistenceRecord.class), 0);
-        
+
         RecordTypeManager.manager().remove(map);
     }
 }

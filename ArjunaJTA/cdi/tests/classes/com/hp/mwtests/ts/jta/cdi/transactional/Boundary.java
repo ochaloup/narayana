@@ -34,5 +34,5 @@ import java.lang.annotation.Target;
 @Stereotype
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Boundary
-{ }
+public @interface Boundary {
+}

@@ -22,7 +22,6 @@
 
 package com.arjuna.ats.jta.cdi;
 
-
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
@@ -106,13 +105,10 @@ public class TransactionContext implements Context {
 
         try {
             int currentStatus = transaction.getStatus();
-            return currentStatus == Status.STATUS_ACTIVE ||
-                    currentStatus == Status.STATUS_MARKED_ROLLBACK ||
-                    currentStatus == Status.STATUS_PREPARED ||
-                    currentStatus == Status.STATUS_UNKNOWN ||
-                    currentStatus == Status.STATUS_PREPARING ||
-                    currentStatus == Status.STATUS_COMMITTING ||
-                    currentStatus == Status.STATUS_ROLLING_BACK;
+            return currentStatus == Status.STATUS_ACTIVE || currentStatus == Status.STATUS_MARKED_ROLLBACK
+                    || currentStatus == Status.STATUS_PREPARED || currentStatus == Status.STATUS_UNKNOWN
+                    || currentStatus == Status.STATUS_PREPARING || currentStatus == Status.STATUS_COMMITTING
+                    || currentStatus == Status.STATUS_ROLLING_BACK;
         } catch (SystemException e) {
             throw new RuntimeException(jtaLogger.i18NLogger.get_error_getting_tx_status(), e);
         }
@@ -136,12 +132,14 @@ public class TransactionContext implements Context {
 
     private TransactionManager getTransactionManager() {
 
-        //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
+        // ignore findbugs warning about incorrect lazy initialization of static
+        // field since the values are looked up via JNDI
         // (ie there is no object construction during initialization)
         if (transactionManager == null) {
             try {
                 InitialContext initialContext = new InitialContext();
-                transactionManager = (TransactionManager) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
+                transactionManager = (TransactionManager) initialContext
+                        .lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
             } catch (NamingException e) {
                 throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tm(), e);
             }
@@ -151,12 +149,14 @@ public class TransactionContext implements Context {
 
     private TransactionSynchronizationRegistry getTransactionSynchronizationRegistry() {
 
-        //  ignore findbugs warning about incorrect lazy initialization of static field since the values are looked up via JNDI
+        // ignore findbugs warning about incorrect lazy initialization of static
+        // field since the values are looked up via JNDI
         // (ie there is no object construction during initialization)
         if (transactionSynchronizationRegistry == null) {
             try {
                 InitialContext initialContext = new InitialContext();
-                transactionSynchronizationRegistry = (TransactionSynchronizationRegistry) initialContext.lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
+                transactionSynchronizationRegistry = (TransactionSynchronizationRegistry) initialContext.lookup(
+                        jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistryJNDIContext());
             } catch (NamingException e) {
                 throw new ContextNotActiveException(jtaLogger.i18NLogger.get_could_not_lookup_tsr(), e);
             }

@@ -51,8 +51,7 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  * i.e., objects that derive from LockManager and StateManager.
  */
 
-public class TORecoveryModule implements RecoveryModule
-{
+public class TORecoveryModule implements RecoveryModule {
 
     /**
      * Create the module to scan in the default location for object states. Any
@@ -60,8 +59,7 @@ public class TORecoveryModule implements RecoveryModule
      */
 
     @SuppressWarnings("unchecked")
-    public TORecoveryModule()
-    {
+    public TORecoveryModule() {
         if (txojLogger.logger.isDebugEnabled()) {
             txojLogger.logger.debug("TORecoveryModule created");
         }
@@ -73,126 +71,99 @@ public class TORecoveryModule implements RecoveryModule
         _objectStore = StoreManager.getTxOJStore();
     }
 
-    public void periodicWorkFirstPass ()
-    {
-        if(txojLogger.logger.isDebugEnabled()) {
+    public void periodicWorkFirstPass() {
+        if (txojLogger.logger.isDebugEnabled()) {
             txojLogger.logger.debug("TORecoveryModule - first pass");
         }
 
         // Build a hashtable of uncommitted transactional objects
         _uncommittedTOTable = new Hashtable();
 
-        try
-        {
+        try {
             InputObjectState types = new InputObjectState();
 
             // find all the types of transactional object (in this ObjectStore)
-            if (_objectStore.allTypes(types))
-            {
+            if (_objectStore.allTypes(types)) {
                 String theName = null;
 
-                try
-                {
+                try {
                     boolean endOfList = false;
 
-                    while (!endOfList)
-                    {
+                    while (!endOfList) {
                         // extract a type
                         theName = types.unpackString();
 
                         if (theName.compareTo("") == 0)
                             endOfList = true;
-                        else
-                        {
+                        else {
                             InputObjectState uids = new InputObjectState();
 
                             // find the uids of anything with an uncommitted
                             // entry in the object store
-                            if (_objectStore.allObjUids(theName, uids,
-                                    StateStatus.OS_UNCOMMITTED))
-                            {
+                            if (_objectStore.allObjUids(theName, uids, StateStatus.OS_UNCOMMITTED)) {
                                 Uid theUid = null;
 
-                                try
-                                {
+                                try {
                                     boolean endOfUids = false;
 
-                                    while (!endOfUids)
-                                    {
+                                    while (!endOfUids) {
                                         // extract a uid
                                         theUid = UidHelper.unpackFrom(uids);
 
                                         if (theUid.equals(Uid.nullUid()))
                                             endOfUids = true;
-                                        else
-                                        {
-                                            String newTypeString = new String(
-                                                    theName);
+                                        else {
+                                            String newTypeString = new String(theName);
                                             Uid newUid = new Uid(theUid);
-                                            
-                                            _uncommittedTOTable.put(newUid,newTypeString);
-                                            
+
+                                            _uncommittedTOTable.put(newUid, newTypeString);
+
                                             if (txojLogger.logger.isDebugEnabled()) {
-                                                txojLogger.logger.debug("TO currently uncommitted "+newUid+" is a "+newTypeString);
+                                                txojLogger.logger.debug("TO currently uncommitted " + newUid + " is a "
+                                                        + newTypeString);
                                             }
                                         }
                                     }
-                                }
-                                catch (Exception e)
-                                {
+                                } catch (Exception e) {
                                     // end of uids!
                                 }
                             }
                         }
                     }
-                }
-                catch (IOException ex)
-                {
+                } catch (IOException ex) {
                     // nothing there.
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     txojLogger.i18NLogger.warn_recovery_TORecoveryModule_5(e);
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             txojLogger.i18NLogger.warn_recovery_TORecoveryModule_5(e);
         }
 
     }
 
-    public void periodicWorkSecondPass ()
-    {
-        if(txojLogger.logger.isDebugEnabled()) {
+    public void periodicWorkSecondPass() {
+        if (txojLogger.logger.isDebugEnabled()) {
             txojLogger.logger.debug("TORecoveryModule - second pass");
         }
 
         Enumeration uncommittedObjects = _uncommittedTOTable.keys();
 
-        while (uncommittedObjects.hasMoreElements())
-        {
+        while (uncommittedObjects.hasMoreElements()) {
             Uid objUid = (Uid) uncommittedObjects.nextElement();
             String objType = (String) _uncommittedTOTable.get(objUid);
 
-            try
-            {
-                if (_objectStore.currentState(objUid, objType) == StateStatus.OS_UNCOMMITTED)
-                {
+            try {
+                if (_objectStore.currentState(objUid, objType) == StateStatus.OS_UNCOMMITTED) {
                     recoverObject(objUid, objType);
-                }
-                else
-                {
+                } else {
                     if (txojLogger.logger.isDebugEnabled()) {
-                        txojLogger.logger.debug("Object ("+objUid+", "+objType+") is no longer uncommitted.");
+                        txojLogger.logger.debug("Object (" + objUid + ", " + objType + ") is no longer uncommitted.");
                     }
                 }
-            }
-            catch (ObjectStoreException ose)
-            {
+            } catch (ObjectStoreException ose) {
                 if (txojLogger.logger.isDebugEnabled()) {
-                    txojLogger.logger.debug("Object ("+objUid+", "+objType+") no longer exists.");
+                    txojLogger.logger.debug("Object (" + objUid + ", " + objType + ") no longer exists.");
                 }
             }
         }
@@ -202,18 +173,15 @@ public class TORecoveryModule implements RecoveryModule
      * Set-up routine.
      */
 
-    protected void initialise ()
-    {
+    protected void initialise() {
         if (txojLogger.logger.isDebugEnabled()) {
             txojLogger.logger.debug("TORecoveryModule.initialise()");
         }
     }
 
-    private final void recoverObject (Uid objUid, String objType)
-    {
+    private final void recoverObject(Uid objUid, String objType) {
         if (txojLogger.logger.isDebugEnabled()) {
-            txojLogger.logger.debug("TORecoveryModule.recoverObject(" + objUid + ", "
-                    + objType + ")");
+            txojLogger.logger.debug("TORecoveryModule.recoverObject(" + objUid + ", " + objType + ")");
         }
 
         /*
@@ -221,8 +189,7 @@ public class TORecoveryModule implements RecoveryModule
          * it uncommitted.
          */
 
-        RecoveredTransactionalObject recoveredTO = new RecoveredTransactionalObject(
-                objUid, objType,_objectStore);
+        RecoveredTransactionalObject recoveredTO = new RecoveredTransactionalObject(objUid, objType, _objectStore);
 
         /*
          * Tell it to replayPhase2, in whatever way it does (in fact it won't do

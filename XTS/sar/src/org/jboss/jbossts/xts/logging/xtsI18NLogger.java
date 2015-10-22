@@ -30,13 +30,12 @@ import static org.jboss.logging.annotations.Message.Format.*;
  * @author adinn
  */
 @MessageLogger(projectCode = "ARJUNA")
-public interface xtsI18NLogger
-{
+public interface xtsI18NLogger {
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 47001, value = "Unable to load XTS initialisation class {0}", format = MESSAGE_FORMAT)

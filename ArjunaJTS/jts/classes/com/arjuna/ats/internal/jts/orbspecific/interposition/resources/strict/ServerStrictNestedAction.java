@@ -39,30 +39,25 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.ServerControl;
 import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.arjuna.ServerNestedAction;
 import com.arjuna.ats.jts.logging.jtsLogger;
 
-public class ServerStrictNestedAction extends ServerNestedAction
-{
+public class ServerStrictNestedAction extends ServerNestedAction {
 
     /*
      * Create local transactions with same ids as remote. The base class is
      * responsible for registering us with the parent transaction.
      */
 
-    public ServerStrictNestedAction(ServerControl control, boolean doRegister)
-    {
+    public ServerStrictNestedAction(ServerControl control, boolean doRegister) {
         super(control);
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerStrictNestedAction::ServerStrictNestedAction ( "
-                    + _theUid + " )");
+            jtsLogger.logger.trace("ServerStrictNestedAction::ServerStrictNestedAction ( " + _theUid + " )");
         }
 
         _registered = false;
         _theResource = null;
 
-        if (_theControl != null)
-        {
-            _theResource = new org.omg.CosTransactions.SubtransactionAwareResourcePOATie(
-                    this);
+        if (_theControl != null) {
+            _theResource = new org.omg.CosTransactions.SubtransactionAwareResourcePOATie(this);
 
             ORBManager.getPOA().objectIsReady(_theResource);
 
@@ -78,18 +73,16 @@ public class ServerStrictNestedAction extends ServerNestedAction
         }
     }
 
-    public boolean interposeResource ()
-    {
-        if (!_registered)
-        {
+    public boolean interposeResource() {
+        if (!_registered) {
             _registered = true;
 
-            if ((_theResource != null) && (_theControl != null))
-            {
+            if ((_theResource != null) && (_theControl != null)) {
                 Coordinator realCoordinator = _theControl.originalCoordinator();
 
                 if (!(_valid = registerSubTran(realCoordinator))) {
-                    jtsLogger.i18NLogger.warn_orbspecific_interposition_resources_strict_ipfailed("ServerStrictNestedAction");
+                    jtsLogger.i18NLogger
+                            .warn_orbspecific_interposition_resources_strict_ipfailed("ServerStrictNestedAction");
 
                     /*
                      * Failed to register. Valid is set, and the interposition
@@ -98,8 +91,7 @@ public class ServerStrictNestedAction extends ServerNestedAction
                 }
 
                 realCoordinator = null;
-            }
-            else
+            } else
                 _valid = false;
         }
 
@@ -112,16 +104,12 @@ public class ServerStrictNestedAction extends ServerNestedAction
      * subsequently.
      */
 
-    public void commit_subtransaction (Coordinator parent)
-            throws SystemException
-    {
+    public void commit_subtransaction(Coordinator parent) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ServerStrictNestedAction::commit_subtransaction : "
-                    + _theUid);
+            jtsLogger.logger.trace("ServerStrictNestedAction::commit_subtransaction : " + _theUid);
         }
 
-        try
-        {
+        try {
             super.commit_subtransaction(parent);
 
             /*
@@ -130,9 +118,7 @@ public class ServerStrictNestedAction extends ServerNestedAction
 
             if (super._parent != null)
                 super._parent.interposeResource();
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             if (super._parent != null)
                 super._parent.interposeResource();
 

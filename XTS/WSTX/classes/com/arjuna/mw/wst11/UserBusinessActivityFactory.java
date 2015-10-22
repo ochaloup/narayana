@@ -31,15 +31,12 @@
 
 package com.arjuna.mw.wst11;
 
-public class UserBusinessActivityFactory
-{
-    public static UserBusinessActivity userBusinessActivity ()
-    {
-        return UserBusinessActivity.getUserBusinessActivity() ;
+public class UserBusinessActivityFactory {
+    public static UserBusinessActivity userBusinessActivity() {
+        return UserBusinessActivity.getUserBusinessActivity();
     }
 
-    public static UserBusinessActivity userSubordinateBusinessActivity ()
-    {
-        return UserBusinessActivity.getUserBusinessActivity().getUserSubordinateBusinessActivity() ;
+    public static UserBusinessActivity userSubordinateBusinessActivity() {
+        return UserBusinessActivity.getUserBusinessActivity().getUserSubordinateBusinessActivity();
     }
 }

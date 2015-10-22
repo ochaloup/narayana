@@ -28,7 +28,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 
-
 /**
  * @author paul.robinson@redhat.com, 2012-02-13
  */
@@ -37,12 +36,14 @@ public class CompensationsCDIExtension implements Extension {
     /**
      * Register all admin CDI beans.
      *
-     * @param bbd the bbd event
-     * @param bm  the bean manager
+     * @param bbd
+     *            the bbd event
+     * @param bm
+     *            the bean manager
      */
     public void register(@Observes BeforeBeanDiscovery bbd, BeanManager bm) {
 
-        //Current API
+        // Current API
         bbd.addAnnotatedType(bm.createAnnotatedType(CompensationManagerImpl.class));
         bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorMandatory.class));
         bbd.addAnnotatedType(bm.createAnnotatedType(CompensationInterceptorNever.class));

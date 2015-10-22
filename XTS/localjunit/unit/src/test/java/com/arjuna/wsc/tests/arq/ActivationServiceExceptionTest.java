@@ -44,20 +44,17 @@ public class ActivationServiceExceptionTest extends BaseWSCTest {
     }
 
     @Test
-    public void testInvalidCreateParametersException()
-            throws Exception
-            {
-        final String messageID = "testInvalidCreateParametersException" ;
-        final String coordinationTypeURI = TestUtil.INVALID_CREATE_PARAMETERS_COORDINATION_TYPE ;
-        try
-        {
-            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageID, coordinationTypeURI, null, null) ;
+    public void testInvalidCreateParametersException() throws Exception {
+        final String messageID = "testInvalidCreateParametersException";
+        final String coordinationTypeURI = TestUtil.INVALID_CREATE_PARAMETERS_COORDINATION_TYPE;
+        try {
+            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageID,
+                    coordinationTypeURI, null, null);
+            fail("Expected exception: InvalidCreateParametersException");
+        } catch (final InvalidCreateParametersException icpe) {
+        } // Ignore, expected
+        catch (final Throwable th) {
             fail("Expected exception: InvalidCreateParametersException");
         }
-        catch (final InvalidCreateParametersException icpe) {} // Ignore, expected
-        catch (final Throwable th)
-        {
-            fail("Expected exception: InvalidCreateParametersException");
-        }
-            }
+    }
 }

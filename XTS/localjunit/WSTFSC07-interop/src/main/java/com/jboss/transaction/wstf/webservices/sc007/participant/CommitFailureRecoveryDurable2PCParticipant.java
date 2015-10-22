@@ -31,59 +31,54 @@ import com.arjuna.wst.WrongStateException;
 import com.arjuna.wst11.messaging.engines.ParticipantEngine;
 
 /**
- * The durable 2PC participant which fails the first call to commit and recovers.
+ * The durable 2PC participant which fails the first call to commit and
+ * recovers.
  */
-public class CommitFailureRecoveryDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant
-{
+public class CommitFailureRecoveryDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant {
     /**
      * The participant engine.
      */
-    private ParticipantEngine engine ;
+    private ParticipantEngine engine;
     /**
      * The set recovery flag.
      */
-    private boolean setRecovery ;
+    private boolean setRecovery;
     /**
      * The recovering flag.
      */
-    private boolean recovering ;
-    
+    private boolean recovering;
+
     /**
      * Set the participant engine.
-     * @param engine The participant engine.
+     * 
+     * @param engine
+     *            The participant engine.
      */
-    public void setEngine(final ParticipantEngine engine)
-    {
-        this.engine = engine ;
+    public void setEngine(final ParticipantEngine engine) {
+        this.engine = engine;
     }
-    
+
     /**
      * Vote to prepare.
      */
-    public Vote prepare()
-        throws WrongStateException, SystemException
-    {
-        return new Prepared() ;
+    public Vote prepare() throws WrongStateException, SystemException {
+        return new Prepared();
     }
-    
-    public void commit()
-        throws WrongStateException, SystemException
-    {
-        if (!setRecovery)
-        {
-            setRecovery = true ;
+
+    public void commit() throws WrongStateException, SystemException {
+        if (!setRecovery) {
+            setRecovery = true;
             final TimerTask timerTask = new TimerTask() {
                 public void run() {
-                    recovering = true ;
-                    engine.recovery() ;
+                    recovering = true;
+                    engine.recovery();
                 }
-            } ;
-            TransportTimer.getTimer().schedule(timerTask, 2000) ;
+            };
+            TransportTimer.getTimer().schedule(timerTask, 2000);
         }
-        
-        if (!recovering)
-        {
-            throw new IllegalStateException("Forced failure of commit") ;
+
+        if (!recovering) {
+            throw new IllegalStateException("Forced failure of commit");
         }
     }
 }

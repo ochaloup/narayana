@@ -54,7 +54,7 @@ public class TransactionSynchronizationRegistryTest {
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);

@@ -65,7 +65,7 @@ public class CompensationManagerService {
         try {
             compensationManagerService2.doWork();
         } catch (MyRuntimeException e) {
-            //try to handle, but the work marked as compensate only.
+            // try to handle, but the work marked as compensate only.
         }
     }
 
@@ -88,7 +88,7 @@ public class CompensationManagerService {
         try {
             compensationManagerService2.doWorkCompensateIfFails(fail);
         } catch (MyRuntimeException e) {
-            //try to handle, but the work marked as compensate only.
+            // try to handle, but the work marked as compensate only.
         }
     }
 

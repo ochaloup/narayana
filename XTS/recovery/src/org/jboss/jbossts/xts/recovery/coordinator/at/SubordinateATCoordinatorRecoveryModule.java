@@ -40,242 +40,217 @@ import java.util.Vector;
 import java.util.Enumeration;
 
 /**
- * This class is a plug-in module for the recovery manager.
- * It is responsible for recovering failed XTS AT subordinate (SubordinateCoordinator) transactions.
- * (instances of com.arjuna.mwlabs.wscf.model.twophase.arjunacore.subordinate.SubordinateCoordinator)
+ * This class is a plug-in module for the recovery manager. It is responsible
+ * for recovering failed XTS AT subordinate (SubordinateCoordinator)
+ * transactions. (instances of
+ * com.arjuna.mwlabs.wscf.model.twophase.arjunacore.subordinate.SubordinateCoordinator)
  *
  * $Id$
  *
  */
-public class SubordinateATCoordinatorRecoveryModule implements XTSRecoveryModule
-{
-    public SubordinateATCoordinatorRecoveryModule()
-    {
+public class SubordinateATCoordinatorRecoveryModule implements XTSRecoveryModule {
+    public SubordinateATCoordinatorRecoveryModule() {
         if (RecoveryLogger.logger.isDebugEnabled()) {
             RecoveryLogger.logger.debug("SubordinateATCoordinatorRecoveryModule created - default");
         }
 
-        if (_recoveryStore == null)
-        {
+        if (_recoveryStore == null) {
             _recoveryStore = StoreManager.getRecoveryStore();
         }
 
-        _transactionStatusConnectionMgr = new TransactionStatusConnectionManager() ;
+        _transactionStatusConnectionMgr = new TransactionStatusConnectionManager();
     }
 
     /**
-     * called by the service startup code before the recovery module is added to the recovery managers
-     * module list
+     * called by the service startup code before the recovery module is added to
+     * the recovery managers module list
      */
-    public void install()
-    {
-        // nothing to do here as we share the implementations used by the ACCoordinatorRecoveryModule
+    public void install() {
+        // nothing to do here as we share the implementations used by the
+        // ACCoordinatorRecoveryModule
     }
 
     /**
-     * module list in order to allow the implementations list to be purged of this module's implementations
+     * module list in order to allow the implementations list to be purged of
+     * this module's implementations
      */
-    public void uninstall()
-    {
-        // nothing to do here as we share the implementations used by the ACCoordinatorRecoveryModule
+    public void uninstall() {
+        // nothing to do here as we share the implementations used by the
+        // ACCoordinatorRecoveryModule
     }
 
     /**
      * This is called periodically by the RecoveryManager
      */
-    public void periodicWorkFirstPass()
-    {
+    public void periodicWorkFirstPass() {
         // Transaction type
-        boolean SubordinateCoordinators = false ;
+        boolean SubordinateCoordinators = false;
 
         // uids per transaction type
-        InputObjectState acc_uids = new InputObjectState() ;
+        InputObjectState acc_uids = new InputObjectState();
 
-        try
-        {
+        try {
             if (RecoveryLogger.logger.isDebugEnabled()) {
                 RecoveryLogger.logger.debug("StatusModule: first pass ");
             }
 
-            SubordinateCoordinators = _recoveryStore.allObjUids( _transactionType, acc_uids );
+            SubordinateCoordinators = _recoveryStore.allObjUids(_transactionType, acc_uids);
 
-        }
-        catch ( ObjectStoreException ex )
-        {
+        } catch (ObjectStoreException ex) {
             RecoveryLogger.i18NLogger.warn_coordinator_at_SubordinateATCoordinatorRecoveryModule_1(ex);
         }
 
-        if ( SubordinateCoordinators )
-        {
-            _transactionUidVector = processTransactions( acc_uids ) ;
+        if (SubordinateCoordinators) {
+            _transactionUidVector = processTransactions(acc_uids);
         }
     }
 
-    public void periodicWorkSecondPass()
-    {
+    public void periodicWorkSecondPass() {
         if (RecoveryLogger.logger.isDebugEnabled()) {
             RecoveryLogger.logger.debug("SubordinateATCoordinatorRecoveryModule: Second pass ");
         }
 
         if (_transactionUidVector != null) {
-            processTransactionsStatus() ;
+            processTransactionsStatus();
         }
 
-        // ok notify the coordinator processor that recovery processing has completed
+        // ok notify the coordinator processor that recovery processing has
+        // completed
 
     }
 
-    protected SubordinateATCoordinatorRecoveryModule(String type)
-    {
+    protected SubordinateATCoordinatorRecoveryModule(String type) {
         if (RecoveryLogger.logger.isDebugEnabled()) {
             RecoveryLogger.logger.debug("SubordinateATCoordinatorRecoveryModule created " + type);
         }
 
-        if (_recoveryStore == null)
-        {
+        if (_recoveryStore == null) {
             _recoveryStore = StoreManager.getRecoveryStore();
         }
 
-        _transactionStatusConnectionMgr = new TransactionStatusConnectionManager() ;
+        _transactionStatusConnectionMgr = new TransactionStatusConnectionManager();
         _transactionType = type;
 
     }
 
-    private void doRecoverTransaction( Uid recoverUid )
-    {
-        boolean commitThisTransaction = true ;
+    private void doRecoverTransaction(Uid recoverUid) {
+        boolean commitThisTransaction = true;
 
-        // if the subordinate transaction has already been recovered and has not committed
+        // if the subordinate transaction has already been recovered and has not
+        // committed
         // then we don't create a new one
 
         if (SubordinateATCoordinator.getRecoveredCoordinator(recoverUid.stringForm()) != null) {
             return;
         }
 
-        // if there is no entry and there is still a log entry then we need to create a new coordinator
-        
+        // if there is no entry and there is still a log entry then we need to
+        // create a new coordinator
+
         // Retrieve the transaction status from its original process.
-        // n.b. for a non-active XTS TX this status will always be committed even
+        // n.b. for a non-active XTS TX this status will always be committed
+        // even
         // if it aborted or had a heuristic outcome. in that case we need to use
         // the logged action status which can only be retrieved after activation
 
-        int theStatus = _transactionStatusConnectionMgr.getTransactionStatus( _transactionType, recoverUid ) ;
+        int theStatus = _transactionStatusConnectionMgr.getTransactionStatus(_transactionType, recoverUid);
 
-        boolean inFlight = isTransactionInMidFlight( theStatus ) ;
+        boolean inFlight = isTransactionInMidFlight(theStatus);
 
-        String Status = ActionStatus.stringForm( theStatus ) ;
+        String Status = ActionStatus.stringForm(theStatus);
 
         if (RecoveryLogger.logger.isDebugEnabled()) {
-            RecoveryLogger.logger.debug("transaction type is " + _transactionType + " uid is " +
-                    recoverUid.toString() + "\n ActionStatus is " + Status +
-                    " in flight is " + inFlight);
+            RecoveryLogger.logger.debug("transaction type is " + _transactionType + " uid is " + recoverUid.toString()
+                    + "\n ActionStatus is " + Status + " in flight is " + inFlight);
         }
 
-        if ( ! inFlight )
-        {
+        if (!inFlight) {
             try {
                 RecoveryLogger.logger.debug("jjh doing revovery here for " + recoverUid);
-                RecoverySubordinateATCoordinator rcvSubordinateCoordinator =
-                        new RecoverySubordinateATCoordinator(recoverUid);
+                RecoverySubordinateATCoordinator rcvSubordinateCoordinator = new RecoverySubordinateATCoordinator(
+                        recoverUid);
                 rcvSubordinateCoordinator.replayPhase2();
-            }
-            catch ( Exception ex )
-            {
+            } catch (Exception ex) {
                 RecoveryLogger.i18NLogger.warn_coordinator_at_SubordinateATCoordinatorRecoveryModule_2(recoverUid, ex);
             }
         }
     }
 
-    private boolean isTransactionInMidFlight( int status )
-    {
-        boolean inFlight = false ;
+    private boolean isTransactionInMidFlight(int status) {
+        boolean inFlight = false;
 
-        switch ( status )
-        {
+        switch (status) {
             // these states can only come from a process that is still alive
-            case ActionStatus.RUNNING    :
+            case ActionStatus.RUNNING :
             case ActionStatus.ABORT_ONLY :
-            case ActionStatus.PREPARING  :
+            case ActionStatus.PREPARING :
             case ActionStatus.COMMITTING :
-            case ActionStatus.ABORTING   :
-            case ActionStatus.PREPARED   :
-                inFlight = true ;
-                break ;
+            case ActionStatus.ABORTING :
+            case ActionStatus.PREPARED :
+                inFlight = true;
+                break;
 
-                // the transaction is apparently still there, but has completed its
-                // phase2. should be safe to redo it.
-            case ActionStatus.COMMITTED  :
-            case ActionStatus.H_COMMIT   :
-            case ActionStatus.H_MIXED    :
-            case ActionStatus.H_HAZARD   :
-            case ActionStatus.ABORTED    :
+            // the transaction is apparently still there, but has completed its
+            // phase2. should be safe to redo it.
+            case ActionStatus.COMMITTED :
+            case ActionStatus.H_COMMIT :
+            case ActionStatus.H_MIXED :
+            case ActionStatus.H_HAZARD :
+            case ActionStatus.ABORTED :
             case ActionStatus.H_ROLLBACK :
-                inFlight = false ;
-                break ;
+                inFlight = false;
+                break;
 
-                // this shouldn't happen
+            // this shouldn't happen
             case ActionStatus.INVALID :
-            default:
-                inFlight = false ;
+            default :
+                inFlight = false;
         }
 
-        return inFlight ;
+        return inFlight;
     }
 
-    private Vector processTransactions( InputObjectState uids )
-    {
-        Vector uidVector = new Vector() ;
+    private Vector processTransactions(InputObjectState uids) {
+        Vector uidVector = new Vector();
 
         if (RecoveryLogger.logger.isDebugEnabled()) {
-            RecoveryLogger.logger.debug("processing " + _transactionType
-                    + " transactions");
+            RecoveryLogger.logger.debug("processing " + _transactionType + " transactions");
         }
 
         final Uid NULL_UID = Uid.nullUid();
         Uid theUid = null;
 
-        while (true)
-        {
-            try
-            {
-                theUid = UidHelper.unpackFrom( uids ) ;
-            }
-            catch ( Exception ex )
-            {
+        while (true) {
+            try {
+                theUid = UidHelper.unpackFrom(uids);
+            } catch (Exception ex) {
                 break;
             }
-            if (theUid.equals(NULL_UID ))
-            {
+            if (theUid.equals(NULL_UID)) {
                 break;
             }
             if (RecoveryLogger.logger.isDebugEnabled()) {
                 RecoveryLogger.logger.debug("found transaction " + theUid);
             }
 
-            uidVector.addElement( theUid ) ;
+            uidVector.addElement(theUid);
         }
 
-        return uidVector ;
+        return uidVector;
     }
 
-    private void processTransactionsStatus()
-    {
+    private void processTransactionsStatus() {
         // Process the Vector of transaction Uids
-        Enumeration transactionUidEnum = _transactionUidVector.elements() ;
+        Enumeration transactionUidEnum = _transactionUidVector.elements();
 
-        while ( transactionUidEnum.hasMoreElements() )
-        {
+        while (transactionUidEnum.hasMoreElements()) {
             Uid currentUid = (Uid) transactionUidEnum.nextElement();
 
-            try
-            {
-                if ( _recoveryStore.currentState( currentUid, _transactionType ) != StateStatus.OS_UNKNOWN )
-                {
-                    doRecoverTransaction( currentUid ) ;
+            try {
+                if (_recoveryStore.currentState(currentUid, _transactionType) != StateStatus.OS_UNKNOWN) {
+                    doRecoverTransaction(currentUid);
                 }
-            }
-            catch ( ObjectStoreException ex )
-            {
+            } catch (ObjectStoreException ex) {
                 RecoveryLogger.i18NLogger.warn_coordinator_at_SubordinateATCoordinatorRecoveryModule_3(currentUid, ex);
             }
         }
@@ -284,17 +259,17 @@ public class SubordinateATCoordinatorRecoveryModule implements XTSRecoveryModule
     }
 
     // 'type' within the Object Store for ACCoordinator.
-    private String _transactionType = SubordinateATCoordinator.TRANSACTION_TYPE ;
+    private String _transactionType = SubordinateATCoordinator.TRANSACTION_TYPE;
 
     // Array of transactions found in the object store of the
     // ACCoordinator type.
-    private Vector _transactionUidVector = null ;
+    private Vector _transactionUidVector = null;
 
     // Reference to the Object Store.
-    private static RecoveryStore _recoveryStore = null ;
+    private static RecoveryStore _recoveryStore = null;
 
     // This object manages the interface to all TransactionStatusManagers
     // processes(JVMs) on this system/node.
-    private TransactionStatusConnectionManager _transactionStatusConnectionMgr ;
+    private TransactionStatusConnectionManager _transactionStatusConnectionMgr;
 
 }

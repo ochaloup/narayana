@@ -42,23 +42,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class HeuristicConfirm implements Status
-{
+public class HeuristicConfirm implements Status {
 
-    public static HeuristicConfirm instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "org.w3c.wscf.twophase.status.HeuristicConfirm";
+    public static HeuristicConfirm instance() {
+        return _instance;
     }
 
-    private HeuristicConfirm ()
-    {
+    public String toString() {
+        return "org.w3c.wscf.twophase.status.HeuristicConfirm";
+    }
+
+    private HeuristicConfirm() {
     }
 
     private static final HeuristicConfirm _instance = new HeuristicConfirm();
-    
+
 }

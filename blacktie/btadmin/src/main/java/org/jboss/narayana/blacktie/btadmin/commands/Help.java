@@ -133,7 +133,8 @@ public class Help implements Command {
             File[] files = directory.listFiles();
             for (File file : files) {
                 if (file.getName().endsWith(".class") && file.getName().indexOf('$') < 0) {
-                    classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+                    classes.add(Class
+                            .forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
                 }
             }
         }

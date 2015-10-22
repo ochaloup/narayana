@@ -41,23 +41,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class NoTransaction implements Status
-{
+public class NoTransaction implements Status {
 
-    public static NoTransaction instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "Status.NoTransaction";
+    public static NoTransaction instance() {
+        return _instance;
     }
 
-    private NoTransaction ()
-    {
+    public String toString() {
+        return "Status.NoTransaction";
+    }
+
+    private NoTransaction() {
     }
 
     private static final NoTransaction _instance = new NoTransaction();
-    
+
 }

@@ -39,10 +39,10 @@ import org.jboss.logging.annotations.MessageLogger;
 public interface jdbcI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 17001, value = "Rollback not allowed by transaction service.", format = MESSAGE_FORMAT)
@@ -80,21 +80,22 @@ public interface jdbcI18NLogger {
     @Message(id = 17011, value = "Delist of resource failed.", format = MESSAGE_FORMAT)
     public String get_delisterror();
 
-//    @Message(id = 17012, value = "Caught exception", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_drcclose();
+    // @Message(id = 17012, value = "Caught exception", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_drcclose();
 
     @Message(id = 17013, value = "Caught exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_drcdest(@Cause() Throwable arg0);
 
-//    @Message(id = 17014, value = "caught exception:", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_drivers_exception();
+    // @Message(id = 17014, value = "caught exception:", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_drivers_exception();
 
-//    @Message(id = 17015, value = "database not for", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_drivers_invaliddb();
+    // @Message(id = 17015, value = "database not for", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_drivers_invaliddb();
 
     @Message(id = 17016, value = "Failed to load dynamic class", format = MESSAGE_FORMAT)
     public String get_dynamicerror();
@@ -106,9 +107,9 @@ public interface jdbcI18NLogger {
     @LogMessage(level = WARN)
     public void warn_getmoderror(@Cause() Throwable arg0);
 
-//    @Message(id = 17019, value = "Caught exception", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_idrcclose();
+    // @Message(id = 17019, value = "Caught exception", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_idrcclose();
 
     @Message(id = 17020, value = "Transaction is not active on the thread!", format = MESSAGE_FORMAT)
     public String get_inactivetransaction();
@@ -116,13 +117,14 @@ public interface jdbcI18NLogger {
     @Message(id = 17021, value = "Could not get transaction information.", format = MESSAGE_FORMAT)
     public String get_infoerror();
 
-//    @Message(id = 17022, value = "Caught exception", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_ircdest();
+    // @Message(id = 17022, value = "Caught exception", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_ircdest();
 
-//    @Message(id = 17023, value = "{0} - failed to set isolation level: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_isolationlevelfailget(String arg0, String arg1);
+    // @Message(id = 17023, value = "{0} - failed to set isolation level: {1}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_isolationlevelfailget(String arg0, String arg1);
 
     @Message(id = 17024, value = "{0} - failed to set isolation level", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -131,8 +133,9 @@ public interface jdbcI18NLogger {
     @Message(id = 17025, value = "Could not resolve JNDI XADataSource", format = MESSAGE_FORMAT)
     public String get_jndierror();
 
-//    @Message(id = 17026, value = "Can't load ConnectionImple class {0}", format = MESSAGE_FORMAT)
-//    public String get_nojdbcimple(String arg0);
+    // @Message(id = 17026, value = "Can't load ConnectionImple class {0}",
+    // format = MESSAGE_FORMAT)
+    // public String get_nojdbcimple(String arg0);
 
     @Message(id = 17027, value = "An exception occurred during initialisation.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -146,9 +149,10 @@ public interface jdbcI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_xa_initexp(@Cause() Throwable arg0);
 
-//    @Message(id = 17030, value = "{0} could not find information for connection!", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_xa_xarec(String arg0);
+    // @Message(id = 17030, value = "{0} could not find information for
+    // connection!", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_xa_xarec(String arg0);
 
     @Message(id = 17031, value = "rollback(Savepoint) not allowed inside distributed tx.", format = MESSAGE_FORMAT)
     public String get_releasesavepointerror();
@@ -166,22 +170,22 @@ public interface jdbcI18NLogger {
     @Message(id = 17035, value = "setSavepoint not allowed inside distributed tx.", format = MESSAGE_FORMAT)
     public String get_setsavepointerror();
 
-//    @Message(id = 17036, value = "State must be:", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_stateerror();
+    // @Message(id = 17036, value = "State must be:", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_stateerror();
 
     @Message(id = 17037, value = "Could not resolve JNDI XADataSource", format = MESSAGE_FORMAT)
     public String get_xa_recjndierror();
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
-    */
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
+     */
 }

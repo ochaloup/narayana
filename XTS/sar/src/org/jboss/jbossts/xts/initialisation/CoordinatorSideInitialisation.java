@@ -17,10 +17,8 @@ import org.jboss.jbossts.xts.recovery.coordinator.CoordinatorRecoveryInitialisat
 /**
  * A class used to perform all 1.1 coordinator side initialisation
  */
-public class CoordinatorSideInitialisation implements XTSInitialisation
-{
-    public void startup() throws Exception
-    {
+public class CoordinatorSideInitialisation implements XTSInitialisation {
+    public void startup() throws Exception {
         // run WS-C initialisation code
 
         ActivationCoordinatorInitialisation.startup();
@@ -41,7 +39,7 @@ public class CoordinatorSideInitialisation implements XTSInitialisation
         WSTCoordinatorInitialisation.startup();
 
         // run WSCF startup code
-        
+
         WSCFInitialisation.startup();
 
         // there is no WSTX coordinator startup
@@ -51,8 +49,7 @@ public class CoordinatorSideInitialisation implements XTSInitialisation
         CoordinatorRecoveryInitialisation.startup();
     }
 
-    public void shutdown() throws Exception
-    {
+    public void shutdown() throws Exception {
         // run recovery shutdown code
 
         CoordinatorRecoveryInitialisation.shutdown();

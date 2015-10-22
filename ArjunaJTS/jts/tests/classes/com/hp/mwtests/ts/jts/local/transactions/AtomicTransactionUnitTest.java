@@ -47,101 +47,92 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.DemoSubTranResource;
 import com.hp.mwtests.ts.jts.orbspecific.resources.demosync;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-
-public class AtomicTransactionUnitTest extends TestBase
-{
+public class AtomicTransactionUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         AtomicTransaction A = new AtomicTransaction();
-        
+
         A.begin();
-        
+
         assertTrue(A.get_transaction_name() != null);
-        
+
         A.set_timeout(10);
-        
+
         assertEquals(A.get_timeout(), 10);
-        
+
         assertTrue(A.getTimeout() != -1);
         assertTrue(A.get_txcontext() != null);
         assertTrue(A.get_uid().notEquals(Uid.nullUid()));
         assertTrue(A.control() != null);
-        
+
         assertFalse(A.equals(null));
         assertTrue(A.equals(A));
         assertFalse(A.equals(new AtomicTransaction()));
-        
+
         A.rollback();
     }
-    
+
     @Test
-    public void testCommit () throws Exception
-    {
+    public void testCommit() throws Exception {
         AtomicTransaction A = new AtomicTransaction();
-        
+
         A.begin();
-        
+
         assertTrue(A.get_txcontext() != null);
-        
+
         A.registerResource(new DemoResource().getResource());
-        
+
         AtomicTransaction B = new AtomicTransaction();
-        
+
         B.begin();
-        
+
         B.registerSubtranAware(new DemoSubTranResource().getReference());
-        
+
         B.commit(true);
-        
+
         A.commit(true);
-        
+
         A = new AtomicTransaction();
-        
+
         A.begin();
-        
+
         A.rollbackOnly();
-        
-        try
-        {
+
+        try {
             A.commit(true);
-            
+
             fail();
-        }
-        catch (final TRANSACTION_ROLLEDBACK ex)
-        {
+        } catch (final TRANSACTION_ROLLEDBACK ex) {
         }
     }
-    
+
     @Test
-    public void testRollback () throws Exception
-    {
+    public void testRollback() throws Exception {
         AtomicTransaction A = new AtomicTransaction();
-        
+
         A.begin();
-        
+
         A.registerSynchronization(new demosync(false).getReference());
-        
+
         A.rollback();
     }
-    
+
     @Test
-    public void testSuspendResume () throws Exception
-    {
+    public void testSuspendResume() throws Exception {
         AtomicTransaction A = new AtomicTransaction();
-        
+
         A.begin();
-        
+
         assertTrue(A.control() != null);
-        
+
         A.suspend();
-        
+
         assertEquals(OTSImpleManager.current().get_control(), null);
-        
+
         A.resume();
-        
+
         assertTrue(OTSImpleManager.current() != null);
-        
+
         A.rollback();
     }
 }

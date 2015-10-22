@@ -31,220 +31,180 @@ import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 /**
  * Simple record used to test AtomicAction
  */
-public class BasicAbstractRecord extends AbstractRecord
-{
-    public BasicAbstractRecord()
-    {
+public class BasicAbstractRecord extends AbstractRecord {
+    public BasicAbstractRecord() {
         super(new Uid());
     }
 
     /**
      * This constructor will be used to recreate the object from an old uid.
      */
-    public BasicAbstractRecord(Uid oldId)
-    {
+    public BasicAbstractRecord(Uid oldId) {
         super(oldId);
     }
 
-    public int typeIs()
-    {
+    public int typeIs() {
         return RecordType.USER_DEF_FIRST0;
     }
 
-    public Object value()
-    {
+    public Object value() {
         return null;
     }
 
-    public void setValue(Object object)
-    {
+    public void setValue(Object object) {
     }
 
-    public int nestedAbort()
-    {
+    public int nestedAbort() {
         qautil.qadebug("nested abort has been called : " + order());
         mNestedAbortCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedOnePhaseCommit()
-    {
+    public int nestedOnePhaseCommit() {
         qautil.qadebug("nested one phase comit has been called : " + order());
         mNestedCommitCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedCommit()
-    {
+    public int nestedCommit() {
         qautil.qadebug("nested comit has been called : " + order());
         mNestedCommitCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedPrepare()
-    {
+    public int nestedPrepare() {
         mNestedPrepareCounter++;
         return TwoPhaseOutcome.PREPARE_OK;
     }
 
-    public int topLevelAbort()
-    {
+    public int topLevelAbort() {
         qautil.qadebug("top level abort has been called : " + order());
         mTopLevelAbortCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelOnePhaseCommit()
-    {
+    public int topLevelOnePhaseCommit() {
         qautil.qadebug("top level one phase commit has been called : " + order());
         mTopLevelCommitCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelCommit()
-    {
+    public int topLevelCommit() {
         qautil.qadebug("top level commit has been called : " + order());
         mTopLevelCommitCounter++;
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelPrepare()
-    {
+    public int topLevelPrepare() {
         qautil.qadebug("prep has been called : " + order());
         mTopLevelPrepareCounter++;
         return TwoPhaseOutcome.PREPARE_OK;
     }
 
-    public void alter(AbstractRecord abstractRecord)
-    {
+    public void alter(AbstractRecord abstractRecord) {
     }
 
-    public void merge(AbstractRecord abstractRecord)
-    {
+    public void merge(AbstractRecord abstractRecord) {
     }
 
-    public boolean shouldAdd(AbstractRecord abstractRecord)
-    {
+    public boolean shouldAdd(AbstractRecord abstractRecord) {
         return false;
     }
 
-    public boolean shouldAlter(AbstractRecord abstractRecord)
-    {
+    public boolean shouldAlter(AbstractRecord abstractRecord) {
         return false;
     }
 
-    public boolean shouldMerge(AbstractRecord abstractRecord)
-    {
+    public boolean shouldMerge(AbstractRecord abstractRecord) {
         return false;
     }
 
-    public boolean shouldReplace(AbstractRecord abstractRecord)
-    {
+    public boolean shouldReplace(AbstractRecord abstractRecord) {
         return false;
     }
 
     /**
-     * My methods to test abstract record is being processed correctly by the transaction
-     * manager.
+     * My methods to test abstract record is being processed correctly by the
+     * transaction manager.
      */
-    public void increase()
-    {
+    public void increase() {
         mValue++;
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return mValue;
     }
 
     /**
      * Override method to indicate we want this object to be saved.
      */
-    public boolean doSave()
-    {
+    public boolean doSave() {
         return true;
     }
 
-    public boolean save_state(OutputObjectState objectState, int objectType)
-    {
+    public boolean save_state(OutputObjectState objectState, int objectType) {
         qautil.qadebug("save state called when value = " + mValue);
         mStaveStateCounter++;
         super.save_state(objectState, objectType);
-        try
-        {
+        try {
             objectState.packInt(mValue);
             return true;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             qautil.debug("BasicAbstractRecord.save_state: ", exception);
             return false;
         }
     }
 
     /**
-     * As this is an abstract record restore state does not function as a ait object
-     * but will be used by the crash recovery engine.
+     * As this is an abstract record restore state does not function as a ait
+     * object but will be used by the crash recovery engine.
      */
-    public boolean restore_state(InputObjectState objectState, int objectType)
-    {
+    public boolean restore_state(InputObjectState objectState, int objectType) {
         qautil.qadebug("restore state called");
         super.restore_state(objectState, objectType);
-        try
-        {
+        try {
             mValue = objectState.unpackInt();
             qautil.qadebug("value restored to " + mValue);
             return true;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             qautil.debug("BasicAbstractRecord.restore_state: ", exception);
             return false;
         }
     }
 
-    public String type()
-    {
+    public String type() {
         return "/StateManager/BasicAbstractRecord";
     }
 
-    public static String thisType()
-    {
+    public static String thisType() {
         return "/StateManager/BasicAbstractRecord";
     }
 
-    public int getStateCounter()
-    {
+    public int getStateCounter() {
         return mStaveStateCounter;
     }
 
-    public int getTLC()
-    {
+    public int getTLC() {
         return mTopLevelCommitCounter;
     }
 
-    public int getTLP()
-    {
+    public int getTLP() {
         return mTopLevelPrepareCounter;
     }
 
-    public int getTLA()
-    {
+    public int getTLA() {
         return mTopLevelAbortCounter;
     }
 
-    public int getNP()
-    {
+    public int getNP() {
         return mNestedPrepareCounter;
     }
 
-    public int getNC()
-    {
+    public int getNC() {
         return mNestedCommitCounter;
     }
 
-    public int getNA()
-    {
+    public int getNA() {
         return mNestedAbortCounter;
     }
 
@@ -257,4 +217,3 @@ public class BasicAbstractRecord extends AbstractRecord
     private int mNestedAbortCounter = 0;
     private int mValue = 0;
 }
-

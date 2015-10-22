@@ -30,85 +30,94 @@ import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
 import com.arjuna.ats.internal.jts.utils.Helper;
 
 /**
- * a wrapper used to wrap a ControlImple or a Control when attempting to remove it from the TransactionReaper
- * transactions list. this wrapper ensures that hashcode and equals calls compare correctly while performing
- * as few remote invocations as possible to do the comparison.
+ * a wrapper used to wrap a ControlImple or a Control when attempting to remove
+ * it from the TransactionReaper transactions list. this wrapper ensures that
+ * hashcode and equals calls compare correctly while performing as few remote
+ * invocations as possible to do the comparison.
  */
-public class PseudoControlWrapper
-{
+public class PseudoControlWrapper {
     // public API
 
     /**
-     * wrap a Control in a wrapper which can be used to test for equality against ControlWrapper instances
-     * n.b. the Control must have been determined to be a non-local control by the caller
+     * wrap a Control in a wrapper which can be used to test for equality
+     * against ControlWrapper instances n.b. the Control must have been
+     * determined to be a non-local control by the caller
      *
      * @param control
      */
-    public PseudoControlWrapper(Control control)
-    {
-        _coordinator = null;    // for non-local control -- only compute when needed
+    public PseudoControlWrapper(Control control) {
+        _coordinator = null; // for non-local control -- only compute when
+                                // needed
         _control = control;
-        _uid = null;            // for non-local control -- only compute when needed
+        _uid = null; // for non-local control -- only compute when needed
         _local = null;
         _hashCode = computeHashCode();
     }
 
     /**
-     * wrap a ControlImple in a wrapper which can be used to test for equality against ControlWrapper instances
+     * wrap a ControlImple in a wrapper which can be used to test for equality
+     * against ControlWrapper instances
      *
      * @param controlImple
      */
-    public PseudoControlWrapper(ControlImple controlImple)
-    {
-        _coordinator = null;    // for non-local control -- only compute when needed
+    public PseudoControlWrapper(ControlImple controlImple) {
+        _coordinator = null; // for non-local control -- only compute when
+                                // needed
         _control = null;
-        _uid = null;            // for non-local control -- only compute when needed
+        _uid = null; // for non-local control -- only compute when needed
         _local = controlImple;
         _hashCode = computeHashCode();
     }
 
     /**
-     * this returns the same hashcode as ControlWrapper for a given Control or ControlImple
+     * this returns the same hashcode as ControlWrapper for a given Control or
+     * ControlImple
      *
      * @return the hashcode of the object
      */
-    public int hashCode()
-    {
+    public int hashCode() {
         return _hashCode;
     }
 
     /**
-     * Test whether this PseudoControlWrapper wraps the same Control as a ControlWrapper
+     * Test whether this PseudoControlWrapper wraps the same Control as a
+     * ControlWrapper
      *
-     * The equality rules differ depending upon whether this wraps a local or remote Control
+     * The equality rules differ depending upon whether this wraps a local or
+     * remote Control
      *
-     * if the wrapped control is local then the local uid can be compared against the uid cached in the ControlWrapper
+     * if the wrapped control is local then the local uid can be compared
+     * against the uid cached in the ControlWrapper
      *
-     * if the wrapped control is non-local then the test depends upon whether the ControlWrapper wraps a local
-     * or remote control. in the former case a uid comparison can be used. in the latter case the coordinators of
-     * the two controls must be obtained and a call to coord.is_same_transaction(othercoord) must be used.
+     * if the wrapped control is non-local then the test depends upon whether
+     * the ControlWrapper wraps a local or remote control. in the former case a
+     * uid comparison can be used. in the latter case the coordinators of the
+     * two controls must be obtained and a call to
+     * coord.is_same_transaction(othercoord) must be used.
      *
-     * @caveats this comparison is only defined against instances of ControlWrapper because this class should only be
-     * used to wrap a control for comparison against an entry in the TransactionReaper's list of controls and should
-     * only compare equal to an entry which is a ControlWrapper for the same Control. as such it breaks all the
-     * rules for an equals implementation and should not be expected to work anywhere else.
+     * @caveats this comparison is only defined against instances of
+     *          ControlWrapper because this class should only be used to wrap a
+     *          control for comparison against an entry in the
+     *          TransactionReaper's list of controls and should only compare
+     *          equal to an entry which is a ControlWrapper for the same
+     *          Control. as such it breaks all the rules for an equals
+     *          implementation and should not be expected to work anywhere else.
      *
      *
      */
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (o instanceof ControlWrapper) {
-            ControlWrapper wrapper = (ControlWrapper)o;
+            ControlWrapper wrapper = (ControlWrapper) o;
 
             if (_local != null) {
-                // the other guys uid will already have been computed so just do a uid -- uid comparison
+                // the other guys uid will already have been computed so just do
+                // a uid -- uid comparison
                 return _local.get_uid().equals(wrapper.get_uid());
             } else if (_control == null) {
                 return false;
             } else if (wrapper.isLocal()) {
                 // the other control is local so a UID comparison must be ok
-                try
-                {
+                try {
                     // make sure we have our uid
                     if (_uid == null) {
                         _uid = computeUid();
@@ -119,9 +128,11 @@ public class PseudoControlWrapper
                 }
             } else {
                 /*
-                 * Trying to compare two non-local controls -- assuming the previous implementation was correct we
-                 * need to do a full comparison of this control's coordinator against the wrapper control's coordinator
-                 * TODO why can't we just get the two UIDs and compare them?
+                 * Trying to compare two non-local controls -- assuming the
+                 * previous implementation was correct we need to do a full
+                 * comparison of this control's coordinator against the wrapper
+                 * control's coordinator TODO why can't we just get the two UIDs
+                 * and compare them?
                  */
                 try {
                     // make sure we have our coordinator
@@ -140,24 +151,26 @@ public class PseudoControlWrapper
 
     /**
      * fetch the coordinator for the wrapped non-local control
+     * 
      * @return the remote coordinator
-     * @throws Exception if the coordinator cannot be obtained e.g. because the control is no longer valid
+     * @throws Exception
+     *             if the coordinator cannot be obtained e.g. because the
+     *             control is no longer valid
      */
-    private Coordinator computeCoordinator()
-            throws Exception
-    {
+    private Coordinator computeCoordinator() throws Exception {
         return _control.get_coordinator();
 
     }
 
     /**
      * fetc the uid for the wrapped non-local control
+     * 
      * @return the uid
-     * @throws Exception if the coordinator cannot be obtained e.g. because the control is no longer valid
+     * @throws Exception
+     *             if the coordinator cannot be obtained e.g. because the
+     *             control is no longer valid
      */
-    private Uid computeUid()
-            throws Exception
-    {
+    private Uid computeUid() throws Exception {
         if (_coordinator == null) {
             _coordinator = computeCoordinator();
         }
@@ -168,11 +181,12 @@ public class PseudoControlWrapper
     }
 
     /**
-     * compute the hashcode for the wrapped local or remote control using the same algorithm as ControlWrapper
+     * compute the hashcode for the wrapped local or remote control using the
+     * same algorithm as ControlWrapper
+     * 
      * @return the hashcode
      */
-    private int computeHashCode()
-    {
+    private int computeHashCode() {
         try {
             if (_local != null) {
                 return _local.getImplHandle().hash_transaction();

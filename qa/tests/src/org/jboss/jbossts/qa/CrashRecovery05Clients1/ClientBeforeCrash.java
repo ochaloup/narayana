@@ -23,7 +23,7 @@ public class ClientBeforeCrash extends ClientCrashBase {
         service = BeforeCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR));
     }
 
-    public void initCrashBehaviour(CrashBehavior ... behaviors) throws Exception {
+    public void initCrashBehaviour(CrashBehavior... behaviors) throws Exception {
         int i = 0;
 
         resourceBehaviors = new ResourceBehavior[behaviors.length];

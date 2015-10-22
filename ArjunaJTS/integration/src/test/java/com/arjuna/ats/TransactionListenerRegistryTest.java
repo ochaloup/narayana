@@ -49,19 +49,17 @@ import java.util.Iterator;
 
 public class TransactionListenerRegistryTest {
     private enum CompletionType {
-        CMT,
-        BMTCOMMIT,
-        BMTROLLBACK,
-        CMTSUSPEND
+        CMT, BMTCOMMIT, BMTROLLBACK, CMTSUSPEND
     };
-  
-  @Test
-  public void testResume() throws SystemException, InvalidTransactionException {
-    TransactionManager tm = new TransactionManagerDelegate();
-        tm.resume(null); // JBTM-2385 used to cause an NPE 
-  }
 
-    private EnumSet<EventType> runTxn(TransactionManager tm) throws SystemException, TransactionTypeNotSupported, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    @Test
+    public void testResume() throws SystemException, InvalidTransactionException {
+        TransactionManager tm = new TransactionManagerDelegate();
+        tm.resume(null); // JBTM-2385 used to cause an NPE
+    }
+
+    private EnumSet<EventType> runTxn(TransactionManager tm) throws SystemException, TransactionTypeNotSupported,
+            NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         ServerVMClientUserTransaction userTransaction = new ServerVMClientUserTransaction(tm);
         TransactionListenerRegistry listenerRegistration = (TransactionListenerRegistry) tm;
         final EnumSet<EventType> log = EnumSet.noneOf(EventType.class);
@@ -90,7 +88,8 @@ public class TransactionListenerRegistryTest {
     }
 
     @Test
-    public void testIllegalCommit() throws SystemException, TransactionTypeNotSupported, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    public void testIllegalCommit() throws SystemException, TransactionTypeNotSupported, NotSupportedException,
+            HeuristicRollbackException, HeuristicMixedException, RollbackException {
         TransactionManager tm = new TransactionManagerDelegate();
 
         runTxn(tm);
@@ -103,7 +102,8 @@ public class TransactionListenerRegistryTest {
     }
 
     @Test
-    public void testIllegalRollback() throws SystemException, TransactionTypeNotSupported, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    public void testIllegalRollback() throws SystemException, TransactionTypeNotSupported, NotSupportedException,
+            HeuristicRollbackException, HeuristicMixedException, RollbackException {
         TransactionManager tm = new TransactionManagerDelegate();
 
         runTxn(tm);
@@ -116,7 +116,8 @@ public class TransactionListenerRegistryTest {
     }
 
     @Test
-    public void testLifecycle() throws SystemException, TransactionTypeNotSupported, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    public void testLifecycle() throws SystemException, TransactionTypeNotSupported, NotSupportedException,
+            HeuristicRollbackException, HeuristicMixedException, RollbackException {
         TransactionManager tm = new TransactionManagerDelegate();
         EnumSet<EventType> log = runTxn(tm);
 
@@ -124,7 +125,8 @@ public class TransactionListenerRegistryTest {
     }
 
     @Test
-    public void test() throws SystemException, NotSupportedException, RollbackException, TransactionTypeNotSupported, InterruptedException, InvalidTransactionException, HeuristicRollbackException, HeuristicMixedException {
+    public void test() throws SystemException, NotSupportedException, RollbackException, TransactionTypeNotSupported,
+            InterruptedException, InvalidTransactionException, HeuristicRollbackException, HeuristicMixedException {
 
         TransactionManager tm = new TransactionManagerDelegate();
         ServerVMClientUserTransaction userTransaction = new ServerVMClientUserTransaction(tm);

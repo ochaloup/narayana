@@ -26,59 +26,54 @@ import java.lang.reflect.Method;
 import javax.sql.XADataSource;
 
 /**
- * A simple wrapper class that uses reflection to load and configure an XADataSource.
+ * A simple wrapper class that uses reflection to load and configure an
+ * XADataSource.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2009-05
  */
-public class XADataSourceReflectionWrapper
-{
+public class XADataSourceReflectionWrapper {
     private XADataSource xaDataSource;
 
-    XADataSourceReflectionWrapper(String classname)
-    {
-        try
-        {
-            xaDataSource = (XADataSource)Class.forName(classname).newInstance();
-        }
-        catch(Exception e) {
+    XADataSourceReflectionWrapper(String classname) {
+        try {
+            xaDataSource = (XADataSource) Class.forName(classname).newInstance();
+        } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
     public void setProperty(String name, String value)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        name = "set"+name.substring(0,1).toUpperCase()+name.substring(1);
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
 
         Method[] methods = xaDataSource.getClass().getMethods();
         Method matchingMethod = null;
-        for(Method method : methods) {
-            if(method.getName().equals(name) && method.getParameterTypes().length == 1) {
+        for (Method method : methods) {
+            if (method.getName().equals(name) && method.getParameterTypes().length == 1) {
                 // ignores overloading, just takes the first match it finds.
                 matchingMethod = method;
                 break;
             }
         }
 
-        if(matchingMethod == null) {
-            throw new NoSuchMethodException("Could not match "+name);
+        if (matchingMethod == null) {
+            throw new NoSuchMethodException("Could not match " + name);
         }
 
         Class type = matchingMethod.getParameterTypes()[0];
         Object argument = value;
 
-        if(type == Integer.TYPE) {
+        if (type == Integer.TYPE) {
             argument = new Integer(value);
         }
-        if(type == Boolean.TYPE) {
+        if (type == Boolean.TYPE) {
             argument = new Boolean(value);
         }
 
         matchingMethod.invoke(xaDataSource, argument);
     }
 
-    public XADataSource getWrappedXADataSource()
-    {
+    public XADataSource getWrappedXADataSource() {
         return xaDataSource;
     }
 }

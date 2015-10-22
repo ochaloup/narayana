@@ -36,17 +36,15 @@ import java.io.IOException;
  * $Id: ORBServices.java,v 1.2 2003/06/26 11:45:07 rbegg Exp $
  */
 
-public class ORBServices
-{
+public class ORBServices {
     private static Services _services = null;
 
     public final static String transactionService = Services.transactionService;
     public final static String otsKind = com.arjuna.orbportability.Services.otsKind;
 
-    public synchronized static org.omg.CORBA.Object getService(String name, Object[] params) throws IOException, InvalidName
-    {
-        if (_services == null)
-        {
+    public synchronized static org.omg.CORBA.Object getService(String name, Object[] params)
+            throws IOException, InvalidName {
+        if (_services == null) {
             _services = new Services(ORBInterface.getORB());
         }
 

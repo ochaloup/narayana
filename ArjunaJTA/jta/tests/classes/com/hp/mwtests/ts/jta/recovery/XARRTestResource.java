@@ -47,7 +47,7 @@ import javax.transaction.xa.Xid;
 
 public class XARRTestResource implements XAResource {
 
-    private Map<File,Xid> xids = new HashMap<File, Xid>();
+    private Map<File, Xid> xids = new HashMap<File, Xid>();
     private File file;
     private String xarrHelper;
 
@@ -87,7 +87,7 @@ public class XARRTestResource implements XAResource {
 
     public Xid[] recover(int flag) throws XAException {
         System.out.println("XARRTestResource XA_RECOVER [" + xarrHelper + "] [" + xids.size() + "]");
-        return xids.values().toArray(new Xid[] {});
+        return xids.values().toArray(new Xid[]{});
     }
 
     public int prepare(Xid xid) throws XAException {

@@ -44,58 +44,47 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
  * (unlike the BasicAction default).
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: TwoPhaseCoordinator.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: TwoPhaseCoordinator.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 3.0.
  */
 
-public class TwoPhaseCoordinator extends BasicAction implements Reapable
-{
+public class TwoPhaseCoordinator extends BasicAction implements Reapable {
 
-    public TwoPhaseCoordinator ()
-    {
+    public TwoPhaseCoordinator() {
     }
 
-    public TwoPhaseCoordinator (Uid id)
-    {
+    public TwoPhaseCoordinator(Uid id) {
         super(id);
     }
 
-    public int start ()
-    {
+    public int start() {
         return start(BasicAction.Current());
     }
 
-    public int start (BasicAction parentAction)
-    {
-        if (parentAction != null)
-        {
+    public int start(BasicAction parentAction) {
+        if (parentAction != null) {
             if (typeOfAction() == ActionType.NESTED)
-            parentAction.addChildAction(this);
+                parentAction.addChildAction(this);
         }
 
         return super.Begin(parentAction);
     }
 
-    public int end (boolean report_heuristics)
-    {
+    public int end(boolean report_heuristics) {
         int outcome;
 
-        if (parent() != null)
-        {
+        if (parent() != null) {
             parent().removeChildAction(this);
         }
 
         boolean canEnd = true;
-        if(status() != ActionStatus.ABORT_ONLY || TxControl.isBeforeCompletionWhenRollbackOnly())
-        {
+        if (status() != ActionStatus.ABORT_ONLY || TxControl.isBeforeCompletionWhenRollbackOnly()) {
             canEnd = beforeCompletion();
         }
 
-        if (canEnd)
-        {
+        if (canEnd) {
             outcome = super.End(report_heuristics);
-        }
-        else
+        } else
             outcome = super.Abort();
 
         afterCompletion(outcome, report_heuristics);
@@ -108,14 +97,13 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
      * ABORT_ONLY or COMMITTING then do not call afterCompletion.
      * 
      * A scenario where this may occur is if during the completion of a previous
-     * transaction, a runtime exception is thrown from one of the AbstractRecords 
-     * methods.
+     * transaction, a runtime exception is thrown from one of the
+     * AbstractRecords methods.
      * 
-     * RuntimeExceptions are not part of the contract of the API and as such all we
-     * can do is leave the transaction alone.
+     * RuntimeExceptions are not part of the contract of the API and as such all
+     * we can do is leave the transaction alone.
      */
-    public int cancel ()
-    {
+    public int cancel() {
         if (TxStats.enabled())
             TxStats.getInstance().incrementApplicationRollbacks();
 
@@ -126,71 +114,68 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
 
         int outcome = super.Abort();
 
-        if (outcome == ActionStatus.ABORTED) { 
+        if (outcome == ActionStatus.ABORTED) {
             afterCompletion(outcome);
         }
 
         return outcome;
     }
 
-    public int addSynchronization (SynchronizationRecord sr)
-    {
+    public int addSynchronization(SynchronizationRecord sr) {
         if (sr == null)
             return AddOutcome.AR_REJECTED;
 
         int result = AddOutcome.AR_REJECTED;
 
         // only allow registration for top-level transactions.
-        
+
         if (parent() != null)
             return AddOutcome.AR_REJECTED;
 
-        switch (status())
-        {
-        // https://jira.jboss.org/jira/browse/JBTM-608
-        case ActionStatus.RUNNING:
-        case ActionStatus.PREPARING:
-        {
-            synchronized (this)
-            {
-                if (_synchs == null)
-                {
-                    // Synchronizations should be stored (or at least iterated) in their natural order
-                    _synchs = new TreeSet<SynchronizationRecord>();
-                }
-            }
-
-            synchronized (_synchs) {
-                if (runningSynchronizations != null) {
-                    if (executingInterposedSynchs && !sr.isInterposed())
-                        return AddOutcome.AR_REJECTED;
-
-                    runningSynchronizations.add(synchronizationCompletionService.submit(
-                            new AsyncBeforeSynchronization(this, sr)));
-
-                    return AddOutcome.AR_ADDED;
-                }
-
-                // disallow addition of Synchronizations that would appear
-                // earlier in sequence than any that has already been called
-                // during the pre-commmit phase. This generic support is required for
-                // JTA Synchronization ordering behaviour
-                if(_currentRecord != null) {
-                    if(sr.compareTo(_currentRecord) != 1) {
-                        return AddOutcome.AR_REJECTED;
+        switch (status()) {
+            // https://jira.jboss.org/jira/browse/JBTM-608
+            case ActionStatus.RUNNING :
+            case ActionStatus.PREPARING : {
+                synchronized (this) {
+                    if (_synchs == null) {
+                        // Synchronizations should be stored (or at least
+                        // iterated) in their natural order
+                        _synchs = new TreeSet<SynchronizationRecord>();
                     }
                 }
 
-                // need to guard against synchs being added while we are performing beforeCompletion processing
-                if (_synchs.add(sr))
-                {
-                    result = AddOutcome.AR_ADDED;
+                synchronized (_synchs) {
+                    if (runningSynchronizations != null) {
+                        if (executingInterposedSynchs && !sr.isInterposed())
+                            return AddOutcome.AR_REJECTED;
+
+                        runningSynchronizations
+                                .add(synchronizationCompletionService.submit(new AsyncBeforeSynchronization(this, sr)));
+
+                        return AddOutcome.AR_ADDED;
+                    }
+
+                    // disallow addition of Synchronizations that would appear
+                    // earlier in sequence than any that has already been called
+                    // during the pre-commmit phase. This generic support is
+                    // required for
+                    // JTA Synchronization ordering behaviour
+                    if (_currentRecord != null) {
+                        if (sr.compareTo(_currentRecord) != 1) {
+                            return AddOutcome.AR_REJECTED;
+                        }
+                    }
+
+                    // need to guard against synchs being added while we are
+                    // performing beforeCompletion processing
+                    if (_synchs.add(sr)) {
+                        result = AddOutcome.AR_ADDED;
+                    }
                 }
             }
-        }
-        break;
-        default:
-            break;
+                break;
+            default :
+                break;
         }
 
         return result;
@@ -208,11 +193,12 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                 if (synchRecord.isInterposed())
                     interposedSynchs.add(synchRecord);
                 else
-                    runningSynchronizations.add(synchronizationCompletionService.submit(
-                            new AsyncBeforeSynchronization(this, synchRecord)));
+                    runningSynchronizations.add(
+                            synchronizationCompletionService.submit(new AsyncBeforeSynchronization(this, synchRecord)));
             }
 
-            // any further additions to _synchs from here on can only be interposed synchronizations
+            // any further additions to _synchs from here on can only be
+            // interposed synchronizations
         }
 
         try {
@@ -224,14 +210,15 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                         if (executingInterposedSynchs || interposedSynchs.size() == 0)
                             break; // all synchronizations have been executed
 
-                        // all non interposed synchronizations have been executed
+                        // all non interposed synchronizations have been
+                        // executed
                         executingInterposedSynchs = true;
                         processed = 0;
                         runningSynchronizations.clear();
 
                         for (SynchronizationRecord synchRecord : interposedSynchs) {
-                            runningSynchronizations.add(synchronizationCompletionService.submit(
-                                    new AsyncBeforeSynchronization(this, synchRecord)));
+                            runningSynchronizations.add(synchronizationCompletionService
+                                    .submit(new AsyncBeforeSynchronization(this, synchRecord)));
                         }
                     }
                 }
@@ -245,14 +232,15 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                     if (_deferredThrowable == null)
                         _deferredThrowable = e.getCause();
 
-                    // the wrapper around the synchronization will already have logged the error
+                    // the wrapper around the synchronization will already have
+                    // logged the error
                     problem = true;
                 } catch (InterruptedException e) {
                     tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_2(_currentRecord.toString(), e);
                     problem = true;
                 }
             } while (!problem);
-        }  finally {
+        } finally {
             // if there was a problem then cancel any remaining synchronizations
             try {
                 for (Future<Boolean> f : runningSynchronizations)
@@ -270,8 +258,7 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
      *         <code>false</code> otherwise.
      */
 
-    public boolean running ()
-    {
+    public boolean running() {
         return (status() == ActionStatus.RUNNING || status() == ActionStatus.ABORT_ONLY);
     }
 
@@ -279,26 +266,25 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
      * Overloads BasicAction.type()
      */
 
-    public String type ()
-    {
+    public String type() {
         return "/StateManager/BasicAction/AtomicAction/TwoPhaseCoordinator";
     }
 
     /**
-     * Get any Throwable that was caught during commit processing but not directly rethrown.
+     * Get any Throwable that was caught during commit processing but not
+     * directly rethrown.
+     * 
      * @return the Throwable, if any
      */
     public Throwable getDeferredThrowable() {
         return _deferredThrowable;
     }
 
-    protected TwoPhaseCoordinator (int at)
-    {
+    protected TwoPhaseCoordinator(int at) {
         super(at);
     }
 
-    protected TwoPhaseCoordinator (Uid u, int at)
-    {
+    protected TwoPhaseCoordinator(Uid u, int at) {
         super(u, at);
     }
 
@@ -307,15 +293,12 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
      * 
      * @return true if successful, false otherwise.
      */
-    
-    protected boolean beforeCompletion ()
-    {
+
+    protected boolean beforeCompletion() {
         boolean problem = false;
 
-        synchronized (_syncLock)
-        {
-            if (!_beforeCalled)
-            {
+        synchronized (_syncLock) {
+            if (!_beforeCalled) {
                 _beforeCalled = true;
 
                 /*
@@ -323,66 +306,73 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                  */
                 if (_synchs == null) {
                     /*
-                     * beforeCompletions already called. Assume everything is alright
-                     * to proceed to commit. The TM instance will flag the outcome. If
-                     * it's rolling back, then we'll get an exception. If it's committing
-                     * then we'll be blocked until the commit (assuming we're still the
-                     * slower thread).
+                     * beforeCompletions already called. Assume everything is
+                     * alright to proceed to commit. The TM instance will flag
+                     * the outcome. If it's rolling back, then we'll get an
+                     * exception. If it's committing then we'll be blocked until
+                     * the commit (assuming we're still the slower thread).
                      */
                 } else if (TxControl.asyncBeforeSynch && _synchs.size() > 1) {
                     problem = !asyncBeforeCompletion();
                 } else {
                     /*
-                     * We must always call afterCompletion() methods, so just catch (and
-                     * log) any exceptions/errors from beforeCompletion() methods.
+                     * We must always call afterCompletion() methods, so just
+                     * catch (and log) any exceptions/errors from
+                     * beforeCompletion() methods.
                      *
-                     * If one of the Syncs throws an error the Record wrapper returns false
-                     * and we will rollback. Hence we don't then bother to call beforeCompletion
-                     * on the remaining records (it's not done for rollabcks anyhow).
+                     * If one of the Syncs throws an error the Record wrapper
+                     * returns false and we will rollback. Hence we don't then
+                     * bother to call beforeCompletion on the remaining records
+                     * (it's not done for rollabcks anyhow).
                      *
-                     * Since Synchronizations may register other Synchronizations, we can't simply
-                     * iterate the collection. Instead we work from an ordered copy, which we periodically
-                     * check for freshness. The addSynchronization method uses _currentRecord to disallow
-                     * adding records in the part of the array we have already traversed, thus all
-                     * Synchronization will be called and the (jta only) rules on ordering of interposed
-                     * Synchronization will be respected.
+                     * Since Synchronizations may register other
+                     * Synchronizations, we can't simply iterate the collection.
+                     * Instead we work from an ordered copy, which we
+                     * periodically check for freshness. The addSynchronization
+                     * method uses _currentRecord to disallow adding records in
+                     * the part of the array we have already traversed, thus all
+                     * Synchronization will be called and the (jta only) rules
+                     * on ordering of interposed Synchronization will be
+                     * respected.
                      */
 
                     int lastIndexProcessed = -1;
                     SynchronizationRecord[] copiedSynchs;
-                    // need to guard against synchs being added while we are performing beforeCompletion processing
+                    // need to guard against synchs being added while we are
+                    // performing beforeCompletion processing
                     synchronized (_synchs) {
-                        copiedSynchs = (SynchronizationRecord[])_synchs.toArray(new SynchronizationRecord[] {});
+                        copiedSynchs = (SynchronizationRecord[]) _synchs.toArray(new SynchronizationRecord[]{});
                     }
-                    while( (lastIndexProcessed < _synchs.size()-1) && !problem) {
+                    while ((lastIndexProcessed < _synchs.size() - 1) && !problem) {
 
                         synchronized (_synchs) {
-                            // if new Synchronization have been registered, refresh our copy of the collection:
-                            if(copiedSynchs.length != _synchs.size()) {
-                                copiedSynchs = (SynchronizationRecord[])_synchs.toArray(new SynchronizationRecord[] {});
+                            // if new Synchronization have been registered,
+                            // refresh our copy of the collection:
+                            if (copiedSynchs.length != _synchs.size()) {
+                                copiedSynchs = (SynchronizationRecord[]) _synchs.toArray(new SynchronizationRecord[]{});
                             }
                         }
 
-                        lastIndexProcessed = lastIndexProcessed+1;
+                        lastIndexProcessed = lastIndexProcessed + 1;
                         _currentRecord = copiedSynchs[lastIndexProcessed];
 
-                        try
-                        {
+                        try {
                             problem = !_currentRecord.beforeCompletion();
 
-                            // if something goes wrong, we can't just throw the exception, we need to continue to
-                            // complete the transaction. However, the exception may have interesting information that
-                            // we want later, so we keep a reference to it as well as logging it.
+                            // if something goes wrong, we can't just throw the
+                            // exception, we need to continue to
+                            // complete the transaction. However, the exception
+                            // may have interesting information that
+                            // we want later, so we keep a reference to it as
+                            // well as logging it.
 
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_2(_currentRecord.toString(), ex);
                             if (_deferredThrowable == null) {
                                 _deferredThrowable = ex;
                             }
                             problem = true;
-                        }
-                        catch (Error er) {
+                        } catch (Error er) {
                             tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_2(_currentRecord.toString(), er);
                             if (_deferredThrowable == null) {
                                 _deferredThrowable = er;
@@ -395,8 +385,8 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
 
             if (problem && !preventCommit()) {
                 /*
-                 * This should not happen. If it does, continue with commit
-                 * to tidy-up.
+                 * This should not happen. If it does, continue with commit to
+                 * tidy-up.
                  */
 
                 tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_1();
@@ -409,9 +399,10 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
     protected boolean asyncAfterCompletion(int myStatus, boolean report_heuristics) {
         boolean problem = false;
 
-        // note there is no need to synchronize on _synchs since synchronizations cannot be registered once
+        // note there is no need to synchronize on _synchs since
+        // synchronizations cannot be registered once
         // the action has started to commit
-        for (Iterator<SynchronizationRecord> i =_synchs.iterator(); i.hasNext(); ) {
+        for (Iterator<SynchronizationRecord> i = _synchs.iterator(); i.hasNext();) {
             SynchronizationRecord synchRecord = i.next();
 
             if (!report_heuristics && synchRecord instanceof HeuristicNotification)
@@ -421,8 +412,8 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                 // run interposed synchronizations first
                 i.remove();
 
-                runningSynchronizations.add(synchronizationCompletionService.submit(
-                        new AsyncAfterSynchronization(this, synchRecord, myStatus)));
+                runningSynchronizations.add(synchronizationCompletionService
+                        .submit(new AsyncAfterSynchronization(this, synchRecord, myStatus)));
             }
         }
 
@@ -441,8 +432,8 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                 runningSynchronizations.clear();
 
                 for (SynchronizationRecord synchRecord : _synchs) {
-                    runningSynchronizations.add(synchronizationCompletionService.submit(
-                            new AsyncAfterSynchronization(this, synchRecord, myStatus)));
+                    runningSynchronizations.add(synchronizationCompletionService
+                            .submit(new AsyncAfterSynchronization(this, synchRecord, myStatus)));
                 }
 
                 _synchs.clear();
@@ -464,29 +455,33 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
     }
 
     /**
-         * Drive afterCompletion participants.
-         * 
-         * @param myStatus the outcome of the transaction (ActionStatus.COMMITTED or ActionStatus.ABORTED).
-         * 
-         * @return true if successful, false otherwise.
-         */
-    
-    protected boolean afterCompletion (int myStatus)
-    {
-        return afterCompletion(myStatus, false);
-    }
-    
-    /**
      * Drive afterCompletion participants.
      * 
-     * @param myStatus the outcome of the transaction (ActionStatus.COMMITTED or ActionStatus.ABORTED).
-     * @param report_heuristics does the caller want to be informed about heurisitics at the point of invocation?
+     * @param myStatus
+     *            the outcome of the transaction (ActionStatus.COMMITTED or
+     *            ActionStatus.ABORTED).
      * 
      * @return true if successful, false otherwise.
      */
-    
-    protected boolean afterCompletion (int myStatus, boolean report_heuristics)
-    {
+
+    protected boolean afterCompletion(int myStatus) {
+        return afterCompletion(myStatus, false);
+    }
+
+    /**
+     * Drive afterCompletion participants.
+     * 
+     * @param myStatus
+     *            the outcome of the transaction (ActionStatus.COMMITTED or
+     *            ActionStatus.ABORTED).
+     * @param report_heuristics
+     *            does the caller want to be informed about heurisitics at the
+     *            point of invocation?
+     * 
+     * @return true if successful, false otherwise.
+     */
+
+    protected boolean afterCompletion(int myStatus, boolean report_heuristics) {
         if (myStatus == ActionStatus.RUNNING) {
             tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_3();
 
@@ -495,10 +490,8 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
 
         boolean problem = false;
 
-        synchronized (_syncLock)
-        {
-            if (!_afterCalled)
-            {
+        synchronized (_syncLock) {
+            if (!_afterCalled) {
                 _afterCalled = true;
 
                 if (_synchs == null) {
@@ -510,56 +503,54 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
                     // beforeCompletions
                     Stack stack = new Stack();
                     Iterator iterator = _synchs.iterator();
-                    while(iterator.hasNext()) {
+                    while (iterator.hasNext()) {
                         stack.push(iterator.next());
                     }
 
                     /*
-                     * Regardless of failures, we must tell all synchronizations what
-                     * happened.
+                     * Regardless of failures, we must tell all synchronizations
+                     * what happened.
                      */
-                    while(!stack.isEmpty())
-                    {
-                        SynchronizationRecord record = (SynchronizationRecord)stack.pop();
+                    while (!stack.isEmpty()) {
+                        SynchronizationRecord record = (SynchronizationRecord) stack.pop();
 
                         /*
-                         * If the caller doesn't want to be informed of heuristics during completion
-                         * then it's possible the application (or admin) may still want to be informed.
-                         * So special participants can be registered with the transaction which are
-                         * triggered during the Synchronization phase and given the true outcome of
-                         * the transaction. We do not dictate a specific implementation for what these
-                         * participants do with the information (e.g., OTS allows for the CORBA Notification Service
-                         * to be used).
+                         * If the caller doesn't want to be informed of
+                         * heuristics during completion then it's possible the
+                         * application (or admin) may still want to be informed.
+                         * So special participants can be registered with the
+                         * transaction which are triggered during the
+                         * Synchronization phase and given the true outcome of
+                         * the transaction. We do not dictate a specific
+                         * implementation for what these participants do with
+                         * the information (e.g., OTS allows for the CORBA
+                         * Notification Service to be used).
                          */
-                        
-                        if (!report_heuristics)
-                        {
-                            if (record instanceof HeuristicNotification)
-                            {
+
+                        if (!report_heuristics) {
+                            if (record instanceof HeuristicNotification) {
                                 ((HeuristicNotification) record).heuristicOutcome(getHeuristicDecision());
                             }
                         }
-                        
-                        try
-                        {
+
+                        try {
                             if (!record.afterCompletion(myStatus)) {
                                 tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_4(record.toString());
 
                                 problem = true;
                             }
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_4a(record.toString(), ex);
                             problem = true;
-                        }
-                        catch (Error er) {
+                        } catch (Error er) {
                             tsLogger.i18NLogger.warn_coordinator_TwoPhaseCoordinator_4b(record.toString(), er);
                             problem = true;
                         }
                     }
 
                     synchronized (_synchs) {
-                        // nulling _syncs causes concurrency problems, so dispose contents instead:
+                        // nulling _syncs causes concurrency problems, so
+                        // dispose contents instead:
                         _synchs.clear();
                     }
                 }
@@ -569,15 +560,12 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
         return !problem;
     }
 
-    public java.util.Map<Uid, String> getSynchronizations()
-    {
-        java.util.Map<Uid, String> synchs = new java.util.HashMap<Uid, String> ();
+    public java.util.Map<Uid, String> getSynchronizations() {
+        java.util.Map<Uid, String> synchs = new java.util.HashMap<Uid, String>();
 
         synchronized (this) {
-            if (_synchs != null)
-            {
-                for (Object _synch : _synchs)
-                {
+            if (_synchs != null) {
+                for (Object _synch : _synchs) {
                     SynchronizationRecord synch = (SynchronizationRecord) _synch;
 
                     synchs.put(synch.get_uid(), synch.toString());
@@ -592,7 +580,8 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
     private List<Future<Boolean>> runningSynchronizations = null;
     private CompletionService<Boolean> synchronizationCompletionService = null;
     private boolean executingInterposedSynchs = false;
-    private SynchronizationRecord _currentRecord; // the most recently processed Synchronization.
+    private SynchronizationRecord _currentRecord; // the most recently processed
+                                                    // Synchronization.
     private Throwable _deferredThrowable;
 
     private Object _syncLock = new Object();

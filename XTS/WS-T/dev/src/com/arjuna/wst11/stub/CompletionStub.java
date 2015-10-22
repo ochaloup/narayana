@@ -18,208 +18,192 @@ import org.oasis_open.docs.ws_tx.wsat._2006._06.Notification;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public class CompletionStub implements
-        CompletionCoordinatorParticipant
-{
+public class CompletionStub implements CompletionCoordinatorParticipant {
     private W3CEndpointReference _completionCoordinator = null;
     private String _id;
 
-    public CompletionStub(final String id, final W3CEndpointReference completionCoordinator)
-            throws Exception
-    {
+    public CompletionStub(final String id, final W3CEndpointReference completionCoordinator) throws Exception {
         _completionCoordinator = completionCoordinator;
         _id = id;
     }
 
-    public void commit () throws TransactionRolledBackException,
-            UnknownTransactionException, SystemException
-    {
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
+    public void commit() throws TransactionRolledBackException, UnknownTransactionException, SystemException {
+        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId());
 
-        final CompletionStub.RequestCallback callback = new CompletionStub.RequestCallback() ;
-        final CompletionInitiatorProcessor completionInitiator = CompletionInitiatorProcessor.getProcessor() ;
-        completionInitiator.registerCallback(_id, callback) ;
-        try
-        {
-            CompletionCoordinatorClient.getClient().sendCommit(_completionCoordinator, map, new InstanceIdentifier(_id)) ;
-            callback.waitUntilTriggered() ;
-        }
-        catch (final Throwable th)
-        {
-            th.printStackTrace() ;
-            throw new SystemException() ;
-        }
-        finally
-        {
-            completionInitiator.removeCallback(_id) ;
+        final CompletionStub.RequestCallback callback = new CompletionStub.RequestCallback();
+        final CompletionInitiatorProcessor completionInitiator = CompletionInitiatorProcessor.getProcessor();
+        completionInitiator.registerCallback(_id, callback);
+        try {
+            CompletionCoordinatorClient.getClient().sendCommit(_completionCoordinator, map,
+                    new InstanceIdentifier(_id));
+            callback.waitUntilTriggered();
+        } catch (final Throwable th) {
+            th.printStackTrace();
+            throw new SystemException();
+        } finally {
+            completionInitiator.removeCallback(_id);
         }
 
-        if (callback.hasTriggered())
-        {
-            if (callback.receivedCommitted())
-            {
-                return ;
+        if (callback.hasTriggered()) {
+            if (callback.receivedCommitted()) {
+                return;
+            } else if (callback.receivedAborted()) {
+                throw new TransactionRolledBackException();
             }
-            else if (callback.receivedAborted())
-            {
-                throw new TransactionRolledBackException() ;
-            }
-            final SoapFault soapFault = callback.getSoapFault() ;
-            if ((soapFault != null) && ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
+            final SoapFault soapFault = callback.getSoapFault();
+            if ((soapFault != null)
+                    && ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
                 throw new UnknownTransactionException();
             }
         }
 
-        throw new SystemException() ;
+        throw new SystemException();
     }
 
-    public void rollback () throws UnknownTransactionException, SystemException
-    {
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
+    public void rollback() throws UnknownTransactionException, SystemException {
+        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId());
 
-        final CompletionStub.RequestCallback callback = new CompletionStub.RequestCallback() ;
-        final CompletionInitiatorProcessor completionInitiator = CompletionInitiatorProcessor.getProcessor() ;
-        completionInitiator.registerCallback(_id, callback) ;
-        try
-        {
-            CompletionCoordinatorClient.getClient().sendRollback(_completionCoordinator, map, new InstanceIdentifier(_id)) ;
-            callback.waitUntilTriggered() ;
-        }
-        catch (final Throwable th)
-        {
-            th.printStackTrace() ;
-            throw new SystemException() ;
-        }
-        finally
-        {
-            completionInitiator.removeCallback(_id) ;
+        final CompletionStub.RequestCallback callback = new CompletionStub.RequestCallback();
+        final CompletionInitiatorProcessor completionInitiator = CompletionInitiatorProcessor.getProcessor();
+        completionInitiator.registerCallback(_id, callback);
+        try {
+            CompletionCoordinatorClient.getClient().sendRollback(_completionCoordinator, map,
+                    new InstanceIdentifier(_id));
+            callback.waitUntilTriggered();
+        } catch (final Throwable th) {
+            th.printStackTrace();
+            throw new SystemException();
+        } finally {
+            completionInitiator.removeCallback(_id);
         }
 
-        if (callback.hasTriggered())
-        {
-            if (callback.receivedAborted())
-            {
-                return ;
+        if (callback.hasTriggered()) {
+            if (callback.receivedAborted()) {
+                return;
             }
-            final SoapFault soapFault = callback.getSoapFault() ;
-            if ((soapFault != null) && ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
+            final SoapFault soapFault = callback.getSoapFault();
+            if ((soapFault != null)
+                    && ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
                 throw new UnknownTransactionException();
             }
         }
 
-        throw new SystemException() ;
+        throw new SystemException();
     }
 
-    private static class RequestCallback extends CompletionInitiatorCallback
-    {
+    private static class RequestCallback extends CompletionInitiatorCallback {
         /**
          * The addressing context.
          */
-        private MAP map ;
+        private MAP map;
         /**
          * The arjuna context.
          */
-        private ArjunaContext arjunaContext ;
+        private ArjunaContext arjunaContext;
         /**
          * The SOAP fault.
          */
-        private SoapFault soapFault ;
+        private SoapFault soapFault;
         /**
          * The aborted notification flag.
          */
-        private boolean aborted ;
+        private boolean aborted;
         /**
          * The committed notification flag.
          */
-        private boolean committed ;
+        private boolean committed;
 
         /**
          * Get the addressing context.
+         * 
          * @return The addressing context.
          */
-        MAP getMAP()
-        {
-            return map ;
+        MAP getMAP() {
+            return map;
         }
 
         /**
          * Get the arjuna context.
+         * 
          * @return The arjuna context.
          */
-        ArjunaContext getArjunaContext()
-        {
-            return arjunaContext ;
+        ArjunaContext getArjunaContext() {
+            return arjunaContext;
         }
 
         /**
          * Get the SOAP fault.
+         * 
          * @return The SOAP fault.
          */
-        SoapFault getSoapFault()
-        {
-            return soapFault ;
+        SoapFault getSoapFault() {
+            return soapFault;
         }
 
         /**
          * Did we receive a aborted notification?
+         * 
          * @return True if aborted, false otherwise.
          */
-        boolean receivedAborted()
-        {
-            return aborted ;
+        boolean receivedAborted() {
+            return aborted;
         }
 
         /**
          * Did we receive a committed notification?
+         * 
          * @return True if committed, false otherwise.
          */
-        boolean receivedCommitted()
-        {
-            return committed ;
+        boolean receivedCommitted() {
+            return committed;
         }
 
         /**
          * A aborted response.
-         * @param aborted The aborted notification.
-         * @param map The addressing context.
-         * @param arjunaContext The arjuna context.
+         * 
+         * @param aborted
+         *            The aborted notification.
+         * @param map
+         *            The addressing context.
+         * @param arjunaContext
+         *            The arjuna context.
          */
-        public void aborted(final Notification aborted, final MAP map,
-            final ArjunaContext arjunaContext)
-        {
-            this.aborted = true ;
-            this.map = map ;
-            this.arjunaContext = arjunaContext ;
+        public void aborted(final Notification aborted, final MAP map, final ArjunaContext arjunaContext) {
+            this.aborted = true;
+            this.map = map;
+            this.arjunaContext = arjunaContext;
         }
 
         /**
          * An committed response.
-         * @param committed The committed notification.
-         * @param map The addressing context.
-         * @param arjunaContext The arjuna context.
+         * 
+         * @param committed
+         *            The committed notification.
+         * @param map
+         *            The addressing context.
+         * @param arjunaContext
+         *            The arjuna context.
          */
-        public void committed(final Notification committed, final MAP map,
-            final ArjunaContext arjunaContext)
-        {
-            this.committed  = true ;
-            this.map = map ;
-            this.arjunaContext = arjunaContext ;
+        public void committed(final Notification committed, final MAP map, final ArjunaContext arjunaContext) {
+            this.committed = true;
+            this.map = map;
+            this.arjunaContext = arjunaContext;
         }
 
         /**
          * A SOAP fault response.
-         * @param soapFault The SOAP fault.
-         * @param map The addressing context.
-         * @param arjunaContext The arjuna context.
+         * 
+         * @param soapFault
+         *            The SOAP fault.
+         * @param map
+         *            The addressing context.
+         * @param arjunaContext
+         *            The arjuna context.
          */
-        public void soapFault(final SoapFault soapFault, final MAP map,
-            final ArjunaContext arjunaContext)
-        {
-            this.soapFault = soapFault ;
-            this.map = map ;
-            this.arjunaContext = arjunaContext ;
+        public void soapFault(final SoapFault soapFault, final MAP map, final ArjunaContext arjunaContext) {
+            this.soapFault = soapFault;
+            this.map = map;
+            this.arjunaContext = arjunaContext;
         }
     }
 }

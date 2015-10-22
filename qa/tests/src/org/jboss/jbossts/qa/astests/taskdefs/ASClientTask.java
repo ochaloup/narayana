@@ -30,20 +30,22 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Ant task for executing a chunk of java code. The interface name of the code to be executed is specified
- * the impl field:
+ * Ant task for executing a chunk of java code. The interface name of the code
+ * to be executed is specified the impl field:
+ * 
  * @see ClientAction
  *
- * It the task completes successfully "Passed" is printed on system output, otherwise "Failed" is printed
+ *      It the task completes successfully "Passed" is printed on system output,
+ *      otherwise "Failed" is printed
  */
-public class ASClientTask extends Task
-{
+public class ASClientTask extends Task {
     /**
-     * The text to print on standard output if the client action returned the expected result.
-     * Note that these values can be overridden on per task basis
-     * When running under the DTF the text should correspond values defined in the file
-     * nodeconfig.xml. The DTF TaskRunner controlling the test will search the output stream
-     * for this text to determine success or failure.
+     * The text to print on standard output if the client action returned the
+     * expected result. Note that these values can be overridden on per task
+     * basis When running under the DTF the text should correspond values
+     * defined in the file nodeconfig.xml. The DTF TaskRunner controlling the
+     * test will search the output stream for this text to determine success or
+     * failure.
      */
     public static final String PASS = "Passed";
     public static final String FAIL = "Failed";
@@ -56,57 +58,42 @@ public class ASClientTask extends Task
     private List<TaskProperty> params = new ArrayList<TaskProperty>();
     private boolean abortOnFail = true;
 
-    public void execute() throws BuildException
-    {
+    public void execute() throws BuildException {
         ASTestConfig config = (ASTestConfig) getProject().getReference(ASTestConfig.CONFIG_REF);
-        Map<String, String> args = new HashMap<String, String> ();
+        Map<String, String> args = new HashMap<String, String>();
 
         for (TaskProperty param : params)
             args.put(param.getKey(), param.getValue());
 
         ClientAction action = null;
 
-        try
-        {
+        try {
             suspendFor(waitFor);
-            
+
             action = (ClientAction) Class.forName(impl).newInstance();
-        }
-        catch (ClassCastException e)
-        {
+        } catch (ClassCastException e) {
             System.err.println("Class " + impl + " does not implement " + ClientAction.class.getName());
-        }
-        catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             System.err.println("Cannot locate class " + impl);
-        }
-        catch (IllegalAccessException e)
-        {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }
-        catch (InstantiationException e)
-        {
+        } catch (InstantiationException e) {
             System.err.println("Class " + impl + " cannot be instantiated: " + e.getMessage());
         }
 
-        try
-        {
+        try {
             printResult(action.execute(config, args));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Error executing test: " + e.getMessage());
             printResult(false);
         }
 
     }
 
-    private void printResult(boolean passed)
-    {
+    private void printResult(boolean passed) {
         StringBuilder sb = new StringBuilder();
 
-        if (name != null)
-        {
+        if (name != null) {
             sb.append(name).append(' ');
         }
 
@@ -118,99 +105,101 @@ public class ASClientTask extends Task
 
     /**
      * Suspend the calling thread
-     * @param millis the number of milli seconds to suspend for
+     * 
+     * @param millis
+     *            the number of milli seconds to suspend for
      * @return false if interupted
-     * @throws IllegalArgumentException if millis is not a number or negative
+     * @throws IllegalArgumentException
+     *             if millis is not a number or negative
      */
-    static boolean suspendFor(String millis) throws IllegalArgumentException
-    {
-        try
-        {
-            try
-            {
+    static boolean suspendFor(String millis) throws IllegalArgumentException {
+        try {
+            try {
                 if (millis != null)
                     Thread.sleep(Integer.parseInt(millis));
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(e);
             }
 
             return true;
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             return false;
         }
     }
 
     /**
-     * Task property to set the test name. This name will be printed when the test completes
-     * followed by a string to indicate pass or failure.
-     * see org.jboss.jbossts.qa.astests.taskdefs.ASClientTask.PASS
-     * @param name the name of the test.
+     * Task property to set the test name. This name will be printed when the
+     * test completes followed by a string to indicate pass or failure. see
+     * org.jboss.jbossts.qa.astests.taskdefs.ASClientTask.PASS
+     * 
+     * @param name
+     *            the name of the test.
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
     /**
-     * Task property to force the task to suspend before executing the client action
+     * Task property to force the task to suspend before executing the client
+     * action
      *
-     * @param waitFor the number of milli seconds to suspend - a null value means don't suspend
-     * @throws IllegalArgumentException if waitFor is not a number or is negative
+     * @param waitFor
+     *            the number of milli seconds to suspend - a null value means
+     *            don't suspend
+     * @throws IllegalArgumentException
+     *             if waitFor is not a number or is negative
      */
-    public void setWaitFor(String waitFor) throws IllegalArgumentException
-    {
+    public void setWaitFor(String waitFor) throws IllegalArgumentException {
         this.waitFor = waitFor;
     }
 
-    public void setAbortOnFail(String abortOnFail)
-    {
+    public void setAbortOnFail(String abortOnFail) {
         this.abortOnFail = "true".equals(abortOnFail);
     }
 
     /**
-     * Task property containing the fully qualified class name of the action to execute.
-     * This class must contain an empty constructor and implement:
+     * Task property containing the fully qualified class name of the action to
+     * execute. This class must contain an empty constructor and implement:
+     * 
      * @see ClientAction
      *
-     * @param impl the class name of the action that this task will instantiate and run
+     * @param impl
+     *            the class name of the action that this task will instantiate
+     *            and run
      */
-    public void setImpl(String impl)
-    {
+    public void setImpl(String impl) {
         this.impl = impl;
     }
 
     /**
-     * Task parameters that are passed into the execute method of the client action
+     * Task parameters that are passed into the execute method of the client
+     * action
      *
-     * @param param a task parameter
+     * @param param
+     *            a task parameter
      */
-    public void addParam(TaskProperty param)
-    {
+    public void addParam(TaskProperty param) {
         params.add(param);
     }
 
     /**
-     * Task property defaults to
-     * see org.jboss.jbossts.qa.astests.taskdefs.ASTestConfig.PASS
+     * Task property defaults to see
+     * org.jboss.jbossts.qa.astests.taskdefs.ASTestConfig.PASS
      *
-     * @param passText the text to print if the test succeeds
+     * @param passText
+     *            the text to print if the test succeeds
      */
-    public void setPassText(String passText)
-    {
+    public void setPassText(String passText) {
         this.passText = passText;
     }
 
     /**
-     * Task property to
-     * see org.jboss.jbossts.qa.astests.taskdefs.ASTestConfig.FAIL
+     * Task property to see
+     * org.jboss.jbossts.qa.astests.taskdefs.ASTestConfig.FAIL
      *
-     * @param failText the text to print if the test succeeds
+     * @param failText
+     *            the text to print if the test succeeds
      */
-    public void setFailText(String failText)
-    {
+    public void setFailText(String failText) {
         this.failText = failText;
     }
 }

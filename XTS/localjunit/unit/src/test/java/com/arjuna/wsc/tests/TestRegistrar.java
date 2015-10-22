@@ -35,15 +35,13 @@ import com.arjuna.wsc11.Registrar;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public class TestRegistrar implements Registrar
-{
-    public void install(String protocolIdentifier)
-    {
+public class TestRegistrar implements Registrar {
+    public void install(String protocolIdentifier) {
     }
 
-    public W3CEndpointReference register(W3CEndpointReference participantProtocolService, String protocolIdentifier, InstanceIdentifier instanceIdentifier, boolean isSecure)
-        throws AlreadyRegisteredException, InvalidProtocolException, InvalidStateException, NoActivityException
-    {
+    public W3CEndpointReference register(W3CEndpointReference participantProtocolService, String protocolIdentifier,
+            InstanceIdentifier instanceIdentifier, boolean isSecure)
+            throws AlreadyRegisteredException, InvalidProtocolException, InvalidStateException, NoActivityException {
         if (protocolIdentifier.equals(TestUtil.ALREADY_REGISTERED_PROTOCOL_IDENTIFIER))
             throw new AlreadyRegisteredException();
         else if (protocolIdentifier.equals(TestUtil.INVALID_PROTOCOL_PROTOCOL_IDENTIFIER))
@@ -56,7 +54,6 @@ public class TestRegistrar implements Registrar
         return TestUtil11.getProtocolCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
     }
 
-    public void uninstall(String protocolIdentifier)
-    {
+    public void uninstall(String protocolIdentifier) {
     }
 }

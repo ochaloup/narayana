@@ -22,8 +22,7 @@ package com.arjuna.ats.internal.jta.resources.jts.orbspecific;
 
 import com.arjuna.ArjunaOTS.ManagedSynchronizationOperations;
 
-public class ManagedSynchronizationImple extends SynchronizationImple implements ManagedSynchronizationOperations
-{
+public class ManagedSynchronizationImple extends SynchronizationImple implements ManagedSynchronizationOperations {
     private javax.transaction.Synchronization ptr;
 
     public ManagedSynchronizationImple(javax.transaction.Synchronization ptr) {
@@ -35,13 +34,11 @@ public class ManagedSynchronizationImple extends SynchronizationImple implements
         return new com.arjuna.ArjunaOTS.ManagedSynchronizationPOATie(this);
     }
 
-    public String implementationType()
-    {
+    public String implementationType() {
         return ptr.getClass().getName();
     }
 
-    public String instanceName()
-    {
+    public String instanceName() {
         return ptr.toString();
     }
 }

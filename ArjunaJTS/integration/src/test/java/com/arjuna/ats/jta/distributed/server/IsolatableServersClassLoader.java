@@ -38,8 +38,8 @@ public class IsolatableServersClassLoader extends ClassLoader {
     private String includedPackage;
     private String otherIgnoredPackage;
 
-    public IsolatableServersClassLoader(String includedPackage, String ignoredPackage, ClassLoader parent) throws SecurityException, NoSuchMethodException,
-            MalformedURLException {
+    public IsolatableServersClassLoader(String includedPackage, String ignoredPackage, ClassLoader parent)
+            throws SecurityException, NoSuchMethodException, MalformedURLException {
         super(parent);
         this.includedPackage = includedPackage;
         this.otherIgnoredPackage = ignoredPackage;
@@ -67,7 +67,8 @@ public class IsolatableServersClassLoader extends ClassLoader {
     }
 
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (!name.matches(ignoredPackage + ".[A-Za-z0-9]*") && otherIgnoredPackage != null && name.startsWith(otherIgnoredPackage)) {
+        if (!name.matches(ignoredPackage + ".[A-Za-z0-9]*") && otherIgnoredPackage != null
+                && name.startsWith(otherIgnoredPackage)) {
             throw new ClassNotFoundException(name);
         }
         Class<?> clazz = null;

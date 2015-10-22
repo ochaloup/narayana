@@ -43,17 +43,12 @@ import com.arjuna.ats.internal.arjuna.common.UidHelper;
  * stored within a specific object store.
  */
 
-public class ObjectStoreIterator
-{
+public class ObjectStoreIterator {
 
-    public ObjectStoreIterator(RecoveryStore recoveryStore, String tName)
-    {
-        try
-        {
+    public ObjectStoreIterator(RecoveryStore recoveryStore, String tName) {
+        try {
             recoveryStore.allObjUids(tName, uidList);
-        }
-        catch (ObjectStoreException e)
-        {
+        } catch (ObjectStoreException e) {
         }
     }
 
@@ -63,16 +58,12 @@ public class ObjectStoreIterator
      * end of list)
      */
 
-    public final synchronized Uid iterate ()
-    {
+    public final synchronized Uid iterate() {
         Uid newUid = null;
 
-        try
-        {
+        try {
             newUid = UidHelper.unpackFrom(uidList);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
         }
 
         return newUid;

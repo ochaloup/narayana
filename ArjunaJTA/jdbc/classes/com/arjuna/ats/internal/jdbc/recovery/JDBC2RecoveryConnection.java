@@ -46,24 +46,17 @@ import com.arjuna.ats.internal.jdbc.ConnectionImple;
  * @since JTS 2.1.
  */
 
-public class JDBC2RecoveryConnection extends ConnectionImple
-{
+public class JDBC2RecoveryConnection extends ConnectionImple {
 
-    public JDBC2RecoveryConnection (String dbName, Properties info)
-            throws SQLException
-    {
+    public JDBC2RecoveryConnection(String dbName, Properties info) throws SQLException {
         super(dbName, info);
     }
 
-    public JDBC2RecoveryConnection (String dbName, String user, String passwd)
-            throws SQLException
-    {
+    public JDBC2RecoveryConnection(String dbName, String user, String passwd) throws SQLException {
         this(dbName, user, passwd, null);
     }
 
-    public JDBC2RecoveryConnection (String dbName, String user, String passwd,
-            String dynamic) throws SQLException
-    {
+    public JDBC2RecoveryConnection(String dbName, String user, String passwd, String dynamic) throws SQLException {
         super(dbName, user, passwd, dynamic, null);
     }
 

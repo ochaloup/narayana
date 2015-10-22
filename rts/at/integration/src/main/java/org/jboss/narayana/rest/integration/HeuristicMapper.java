@@ -26,16 +26,16 @@ public class HeuristicMapper implements ExceptionMapper<HeuristicException> {
 
     private String heuristicTypeToTxStatus(final HeuristicType heuristicType) {
         switch (heuristicType) {
-            case HEURISTIC_COMMIT:
+            case HEURISTIC_COMMIT :
                 return TxStatus.TransactionHeuristicCommit.name();
 
-            case HEURISTIC_HAZARD:
+            case HEURISTIC_HAZARD :
                 return TxStatus.TransactionHeuristicHazard.name();
 
-            case HEURISTIC_MIXED:
+            case HEURISTIC_MIXED :
                 return TxStatus.TransactionHeuristicMixed.name();
 
-            case HEURISTIC_ROLLBACK:
+            case HEURISTIC_ROLLBACK :
                 return TxStatus.TransactionHeuristicRollback.name();
         }
 

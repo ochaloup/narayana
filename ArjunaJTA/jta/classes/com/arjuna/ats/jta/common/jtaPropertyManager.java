@@ -35,10 +35,8 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 /**
  * Property manager wrapper for the JTA module.
  */
-public class jtaPropertyManager
-{
-    public static JTAEnvironmentBean getJTAEnvironmentBean()
-    {
+public class jtaPropertyManager {
+    public static JTAEnvironmentBean getJTAEnvironmentBean() {
         return BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
     }
 }

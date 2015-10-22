@@ -67,8 +67,8 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
         _theXid = null;
 
         copy(xid);
-        
-        hashCode = getHash(_theXid) ;
+
+        hashCode = getHash(_theXid);
     }
 
     public XidImple(AtomicAction c) {
@@ -192,8 +192,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
 
                 System.arraycopy(gtx, 0, _theXid.data, 0, gtx.length);
                 if (bqlength > 0) {
-                    System.arraycopy(bql, 0, _theXid.data, gtx.length,
-                            bql.length);
+                    System.arraycopy(bql, 0, _theXid.data, gtx.length, bql.length);
                 }
             }
         }
@@ -214,8 +213,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
                     byte[] bql = xid.getBranchQualifier();
                     final int bqlength = (bql == null ? 0 : bql.length);
 
-                    if ((_theXid.gtrid_length == gtx.length)
-                            && (_theXid.bqual_length == bqlength)) {
+                    if ((_theXid.gtrid_length == gtx.length) && (_theXid.bqual_length == bqlength)) {
                         int i;
 
                         for (i = 0; i < _theXid.gtrid_length; i++) {
@@ -223,8 +221,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
                                 return false;
                         }
 
-                        for (i = _theXid.gtrid_length; i < _theXid.gtrid_length
-                                + _theXid.bqual_length; i++) {
+                        for (i = _theXid.gtrid_length; i < _theXid.gtrid_length + _theXid.bqual_length; i++) {
                             if (_theXid.data[i] != bql[i])
                                 return false;
                         }
@@ -279,8 +276,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
         return result;
     }
 
-    public static final void pack(OutputObjectState os, Xid xid)
-            throws IOException {
+    public static final void pack(OutputObjectState os, Xid xid) throws IOException {
         if (xid instanceof XidImple) {
             XidImple x = (XidImple) xid;
 
@@ -367,8 +363,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
         if (xid == null) {
             return 0;
         }
-        final int hash = generateHash(xid.formatID, xid.data, 0,
-                xid.gtrid_length);
+        final int hash = generateHash(xid.formatID, xid.data, 0, xid.gtrid_length);
         return generateHash(hash, xid.data, xid.gtrid_length, xid.bqual_length);
     }
 
@@ -381,8 +376,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
      *            The bytes to include in the hash.
      * @return The new hash code.
      */
-    protected static int generateHash(int hash, final byte[] bytes,
-            final int start, final int length) {
+    protected static int generateHash(int hash, final byte[] bytes, final int start, final int length) {
         for (int count = start; count < length; count++) {
             hash = 31 * hash + bytes[count];
         }

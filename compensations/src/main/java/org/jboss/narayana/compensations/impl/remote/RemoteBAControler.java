@@ -33,7 +33,8 @@ public class RemoteBAControler implements BAControler {
     }
 
     @Override
-    public void closeBusinessActivity() throws WrongStateException, UnknownTransactionException, TransactionRolledBackException, SystemException {
+    public void closeBusinessActivity()
+            throws WrongStateException, UnknownTransactionException, TransactionRolledBackException, SystemException {
 
         UserBusinessActivityFactory.userBusinessActivity().close();
         CompensationManagerImpl.suspend();
@@ -47,7 +48,8 @@ public class RemoteBAControler implements BAControler {
     }
 
     @Override
-    public void completeBusinessActivity(final boolean isException) throws WrongStateException, UnknownTransactionException, SystemException {
+    public void completeBusinessActivity(final boolean isException)
+            throws WrongStateException, UnknownTransactionException, SystemException {
 
         if (CompensationManagerImpl.isCompensateOnly() && !isException) {
             cancelBusinessActivity();
@@ -87,7 +89,6 @@ public class RemoteBAControler implements BAControler {
         BusinessActivityManagerFactory.businessActivityManager().resume((TxContext) context);
     }
 
-
     @Override
     public Object getCurrentTransaction() throws Exception {
 
@@ -96,12 +97,13 @@ public class RemoteBAControler implements BAControler {
 
     @Override
     public ParticipantManager enlist(Class<? extends CompensationHandler> compensationHandlerClass,
-                                     Class<? extends ConfirmationHandler> confirmationHandlerClass,
-                                     Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception {
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception {
 
-        RemoteParticipant p = new RemoteParticipant(compensationHandlerClass, confirmationHandlerClass, transactionLoggedHandlerClass, getCurrentTransaction());
-        BAParticipantManager pm = BusinessActivityManagerFactory.businessActivityManager().
-                enlistForBusinessAgreementWithParticipantCompletion(p, String.valueOf(UUID.randomUUID()));
+        RemoteParticipant p = new RemoteParticipant(compensationHandlerClass, confirmationHandlerClass,
+                transactionLoggedHandlerClass, getCurrentTransaction());
+        BAParticipantManager pm = BusinessActivityManagerFactory.businessActivityManager()
+                .enlistForBusinessAgreementWithParticipantCompletion(p, String.valueOf(UUID.randomUUID()));
         return new RemoteParticipantManager(pm);
     }
 

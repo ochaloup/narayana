@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.PerfProfile01Servers;
  * $Id: Server_AIT01_ImplicitObject.java,v 1.2 2003/06/26 11:44:23 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.PerfProfile01.*;
 import org.jboss.jbossts.qa.PerfProfile01Impls.AITImplicitObjectImpl01;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server_AIT01_ImplicitObject
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server_AIT01_ImplicitObject {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -83,11 +79,8 @@ public class Server_AIT01_ImplicitObject
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server_AIT01_ImplicitObject.main: " + exception);
         }
     }
 }
-

@@ -56,18 +56,14 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients1;
  * $Id: Client03b.java,v 1.2 2003/06/26 11:43:30 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery05.CrashBehavior;
 import org.jboss.jbossts.qa.Utils.OTS;
 
-public class Client03b
-{
-    public static void main(String[] args)
-    {
+public class Client03b {
+    public static void main(String[] args) {
         ClientBeforeCrash beforeCrash = new ClientBeforeCrash(Client01b.class.getSimpleName());
 
-        try
-        {
+        try {
             beforeCrash.initOrb(args);
             beforeCrash.initCrashBehaviour(CrashBehavior.CrashBehaviorCrashInRollback);
             beforeCrash.serviceSetup();
@@ -75,12 +71,9 @@ public class Client03b
             OTS.current().rollback();
 
             beforeCrash.reportStatus();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             beforeCrash.reportException(exception);
-        }
-        finally {
+        } finally {
             beforeCrash.shutdownOrb();
         }
     }

@@ -23,22 +23,17 @@ package org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.client;
 import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.impl.Service01;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 
-public class Client002 extends BaseTestClient
-{
-    public static void main(String[] args)
-    {
+public class Client002 extends BaseTestClient {
+    public static void main(String[] args) {
         Client002 test = new Client002(args);
     }
 
-    private Client002(String[] args)
-    {
+    private Client002(String[] args) {
         super(args);
     }
 
-    public void Test()
-    {
-        try
-        {
+    public void Test() {
+        try {
             setNumberOfCalls(2);
             setNumberOfResources(1);
 
@@ -55,13 +50,11 @@ public class Client002 extends BaseTestClient
             mService.doWork(mMaxIteration);
             abort();
 
-            //check final values
+            // check final values
             mCorrect = mCorrect && mService.checkAbortOper();
 
             qaAssert(mCorrect);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Fail("Error in Client002.test() :", e);
         }
     }

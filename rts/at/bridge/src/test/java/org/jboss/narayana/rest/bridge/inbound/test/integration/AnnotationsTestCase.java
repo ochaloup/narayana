@@ -33,8 +33,7 @@ public class AnnotationsTestCase extends AbstractTestCase {
             + ResourceWithTransactionalAnnotation.MANDATORY_SEGMENT;
 
     private static final String TRANSACTIONAL_NEVER_URL = DEPLOYMENT_URL + "/"
-            + ResourceWithTransactionalAnnotation.URL_SEGMENT + "/"
-            + ResourceWithTransactionalAnnotation.NEVER_SEGMENT;
+            + ResourceWithTransactionalAnnotation.URL_SEGMENT + "/" + ResourceWithTransactionalAnnotation.NEVER_SEGMENT;
 
     private static final String TRANSACTION_ATTRIBUTE_MANDATORY_URL = DEPLOYMENT_URL + "/"
             + ResourceWithTransactionAttributeAnnotation.URL_SEGMENT + "/"
@@ -49,8 +48,7 @@ public class AnnotationsTestCase extends AbstractTestCase {
         return getEmptyWebArchive()
                 .addClasses(ResourceWitoutAnnotation.class, ResourceWithTransactionalAnnotation.class,
                         ResourceWithTransactionAttributeAnnotation.class)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsWebInfResource("web.xml", "web.xml");
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").addAsWebInfResource("web.xml", "web.xml");
     }
 
     @Before

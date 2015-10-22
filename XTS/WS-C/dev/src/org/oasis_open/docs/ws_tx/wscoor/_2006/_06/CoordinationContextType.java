@@ -14,11 +14,13 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-
 /**
- * <p>Java class for CoordinationContextType complex type.
+ * <p>
+ * Java class for CoordinationContextType complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="CoordinationContextType">
@@ -45,16 +47,10 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CoordinationContextType", propOrder = {
-    "identifier",
-    "expires",
-    "coordinationType",
-    "registrationService"
-})
-@XmlSeeAlso({
-    org.oasis_open.docs.ws_tx.wscoor._2006._06.CreateCoordinationContextType.CurrentContext.class,
-    CoordinationContext.class
-})
+@XmlType(name = "CoordinationContextType", propOrder = {"identifier", "expires", "coordinationType",
+        "registrationService"})
+@XmlSeeAlso({org.oasis_open.docs.ws_tx.wscoor._2006._06.CreateCoordinationContextType.CurrentContext.class,
+        CoordinationContext.class})
 public class CoordinationContextType {
 
     @XmlElement(name = "Identifier", required = true)
@@ -72,10 +68,8 @@ public class CoordinationContextType {
     /**
      * Gets the value of the identifier property.
      * 
-     * @return
-     *     possible object is
-     *     {@link CoordinationContextType.Identifier }
-     *     
+     * @return possible object is {@link CoordinationContextType.Identifier }
+     * 
      */
     public CoordinationContextType.Identifier getIdentifier() {
         return identifier;
@@ -85,9 +79,8 @@ public class CoordinationContextType {
      * Sets the value of the identifier property.
      * 
      * @param value
-     *     allowed object is
-     *     {@link CoordinationContextType.Identifier }
-     *     
+     *            allowed object is {@link CoordinationContextType.Identifier }
+     * 
      */
     public void setIdentifier(CoordinationContextType.Identifier value) {
         this.identifier = value;
@@ -96,10 +89,8 @@ public class CoordinationContextType {
     /**
      * Gets the value of the expires property.
      * 
-     * @return
-     *     possible object is
-     *     {@link Expires }
-     *     
+     * @return possible object is {@link Expires }
+     * 
      */
     public Expires getExpires() {
         return expires;
@@ -109,9 +100,8 @@ public class CoordinationContextType {
      * Sets the value of the expires property.
      * 
      * @param value
-     *     allowed object is
-     *     {@link Expires }
-     *     
+     *            allowed object is {@link Expires }
+     * 
      */
     public void setExpires(Expires value) {
         this.expires = value;
@@ -120,10 +110,8 @@ public class CoordinationContextType {
     /**
      * Gets the value of the coordinationType property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * @return possible object is {@link String }
+     * 
      */
     public String getCoordinationType() {
         return coordinationType;
@@ -133,9 +121,8 @@ public class CoordinationContextType {
      * Sets the value of the coordinationType property.
      * 
      * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *            allowed object is {@link String }
+     * 
      */
     public void setCoordinationType(String value) {
         this.coordinationType = value;
@@ -144,10 +131,8 @@ public class CoordinationContextType {
     /**
      * Gets the value of the registrationService property.
      * 
-     * @return
-     *     possible object is
-     *     {@link W3CEndpointReference }
-     *     
+     * @return possible object is {@link W3CEndpointReference }
+     * 
      */
     public W3CEndpointReference getRegistrationService() {
         return registrationService;
@@ -157,37 +142,38 @@ public class CoordinationContextType {
      * Sets the value of the registrationService property.
      * 
      * @param value
-     *     allowed object is
-     *     {@link W3CEndpointReference }
-     *     
+     *            allowed object is {@link W3CEndpointReference }
+     * 
      */
     public void setRegistrationService(W3CEndpointReference value) {
         this.registrationService = value;
     }
 
     /**
-     * Gets a map that contains attributes that aren't bound to any typed property on this class.
+     * Gets a map that contains attributes that aren't bound to any typed
+     * property on this class.
      * 
      * <p>
-     * the map is keyed by the name of the attribute and 
-     * the value is the string value of the attribute.
+     * the map is keyed by the name of the attribute and the value is the string
+     * value of the attribute.
      * 
-     * the map returned by this method is live, and you can add new attribute
-     * by updating the map directly. Because of this design, there's no setter.
+     * the map returned by this method is live, and you can add new attribute by
+     * updating the map directly. Because of this design, there's no setter.
      * 
      * 
-     * @return
-     *     always non-null
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;
     }
 
-
     /**
-     * <p>Java class for anonymous complex type.
+     * <p>
+     * Java class for anonymous complex type.
      * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
+     * <p>
+     * The following schema fragment specifies the expected content contained
+     * within this class.
      * 
      * <pre>
      * &lt;complexType>
@@ -201,9 +187,7 @@ public class CoordinationContextType {
      * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "value"
-    })
+    @XmlType(name = "", propOrder = {"value"})
     public static class Identifier {
 
         @XmlValue
@@ -215,10 +199,8 @@ public class CoordinationContextType {
         /**
          * Gets the value of the value property.
          * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         * @return possible object is {@link String }
+         * 
          */
         public String getValue() {
             return value;
@@ -228,27 +210,27 @@ public class CoordinationContextType {
          * Sets the value of the value property.
          * 
          * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *            allowed object is {@link String }
+         * 
          */
         public void setValue(String value) {
             this.value = value;
         }
 
         /**
-         * Gets a map that contains attributes that aren't bound to any typed property on this class.
+         * Gets a map that contains attributes that aren't bound to any typed
+         * property on this class.
          * 
          * <p>
-         * the map is keyed by the name of the attribute and 
-         * the value is the string value of the attribute.
+         * the map is keyed by the name of the attribute and the value is the
+         * string value of the attribute.
          * 
-         * the map returned by this method is live, and you can add new attribute
-         * by updating the map directly. Because of this design, there's no setter.
+         * the map returned by this method is live, and you can add new
+         * attribute by updating the map directly. Because of this design,
+         * there's no setter.
          * 
          * 
-         * @return
-         *     always non-null
+         * @return always non-null
          */
         public Map<QName, String> getOtherAttributes() {
             return otherAttributes;

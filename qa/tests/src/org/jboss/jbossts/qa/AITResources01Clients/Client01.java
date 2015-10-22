@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client01.java,v 1.2 2003/06/26 11:43:06 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client01
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client01 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,37 +73,28 @@ public class Client01
 
             int numberOfCalls = 1000;
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 counter.increase();
             }
 
             IntHolder value = new IntHolder();
             counter.get(value);
 
-            if (value.value == numberOfCalls)
-            {
+            if (value.value == numberOfCalls) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client01.main: " + exception);
             exception.printStackTrace(System.err);
         }

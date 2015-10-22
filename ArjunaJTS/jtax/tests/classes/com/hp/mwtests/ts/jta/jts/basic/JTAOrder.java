@@ -44,18 +44,16 @@ import com.hp.mwtests.ts.jta.jts.common.FirstXAResource;
 import com.hp.mwtests.ts.jta.jts.common.LastXAResource;
 import com.hp.mwtests.ts.jta.jts.common.TestResource;
 
-public class JTAOrder
-{
+public class JTAOrder {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
@@ -63,11 +61,12 @@ public class JTAOrder
 
         boolean passed = false;
 
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
-        try
-        {
+        try {
             javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
             XAResource theResource = new TestResource();
@@ -87,9 +86,7 @@ public class JTAOrder
             System.err.println("Committing transaction.");
 
             tm.commit();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

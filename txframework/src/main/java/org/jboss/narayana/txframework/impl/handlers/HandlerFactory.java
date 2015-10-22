@@ -50,13 +50,15 @@ public class HandlerFactory {
             return protocolHandler;
         }
 
-        Compensatable compensatable = (Compensatable) serviceInvocationMeta.getServiceClass().getAnnotation(Compensatable.class);
+        Compensatable compensatable = (Compensatable) serviceInvocationMeta.getServiceClass()
+                .getAnnotation(Compensatable.class);
         if (compensatable != null) {
             protocolHandler = new WSBAHandler(serviceInvocationMeta, compensatable.completionType());
         }
 
         if (protocolHandler == null) {
-            throw new UnsupportedProtocolException("Expected to find a transaction type annotation on '" + serviceInvocationMeta.getServiceClass().getName() + "'");
+            throw new UnsupportedProtocolException("Expected to find a transaction type annotation on '"
+                    + serviceInvocationMeta.getServiceClass().getName() + "'");
         }
 
         protocolHandlerMap.put(txid, protocolHandler);
@@ -73,13 +75,13 @@ public class HandlerFactory {
 
         String txid;
 
-        //Try WS-AT
+        // Try WS-AT
         txid = UserTransactionFactory.userTransaction().transactionIdentifier();
         if (!txid.equals("Unknown")) {
             return txid;
         }
 
-        //Try WS-BA
+        // Try WS-BA
         try {
             BusinessActivityManager businessActivityManager = BusinessActivityManagerFactory.businessActivityManager();
 
@@ -93,7 +95,7 @@ public class HandlerFactory {
             throw new TXFrameworkException("Error when looking up Business Activity", e);
         }
 
-        //Try REST-AT
+        // Try REST-AT
         HttpServletRequest req = ResteasyProviderFactory.getContextData(HttpServletRequest.class);
         String enlistUrl = req.getHeader("enlistURL");
         if (enlistUrl != null) {

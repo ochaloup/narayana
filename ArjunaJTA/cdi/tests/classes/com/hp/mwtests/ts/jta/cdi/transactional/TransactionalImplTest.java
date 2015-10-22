@@ -59,8 +59,7 @@ public class TransactionalImplTest {
     @Deployment
     public static WebArchive createTestArchive() {
 
-        return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
+        return ShrinkWrap.create(WebArchive.class, "test.war").addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -114,7 +113,7 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithDefault(RuntimeException.class);
             Assert.fail("Expected RuntimeException to be thrown, but it was not");
         } catch (RuntimeException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(false);
@@ -131,7 +130,7 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithDefault(Exception.class);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (Exception e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(false);
@@ -148,14 +147,13 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithDefaultAndRollbackOn(TestException.class);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TestException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(false);
 
         AssertionParticipant.assertRolledBack();
     }
-
 
     @Test
     public void testDefaultWithDontRollbackOn() throws Throwable {
@@ -166,14 +164,13 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithDefaultAndDontRollbackOn(TestRuntimeException.class);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TestRuntimeException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(false);
 
         AssertionParticipant.assertCommitted();
     }
-
 
     @Test
     public void testDefaultWithDoAndDontRollbackOn() throws Throwable {
@@ -184,14 +181,13 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithDefaultAndDoAndDontRollbackOn(TestException.class);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TestException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(false);
 
         AssertionParticipant.assertCommitted();
     }
-
 
     @Test
     public void testRequiresNewNoExistingTX() throws Exception {
@@ -202,7 +198,6 @@ public class TransactionalImplTest {
 
         AssertionParticipant.assertCommitted();
     }
-
 
     @Test
     public void testRequiresNewExistingTX() throws Exception {
@@ -245,13 +240,12 @@ public class TransactionalImplTest {
     @Test
     public void testMandatoryNoExistingTX() throws Exception {
 
-
         Utills.assertTransactionActive(false);
         try {
             testTransactionalBean.invokeWithMandatory(null);
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            //expected
+            // expected
         }
         Utills.assertTransactionActive(false);
     }
@@ -320,7 +314,7 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithNever();
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(true);
@@ -349,7 +343,7 @@ public class TransactionalImplTest {
             testTransactionalBean.invokeWithCLassLevelDefault();
             Assert.fail("Expected Exception to be thrown, but it was not");
         } catch (TransactionalException e) {
-            //expected
+            // expected
         }
 
         Utills.assertTransactionActive(true);
@@ -414,7 +408,9 @@ public class TransactionalImplTest {
     }
 
     /**
-     * Test that business logic annotated with a stereotype that includes @Transactional executes inside a transaction
+     * Test that business logic annotated with a stereotype that
+     * includes @Transactional executes inside a transaction
+     * 
      * @throws Exception
      */
     @Test(expected = TestException.class)

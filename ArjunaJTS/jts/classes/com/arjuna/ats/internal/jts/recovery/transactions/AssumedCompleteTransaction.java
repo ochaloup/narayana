@@ -29,7 +29,6 @@
  * $Id: AssumedCompleteTransaction.java 2342 2006-03-30 13:06:17Z  $
  */
 
-
 package com.arjuna.ats.internal.jts.recovery.transactions;
 
 import java.util.Date;
@@ -48,71 +47,62 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * Recovery will not be attempted unless a replay completion is received, in
  * which case it is reactivated.
  * <P>
- * Several of the methods of OTS_Transaction could be simplified for an 
- * AssumedCompleteTransaction (e.g. the status must be committed), but they
- * are kept the same to simplify maintenance
+ * Several of the methods of OTS_Transaction could be simplified for an
+ * AssumedCompleteTransaction (e.g. the status must be committed), but they are
+ * kept the same to simplify maintenance
  * <P>
+ * 
  * @author Peter Furniss (peter.furniss@arjuna.com)
- * @version $Id: AssumedCompleteTransaction.java 2342 2006-03-30 13:06:17Z  $ 
+ * @version $Id: AssumedCompleteTransaction.java 2342 2006-03-30 13:06:17Z $
  *
  */
 
-public class AssumedCompleteTransaction extends RecoveredTransaction
-{
-    public AssumedCompleteTransaction ( Uid actionUid )
-    {
-    super(actionUid,ourTypeName);
+public class AssumedCompleteTransaction extends RecoveredTransaction {
+    public AssumedCompleteTransaction(Uid actionUid) {
+        super(actionUid, ourTypeName);
 
-    if (jtsLogger.logger.isDebugEnabled()) {
-        jtsLogger.logger.debug("AssumedCompleteTransaction "+get_uid()+" created");
-    }
+        if (jtsLogger.logger.isDebugEnabled()) {
+            jtsLogger.logger.debug("AssumedCompleteTransaction " + get_uid() + " created");
+        }
     }
 
     /**
-     *  the original process must be deceased if we are assumed complete
+     * the original process must be deceased if we are assumed complete
      */
-    public Status getOriginalStatus()
-    {
+    public Status getOriginalStatus() {
         return Status.StatusNoTransaction;
     }
 
-
-    public String type ()
-    {
+    public String type() {
         return AssumedCompleteTransaction.typeName();
     }
     /**
-     * typeName differs from original to force the ActionStore to 
-     * keep AssumedCompleteTransactions separate
+     * typeName differs from original to force the ActionStore to keep
+     * AssumedCompleteTransactions separate
      */
 
-    public static String typeName ()
-    {
+    public static String typeName() {
         return ourTypeName;
     }
 
-    public String toString ()
-    {
-        return "AssumedCompleteTransaction < "+get_uid()+" >";
+    public String toString() {
+        return "AssumedCompleteTransaction < " + get_uid() + " >";
     }
 
     /**
      * This T is already assumed complete, so return false
      */
-    public boolean assumeComplete()
-    {
+    public boolean assumeComplete() {
         return false;
     }
 
-    public Date getLastActiveTime()
-    {
+    public Date getLastActiveTime() {
         return _lastActiveTime;
     }
 
-    public boolean restore_state (InputObjectState objectState, int ot)
-    {
+    public boolean restore_state(InputObjectState objectState, int ot) {
         // do the other stuff
-        boolean result = super.restore_state(objectState,ot);
+        boolean result = super.restore_state(objectState, ot);
 
         if (result) {
             try {
@@ -126,12 +116,11 @@ public class AssumedCompleteTransaction extends RecoveredTransaction
         return result;
     }
 
-    public boolean save_state (OutputObjectState os, int ot)
-    {
+    public boolean save_state(OutputObjectState os, int ot) {
         // do the other stuff
-        boolean result = super.save_state(os,ot);
+        boolean result = super.save_state(os, ot);
 
-        if (result ) {
+        if (result) {
             // a re-write means we have just been active
             _lastActiveTime = new Date();
             try {

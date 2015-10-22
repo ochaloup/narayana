@@ -42,39 +42,48 @@ import com.arjuna.ats.arjuna.common.Uid;
 public interface jtsI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
-//    @Message(id = 22001, value = "ExpiredAssumedCompleteScanner created, with expiry time of {0}  seconds", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_1(String arg0);
+    // @Message(id = 22001, value = "ExpiredAssumedCompleteScanner created, with
+    // expiry time of {0} seconds", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_1(String
+    // arg0);
 
-//    @Message(id = 22002, value = "ExpiredAssumedCompleteScanner - scanning to remove items from before {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_2(String arg0);
+    // @Message(id = 22002, value = "ExpiredAssumedCompleteScanner - scanning to
+    // remove items from before {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_2(String
+    // arg0);
 
     @Message(id = 22003, value = "Removing old assumed complete transaction {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
     public void info_arjuna_recovery_ExpiredAssumedCompleteScanner_3(Uid arg0);
 
-//    @Message(id = 22004, value = "Expiry scan interval set to {0} seconds", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_4(String arg0);
+    // @Message(id = 22004, value = "Expiry scan interval set to {0} seconds",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_4(String
+    // arg0);
 
-//    @Message(id = 22005, value = "{0}  has inappropriate value ({1})", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_5(String arg0, String arg1);
+    // @Message(id = 22005, value = "{0} has inappropriate value ({1})", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_arjuna_recovery_ExpiredAssumedCompleteScanner_5(String
+    // arg0, String arg1);
 
     @Message(id = 22006, value = "The ORB has not been initialized yet", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
     public void fatal_ORBManager();
 
-//    @Message(id = 22007, value = "{0} expected a Coordinator reference and did not get one: {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_context_coorref(String arg0, String arg1);
+    // @Message(id = 22007, value = "{0} expected a Coordinator reference and
+    // did not get one: {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_context_coorref(String arg0, String arg1);
 
     @Message(id = 22008, value = "{0} caught exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -263,11 +272,13 @@ public interface jtsI18NLogger {
 
     @Message(id = 22056, value = "{0} - a failure occured when getting {1} codec - unknown encoding.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_jacorb_interceptors_context_codecerror(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_jacorb_interceptors_context_codecerror(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22057, value = "{0} - duplicate interceptor name for {1} when registering", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_jacorb_interceptors_context_duplicatename(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_jacorb_interceptors_context_duplicatename(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22058, value = "Context interceptor caught an unexpected exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -288,11 +299,13 @@ public interface jtsI18NLogger {
 
     @Message(id = 22063, value = "{0} - a failure occured when getting {1} codec - unknown encoding.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_jacorb_interceptors_interposition_codecerror(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_jacorb_interceptors_interposition_codecerror(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22064, value = "{0} - duplicate interceptor name for {1} when registering", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_jacorb_interceptors_interposition_duplicatename(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_jacorb_interceptors_interposition_duplicatename(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22065, value = "Invalid portable interceptor transaction parameter!", format = MESSAGE_FORMAT)
     public String get_orbspecific_jacorb_interceptors_interposition_invalidparam();
@@ -304,17 +317,21 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_interceptors_interposition_srie(String arg0, @Cause() Throwable arg1);
 
-//    @Message(id = 22068, value = "Client Interceptor for RecoveryCoordinators created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_ClientForwardInterceptor_1();
+    // @Message(id = 22068, value = "Client Interceptor for RecoveryCoordinators
+    // created", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_ClientForwardInterceptor_1();
 
     @Message(id = 22069, value = "Failed to retreive the Object reference of the default RecoverCoordinator Object.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_ClientForwardInterceptor_2(@Cause() Throwable arg0);
 
-//    @Message(id = 22070, value = "Failed to obtain the ObjectId string of the RecveryCoordinator target.", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_ClientForwardInterceptor_3();
+    // @Message(id = 22070, value = "Failed to obtain the ObjectId string of the
+    // RecveryCoordinator target.", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_ClientForwardInterceptor_3();
 
     @Message(id = 22071, value = "Failed to build service context with the ObjectId", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -324,21 +341,30 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_ClientInitializer_1(@Cause() Throwable arg0);
 
-//    @Message(id = 22073, value = "JacOrbDefaultServant replay_completion for recoverId {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbDefaultServant_1(String arg0);
+    // @Message(id = 22073, value = "JacOrbDefaultServant replay_completion for
+    // recoverId {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbDefaultServant_1(String
+    // arg0);
 
-//    @Message(id = 22074, value = "JacOrbDefaultServant replay_completion for ObjectId {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbDefaultServant_2(String arg0);
+    // @Message(id = 22074, value = "JacOrbDefaultServant replay_completion for
+    // ObjectId {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbDefaultServant_2(String
+    // arg0);
 
     @Message(id = 22075, value = "JacOrbServant.replay_completion got exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCDefaultServant_3(@Cause() Throwable arg0);
 
-//    @Message(id = 22076, value = "JacOrbRCManager: Created reference for tran {0} = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCManager_1(String arg0, String arg1);
+    // @Message(id = 22076, value = "JacOrbRCManager: Created reference for tran
+    // {0} = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCManager_1(String
+    // arg0, String arg1);
 
     @Message(id = 22077, value = "RCManager.makeRC did not make rcvco reference", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -360,17 +386,21 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_1(@Cause() Throwable arg0);
 
-//    @Message(id = 22082, value = "JacOrbRCServiceInit - set default servant and activated", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_2();
+    // @Message(id = 22082, value = "JacOrbRCServiceInit - set default servant
+    // and activated", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_2();
 
     @Message(id = 22083, value = "JacOrbRCServiceInit - Failed to start RC service", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_3(@Cause() Throwable arg0);
 
-//    @Message(id = 22084, value = "Unable to create file ObjectId", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_4();
+    // @Message(id = 22084, value = "Unable to create file ObjectId", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_4();
 
     @Message(id = 22085, value = "Unable to create file ObjectId - security problems", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
@@ -384,36 +414,45 @@ public interface jtsI18NLogger {
     @LogMessage(level = INFO)
     public void info_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_6a();
 
-//    @Message(id = 22088, value = "Failed to create orb and poa for transactional objects", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_7(@Cause() Throwable arg0);
+    // @Message(id = 22088, value = "Failed to create orb and poa for
+    // transactional objects", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_7(@Cause()
+    // Throwable arg0);
 
     @Message(id = 22089, value = "RootPOA is null. Initialization failed. Check no conflicting or duplicate service is running.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_8();
 
-//    @Message(id = 22090, value = "JacOrb RecoveryCoordinator creator setup", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_JacOrbRecoveryInit_1();
+    // @Message(id = 22090, value = "JacOrb RecoveryCoordinator creator setup",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_JacOrbRecoveryInit_1();
 
     @Message(id = 22091, value = "Failed in ServerInitializer::post_init -", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_orbspecific_jacorb_recoverycoordinators_ServerInitializer_1(@Cause() Throwable arg0);
 
-//    @Message(id = 22092, value = "Failed to obtain the service context -", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_orbspecific_jacorb_recoverycoordinators_ServerRecoveryInterceptor_1();
+    // @Message(id = 22092, value = "Failed to obtain the service context -",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_orbspecific_jacorb_recoverycoordinators_ServerRecoveryInterceptor_1();
 
     @Message(id = 22093, value = "Cannot create a codec of the required encoding.", format = MESSAGE_FORMAT)
     public String get_orbspecific_javaidl_interceptors_context_codeccreate();
 
     @Message(id = 22094, value = "{0} - a failure occured when getting {1} codec - unknown encoding.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_javaidl_interceptors_context_codecerror(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_javaidl_interceptors_context_codecerror(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22095, value = "{0} - duplicate interceptor name for {1} when registering", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_javaidl_interceptors_context_duplicatename(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_javaidl_interceptors_context_duplicatename(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22096, value = "Context interceptor caught an unexpected exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -434,11 +473,13 @@ public interface jtsI18NLogger {
 
     @Message(id = 22101, value = "{0} - a failure occured when getting {1} codec - unknown encoding.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_javaidl_interceptors_interposition_codecerror(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_javaidl_interceptors_interposition_codecerror(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22102, value = "{0} - duplicate interceptor name for {1} when registering", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_orbspecific_javaidl_interceptors_interposition_duplicatename(String arg0, String arg1, @Cause() Throwable arg2);
+    public void warn_orbspecific_javaidl_interceptors_interposition_duplicatename(String arg0, String arg1,
+            @Cause() Throwable arg2);
 
     @Message(id = 22103, value = "Invalid portable interceptor transaction parameter!", format = MESSAGE_FORMAT)
     public String get_orbspecific_javaidl_interceptors_interposition_invalidparam();
@@ -469,69 +510,82 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_otsserverfailed(@Cause() Throwable arg0);
 
-//    @Message(id = 22111, value = "ExpiredContactScanner created, with expiry time of {0} seconds", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_ExpiredContactScanner_1(String arg0);
+    // @Message(id = 22111, value = "ExpiredContactScanner created, with expiry
+    // time of {0} seconds", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_ExpiredContactScanner_1(String arg0);
 
-//    @Message(id = 22112, value = "ExpiredContactScanner - scanning to remove items from before {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_ExpiredContactScanner_2(String arg0);
+    // @Message(id = 22112, value = "ExpiredContactScanner - scanning to remove
+    // items from before {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_ExpiredContactScanner_2(String arg0);
 
     @Message(id = 22113, value = "Removing old contact item {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
     public void info_recovery_ExpiredContactScanner_3(Uid arg0);
 
-//    @Message(id = 22114, value = "Expiry scan interval set to {0} seconds", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_ExpiredContactScanner_4(String arg0);
+    // @Message(id = 22114, value = "Expiry scan interval set to {0} seconds",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_ExpiredContactScanner_4(String arg0);
 
-//    @Message(id = 22115, value = "{0} has inappropriate value {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_ExpiredContactScanner_5(String arg0, String arg1);
+    // @Message(id = 22115, value = "{0} has inappropriate value {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_ExpiredContactScanner_5(String arg0, String
+    // arg1);
 
     @Message(id = 22116, value = "Could not locate supported ORB for RecoveryCoordinator initialisation.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_RecoveryEnablement_1();
 
-//    @Message(id = 22117, value = "Full crash recovery is not supported with this orb", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryEnablement_2();
+    // @Message(id = 22117, value = "Full crash recovery is not supported with
+    // this orb", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryEnablement_2();
 
-//    @Message(id = 22118, value = "Set property {0}  =  {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryEnablement_3(String arg0, String arg1);
+    // @Message(id = 22118, value = "Set property {0} = {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryEnablement_3(String arg0, String arg1);
 
-//    @Message(id = 22119, value = "RecoveryCoordinator service can only be provided in RecoveryManager", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryEnablement_4();
+    // @Message(id = 22119, value = "RecoveryCoordinator service can only be
+    // provided in RecoveryManager", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryEnablement_4();
 
-//    @Message(id = 22120, value = "ORB/OA initialisation failed: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryEnablement_5(String arg0);
+    // @Message(id = 22120, value = "ORB/OA initialisation failed: {0}", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryEnablement_5(String arg0);
 
     @Message(id = 22121, value = "The Recovery Service Initialisation failed", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_RecoveryEnablement_6();
 
-//    @Message(id = 22122, value = "added ORBAttribute for recoveryCoordinatorInitialiser", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryInit_1();
+    // @Message(id = 22122, value = "added ORBAttribute for
+    // recoveryCoordinatorInitialiser", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryInit_1();
 
-//    @Message(id = 22123, value = "Full crash recovery is not supported with this orb", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryInit_2();
+    // @Message(id = 22123, value = "Full crash recovery is not supported with
+    // this orb", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryInit_2();
 
-//    @Message(id = 22124, value = "added event handler  {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryInit_3(String arg0);
+    // @Message(id = 22124, value = "added event handler {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryInit_3(String arg0);
 
     @Message(id = 22125, value = "RecoveryCoordinator service can only be provided in RecoveryManager", format = MESSAGE_FORMAT)
     @LogMessage(level = FATAL)
     public void fatal_recovery_RecoveryInit_4();
 
-//    @Message(id = 22126, value = "ORB/OA initialisation failed: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_RecoveryInit_5(String arg0);
+    // @Message(id = 22126, value = "ORB/OA initialisation failed: {0}", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_RecoveryInit_5(String arg0);
 
     @Message(id = 22127, value = "Problem with storing process/factory link", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -561,21 +615,26 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_contact_FactoryContactItem_7(@Cause() Throwable arg0);
 
-//    @Message(id = 22134, value = "RecoveryContactWriter() created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_RecoveryContactWriter_1();
+    // @Message(id = 22134, value = "RecoveryContactWriter() created", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_RecoveryContactWriter_1();
 
-//    @Message(id = 22135, value = "RecoveryContactWriter.connected( \" {0} \")", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_RecoveryContactWriter_2(String arg0);
+    // @Message(id = 22135, value = "RecoveryContactWriter.connected( \" {0}
+    // \")", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_RecoveryContactWriter_2(String arg0);
 
-//    @Message(id = 22136, value = "RecoveryContactWriter.connected - found ArjunaFactory", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_RecoveryContactWriter_3();
+    // @Message(id = 22136, value = "RecoveryContactWriter.connected - found
+    // ArjunaFactory", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_RecoveryContactWriter_3();
 
-//    @Message(id = 22137, value = "StatusChecker.getStatus( {0} ) - current status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_1(String arg0, String arg1);
+    // @Message(id = 22137, value = "StatusChecker.getStatus( {0} ) - current
+    // status = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_1(String arg0, String
+    // arg1);
 
     @Message(id = 22138, value = "NoTransaction exception on trying to contact original process", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -587,11 +646,12 @@ public interface jtsI18NLogger {
 
     @Message(id = 22140, value = "Exception on trying to contact original process", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void  warn_recovery_contact_StatusChecker_12(@Cause() Throwable arg0);
+    public void warn_recovery_contact_StatusChecker_12(@Cause() Throwable arg0);
 
-//    @Message(id = 22141, value = "StatusChecker.getStatus({0}) -  no factory, process previously dead", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_13(String arg0);
+    // @Message(id = 22141, value = "StatusChecker.getStatus({0}) - no factory,
+    // process previously dead", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_13(String arg0);
 
     @Message(id = 22142, value = "no known contactitem for {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -601,33 +661,41 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_contact_StatusChecker_15(Uid arg0, @Cause() Throwable arg1);
 
-//    @Message(id = 22144, value = "StatusChecker.getStatus( {0} ) - stored status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_2(String arg0, String arg1);
+    // @Message(id = 22144, value = "StatusChecker.getStatus( {0} ) - stored
+    // status = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_2(String arg0, String
+    // arg1);
 
     @Message(id = 22145, value = "StatusChecked.getStatus - found intentions list for apparently unknown transaction: {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_contact_StatusChecker_3(Uid arg0);
 
-//    @Message(id = 22146, value = "StatusChecker.getStatus( {0} ) - Status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_4(String arg0, String arg1);
+    // @Message(id = 22146, value = "StatusChecker.getStatus( {0} ) - Status =
+    // {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_4(String arg0, String
+    // arg1);
 
-//    @Message(id = 22147, value = "StatusChecker.getStatus({0}) - NO_IMPLEMENT = dead", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_5(String arg0);
+    // @Message(id = 22147, value = "StatusChecker.getStatus({0}) - NO_IMPLEMENT
+    // = dead", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_5(String arg0);
 
-//    @Message(id = 22148, value = "StatusChecker.getStatus({0}) - TRANSIENT = dead", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_6(String arg0);
+    // @Message(id = 22148, value = "StatusChecker.getStatus({0}) - TRANSIENT =
+    // dead", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_6(String arg0);
 
-//    @Message(id = 22149, value = "StatusChecker.getStatus({0}) - COMM_FAILURE = live", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_7(String arg0);
+    // @Message(id = 22149, value = "StatusChecker.getStatus({0}) - COMM_FAILURE
+    // = live", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_7(String arg0);
 
-//    @Message(id = 22150, value = "StatusChecker.getStatus({0}) - OBJECT_NOT_EXIST = dead", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_contact_StatusChecker_8(String arg0);
+    // @Message(id = 22150, value = "StatusChecker.getStatus({0}) -
+    // OBJECT_NOT_EXIST = dead", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_contact_StatusChecker_8(String arg0);
 
     @Message(id = 22151, value = "BAD_PARAM exception on trying to contact original process", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -637,25 +705,35 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_rcnull(String arg0);
 
-//    @Message(id = 22153, value = "GenericRecoveryCoordinator {0} constructed", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_1(String arg0);
+    // @Message(id = 22153, value = "GenericRecoveryCoordinator {0}
+    // constructed", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_1(String
+    // arg0);
 
-//    @Message(id = 22154, value = "GenericRecoveryCoordinator() constructing", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_2();
+    // @Message(id = 22154, value = "GenericRecoveryCoordinator() constructing",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_2();
 
-//    @Message(id = 22155, value = "GenericRecoveryCoordinator - swapping Resource for RC {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_4(String arg0);
+    // @Message(id = 22155, value = "GenericRecoveryCoordinator - swapping
+    // Resource for RC {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_recoverycoordinators_GenericRecoveryCoordinator_4(String
+    // arg0);
 
     @Message(id = 22156, value = "GenericRecoveryCreator: Missing params to create", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_recoverycoordinators_GenericRecoveryCreator_1();
 
-//    @Message(id = 22157, value = "RecoveryCoordinatorId: created RCkey {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_recoverycoordinators_RecoveryCoordinatorId_1(String arg0);
+    // @Message(id = 22157, value = "RecoveryCoordinatorId: created RCkey {0}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_recoverycoordinators_RecoveryCoordinatorId_1(String arg0);
 
     @Message(id = 22158, value = "System exception when creating RecoveryCoordinator object key", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -665,41 +743,55 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_recoverycoordinators_RecoveryCoordinatorId_3(String arg0);
 
-//    @Message(id = 22160, value = "ResourceCompletor.rollback() - rollback failed: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_recoverycoordinators_ResourceCompletor_1(String arg0);
+    // @Message(id = 22160, value = "ResourceCompletor.rollback() - rollback
+    // failed: {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_recoverycoordinators_ResourceCompletor_1(String
+    // arg0);
 
     @Message(id = 22161, value = "Failure recovery not supported for this ORB.", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_recoveryinit_1();
 
-//    @Message(id = 22162, value = "AssumedCompleteServerTransaction {0} created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_AssumedCompleteServerTransaction_1(String arg0);
+    // @Message(id = 22162, value = "AssumedCompleteServerTransaction {0}
+    // created", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_AssumedCompleteServerTransaction_1(String
+    // arg0);
 
-//    @Message(id = 22163, value = "AssumedCompleteTransaction {0} created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_AssumedCompleteTransaction_1(String arg0);
+    // @Message(id = 22163, value = "AssumedCompleteTransaction {0} created",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_AssumedCompleteTransaction_1(String arg0);
 
-//    @Message(id = 22164, value = "", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_CachedRecoveredTransaction_1();
+    // @Message(id = 22164, value = "", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_CachedRecoveredTransaction_1();
 
-//    @Message(id = 22165, value = "CachedRecoveredTransaction.originalBusy - told status is {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_CachedRecoveredTransaction_2(String arg0);
+    // @Message(id = 22165, value = "CachedRecoveredTransaction.originalBusy -
+    // told status is {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_CachedRecoveredTransaction_2(String arg0);
 
-//    @Message(id = 22166, value = "RecoveredServerTransaction {0} created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_1(String arg0);
+    // @Message(id = 22166, value = "RecoveredServerTransaction {0} created",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_1(String arg0);
 
     @Message(id = 22167, value = "Got TRANSIENT from ORB for tx {0}, unable determine status, will retry later", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredServerTransaction_10(Uid arg0);
 
-//    @Message(id = 22168, value = "RecoveredServerTransaction.getStatusFromParent - replay_completion got object_not_exist = {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_11(String arg0);
+    // @Message(id = 22168, value =
+    // "RecoveredServerTransaction.getStatusFromParent - replay_completion got
+    // object_not_exist = {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_11(String arg0);
 
     @Message(id = 22169, value = "RecoveredServerTransaction: caught NotPrepared", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -713,29 +805,45 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredServerTransaction_14(Uid arg0);
 
-//    @Message(id = 22172, value = "RecoveredServerTransaction:getStatusFromParent - no recovcoord or status not prepared", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_15();
+    // @Message(id = 22172, value =
+    // "RecoveredServerTransaction:getStatusFromParent - no recovcoord or status
+    // not prepared", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_RecoveredServerTransaction_15();
 
-//    @Message(id = 22173, value = "\"RecoveredServerTransaction.unpackHeader - txid = {0} and processUid = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_16(String arg0, String arg1);
+    // @Message(id = 22173, value = "\"RecoveredServerTransaction.unpackHeader -
+    // txid = {0} and processUid = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_16(String arg0,
+    // String arg1);
 
-//    @Message(id = 22174, value = "RecoveredServerTransaction - activate of {0} failed with {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_17(String arg0, String arg1);
+    // @Message(id = 22174, value = "RecoveredServerTransaction - activate of
+    // {0} failed with {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_17(String arg0,
+    // String arg1);
 
     @Message(id = 22175, value = "RecoveredServerTransaction - activate of {0} failed!", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredServerTransaction_2(Uid arg0);
 
-//    @Message(id = 22176, value = "RecoveredServerTransaction.replayPhase2({0}) - status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_4(String arg0, String arg1);
+    // @Message(id = 22176, value =
+    // "RecoveredServerTransaction.replayPhase2({0}) - status = {1}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_4(String arg0,
+    // String arg1);
 
-//    @Message(id = 22177, value = "RecoveredServerTransaction.replayPhase2({0}) - status after contacting parent = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_5(String arg0, String arg1);
+    // @Message(id = 22177, value =
+    // "RecoveredServerTransaction.replayPhase2({0}) - status after contacting
+    // parent = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_5(String arg0,
+    // String arg1);
 
     @Message(id = 22178, value = "ServerTransaction {0} unable determine status - retry later", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
@@ -745,17 +853,24 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredServerTransaction_7(String arg0);
 
-//    @Message(id = 22180, value = "RecoveredServerTransaction.replayPhase2: ({0}) finished", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_8(String arg0);
+    // @Message(id = 22180, value = "RecoveredServerTransaction.replayPhase2:
+    // ({0}) finished", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_8(String arg0);
 
-//    @Message(id = 22181, value = "RecoveredServerTransaction.getStatusFromParent - replay_completion status = {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredServerTransaction_9(String arg0);
+    // @Message(id = 22181, value =
+    // "RecoveredServerTransaction.getStatusFromParent - replay_completion
+    // status = {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_RecoveredServerTransaction_9(String arg0);
 
-//    @Message(id = 22182, value = "RecoveredTransaction {0} created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredTransaction_1(String arg0);
+    // @Message(id = 22182, value = "RecoveredTransaction {0} created", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_RecoveredTransaction_1(String
+    // arg0);
 
     @Message(id = 22183, value = "RecoveredTransaction activate of {0} failed", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -765,25 +880,31 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredTransaction_3(Uid arg0, @Cause() Throwable arg1);
 
-//    @Message(id = 22185, value = "RecoveredTransaction.replayPhase2 ({0}) - status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredTransaction_5(String arg0, String arg1);
+    // @Message(id = 22185, value = "RecoveredTransaction.replayPhase2 ({0}) -
+    // status = {1}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_RecoveredTransaction_5(String
+    // arg0, String arg1);
 
     @Message(id = 22186, value = "RecoveredTransaction.replayPhase2 for {0} failed", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredTransaction_6(String arg0);
 
-//    @Message(id = 22187, value = "RecoveredTransaction.replayPhase2 ({0}) finished", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_RecoveredTransaction_7(String arg0);
+    // @Message(id = 22187, value = "RecoveredTransaction.replayPhase2 ({0})
+    // finished", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_RecoveredTransaction_7(String
+    // arg0);
 
     @Message(id = 22188, value = "RecoveredTransaction.removeOldStoreEntry - problem", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_RecoveredTransaction_8(@Cause() Throwable arg0);
 
-//    @Message(id = 22189, value = "ServerTransactionRecoveryModule created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_ServerTransactionRecoveryModule_1();
+    // @Message(id = 22189, value = "ServerTransactionRecoveryModule created",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_ServerTransactionRecoveryModule_1();
 
     @Message(id = 22190, value = "ServerTransactionRecoveryModule - First Pass", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
@@ -797,29 +918,46 @@ public interface jtsI18NLogger {
     @LogMessage(level = INFO)
     public void info_recovery_transactions_ServerTransactionRecoveryModule_5(Uid arg0);
 
-//    @Message(id = 22193, value = "ServerTransactionRecoveryModule - Transaction {0} still in state unknown (?).", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_ServerTransactionRecoveryModule_6(String arg0);
+    // @Message(id = 22193, value = "ServerTransactionRecoveryModule -
+    // Transaction {0} still in state unknown (?).", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_ServerTransactionRecoveryModule_6(String
+    // arg0);
 
-//    @Message(id = 22194, value = "ServerTransactionRecoveryModule - Transaction {0} is not in object store - assumed completed", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_ServerTransactionRecoveryModule_7(String arg0);
+    // @Message(id = 22194, value = "ServerTransactionRecoveryModule -
+    // Transaction {0} is not in object store - assumed completed", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_ServerTransactionRecoveryModule_7(String
+    // arg0);
 
-//    @Message(id = 22195, value = "Activated transaction {0} status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_ServerTransactionRecoveryModule_8(String arg0, String arg1);
+    // @Message(id = 22195, value = "Activated transaction {0} status = {1}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_ServerTransactionRecoveryModule_8(String arg0,
+    // String arg1);
 
-//    @Message(id = 22196, value = "Transaction {0} still busy", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_ServerTransactionRecoveryModule_9(String arg0);
+    // @Message(id = 22196, value = "Transaction {0} still busy", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_ServerTransactionRecoveryModule_9(String
+    // arg0);
 
-//    @Message(id = 22197, value = "TopLevelTransactionRecoveryModule created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TopLevelTransactionRecoveryModule_1();
+    // @Message(id = 22197, value = "TopLevelTransactionRecoveryModule created",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_TopLevelTransactionRecoveryModule_1();
 
-//    @Message(id = 22198, value = "TopLevelTransactionRecoveryModule destoryed", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TopLevelTransactionRecoveryModule_2();
+    // @Message(id = 22198, value = "TopLevelTransactionRecoveryModule
+    // destoryed", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_TopLevelTransactionRecoveryModule_2();
 
     @Message(id = 22199, value = "TopLevelTransactionRecoveryModule First Pass", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
@@ -829,25 +967,30 @@ public interface jtsI18NLogger {
     @LogMessage(level = INFO)
     public void info_recovery_transactions_TopLevelTransactionRecoveryModule_4();
 
-//    @Message(id = 22201, value = "Transaction {0} previously assumed complete", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCacheItem_1(String arg0);
+    // @Message(id = 22201, value = "Transaction {0} previously assumed
+    // complete", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCacheItem_1(String
+    // arg0);
 
     @Message(id = 22202, value = "TransactionCacheItem.loadTransaction - unknown type: {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_TransactionCacheItem_2(String arg0);
 
-//    @Message(id = 22203, value = "asking the tran for original status", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_1();
+    // @Message(id = 22203, value = "asking the tran for original status",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_1();
 
-//    @Message(id = 22204, value = "no transaction in cache so not asking for original status", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_2();
+    // @Message(id = 22204, value = "no transaction in cache so not asking for
+    // original status", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_2();
 
-//    @Message(id = 22205, value = "Transaction {0} assumed complete - changing type.", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_3(String arg0);
+    // @Message(id = 22205, value = "Transaction {0} assumed complete - changing
+    // type.", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_3(String arg0);
 
     @Message(id = 22206, value = "Transaction {0} assumed complete - will not poll any more", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
@@ -857,25 +1000,31 @@ public interface jtsI18NLogger {
     @LogMessage(level = INFO)
     public void info_recovery_transactions_TransactionCache_5(Uid arg0);
 
-//    @Message(id = 22208, value = "TransactionCache.remove {0}: transaction not in cache", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_6(String arg0);
+    // @Message(id = 22208, value = "TransactionCache.remove {0}: transaction
+    // not in cache", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_6(String arg0);
 
-//    @Message(id = 22209, value = "TransactionCache.remove {0}: removed transaction from cache", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_7(String arg0);
+    // @Message(id = 22209, value = "TransactionCache.remove {0}: removed
+    // transaction from cache", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_7(String arg0);
 
-//    @Message(id = 22210, value = "Non-integer value for property {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionCache_8(String arg0);
+    // @Message(id = 22210, value = "Non-integer value for property {0}", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionCache_8(String arg0);
 
-//    @Message(id = 22211, value = "TransactionRecoveryModule created", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_1();
+    // @Message(id = 22211, value = "TransactionRecoveryModule created", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_1();
 
-//    @Message(id = 22212, value = "Transaction {0} still busy", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_10(String arg0);
+    // @Message(id = 22212, value = "Transaction {0} still busy", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_recovery_transactions_TransactionRecoveryModule_10(String arg0);
 
     @Message(id = 22213, value = "TransactionRecoveryModule.periodicWorkFirstPass()", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
@@ -889,33 +1038,43 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_TransactionRecoveryModule_2();
 
-//    @Message(id = 22216, value = "TransactionRecoveryModule: scanning for {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_3(String arg0);
+    // @Message(id = 22216, value = "TransactionRecoveryModule: scanning for
+    // {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_3(String
+    // arg0);
 
     @Message(id = 22217, value = "TransactionRecoveryModule: Object store exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recovery_transactions_TransactionRecoveryModule_4(@Cause() Throwable arg0);
 
-//    @Message(id = 22218, value = "found transaction  {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_5(String arg0);
+    // @Message(id = 22218, value = "found transaction {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_5(String
+    // arg0);
 
     @Message(id = 22219, value = "Transaction {0} still in ActionStore", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
     public void info_recovery_transactions_TransactionRecoveryModule_6(Uid arg0);
 
-//    @Message(id = 22220, value = "Transaction {0} in state unknown (?).", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_7(String arg0);
+    // @Message(id = 22220, value = "Transaction {0} in state unknown (?).",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_7(String
+    // arg0);
 
-//    @Message(id = 22221, value = "Transaction {0} is not in object store - assumed completed", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_8(String arg0);
+    // @Message(id = 22221, value = "Transaction {0} is not in object store -
+    // assumed completed", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_8(String
+    // arg0);
 
-//    @Message(id = 22222, value = "Activated transaction {0} status = {1}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_recovery_transactions_TransactionRecoveryModule_9(String arg0, String arg1);
+    // @Message(id = 22222, value = "Activated transaction {0} status = {1}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_recovery_transactions_TransactionRecoveryModule_9(String
+    // arg0, String arg1);
 
     @Message(id = 22223, value = "{0} caught exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -977,9 +1136,10 @@ public interface jtsI18NLogger {
     @LogMessage(level = WARN)
     public void warn_extensions_atcannotabort(String arg0, String arg1);
 
-//    @Message(id = 22238, value = "{0} - current transaction is null!", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_extensions_atcurrenttxnull(String arg0);
+    // @Message(id = 22238, value = "{0} - current transaction is null!", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_extensions_atcurrenttxnull(String arg0);
 
     @Message(id = 22239, value = "{0} caught unexpected exception", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -1035,7 +1195,7 @@ public interface jtsI18NLogger {
     @Message(id = 22252, value = "Failed to remove old ObjectStore entry", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_recoveredServerTransaction_removeOldStoreEntry(@Cause() Throwable arg0);
-    
+
     @Message(id = 22253, value = "A client-side request interceptor already exists with that name.", format = MESSAGE_FORMAT)
     public String get_orbspecific_jacorb_interceptors_context_cie();
 
@@ -1058,11 +1218,11 @@ public interface jtsI18NLogger {
     @Message(id = 22259, value = "ExtendedResourceRecord detected that the remote side had cleaned up, assuming 1PC resource", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_1pc_commit_one();
-    
+
     @Message(id = 22260, value = "{0} caught exception", format = MESSAGE_FORMAT)
     @LogMessage(level = DEBUG)
     public void debug_orbspecific_interposition_resources_arjuna_generror(String arg0, @Cause() Throwable arg1);
- 
+
     @Message(id = 22261, value = "ServerTopLevelAction detected that the transaction was inactive", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_server_top_level_action_inactive();
@@ -1071,14 +1231,14 @@ public interface jtsI18NLogger {
     public String get_nodename_null();
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
-    */
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
+     */
 }

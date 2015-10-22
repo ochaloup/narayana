@@ -79,13 +79,14 @@ import com.arjuna.ats.jts.utils.Utility;
  * associated with the thread.
  *
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: CurrentImple.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: CurrentImple.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
  */
 
-public class CurrentImple extends LocalObject implements
-        org.omg.CosTransactions.Current, com.arjuna.ats.jts.extensions.Current
-{
+public class CurrentImple extends LocalObject
+        implements
+            org.omg.CosTransactions.Current,
+            com.arjuna.ats.jts.extensions.Current {
 
     public static final int TX_BEGUN = 0;
     public static final int TX_COMMITTED = 1;
@@ -93,8 +94,7 @@ public class CurrentImple extends LocalObject implements
     public static final int TX_SUSPENDED = 3;
     public static final int TX_RESUMED = 4;
 
-    public CurrentImple ()
-    {
+    public CurrentImple() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::CurrentImple ()");
         }
@@ -102,8 +102,7 @@ public class CurrentImple extends LocalObject implements
         _theManager = new ContextManager();
     }
 
-    public void begin () throws SubtransactionsUnavailable, SystemException
-    {
+    public void begin() throws SubtransactionsUnavailable, SystemException {
         ControlWrapper currentAction = _theManager.current();
 
         if (currentAction == null) // no current, so create top-level action
@@ -113,14 +112,10 @@ public class CurrentImple extends LocalObject implements
             }
 
             if (OTSImpleManager.localFactory())
-                currentAction = new ControlWrapper(
-                        OTSImpleManager.factory().createLocal(get_timeout()));
+                currentAction = new ControlWrapper(OTSImpleManager.factory().createLocal(get_timeout()));
             else
-                currentAction = new ControlWrapper(
-                        OTSImpleManager.get_factory().create(get_timeout()));
-        }
-        else
-        {
+                currentAction = new ControlWrapper(OTSImpleManager.get_factory().create(get_timeout()));
+        } else {
             if (jtsLogger.logger.isTraceEnabled()) {
                 jtsLogger.logger.trace("CurrentImple::begin - creating new subtransaction.");
             }
@@ -132,36 +127,19 @@ public class CurrentImple extends LocalObject implements
              * begin is a subtransaction. So, we throw INVALID_TRANSACTION.
              */
 
-            try
-            {
+            try {
                 currentAction = currentAction.create_subtransaction();
-            }
-            catch (Unavailable ex)
-            {
-                throw new INVALID_TRANSACTION(
-                        ExceptionCodes.UNAVAILABLE_COORDINATOR,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            catch (Inactive e)
-            {
-                throw new INVALID_TRANSACTION(
-                        ExceptionCodes.INACTIVE_TRANSACTION,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            catch (NO_MEMORY nme)
-            {
+            } catch (Unavailable ex) {
+                throw new INVALID_TRANSACTION(ExceptionCodes.UNAVAILABLE_COORDINATOR, CompletionStatus.COMPLETED_NO);
+            } catch (Inactive e) {
+                throw new INVALID_TRANSACTION(ExceptionCodes.INACTIVE_TRANSACTION, CompletionStatus.COMPLETED_NO);
+            } catch (NO_MEMORY nme) {
                 System.gc();
 
                 throw nme;
-            }
-            catch (SystemException sysEx)
-            {
-                throw new INVALID_TRANSACTION(
-                        ExceptionCodes.INACTIVE_TRANSACTION,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            catch (OutOfMemoryError me)
-            {
+            } catch (SystemException sysEx) {
+                throw new INVALID_TRANSACTION(ExceptionCodes.INACTIVE_TRANSACTION, CompletionStatus.COMPLETED_NO);
+            } catch (OutOfMemoryError me) {
                 System.gc();
 
                 throw new NO_MEMORY(0, CompletionStatus.COMPLETED_NO);
@@ -170,23 +148,17 @@ public class CurrentImple extends LocalObject implements
 
         _theManager.pushAction(currentAction);
 
-        try
-        {
+        try {
             ThreadAssociationControl.updateAssociation(currentAction, TX_BEGUN);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             /*
              * An error happened, so mark the transaction as rollback only (in
              * case it hasn't already been so marked.)
              */
 
-            try
-            {
+            try {
                 rollback_only();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
             }
         }
 
@@ -210,24 +182,18 @@ public class CurrentImple extends LocalObject implements
      *
      */
 
-    public void commit (boolean report_heuristics) throws NoTransaction,
-            HeuristicMixed, HeuristicHazard, SystemException
-    {
+    public void commit(boolean report_heuristics)
+            throws NoTransaction, HeuristicMixed, HeuristicHazard, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::commit ( "
-                    + report_heuristics + " )");
+            jtsLogger.logger.trace("CurrentImple::commit ( " + report_heuristics + " )");
         }
 
         ControlWrapper currentAction = _theManager.current();
 
-        if (currentAction != null)
-        {
-            try
-            {
+        if (currentAction != null) {
+            try {
                 ThreadAssociationControl.updateAssociation(currentAction, TX_COMMITTED);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 /*
                  * An error happened, so mark the transaction as rollback only
                  * (in case it hasn't already been so marked.)
@@ -242,14 +208,11 @@ public class CurrentImple extends LocalObject implements
              * later destroy the control.
              */
 
-            try
-            {
+            try {
                 currentAction.commit(report_heuristics);
 
                 _theManager.popAction();
-            }
-            catch (TRANSACTION_ROLLEDBACK e1)
-            {
+            } catch (TRANSACTION_ROLLEDBACK e1) {
                 /*
                  * Is ok to destroy transaction. Different for heuristics.
                  */
@@ -257,29 +220,21 @@ public class CurrentImple extends LocalObject implements
                 _theManager.popAction();
 
                 throw e1;
-            }
-            catch (HeuristicMixed e2)
-            {
+            } catch (HeuristicMixed e2) {
                 _theManager.popAction();
 
                 if (report_heuristics)
                     throw e2;
-            }
-            catch (HeuristicHazard e3)
-            {
+            } catch (HeuristicHazard e3) {
                 _theManager.popAction();
 
                 if (report_heuristics)
                     throw e3;
-            }
-            catch (SystemException e4)
-            {
+            } catch (SystemException e4) {
                 _theManager.popAction();
 
                 throw e4;
-            }
-            catch (Unavailable e5)
-            {
+            } catch (Unavailable e5) {
                 /*
                  * If terminated by some other thread then the reference we have
                  * will no longer be valid.
@@ -289,8 +244,7 @@ public class CurrentImple extends LocalObject implements
 
                 throw new INVALID_TRANSACTION();
             }
-        }
-        else
+        } else
             throw new NoTransaction();
     }
 
@@ -304,26 +258,21 @@ public class CurrentImple extends LocalObject implements
      * INVALID_TRANSACTION.
      */
 
-    public void rollback () throws NoTransaction, SystemException
-    {
+    public void rollback() throws NoTransaction, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::rollback ()");
         }
 
         ControlWrapper currentAction = _theManager.current();
 
-        if (currentAction != null)
-        {
+        if (currentAction != null) {
             ThreadAssociationControl.updateAssociation(currentAction, TX_ABORTED);
 
-            try
-            {
+            try {
                 currentAction.rollback();
 
                 _theManager.popAction();
-            }
-            catch (INVALID_TRANSACTION e1)
-            {
+            } catch (INVALID_TRANSACTION e1) {
                 /*
                  * If transaction has already terminated, then throw
                  * INVALID_TRANSACTION. Differentiates between this stat and not
@@ -333,15 +282,11 @@ public class CurrentImple extends LocalObject implements
                 _theManager.popAction();
 
                 throw e1;
-            }
-            catch (SystemException e2)
-            {
+            } catch (SystemException e2) {
                 _theManager.popAction();
 
                 throw e2;
-            }
-            catch (Unavailable e)
-            {
+            } catch (Unavailable e) {
                 /*
                  * If no terminator then not allowed!
                  */
@@ -350,8 +295,7 @@ public class CurrentImple extends LocalObject implements
 
                 throw new INVALID_TRANSACTION();
             }
-        }
-        else
+        } else
             throw new NoTransaction();
     }
 
@@ -360,128 +304,96 @@ public class CurrentImple extends LocalObject implements
      * throw INVALID_TRANSACTION.
      */
 
-    public void rollback_only () throws NoTransaction, SystemException
-    {
+    public void rollback_only() throws NoTransaction, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::rollback_only ()");
         }
 
         ControlWrapper currentAction = _theManager.current();
 
-        if (currentAction != null)
-        {
-            try
-            {
+        if (currentAction != null) {
+            try {
                 currentAction.rollback_only();
-            }
-            catch (org.omg.CosTransactions.Inactive exc)
-            {
-                throw new INVALID_TRANSACTION(
-                        ExceptionCodes.INACTIVE_TRANSACTION,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            catch (SystemException e)
-            {
+            } catch (org.omg.CosTransactions.Inactive exc) {
+                throw new INVALID_TRANSACTION(ExceptionCodes.INACTIVE_TRANSACTION, CompletionStatus.COMPLETED_NO);
+            } catch (SystemException e) {
                 throw e;
-            }
-            catch (Unavailable ex)
-            {
+            } catch (Unavailable ex) {
                 throw new NoTransaction();
             }
-        }
-        else
+        } else
             throw new NoTransaction();
     }
 
-    public org.omg.CosTransactions.Status get_status () throws SystemException
-    {
+    public org.omg.CosTransactions.Status get_status() throws SystemException {
         ControlWrapper currentAction = _theManager.current();
-        org.omg.CosTransactions.Status stat = ((currentAction == null) ? org.omg.CosTransactions.Status.StatusNoTransaction
+        org.omg.CosTransactions.Status stat = ((currentAction == null)
+                ? org.omg.CosTransactions.Status.StatusNoTransaction
                 : currentAction.get_status());
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::get_status - returning "
-                    + Utility.stringStatus(stat));
+            jtsLogger.logger.trace("CurrentImple::get_status - returning " + Utility.stringStatus(stat));
         }
 
         return stat;
     }
 
-    public String get_transaction_name () throws SystemException
-    {
+    public String get_transaction_name() throws SystemException {
         ControlWrapper currentAction = _theManager.current();
-        String ch = ((currentAction == null) ? "null"
-                : currentAction.get_transaction_name());
+        String ch = ((currentAction == null) ? "null" : currentAction.get_transaction_name());
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::get_transaction_name - returning "
-                    + ch);
+            jtsLogger.logger.trace("CurrentImple::get_transaction_name - returning " + ch);
         }
 
         return ch;
     }
 
-    public synchronized void set_timeout (int seconds) throws SystemException
-    {
+    public synchronized void set_timeout(int seconds) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::set_timeout ( "
-                    + seconds + " )");
+            jtsLogger.logger.trace("CurrentImple::set_timeout ( " + seconds + " )");
         }
 
         /*
          * Only bother if the value is anything other than the default.
          */
 
-        if (seconds > 0)
-        {
+        if (seconds > 0) {
             otsTransactionTimeout.set(new Integer(seconds));
-        }
-        else
-        {
-            if (seconds < 0)
-            {
-                throw new BAD_PARAM(ExceptionCodes.INVALID_TIMEOUT,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            else
-            {
+        } else {
+            if (seconds < 0) {
+                throw new BAD_PARAM(ExceptionCodes.INVALID_TIMEOUT, CompletionStatus.COMPLETED_NO);
+            } else {
                 otsTransactionTimeout.set(null);
             }
         }
     }
 
-    public final synchronized int get_timeout () throws SystemException
-    {
+    public final synchronized int get_timeout() throws SystemException {
         Integer value = (Integer) otsTransactionTimeout.get();
         int v = 0; // if not set then assume 0. What else can we do?
 
-        if (value != null)
-        {
+        if (value != null) {
             v = value.intValue();
-        }
-        else
+        } else
             v = TxControl.getDefaultTimeout();
 
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::get_timeout - returning "
-                    + v);
+            jtsLogger.logger.trace("CurrentImple::get_timeout - returning " + v);
         }
 
         return v;
     }
 
-    public void setCheckedAction (CheckedAction ca) throws SystemException
-    {
+    public void setCheckedAction(CheckedAction ca) throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::setCheckedAction ( "
-                    + ca + " )");
+            jtsLogger.logger.trace("CurrentImple::setCheckedAction ( " + ca + " )");
         }
 
         CheckedActions.set(ca);
     }
 
-    public CheckedAction getCheckedAction () throws SystemException
-    {
+    public CheckedAction getCheckedAction() throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::getCheckedAction ()");
         }
@@ -489,9 +401,7 @@ public class CurrentImple extends LocalObject implements
         return CheckedActions.get();
     }
 
-    public org.omg.CosTransactions.Control get_control ()
-            throws SystemException
-    {
+    public org.omg.CosTransactions.Control get_control() throws SystemException {
         ControlWrapper theControl = _theManager.current();
 
         if (theControl == null)
@@ -505,39 +415,27 @@ public class CurrentImple extends LocalObject implements
          * propagation we can guarantee between Orbs.
          */
 
-        if (true)
-        {
+        if (true) {
             /*
              * If it's a locally created control then we may not have registered
              * it with the ORB yet, so do so now.
              */
 
-            try
-            {
+            try {
                 return theControl.get_control();
-            }
-            catch (Unavailable e)
-            {
+            } catch (Unavailable e) {
                 return null;
             }
-        }
-        else
-        {
+        } else {
             Coordinator coord = null;
 
-            try
-            {
+            try {
                 coord = theControl.get_coordinator();
-            }
-            catch (Unavailable e)
-            {
+            } catch (Unavailable e) {
                 coord = null;
 
-                throw new UNKNOWN(ExceptionCodes.UNAVAILABLE_COORDINATOR,
-                        CompletionStatus.COMPLETED_NO);
-            }
-            catch (SystemException sysEx)
-            {
+                throw new UNKNOWN(ExceptionCodes.UNAVAILABLE_COORDINATOR, CompletionStatus.COMPLETED_NO);
+            } catch (SystemException sysEx) {
                 coord = null;
 
                 throw sysEx;
@@ -573,22 +471,18 @@ public class CurrentImple extends LocalObject implements
      * can always regenerate the hierarchy later if required by resume.
      */
 
-    public org.omg.CosTransactions.Control suspend () throws SystemException
-    {
+    public org.omg.CosTransactions.Control suspend() throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::suspend ()");
         }
 
         ControlWrapper actPtr = _theManager.popAction();
 
-        if (actPtr == null)
-        {
+        if (actPtr == null) {
             ThreadAssociationControl.updateAssociation(null, TX_SUSPENDED);
 
             return null;
-        }
-        else
-        {
+        } else {
             ThreadAssociationControl.updateAssociation(actPtr, TX_SUSPENDED);
 
             /*
@@ -626,11 +520,9 @@ public class CurrentImple extends LocalObject implements
      * for now we go to the overhead of the work regardless.
      */
 
-    public void resume (Control which) throws InvalidControl, SystemException
-    {
+    public void resume(Control which) throws InvalidControl, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::resume ( "
-                    + which + " )");
+            jtsLogger.logger.trace("CurrentImple::resume ( " + which + " )");
         }
 
         /*
@@ -662,12 +554,10 @@ public class CurrentImple extends LocalObject implements
          * it here.
          */
 
-        try
-        {
+        try {
             Coordinator coord = cont.get_coordinator();
 
-            if (!coord.is_top_level_transaction())
-            {
+            if (!coord.is_top_level_transaction()) {
                 /*
                  * Is the Control an ActionControl? If so then it has methods to
                  * allow us to get the parent directly. Otherwise, rely on the
@@ -676,15 +566,12 @@ public class CurrentImple extends LocalObject implements
 
                 ActionControl actControl = null;
 
-                try
-                {
+                try {
                     actControl = com.arjuna.ArjunaOTS.ActionControlHelper.narrow(cont);
 
                     if (actControl == null)
                         throw new BAD_PARAM();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     /*
                      * Not an ActionControl.
                      */
@@ -692,42 +579,27 @@ public class CurrentImple extends LocalObject implements
                     actControl = null;
                 }
 
-                if (actControl != null)
-                {
+                if (actControl != null) {
                     invalidControl = _theManager.addActionControlHierarchy(actControl);
-                }
-                else
-                {
+                } else {
                     invalidControl = _theManager.addRemoteHierarchy(cont);
                 }
             }
 
             coord = null;
-        }
-        catch (OBJECT_NOT_EXIST one)
+        } catch (OBJECT_NOT_EXIST one) {
+            // throw new InvalidControl();
+        } catch (UNKNOWN ue) // JacORB 1.4.5 bug
         {
-            //        throw new InvalidControl();
-        }
-        catch (UNKNOWN ue) // JacORB 1.4.5 bug
+        } catch (org.omg.CORBA.OBJ_ADAPTER oae) // JacORB 2.0 beta 2 bug
         {
-        }
-        catch (org.omg.CORBA.OBJ_ADAPTER oae) // JacORB 2.0 beta 2 bug
-        {
-        }
-        catch (SystemException sysEx)
-        {
+        } catch (SystemException sysEx) {
             throw new InvalidControl();
-        }
-        catch (UserException usrEx)
-        {
+        } catch (UserException usrEx) {
             throw new InvalidControl();
-        }
-        catch (NullPointerException npx)
-        {
+        } catch (NullPointerException npx) {
             throw new InvalidControl();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new BAD_OPERATION("CurrentImple.resume: " + ex.toString());
         }
 
@@ -735,19 +607,15 @@ public class CurrentImple extends LocalObject implements
          * Now put the new transaction on the top of the list.
          */
 
-        try
-        {
-            if (!invalidControl)
-            {
+        try {
+            if (!invalidControl) {
                 ControlWrapper wrap = new ControlWrapper(cont);
 
                 ThreadAssociationControl.updateAssociation(wrap, TX_RESUMED);
 
                 _theManager.pushAction(wrap);
             }
-        }
-        catch (NullPointerException npx)
-        {
+        } catch (NullPointerException npx) {
             invalidControl = true;
         }
 
@@ -764,17 +632,13 @@ public class CurrentImple extends LocalObject implements
      * @since JTS 2.1.
      */
 
-    public final ContextManager contextManager ()
-    {
+    public final ContextManager contextManager() {
         return _theManager;
     }
 
-    public void resumeImple (ControlImple which) throws InvalidControl,
-            SystemException
-    {
+    public void resumeImple(ControlImple which) throws InvalidControl, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::resumeImple ( "
-                    + which + " )");
+            jtsLogger.logger.trace("CurrentImple::resumeImple ( " + which + " )");
         }
 
         /*
@@ -798,19 +662,15 @@ public class CurrentImple extends LocalObject implements
          * Now put the new transaction on the top of the list.
          */
 
-        try
-        {
-            if (!invalidControl)
-            {
+        try {
+            if (!invalidControl) {
                 ControlWrapper wrap = new ControlWrapper(which);
 
                 ThreadAssociationControl.updateAssociation(wrap, TX_RESUMED);
 
                 _theManager.pushAction(wrap);
             }
-        }
-        catch (NullPointerException npx)
-        {
+        } catch (NullPointerException npx) {
             npx.printStackTrace();
             invalidControl = true;
         }
@@ -819,19 +679,16 @@ public class CurrentImple extends LocalObject implements
             throw new InvalidControl();
     }
 
-    public void resumeWrapper (ControlWrapper which) throws InvalidControl,
-            SystemException
-    {
+    public void resumeWrapper(ControlWrapper which) throws InvalidControl, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("CurrentImple::resumeWrapper ( "
-                    + which + " )");
+            jtsLogger.logger.trace("CurrentImple::resumeWrapper ( " + which + " )");
         }
 
-        if (which != null)
-        {
+        if (which != null) {
             /*
-             * If this is a local transaction and we haven't zero-ed the transaction
-             * reference then resume it. Otherwise go with the Control.
+             * If this is a local transaction and we haven't zero-ed the
+             * transaction reference then resume it. Otherwise go with the
+             * Control.
              */
 
             ArjunaTransactionImple tx = ((which.getImple() == null) ? null : which.getImple().getImplHandle());
@@ -840,29 +697,23 @@ public class CurrentImple extends LocalObject implements
                 resumeImple(which.getImple());
             else
                 resume(which.getControl());
-        }
-        else
-        {
+        } else {
             resumeImple(null);
         }
     }
 
-    public ControlWrapper suspendWrapper () throws SystemException
-    {
+    public ControlWrapper suspendWrapper() throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple::suspendWrapper ()");
         }
 
         ControlWrapper actPtr = _theManager.popAction();
 
-        if (actPtr == null)
-        {
+        if (actPtr == null) {
             ThreadAssociationControl.updateAssociation(null, TX_SUSPENDED);
 
             return null;
-        }
-        else
-        {
+        } else {
             ThreadAssociationControl.updateAssociation(actPtr, TX_SUSPENDED);
 
             /*
@@ -877,8 +728,7 @@ public class CurrentImple extends LocalObject implements
         }
     }
 
-    public ControlWrapper getControlWrapper () throws SystemException
-    {
+    public ControlWrapper getControlWrapper() throws SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("CurrentImple.getControlWrapper ()");
         }
@@ -889,6 +739,6 @@ public class CurrentImple extends LocalObject implements
     protected static ContextManager _theManager = null;
 
     private static ThreadLocal otsTransactionTimeout = new ThreadLocal(); // thread
-                                                                          // specific
+                                                                            // specific
 
 }

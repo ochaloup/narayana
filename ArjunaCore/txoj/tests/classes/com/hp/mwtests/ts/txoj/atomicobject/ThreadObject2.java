@@ -20,7 +20,6 @@
  */
 package com.hp.mwtests.ts.txoj.atomicobject;
 
-
 /*
  * Copyright (C) 1998, 1999, 2000,
  *
@@ -32,22 +31,18 @@ package com.hp.mwtests.ts.txoj.atomicobject;
  * $Id: AtomicObjectTest3.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class ThreadObject2 extends Thread
-{
+public class ThreadObject2 extends Thread {
 
-    public ThreadObject2 (int v)
-        {
+    public ThreadObject2(int v) {
         _value = v;
-        }
+    }
 
-    public void run ()
-        {
-        for (int i = 0; i < 100; i++)
-        {
+    public void run() {
+        for (int i = 0; i < 100; i++) {
             AtomicObjectTest3.randomOperation(_value, 0);
             AtomicObjectTest3.highProbYield();
         }
-        }
+    }
 
     private int _value;
 

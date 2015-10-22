@@ -16,44 +16,37 @@ import com.arjuna.wstx.tests.common.FailureParticipant;
 
 @RunWith(Arquillian.class)
 public class CommitRollbackInPrepareTest {
-    
+
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoDurableParticipant.class,
-                FailureParticipant.class);
+        return WarDeployment.getDeployment(DemoDurableParticipant.class, FailureParticipant.class);
     }
 
     @Test
-    public void testCommitRollbackInPrepare()
-            throws Exception
-    {
+    public void testCommitRollbackInPrepare() throws Exception {
         UserTransaction ut = UserTransaction.getUserTransaction();
-    try
-    {
-        TransactionManager tm = TransactionManager.getTransactionManager();
-        FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE, FailureParticipant.NONE);
-        DemoDurableParticipant p2 = new DemoDurableParticipant();
-
-        ut.begin();
-
-        tm.enlistForDurableTwoPhase(p1, "failure");
-        tm.enlistForDurableTwoPhase(p2, p2.identifier());
-    }  catch (Exception eouter) {
         try {
-            ut.rollback();
-        } catch(Exception einner) {
-        }
-        throw eouter;
-    }
-    try {
-        ut.commit();
+            TransactionManager tm = TransactionManager.getTransactionManager();
+            FailureParticipant p1 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE, FailureParticipant.NONE);
+            DemoDurableParticipant p2 = new DemoDurableParticipant();
 
-        fail("expected TransactionRolledBackException");
-    }
-    catch (com.arjuna.wst.TransactionRolledBackException ex)
-    {
-        // we should arrive here
-    }
+            ut.begin();
+
+            tm.enlistForDurableTwoPhase(p1, "failure");
+            tm.enlistForDurableTwoPhase(p2, p2.identifier());
+        } catch (Exception eouter) {
+            try {
+                ut.rollback();
+            } catch (Exception einner) {
+            }
+            throw eouter;
+        }
+        try {
+            ut.commit();
+
+            fail("expected TransactionRolledBackException");
+        } catch (com.arjuna.wst.TransactionRolledBackException ex) {
+            // we should arrive here
+        }
     }
 }

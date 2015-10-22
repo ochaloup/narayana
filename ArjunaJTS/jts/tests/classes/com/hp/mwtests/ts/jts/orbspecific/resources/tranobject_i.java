@@ -43,49 +43,40 @@ import org.omg.CosTransactions.Vote;
 
 import com.arjuna.ats.internal.jts.ORBManager;
 
-public class tranobject_i extends org.omg.CosTransactions.ResourcePOA
-{
-    
-    public tranobject_i ()
-    {
-    ORBManager.getPOA().objectIsReady(this);
+public class tranobject_i extends org.omg.CosTransactions.ResourcePOA {
 
-    ref = ResourceHelper.narrow(ORBManager.getPOA().corbaReference(this));
+    public tranobject_i() {
+        ORBManager.getPOA().objectIsReady(this);
+
+        ref = ResourceHelper.narrow(ORBManager.getPOA().corbaReference(this));
     }
 
-    public Resource getReference ()
-    {
-    return ref;
-    }
- 
-    public org.omg.CosTransactions.Vote prepare () throws SystemException
-    {
-    System.out.println("TRANOBJECT : PREPARE");
-    
-    return Vote.VoteCommit;
+    public Resource getReference() {
+        return ref;
     }
 
-    public void rollback () throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard
-    {
-    System.out.println("TRANOBJECT : ROLLBACK");
+    public org.omg.CosTransactions.Vote prepare() throws SystemException {
+        System.out.println("TRANOBJECT : PREPARE");
+
+        return Vote.VoteCommit;
     }
 
-    public void commit () throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
-    {
-    System.out.println("TRANOBJECT : COMMIT");
+    public void rollback() throws SystemException, HeuristicCommit, HeuristicMixed, HeuristicHazard {
+        System.out.println("TRANOBJECT : ROLLBACK");
     }
 
-    public void forget () throws SystemException
-    {
-    System.out.println("TRANOBJECT : FORGET");
+    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+        System.out.println("TRANOBJECT : COMMIT");
     }
 
-    public void commit_one_phase () throws SystemException, HeuristicHazard
-    {
-    System.out.println("TRANOBJECT : COMMIT_ONE_PHASE");
+    public void forget() throws SystemException {
+        System.out.println("TRANOBJECT : FORGET");
     }
-    
+
+    public void commit_one_phase() throws SystemException, HeuristicHazard {
+        System.out.println("TRANOBJECT : COMMIT_ONE_PHASE");
+    }
+
     private Resource ref;
 
 }
-

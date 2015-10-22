@@ -47,7 +47,8 @@ public class WSBAParticipantCompletionParticipantTest {
 
         LifecycleImpl lifecycle = new LifecycleImpl();
         ServiceInvocationMeta serviceInvocationMeta = new ServiceInvocationMeta(lifecycle, LifecycleImpl.class, null);
-        WSBAParticipantCompletionParticipant participant = new WSBAParticipantCompletionParticipant(serviceInvocationMeta, new HashMap());
+        WSBAParticipantCompletionParticipant participant = new WSBAParticipantCompletionParticipant(
+                serviceInvocationMeta, new HashMap());
 
         participant.cancel();
         participant.close();
@@ -67,15 +68,20 @@ public class WSBAParticipantCompletionParticipantTest {
         expectedOrder.add(Unknown.class);
 
         List<Class<? extends Annotation>> actualOrder = lifecycle.getExecutionOrder();
-        assertOrder(actualOrder, Cancel.class, Close.class, Compensate.class, ConfirmCompleted.class, Error.class, Status.class, Unknown.class);
+        assertOrder(actualOrder, Cancel.class, Close.class, Compensate.class, ConfirmCompleted.class, Error.class,
+                Status.class, Unknown.class);
     }
 
-    private void assertOrder(List<Class<? extends Annotation>> actualOrder, Class<? extends Annotation>... expectedOrder) {
+    private void assertOrder(List<Class<? extends Annotation>> actualOrder,
+            Class<? extends Annotation>... expectedOrder) {
 
         org.junit.Assert.assertEquals(Arrays.asList(expectedOrder), actualOrder);
     }
 
-    public class LifecycleImpl implements BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant {
+    public class LifecycleImpl
+            implements
+                BusinessAgreementWithParticipantCompletionParticipant,
+                ConfirmCompletedParticipant {
 
         private List<Class<? extends Annotation>> executionOrder = new ArrayList<Class<? extends Annotation>>();
 
@@ -108,7 +114,6 @@ public class WSBAParticipantCompletionParticipantTest {
 
             executionOrder.add(org.jboss.narayana.txframework.api.annotation.lifecycle.ba.Error.class);
         }
-
 
         @Status
         public String status() {

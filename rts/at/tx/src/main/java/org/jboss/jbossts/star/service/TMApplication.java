@@ -39,64 +39,55 @@ import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeManager;
 import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 
-public class TMApplication extends Application
-{
+public class TMApplication extends Application {
     private final static Logger log = Logger.getLogger(TMApplication.class);
 
     HashSet<Object> singletons = new HashSet<Object>();
-    Set<Class<?>> classes = new HashSet<Class<?>> ();
+    Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    public TMApplication(Class<?> ... extraClasses)
-    {
+    public TMApplication(Class<?>... extraClasses) {
         Collections.addAll(classes, resourceClasses);
         Collections.addAll(classes, mappers);
         Collections.addAll(classes, extraClasses);
 
-//        singletons.addAll(Arrays.asList(resources));
-        try
-        {
-            // TODO move com/arjuna/ats/jbossatx/jt[as]/TransactionManagerService.isRecoveryManagerRunning
+        // singletons.addAll(Arrays.asList(resources));
+        try {
+            // TODO move
+            // com/arjuna/ats/jbossatx/jt[as]/TransactionManagerService.isRecoveryManagerRunning
             // to RecoveryManager and change logging
             // by default do not colocate the coordinator and recovery manager
             if ("true".equals(System.getProperty("recovery", "false")))
                 RecoveryManager.manager();
 
-           // register RESTRecord record type so that it is persisted in the object store correctly
-           RecordTypeManager.manager().add(new RecordTypeMap() {
-               public Class<? extends AbstractRecord> getRecordClass () { return RESTRecord.class;}
-               public int getType () {return RecordType.RESTAT_RECORD;}
-           });
-        }
-        catch (Throwable e)
-        {
+            // register RESTRecord record type so that it is persisted in the
+            // object store correctly
+            RecordTypeManager.manager().add(new RecordTypeMap() {
+                public Class<? extends AbstractRecord> getRecordClass() {
+                    return RESTRecord.class;
+                }
+                public int getType() {
+                    return RecordType.RESTAT_RECORD;
+                }
+            });
+        } catch (Throwable e) {
             log.warnf("TM JAX-RS application failed to start: %s", e.getMessage());
         }
     }
 
     @Override
-    public Set<Class<?>> getClasses()
-    {
+    public Set<Class<?>> getClasses() {
         return classes;
     }
 
     @Override
-    public Set<Object> getSingletons()
-    {
+    public Set<Object> getSingletons() {
         return singletons;
     }
 
-    private static Class<?>[] mappers = {
-        TMUnavailableMapper.class,
-        TransactionStatusMapper.class,
-        HttpResponseMapper.class,
-        NotFoundMapper.class
-    };
-    
-    private static Class<?>[] resourceClasses = {
-            Coordinator.class,
-    };
+    private static Class<?>[] mappers = {TMUnavailableMapper.class, TransactionStatusMapper.class,
+            HttpResponseMapper.class, NotFoundMapper.class};
 
-    private static Object[] resources = {
-            new Coordinator(),
-    };
+    private static Class<?>[] resourceClasses = {Coordinator.class,};
+
+    private static Object[] resources = {new Coordinator(),};
 }

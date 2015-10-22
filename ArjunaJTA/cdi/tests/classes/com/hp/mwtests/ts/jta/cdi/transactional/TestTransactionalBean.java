@@ -1,6 +1,5 @@
 package com.hp.mwtests.ts.jta.cdi.transactional;
 
-
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.transaction.Transaction;
@@ -12,7 +11,6 @@ import javax.transaction.UserTransaction;
  */
 @Transactional(Transactional.TxType.NEVER)
 public class TestTransactionalBean {
-
 
     @EJB
     TestSessionBean testSessionBean;
@@ -47,7 +45,6 @@ public class TestTransactionalBean {
         throw throwable.newInstance();
     }
 
-
     @Transactional(rollbackOn = TestException.class)
     public void invokeWithDefaultAndRollbackOn(Class<? extends Throwable> throwable) throws Throwable {
 
@@ -77,7 +74,7 @@ public class TestTransactionalBean {
         Utills.assertDifferentTransaction(oldTransaction);
     }
 
-    @Transactional(value=Transactional.TxType.MANDATORY)
+    @Transactional(value = Transactional.TxType.MANDATORY)
     public void invokeWithMandatory(Transaction expectedTransaction) throws Exception {
 
         AssertionParticipant.enlist();

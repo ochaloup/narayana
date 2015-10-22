@@ -38,8 +38,7 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
 /**
  * Log record for driving participants through 2PC and recovery
  */
-public class RESTRecord extends AbstractRecord
-{
+public class RESTRecord extends AbstractRecord {
     protected final static Logger log = Logger.getLogger(RESTRecord.class);
     private String participantURI;
 
@@ -66,8 +65,7 @@ public class RESTRecord extends AbstractRecord
         status = TxStatus.TransactionStatusUnknown;
     }
 
-    public RESTRecord(String txId, String coordinatorURI, String participantURI, String terminateURI)
-    {
+    public RESTRecord(String txId, String coordinatorURI, String participantURI, String terminateURI) {
         super(new Uid());
 
         if (log.isTraceEnabled())
@@ -83,8 +81,8 @@ public class RESTRecord extends AbstractRecord
         recoveryURI = "";
     }
 
-    public RESTRecord(String txId, String coordinatorURI, String participantURI,
-                      String commitURI, String prepareURI, String  rollbackURI, String commitOnePhaseURI) {
+    public RESTRecord(String txId, String coordinatorURI, String participantURI, String commitURI, String prepareURI,
+            String rollbackURI, String commitOnePhaseURI) {
         this(txId, coordinatorURI, participantURI, null);
 
         if (log.isTraceEnabled())
@@ -96,18 +94,15 @@ public class RESTRecord extends AbstractRecord
         this.commitOnePhaseURI = commitOnePhaseURI;
     }
 
-    String getParticipantURI()
-    {
+    String getParticipantURI() {
         return participantURI;
     }
 
-    public int typeIs()
-    {
+    public int typeIs() {
         return RecordType.RESTAT_RECORD;
     }
 
-    public Object value()
-    {
+    public Object value() {
         return status.name();
     }
 
@@ -119,60 +114,47 @@ public class RESTRecord extends AbstractRecord
         return age;
     }
 
-    public void setValue(Object o)
-    {
+    public void setValue(Object o) {
     }
 
-    public int nestedAbort()
-    {
+    public int nestedAbort() {
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedCommit()
-    {
+    public int nestedCommit() {
         return TwoPhaseOutcome.FINISH_OK;
     }
 
     /*
-    * Not sub-transaction aware.
-    */
-    public int nestedPrepare()
-    {
+     * Not sub-transaction aware.
+     */
+    public int nestedPrepare() {
         return TwoPhaseOutcome.PREPARE_OK; // do nothing
     }
 
-    private void check_suspend(Fault f)
-    {
-        if (fault.equals(f))
-        {
-            try
-            {
+    private void check_suspend(Fault f) {
+        if (fault.equals(f)) {
+            try {
                 log.infof("%s: for 10 seconds", f);
                 Thread.sleep(10000);
-            }
-            catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void check_halt(Fault f)
-    {
-        if (fault.equals(f))
-        {
+    private void check_halt(Fault f) {
+        if (fault.equals(f)) {
             log.infof("%s: halt VM", f);
             Runtime.getRuntime().halt(1);
         }
     }
 
-    private int statusToOutcome()
-    {
+    private int statusToOutcome() {
         return statusToOutcome(status);
     }
 
-    private int statusToOutcome(TxStatus status)
-    {
+    private int statusToOutcome(TxStatus status) {
         try {
             if (!status.equals(TxStatus.TransactionStatusUnknown))
                 return status.twoPhaseOutcome();
@@ -189,7 +171,7 @@ public class RESTRecord extends AbstractRecord
             log.tracef("forgetting heuristic for %s", participantURI);
 
         try {
-            new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NO_CONTENT},
+            new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NO_CONTENT},
                     this.participantURI, "DELETE", null);
             status = TxStatus.TransactionStatusUnknown;
         } catch (HttpResponseException e) {
@@ -199,8 +181,7 @@ public class RESTRecord extends AbstractRecord
         return super.forgetHeuristic();
     }
 
-    public int topLevelPrepare()
-    {
+    public int topLevelPrepare() {
         if (log.isTraceEnabled())
             log.tracef("prepare %s", prepareURI);
 
@@ -213,9 +194,8 @@ public class RESTRecord extends AbstractRecord
         if (prepareURI == null || txId == null)
             return TwoPhaseOutcome.PREPARE_READONLY;
 
-        try
-        {
-            String body = new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK}, this.prepareURI, "PUT",
+        try {
+            String body = new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, this.prepareURI, "PUT",
                     TxMediaType.TX_STATUS_MEDIA_TYPE, TxSupport.toStatusContent(TxStatus.TransactionPrepared.name()));
 
             if (body.isEmpty()) {
@@ -229,9 +209,7 @@ public class RESTRecord extends AbstractRecord
 
             if (outcome != TwoPhaseOutcome.FINISH_ERROR)
                 return outcome;
-        }
-        catch (HttpResponseException e)
-        {
+        } catch (HttpResponseException e) {
             if (checkFinishError(e.getActualResponse(), TxStatus.TransactionPrepared)) {
                 status = TxStatus.TransactionPrepared;
                 return TwoPhaseOutcome.PREPARE_OK;
@@ -243,8 +221,7 @@ public class RESTRecord extends AbstractRecord
         return TwoPhaseOutcome.PREPARE_NOTOK;
     }
 
-    public int topLevelAbort()
-    {
+    public int topLevelAbort() {
         if (log.isTraceEnabled())
             log.debugf("trace %s", rollbackURI);
 
@@ -255,7 +232,7 @@ public class RESTRecord extends AbstractRecord
             return TwoPhaseOutcome.FINISH_ERROR;
 
         try {
-            String body = new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK}, this.rollbackURI, "PUT",
+            String body = new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, this.rollbackURI, "PUT",
                     TxMediaType.TX_STATUS_MEDIA_TYPE, TxSupport.toStatusContent(TxStatus.TransactionRolledBack.name()));
 
             if (body.isEmpty()) {
@@ -272,8 +249,7 @@ public class RESTRecord extends AbstractRecord
         return statusToOutcome();
     }
 
-    public int topLevelCommit()
-    {
+    public int topLevelCommit() {
         if (log.isTraceEnabled())
             log.tracef("commit %s", commitURI);
 
@@ -286,8 +262,7 @@ public class RESTRecord extends AbstractRecord
         return doCommit(TxStatus.TransactionCommitted);
     }
 
-    public int nestedOnePhaseCommit()
-    {
+    public int nestedOnePhaseCommit() {
         return TwoPhaseOutcome.FINISH_ERROR;
     }
 
@@ -297,13 +272,11 @@ public class RESTRecord extends AbstractRecord
      * additional recoverable state, such as a reference to the transaction
      * coordinator, since it will not have an intentions list anyway.
      */
-    public int topLevelOnePhaseCommit()
-    {
+    public int topLevelOnePhaseCommit() {
         return doCommit(TxStatus.TransactionCommittedOnePhase);
     }
 
-    private int doCommit(TxStatus nextState)
-    {
+    private int doCommit(TxStatus nextState) {
         TxSupport txs = new TxSupport();
 
         check_halt(Fault.commit_halt);
@@ -312,14 +285,13 @@ public class RESTRecord extends AbstractRecord
         if (txId == null)
             return TwoPhaseOutcome.FINISH_ERROR;
 
-        try
-        {
+        try {
             if (log.isTraceEnabled())
                 log.tracef("committing %s", this.commitURI);
 
             if (!TxStatus.TransactionReadOnly.equals(status)) {
                 txs = new TxSupport();
-                String body = txs.httpRequest(new int[] {HttpURLConnection.HTTP_OK}, this.commitURI, "PUT",
+                String body = txs.httpRequest(new int[]{HttpURLConnection.HTTP_OK}, this.commitURI, "PUT",
                         TxMediaType.TX_STATUS_MEDIA_TYPE, TxSupport.toStatusContent(nextState.name()));
 
                 if (body.isEmpty()) {
@@ -336,16 +308,14 @@ public class RESTRecord extends AbstractRecord
 
             if (log.isTraceEnabled())
                 log.tracef("COMMIT OK at commitURI: %s", this.commitURI);
-        }
-        catch (HttpResponseException e)
-        {
+        } catch (HttpResponseException e) {
             if (log.isDebugEnabled())
                 log.debugf(e, "commit exception: HTTP code: %s body: %s", e.getActualResponse(), txs.getBody());
 
             // should result in the recovery system taking over
             if (e.getActualResponse() == HttpURLConnection.HTTP_UNAVAILABLE) {
                 log.trace("Finishing with TwoPhaseOutcome.FINISH_ERROR");
-                 return TwoPhaseOutcome.FINISH_ERROR;
+                return TwoPhaseOutcome.FINISH_ERROR;
             } else {
                 checkFinishError(e.getActualResponse(), nextState);
                 status = TxStatus.fromStatus(txs.getBody());
@@ -355,13 +325,11 @@ public class RESTRecord extends AbstractRecord
         return statusToOutcome(status);
     }
 
-    private boolean checkFinishError(int expected, TxStatus nextState) throws HttpResponseException
-    {
-        if (expected == HttpURLConnection.HTTP_NOT_FOUND)
-        {
-            // the participant may have moved so check the coordinator participantURI
-            if (hasParticipantMoved())
-            {
+    private boolean checkFinishError(int expected, TxStatus nextState) throws HttpResponseException {
+        if (expected == HttpURLConnection.HTTP_NOT_FOUND) {
+            // the participant may have moved so check the coordinator
+            // participantURI
+            if (hasParticipantMoved()) {
                 if (log.isDebugEnabled())
                     log.debugf("participant has moved commit to new participantURI %s", this.participantURI);
 
@@ -381,20 +349,16 @@ public class RESTRecord extends AbstractRecord
                     return false;
                 }
 
-                try
-                {
-                    TxSupport.getStatus(new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK},
-                            uri, "PUT", TxMediaType.TX_STATUS_MEDIA_TYPE,
-                            TxSupport.toStatusContent(nextState.name())));
+                try {
+                    TxSupport.getStatus(new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, uri, "PUT",
+                            TxMediaType.TX_STATUS_MEDIA_TYPE, TxSupport.toStatusContent(nextState.name())));
                     if (log.isDebugEnabled())
                         log.debug("Finish OK at new participantURI: %s" + this.participantURI);
 
                     status = nextState;
 
                     return true;
-                }
-                catch (HttpResponseException e1)
-                {
+                } catch (HttpResponseException e1) {
                     if (log.isTraceEnabled())
                         log.tracef(e1, "Finish still failing at new URI: ");
 
@@ -410,26 +374,26 @@ public class RESTRecord extends AbstractRecord
     }
 
     /**
-     * A participant tells the coordinator if it changes its URL.
-     * To see if this has happened perform a GET on the recovery participantURI which returns the
-     * last known location of the participant.
+     * A participant tells the coordinator if it changes its URL. To see if this
+     * has happened perform a GET on the recovery participantURI which returns
+     * the last known location of the participant.
+     * 
      * @return true if the participant did move
      */
-    private boolean hasParticipantMoved()
-    {
-        try
-        {
+    private boolean hasParticipantMoved() {
+        try {
             if (log.isTraceEnabled())
                 log.tracef("seeing if participant has moved: %s  recoveryURI: %s", coordinatorID, recoveryURI);
 
             if (recoveryURI.length() == 0)
-                    return false;
+                return false;
 
-            // get the latest participant terminateURI (or URIs in the case of a Two Phase Unaware participant)
+            // get the latest participant terminateURI (or URIs in the case of a
+            // Two Phase Unaware participant)
             // by probing the recovery URI:
             Map<String, String> links = new HashMap<String, String>();
 
-            new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK}, recoveryURI, "GET",
+            new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, recoveryURI, "GET",
                     TxMediaType.PLAIN_MEDIA_TYPE, null, links);
 
             String terminateURI = links.get(TxLinkNames.PARTICIPANT_TERMINATOR);
@@ -459,12 +423,11 @@ public class RESTRecord extends AbstractRecord
                     this.commitOnePhaseURI = commitOnePhaseURI;
 
                 if (log.isTraceEnabled())
-                    log.tracef("... yes it has - new terminate URIs (commit, prepare, rollback and commit one phase)" +
-                            " are %s %s %s %s",
-                            commitURI != null ?  commitURI : "",
-                            prepareURI != null ?  prepareURI : "",
-                            rollbackURI != null ?  rollbackURI : "",
-                            commitOnePhaseURI != null ?  commitOnePhaseURI : "");
+                    log.tracef(
+                            "... yes it has - new terminate URIs (commit, prepare, rollback and commit one phase)"
+                                    + " are %s %s %s %s",
+                            commitURI != null ? commitURI : "", prepareURI != null ? prepareURI : "",
+                            rollbackURI != null ? rollbackURI : "", commitOnePhaseURI != null ? commitOnePhaseURI : "");
 
                 if (this.commitURI != null && this.prepareURI != null && this.rollbackURI != null)
                     return true;
@@ -477,9 +440,7 @@ public class RESTRecord extends AbstractRecord
 
                 return true;
             }
-        }
-        catch (HttpResponseException e)
-        {
+        } catch (HttpResponseException e) {
             if (log.isTraceEnabled())
                 log.tracef(e, "participant has not moved: %s", e.getMessage());
         }
@@ -487,10 +448,8 @@ public class RESTRecord extends AbstractRecord
         return false;
     }
 
-    public boolean save_state(OutputObjectState os, int t)
-    {
-        try
-        {
+    public boolean save_state(OutputObjectState os, int t) {
+        try {
             os.packString(txId);
             os.packBoolean(prepared);
             os.packString(participantURI);
@@ -506,19 +465,15 @@ public class RESTRecord extends AbstractRecord
             os.packString(commitOnePhaseURI);
 
             return super.save_state(os, t);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
 
             return false;
         }
     }
 
-    public boolean restore_state(InputObjectState os, int t)
-    {
-        try
-        {
+    public boolean restore_state(InputObjectState os, int t) {
+        try {
             txId = os.unpackString();
             prepared = os.unpackBoolean();
             participantURI = os.unpackString();
@@ -541,53 +496,42 @@ public class RESTRecord extends AbstractRecord
                 log.infof("restore_state %s", terminateURI);
 
             return super.restore_state(os, t);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public String type()
-    {
+    public String type() {
         return RESTRecord.typeName();
     }
 
-    public static String typeName()
-    {
+    public static String typeName() {
         return "/StateManager/AbstractRecord/RESTRecord";
     }
 
-    public boolean doSave()
-    {
+    public boolean doSave() {
         return true;
     }
 
-    public void merge(AbstractRecord a)
-    {
+    public void merge(AbstractRecord a) {
     }
 
-    public void alter(AbstractRecord a)
-    {
+    public void alter(AbstractRecord a) {
     }
 
-    public boolean shouldAdd(AbstractRecord a)
-    {
+    public boolean shouldAdd(AbstractRecord a) {
         return (a.typeIs() == typeIs());
     }
 
-    public boolean shouldAlter(AbstractRecord a)
-    {
+    public boolean shouldAlter(AbstractRecord a) {
         return false;
     }
 
-    public boolean shouldMerge(AbstractRecord a)
-    {
+    public boolean shouldMerge(AbstractRecord a) {
         return false;
     }
 
-    public boolean shouldReplace(AbstractRecord a)
-    {
+    public boolean shouldReplace(AbstractRecord a) {
         return false;
     }
 
@@ -597,18 +541,13 @@ public class RESTRecord extends AbstractRecord
 
     // TODO remove fault injection code - use byteman instead
     enum Fault {
-        abort_halt, abort_suspend, prepare_halt,
-        prepare_suspend, commit_halt, commit_suspend,
-        h_commit, h_rollback, h_hazard, h_mixed, none
+        abort_halt, abort_suspend, prepare_halt, prepare_suspend, commit_halt, commit_suspend, h_commit, h_rollback, h_hazard, h_mixed, none
     }
     Fault fault = Fault.none;
 
-    public void setFault(String name)
-    {
-        for (Fault f : Fault.values())
-        {
-            if (f.name().equals(name))
-            {
+    public void setFault(String name) {
+        for (Fault f : Fault.values()) {
+            if (f.name().equals(name)) {
                 log.tracef("setFault: %s participantURI: %s", f, participantURI);
 
                 fault = f;

@@ -39,21 +39,20 @@ import com.arjuna.ats.jta.xa.XidImple;
 import java.io.IOException;
 
 /**
- * An XAResourceOrphanFilter which vetos rollback for xids owned by top level JTA transactions.
+ * An XAResourceOrphanFilter which vetos rollback for xids owned by top level
+ * JTA transactions.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com), 2010-03
  */
-public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphanFilter
-{
+public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphanFilter {
     @Override
-    public Vote checkXid(Xid xid)
-    {
-        if(xid.getFormatId() != XATxConverter.FORMAT_ID) {
+    public Vote checkXid(Xid xid) {
+        if (xid.getFormatId() != XATxConverter.FORMAT_ID) {
             // we only care about Xids created by the JTA
             return Vote.ABSTAIN;
         }
 
-        if(transactionLog(xid)) {
+        if (transactionLog(xid)) {
             // it's owned by a logged transaction which
             // will recover it top down in due course
             return Vote.LEAVE_ALONE;
@@ -64,10 +63,11 @@ public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphan
 
     private boolean containsCommitMarkableResourceRecord(Uid u) {
         try {
-            InputObjectState state = StoreManager.getRecoveryStore().read_committed(
-                    u, RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE);
+            InputObjectState state = StoreManager.getRecoveryStore().read_committed(u,
+                    RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE);
             if (state != null) {
-                RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE, u, state);
+                RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
+                        RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE, u, state);
 
                 return (rcaa.containsIncompleteCommitMarkableResourceRecord());
             }
@@ -81,13 +81,13 @@ public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphan
     /**
      * Is there a log file for this transaction?
      *
-     * @param xid the transaction to check.
+     * @param xid
+     *            the transaction to check.
      *
      * @return <code>boolean</code>true if there is a log file,
      *         <code>false</code> if there isn't.
      */
-    private boolean transactionLog(Xid xid)
-    {
+    private boolean transactionLog(Xid xid) {
         RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
         String transactionType = new AtomicAction().type();
 
@@ -95,42 +95,32 @@ public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphan
         Uid u = theXid.getTransactionUid();
 
         if (jtaLogger.logger.isDebugEnabled()) {
-            jtaLogger.logger.debug("Checking whether Xid "
-                    + theXid + " exists in ObjectStore.");
+            jtaLogger.logger.debug("Checking whether Xid " + theXid + " exists in ObjectStore.");
         }
 
-        if (!u.equals(Uid.nullUid()))
-        {
-            try
-            {
+        if (!u.equals(Uid.nullUid())) {
+            try {
 
                 if (jtaLogger.logger.isDebugEnabled()) {
                     jtaLogger.logger.debug("Looking for " + u + " and " + transactionType);
                 }
 
-                if (containsCommitMarkableResourceRecord(u) ||
-                        recoveryStore.currentState(u, transactionType) != StateStatus.OS_UNKNOWN)
-                {
+                if (containsCommitMarkableResourceRecord(u)
+                        || recoveryStore.currentState(u, transactionType) != StateStatus.OS_UNKNOWN) {
                     if (jtaLogger.logger.isDebugEnabled()) {
                         jtaLogger.logger.debug("Found record for " + theXid);
                     }
 
                     return true;
-                }
-                else
-                {
+                } else {
                     if (jtaLogger.logger.isDebugEnabled()) {
                         jtaLogger.logger.debug("No record found for " + theXid);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
-        else
-        {
+        } else {
             jtaLogger.i18NLogger.info_recovery_notaxid(XAHelper.xidToString(xid));
         }
 

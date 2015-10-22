@@ -34,53 +34,57 @@ import com.jboss.transaction.wstf.webservices.sc007.generated.InitiatorPortType;
 
 /**
  * The initiator client.
+ * 
  * @author kevin
  */
-public class InitiatorClient
-{
+public class InitiatorClient {
     /**
      * The client singleton.
      */
-    private static final InitiatorClient CLIENT = new InitiatorClient() ;
-    
+    private static final InitiatorClient CLIENT = new InitiatorClient();
+
     /**
      * The response action.
      */
-    private static final String responseAction = InteropConstants.INTEROP_ACTION_RESPONSE ;
-    
+    private static final String responseAction = InteropConstants.INTEROP_ACTION_RESPONSE;
+
     /**
      * Construct the interop synch client.
      */
-    private InitiatorClient()
-    {
+    private InitiatorClient() {
     }
 
     /**
      * Send a response.
-     * @param map The addressing context initialised with to, message ID and relates to.
-     * @throws SoapFault For any errors.
-     * @throws IOException for any transport errors.
+     * 
+     * @param map
+     *            The addressing context initialised with to, message ID and
+     *            relates to.
+     * @throws SoapFault
+     *             For any errors.
+     * @throws IOException
+     *             for any transport errors.
      */
-    public void sendResponse(final MAP map)
-        throws SoapFault, IOException
-    {
+    public void sendResponse(final MAP map) throws SoapFault, IOException {
         InitiatorPortType port = InteropClient.getInitiatorPort(map, responseAction);
         port.response();
     }
 
     /**
      * Send a fault.
-     * @param map The addressing context.
-     * @param soapFault The SOAP fault.
-     * @throws SoapFault For any errors.
-     * @throws IOException for any transport errors.
+     * 
+     * @param map
+     *            The addressing context.
+     * @param soapFault
+     *            The SOAP fault.
+     * @throws SoapFault
+     *             For any errors.
+     * @throws IOException
+     *             for any transport errors.
      */
-    public void sendSoapFault(final MAP map, final SoapFault11 soapFault)
-        throws SoapFault, IOException
-    {
-        String soapFaultAction = soapFault.getAction() ;
-        if (soapFaultAction == null)
-        {
+    public void sendSoapFault(final MAP map, final SoapFault11 soapFault) throws SoapFault, IOException {
+        String soapFaultAction = soapFault.getAction();
+        if (soapFaultAction == null) {
             soapFaultAction = faultAction;
         }
         MAP replyProperties = AddressingHelper.createFaultContext(map, MessageId.getMessageId());
@@ -91,10 +95,10 @@ public class InitiatorClient
     private static final String faultAction = AtomicTransactionConstants.WSAT_ACTION_FAULT;
     /**
      * Get the Interop client singleton.
+     * 
      * @return The Interop client singleton.
      */
-    public static InitiatorClient getClient()
-    {
-        return CLIENT ;
+    public static InitiatorClient getClient() {
+        return CLIENT;
     }
 }

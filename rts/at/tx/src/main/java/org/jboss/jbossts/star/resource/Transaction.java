@@ -46,8 +46,7 @@ import org.jboss.jbossts.star.util.media.txstatusext.TwoPhaseAwareParticipantEle
 import org.jboss.logging.Logger;
 
 @XmlRootElement(name = "transaction")
-public class Transaction extends AtomicAction
-{
+public class Transaction extends AtomicAction {
     protected final static Logger log = Logger.getLogger(Transaction.class);
 
     private long age = System.currentTimeMillis();
@@ -56,14 +55,12 @@ public class Transaction extends AtomicAction
     private String recoveryUrl = null;
     private Collection<String> volatileParticipants; // synchronizations
 
-    public Transaction()
-    {
+    public Transaction() {
         super();
         volatileParticipants = new ArrayList<String>();
     }
 
-    public Transaction(Coordinator coordinator, String initiator)
-    {
+    public Transaction(Coordinator coordinator, String initiator) {
         this();
         this.coordinator = coordinator;
         this.initiator = initiator;
@@ -88,20 +85,17 @@ public class Transaction extends AtomicAction
     }
 
     @XmlElement
-    public String getInitiator()
-    {
+    public String getInitiator() {
         return initiator;
     }
 
     @XmlElement
-    public String getAge()
-    {
+    public String getAge() {
         return Long.toString(System.currentTimeMillis() - age);
     }
 
     @XmlAttribute
-    public String getStatus()
-    {
+    public String getStatus() {
         return getStatus(lookupStatus());
     }
 
@@ -109,12 +103,11 @@ public class Transaction extends AtomicAction
         return status();
     }
 
-    public String getStatus(int status)
-    {
+    public String getStatus(int status) {
         TxStatus txStatus = TxStatus.fromActionStatus(status);
 
         if (txStatus.equals(TxStatus.TransactionStatusUnknown))
-            return ""; //ActionStatus.stringForm(lookupStatus());
+            return ""; // ActionStatus.stringForm(lookupStatus());
 
         return txStatus.name();
     }
@@ -123,15 +116,14 @@ public class Transaction extends AtomicAction
         return TxStatus.fromActionStatus(lookupStatus());
     }
 
-    public String getRecoveryUrl()
-    {
+    public String getRecoveryUrl() {
         return recoveryUrl;
     }
 
     public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase,
-                                    String terminateUrl) {
+            String terminateUrl) {
         if (findParticipant(participantUrl) != null)
-            return null;    // already enlisted
+            return null; // already enlisted
 
         String txId = get_uid().fileStringForm();
         RESTRecord p = new RESTRecord(txId, coordinatorUrl, participantUrl, terminateUrl);
@@ -147,13 +139,13 @@ public class Transaction extends AtomicAction
     }
 
     public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase,
-                                    String commitURI, String prepareURI, String rollbackURI, String commitOnePhaseURI) {
+            String commitURI, String prepareURI, String rollbackURI, String commitOnePhaseURI) {
         if (findParticipant(participantUrl) != null)
-            return null;    // already enlisted
+            return null; // already enlisted
 
         String txId = get_uid().fileStringForm();
-        RESTRecord p = new RESTRecord(txId, coordinatorUrl, participantUrl,
-                commitURI, prepareURI, rollbackURI, commitOnePhaseURI);
+        RESTRecord p = new RESTRecord(txId, coordinatorUrl, participantUrl, commitURI, prepareURI, rollbackURI,
+                commitOnePhaseURI);
         String coordinatorId = p.get_uid().fileStringForm();
 
         recoveryUrl = recoveryUrlBase + txId + '/' + coordinatorId;
@@ -165,12 +157,13 @@ public class Transaction extends AtomicAction
         return null;
     }
     /**
-     * Determine whether a participant is enlisted in this transaction and the commitment
-     * is not running.
+     * Determine whether a participant is enlisted in this transaction and the
+     * commitment is not running.
      *
-     * @param participantUrl the participant url to search for
-     * @return false if the participant is not enlisted or if the commitment protocol is
-     * already running
+     * @param participantUrl
+     *            the participant url to search for
+     * @return false if the participant is not enlisted or if the commitment
+     *         protocol is already running
      */
     public boolean isEnlisted(String participantUrl) {
         return findParticipant(participantUrl) != null;
@@ -185,16 +178,14 @@ public class Transaction extends AtomicAction
         return false;
     }
 
-    public void getParticipants(Collection<String> enlistmentIds)
-    {
+    public void getParticipants(Collection<String> enlistmentIds) {
         if (pendingList == null)
             return;
 
         // only add faults for pending records
         AbstractRecord r = pendingList.peekFront();
 
-        while (r != null)
-        {
+        while (r != null) {
             if (r instanceof RESTRecord)
                 enlistmentIds.add(r.get_uid().fileStringForm());
 
@@ -202,16 +193,14 @@ public class Transaction extends AtomicAction
         }
     }
 
-    public void setFault(String fault)
-    {
+    public void setFault(String fault) {
         if (pendingList == null)
             return;
 
         // only add faults for pending records
         AbstractRecord r = pendingList.peekFront();
 
-        while (r != null)
-        {
+        while (r != null) {
             if (r instanceof RESTRecord)
                 ((RESTRecord) r).setFault(fault);
 
@@ -219,20 +208,16 @@ public class Transaction extends AtomicAction
         }
     }
 
-    public boolean isFinishing()
-    {
+    public boolean isFinishing() {
         return getTxStatus().isFinishing();
     }
-    public boolean isAlive()
-    {
+    public boolean isAlive() {
         return getTxStatus().isActive();
     }
 
-    public boolean isRunning()
-    {
+    public boolean isRunning() {
         return getTxStatus().isRunning();
     }
-
 
     private RESTRecord findParticipant(String participantUrl) {
         if (pendingList != null) {
@@ -281,7 +266,7 @@ public class Transaction extends AtomicAction
 
         for (String uri : volatileParticipants) {
             try {
-                new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK}, uri, "PUT", null);
+                new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, uri, "PUT", null);
             } catch (HttpResponseException e) {
                 commit = false;
 
@@ -293,7 +278,8 @@ public class Transaction extends AtomicAction
         if (!super.beforeCompletion())
             commit = false;
 
-        // Get a list of the participants before they check-out of the transaction
+        // Get a list of the participants before they check-out of the
+        // transaction
         enlistmentIds = new ArrayList<String>();
         getParticipants(enlistmentIds);
 
@@ -307,15 +293,16 @@ public class Transaction extends AtomicAction
 
     @Override
     protected boolean afterCompletion(int arjunaStatus, boolean report_heuristics) {
-        // NB volatileParticipants collection cannot change once 2PC has commenced
+        // NB volatileParticipants collection cannot change once 2PC has
+        // commenced
 
         if (volatileParticipants.size() != 0) {
             String status = TxSupport.toStatusContent(TxStatus.fromActionStatus(arjunaStatus).name());
 
             for (String uri : volatileParticipants) {
                 try {
-                    new TxSupport().httpRequest(new int[] {HttpURLConnection.HTTP_OK},
-                            uri, "PUT", TxMediaType.TX_STATUS_MEDIA_TYPE, status);
+                    new TxSupport().httpRequest(new int[]{HttpURLConnection.HTTP_OK}, uri, "PUT",
+                            TxMediaType.TX_STATUS_MEDIA_TYPE, status);
                 } catch (HttpResponseException e) {
                     if (log.isDebugEnabled())
                         log.debugf(e, "volatile participant %s error %s during afterCompletion", uri, e.getMessage());

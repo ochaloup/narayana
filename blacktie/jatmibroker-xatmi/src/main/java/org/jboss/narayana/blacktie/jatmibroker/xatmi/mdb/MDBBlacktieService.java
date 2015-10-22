@@ -19,7 +19,8 @@ import org.jboss.narayana.blacktie.jatmibroker.xatmi.Connection;
 import org.jboss.narayana.blacktie.jatmibroker.xatmi.ConnectionException;
 
 /**
- * All BlackTie MDB services should extend this class so that they can be advertised
+ * All BlackTie MDB services should extend this class so that they can be
+ * advertised
  */
 public abstract class MDBBlacktieService extends BlackTieService implements MessageListener {
 
@@ -40,9 +41,11 @@ public abstract class MDBBlacktieService extends BlackTieService implements Mess
     }
 
     /**
-     * The onMessage method formats the JMS received bytes message into a format understood by the XATMI API.
+     * The onMessage method formats the JMS received bytes message into a format
+     * understood by the XATMI API.
      * 
-     * @param message The message received wrapping an XATMI invocation
+     * @param message
+     *            The message received wrapping an XATMI invocation
      */
     @TransactionAttribute(TransactionAttributeType.NEVER)
     public void onMessage(Message message) {
@@ -58,10 +61,12 @@ public abstract class MDBBlacktieService extends BlackTieService implements Mess
             log.trace(serviceName);
             if (JtsTransactionImple.hasTransaction()) {
                 throw new ConnectionException(Connection.TPEPROTO,
-                        "Blacktie services must not be called with a transactional context: " + getName() + ":" + serviceName);
+                        "Blacktie services must not be called with a transactional context: " + getName() + ":"
+                                + serviceName);
             }
             BytesMessage bytesMessage = ((BytesMessage) message);
-            org.jboss.narayana.blacktie.jatmibroker.core.transport.Message toProcess = convertFromBytesMessage(bytesMessage);
+            org.jboss.narayana.blacktie.jatmibroker.core.transport.Message toProcess = convertFromBytesMessage(
+                    bytesMessage);
             log.debug("SERVER onMessage: transaction control ior: " + toProcess.control);
             processMessage(serviceName, toProcess);
             log.debug("Processed message");
@@ -70,8 +75,8 @@ public abstract class MDBBlacktieService extends BlackTieService implements Mess
         }
     }
 
-    private static org.jboss.narayana.blacktie.jatmibroker.core.transport.Message convertFromBytesMessage(BytesMessage message)
-            throws JMSException {
+    private static org.jboss.narayana.blacktie.jatmibroker.core.transport.Message convertFromBytesMessage(
+            BytesMessage message) throws JMSException {
         String controlIOR = message.getStringProperty("messagecontrol");
         String replyTo = message.getStringProperty("messagereplyto");
         int len = (int) message.getBodyLength();

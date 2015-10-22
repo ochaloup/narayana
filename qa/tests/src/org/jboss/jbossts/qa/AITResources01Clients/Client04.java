@@ -69,17 +69,13 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client04.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
-
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.*;
 
-public class Client04
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client04 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -92,39 +88,31 @@ public class Client04
             float serverIncreaseThreshold;
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 2])) {
                 clientIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultClientIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 clientIncreaseThreshold = Float.parseFloat(args[args.length - 2]);
             }
 
             // If no threshold value then use default.
-            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1]))
-            {
+            if (MemoryTestProfileStore.getNoThresholdValue().equals(args[args.length - 1])) {
                 serverIncreaseThreshold = Float.parseFloat(MemoryTestProfileStore.getDefaultServerIncreaseThreshold());
-            }
-            else // Use passed threshold
+            } else // Use passed threshold
             {
                 serverIncreaseThreshold = Float.parseFloat(args[args.length - 1]);
             }
 
-            for (int index = 0; index < 2; index++)
-            {
+            for (int index = 0; index < 2; index++) {
                 AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                 atomicTransaction.begin();
 
                 counter.increase();
 
-                if ((index % 2) == 0)
-                {
+                if ((index % 2) == 0) {
                     atomicTransaction.commit(true);
-                }
-                else
-                {
+                } else {
                     atomicTransaction.rollback();
                 }
             }
@@ -132,20 +120,16 @@ public class Client04
             int clientMemory0 = (int) JVMStats.getMemory();
             int serverMemory0 = counter.getMemory();
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                 atomicTransaction.begin();
 
                 counter.increase();
 
-                if ((index % 2) == 0)
-                {
+                if ((index % 2) == 0) {
                     atomicTransaction.commit(true);
-                }
-                else
-                {
+                } else {
                     atomicTransaction.rollback();
                 }
             }
@@ -164,29 +148,21 @@ public class Client04
             System.err.println("Server percentage memory increase: " + (float) (100.0 * serverMemoryIncrease) + "%");
             System.err.println("Server memory increase per call  : " + (serverMemory1 - serverMemory0) / numberOfCalls);
 
-            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < clientIncreaseThreshold))
-            {
+            if ((clientMemoryIncrease < clientIncreaseThreshold) && (serverMemoryIncrease < clientIncreaseThreshold)) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client04.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client04.main: " + exception);
             exception.printStackTrace(System.err);
         }

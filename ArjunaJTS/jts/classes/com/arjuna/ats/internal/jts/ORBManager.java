@@ -42,33 +42,25 @@ import com.arjuna.orbportability.RootOA;
  * non-recoverable CORBA objects it creates.
  */
 
-public class ORBManager
-{
-    public static final com.arjuna.orbportability.ORB getORB ()
-    {
-        if (isInitialised())
-        {
+public class ORBManager {
+    public static final com.arjuna.orbportability.ORB getORB() {
+        if (isInitialised()) {
             return getTheORB();
-        }
-        else
-        {
+        } else {
             jtsLogger.i18NLogger.fatal_ORBManager();
             throw new com.arjuna.ats.arjuna.exceptions.FatalError();
         }
     }
 
-    private static final com.arjuna.orbportability.ORB getTheORB ()
-    {
+    private static final com.arjuna.orbportability.ORB getTheORB() {
         if (_theOrb == null)
             _theOrb = ORB.getInstance(ORB_NAME);
 
         return _theOrb;
     }
 
-    public static final boolean setORB (com.arjuna.orbportability.ORB theOrb)
-    {
-        if (_theOrb == null)
-        {
+    public static final boolean setORB(com.arjuna.orbportability.ORB theOrb) {
+        if (_theOrb == null) {
             _theOrb = theOrb;
 
             theOrb.setORBShutdownListener(new ORBShutdownListener() {
@@ -85,21 +77,16 @@ public class ORBManager
         return false;
     }
 
-    public static final com.arjuna.orbportability.OA getPOA ()
-    {
-        if (isInitialised())
-        {
+    public static final com.arjuna.orbportability.OA getPOA() {
+        if (isInitialised()) {
             return getThePOA();
-        }
-        else
-        {
+        } else {
             jtsLogger.i18NLogger.fatal_ORBManager();
             throw new com.arjuna.ats.arjuna.exceptions.FatalError();
         }
     }
 
-    private static final com.arjuna.orbportability.OA getThePOA ()
-    {
+    private static final com.arjuna.orbportability.OA getThePOA() {
         if (_thePoa == null) {
             _thePoa = RootOA.getRootOA(_theOrb);
             _thePoa.addPreShutdown(new ShutdownOTS());
@@ -108,10 +95,8 @@ public class ORBManager
         return _thePoa;
     }
 
-    public static final boolean setPOA (com.arjuna.orbportability.OA thePoa)
-    {
-        if (_thePoa == null)
-        {
+    public static final boolean setPOA(com.arjuna.orbportability.OA thePoa) {
+        if (_thePoa == null) {
             _thePoa = thePoa;
             _thePoa.addPreShutdown(new ShutdownOTS());
             return true;
@@ -120,13 +105,11 @@ public class ORBManager
         return false;
     }
 
-    public static final com.arjuna.orbportability.Services getServices ()
-    {
+    public static final com.arjuna.orbportability.Services getServices() {
         return new com.arjuna.orbportability.Services(_theOrb);
     }
 
-    public static final boolean isInitialised ()
-    {
+    public static final boolean isInitialised() {
         return (_theOrb != null || _thePoa != null);
     }
 

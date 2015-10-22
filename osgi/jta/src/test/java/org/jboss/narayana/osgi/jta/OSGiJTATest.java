@@ -64,7 +64,8 @@ public class OSGiJTATest {
                 builder.addBundleSymbolicName(archive.getName());
                 builder.addBundleManifestVersion(2);
 
-                builder.addImportPackages("javax.xml.parsers", "org.xml.sax", "org.xml.sax.helpers", "javax.naming.spi");
+                builder.addImportPackages("javax.xml.parsers", "org.xml.sax", "org.xml.sax.helpers",
+                        "javax.naming.spi");
                 builder.addBundleActivator(Activator.class.getName());
                 builder.addManifestHeader("arjuna-properties-file", "jbossts-properties.xml");
                 return builder.openStream();
@@ -74,7 +75,7 @@ public class OSGiJTATest {
     }
 
     @Test
-    public  void testTransactionManager(@ArquillianResource Bundle bundle) throws Exception {
+    public void testTransactionManager(@ArquillianResource Bundle bundle) throws Exception {
         assertEquals("System Bundle ID", 0, context.getBundle().getBundleId());
 
         bundle.start();

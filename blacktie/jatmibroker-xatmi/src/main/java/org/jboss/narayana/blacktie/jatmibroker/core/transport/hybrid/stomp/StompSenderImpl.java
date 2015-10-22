@@ -43,8 +43,8 @@ public class StompSenderImpl implements Sender {
     private Map<String, Sender> conversationalMap;
     private String serviceName;
 
-    public StompSenderImpl(String serviceName, boolean conversational, String type, Map<String, Sender> conversationalMap,
-            Properties properties) throws ConnectionException, IOException {
+    public StompSenderImpl(String serviceName, boolean conversational, String type,
+            Map<String, Sender> conversationalMap, Properties properties) throws ConnectionException, IOException {
         String qtype = "/queue/";
         if (type != null) {
             qtype = "/" + type + "/";
@@ -71,8 +71,8 @@ public class StompSenderImpl implements Sender {
     /**
      * Don't want send and close at the same time
      */
-    public synchronized void send(Object replyTo, short rval, int rcode, byte[] data, int len, int correlationId, int flags,
-            int ttl, String type, String subtype) throws ConnectionException {
+    public synchronized void send(Object replyTo, short rval, int rcode, byte[] data, int len, int correlationId,
+            int flags, int ttl, String type, String subtype) throws ConnectionException {
         if (closed) {
             throw new ConnectionException(Connection.TPEPROTO, "Sender closed");
         }

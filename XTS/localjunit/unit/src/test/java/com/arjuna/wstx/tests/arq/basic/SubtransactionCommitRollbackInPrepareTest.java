@@ -21,26 +21,23 @@ import com.arjuna.wstx.tests.common.FailureParticipant;
 
 @RunWith(Arquillian.class)
 public class SubtransactionCommitRollbackInPrepareTest {
-    
+
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                FailureParticipant.class,
-                DemoDurableParticipant.class,
+        return WarDeployment.getDeployment(FailureParticipant.class, DemoDurableParticipant.class,
                 DemoVolatileParticipant.class);
     }
 
     @Test
-    public void testSubTransactionCommitRollbackInPrepare()
-            throws Exception
-            {
+    public void testSubTransactionCommitRollbackInPrepare() throws Exception {
         final UserTransaction ut = UserTransactionFactory.userTransaction();
         final UserTransaction ust = UserTransactionFactory.userSubordinateTransaction();
         final TransactionManager tm = TransactionManager.getTransactionManager();
 
         final DemoDurableParticipant p1 = new DemoDurableParticipant();
         final DemoVolatileParticipant p2 = new DemoVolatileParticipant();
-        final FailureParticipant p3 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE, FailureParticipant.NONE);
+        final FailureParticipant p3 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE,
+                FailureParticipant.NONE);
         final DemoVolatileParticipant p4 = new DemoVolatileParticipant();
 
         ut.begin();
@@ -65,5 +62,5 @@ public class SubtransactionCommitRollbackInPrepareTest {
         assertTrue(p2.prepared() && p2.resolved() && !p2.passed());
         assertTrue(!p3.passed());
         assertTrue(p4.prepared() && p4.resolved() && !p4.passed());
-            }
+    }
 }

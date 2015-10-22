@@ -44,18 +44,16 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.DemoArjunaResource;
 
-public class ArjunaNestingTest
-{
+public class ArjunaNestingTest {
     @Test
-    public void run() throws Exception
-    {
+    public void run() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
@@ -66,60 +64,44 @@ public class ArjunaNestingTest
         org.omg.CosTransactions.Current current = OTSManager.get_current();
         DemoArjunaResource sr = new DemoArjunaResource();
 
-        try
-        {
+        try {
             current.begin();
             current.begin();
             current.begin();
-        }
-        catch (SystemException sysEx)
-        {
-            fail("Unexpected system exception:" +sysEx);
+        } catch (SystemException sysEx) {
+            fail("Unexpected system exception:" + sysEx);
             sysEx.printStackTrace(System.err);
-        }
-        catch (UserException se)
-        {
-            fail("Unexpected user exception:" +se);
+        } catch (UserException se) {
+            fail("Unexpected user exception:" + se);
             se.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             sr.registerResource(registerSubtran);
-        }
-        catch (SystemException ex1)
-        {
-            fail("Unexpected system exception: "+ex1);
+        } catch (SystemException ex1) {
+            fail("Unexpected system exception: " + ex1);
             ex1.printStackTrace(System.err);
-        }
-        catch (Exception e)
-        {
-            fail("call to registerSubtran failed: "+e);
+        } catch (Exception e) {
+            fail("call to registerSubtran failed: " + e);
             e.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             System.out.println("committing first nested transaction");
             current.commit(true);
 
             System.out.println("committing second nested transaction");
             current.commit(true);
 
-            if (!doAbort)
-            {
+            if (!doAbort) {
                 System.out.println("committing top-level transaction");
                 current.commit(true);
-            }
-            else
-            {
+            } else {
                 System.out.println("aborting top-level transaction");
                 current.rollback();
             }
-        }
-        catch (Exception ex)
-        {
-            fail("Caught unexpected exception: "+ex);
+        } catch (Exception ex) {
+            fail("Caught unexpected exception: " + ex);
             ex.printStackTrace(System.err);
         }
 
@@ -130,4 +112,3 @@ public class ArjunaNestingTest
     }
 
 }
-

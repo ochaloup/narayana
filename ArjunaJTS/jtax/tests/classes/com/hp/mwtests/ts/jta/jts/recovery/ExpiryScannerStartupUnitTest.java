@@ -33,19 +33,21 @@ import com.arjuna.ats.internal.jta.recovery.jts.XARecoveryModule;
 public class ExpiryScannerStartupUnitTest {
     @Test
     public void testExpiryBackground() throws Exception {
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryModuleClassNames(Arrays.asList(new String[] { XARecoveryModule.class.getName() }));
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setExpiryScanners(Arrays.asList(new ExpiryScanner[] { new ExpiryScanner() {
+        recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .setRecoveryModuleClassNames(Arrays.asList(new String[]{XARecoveryModule.class.getName()}));
+        recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .setExpiryScanners(Arrays.asList(new ExpiryScanner[]{new ExpiryScanner() {
 
-            @Override
-            public void scan() {
-                AbstractRecord.create(172);
-            }
+                    @Override
+                    public void scan() {
+                        AbstractRecord.create(172);
+                    }
 
-            @Override
-            public boolean toBeUsed() {
-                return true;
-            }
-        } }));
+                    @Override
+                    public boolean toBeUsed() {
+                        return true;
+                    }
+                }}));
 
         recoveryPropertyManager.getRecoveryEnvironmentBean().setPeriodicRecoveryPeriod(1);
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);

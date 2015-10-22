@@ -81,13 +81,11 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * AbstractRecord objects.
  * 
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ExtendedResourceRecord.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: ExtendedResourceRecord.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
  */
 
-public class ExtendedResourceRecord extends
-        com.arjuna.ats.arjuna.coordinator.AbstractRecord
-{
+public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.AbstractRecord {
 
     private boolean lastRecord;
     /**
@@ -101,15 +99,14 @@ public class ExtendedResourceRecord extends
      *            commit_subtransaction.
      */
 
-    public ExtendedResourceRecord (boolean propagate, Uid objUid, ArjunaSubtranAwareResource theResource, Coordinator myParent, Uid recCoordUid, ArjunaTransactionImple current)
-    {
+    public ExtendedResourceRecord(boolean propagate, Uid objUid, ArjunaSubtranAwareResource theResource,
+            Coordinator myParent, Uid recCoordUid, ArjunaTransactionImple current) {
         super(objUid, null, ObjectType.ANDPERSISTENT);
 
         _resourceHandle = theResource;
         _stringifiedResourceHandle = null;
         _parentCoordHandle = myParent;
-        _recCoordUid = (recCoordUid != null) ? recCoordUid : new Uid(
-                Uid.nullUid());
+        _recCoordUid = (recCoordUid != null) ? recCoordUid : new Uid(Uid.nullUid());
         _currentTransaction = current;
         _propagateRecord = propagate;
         _rolledback = false;
@@ -121,8 +118,7 @@ public class ExtendedResourceRecord extends
      * Specific OTS method for getting at the value.
      */
 
-    public final ArjunaSubtranAwareResource resourceHandle ()
-    {
+    public final ArjunaSubtranAwareResource resourceHandle() {
         /*
          * After recovery we may have not been able to recreate the
          * _resourceHandle due to the fact that the Resource itself may not be
@@ -132,49 +128,42 @@ public class ExtendedResourceRecord extends
          * this point the Resource may have recovered.
          */
 
-        if ((_resourceHandle == null) && (_stringifiedResourceHandle != null))
-        {
-            try
-            {
+        if ((_resourceHandle == null) && (_stringifiedResourceHandle != null)) {
+            try {
                 org.omg.CORBA.ORB theOrb = ORBManager.getORB().orb();
 
                 if (theOrb == null)
                     throw new UNKNOWN();
 
-                if (jtsLogger.logger.isTraceEnabled())
-                {
-                    jtsLogger.logger.trace( "ExtendedResourceRecord: About to string_to_object on " + _stringifiedResourceHandle);
+                if (jtsLogger.logger.isTraceEnabled()) {
+                    jtsLogger.logger.trace(
+                            "ExtendedResourceRecord: About to string_to_object on " + _stringifiedResourceHandle);
                 }
 
                 org.omg.CORBA.Object optr = theOrb.string_to_object(_stringifiedResourceHandle);
 
-                if (jtsLogger.logger.isTraceEnabled())
-                {
-                    jtsLogger.logger.trace("ExtendedResourceRecord: Successfully stringed to object, next try to narrow");
+                if (jtsLogger.logger.isTraceEnabled()) {
+                    jtsLogger.logger
+                            .trace("ExtendedResourceRecord: Successfully stringed to object, next try to narrow");
                 }
 
                 theOrb = null;
 
                 _resourceHandle = com.arjuna.ArjunaOTS.ArjunaSubtranAwareResourceHelper.unchecked_narrow(optr);
 
-                if (jtsLogger.logger.isTraceEnabled())
-                {
+                if (jtsLogger.logger.isTraceEnabled()) {
                     jtsLogger.logger.trace("ExtendedResourceRecord: Successfully narrowed");
                 }
 
                 if (_resourceHandle == null)
                     throw new BAD_PARAM();
-                else
-                {
+                else {
                     optr = null;
                 }
-            }
-            catch (SystemException e)
-            {
+            } catch (SystemException e) {
                 // Failed to narrow to a ArjunaSubtranAwareResource
 
-                if (jtsLogger.logger.isTraceEnabled())
-                {
+                if (jtsLogger.logger.isTraceEnabled()) {
                     jtsLogger.logger.trace("ExtendedResourceRecord: Failed to narrow to ArjunaSubtranAwareResource");
                 }
             }
@@ -183,90 +172,70 @@ public class ExtendedResourceRecord extends
         return _resourceHandle;
     }
 
-    public boolean propagateOnCommit ()
-    {
+    public boolean propagateOnCommit() {
         if (_propagateRecord)
             return true;
 
         OTSAbstractRecord resHandle = otsRecord();
 
-        try
-        {
+        try {
             if ((resHandle != null) && !_endpointFailed)
                 return resHandle.propagateOnCommit();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             _endpointFailed = true;
         }
 
         return true;
     }
 
-    public boolean propagateOnAbort ()
-    {
+    public boolean propagateOnAbort() {
         OTSAbstractRecord resHandle = otsRecord();
 
-        try
-        {
+        try {
             if ((resHandle != null) && !_endpointFailed)
                 return resHandle.propagateOnAbort();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             _endpointFailed = true;
         }
 
         return false;
     }
 
-    public Uid order ()
-    {
+    public Uid order() {
         Uid toReturn = super.order();
 
-        if (_cachedUid == null)
-        {
+        if (_cachedUid == null) {
             OTSAbstractRecord resHandle = otsRecord();
 
-            try
-            {
-                if ((resHandle != null) && !_endpointFailed)
-                {
+            try {
+                if ((resHandle != null) && !_endpointFailed) {
                     toReturn = _cachedUid = new Uid(resHandle.uid());
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 _endpointFailed = true;
             }
-        }
-        else
+        } else
             toReturn = _cachedUid;
 
         return toReturn;
     }
 
-    public int typeIs ()
-    {
+    public int typeIs() {
         OTSAbstractRecord resHandle = otsRecord();
         int r = RecordType.OTS_ABSTRACTRECORD;
 
-        if (_cachedType == -1)
-        {
-            try
-            {
+        if (_cachedType == -1) {
+            try {
                 if ((resHandle != null) && !_endpointFailed)
                     _cachedType = r = resHandle.type_id();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 r = RecordType.OTS_ABSTRACTRECORD;
 
                 _endpointFailed = true;
 
                 jtsLogger.i18NLogger.warn_resources_errtypefail("ExtendedResourceRecord.typeIs", Integer.toString(r));
             }
-        }
-        else
+        } else
             r = _cachedType;
 
         resHandle = null;
@@ -274,13 +243,11 @@ public class ExtendedResourceRecord extends
         return r;
     }
 
-    public Object value ()
-    {
+    public Object value() {
         return _resourceHandle;
     }
 
-    public void setValue (Object o)
-    {
+    public void setValue(Object o) {
         jtsLogger.i18NLogger.warn_resources_errsetvalue("ExtendedResourceRecord.set_value");
     }
 
@@ -296,10 +263,8 @@ public class ExtendedResourceRecord extends
      * after which they are dropped.
      */
 
-    public int nestedAbort ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int nestedAbort() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::nestedAbort() for " + order());
         }
 
@@ -307,22 +272,16 @@ public class ExtendedResourceRecord extends
          * Must be an staResource to get here.
          */
 
-        try
-        {
+        try {
             resourceHandle().rollback_subtransaction();
-        }
-        catch (OBJECT_NOT_EXIST one)
-        {
-            if (_rolledback)
-            {
+        } catch (OBJECT_NOT_EXIST one) {
+            if (_rolledback) {
                 _rolledback = false; // in case we get propagated to the parent
 
                 return TwoPhaseOutcome.FINISH_OK;
-            }
-            else
+            } else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        }
-        catch (SystemException ex) {
+        } catch (SystemException ex) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.nestedAbort", ex);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -331,17 +290,14 @@ public class ExtendedResourceRecord extends
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int nestedCommit ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int nestedCommit() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::nestedCommit() for " + order());
         }
 
         int o = TwoPhaseOutcome.FINISH_ERROR;
 
-        try
-        {
+        try {
             resourceHandle().commit_subtransaction(_parentCoordHandle);
 
             /*
@@ -350,8 +306,7 @@ public class ExtendedResourceRecord extends
 
             _parentCoordHandle = null;
 
-            if (_currentTransaction != null)
-            {
+            if (_currentTransaction != null) {
                 /*
                  * Now change our notion of our parent for subsequent nested
                  * transaction commits. We were passed a reference to the
@@ -363,27 +318,23 @@ public class ExtendedResourceRecord extends
 
                 ControlImple control = ((_currentTransaction == null) ? null : _currentTransaction.getControlHandle());
 
-                if (control != null)
-                {
+                if (control != null) {
                     _parentCoordHandle = control.get_coordinator();
 
                     control = null;
 
                     o = TwoPhaseOutcome.FINISH_OK;
-                }
-                else {
+                } else {
                     jtsLogger.i18NLogger.warn_resources_errnoparent("ExtendedResourceRecord.nestedCommit");
 
                     o = TwoPhaseOutcome.FINISH_ERROR;
                 }
-            }
-            else {
+            } else {
                 jtsLogger.i18NLogger.warn_resources_noparent(get_uid());
 
                 o = TwoPhaseOutcome.FINISH_ERROR;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.nestedCommit", e);
 
             o = TwoPhaseOutcome.FINISH_ERROR;
@@ -396,33 +347,28 @@ public class ExtendedResourceRecord extends
      * Because resource is an Arjuna AbstractRecord we can do proper nesting!
      */
 
-    public int nestedPrepare ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int nestedPrepare() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::nestedPrepare() for " + order());
         }
 
         int o = TwoPhaseOutcome.PREPARE_NOTOK;
 
-        try
-        {
-            switch (resourceHandle().prepare_subtransaction().value())
-            {
-            case Vote._VoteCommit:
-                o = TwoPhaseOutcome.PREPARE_OK;
-                break;
-            case Vote._VoteRollback:
-                _rolledback = true;
+        try {
+            switch (resourceHandle().prepare_subtransaction().value()) {
+                case Vote._VoteCommit :
+                    o = TwoPhaseOutcome.PREPARE_OK;
+                    break;
+                case Vote._VoteRollback :
+                    _rolledback = true;
 
-                o = TwoPhaseOutcome.PREPARE_NOTOK;
-                break;
-            case Vote._VoteReadOnly:
-                o = TwoPhaseOutcome.PREPARE_READONLY;
-                break;
+                    o = TwoPhaseOutcome.PREPARE_NOTOK;
+                    break;
+                case Vote._VoteReadOnly :
+                    o = TwoPhaseOutcome.PREPARE_READONLY;
+                    break;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.nestedPrepare", e);
 
             o = TwoPhaseOutcome.PREPARE_NOTOK;
@@ -431,40 +377,27 @@ public class ExtendedResourceRecord extends
         return o;
     }
 
-    public int topLevelAbort ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int topLevelAbort() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::topLevelAbort() for " + order());
         }
 
-        try
-        {
-            if (resourceHandle() != null)
-            {
+        try {
+            if (resourceHandle() != null) {
                 _resourceHandle.rollback();
-            }
-            else
+            } else
                 return TwoPhaseOutcome.FINISH_ERROR;
-        }
-        catch (HeuristicCommit e1)
-        {
+        } catch (HeuristicCommit e1) {
             if (_rolledback)
                 return TwoPhaseOutcome.HEURISTIC_HAZARD; // participant lied in
-                                                         // prepare!
+                                                            // prepare!
             else
                 return TwoPhaseOutcome.HEURISTIC_COMMIT;
-        }
-        catch (HeuristicMixed e2)
-        {
+        } catch (HeuristicMixed e2) {
             return TwoPhaseOutcome.HEURISTIC_MIXED;
-        }
-        catch (HeuristicHazard e3)
-        {
+        } catch (HeuristicHazard e3) {
             return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        }
-        catch (OBJECT_NOT_EXIST one)
-        {
+        } catch (OBJECT_NOT_EXIST one) {
             /*
              * If the resource voted to roll back in prepare then it can legally
              * be garbage collected at that point. Hence, it may be that we get
@@ -476,8 +409,7 @@ public class ExtendedResourceRecord extends
                 return TwoPhaseOutcome.FINISH_OK;
             else
                 return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        }
-        catch (SystemException e4) {
+        } catch (SystemException e4) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelAbort", e4);
 
             return TwoPhaseOutcome.FINISH_ERROR;
@@ -486,90 +418,63 @@ public class ExtendedResourceRecord extends
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelCommit ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int topLevelCommit() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::topLevelCommit() for " + order());
         }
 
         if (!lastRecord) {
-            
-        try
-        {
-            if (resourceHandle() != null)
-            {
-                _resourceHandle.commit();
-            }
-            else
-                return TwoPhaseOutcome.FINISH_ERROR;
-        }
-        catch (NotPrepared e1)
-        {
-            return TwoPhaseOutcome.NOT_PREPARED;
-        }
-        catch (HeuristicRollback e2)
-        {
-            return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
-        }
-        catch (HeuristicMixed e3)
-        {
-            return TwoPhaseOutcome.HEURISTIC_MIXED;
-        }
-        catch (HeuristicHazard e4)
-        {
-            return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        }
-        catch (SystemException e6) {
-            jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelCommit", e6);
 
-            return TwoPhaseOutcome.FINISH_ERROR;
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
-            
-            return TwoPhaseOutcome.FINISH_ERROR;
-        }
+            try {
+                if (resourceHandle() != null) {
+                    _resourceHandle.commit();
+                } else
+                    return TwoPhaseOutcome.FINISH_ERROR;
+            } catch (NotPrepared e1) {
+                return TwoPhaseOutcome.NOT_PREPARED;
+            } catch (HeuristicRollback e2) {
+                return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
+            } catch (HeuristicMixed e3) {
+                return TwoPhaseOutcome.HEURISTIC_MIXED;
+            } catch (HeuristicHazard e4) {
+                return TwoPhaseOutcome.HEURISTIC_HAZARD;
+            } catch (SystemException e6) {
+                jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelCommit", e6);
+
+                return TwoPhaseOutcome.FINISH_ERROR;
+            } catch (Exception e2) {
+                e2.printStackTrace();
+
+                return TwoPhaseOutcome.FINISH_ERROR;
+            }
         }
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public int topLevelPrepare ()
-    {
-        if (jtsLogger.logger.isTraceEnabled())
-        {
+    public int topLevelPrepare() {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ExtendedResourceRecord::topLevelPrepare() for " + order());
         }
 
-        try
-        {
-            if (resourceHandle() != null)
-            {
-                switch (_resourceHandle.prepare().value())
-                {
-                case Vote._VoteCommit:
-                    return TwoPhaseOutcome.PREPARE_OK;
-                case Vote._VoteRollback:
-                    _rolledback = true;
+        try {
+            if (resourceHandle() != null) {
+                switch (_resourceHandle.prepare().value()) {
+                    case Vote._VoteCommit :
+                        return TwoPhaseOutcome.PREPARE_OK;
+                    case Vote._VoteRollback :
+                        _rolledback = true;
 
-                    return TwoPhaseOutcome.PREPARE_NOTOK;
-                case Vote._VoteReadOnly:
-                    return TwoPhaseOutcome.PREPARE_READONLY;
+                        return TwoPhaseOutcome.PREPARE_NOTOK;
+                    case Vote._VoteReadOnly :
+                        return TwoPhaseOutcome.PREPARE_READONLY;
                 }
-            }
-            else
+            } else
                 return TwoPhaseOutcome.PREPARE_NOTOK;
-        }
-        catch (HeuristicMixed e1)
-        {
+        } catch (HeuristicMixed e1) {
             return TwoPhaseOutcome.HEURISTIC_MIXED;
-        }
-        catch (HeuristicHazard e2)
-        {
+        } catch (HeuristicHazard e2) {
             return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelPrepare", e);
 
             return TwoPhaseOutcome.PREPARE_NOTOK;
@@ -578,59 +483,47 @@ public class ExtendedResourceRecord extends
         return TwoPhaseOutcome.PREPARE_NOTOK;
     }
 
-    public int nestedOnePhaseCommit ()
-    {
-        switch (nestedPrepare())
-        {
-        case TwoPhaseOutcome.PREPARE_OK:
-            return nestedCommit();
-        case TwoPhaseOutcome.PREPARE_READONLY:
-            return TwoPhaseOutcome.FINISH_OK;
-        default:
-            return TwoPhaseOutcome.FINISH_ERROR;
+    public int nestedOnePhaseCommit() {
+        switch (nestedPrepare()) {
+            case TwoPhaseOutcome.PREPARE_OK :
+                return nestedCommit();
+            case TwoPhaseOutcome.PREPARE_READONLY :
+                return TwoPhaseOutcome.FINISH_OK;
+            default :
+                return TwoPhaseOutcome.FINISH_ERROR;
         }
     }
 
-    public int topLevelOnePhaseCommit ()
-    {
-        try
-        {            
+    public int topLevelOnePhaseCommit() {
+        try {
             if (resourceHandle() != null)
                 _resourceHandle.commit_one_phase();
-        }
-        catch (HeuristicHazard e1)
-        {            
+        } catch (HeuristicHazard e1) {
             return TwoPhaseOutcome.HEURISTIC_HAZARD;
-        }
-        catch (TRANSACTION_ROLLEDBACK e4)
-        {            
+        } catch (TRANSACTION_ROLLEDBACK e4) {
             /*
-             * It rolled back. That's ok, but we need to be able
-             * to communicate that back to the caller.
+             * It rolled back. That's ok, but we need to be able to communicate
+             * that back to the caller.
              */
-            
-            return TwoPhaseOutcome.ONE_PHASE_ERROR;  // TODO TPO extension required.
-        }
-        catch (INVALID_TRANSACTION e5)
-        {
+
+            return TwoPhaseOutcome.ONE_PHASE_ERROR; // TODO TPO extension
+                                                    // required.
+        } catch (INVALID_TRANSACTION e5) {
             return TwoPhaseOutcome.ONE_PHASE_ERROR;
-        }
-        catch (final UNKNOWN ex)
-        {
+        } catch (final UNKNOWN ex) {
             /*
              * Means we can retry.
              */
-            
+
             return TwoPhaseOutcome.FINISH_ERROR;
-        }
-        catch (Exception e5) {
+        } catch (Exception e5) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.topLevelOnePhaseCommit", e5);
 
             e5.printStackTrace();
 
             /*
-                * Unknown error - better assume heuristic!
-                */
+             * Unknown error - better assume heuristic!
+             */
 
             return TwoPhaseOutcome.HEURISTIC_HAZARD;
         }
@@ -638,43 +531,31 @@ public class ExtendedResourceRecord extends
         return TwoPhaseOutcome.FINISH_OK;
     }
 
-    public boolean forgetHeuristic ()
-    {
-        try
-        {
-            if (resourceHandle() != null)
-            {
+    public boolean forgetHeuristic() {
+        try {
+            if (resourceHandle() != null) {
                 _resourceHandle.forget();
                 return true;
-            }
-            else {
+            } else {
                 jtsLogger.i18NLogger.warn_resources_errnores("ExtendedResourceRecord.forgetHeuristic");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.forgetHeuristic", e);
         }
 
         return false;
     }
-/*
-    public static AbstractRecord create ()
-    {
-        return new ExtendedResourceRecord();
-    }
-
-    public void remove (AbstractRecord toDelete)
-    {
-        toDelete = null;
-    }
-*/
-    public void print (PrintWriter strm)
-    {
+    /*
+     * public static AbstractRecord create () { return new
+     * ExtendedResourceRecord(); }
+     * 
+     * public void remove (AbstractRecord toDelete) { toDelete = null; }
+     */
+    public void print(PrintWriter strm) {
         super.print(strm);
 
         strm.println("ExtendedResourceRecord");
-        strm.println(_resourceHandle + "\t" + _parentCoordHandle + "\t"
-                + _propagateRecord);
+        strm.println(_resourceHandle + "\t" + _parentCoordHandle + "\t" + _propagateRecord);
     }
 
     /**
@@ -686,16 +567,14 @@ public class ExtendedResourceRecord extends
      * object_to_string to be meaningful.
      */
 
-    public boolean restore_state (InputObjectState os, int t)
-    {
+    public boolean restore_state(InputObjectState os, int t) {
         int isString = 0;
         boolean result = super.restore_state(os, t);
 
         if (!result)
             return false;
 
-        try
-        {
+        try {
             _propagateRecord = os.unpackBoolean();
 
             /*
@@ -710,8 +589,7 @@ public class ExtendedResourceRecord extends
 
             isString = os.unpackInt();
 
-            if (isString == 1)
-            {
+            if (isString == 1) {
                 _stringifiedResourceHandle = os.unpackString();
 
                 /*
@@ -722,18 +600,15 @@ public class ExtendedResourceRecord extends
                 // Unpack recovery coordinator Uid
                 _recCoordUid = UidHelper.unpackFrom(os);
 
-                if (jtsLogger.logger.isTraceEnabled())
-                {
-                    jtsLogger.logger.trace("ExtendedResourceRecord.restore_state: unpacked record with uid=" + _recCoordUid);
+                if (jtsLogger.logger.isTraceEnabled()) {
+                    jtsLogger.logger
+                            .trace("ExtendedResourceRecord.restore_state: unpacked record with uid=" + _recCoordUid);
                 }
-            }
-            else
+            } else
                 _stringifiedResourceHandle = null;
-            
+
             lastRecord = os.unpackBoolean();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
 
             result = false;
@@ -753,15 +628,13 @@ public class ExtendedResourceRecord extends
      * object_to_string to be meaningful.
      */
 
-    public boolean save_state (OutputObjectState os, int t)
-    {
+    public boolean save_state(OutputObjectState os, int t) {
         boolean result = super.save_state(os, t);
 
         if (!result)
             return false;
 
-        try
-        {
+        try {
             /*
              * Do we need to save the parent coordinator handle?
              */
@@ -785,18 +658,13 @@ public class ExtendedResourceRecord extends
 
             os.packInt(_cachedType);
 
-            if ((_resourceHandle == null)
-                    && (_stringifiedResourceHandle == null))
-            {
+            if ((_resourceHandle == null) && (_stringifiedResourceHandle == null)) {
                 os.packInt(-1);
-            }
-            else
-            {
+            } else {
                 os.packInt(1);
                 String stringRef = null;
 
-                if (_resourceHandle != null)
-                {
+                if (_resourceHandle != null) {
                     org.omg.CORBA.ORB theOrb = ORBManager.getORB().orb();
 
                     if (theOrb == null)
@@ -805,86 +673,69 @@ public class ExtendedResourceRecord extends
                     stringRef = theOrb.object_to_string(_resourceHandle);
 
                     theOrb = null;
-                }
-                else
-                {
+                } else {
                     stringRef = _stringifiedResourceHandle;
                 }
 
-                if (stringRef != null)
-                {
+                if (stringRef != null) {
                     os.packString(stringRef);
 
-                    if (jtsLogger.logger.isTraceEnabled())
-                    {
+                    if (jtsLogger.logger.isTraceEnabled()) {
                         jtsLogger.logger.trace("ExtendedResourceRecord: packed obj ref " + stringRef);
                     }
-                }
-                else
-                {
+                } else {
                     result = false;
                 }
 
                 stringRef = null;
 
-                if (result)
-                {
+                if (result) {
                     // Pack recovery coordinator Uid
                     UidHelper.packInto(_recCoordUid, os);
 
-                    if (jtsLogger.logger.isTraceEnabled())
-                    {
+                    if (jtsLogger.logger.isTraceEnabled()) {
                         jtsLogger.logger.trace("Packed rec co uid of " + _recCoordUid);
                     }
                 }
-                
+
                 os.packBoolean(lastRecord);
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             result = false;
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             result = false;
         }
 
         return result;
     }
 
-    public String type ()
-    {
+    public String type() {
         return "/StateManager/AbstractRecord/ExtendedResourceRecord";
     }
 
-
-    public boolean doSave ()
-    {
+    public boolean doSave() {
         if (_restored)
             return true;
 
         switch (_doSave) // check cached value first
         {
-        case -1:
-            break; // not cached yet
-        case 0:
-            return false;
-        case 1:
-            return true;
-        default:
-            break;
+            case -1 :
+                break; // not cached yet
+            case 0 :
+                return false;
+            case 1 :
+                return true;
+            default :
+                break;
         }
-        
+
         OTSAbstractRecord resHandle = otsRecord();
         boolean save = true;
 
-        try
-        {
+        try {
             if ((resHandle != null) && !_endpointFailed)
                 save = resHandle.saveRecord();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             save = true; // just to be on the safe side!
 
             _endpointFailed = true;
@@ -895,33 +746,25 @@ public class ExtendedResourceRecord extends
         resHandle = null;
 
         _doSave = (save ? 1 : 0);
-        
+
         return save;
     }
 
-    public final Uid getRCUid ()
-    {
+    public final Uid getRCUid() {
         return _recCoordUid;
     }
 
-    public void merge (AbstractRecord absRec)
-    {
+    public void merge(AbstractRecord absRec) {
         OTSAbstractRecord resHandle = otsRecord();
 
-        if (resHandle != null)
-        {
+        if (resHandle != null) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     resHandle.merge(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                } catch (Exception e) {
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.merge", e);
                 }
 
@@ -932,24 +775,17 @@ public class ExtendedResourceRecord extends
         resHandle = null;
     }
 
-    public void alter (AbstractRecord absRec)
-    {
+    public void alter(AbstractRecord absRec) {
         OTSAbstractRecord resHandle = otsRecord();
 
-        if (resHandle != null)
-        {
+        if (resHandle != null) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     resHandle.alter(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                } catch (Exception e) {
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.alter", e);
                 }
 
@@ -960,26 +796,21 @@ public class ExtendedResourceRecord extends
         resHandle = null;
     }
 
-    public boolean shouldAdd (AbstractRecord absRec)
-    {
+    public boolean shouldAdd(AbstractRecord absRec) {
         boolean result = false;
         OTSAbstractRecord resHandle = otsRecord();
 
-        if ((resHandle != null) && !_endpointFailed)
-        {
+        if ((resHandle != null) && !_endpointFailed) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     result = resHandle.shouldAdd(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                    // This is expected to happen whenever a resource has gone away, for example during a crash or if it has exited the 2PC process early by returning XA_RDONLY out of prepare
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                    // This is expected to happen whenever a resource has gone
+                    // away, for example during a crash or if it has exited the
+                    // 2PC process early by returning XA_RDONLY out of prepare
+                } catch (Exception e) {
                     _endpointFailed = true;
 
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.shouldAdd", e);
@@ -994,26 +825,21 @@ public class ExtendedResourceRecord extends
         return result;
     }
 
-    public boolean shouldAlter (AbstractRecord absRec)
-    {
+    public boolean shouldAlter(AbstractRecord absRec) {
         boolean result = false;
         OTSAbstractRecord resHandle = otsRecord();
 
-        if ((resHandle != null) && !_endpointFailed)
-        {
+        if ((resHandle != null) && !_endpointFailed) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     result = resHandle.shouldAlter(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                    // This is expected to happen whenever a resource has gone away, for example during a crash or if it has exited the 2PC process early by returning XA_RDONLY out of prepare
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                    // This is expected to happen whenever a resource has gone
+                    // away, for example during a crash or if it has exited the
+                    // 2PC process early by returning XA_RDONLY out of prepare
+                } catch (Exception e) {
                     _endpointFailed = true;
 
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.shouldAlter", e);
@@ -1028,26 +854,21 @@ public class ExtendedResourceRecord extends
         return result;
     }
 
-    public boolean shouldMerge (AbstractRecord absRec)
-    {
+    public boolean shouldMerge(AbstractRecord absRec) {
         boolean result = false;
         OTSAbstractRecord resHandle = otsRecord();
 
-        if ((resHandle != null) && !_endpointFailed)
-        {
+        if ((resHandle != null) && !_endpointFailed) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     result = resHandle.shouldMerge(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                    // This is expected to happen whenever a resource has gone away, for example during a crash or if it has exited the 2PC process early by returning XA_RDONLY out of prepare
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                    // This is expected to happen whenever a resource has gone
+                    // away, for example during a crash or if it has exited the
+                    // 2PC process early by returning XA_RDONLY out of prepare
+                } catch (Exception e) {
                     _endpointFailed = true;
 
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.shouldMerge", e);
@@ -1062,26 +883,21 @@ public class ExtendedResourceRecord extends
         return result;
     }
 
-    public boolean shouldReplace (AbstractRecord absRec)
-    {
+    public boolean shouldReplace(AbstractRecord absRec) {
         boolean result = recoveryReplace(absRec);
         OTSAbstractRecord resHandle = otsRecord();
 
-        if ((resHandle != null) && !result && !_endpointFailed)
-        {
+        if ((resHandle != null) && !result && !_endpointFailed) {
             OTSAbstractRecord rec = otsRecord(absRec);
 
-            if (rec != null)
-            {
-                try
-                {
+            if (rec != null) {
+                try {
                     result = resHandle.shouldReplace(rec);
-                }
-                catch (OBJECT_NOT_EXIST ex)
-                {
-                    // This is expected to happen whenever a resource has gone away, for example during a crash or if it has exited the 2PC process early by returning XA_RDONLY out of prepare
-                }
-                catch (Exception e) {
+                } catch (OBJECT_NOT_EXIST ex) {
+                    // This is expected to happen whenever a resource has gone
+                    // away, for example during a crash or if it has exited the
+                    // 2PC process early by returning XA_RDONLY out of prepare
+                } catch (Exception e) {
                     _endpointFailed = true;
 
                     jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.shouldReplace", e);
@@ -1100,8 +916,7 @@ public class ExtendedResourceRecord extends
      * Protected constructor used by crash recovery.
      */
 
-    public ExtendedResourceRecord ()
-    {
+    public ExtendedResourceRecord() {
         super();
 
         _resourceHandle = null;
@@ -1114,12 +929,10 @@ public class ExtendedResourceRecord extends
         _restored = false;
     }
 
-    private boolean recoveryReplace (AbstractRecord rec)
-    {
+    private boolean recoveryReplace(AbstractRecord rec) {
         boolean replace = false;
 
-        if ((rec != null) && (rec instanceof ExtendedResourceRecord))
-        {
+        if ((rec != null) && (rec instanceof ExtendedResourceRecord)) {
             /*
              * It is no good checking type equality because at recovery time the
              * failed resource won't respond and the implementations of this
@@ -1134,9 +947,7 @@ public class ExtendedResourceRecord extends
              * the uids are NIL_UID
              */
 
-            if ((_recCoordUid.notEquals(Uid.nullUid()))
-                    && (_recCoordUid.equals(newRec.getRCUid())))
-            {
+            if ((_recCoordUid.notEquals(Uid.nullUid())) && (_recCoordUid.equals(newRec.getRCUid()))) {
                 replace = true;
             }
         }
@@ -1144,26 +955,22 @@ public class ExtendedResourceRecord extends
         return replace;
     }
 
-    private final OTSAbstractRecord otsRecord (AbstractRecord absRec)
-    {
+    private final OTSAbstractRecord otsRecord(AbstractRecord absRec) {
         /*
          * Is the abstract record an ExtendedResourceRecord ?
          */
 
         OTSAbstractRecord resHandle = null;
 
-        if ((absRec != null) && (absRec instanceof ExtendedResourceRecord))
-        {
-            try
-            {
+        if ((absRec != null) && (absRec instanceof ExtendedResourceRecord)) {
+            try {
                 ExtendedResourceRecord theRecord = (ExtendedResourceRecord) absRec;
                 ArjunaSubtranAwareResource theResource = theRecord.resourceHandle();
 
                 resHandle = com.arjuna.ArjunaOTS.OTSAbstractRecordHelper.unchecked_narrow(theResource);
 
                 theResource = null;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 jtsLogger.i18NLogger.warn_resources_errgenerr("ExtendedResourceRecord.otsRecord", e);
             }
         }
@@ -1171,10 +978,8 @@ public class ExtendedResourceRecord extends
         return resHandle;
     }
 
-    private final OTSAbstractRecord otsRecord ()
-    {
-        try
-        {
+    private final OTSAbstractRecord otsRecord() {
+        try {
             if (_otsARHandle == null) {
                 _otsARHandle = com.arjuna.ArjunaOTS.OTSAbstractRecordHelper.unchecked_narrow(_resourceHandle);
                 lastRecord = RecordType.LASTRESOURCE == _otsARHandle.type_id();
@@ -1184,9 +989,7 @@ public class ExtendedResourceRecord extends
                 throw new BAD_PARAM();
             else
                 return _otsARHandle;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // we are not an OTSAbstractRecord
 
             return null;

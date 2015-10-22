@@ -42,135 +42,132 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporte
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
 import com.arjuna.ats.jta.xa.XidImple;
 
-public class TransactionImporterImple implements TransactionImporter
-{
-    
+public class TransactionImporterImple implements TransactionImporter {
+
     /**
-     * Create a subordinate transaction associated with the
-     * global transaction inflow. No timeout is associated with the
-     * transaction.
+     * Create a subordinate transaction associated with the global transaction
+     * inflow. No timeout is associated with the transaction.
      * 
-     * @param xid the global transaction.
+     * @param xid
+     *            the global transaction.
      * 
      * @return the subordinate transaction.
      * 
-     * @throws XAException thrown if there are any errors.
+     * @throws XAException
+     *             thrown if there are any errors.
      */
-    
-    public SubordinateTransaction importTransaction (Xid xid) throws XAException
-    {
+
+    public SubordinateTransaction importTransaction(Xid xid) throws XAException {
         return importTransaction(xid, 0);
     }
 
     /**
-     * Create a subordinate transaction associated with the
-     * global transaction inflow and having a specified timeout.
+     * Create a subordinate transaction associated with the global transaction
+     * inflow and having a specified timeout.
      * 
-     * @param xid the global transaction.
-     * @param timeout the timeout associated with the global transaction.
+     * @param xid
+     *            the global transaction.
+     * @param timeout
+     *            the timeout associated with the global transaction.
      * 
      * @return the subordinate transaction.
      * 
-     * @throws XAException thrown if there are any errors.
+     * @throws XAException
+     *             thrown if there are any errors.
      */
-    
-    public SubordinateTransaction importTransaction (Xid xid, int timeout) throws XAException
-    {
+
+    public SubordinateTransaction importTransaction(Xid xid, int timeout) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
-        
+
         /*
          * Check to see if we haven't already imported this thing.
          */
-        
+
         SubordinateTransaction imported = getImportedTransaction(xid);
-        
-        if (imported == null)
-        {    
+
+        if (imported == null) {
             imported = new TransactionImple(timeout, xid);
-            
+
             _transactions.put(new XidImple(xid), imported);
         }
-        
+
         return imported;
     }
 
-    public SubordinateTransaction recoverTransaction (Uid actId) throws XAException
-    {
+    public SubordinateTransaction recoverTransaction(Uid actId) throws XAException {
         if (actId == null)
             throw new IllegalArgumentException();
-        
+
         TransactionImple recovered = new TransactionImple(actId);
-        
+
         if (recovered.baseXid() == null)
             throw new IllegalArgumentException();
-        
+
         TransactionImple tx = (TransactionImple) _transactions.get(recovered.baseXid());
 
-        if (tx == null)
-        {
+        if (tx == null) {
             recovered.recordTransaction();
 
             _transactions.put(recovered.baseXid(), recovered);
-            
+
             return recovered;
-        }
-        else
+        } else
             return tx;
     }
-    
+
     /**
-     * Get the subordinate (imported) transaction associated with the
-     * global transaction.
+     * Get the subordinate (imported) transaction associated with the global
+     * transaction.
      * 
-     * @param xid the global transaction.
+     * @param xid
+     *            the global transaction.
      * 
-     * @return the subordinate transaction or <code>null</code> if there
-     * is none.
+     * @return the subordinate transaction or <code>null</code> if there is
+     *         none.
      * 
-     * @throws XAException thrown if there are any errors.
+     * @throws XAException
+     *             thrown if there are any errors.
      */
-    
-    public SubordinateTransaction getImportedTransaction (Xid xid) throws XAException
-    {
+
+    public SubordinateTransaction getImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
-        
+
         SubordinateTransaction tx = _transactions.get(new XidImple(xid));
-        
+
         if (tx == null)
             return null;
 
-        if (tx.baseXid() == null)
-        {
+        if (tx.baseXid() == null) {
             /*
-             * Try recovery again. If it fails we'll throw a RETRY to the caller who
-             * should try again later.
+             * Try recovery again. If it fails we'll throw a RETRY to the caller
+             * who should try again later.
              */
             tx.recover();
 
             return tx;
-        }
-        else
+        } else
             return tx;
     }
 
     /**
      * Remove the subordinate (imported) transaction.
      * 
-     * @param xid the global transaction.
+     * @param xid
+     *            the global transaction.
      * 
-     * @throws XAException thrown if there are any errors.
+     * @throws XAException
+     *             thrown if there are any errors.
      */
-    
-    public void removeImportedTransaction (Xid xid) throws XAException
-    {
+
+    public void removeImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
         _transactions.remove(new XidImple(xid));
     }
-    
+
     private static ConcurrentHashMap<Xid, SubordinateTransaction> _transactions = new ConcurrentHashMap<Xid, SubordinateTransaction>();
-    
+
 }

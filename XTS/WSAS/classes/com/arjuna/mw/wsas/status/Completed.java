@@ -39,21 +39,17 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class Completed implements Status
-{
+public class Completed implements Status {
 
-    public static Completed instance ()
-    {
-    return _instance;
+    public static Completed instance() {
+        return _instance;
     }
 
-    public String toString ()
-    {
-    return "Status.Completed";
+    public String toString() {
+        return "Status.Completed";
     }
 
-    private Completed ()
-    {
+    private Completed() {
     }
 
     private static final Completed _instance = new Completed();

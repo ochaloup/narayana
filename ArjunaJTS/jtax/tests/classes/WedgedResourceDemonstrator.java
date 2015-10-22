@@ -42,11 +42,9 @@ import com.arjuna.orbportability.RootOA;
 public class WedgedResourceDemonstrator {
 
     @Test
-    public void testWedge() throws InvalidName, SystemException,
-            NotSupportedException, javax.transaction.SystemException,
-            IllegalStateException, RollbackException, SecurityException,
-            HeuristicMixedException, HeuristicRollbackException,
-            InterruptedException {
+    public void testWedge() throws InvalidName, SystemException, NotSupportedException,
+            javax.transaction.SystemException, IllegalStateException, RollbackException, SecurityException,
+            HeuristicMixedException, HeuristicRollbackException, InterruptedException {
 
         String mode = "jts";
         if (mode.equals("jts")) {
@@ -62,12 +60,12 @@ public class WedgedResourceDemonstrator {
             RecoveryManager.manager().initialize();
         }
 
-        TransactionManager transactionManager = mode.equals("jts") ? new com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple()
+        TransactionManager transactionManager = mode.equals("jts")
+                ? new com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple()
                 : new com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionManagerImple();
         transactionManager.setTransactionTimeout(2);
         transactionManager.begin();
-        transactionManager.getTransaction().enlistResource(
-                new TimeoutOnFirstRollbackResource());
+        transactionManager.getTransaction().enlistResource(new TimeoutOnFirstRollbackResource());
 
         // Business logic
         Thread.currentThread().sleep(5000);
@@ -101,8 +99,7 @@ public class WedgedResourceDemonstrator {
                     // just so the app will be able to clean up
                     this.wait(7000);
                 } catch (InterruptedException e) {
-                    throw new NullPointerException(
-                            "Interrupted, simulating jacorb");
+                    throw new NullPointerException("Interrupted, simulating jacorb");
                 }
             }
         }

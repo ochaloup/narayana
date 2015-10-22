@@ -24,22 +24,17 @@ import org.jboss.jbossts.qa.ArjunaCore.AbstractRecord.impl.Service01;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class MemoryClient002 extends BaseTestClient
-{
-    public static void main(String[] args)
-    {
+public class MemoryClient002 extends BaseTestClient {
+    public static void main(String[] args) {
         MemoryClient002 test = new MemoryClient002(args);
     }
 
-    private MemoryClient002(String[] args)
-    {
+    private MemoryClient002(String[] args) {
         super(args);
     }
 
-    public void Test()
-    {
-        try
-        {
+    public void Test() {
+        try {
             setNumberOfCalls(3);
             setNumberOfResources(2);
             getClientThreshold(1);
@@ -50,7 +45,7 @@ public class MemoryClient002 extends BaseTestClient
             mService.doWork(mMaxIteration);
             commit();
 
-            //get first memory reading.
+            // get first memory reading.
             getFirstReading();
 
             mService = new Service01(mNumberOfResources);
@@ -62,9 +57,7 @@ public class MemoryClient002 extends BaseTestClient
             getSecondReading();
 
             qaMemoryAssert();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Fail("Error in MemoryClient002.test() :", e);
         }
     }

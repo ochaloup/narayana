@@ -31,8 +31,7 @@ import org.jboss.tm.XAResourceWrapper;
 
 import com.arjuna.ats.jta.resources.LastResourceCommitOptimisation;
 
-public class JDBCConnectableResource implements ConnectableResource,
-        LastResourceCommitOptimisation, XAResourceWrapper {
+public class JDBCConnectableResource implements ConnectableResource, LastResourceCommitOptimisation, XAResourceWrapper {
 
     private Connection connection;
     private Xid startedXid;

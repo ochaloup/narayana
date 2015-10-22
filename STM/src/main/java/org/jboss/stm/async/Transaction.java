@@ -19,7 +19,6 @@
  * @author JBoss Inc.
  */
 
-
 package org.jboss.stm.async;
 
 import java.util.concurrent.ExecutorService;
@@ -34,24 +33,24 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
 
 /**
- * This is a user-level transaction class. Unlike AtomicAction which it uses, this
- * provides an asynchronous begin, commit and rollback capability. There
- * are a number of ways in which we currently support asynchronous interactions with
- * the transaction system, such as async prepare or async commit. The developer could
- * also register a two-phase aware participant or a Synchronisation and use callbacks
- * themselves to determine the outcome of the transaction. These continue to be
- * available to the developer but this API is intended to provide a simplified interface
- * to allow clients to make use of asynchronous transactions.
+ * This is a user-level transaction class. Unlike AtomicAction which it uses,
+ * this provides an asynchronous begin, commit and rollback capability. There
+ * are a number of ways in which we currently support asynchronous interactions
+ * with the transaction system, such as async prepare or async commit. The
+ * developer could also register a two-phase aware participant or a
+ * Synchronisation and use callbacks themselves to determine the outcome of the
+ * transaction. These continue to be available to the developer but this API is
+ * intended to provide a simplified interface to allow clients to make use of
+ * asynchronous transactions.
  * 
- * Note, we deliberately don't derive from AtomicAction so that developers must make
- * a conscious choice between a synchronous or asynchronous transaction.
+ * Note, we deliberately don't derive from AtomicAction so that developers must
+ * make a conscious choice between a synchronous or asynchronous transaction.
  *
  * @author Mark Little (mark@arjuna.com)
  * @version $Id$
  */
 
-public class Transaction
-{
+public class Transaction {
     /**
      * Create a new transaction. If there is already a transaction associated
      * with the thread then this new transaction will be automatically nested.
@@ -61,8 +60,7 @@ public class Transaction
      * automatically rolled back by the system.
      */
 
-    public Transaction ()
-    {
+    public Transaction() {
         _theTransaction = new AtomicAction();
     }
 
@@ -71,8 +69,7 @@ public class Transaction
      * an AtomicAction, typically during crash recovery.
      */
 
-    public Transaction (Uid objUid)
-    {
+    public Transaction(Uid objUid) {
         _theTransaction = new AtomicAction(objUid);
     }
 
@@ -85,8 +82,7 @@ public class Transaction
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public Future<Integer> begin ()
-    {
+    public Future<Integer> begin() {
         return begin(AtomicAction.NO_TIMEOUT);
     }
 
@@ -96,15 +92,15 @@ public class Transaction
      * If the transaction is already running or has terminated, then an error
      * code will be returned.
      *
-     * @param timeout the timeout associated with the transaction. If the
+     * @param timeout
+     *            the timeout associated with the transaction. If the
      *            transaction is still active when this timeout elapses, the
      *            system will automatically roll it back.
      *
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public Future<Integer> begin (int timeout)
-    {
+    public Future<Integer> begin(int timeout) {
         return _threadPool.submit(new TransactionExecutorBegin(timeout, _theTransaction));
     }
 
@@ -115,8 +111,7 @@ public class Transaction
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public Future<Integer> commit ()
-    {
+    public Future<Integer> commit() {
         return commit(true);
     }
 
@@ -130,8 +125,7 @@ public class Transaction
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public Future<Integer> commit (boolean report_heuristics)
-    {
+    public Future<Integer> commit(boolean report_heuristics) {
         return _threadPool.submit(new TransactionExecutorCommit(report_heuristics, _theTransaction));
     }
 
@@ -144,8 +138,7 @@ public class Transaction
      * @return <code>ActionStatus</code> indicating outcome.
      */
 
-    public Future<Integer> abort ()
-    {
+    public Future<Integer> abort() {
         return _threadPool.submit(new TransactionExecutorAbort(_theTransaction));
     }
 
@@ -153,8 +146,7 @@ public class Transaction
      * @return the timeout associated with this instance.
      */
 
-    public final int getTimeout ()
-    {
+    public final int getTimeout() {
         return _theTransaction.getTimeout();
     }
 
@@ -168,8 +160,7 @@ public class Transaction
      *         logs in the transaction object store.
      */
 
-    public String type ()
-    {
+    public String type() {
         return _theTransaction.type();
     }
 
@@ -189,8 +180,7 @@ public class Transaction
      *
      */
 
-    public static final Transaction suspend ()
-    {
+    public static final Transaction suspend() {
         return new Transaction(AtomicAction.suspend());
     }
 
@@ -204,24 +194,23 @@ public class Transaction
      * wrong for an application thread to proceed under the assumption it had
      * succeeded/happened yet. Ordering of events makes a difference here.
      *
-     * @param act the transaction to associate. If this is a nested
-     *            transaction, then the thread will be associated with all of
-     *            the transactions in the hierarchy.
+     * @param act
+     *            the transaction to associate. If this is a nested transaction,
+     *            then the thread will be associated with all of the
+     *            transactions in the hierarchy.
      *
      * @return <code>true</code> if association is successful,
      *         <code>false</code> otherwise.
      */
 
-    public static final boolean resume (Transaction act)
-    {
+    public static final boolean resume(Transaction act) {
         return AtomicAction.resume(act._theTransaction);
     }
 
-    private Transaction (AtomicAction act)
-    {
+    private Transaction(AtomicAction act) {
         _theTransaction = act;
     }
-    
+
     private AtomicAction _theTransaction;
     private final ExecutorService _threadPool = Executors.newFixedThreadPool(1);
 }

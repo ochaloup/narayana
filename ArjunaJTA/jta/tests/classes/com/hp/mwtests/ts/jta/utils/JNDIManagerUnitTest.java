@@ -27,133 +27,94 @@ import org.junit.Test;
 
 import com.arjuna.ats.jta.utils.JNDIManager;
 
-public class JNDIManagerUnitTest
-{
+public class JNDIManagerUnitTest {
     @Test
-    public void testBind () throws Exception
-    {
-        try
-        {
+    public void testBind() throws Exception {
+        try {
             JNDIManager.bindJTAImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTAImplementations(null);
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTATransactionManagerImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTATransactionManagerImplementation(null);
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTATransactionSynchronizationRegistryImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTATransactionSynchronizationRegistryImplementation(null);
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTAUserTransactionImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.bindJTAUserTransactionImplementation(null);
-            
+
             fail();
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
         }
     }
-    
+
     @Test
-    public void testUnbind () throws Exception
-    {
-        try
-        {
+    public void testUnbind() throws Exception {
+        try {
             JNDIManager.unbindJTATransactionManagerImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.unbindJTATransactionManagerImplementation(null);
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.unbindJTATransactionSynchronizationRegistryImplementation();
-            
+
             fail();
+        } catch (final Exception ex) {
         }
-        catch (final Exception ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             JNDIManager.unbindJTATransactionSynchronizationRegistryImplementation(null);
-            
+
             fail();
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
         }
     }
 }

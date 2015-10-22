@@ -30,141 +30,105 @@ import com.arjuna.wst11.messaging.engines.ParticipantCompletionParticipantEngine
 
 import javax.xml.namespace.QName;
 
-public class BAParticipantCompletionParticipantManagerStub implements BAParticipantManager
-{
-    private final ParticipantCompletionParticipantEngine coordinator ;
+public class BAParticipantCompletionParticipantManagerStub implements BAParticipantManager {
+    private final ParticipantCompletionParticipantEngine coordinator;
 
     public BAParticipantCompletionParticipantManagerStub(final ParticipantCompletionParticipantEngine coordinator)
-        throws Exception
-    {
+            throws Exception {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + " constructor");
         }
 
-        this.coordinator = coordinator ;
+        this.coordinator = coordinator;
     }
 
-    public synchronized void exit ()
-        throws WrongStateException, UnknownTransactionException, SystemException
-    {
+    public synchronized void exit() throws WrongStateException, UnknownTransactionException, SystemException {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".exit");
         }
 
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Completed -> illegal state
-         * Closing -> illegal state
-         * Compensating -> illegal state
-         * Failing-Active -> illegal state
-         * Failing-Canceling -> illegal state
-         * Failing-Compensating -> illegal state
-         * NotCompleting -> illegal state
-         * Exiting -> no response
-         * Ended -> ended
+         * Active -> illegal state Canceling -> illegal state Completed ->
+         * illegal state Closing -> illegal state Compensating -> illegal state
+         * Failing-Active -> illegal state Failing-Canceling -> illegal state
+         * Failing-Compensating -> illegal state NotCompleting -> illegal state
+         * Exiting -> no response Ended -> ended
          */
-        final State state = coordinator.exit() ;
+        final State state = coordinator.exit();
 
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".exit. State: " + state);
         }
 
-        if (state == State.STATE_EXITING)
-        {
-            throw new SystemException() ;
-        }
-        else if (state != State.STATE_ENDED)
-        {
-            throw new WrongStateException() ;
+        if (state == State.STATE_EXITING) {
+            throw new SystemException();
+        } else if (state != State.STATE_ENDED) {
+            throw new WrongStateException();
         }
     }
 
-    public synchronized void completed ()
-        throws WrongStateException, UnknownTransactionException, SystemException
-    {
+    public synchronized void completed() throws WrongStateException, UnknownTransactionException, SystemException {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".completed");
         }
 
         // returns original state
-        final State state = coordinator.completed() ;
+        final State state = coordinator.completed();
 
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".completed. State: " + state);
         }
 
-        if ((state != State.STATE_ACTIVE) && (state != State.STATE_COMPLETED))
-        {
-            throw new WrongStateException() ;
+        if ((state != State.STATE_ACTIVE) && (state != State.STATE_COMPLETED)) {
+            throw new WrongStateException();
         }
     }
 
-    public void cannotComplete()
-        throws WrongStateException, UnknownTransactionException, SystemException
-    {
+    public void cannotComplete() throws WrongStateException, UnknownTransactionException, SystemException {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".cannotComplete");
         }
 
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Completed -> illegal state
-         * Closing -> illegal state
-         * Compensating -> illegal state
-         * Failing-Active -> illegal state
-         * Failing-Canceling -> illegal state
-         * Failing-Compensating -> illegal state
-         * NotCompleting -> no response
-         * Exiting -> illegal state
-         * Ended -> ended
+         * Active -> illegal state Canceling -> illegal state Completed ->
+         * illegal state Closing -> illegal state Compensating -> illegal state
+         * Failing-Active -> illegal state Failing-Canceling -> illegal state
+         * Failing-Compensating -> illegal state NotCompleting -> no response
+         * Exiting -> illegal state Ended -> ended
          */
-        final State state = coordinator.cannotComplete() ;
+        final State state = coordinator.cannotComplete();
 
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".completed. State: " + state);
         }
 
-        if (state == State.STATE_NOT_COMPLETING)
-        {
-            throw new SystemException() ;
-        }
-        else if (state != State.STATE_ENDED)
-        {
-            throw new WrongStateException() ;
+        if (state == State.STATE_NOT_COMPLETING) {
+            throw new SystemException();
+        } else if (state != State.STATE_ENDED) {
+            throw new WrongStateException();
         }
     }
 
-    public synchronized void fail (final QName exceptionIdentifier)
-        throws SystemException
-    {
+    public synchronized void fail(final QName exceptionIdentifier) throws SystemException {
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".fail");
         }
 
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Completed -> illegal state
-         * Closing -> illegal state
-         * Compensating -> illegal state
-         * Failing-Active -> no response
-         * Failing-Canceling -> no response
-         * Failing-Compensating -> no response
-         * NotCompleting -> illegal state
-         * Exiting -> illegal state
-         * Ended -> ended
+         * Active -> illegal state Canceling -> illegal state Completed ->
+         * illegal state Closing -> illegal state Compensating -> illegal state
+         * Failing-Active -> no response Failing-Canceling -> no response
+         * Failing-Compensating -> no response NotCompleting -> illegal state
+         * Exiting -> illegal state Ended -> ended
          */
-        final State state = coordinator.fail(exceptionIdentifier) ;
+        final State state = coordinator.fail(exceptionIdentifier);
 
         if (WSTLogger.logger.isTraceEnabled()) {
             WSTLogger.logger.trace(getClass().getSimpleName() + ".fail. State: " + state);
         }
 
-        if (state != State.STATE_ENDED)
-        {
-            throw new SystemException() ;
+        if (state != State.STATE_ENDED) {
+            throw new SystemException();
         }
     }
 }

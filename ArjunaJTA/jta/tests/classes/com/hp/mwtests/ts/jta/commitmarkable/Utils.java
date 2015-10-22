@@ -54,8 +54,8 @@ public class Utils {
                         throw e;
                     }
                 }
-                statement
-                        .execute("create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
+                statement.execute(
+                        "create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
                 try {
                     statement.execute("drop table foo");
                 } catch (SQLException e) {
@@ -68,20 +68,18 @@ public class Utils {
                     statement.execute("drop table xids");
                     statement.execute("drop index index_xid on xids");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42000")
-                            && ex.getErrorCode() != 942) {
+                    if (!ex.getSQLState().equals("42000") && ex.getErrorCode() != 942) {
                         throw ex;
                     }
                 }
-                statement
-                        .execute("create table xids (xid RAW(144), transactionManagerID varchar(64), actionuid RAW(28))");
+                statement.execute(
+                        "create table xids (xid RAW(144), transactionManagerID varchar(64), actionuid RAW(28))");
 
                 statement.execute("create unique index index_xid on xids (xid)");
                 try {
                     statement.execute("drop table foo");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42000")
-                            && ex.getErrorCode() != 942) {
+                    if (!ex.getSQLState().equals("42000") && ex.getErrorCode() != 942) {
                         throw ex;
                     }
                 }
@@ -90,20 +88,18 @@ public class Utils {
                     statement.execute("drop table xids");
                     statement.execute("drop index index_xid");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42704")
-                            && ex.getErrorCode() != -204) {
+                    if (!ex.getSQLState().equals("42704") && ex.getErrorCode() != -204) {
                         throw ex;
                     }
                 }
-                statement
-                        .execute("create table xids (xid VARCHAR(255), transactionManagerID varchar(64), actionuid VARCHAR(255))");
+                statement.execute(
+                        "create table xids (xid VARCHAR(255), transactionManagerID varchar(64), actionuid VARCHAR(255))");
 
                 statement.execute("create unique index index_xid on xids (xid)");
                 try {
                     statement.execute("drop table foo");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42704")
-                            && ex.getErrorCode() != -204) {
+                    if (!ex.getSQLState().equals("42704") && ex.getErrorCode() != -204) {
                         throw ex;
                     }
                 }
@@ -112,20 +108,18 @@ public class Utils {
                     statement.execute("drop table xids");
                     statement.execute("drop index index_xid on xids");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("S0005")
-                            && ex.getErrorCode() != 3701) {
+                    if (!ex.getSQLState().equals("S0005") && ex.getErrorCode() != 3701) {
                         throw ex;
                     }
                 }
-                statement
-                        .execute("create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
+                statement.execute(
+                        "create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
 
                 statement.execute("create unique index index_xid on xids (xid)");
                 try {
                     statement.execute("drop table foo");
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("S0005")
-                            && ex.getErrorCode() != 3701) {
+                    if (!ex.getSQLState().equals("S0005") && ex.getErrorCode() != 3701) {
                         throw ex;
                     }
                 }
@@ -133,17 +127,15 @@ public class Utils {
                 statement.execute("drop table if exists xids");
                 if (driverName.equals("postgresql")) {
                     statement.execute("drop index if exists index_xid");
-                    statement
-                            .execute("create table xids (xid bytea, transactionManagerID varchar(64), actionuid bytea)");
-                    statement
-                            .execute("create unique index index_xid on xids (xid)");
+                    statement.execute(
+                            "create table xids (xid bytea, transactionManagerID varchar(64), actionuid bytea)");
+                    statement.execute("create unique index index_xid on xids (xid)");
                 } else {
-                    statement
-                            .execute("create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
+                    statement.execute(
+                            "create table xids (xid varbinary(144), transactionManagerID varchar(64), actionuid varbinary(28))");
                     if (driverName.equals("h2")) {
                         statement.execute("drop index if exists index_xid");
-                        statement
-                                .execute("create unique index index_xid on xids (xid)");
+                        statement.execute("create unique index index_xid on xids (xid)");
 
                     }
                 }
@@ -182,8 +174,7 @@ public class Utils {
 
             if (driverName.equals("jconnect")) {
                 try {
-                    statement
-                            .execute("drop table " + Utils.getXAFooTableName());
+                    statement.execute("drop table " + Utils.getXAFooTableName());
                 } catch (SQLException ex) {
                     if (ex.getErrorCode() != 3701) {
                         throw ex;
@@ -191,40 +182,32 @@ public class Utils {
                 }
             } else if (driverName.equals("oracle")) {
                 try {
-                    statement
-                            .execute("drop table " + Utils.getXAFooTableName());
+                    statement.execute("drop table " + Utils.getXAFooTableName());
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42000")
-                            && ex.getErrorCode() != 942) {
+                    if (!ex.getSQLState().equals("42000") && ex.getErrorCode() != 942) {
                         throw ex;
                     }
                 }
             } else if (driverName.equals("ibm")) {
                 try {
-                    statement
-                            .execute("drop table " + Utils.getXAFooTableName());
+                    statement.execute("drop table " + Utils.getXAFooTableName());
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("42704")
-                            && ex.getErrorCode() != -204) {
+                    if (!ex.getSQLState().equals("42704") && ex.getErrorCode() != -204) {
                         throw ex;
                     }
                 }
             } else if (driverName.equals("microsoft")) {
                 try {
-                    statement
-                            .execute("drop table " + Utils.getXAFooTableName());
+                    statement.execute("drop table " + Utils.getXAFooTableName());
                 } catch (SQLException ex) {
-                    if (!ex.getSQLState().equals("S0005")
-                            && ex.getErrorCode() != 3701) {
+                    if (!ex.getSQLState().equals("S0005") && ex.getErrorCode() != 3701) {
                         throw ex;
                     }
                 }
             } else {
-                statement.execute("drop table if exists "
-                        + Utils.getXAFooTableName());
+                statement.execute("drop table if exists " + Utils.getXAFooTableName());
             }
-            statement.execute("create table " + Utils.getXAFooTableName()
-                    + " (bar int)");
+            statement.execute("create table " + Utils.getXAFooTableName() + " (bar int)");
             statement.close();
             connection.close();
             xaConnection.close();
@@ -233,8 +216,7 @@ public class Utils {
         }
     }
 
-    public static void createTables(Connection connection,
-            XADataSource xaDataSource) throws SQLException {
+    public static void createTables(Connection connection, XADataSource xaDataSource) throws SQLException {
         createTables(connection);
         createTables(xaDataSource);
     }
@@ -242,15 +224,13 @@ public class Utils {
     public static void removeRecursive(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult visitFile(Path file,
-                    BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc)
-                    throws IOException {
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
                 // try to delete the file anyway, even if its attributes
                 // could not be read, since delete-only access is
                 // theoretically possible
@@ -259,8 +239,7 @@ public class Utils {
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc)
-                    throws IOException {
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 if (exc == null) {
                     Files.delete(dir);
                     return FileVisitResult.CONTINUE;

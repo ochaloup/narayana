@@ -38,13 +38,11 @@ import javax.jws.soap.SOAPBinding;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-
 /**
  * @author Paul Robinson (paul.robinson@redhat.com)
  */
 @Stateless
-@WebService(serviceName = "BABridgedService", portName = "BABridgedService",
-        name = "BABridged", targetNamespace = "http://www.jboss.com/functional/ba/bridged/")
+@WebService(serviceName = "BABridgedService", portName = "BABridgedService", name = "BABridged", targetNamespace = "http://www.jboss.com/functional/ba/bridged/")
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 @Compensatable(completionType = CompletionType.PARTICIPANT)
 public class BABridgedService implements BABridged {
@@ -96,7 +94,6 @@ public class BABridgedService implements BABridged {
         counter.setConfirmed(false);
         em.merge(counter);
     }
-
 
     @Compensate
     @WebMethod(exclude = true)

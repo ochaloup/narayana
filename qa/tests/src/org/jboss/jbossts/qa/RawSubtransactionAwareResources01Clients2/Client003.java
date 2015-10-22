@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.RawSubtransactionAwareResources01Clients2;
  * $Id: Client003.java,v 1.2 2003/06/26 11:45:00 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawSubtransactionAwareResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client003
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client003 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -94,32 +90,26 @@ public class Client003
             correct = correct && service1.is_correct();
             correct = correct && service2.is_correct();
 
-            correct = correct && (service1.get_subtransaction_aware_resource_trace(0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
-            correct = correct && (service2.get_subtransaction_aware_resource_trace(0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
+            correct = correct && (service1.get_subtransaction_aware_resource_trace(
+                    0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
+            correct = correct && (service2.get_subtransaction_aware_resource_trace(
+                    0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client003.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client003.main: " + exception);
             exception.printStackTrace(System.err);
         }

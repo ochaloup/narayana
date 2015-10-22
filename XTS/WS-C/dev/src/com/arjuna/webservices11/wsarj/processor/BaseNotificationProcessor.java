@@ -6,25 +6,24 @@ import com.arjuna.webservices11.wsarj.InstanceIdentifier;
 
 /**
  * Utility class handling common response functionality.
+ * 
  * @author kevin
  */
-public abstract class BaseNotificationProcessor extends BaseProcessor
-{
+public abstract class BaseNotificationProcessor extends BaseProcessor {
     /**
      * Get the callback ids.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param arjunaContext
+     *            The arjuna context.
      * @return The callback ids.
      */
-    protected String[] getIDs(final ArjunaContext arjunaContext)
-    {
-        if (arjunaContext != null)
-        {
-            final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier() ;
-            if (instanceIdentifier != null)
-            {
-                return new String[] {instanceIdentifier.getInstanceIdentifier()} ;
+    protected String[] getIDs(final ArjunaContext arjunaContext) {
+        if (arjunaContext != null) {
+            final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
+            if (instanceIdentifier != null) {
+                return new String[]{instanceIdentifier.getInstanceIdentifier()};
             }
         }
-        return null ;
+        return null;
     }
 }

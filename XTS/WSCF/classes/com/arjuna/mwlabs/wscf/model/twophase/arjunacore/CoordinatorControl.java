@@ -78,21 +78,17 @@ import java.util.Hashtable;
  * 
  */
 
-public class CoordinatorControl
-{
+public class CoordinatorControl {
 
-    public CoordinatorControl ()
-    {
+    public CoordinatorControl() {
     }
 
     /**
      * An activity has begun and is active on the current thread.
      */
 
-    public void begin () throws SystemException
-    {        
-        try
-        {
+    public void begin() throws SystemException {
+        try {
             ATCoordinator coord = new ATCoordinator();
             int status = coord.start(parentCoordinator());
 
@@ -100,17 +96,12 @@ public class CoordinatorControl
                 throw new BegunFailedException(
                         wscfLogger.i18NLogger.get_model_twophase_arjunacore_CoordinatorControl_1()
                                 + ActionStatus.stringForm(status));
-            else
-            {
+            else {
                 _coordinators.put(currentActivity(), coord);
             }
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             throw ex;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new UnexpectedException(ex.toString());
         }
     }
@@ -125,19 +116,15 @@ public class CoordinatorControl
      *         current activity.
      */
 
-    public Outcome complete (CompletionStatus cs) throws SystemException
-    {
+    public Outcome complete(CompletionStatus cs) throws SystemException {
         ATCoordinator current = currentCoordinator();
         int outcome;
 
-        if ((cs != null) && (cs instanceof Success))
-        {
+        if ((cs != null) && (cs instanceof Success)) {
             // commit
 
             outcome = current.end(true);
-        }
-        else
-        {
+        } else {
             // abort
 
             outcome = current.cancel();
@@ -147,29 +134,28 @@ public class CoordinatorControl
 
         int result;
 
-        switch (outcome)
-        {
-        case ActionStatus.ABORTED:
-            result = TwoPhaseResult.CANCELLED;
-            break;
-        case ActionStatus.COMMITTED:
-            result = TwoPhaseResult.CONFIRMED;
-            break;
-        case ActionStatus.H_ROLLBACK:
-            result = TwoPhaseResult.HEURISTIC_CANCEL;
-            break;
-        case ActionStatus.H_COMMIT:
-            result = TwoPhaseResult.HEURISTIC_CONFIRM;
-            break;
-        case ActionStatus.H_MIXED:
-            result = TwoPhaseResult.HEURISTIC_MIXED;
-            break;
-        case ActionStatus.H_HAZARD:
-            result = TwoPhaseResult.HEURISTIC_HAZARD;
-            break;
-        default:
-            result = TwoPhaseResult.FINISH_ERROR;
-            break;
+        switch (outcome) {
+            case ActionStatus.ABORTED :
+                result = TwoPhaseResult.CANCELLED;
+                break;
+            case ActionStatus.COMMITTED :
+                result = TwoPhaseResult.CONFIRMED;
+                break;
+            case ActionStatus.H_ROLLBACK :
+                result = TwoPhaseResult.HEURISTIC_CANCEL;
+                break;
+            case ActionStatus.H_COMMIT :
+                result = TwoPhaseResult.HEURISTIC_CONFIRM;
+                break;
+            case ActionStatus.H_MIXED :
+                result = TwoPhaseResult.HEURISTIC_MIXED;
+                break;
+            case ActionStatus.H_HAZARD :
+                result = TwoPhaseResult.HEURISTIC_HAZARD;
+                break;
+            default :
+                result = TwoPhaseResult.FINISH_ERROR;
+                break;
         }
 
         return new CoordinationOutcome(cs, result);
@@ -179,24 +165,21 @@ public class CoordinatorControl
      * The activity has been suspended.
      */
 
-    public void suspend () throws SystemException
-    {
+    public void suspend() throws SystemException {
     }
 
     /**
      * The activity has been resumed on the current thread.
      */
 
-    public void resume () throws SystemException
-    {
+    public void resume() throws SystemException {
     }
 
     /**
      * The activity has completed and is no longer active on the current thread.
      */
 
-    public void completed () throws SystemException
-    {
+    public void completed() throws SystemException {
     }
 
     /**
@@ -224,9 +207,8 @@ public class CoordinatorControl
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate (CompletionStatus cs) throws WrongStateException,
-            ProtocolViolationException, SystemException
-    {
+    public Outcome coordinate(CompletionStatus cs)
+            throws WrongStateException, ProtocolViolationException, SystemException {
         return null;
     }
 
@@ -240,44 +222,42 @@ public class CoordinatorControl
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status () throws SystemException
-    {
+    public com.arjuna.mw.wsas.status.Status status() throws SystemException {
         int currentStatus = currentCoordinator().status();
 
-        switch (currentStatus)
-        {
-        case ActionStatus.CREATED:
-        case ActionStatus.RUNNING:
-            return Active.instance();
-        case ActionStatus.PREPARING:
-            return Preparing.instance();
-        case ActionStatus.ABORTING:
-            return Cancelling.instance();
-        case ActionStatus.ABORTED:
-            return Cancelled.instance();
-        case ActionStatus.ABORT_ONLY:
-            return CancelOnly.instance();
-        case ActionStatus.PREPARED:
-            return Prepared.instance();
-        case ActionStatus.COMMITTING:
-            return Confirming.instance();
-        case ActionStatus.COMMITTED:
-            return Confirmed.instance();
-        case ActionStatus.H_ROLLBACK:
-            return HeuristicCancel.instance();
-        case ActionStatus.H_COMMIT:
-            return HeuristicConfirm.instance();
-        case ActionStatus.H_MIXED:
-            return HeuristicMixed.instance();
-        case ActionStatus.H_HAZARD:
-            return HeuristicHazard.instance();
-        case ActionStatus.NO_ACTION:
-            return NoActivity.instance();
-        case ActionStatus.DISABLED:
-        case ActionStatus.INVALID:
-        case ActionStatus.CLEANUP:
-        default:
-            return Unknown.instance();
+        switch (currentStatus) {
+            case ActionStatus.CREATED :
+            case ActionStatus.RUNNING :
+                return Active.instance();
+            case ActionStatus.PREPARING :
+                return Preparing.instance();
+            case ActionStatus.ABORTING :
+                return Cancelling.instance();
+            case ActionStatus.ABORTED :
+                return Cancelled.instance();
+            case ActionStatus.ABORT_ONLY :
+                return CancelOnly.instance();
+            case ActionStatus.PREPARED :
+                return Prepared.instance();
+            case ActionStatus.COMMITTING :
+                return Confirming.instance();
+            case ActionStatus.COMMITTED :
+                return Confirmed.instance();
+            case ActionStatus.H_ROLLBACK :
+                return HeuristicCancel.instance();
+            case ActionStatus.H_COMMIT :
+                return HeuristicConfirm.instance();
+            case ActionStatus.H_MIXED :
+                return HeuristicMixed.instance();
+            case ActionStatus.H_HAZARD :
+                return HeuristicHazard.instance();
+            case ActionStatus.NO_ACTION :
+                return NoActivity.instance();
+            case ActionStatus.DISABLED :
+            case ActionStatus.INVALID :
+            case ActionStatus.CLEANUP :
+            default :
+                return Unknown.instance();
         }
     }
 
@@ -291,9 +271,7 @@ public class CoordinatorControl
      *         the current coordinator.
      */
 
-    public Qualifier[] qualifiers () throws NoCoordinatorException,
-            SystemException
-    {
+    public Qualifier[] qualifiers() throws NoCoordinatorException, SystemException {
         return currentCoordinator().qualifiers();
     }
 
@@ -304,9 +282,7 @@ public class CoordinatorControl
      * @return The unique identity of the current coordinator.
      */
 
-    public CoordinatorId identifier () throws NoCoordinatorException,
-            SystemException
-    {
+    public CoordinatorId identifier() throws NoCoordinatorException, SystemException {
         return currentCoordinator().identifier();
     }
 
@@ -330,10 +306,8 @@ public class CoordinatorControl
      *                Thrown if any other error occurs.
      */
 
-    public void enlistParticipant (Participant act) throws WrongStateException,
-            DuplicateParticipantException, InvalidParticipantException,
-            NoCoordinatorException, SystemException
-    {
+    public void enlistParticipant(Participant act) throws WrongStateException, DuplicateParticipantException,
+            InvalidParticipantException, NoCoordinatorException, SystemException {
         currentCoordinator().enlistParticipant(act);
     }
 
@@ -351,10 +325,8 @@ public class CoordinatorControl
      *                Thrown if any other error occurs.
      */
 
-    public void delistParticipant (Participant act)
-            throws InvalidParticipantException, NoCoordinatorException,
-            WrongStateException, SystemException
-    {
+    public void delistParticipant(Participant act)
+            throws InvalidParticipantException, NoCoordinatorException, WrongStateException, SystemException {
         currentCoordinator().delistParticipant(act);
     }
 
@@ -378,11 +350,9 @@ public class CoordinatorControl
      *                Thrown if any other error occurs.
      */
 
-    public void enlistSynchronization (Synchronization act)
-            throws WrongStateException, DuplicateSynchronizationException,
-            InvalidSynchronizationException, NoCoordinatorException,
-            SystemException
-    {
+    public void enlistSynchronization(Synchronization act)
+            throws WrongStateException, DuplicateSynchronizationException, InvalidSynchronizationException,
+            NoCoordinatorException, SystemException {
         currentCoordinator().enlistSynchronization(act);
     }
 
@@ -400,123 +370,97 @@ public class CoordinatorControl
      *                Thrown if any other error occurs.
      */
 
-    public void delistSynchronization (Synchronization act)
-            throws InvalidSynchronizationException, NoCoordinatorException,
-            WrongStateException, SystemException
-    {
+    public void delistSynchronization(Synchronization act)
+            throws InvalidSynchronizationException, NoCoordinatorException, WrongStateException, SystemException {
         currentCoordinator().delistSynchronization(act);
     }
 
-    public void participantRolledBack (String participantId)
-            throws NoActivityException, InvalidParticipantException,
-            WrongStateException, SystemException
-    {
+    public void participantRolledBack(String participantId)
+            throws NoActivityException, InvalidParticipantException, WrongStateException, SystemException {
         currentCoordinator().participantRolledBack(participantId);
     }
 
-    public void participantReadOnly (String participantId)
-            throws NoActivityException, InvalidParticipantException,
-            SystemException
-    {
+    public void participantReadOnly(String participantId)
+            throws NoActivityException, InvalidParticipantException, SystemException {
         currentCoordinator().participantReadOnly(participantId);
     }
 
     /**
-     * Create a subordinate transaction, i.e., one which can be driven
-     * through prepare, commit and rollback. Such a transaction is not
-     * interposed with any parent transaction because the parent may
-     * be physically remote from the child. Such interposition is the
-     * responsibility of the invoker.
+     * Create a subordinate transaction, i.e., one which can be driven through
+     * prepare, commit and rollback. Such a transaction is not interposed with
+     * any parent transaction because the parent may be physically remote from
+     * the child. Such interposition is the responsibility of the invoker.
      * 
-     * @return the subordinate transaction. The transaction is not
-     * associated with the thread and is not interposed. It is running.
+     * @return the subordinate transaction. The transaction is not associated
+     *         with the thread and is not interposed. It is running.
      * 
-     * @throws SystemException throw if any error occurs.
+     * @throws SystemException
+     *             throw if any error occurs.
      */
-    
-    public final ATCoordinator createSubordinate (String subordinateType) throws SystemException
-    {    
-        try
-        {
+
+    public final ATCoordinator createSubordinate(String subordinateType) throws SystemException {
+        try {
             SubordinateATCoordinator coord = new SubordinateATCoordinator(subordinateType);
             int status = coord.start(null);
 
-            if (status != ActionStatus.RUNNING)
-            {
+            if (status != ActionStatus.RUNNING) {
                 throw new BegunFailedException(
                         wscfLogger.i18NLogger.get_model_twophase_arjunacore_CoordinatorControl_1()
                                 + ActionStatus.stringForm(status));
-            }
-            else
-            {
+            } else {
                 /*
                  * TODO does this need to be added to the list?
                  */
-                
+
                 // _coordinators.put(currentActivity(), coord);
-                
+
                 return coord;
             }
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             throw ex;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new UnexpectedException(ex.toString());
         }
     }
-    
-    public final ATCoordinator currentCoordinator () throws NoCoordinatorException,
-            SystemException
-    {
+
+    public final ATCoordinator currentCoordinator() throws NoCoordinatorException, SystemException {
         ATCoordinator coord = (ATCoordinator) _coordinators.get(currentActivity());
-        
+
         if (coord == null)
             throw new NoCoordinatorException();
         else
             return coord;
     }
 
-    private final ActivityHandleImple currentActivity () throws SystemException
-    {
-        try
-        {
+    private final ActivityHandleImple currentActivity() throws SystemException {
+        try {
             ActivityHierarchy hier = UserActivityFactory.userActivity().currentActivity();
 
             if (hier.size() > 0)
                 return (ActivityHandleImple) hier.activity(hier.size() - 1);
             else
                 return null;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
         }
     }
 
-    private final ATCoordinator parentCoordinator () throws SystemException
-    {
-        try
-        {
+    private final ATCoordinator parentCoordinator() throws SystemException {
+        try {
             ActivityHierarchy hier = UserActivityFactory.userActivity().currentActivity();
             ActivityHandleImple parentActivity = null;
             ATCoordinator parentCoordinator = null;
 
-            if (hier.size() > 1)
-            {
+            if (hier.size() > 1) {
                 parentActivity = (ActivityHandleImple) hier.activity(hier.size() - 2);
 
                 parentCoordinator = (ATCoordinator) _coordinators.get(parentActivity);
             }
 
             return parentCoordinator;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
 
             return null;

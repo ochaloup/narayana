@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client02.java,v 1.2 2003/06/26 11:43:10 rbegg Exp $
  */
 
-
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -65,12 +64,9 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client02
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client02 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -79,20 +75,16 @@ public class Client02
 
             int numberOfCalls = 1000;
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                 atomicTransaction.begin();
 
                 counter.increase(OTS.current().get_control());
 
-                if ((index % 2) == 0)
-                {
+                if ((index % 2) == 0) {
                     atomicTransaction.commit(true);
-                }
-                else
-                {
+                } else {
                     atomicTransaction.rollback();
                 }
             }
@@ -106,29 +98,21 @@ public class Client02
 
             atomicTransaction.commit(true);
 
-            if (value.value == (numberOfCalls / 2))
-            {
+            if (value.value == (numberOfCalls / 2)) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -42,32 +42,26 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class TransactionTest5
-{
+public class TransactionTest5 {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
-        try
-        {
+        try {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[] {}, null);
+            myORB.initORB(new String[]{}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
             ORBManager.setPOA(myOA);
-        }
-        catch (Exception e)
-        {
-            System.err.println("Initialisation failed: "+e);
+        } catch (Exception e) {
+            System.err.println("Initialisation failed: " + e);
         }
 
-        try
-        {
+        try {
             OTSManager.get_current().begin();
 
             Control cont = OTSManager.get_current().get_control();
@@ -79,14 +73,10 @@ public class TransactionTest5
             OTSManager.get_current().rollback_only();
 
             System.out.println("\nFailed.");
-        }
-        catch (org.omg.CosTransactions.NoTransaction ex)
-        {
+        } catch (org.omg.CosTransactions.NoTransaction ex) {
             System.out.println("\nPassed.");
-        }
-        catch (Throwable e)
-        {
-            fail("caught: "+e);
+        } catch (Throwable e) {
+            fail("caught: " + e);
 
             e.printStackTrace();
         }

@@ -19,19 +19,15 @@ public class ConfirmWithCompleteTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoBusinessParticipant.class,
-                DemoBusinessParticipantWithComplete.class);
+        return WarDeployment.getDeployment(DemoBusinessParticipant.class, DemoBusinessParticipantWithComplete.class);
     }
 
-
     @Test
-    public void testConfirmWithComplete()
-            throws Exception
-            {
+    public void testConfirmWithComplete() throws Exception {
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
         BusinessActivityManager bam = BusinessActivityManager.getBusinessActivityManager();
-        DemoBusinessParticipantWithComplete p = new DemoBusinessParticipantWithComplete(DemoBusinessParticipantWithComplete.COMPLETE, "1234");
+        DemoBusinessParticipantWithComplete p = new DemoBusinessParticipantWithComplete(
+                DemoBusinessParticipantWithComplete.COMPLETE, "1234");
         try {
             uba.begin();
 
@@ -41,7 +37,7 @@ public class ConfirmWithCompleteTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
@@ -49,5 +45,5 @@ public class ConfirmWithCompleteTest {
         uba.cancel();
 
         assertTrue(p.passed());
-            }
+    }
 }

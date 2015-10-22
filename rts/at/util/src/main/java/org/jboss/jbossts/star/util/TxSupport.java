@@ -55,10 +55,10 @@ import javax.net.ssl.*;
 
 /**
  * Various utilities for sending HTTP messages
+ * 
  * @deprecated
  */
-public class TxSupport
-{
+public class TxSupport {
     protected static final Logger log = Logger.getLogger(TxSupport.class);
 
     /**
@@ -84,7 +84,9 @@ public class TxSupport
     public static String TXN_MGR_URL = DEF_TX_URL;
     public static final String URI_SEPARATOR = ",";
 
-    private static Pattern NVP_PATTERN = Pattern.compile("\\b\\w+\\s*=\\s*.*"); // matches name=value pairs
+    private static Pattern NVP_PATTERN = Pattern.compile("\\b\\w+\\s*=\\s*.*"); // matches
+                                                                                // name=value
+                                                                                // pairs
 
     private Map<String, String> links = new HashMap<String, String>();
     private String participantLinkHeader = null;
@@ -125,8 +127,7 @@ public class TxSupport
     }
 
     public static void addLinkHeader(Response.ResponseBuilder response, UriInfo info, String title, String name,
-                                     String ... pathComponents)
-    {
+            String... pathComponents) {
         String basePath = info.getMatchedURIs().get(0);
         UriBuilder builder = info.getBaseUriBuilder();
         builder.path(basePath);
@@ -140,14 +141,12 @@ public class TxSupport
     }
 
     public static void setLinkHeader(Response.ResponseBuilder builder, String title, String rel, String href,
-                                     String type)
-    {
+            String type) {
         Link link = new Link(title, rel, href, type, null);
         setLinkHeader(builder, link);
     }
 
-    public static void setLinkHeader(Response.ResponseBuilder builder, Link link)
-    {
+    public static void setLinkHeader(Response.ResponseBuilder builder, Link link) {
         builder.header("Link", link);
     }
 
@@ -156,12 +155,14 @@ public class TxSupport
     }
 
     public Collection<String> getTransactions(String mediaType) throws HttpResponseException {
-        String content = httpRequest(new int[] {HttpURLConnection.HTTP_OK}, txnMgr, "GET", mediaType, null, links);
-        Collection<String> txns = new ArrayList<String> ();
+        String content = httpRequest(new int[]{HttpURLConnection.HTTP_OK}, txnMgr, "GET", mediaType, null, links);
+        Collection<String> txns = new ArrayList<String>();
 
-        // the returned document contains transaction URLs delimited by the TXN_LIST_SEP character
-        // If the string is empty split returns an array of size 1 with the empty string as the element
-        if(content.length() == 0) {
+        // the returned document contains transaction URLs delimited by the
+        // TXN_LIST_SEP character
+        // If the string is empty split returns an array of size 1 with the
+        // empty string as the element
+        if (content.length() == 0) {
             return txns;
         }
         for (String txn : content.split(URI_SEPARATOR))
@@ -170,7 +171,7 @@ public class TxSupport
         return txns;
     }
     public int txCount() throws HttpResponseException {
-        String content = httpRequest(new int[] {HttpURLConnection.HTTP_OK}, txnMgr, "GET",
+        String content = httpRequest(new int[]{HttpURLConnection.HTTP_OK}, txnMgr, "GET",
                 TxMediaType.TX_LIST_MEDIA_TYPE, null, null);
 
         return content.length() == 0 ? 0 : content.split(URI_SEPARATOR).length;
@@ -183,27 +184,29 @@ public class TxSupport
         return this;
     }
     public TxSupport startTx(long milliseconds) throws HttpResponseException {
-        httpRequest(new int[] {HttpURLConnection.HTTP_CREATED}, txnMgr, "POST", TxMediaType.POST_MEDIA_TYPE,
+        httpRequest(new int[]{HttpURLConnection.HTTP_CREATED}, txnMgr, "POST", TxMediaType.POST_MEDIA_TYPE,
                 TxMediaType.TIMEOUT_PROPERTY + "=" + milliseconds, links);
         links.put(TxLinkNames.TRANSACTION, links.get(TxLinkNames.LOCATION));
         return this;
     }
     public String commitTx() throws HttpResponseException {
-        return httpRequest(new int[] {HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
+        return httpRequest(new int[]{HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
                 TxMediaType.TX_STATUS_MEDIA_TYPE, TxStatusMediaType.TX_COMMITTED, null);
     }
     public String rollbackTx() throws HttpResponseException {
-        return httpRequest(new int[] {HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
+        return httpRequest(new int[]{HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
                 TxMediaType.TX_STATUS_MEDIA_TYPE, TxStatusMediaType.TX_ROLLEDBACK, null);
     }
     public String markTxRollbackOnly() throws HttpResponseException {
-        return httpRequest(new int[] {HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
+        return httpRequest(new int[]{HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TERMINATOR), "PUT",
                 TxMediaType.TX_STATUS_MEDIA_TYPE, TxStatusMediaType.TX_ROLLBACK_ONLY, null);
     }
 
     /**
      * Get the status of the current transaction
-     * @return the transaction status expressed in the default media type (@see TxMediaType#TX_STATUS_MEDIA_TYPE)
+     * 
+     * @return the transaction status expressed in the default media type (@see
+     *         TxMediaType#TX_STATUS_MEDIA_TYPE)
      * @throws HttpResponseException
      */
     public String txStatus() throws HttpResponseException {
@@ -213,7 +216,7 @@ public class TxSupport
         return txStatus(mediaType, links);
     }
     private String txStatus(String mediaType, Map<String, String> linkHeaders) throws HttpResponseException {
-        return httpRequest(new int[] {HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_UNSUPPORTED_TYPE},
+        return httpRequest(new int[]{HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_UNSUPPORTED_TYPE},
                 links.get(TxLinkNames.TRANSACTION), "GET", mediaType, null, linkHeaders);
     }
     public String getTxnUri() {
@@ -240,7 +243,7 @@ public class TxSupport
     }
 
     public void refreshTransactionHeaders(Map<String, String> linkHeaders) throws HttpResponseException {
-        httpRequest(new int[] {HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TRANSACTION), "HEAD",
+        httpRequest(new int[]{HttpURLConnection.HTTP_OK}, links.get(TxLinkNames.TRANSACTION), "HEAD",
                 TxMediaType.TX_STATUS_MEDIA_TYPE, null, linkHeaders);
     }
 
@@ -250,8 +253,8 @@ public class TxSupport
         if (vParticipant)
             content += "," + links.get(TxLinkNames.VOLATILE_PARTICIPANT);
 
-        return httpRequest(new int[] {HttpURLConnection.HTTP_OK}, pUrl, "POST", TxMediaType.POST_MEDIA_TYPE,
-                content, null);
+        return httpRequest(new int[]{HttpURLConnection.HTTP_OK}, pUrl, "POST", TxMediaType.POST_MEDIA_TYPE, content,
+                null);
     }
 
     // return a map of link name to link uri
@@ -299,20 +302,29 @@ public class TxSupport
     }
 
     /**
-     * Constructs the participant-resource and participant-terminator URIs for participants in the format:
-     * "baseURI/{uid1}/{uid2}/participant" and "baseURI/{uid1}/{uid2}/terminator" and optionally
+     * Constructs the participant-resource and participant-terminator URIs for
+     * participants in the format: "baseURI/{uid1}/{uid2}/participant" and
+     * "baseURI/{uid1}/{uid2}/terminator" and optionally
      * "baseURI/{uid1}/{uid2}/volatile"
      *
-     * If uid1 is null then the "{uid1}/" is not included and similarly if uid2 is null.
+     * If uid1 is null then the "{uid1}/" is not included and similarly if uid2
+     * is null.
      *
-     * @param baseURI the (full) uri prefix
-     * @param vParticipant if true also construct a link header for participation in the volatile protocol
-     * @param uid1 a string which together with baseURI and possibly uid2 produce a unique id
-     * @param uid2 a string which together with baseURI and possibly uid1 produce a unique id
+     * @param baseURI
+     *            the (full) uri prefix
+     * @param vParticipant
+     *            if true also construct a link header for participation in the
+     *            volatile protocol
+     * @param uid1
+     *            a string which together with baseURI and possibly uid2 produce
+     *            a unique id
+     * @param uid2
+     *            a string which together with baseURI and possibly uid1 produce
+     *            a unique id
      * @return link header value
      */
-    public String makeTwoPhaseAwareParticipantLinkHeader(
-            String baseURI, boolean vParticipant, String uid1, String uid2) {
+    public String makeTwoPhaseAwareParticipantLinkHeader(String baseURI, boolean vParticipant, String uid1,
+            String uid2) {
         StringBuilder resourcePrefix = new StringBuilder(baseURI);
         StringBuilder linkHeader = new StringBuilder(); // "Link:"
 
@@ -340,11 +352,11 @@ public class TxSupport
 
     public String makeTwoPhaseAwareParticipantLinkHeader(String participantHref, String terminatorHref) {
         StringBuilder linkHeader = new StringBuilder();
-        linkHeader.append("<").append(participantHref).append(">; rel=\"")
-                .append(TxLinkNames.PARTICIPANT_RESOURCE).append("\"");
+        linkHeader.append("<").append(participantHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_RESOURCE)
+                .append("\"");
         linkHeader.append(',');
-        linkHeader.append("<").append(terminatorHref).append(">; rel=\"")
-                .append(TxLinkNames.PARTICIPANT_TERMINATOR).append("\"");
+        linkHeader.append("<").append(terminatorHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_TERMINATOR)
+                .append("\"");
 
         participantLinkHeader = linkHeader.toString();
 
@@ -352,20 +364,30 @@ public class TxSupport
     }
 
     /**
-     * Constructs the participant-resource and participant-terminator URIs for participants in the format:
-     * "baseURI/{uid1}/{uid2}/participant" and "baseURI/{uid1}/{uid2}/terminate"
-     * If uid1 is null then the "{uid1}/" is not included and similarly if uid2 is null.
-     * @param baseURI the (full) uri prefix
-     * @param vParticipant if true also construct a link header for participation in the volatile protocol
-     * @param uid1 a string which together with baseURI and possibly uid2 produce a unique id
-     * @param uid2 a string which together with baseURI and possibly uid1 produce a unique id
-     * @param commitOnePhase if true generate a commit-one-phase link header
+     * Constructs the participant-resource and participant-terminator URIs for
+     * participants in the format: "baseURI/{uid1}/{uid2}/participant" and
+     * "baseURI/{uid1}/{uid2}/terminate" If uid1 is null then the "{uid1}/" is
+     * not included and similarly if uid2 is null.
+     * 
+     * @param baseURI
+     *            the (full) uri prefix
+     * @param vParticipant
+     *            if true also construct a link header for participation in the
+     *            volatile protocol
+     * @param uid1
+     *            a string which together with baseURI and possibly uid2 produce
+     *            a unique id
+     * @param uid2
+     *            a string which together with baseURI and possibly uid1 produce
+     *            a unique id
+     * @param commitOnePhase
+     *            if true generate a commit-one-phase link header
      * @return link header value
      */
-    public String makeTwoPhaseUnAwareParticipantLinkHeader(
-            String baseURI, boolean vParticipant, String uid1, String uid2, boolean commitOnePhase) {
+    public String makeTwoPhaseUnAwareParticipantLinkHeader(String baseURI, boolean vParticipant, String uid1,
+            String uid2, boolean commitOnePhase) {
         StringBuilder resourcePrefix = new StringBuilder(baseURI);
-        StringBuilder linkHeader = new StringBuilder();  // "Link:"
+        StringBuilder linkHeader = new StringBuilder(); // "Link:"
 
         if (uid1 != null)
             resourcePrefix.append('/').append(uid1);
@@ -390,21 +412,25 @@ public class TxSupport
         return participantLinkHeader;
     }
 
-    public String makeTwoPhaseUnAwareParticipantLinkHeader(
-            String participantHref, String prepareHref, String commitHref, String rollbackHref,
-            String vParticipantHref) {
+    public String makeTwoPhaseUnAwareParticipantLinkHeader(String participantHref, String prepareHref,
+            String commitHref, String rollbackHref, String vParticipantHref) {
         StringBuilder linkHeader = new StringBuilder();
-        linkHeader.append("<").append(participantHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_RESOURCE).append("\"");
+        linkHeader.append("<").append(participantHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_RESOURCE)
+                .append("\"");
         linkHeader.append(',');
-        linkHeader.append("<").append(prepareHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_PREPARE).append("\"");
+        linkHeader.append("<").append(prepareHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_PREPARE)
+                .append("\"");
         linkHeader.append(',');
-        linkHeader.append("<").append(commitHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_COMMIT).append("\"");
+        linkHeader.append("<").append(commitHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_COMMIT)
+                .append("\"");
         linkHeader.append(',');
-        linkHeader.append("<").append(rollbackHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_ROLLBACK).append("\"");
+        linkHeader.append("<").append(rollbackHref).append(">; rel=\"").append(TxLinkNames.PARTICIPANT_ROLLBACK)
+                .append("\"");
 
         if (vParticipantHref != null) {
             linkHeader.append(',');
-            linkHeader.append("<").append(vParticipantHref).append(">; rel=\"").append(TxLinkNames.VOLATILE_PARTICIPANT).append("\"");
+            linkHeader.append("<").append(vParticipantHref).append(">; rel=\"").append(TxLinkNames.VOLATILE_PARTICIPANT)
+                    .append("\"");
         }
 
         participantLinkHeader = linkHeader.toString();
@@ -433,8 +459,8 @@ public class TxSupport
             addLink2(hdr, TxLinkNames.PARTICIPANT_ROLLBACK, links.get(TxLinkNames.PARTICIPANT_ROLLBACK), false);
 
         if (links.containsKey(TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE))
-            addLink2(hdr, TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE,
-                    links.get(TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE), false);
+            addLink2(hdr, TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE, links.get(TxLinkNames.PARTICIPANT_COMMIT_ONE_PHASE),
+                    false);
 
         participantLinkHeader = hdr.toString();
 
@@ -446,8 +472,11 @@ public class TxSupport
     }
 
     /**
-     * @param enlistUri the URI for enlisting participants with a transaction manager
-     * @param participantLinkHeader link header for the participant to identify itself to the coordinator
+     * @param enlistUri
+     *            the URI for enlisting participants with a transaction manager
+     * @param participantLinkHeader
+     *            link header for the participant to identify itself to the
+     *            coordinator
      * @return participant recovery URI
      */
     public String enlistParticipant(String enlistUri, String participantLinkHeader) {
@@ -464,8 +493,7 @@ public class TxSupport
     public void enlistVolatileParticipant(String enlistUri, String participantLinkHeader) {
         Map<String, String> reqHeaders = new HashMap<String, String>();
         reqHeaders.put("Link", participantLinkHeader);
-        httpRequest(new int[]{HttpURLConnection.HTTP_OK}, enlistUri, "PUT", null, null,
-                links, reqHeaders);
+        httpRequest(new int[]{HttpURLConnection.HTTP_OK}, enlistUri, "PUT", null, null, links, reqHeaders);
     }
 
     public String httpRequest(int[] expect, String url, String method, String mediaType) throws HttpResponseException {
@@ -478,13 +506,12 @@ public class TxSupport
     }
 
     public String httpRequest(int[] expect, String url, String method, String mediaType, String content,
-                              Map<String, String> linkHeaders) throws HttpResponseException {
+            Map<String, String> linkHeaders) throws HttpResponseException {
         return httpRequest(expect, url, method, mediaType, content, linkHeaders, null);
     }
 
     public String httpRequest(int[] expect, String url, String method, String mediaType, String content,
-                              Map<String, String> linkHeaders, Map<String, String> reqHeaders)
-            throws HttpResponseException {
+            Map<String, String> linkHeaders, Map<String, String> reqHeaders) throws HttpResponseException {
         HttpURLConnection connection = null;
 
         try {
@@ -505,14 +532,8 @@ public class TxSupport
             }
 
             if (log.isTraceEnabled())
-                log.trace("httpRequest:" +
-                        "\n\turl: " + url +
-                        "\n\tmethod: " + method +
-                        "\n\tmediaType: " + mediaType +
-                        "\n\tcontent: " + content +
-                        "\n\tresponse code: " + status +
-                        "\n\tresponse body: " + body
-                );
+                log.trace("httpRequest:" + "\n\turl: " + url + "\n\tmethod: " + method + "\n\tmediaType: " + mediaType
+                        + "\n\tcontent: " + content + "\n\tresponse code: " + status + "\n\tresponse body: " + body);
 
             if (expect != null && expect.length != 0) {
                 for (int sc : expect)
@@ -541,16 +562,17 @@ public class TxSupport
 
         if (linkHeaders != null) {
             for (String link : linkHeaders) {
-                for (Link lnk : LinkHeader.valueOf( link).getLinks())
+                for (Link lnk : LinkHeader.valueOf(link).getLinks())
                     links.put(lnk.getRelationship(), lnk.getHref());
 
-/*                String[] lhs = link.split(","); // links are separated by a comma
-
-                for (String lnk : lhs) {
-                    Matcher m = LINK_PATTERN.matcher(lnk);
-                    if (m.find() && m.groupCount() > 1)
-                        links.put(m.group(2), m.group(1));
-                }*/
+                /*
+                 * String[] lhs = link.split(","); // links are separated by a
+                 * comma
+                 * 
+                 * for (String lnk : lhs) { Matcher m =
+                 * LINK_PATTERN.matcher(lnk); if (m.find() && m.groupCount() >
+                 * 1) links.put(m.group(2), m.group(1)); }
+                 */
             }
         }
     }
@@ -564,8 +586,7 @@ public class TxSupport
     }
 
     private HttpURLConnection openConnection(HttpURLConnection connection, String url, String method,
-                                             String contentType, String content, Map<String, String> reqHeaders)
-            throws IOException {
+            String contentType, String content, Map<String, String> reqHeaders) throws IOException {
         if (connection != null)
             connection.disconnect();
 
@@ -613,13 +634,11 @@ public class TxSupport
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             int wasRead;
 
-            do
-            {
+            do {
                 wasRead = reader.read(buffer, 0, 1024);
                 if (wasRead > 0)
                     builder.append(buffer, 0, wasRead);
-            }
-            while (wasRead > -1);
+            } while (wasRead > -1);
         } finally {
             if (reader != null) {
                 reader.close();
@@ -628,17 +647,20 @@ public class TxSupport
         return builder;
     }
     /**
-     * Parse a string for name=value pairs
-     * TODO java.util.Scanner might be more efficient
-     * @param pairs the name value pairs contained in content
-     * @param content a string containing name=value substrings
+     * Parse a string for name=value pairs TODO java.util.Scanner might be more
+     * efficient
+     * 
+     * @param pairs
+     *            the name value pairs contained in content
+     * @param content
+     *            a string containing name=value substrings
      */
     public static void matchNames(Map<String, String> pairs, String content, String splitChars) {
         if (content != null) {
             String[] lines;
 
             if (splitChars == null) {
-                lines = new String[] {content};
+                lines = new String[]{content};
             } else {
                 lines = content.split(splitChars);
             }
@@ -659,8 +681,7 @@ public class TxSupport
         }
     }
 
-    public static String getStringValue(String content, String name)
-    {
+    public static String getStringValue(String content, String name) {
         Map<String, String> matches = new HashMap<String, String>();
 
         TxSupport.matchNames(matches, content, null);
@@ -668,8 +689,7 @@ public class TxSupport
         return matches.get(name);
     }
 
-    public static int getIntValue(String content, String name, int defValue)
-    {
+    public static int getIntValue(String content, String name, int defValue) {
         String v = getStringValue(content, name);
 
         if (v != null)
@@ -682,11 +702,10 @@ public class TxSupport
         return defValue;
     }
 
-    public static UriBuilder getUriBuilder(UriInfo info, int npaths, String ... paths)
-    {
+    public static UriBuilder getUriBuilder(UriInfo info, int npaths, String... paths) {
         UriBuilder builder = info.getBaseUriBuilder();
 
-        if (npaths > 0){
+        if (npaths > 0) {
             List<PathSegment> segments = info.getPathSegments();
 
             for (int i = 0; i < npaths; i++)
@@ -703,19 +722,19 @@ public class TxSupport
         return builder;
     }
 
-    public static URI getUri(UriInfo info, int npaths, String ... paths)
-    {
+    public static URI getUri(UriInfo info, int npaths, String... paths) {
         return getUriBuilder(info, npaths, paths).build();
     }
 
-    public static String extractUri(UriInfo info, String ... paths) {
-        // careful with extracting the uri from a UriInfo since it casues issues with emma
-        // also info.getBaseUri() + info.getPath() fail running the wildfly testsuite
+    public static String extractUri(UriInfo info, String... paths) {
+        // careful with extracting the uri from a UriInfo since it casues issues
+        // with emma
+        // also info.getBaseUri() + info.getPath() fail running the wildfly
+        // testsuite
         return getUri(info, info.getPathSegments().size(), paths).toASCIIString();
     }
 
-    public static String buildURI(UriBuilder builder, String ... pathComponents)
-    {
+    public static String buildURI(UriBuilder builder, String... pathComponents) {
         for (String component : pathComponents)
             builder.path(component);
 
@@ -743,12 +762,17 @@ public class TxSupport
     }
 
     /**
-     * Obtain statistical information such as the number of transactions that have committed and aborted.
+     * Obtain statistical information such as the number of transactions that
+     * have committed and aborted.
+     * 
      * @return transaction statistics
-     * @throws JAXBException if JAXB cannot convert an XML representation of the statistics into a JAXB object
+     * @throws JAXBException
+     *             if JAXB cannot convert an XML representation of the
+     *             statistics into a JAXB object
      */
     public TransactionStatisticsElement getTransactionStatistics() throws JAXBException {
-        // performing a get on the transaction-manager MAY return a link for obtaining transaction statistic
+        // performing a get on the transaction-manager MAY return a link for
+        // obtaining transaction statistic
         getTransactions();
 
         String statisticsHref = getLink(TxLinkNames.STATISTICS);
@@ -757,20 +781,20 @@ public class TxSupport
             return null;
 
         // GET the statistics
-        String txStats = httpRequest(new int[] {HttpURLConnection.HTTP_OK}, statisticsHref, "GET",
+        String txStats = httpRequest(new int[]{HttpURLConnection.HTTP_OK}, statisticsHref, "GET",
                 TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
 
         if (log.isTraceEnabled())
             log.tracef("Unmarshalling TransactionStatisticsElement\n%s", txStats);
 
-        JAXBContext jc = JAXBContext.newInstance(TransactionStatisticsElement.class.getPackage().getName() );
+        JAXBContext jc = JAXBContext.newInstance(TransactionStatisticsElement.class.getPackage().getName());
         Unmarshaller u = jc.createUnmarshaller();
-        Object o = u.unmarshal( new StreamSource( new StringReader(txStats)));
+        Object o = u.unmarshal(new StreamSource(new StringReader(txStats)));
 
         if (o instanceof TransactionStatisticsElement)
-            return (TransactionStatisticsElement)o;
+            return (TransactionStatisticsElement) o;
 
-        return (TransactionStatisticsElement)((JAXBElement)o).getValue();
+        return (TransactionStatisticsElement) ((JAXBElement) o).getValue();
     }
 
     public CoordinatorElement getTransactionInfo() throws JAXBException {
@@ -779,19 +803,18 @@ public class TxSupport
 
         txStatus(TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
 
-        if (status == HttpURLConnection.HTTP_UNSUPPORTED_TYPE )
+        if (status == HttpURLConnection.HTTP_UNSUPPORTED_TYPE)
             return null;
 
         if (log.isTraceEnabled())
             log.tracef("Unmarshalling CoordinatorElement\n%s", getBody());
 
-        JAXBContext jc = JAXBContext.newInstance(CoordinatorElement.class.getPackage().getName() );
-
+        JAXBContext jc = JAXBContext.newInstance(CoordinatorElement.class.getPackage().getName());
 
         Unmarshaller u = jc.createUnmarshaller();
-        Object o = u.unmarshal( new StreamSource( new StringReader(getBody())));
+        Object o = u.unmarshal(new StreamSource(new StringReader(getBody())));
 
-        return (CoordinatorElement)((JAXBElement)o).getValue();
+        return (CoordinatorElement) ((JAXBElement) o).getValue();
     }
 
     public CoordinatorElement getTransactionInfo(String uri) throws JAXBException {
@@ -800,28 +823,26 @@ public class TxSupport
         return getTransactionInfo();
     }
 
-
     public TransactionManagerElement getTransactionManagerInfo() throws JAXBException {
         // GET the extended transaction-manager info
-        String xml = httpRequest(new int[]{HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_UNSUPPORTED_TYPE},
-                txnMgr, "GET", TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
+        String xml = httpRequest(new int[]{HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_UNSUPPORTED_TYPE}, txnMgr,
+                "GET", TxMediaType.TX_STATUS_EXT_MEDIA_TYPE);
 
-        if (status == HttpURLConnection.HTTP_UNSUPPORTED_TYPE )
+        if (status == HttpURLConnection.HTTP_UNSUPPORTED_TYPE)
             return null;
 
         if (log.isTraceEnabled())
             log.tracef("Unmarshalling TransactionManagerElement%n%s", xml);
 
-        JAXBContext jc = JAXBContext.newInstance(TransactionManagerElement.class.getPackage().getName() );
-
+        JAXBContext jc = JAXBContext.newInstance(TransactionManagerElement.class.getPackage().getName());
 
         Unmarshaller u = jc.createUnmarshaller();
-        Object o = u.unmarshal( new StreamSource( new StringReader(xml)));
+        Object o = u.unmarshal(new StreamSource(new StringReader(xml)));
 
         if (o instanceof TransactionManagerElement)
-            return (TransactionManagerElement)o;
+            return (TransactionManagerElement) o;
 
-        return (TransactionManagerElement)((JAXBElement)o).getValue();
+        return (TransactionManagerElement) ((JAXBElement) o).getValue();
     }
 
     private static SSLContext getSSLContext() throws Exception {
@@ -835,7 +856,9 @@ public class TxSupport
         try {
             ks.load(fis, trustStorePswd.toCharArray());
         } finally {
-            if (fis != null) { fis.close(); }
+            if (fis != null) {
+                fis.close();
+            }
         }
 
         // Get the default Key Manager
@@ -846,5 +869,5 @@ public class TxSupport
         sslContext.init(kmf.getKeyManagers(), null, null);
 
         return sslContext;
-   }
+    }
 }

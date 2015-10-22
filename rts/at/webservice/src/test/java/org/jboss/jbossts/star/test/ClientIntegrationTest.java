@@ -31,7 +31,7 @@ public class ClientIntegrationTest extends BaseTest {
     public static void startServer() throws Exception {
         startContainer(TxSupport.TXN_MGR_URL, "org.jboss.jbossts.star.test", BaseTest.TransactionalResource.class);
     }
-    
+
     @Test
     public void testTransactionUrls() throws Exception {
         specTest.testTransactionUrls();
@@ -40,10 +40,10 @@ public class ClientIntegrationTest extends BaseTest {
     public void testTransactionTimeout() throws Exception {
         specTest.testTransactionTimeout();
     }
-     @Test
+    @Test
     public void testRollback() throws Exception {
-         specTest.testRollback();
-     }
+        specTest.testRollback();
+    }
 
     @Test
     public void testEnlistResource() throws Exception {

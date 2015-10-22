@@ -25,54 +25,44 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-public class TestResource implements XAResource
-{
-    public TestResource ()
-    {
+public class TestResource implements XAResource {
+    public TestResource() {
         this(false, true);
     }
 
-    public TestResource (boolean readonly)
-    {
+    public TestResource(boolean readonly) {
         this(readonly, true);
     }
-    
-    public TestResource (boolean readonly, boolean print)
-    {
+
+    public TestResource(boolean readonly, boolean print) {
         _readonly = readonly;
         _doPrint = print;
     }
 
-    public void commit (Xid id, boolean onePhase) throws XAException
-    {
+    public void commit(Xid id, boolean onePhase) throws XAException {
         if (_doPrint)
             System.out.println("XA_COMMIT[" + id + "]");
     }
 
-    public void end (Xid xid, int flags) throws XAException
-    {
+    public void end(Xid xid, int flags) throws XAException {
         if (_doPrint)
             System.out.println("XA_END[" + xid + "] Flags=" + flags);
     }
 
-    public void forget (Xid xid) throws XAException
-    {
+    public void forget(Xid xid) throws XAException {
         if (_doPrint)
             System.out.println("XA_FORGET[" + xid + "]");
     }
 
-    public int getTransactionTimeout () throws XAException
-    {
+    public int getTransactionTimeout() throws XAException {
         return (_timeout);
     }
 
-    public boolean isSameRM (XAResource xares) throws XAException
-    {
+    public boolean isSameRM(XAResource xares) throws XAException {
         return (xares.equals(this));
     }
 
-    public int prepare (Xid xid) throws XAException
-    {
+    public int prepare(Xid xid) throws XAException {
         if (_doPrint)
             System.out.println("XA_PREPARE[" + xid + "]");
 
@@ -84,34 +74,30 @@ public class TestResource implements XAResource
         // throw new XAException();
     }
 
-    public Xid[] recover (int flag) throws XAException
-    {
+    public Xid[] recover(int flag) throws XAException {
         if (_doPrint)
             System.out.println("RECOVER[" + flag + "]");
-        
+
         return (null);
     }
 
-    public void rollback (Xid xid) throws XAException
-    {
+    public void rollback(Xid xid) throws XAException {
         if (_doPrint)
             System.out.println("XA_ROLLBACK[" + xid + "]");
     }
 
-    public boolean setTransactionTimeout (int seconds) throws XAException
-    {
+    public boolean setTransactionTimeout(int seconds) throws XAException {
         _timeout = seconds;
         return (true);
     }
 
-    public void start (Xid xid, int flags) throws XAException
-    {
+    public void start(Xid xid, int flags) throws XAException {
         if (_doPrint)
             System.out.println("XA_START[" + xid + "] Flags=" + flags);
     }
 
     protected int _timeout = 0;
-    
+
     protected boolean _doPrint = false;
 
     private boolean _readonly = false;

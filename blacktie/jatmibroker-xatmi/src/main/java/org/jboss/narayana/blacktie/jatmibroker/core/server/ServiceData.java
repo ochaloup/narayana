@@ -39,9 +39,9 @@ public class ServiceData {
     private String serviceClassName;
     private String serviceName;
 
-    public ServiceData(TransportFactory transportFactory, Properties properties, String serviceName, String serviceClassName)
-            throws ConnectionException, InstantiationException, IllegalAccessException, ClassNotFoundException,
-            ConfigurationException {
+    public ServiceData(TransportFactory transportFactory, Properties properties, String serviceName,
+            String serviceClassName) throws ConnectionException, InstantiationException, IllegalAccessException,
+            ClassNotFoundException, ConfigurationException {
         this.serviceName = serviceName;
         this.serviceClassName = serviceClassName;
 
@@ -53,8 +53,8 @@ public class ServiceData {
 
         Class callback = Class.forName(serviceClassName);
         for (int i = 0; i < size; i++) {
-            dispatchers.add(new ServiceDispatcher(serviceName, (Service) callback.newInstance(), connection.getReceiver(
-                    serviceName, conversational), i));
+            dispatchers.add(new ServiceDispatcher(serviceName, (Service) callback.newInstance(),
+                    connection.getReceiver(serviceName, conversational), i));
         }
     }
 

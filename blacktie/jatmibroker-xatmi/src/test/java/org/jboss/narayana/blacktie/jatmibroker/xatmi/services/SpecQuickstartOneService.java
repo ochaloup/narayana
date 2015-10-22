@@ -19,7 +19,8 @@ public class SpecQuickstartOneService implements Service {
         /* extract request typed buffer */
         X_C_TYPE dc_ptr = (X_C_TYPE) svcinfo.getBuffer();
         /*
-         * Depending on service name used to invoke this routine, perform either debit or credit work.
+         * Depending on service name used to invoke this routine, perform either
+         * debit or credit work.
          */
         if (!svcinfo.getName().equals("DEBIT")) {
             /*
@@ -27,7 +28,8 @@ public class SpecQuickstartOneService implements Service {
              */
         } else {
             /*
-             * Parse input data and perform credit as part of global transaction.
+             * Parse input data and perform credit as part of global
+             * transaction.
              */
         }
         // TODO MAKE TWO TESTS

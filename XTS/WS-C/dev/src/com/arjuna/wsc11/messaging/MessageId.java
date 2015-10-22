@@ -27,23 +27,22 @@ import java.rmi.dgc.VMID;
 
 /**
  * A simple message id generator, used when UID is inaccessible.
+ * 
  * @author kevin
  */
-public class MessageId
-{
+public class MessageId {
     /**
      * Prevent instantiation.
      */
-    private MessageId()
-    {
+    private MessageId() {
     }
 
     /**
      * Get the next message identifier.
+     * 
      * @return The next message identifier.
      */
-    public static String getMessageId()
-    {
-        return "urn:" + new VMID().toString() ;
+    public static String getMessageId() {
+        return "urn:" + new VMID().toString();
     }
 }

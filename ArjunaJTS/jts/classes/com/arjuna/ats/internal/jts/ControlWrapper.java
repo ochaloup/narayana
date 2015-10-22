@@ -79,7 +79,7 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * signatures may be slightly different.
  * 
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: ControlWrapper.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: ControlWrapper.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 2.0.
  */
 
@@ -88,48 +88,40 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * otherwise we would never know.
  */
 
-public class ControlWrapper implements Reapable
-{
+public class ControlWrapper implements Reapable {
 
-    public ControlWrapper (Control c)
-    {
+    public ControlWrapper(Control c) {
         this(c, (Uid) null);
 
         /*
-         * Now get the Uid for this control or generate one if it isn't a
-         * JBoss transaction.
+         * Now get the Uid for this control or generate one if it isn't a JBoss
+         * transaction.
          */
 
-        try
-        {
+        try {
             UidCoordinator uidCoord = Helper.getUidCoordinator(c);
 
             _theUid = Helper.getUid(uidCoord);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             _theUid = new Uid();
         }
     }
 
-    public ControlWrapper (ControlImple impl)
-    {
+    public ControlWrapper(ControlImple impl) {
         _control = null;
         _controlImpl = impl;
         _checkedLocality = true;
         _theUid = impl.get_uid();
     }
 
-    public ControlWrapper (Control c, ControlImple impl)
-    {
+    public ControlWrapper(Control c, ControlImple impl) {
         _control = c;
         _controlImpl = impl;
         _checkedLocality = (impl != null);
         _theUid = ((impl == null) ? Uid.nullUid() : impl.get_uid());
     }
 
-    public ControlWrapper (Control c, Uid u)
-    {
+    public ControlWrapper(Control c, Uid u) {
         _control = c;
         _controlImpl = null;
         _checkedLocality = false;
@@ -140,122 +132,88 @@ public class ControlWrapper implements Reapable
      * The Reapable methods.
      */
 
-    public boolean running ()
-    {
-        try
-        {
+    public boolean running() {
+        try {
             org.omg.CosTransactions.Status status = get_status();
 
-            switch (status.value())
-            {
-            case Status._StatusActive:
-            case Status._StatusMarkedRollback:
-                return true;
-            default:
-                return false;
+            switch (status.value()) {
+                case Status._StatusActive :
+                case Status._StatusMarkedRollback :
+                    return true;
+                default :
+                    return false;
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return true;
         }
     }
 
-    public boolean preventCommit ()
-    {
-        try
-        {
+    public boolean preventCommit() {
+        try {
             rollback_only();
 
             return true;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             jtsLogger.i18NLogger.warn_cwcommit(ex);
 
             return false;
         }
     }
 
-    public int cancel ()
-    {
-        try
-        {
+    public int cancel() {
+        try {
             rollback();
 
             return ActionStatus.ABORTED;
-        }
-        catch (Unavailable ex)
-        {
+        } catch (Unavailable ex) {
             return ActionStatus.INVALID;
-        }
-        catch (NoTransaction ex)
-        {
+        } catch (NoTransaction ex) {
             return ActionStatus.NO_ACTION;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             jtsLogger.i18NLogger.warn_cwabort(ex);
 
             return ActionStatus.INVALID;
         }
     }
 
-    public Uid get_uid ()
-    {
+    public Uid get_uid() {
         return _theUid;
     }
 
-    public ControlWrapper create_subtransaction () throws Unavailable,
-            Inactive, SubtransactionsUnavailable, SystemException
-    {
+    public ControlWrapper create_subtransaction()
+            throws Unavailable, Inactive, SubtransactionsUnavailable, SystemException {
         Coordinator coord = null;
 
-        try
-        {
-            coord = ((_control != null) ? _control.get_coordinator()
-                    : _controlImpl.get_coordinator());
-        }
-        catch (SystemException e)
-        {
+        try {
+            coord = ((_control != null) ? _control.get_coordinator() : _controlImpl.get_coordinator());
+        } catch (SystemException e) {
             coord = null;
         }
 
-        if (coord != null)
-        {
+        if (coord != null) {
             return new ControlWrapper(coord.create_subtransaction());
-        }
-        else
-        {
+        } else {
             if (jtsLogger.logger.isTraceEnabled()) {
                 jtsLogger.logger.trace("ControlWrapper::create_subtransaction - subtransaction parent is inactive.");
             }
 
-            throw new INVALID_TRANSACTION(
-                    ExceptionCodes.UNAVAILABLE_COORDINATOR,
-                    CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.UNAVAILABLE_COORDINATOR, CompletionStatus.COMPLETED_NO);
         }
     }
 
-    public final void commit (boolean report_heuristics) throws Unavailable,
-            HeuristicMixed, HeuristicHazard, SystemException
-    {
-        try
-        {
+    public final void commit(boolean report_heuristics)
+            throws Unavailable, HeuristicMixed, HeuristicHazard, SystemException {
+        try {
             if (_controlImpl != null)
                 _controlImpl.getImplHandle().commit(report_heuristics);
-            else
-            {
+            else {
                 Terminator t = null;
 
-                try
-                {
+                try {
                     t = _control.get_terminator();
-                }
-                catch (SystemException e)
-                {
+                } catch (SystemException e) {
                     throw new Unavailable();
-                }
-                catch (final NullPointerException ex)
-                {
+                } catch (final NullPointerException ex) {
                     throw new Unavailable();
                 }
 
@@ -264,260 +222,193 @@ public class ControlWrapper implements Reapable
                 else
                     throw new Unavailable();
             }
-        }
-        catch (NullPointerException ex)  // if local handle is null then it was terminated (probably by reaper)
+        } catch (NullPointerException ex) // if local handle is null then it was
+                                            // terminated (probably by reaper)
         {
             // check termination status
-            
+
             if (_controlImpl.getFinalStatus() != org.omg.CosTransactions.Status.StatusCommitted)
-                        throw new TRANSACTION_ROLLEDBACK();
+                throw new TRANSACTION_ROLLEDBACK();
         }
     }
 
-    public final void rollback () throws Unavailable, NoTransaction,
-            SystemException
-    {
-        try
-        {
+    public final void rollback() throws Unavailable, NoTransaction, SystemException {
+        try {
             if (_controlImpl != null)
                 _controlImpl.getImplHandle().rollback();
-            else
-            {
+            else {
                 Terminator t = null;
 
-                try
-                {
+                try {
                     t = _control.get_terminator();
-                }
-                catch (SystemException e)
-                {
+                } catch (SystemException e) {
+                    throw new Unavailable();
+                } catch (final NullPointerException ex) {
                     throw new Unavailable();
                 }
-                catch (final NullPointerException ex)
-                                {
-                                    throw new Unavailable();
-                                }
-                
+
                 if (t != null)
                     t.rollback();
                 else
                     throw new Unavailable();
             }
-        }
-        catch (NullPointerException ex)
-        {
+        } catch (NullPointerException ex) {
             throw new TRANSACTION_ROLLEDBACK();
         }
     }
 
-    public final void rollback_only () throws Unavailable, NoTransaction,
-            Inactive, SystemException
-    {
-        try
-        {
+    public final void rollback_only() throws Unavailable, NoTransaction, Inactive, SystemException {
+        try {
             if (_controlImpl != null)
                 _controlImpl.getImplHandle().rollback_only();
-            else
-            {
+            else {
                 Coordinator c = null;
 
-                try
-                {
+                try {
                     c = _control.get_coordinator();
-                }
-                catch (SystemException e)
-                {
+                } catch (SystemException e) {
+                    throw new Unavailable();
+                } catch (final NullPointerException ex) {
                     throw new Unavailable();
                 }
-                catch (final NullPointerException ex)
-                                {
-                                    throw new Unavailable();
-                                }
-                
+
                 if (c != null)
                     c.rollback_only();
                 else
                     throw new Unavailable();
             }
-        }
-        catch (NullPointerException ex)
-        {
+        } catch (NullPointerException ex) {
             throw new Inactive();
         }
     }
 
-    public final org.omg.CosTransactions.RecoveryCoordinator register_resource (Resource r)
-            throws Inactive, SystemException
-    {
-        try
-        {
+    public final org.omg.CosTransactions.RecoveryCoordinator register_resource(Resource r)
+            throws Inactive, SystemException {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.getImplHandle().register_resource(r);
-            else
-            {
-                try
-                {
+            else {
+                try {
                     Coordinator coord = _control.get_coordinator();
 
                     return coord.register_resource(r);
-                }
-                catch (Unavailable e2)
-                {
+                } catch (Unavailable e2) {
                     throw new Inactive();
-                }
-                catch (SystemException e3)
-                {
+                } catch (SystemException e3) {
+                    throw new UNKNOWN();
+                } catch (final NullPointerException ex) {
                     throw new UNKNOWN();
                 }
-                catch (final NullPointerException ex)
-                                {
-                                    throw new UNKNOWN();
-                                }
             }
-        }
-        catch (NullPointerException e1)
-        {
+        } catch (NullPointerException e1) {
             // no transaction
 
             throw new Inactive();
         }
     }
 
-    public final void register_subtran_aware (SubtransactionAwareResource sr)
-            throws Inactive, NotSubtransaction, SystemException
-    {
-        try
-        {
+    public final void register_subtran_aware(SubtransactionAwareResource sr)
+            throws Inactive, NotSubtransaction, SystemException {
+        try {
             if (_controlImpl != null)
                 _controlImpl.getImplHandle().register_subtran_aware(sr);
-            else
-            {
-                try
-                {
+            else {
+                try {
                     Coordinator coord = _control.get_coordinator();
 
                     coord.register_subtran_aware(sr);
-                }
-                catch (Unavailable e2)
-                {
+                } catch (Unavailable e2) {
                     throw new Inactive();
-                }
-                catch (SystemException e3)
-                {
+                } catch (SystemException e3) {
+                    throw new UNKNOWN();
+                } catch (final NullPointerException ex) {
                     throw new UNKNOWN();
                 }
-                catch (final NullPointerException ex)
-                                {
-                                    throw new UNKNOWN();
-                                }
             }
-        }
-        catch (NullPointerException e1)
-        {
+        } catch (NullPointerException e1) {
             // no transaction
 
             throw new Inactive();
         }
     }
 
-    public final void register_synchronization (Synchronization sync)
-            throws Inactive, SynchronizationUnavailable, SystemException
-    {
-        try
-        {
+    public final void register_synchronization(Synchronization sync)
+            throws Inactive, SynchronizationUnavailable, SystemException {
+        try {
             if (_controlImpl != null)
                 _controlImpl.getImplHandle().register_synchronization(sync);
-            else
-            {
-                try
-                {
+            else {
+                try {
                     Coordinator coord = _control.get_coordinator();
 
                     coord.register_synchronization(sync);
-                }
-                catch (final Unavailable e2)
-                {
+                } catch (final Unavailable e2) {
                     throw new Inactive();
-                }
-                catch (final Exception e3)
-                {
+                } catch (final Exception e3) {
                     throw new UNKNOWN();
                 }
             }
-        }
-        catch (final NullPointerException e1)
-        {
+        } catch (final NullPointerException e1) {
             // not available
 
             throw new Inactive();
         }
     }
 
-    public java.util.Map<Uid, String> getSynchronizations()
-    {
-        if ( _controlImpl.getImplHandle() == null)
+    public java.util.Map<Uid, String> getSynchronizations() {
+        if (_controlImpl.getImplHandle() == null)
             return Collections.EMPTY_MAP;
         else
-            return _controlImpl.getImplHandle().getSynchronizations();    
+            return _controlImpl.getImplHandle().getSynchronizations();
     }
 
-    public final org.omg.CosTransactions.Status get_status () throws SystemException
-    {
-        if (_controlImpl != null)
-        {
+    public final org.omg.CosTransactions.Status get_status() throws SystemException {
+        if (_controlImpl != null) {
             ArjunaTransactionImple tx = _controlImpl.getImplHandle();
-            
+
             if (tx == null)
                 return _controlImpl.getFinalStatus();
             else
                 return tx.get_status();
-        }
-        else
-        {
+        } else {
             Coordinator c = null;
 
-            try
-            {
+            try {
                 if (_control != null)
                     c = _control.get_coordinator();
                 else
                     return org.omg.CosTransactions.Status.StatusUnknown;
-            }
-            catch (final OBJECT_NOT_EXIST ex)
-            {
+            } catch (final OBJECT_NOT_EXIST ex) {
                 // definitely/maybe not there so rolled back.
-                
+
                 /*
-                 * If checked transactions are enabled then only the starting thread
-                 * should be able to terminate the transaction. In which case, anyone
-                 * else asking for the state of the transaction is either a participant
-                 * or tooling/application and in which case OBJECT_NOT_EXIST means the
-                 * transaction rolled back (otherwise why would the participant be asking
-                 * when there's no log?) or it could have committed (and in which case the
-                 * tool needs to take care of any possible ambiguity).
+                 * If checked transactions are enabled then only the starting
+                 * thread should be able to terminate the transaction. In which
+                 * case, anyone else asking for the state of the transaction is
+                 * either a participant or tooling/application and in which case
+                 * OBJECT_NOT_EXIST means the transaction rolled back (otherwise
+                 * why would the participant be asking when there's no log?) or
+                 * it could have committed (and in which case the tool needs to
+                 * take care of any possible ambiguity).
                  * 
-                 * However, if checked transactions aren't enabled then multiple threads can
-                 * terminate the transaction, meaning the ambiguity could impact at the application
-                 * level and become a source of possible inconsistency. So we err on the safe side
-                 * here and say "we don't really know".
+                 * However, if checked transactions aren't enabled then multiple
+                 * threads can terminate the transaction, meaning the ambiguity
+                 * could impact at the application level and become a source of
+                 * possible inconsistency. So we err on the safe side here and
+                 * say "we don't really know".
                  */
-                
+
                 if (jtsPropertyManager.getJTSEnvironmentBean().isCheckedTransactions())
                     return org.omg.CosTransactions.Status.StatusRolledBack;
                 else
                     return org.omg.CosTransactions.Status.StatusUnknown;
-            }
-            catch (final Exception e)
-            {
+            } catch (final Exception e) {
                 return org.omg.CosTransactions.Status.StatusUnknown;
             }
 
-            try
-            {
+            try {
                 return c.get_status();
-            }
-            catch (final Exception e)
-            {
+            } catch (final Exception e) {
                 // who knows?!
 
                 return org.omg.CosTransactions.Status.StatusUnknown;
@@ -525,108 +416,73 @@ public class ControlWrapper implements Reapable
         }
     }
 
-    public final String get_transaction_name () throws SystemException
-    {
-        try
-        {
+    public final String get_transaction_name() throws SystemException {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.getImplHandle().get_transaction_name();
-            else
-            {
-                try
-                {
+            else {
+                try {
                     return _control.get_coordinator().get_transaction_name();
-                }
-                catch (Unavailable e1)
-                {
+                } catch (Unavailable e1) {
                     return null;
-                }
-                catch (SystemException e2)
-                {
+                } catch (SystemException e2) {
                     throw e2;
+                } catch (final NullPointerException ex) {
+                    throw new UNKNOWN();
                 }
-                catch (final NullPointerException ex)
-                                {
-                                    throw new UNKNOWN();
-                                }
             }
-        }
-        catch (NullPointerException e3)
-        {
+        } catch (NullPointerException e3) {
             throw new UNKNOWN();
         }
     }
 
-    public final Control get_control ()
-            throws org.omg.CosTransactions.Unavailable, SystemException
-    {
-        try
-        {
+    public final Control get_control() throws org.omg.CosTransactions.Unavailable, SystemException {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.getControl();
             else
                 return _control;
-        }
-        catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             throw new Unavailable();
         }
     }
 
-    public final Coordinator get_coordinator () throws SystemException,
-            org.omg.CosTransactions.Unavailable
-    {
-        try
-        {
+    public final Coordinator get_coordinator() throws SystemException, org.omg.CosTransactions.Unavailable {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.get_coordinator();
             else
                 return _control.get_coordinator();
-        }
-        catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             throw new org.omg.CosTransactions.Unavailable();
         }
     }
 
-    public final Terminator get_terminator () throws SystemException,
-            org.omg.CosTransactions.Unavailable
-    {
-        try
-        {
+    public final Terminator get_terminator() throws SystemException, org.omg.CosTransactions.Unavailable {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.get_terminator();
             else
                 return _control.get_terminator();
-        }
-        catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             throw new org.omg.CosTransactions.Unavailable();
         }
     }
 
-    public final int hash_transaction () throws SystemException
-    {
-        try
-        {
+    public final int hash_transaction() throws SystemException {
+        try {
             if (_controlImpl != null)
                 return _controlImpl.getImplHandle().hash_transaction();
-            else
-            {
-                try
-                {
+            else {
+                try {
                     Coordinator coord = _control.get_coordinator();
 
                     return coord.hash_transaction();
-                }
-                catch (SystemException ex)
-                {
+                } catch (SystemException ex) {
                     throw ex;
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return -1;
         }
     }
@@ -638,23 +494,17 @@ public class ControlWrapper implements Reapable
      * imported more than once and given different local ids.
      */
 
-    public boolean equals (Object e)
-    {
-        if (e instanceof Uid)
-        {
+    public boolean equals(Object e) {
+        if (e instanceof Uid) {
             return _theUid.equals(e);
         }
 
-        if (e instanceof ControlWrapper)
-        {
+        if (e instanceof ControlWrapper) {
             ControlWrapper c = (ControlWrapper) e;
 
-            if (c.isLocal() && isLocal())
-            {
+            if (c.isLocal() && isLocal()) {
                 return c.getImple().equals(_controlImpl);
-            }
-            else
-            {
+            } else {
                 /*
                  * One of them is not local, so we have to revert to indirect
                  * comparison.
@@ -662,32 +512,23 @@ public class ControlWrapper implements Reapable
 
                 Coordinator coord = null;
 
-                try
-                {
+                try {
                     coord = _control.get_coordinator();
-                }
-                catch (Exception e1)
-                {
+                } catch (Exception e1) {
                     return false;
                 }
 
                 Coordinator myCoord = null;
 
-                try
-                {
+                try {
                     myCoord = get_coordinator();
-                }
-                catch (Exception e2)
-                {
+                } catch (Exception e2) {
                     return false;
                 }
 
-                try
-                {
+                try {
                     return coord.is_same_transaction(myCoord);
-                }
-                catch (Exception e3)
-                {
+                } catch (Exception e3) {
                 }
             }
         }
@@ -701,14 +542,10 @@ public class ControlWrapper implements Reapable
      * @since JTS 2.1.1.
      */
 
-    public String toString ()
-    {
-        try
-        {
+    public String toString() {
+        try {
             return get_transaction_name() + " : " + super.toString();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return "Invalid";
         }
     }
@@ -717,30 +554,23 @@ public class ControlWrapper implements Reapable
      * Override Object.hashCode. We always return a positive value.
      */
 
-    public int hashCode ()
-    {
-        try
-        {
+    public int hashCode() {
+        try {
             return hash_transaction();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return -1;
         }
     }
 
-    public final Control getControl ()
-    {
+    public final Control getControl() {
         return _control;
     }
 
-    public final ControlImple getImple ()
-    {
+    public final ControlImple getImple() {
         return _controlImpl;
     }
 
-    public final boolean isLocal ()
-    {
+    public final boolean isLocal() {
         return ((_controlImpl == null) ? false : true);
     }
 
@@ -749,10 +579,8 @@ public class ControlWrapper implements Reapable
      * locality is not likely to change!
      */
 
-    public final void determineLocality ()
-    {
-        if (!_checkedLocality)
-        {
+    public final void determineLocality() {
+        if (!_checkedLocality) {
             _controlImpl = Helper.localControl(_control);
 
             /*
@@ -760,9 +588,7 @@ public class ControlWrapper implements Reapable
              * are remote.
              */
 
-            if ((_controlImpl != null)
-                    && (_controlImpl.getImplHandle() == null))
-            {
+            if ((_controlImpl != null) && (_controlImpl.getImplHandle() == null)) {
                 _theUid = _controlImpl.get_uid();
                 _controlImpl = null;
             }

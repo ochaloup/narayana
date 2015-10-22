@@ -14,11 +14,13 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
-
 /**
- * <p>Java class for CreateCoordinationContextResponseType complex type.
+ * <p>
+ * Java class for CreateCoordinationContextResponseType complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="CreateCoordinationContextResponseType">
@@ -36,10 +38,7 @@ import org.w3c.dom.Element;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CreateCoordinationContextResponseType", propOrder = {
-    "coordinationContext",
-    "any"
-})
+@XmlType(name = "CreateCoordinationContextResponseType", propOrder = {"coordinationContext", "any"})
 public class CreateCoordinationContextResponseType {
 
     @XmlElement(name = "CoordinationContext", required = true)
@@ -52,10 +51,8 @@ public class CreateCoordinationContextResponseType {
     /**
      * Gets the value of the coordinationContext property.
      * 
-     * @return
-     *     possible object is
-     *     {@link CoordinationContext }
-     *     
+     * @return possible object is {@link CoordinationContext }
+     * 
      */
     public CoordinationContext getCoordinationContext() {
         return coordinationContext;
@@ -65,9 +62,8 @@ public class CreateCoordinationContextResponseType {
      * Sets the value of the coordinationContext property.
      * 
      * @param value
-     *     allowed object is
-     *     {@link CoordinationContext }
-     *     
+     *            allowed object is {@link CoordinationContext }
+     * 
      */
     public void setCoordinationContext(CoordinationContext value) {
         this.coordinationContext = value;
@@ -77,21 +73,21 @@ public class CreateCoordinationContextResponseType {
      * Gets the value of the any property.
      * 
      * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the any property.
+     * This accessor method returns a reference to the live list, not a
+     * snapshot. Therefore any modification you make to the returned list will
+     * be present inside the JAXB object. This is why there is not a
+     * <CODE>set</CODE> method for the any property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
+     * 
      * <pre>
-     *    getAny().add(newItem);
+     * getAny().add(newItem);
      * </pre>
      * 
      * 
      * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Element }
+     * Objects of the following type(s) are allowed in the list {@link Element }
      * {@link Object }
      * 
      * 
@@ -104,18 +100,18 @@ public class CreateCoordinationContextResponseType {
     }
 
     /**
-     * Gets a map that contains attributes that aren't bound to any typed property on this class.
+     * Gets a map that contains attributes that aren't bound to any typed
+     * property on this class.
      * 
      * <p>
-     * the map is keyed by the name of the attribute and 
-     * the value is the string value of the attribute.
+     * the map is keyed by the name of the attribute and the value is the string
+     * value of the attribute.
      * 
-     * the map returned by this method is live, and you can add new attribute
-     * by updating the map directly. Because of this design, there's no setter.
+     * the map returned by this method is live, and you can add new attribute by
+     * updating the map directly. Because of this design, there's no setter.
      * 
      * 
-     * @return
-     *     always non-null
+     * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {
         return otherAttributes;

@@ -45,13 +45,15 @@ import org.junit.runner.RunWith;
  * <a href="https://issues.jboss.org/browse/JBTM-2350">JBTM-2350</a>.
  * </p>
  * <p>
- * Tests weather previousUserTransactionAvailability leaks between threads in certain race condition when
- * same method annotated transactional is invoked from two threads with different transaction management type
- * (user transaction availability).
+ * Tests weather previousUserTransactionAvailability leaks between threads in
+ * certain race condition when same method annotated transactional is invoked
+ * from two threads with different transaction management type (user transaction
+ * availability).
  * </p>
  *
- * @author <a href="mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz Krakowiak
- *         &lt;tomasz.krakowiak@efish.pl&gt;</a>
+ * @author <a href=
+ *         "mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz
+ *         Krakowiak &lt;tomasz.krakowiak@efish.pl&gt;</a>
  */
 @RunWith(Arquillian.class)
 public class ConcurrentTransactionalTest {
@@ -63,8 +65,7 @@ public class ConcurrentTransactionalTest {
 
     @Deployment
     public static WebArchive createTestArchive() {
-        return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
+        return ShrinkWrap.create(WebArchive.class, "test.war").addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -130,50 +131,52 @@ public class ConcurrentTransactionalTest {
 
     /**
      * <p>
-     * Following description referees to narayana implementation from version 5.0.0 to 5.0.4.
+     * Following description referees to narayana implementation from version
+     * 5.0.0 to 5.0.4.
      * </p>
      * <p>
-     * We have a bean - {@link TestTransactionalInvokerBean testTransactionalInvokerBean} -
-     * with a method annotated transactional using tx type txType.
+     * We have a bean - {@link TestTransactionalInvokerBean
+     * testTransactionalInvokerBean} - with a method annotated transactional
+     * using tx type txType.
      * </p>
      * <p>
      * This method is being called from two threads, where:
      * </p>
      * <ul>
-     * <li>
-     * Thread 1 is participating in transactionManagementType, therefore it's
-     * {@link ServerVMClientUserTransaction#isAvailables} value is true if it's value is
-     * {@link TransactionManagementType#BEAN BEAN}.
-     * </li>
-     * <li>
-     * Thread 2 is participating in transaction management type opposite to transactionManagementType,
-     * therefore it's {@link ServerVMClientUserTransaction#isAvailables} value is different than for Thread 1.
-     * </li>
+     * <li>Thread 1 is participating in transactionManagementType, therefore
+     * it's {@link ServerVMClientUserTransaction#isAvailables} value is true if
+     * it's value is {@link TransactionManagementType#BEAN BEAN}.</li>
+     * <li>Thread 2 is participating in transaction management type opposite to
+     * transactionManagementType, therefore it's
+     * {@link ServerVMClientUserTransaction#isAvailables} value is different
+     * than for Thread 1.</li>
      * </ul>
      * <p>
-     * Both threads call {@link TestTransactionalInvokerBean testTransactionalInvokerBean}'s method with
-     * appropriate tx type at the same time.
+     * Both threads call {@link TestTransactionalInvokerBean
+     * testTransactionalInvokerBean}'s method with appropriate tx type at the
+     * same time.
      * </p>
      * <p>
      * What may happen:
      * </p>
      * <ol>
-     * <li>
-     * 1. Thread 1 - enters {@link TestTransactionalInvokerBean testTransactionalInvokerBean}'s method.<br/>
-     * Interceptor sets previousUserTransactionAvailability.
-     * </li>
-     * <li>
-     * 2. Thread 2 - enters {@link TestTransactionalInvokerBean testTransactionalInvokerBean}'s method.<br/>
-     * Interceptor sets previousUserTransactionAvailability to opposite value that it was set in Thread 1.
-     * </li>
-     * <li>
-     * 3. Thread 1 - exits method {@link TestTransactionalInvokerBean testTransactionalInvokerBean}'s and
-     * {@link ServerVMClientUserTransaction#isAvailables} thread local value is set to incorrect value.
-     * </li>
+     * <li>1. Thread 1 - enters {@link TestTransactionalInvokerBean
+     * testTransactionalInvokerBean}'s method.<br/>
+     * Interceptor sets previousUserTransactionAvailability.</li>
+     * <li>2. Thread 2 - enters {@link TestTransactionalInvokerBean
+     * testTransactionalInvokerBean}'s method.<br/>
+     * Interceptor sets previousUserTransactionAvailability to opposite value
+     * that it was set in Thread 1.</li>
+     * <li>3. Thread 1 - exits method {@link TestTransactionalInvokerBean
+     * testTransactionalInvokerBean}'s and
+     * {@link ServerVMClientUserTransaction#isAvailables} thread local value is
+     * set to incorrect value.</li>
      * </ol>
      *
-     * @param transactionManagementType transaction management type
-     * @param txType tx type to which related interceptor test to run.
+     * @param transactionManagementType
+     *            transaction management type
+     * @param txType
+     *            tx type to which related interceptor test to run.
      */
     private void doTest(TransactionManagementType transactionManagementType, TxType txType) {
         CountDownLatch thread1EnterLatch = new CountDownLatch(1);
@@ -184,24 +187,17 @@ public class ConcurrentTransactionalTest {
 
         boolean startTransaction = txType == TxType.MANDATORY;
 
-        TransactionManagementType otherTransactionManagementType = otherTransactionManagementType(transactionManagementType);
+        TransactionManagementType otherTransactionManagementType = otherTransactionManagementType(
+                transactionManagementType);
         boolean expectedUserTransactionAvailable = transactionManagementType == TransactionManagementType.BEAN;
 
         Runnable thread1Runnable = helper.runWithTransactionManagement(transactionManagementType, startTransaction,
                 helper.runAndCheckUserTransactionAvailability(
-                        helper.runInTxType(txType,
-                                new DeterminingRaceRunnable(thread1EnterLatch, thread1ExitLatch)
-                        ),
-                        expectedUserTransactionAvailable
-                )
-        );
+                        helper.runInTxType(txType, new DeterminingRaceRunnable(thread1EnterLatch, thread1ExitLatch)),
+                        expectedUserTransactionAvailable));
         Runnable thread2Runnable = new AwaitAndRun(thread2StartLatch,
                 helper.runWithTransactionManagement(otherTransactionManagementType, startTransaction,
-                        helper.runInTxType(txType,
-                                new DeterminingRaceRunnable(thread2EnterLatch, thread2ExitLatch)
-                        )
-                )
-        );
+                        helper.runInTxType(txType, new DeterminingRaceRunnable(thread2EnterLatch, thread2ExitLatch))));
 
         Future<?> thread2Future = executorService.submit(thread2Runnable);
         thread1Runnable.run();
@@ -214,23 +210,28 @@ public class ConcurrentTransactionalTest {
 
     /**
      * <p>
-     * Returns opposite transaction management type to transactionManagementType:
+     * Returns opposite transaction management type to
+     * transactionManagementType:
      * </p>
      * <ul>
-     * <li>{@link TransactionManagementType#BEAN} for {@link TransactionManagementType#CONTAINER}</li>
-     * <li>{@link TransactionManagementType#CONTAINER} for {@link TransactionManagementType#BEAN}</li>
+     * <li>{@link TransactionManagementType#BEAN} for
+     * {@link TransactionManagementType#CONTAINER}</li>
+     * <li>{@link TransactionManagementType#CONTAINER} for
+     * {@link TransactionManagementType#BEAN}</li>
      * </ul>
      *
-     * @param transactionManagementType transactionManagementType
+     * @param transactionManagementType
+     *            transactionManagementType
      * @return Opposite transaction management type to transactionManagementType
      */
-    private TransactionManagementType otherTransactionManagementType(TransactionManagementType transactionManagementType) {
+    private TransactionManagementType otherTransactionManagementType(
+            TransactionManagementType transactionManagementType) {
         switch (transactionManagementType) {
-            case CONTAINER:
+            case CONTAINER :
                 return TransactionManagementType.BEAN;
-            case BEAN:
+            case BEAN :
                 return TransactionManagementType.CONTAINER;
-            default:
+            default :
                 throw new RuntimeException("Unexpected transaction management type " + transactionManagementType);
         }
     }

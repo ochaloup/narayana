@@ -33,39 +33,30 @@ import com.arjuna.ats.jts.utils.Utility;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class XidUtils
-{
-    public static Xid getXid (Uid uid, boolean branch) throws IllegalStateException
-    {
+public class XidUtils {
+    public static Xid getXid(Uid uid, boolean branch) throws IllegalStateException {
         return XATxConverter.getXid(uid, branch, ArjunaTransactionImple.interpositionType());
     }
 
-    public static Xid getXid (org.omg.CosTransactions.Control cont, boolean branch) throws IllegalStateException
-    {
+    public static Xid getXid(org.omg.CosTransactions.Control cont, boolean branch) throws IllegalStateException {
         if (cont == null)
             throw new IllegalStateException();
 
         Uid u = null;
 
-        if (cont instanceof ControlImple)
-        {
+        if (cont instanceof ControlImple) {
             u = ((ControlImple) cont).get_uid();
 
             return getXid(u, branch);
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 u = Utility.getUid(cont);
-                if(u.equals(Uid.nullUid())) {
+                if (u.equals(Uid.nullUid())) {
                     throw new IllegalStateException();
                 }
 
                 return getXid(u, branch);
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         }

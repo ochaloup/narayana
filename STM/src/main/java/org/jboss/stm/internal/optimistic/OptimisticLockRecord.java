@@ -54,89 +54,72 @@ import com.arjuna.ats.internal.txoj.abstractrecords.LockRecord;
  * long as they keep the state the same then we are ok.
  */
 
-class OptimisticLockRecord extends LockRecord
-{
-    public OptimisticLockRecord (OptimisticLockManager lm, BasicAction currAct, boolean check)
-    {
+class OptimisticLockRecord extends LockRecord {
+    public OptimisticLockRecord(OptimisticLockManager lm, BasicAction currAct, boolean check) {
         super(lm, currAct);
 
-        try
-        {
+        try {
             _state = lm.getStore().read_committed(lm.get_uid(), lm.type());
-        }
-        catch (final ObjectStoreException ex)
-        {
+        } catch (final ObjectStoreException ex) {
             _state = null;
         }
-        
-    _status = lm.status();
-    _check = check;
-    }
-    
-    public OptimisticLockRecord (OptimisticLockManager lm, boolean rdOnly, BasicAction currAct, boolean check)
-    {
-        super(lm, rdOnly, currAct);
-    
-        try
-        {
-            _state = lm.getStore().read_committed(lm.get_uid(), lm.type());
-        }
-        catch (final ObjectStoreException ex)
-        {
-            _state = null;
-        }
-        
-    _status = lm.status();
-    _check = check;
+
+        _status = lm.status();
+        _check = check;
     }
 
-    public int typeIs ()
-    {
+    public OptimisticLockRecord(OptimisticLockManager lm, boolean rdOnly, BasicAction currAct, boolean check) {
+        super(lm, rdOnly, currAct);
+
+        try {
+            _state = lm.getStore().read_committed(lm.get_uid(), lm.type());
+        } catch (final ObjectStoreException ex) {
+            _state = null;
+        }
+
+        _status = lm.status();
+        _check = check;
+    }
+
+    public int typeIs() {
         return RecordType.USER_DEF_FIRST0;
     }
-    
-    public int nestedAbort ()
-    {
-        if (txojLogger.logger.isTraceEnabled())
-        {
-            txojLogger.logger.trace("OptimisticLockRecord::nestedAbort() for "+order());
-        }
-        
-    /*
-     * Optimistic cc means we just throw away the state.
-     */
 
-    _state = null;
-    
-    return super.nestedAbort();
+    public int nestedAbort() {
+        if (txojLogger.logger.isTraceEnabled()) {
+            txojLogger.logger.trace("OptimisticLockRecord::nestedAbort() for " + order());
+        }
+
+        /*
+         * Optimistic cc means we just throw away the state.
+         */
+
+        _state = null;
+
+        return super.nestedAbort();
     }
 
-    public int topLevelPrepare ()
-    {
-        if (txojLogger.logger.isTraceEnabled())
-        {
-            txojLogger.logger.trace("OptimisticLockRecord::nestedPrepare() for "+order());
+    public int topLevelPrepare() {
+        if (txojLogger.logger.isTraceEnabled()) {
+            txojLogger.logger.trace("OptimisticLockRecord::nestedPrepare() for " + order());
         }
-        
-    if (value() == null)
+
+        if (value() == null)
             return TwoPhaseOutcome.PREPARE_NOTOK;
-    
-    if (checkState())
-        return super.topLevelPrepare();
-    else
-    {
-        txojLogger.i18NLogger.warn_OptimisticLockRecord_1((LockManager) value());
-        
-        return TwoPhaseOutcome.PREPARE_NOTOK;
+
+        if (checkState())
+            return super.topLevelPrepare();
+        else {
+            txojLogger.i18NLogger.warn_OptimisticLockRecord_1((LockManager) value());
+
+            return TwoPhaseOutcome.PREPARE_NOTOK;
+        }
     }
-    }
-    
-    public int topLevelCommit ()
-    {       
+
+    public int topLevelCommit() {
         boolean stateOK = checkState();
-        
-        if (stateOK)
-        {
+
+        if (stateOK) {
             txojLogger.i18NLogger.warn_OptimisticLockRecord_2((LockManager) value());
         }
 
@@ -146,140 +129,120 @@ class OptimisticLockRecord extends LockRecord
             return TwoPhaseOutcome.FINISH_ERROR;
     }
 
-    public String type ()
-    {
-    return "/StateManager/AbstractRecord/LockRecord/OptimisticLockRecord";
-    }
-    
-    public String toString ()
-    {
-        return _myUid.stringForm();
-    }
-    
-    protected OptimisticLockRecord ()
-    {
-    super();
+    public String type() {
+        return "/StateManager/AbstractRecord/LockRecord/OptimisticLockRecord";
     }
 
-    private boolean checkState ()
-    {
+    public String toString() {
+        return _myUid.stringForm();
+    }
+
+    protected OptimisticLockRecord() {
+        super();
+    }
+
+    private boolean checkState() {
         if ((_status == ObjectStatus.ACTIVE_NEW) || (!_check))
             return true;
 
         if (_state == null)
             return false;
-        
+
         /*
          * If the object is recoverable then we can just check the local state.
          * If the object is persistent then we have to check the state on disk.
          */
-        
+
         OutputObjectState tempState = new OutputObjectState();
         OptimisticLockManager man = (OptimisticLockManager) value();
         int objectType = man.objectType();
-        
-        synchronized (man)
-        {
+
+        synchronized (man) {
             /*
-             * If we check the state now, it's possible that some other transactions may be
-             * doing the same concurrently. We need to lock the object at this point. Or
-             * suffer heuristic by checking during commit - though this still leaves a window
-             * of vulnerability.
+             * If we check the state now, it's possible that some other
+             * transactions may be doing the same concurrently. We need to lock
+             * the object at this point. Or suffer heuristic by checking during
+             * commit - though this still leaves a window of vulnerability.
              */
-            
+
             /*
-             * Assume initially that this will only work if the objects are all in the same
-             * address space, since sharing across spaces will impose performance overhead
-             * anyway. In that case, we can maintain a list of all objects that are being
-             * managed optimistically and check them directly as well as lock them.
+             * Assume initially that this will only work if the objects are all
+             * in the same address space, since sharing across spaces will
+             * impose performance overhead anyway. In that case, we can maintain
+             * a list of all objects that are being managed optimistically and
+             * check them directly as well as lock them.
              * 
-             * Problem is that it's the state that needs to be checked and there may be
-             * multiple instances of the state active in memory at the same time. So would
-             * need to keep each instance per Uid.
+             * Problem is that it's the state that needs to be checked and there
+             * may be multiple instances of the state active in memory at the
+             * same time. So would need to keep each instance per Uid.
              */
-            
+
             /*
-             * Could even make this specific to STM and in which case we have even more control.
+             * Could even make this specific to STM and in which case we have
+             * even more control.
              */
-    
-            if (objectType == ObjectType.RECOVERABLE)
-            {
-                if (man.save_state(tempState, objectType))
-                {
+
+            if (objectType == ObjectType.RECOVERABLE) {
+                if (man.save_state(tempState, objectType)) {
                     boolean identical = true;
-                    
-                    if (tempState.length() == _state.length())
-                    {
-                        for (int i = 0; (i < tempState.length()) && identical; i++)
-                        {   
+
+                    if (tempState.length() == _state.length()) {
+                        for (int i = 0; (i < tempState.length()) && identical; i++) {
                             if (tempState.buffer()[i] != _state.buffer()[i])
                                 identical = false;
                         }
-                        
+
                         if (identical)
                             return true;
                     }
                 }
             }
-            
-            if (objectType == ObjectType.ANDPERSISTENT)
-            {
+
+            if (objectType == ObjectType.ANDPERSISTENT) {
                 /*
-                 * Don't need the state - could just check the time of the file update if we are using
-                 * a file based object store.
+                 * Don't need the state - could just check the time of the file
+                 * update if we are using a file based object store.
                  */
-                
-                try
-                {
+
+                try {
                     InputObjectState s = man.getStore().read_committed(man.get_uid(), man.type());
 
-                    if (s != null)
-                    {
+                    if (s != null) {
                         boolean identical = true;
 
-                        if (s.length() == _state.length())
-                        {
-                            for (int i = 0; (i < s.length()) && identical; i++)
-                            {
+                        if (s.length() == _state.length()) {
+                            for (int i = 0; (i < s.length()) && identical; i++) {
                                 if (s.buffer()[i] != _state.buffer()[i])
                                     identical = false;
                             }
-                            
+
                             if (identical)
                                 return true;
                         }
-                    }
-                    else
-                    {
+                    } else {
                         return false;
                     }
-                }
-                catch (final Exception ex)
-                {
+                } catch (final Exception ex) {
                     ex.printStackTrace();
                 }
             }
         }
-        
+
         return false;
     }
 
-    public boolean shouldReplace (AbstractRecord ar)
-    {
-        if (!super.shouldReplace(ar))
-        {
-            if ((order().equals(ar.order())) && typeIs() == ar.typeIs())
-            {
+    public boolean shouldReplace(AbstractRecord ar) {
+        if (!super.shouldReplace(ar)) {
+            if ((order().equals(ar.order())) && typeIs() == ar.typeIs()) {
                 if (!((OptimisticLockRecord) ar)._check && _check)
                     return true;
             }
-            
+
             return false;
-        }
-        else
+        } else
             return true;
     }
-    
+
     private InputObjectState _state = new InputObjectState();
     private int _status = ObjectStatus.ACTIVE_NEW;
     private boolean _check = true;

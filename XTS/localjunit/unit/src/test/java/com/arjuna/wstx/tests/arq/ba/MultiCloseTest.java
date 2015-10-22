@@ -23,9 +23,7 @@ public class MultiCloseTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoBusinessParticipant.class,
-                FailureBusinessParticipant.class,
+        return WarDeployment.getDeployment(DemoBusinessParticipant.class, FailureBusinessParticipant.class,
                 ParticipantCompletionCoordinatorRules.class);
     }
 
@@ -40,9 +38,7 @@ public class MultiCloseTest {
     }
 
     @Test
-    public void testMultiClose()
-            throws Exception
-            {
+    public void testMultiClose() throws Exception {
 
         ParticipantCompletionCoordinatorRules.setParticipantCount(2);
 
@@ -52,7 +48,8 @@ public class MultiCloseTest {
         com.arjuna.wst11.BAParticipantManager bpm1 = null;
         com.arjuna.wst11.BAParticipantManager bpm2 = null;
         DemoBusinessParticipant p = new DemoBusinessParticipant(DemoBusinessParticipant.CLOSE, "1240");
-        FailureBusinessParticipant fp = new FailureBusinessParticipant(FailureBusinessParticipant.FAIL_IN_CLOSE, "5679");
+        FailureBusinessParticipant fp = new FailureBusinessParticipant(FailureBusinessParticipant.FAIL_IN_CLOSE,
+                "5679");
 
         try {
             uba.begin();
@@ -64,11 +61,11 @@ public class MultiCloseTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
         uba.close();
         assertTrue(p.passed());
-            }
+    }
 }

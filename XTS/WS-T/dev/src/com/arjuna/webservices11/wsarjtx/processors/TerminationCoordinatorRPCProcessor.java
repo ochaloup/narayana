@@ -28,60 +28,70 @@ import org.jboss.ws.api.addressing.MAP;
 
 /**
  * The Terminator Participant processor.
+ * 
  * @author kevin
  */
-public abstract class TerminationCoordinatorRPCProcessor
-{
+public abstract class TerminationCoordinatorRPCProcessor {
     /**
      * The participant processor.
      */
-    private static TerminationCoordinatorRPCProcessor PROCESSOR ;
+    private static TerminationCoordinatorRPCProcessor PROCESSOR;
 
     /**
      * Get the processor.
+     * 
      * @return The processor.
      */
-    public static TerminationCoordinatorRPCProcessor getProcessor()
-    {
-        return PROCESSOR ;
+    public static TerminationCoordinatorRPCProcessor getProcessor() {
+        return PROCESSOR;
     }
 
     /**
      * Set the processor.
-     * @param processor The processor.
+     * 
+     * @param processor
+     *            The processor.
      * @return The previous processor.
      */
-    public static TerminationCoordinatorRPCProcessor setProcessor(final TerminationCoordinatorRPCProcessor processor)
-    {
-        final TerminationCoordinatorRPCProcessor origProcessor = PROCESSOR ;
-        PROCESSOR = processor ;
-        return origProcessor ;
+    public static TerminationCoordinatorRPCProcessor setProcessor(final TerminationCoordinatorRPCProcessor processor) {
+        final TerminationCoordinatorRPCProcessor origProcessor = PROCESSOR;
+        PROCESSOR = processor;
+        return origProcessor;
     }
 
     /**
      * Cancel.
-     * @param cancel The cancel notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param cancel
+     *            The cancel notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public abstract void cancel(final NotificationType cancel, final MAP map,
-        final ArjunaContext arjunaContext);
+    public abstract void cancel(final NotificationType cancel, final MAP map, final ArjunaContext arjunaContext);
 
     /**
      * Close.
-     * @param close The close notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param close
+     *            The close notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public abstract void close(final NotificationType close, final MAP map,
-        final ArjunaContext arjunaContext) ;
+    public abstract void close(final NotificationType close, final MAP map, final ArjunaContext arjunaContext);
 
     /**
      * Complete.
-     * @param complete The complete notification.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param complete
+     *            The complete notification.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public abstract void complete(final NotificationType complete, final MAP map,
-        final ArjunaContext arjunaContext) ;
+    public abstract void complete(final NotificationType complete, final MAP map, final ArjunaContext arjunaContext);
 }

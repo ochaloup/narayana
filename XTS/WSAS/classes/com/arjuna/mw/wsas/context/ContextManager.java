@@ -50,50 +50,42 @@ import com.arjuna.mwlabs.wsas.activity.ActivityImple;
  * @since 1.0.
  */
 
-public class ContextManager
-{
+public class ContextManager {
 
-    public ContextManager ()
-    {
-    _manager = ActivityManagerFactory.activityManager();
+    public ContextManager() {
+        _manager = ActivityManagerFactory.activityManager();
     }
 
     /**
-     * message com.arjuna.mw.wsas.context.ContextManager_3 [com.arjuna.mw.wsas.context.ContextManager_3] - getHighLevelServices threw:
-     * message com.arjuna.mw.wsas.context.ContextManager_4 [com.arjuna.mw.wsas.context.ContextManager_4] - assembling context and received:
+     * message com.arjuna.mw.wsas.context.ContextManager_3
+     * [com.arjuna.mw.wsas.context.ContextManager_3] - getHighLevelServices
+     * threw: message com.arjuna.mw.wsas.context.ContextManager_4
+     * [com.arjuna.mw.wsas.context.ContextManager_4] - assembling context and
+     * received:
      */
 
-    public final Context context (String serviceType)
-    {
+    public final Context context(String serviceType) {
         Context ctx = null;
         HLS service = null;
 
-        try
-        {
-            // ensure we are in an activity associated with the correct service type
+        try {
+            // ensure we are in an activity associated with the correct service
+            // type
 
             String currentServiceType = UserActivityFactory.userActivity().serviceType();
             if (currentServiceType.equals(serviceType)) {
                 service = _manager.getHighLevelService(serviceType);
             }
-        }
-        catch (NoActivityException nae)
-        {
+        } catch (NoActivityException nae) {
             // ignore
-        }
-        catch (Exception ex)
-        {
-        wsasLogger.i18NLogger.warn_context_ContextManager_1(ex);
+        } catch (Exception ex) {
+            wsasLogger.i18NLogger.warn_context_ContextManager_1(ex);
         }
 
-        if (service != null)
-        {
-            try
-            {
+        if (service != null) {
+            try {
                 ctx = service.context();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 wsasLogger.i18NLogger.warn_context_ContextManager_2(ex);
 
                 ctx = null;

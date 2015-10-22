@@ -27,58 +27,63 @@ import org.jboss.ws.api.addressing.MAP;
 
 /**
  * The Initiator processor.
+ * 
  * @author kevin
  */
-public class BAInitiatorProcessor extends BaseWSAddrResponseProcessor
-{
+public class BAInitiatorProcessor extends BaseWSAddrResponseProcessor {
     /**
      * The initiator singleton.
      */
-    private static final BAInitiatorProcessor INITIATOR = new BAInitiatorProcessor() ;
-    
+    private static final BAInitiatorProcessor INITIATOR = new BAInitiatorProcessor();
+
     /**
      * Get the initiator singleton.
+     * 
      * @return The singleton.
      */
-    public static BAInitiatorProcessor getInitiator()
-    {
-        return INITIATOR ;
+    public static BAInitiatorProcessor getInitiator() {
+        return INITIATOR;
     }
 
     /**
      * Handle a response response.
-     * @param map The current addressing context.
+     * 
+     * @param map
+     *            The current addressing context.
      */
-    public void handleResponse(final MAP map)
-    {
+    public void handleResponse(final MAP map) {
         handleCallbacks(new CallbackExecutorAdapter() {
             public void execute(final Callback callback) {
-                ((BAInitiatorCallback)callback).response(map) ;
+                ((BAInitiatorCallback) callback).response(map);
             }
-        }, getIDs(map)) ;
+        }, getIDs(map));
     }
 
     /**
      * Register a SOAP fault response.
-     * @param soapFault The SOAP fault response.
-     * @param map The current addressing context.
+     * 
+     * @param soapFault
+     *            The SOAP fault response.
+     * @param map
+     *            The current addressing context.
      */
-    public void handleSoapFault(final SoapFault soapFault, final MAP map)
-    {
+    public void handleSoapFault(final SoapFault soapFault, final MAP map) {
         handleCallbacks(new CallbackExecutorAdapter() {
             public void execute(final Callback callback) {
-                ((BAInitiatorCallback)callback).soapFault(soapFault, map) ;
+                ((BAInitiatorCallback) callback).soapFault(soapFault, map);
             }
-        }, getIDs(map)) ;
+        }, getIDs(map));
     }
 
     /**
      * Register a callback for the specific message id.
-     * @param messageID The message ID.
-     * @param callback The callback for the response.
+     * 
+     * @param messageID
+     *            The message ID.
+     * @param callback
+     *            The callback for the response.
      */
-    public void registerCallback(final String messageID, final BAInitiatorCallback callback)
-    {
-        register(messageID, callback) ;
+    public void registerCallback(final String messageID, final BAInitiatorCallback callback) {
+        register(messageID, callback);
     }
 }

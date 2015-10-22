@@ -31,8 +31,7 @@ package org.jboss.jbossts.qa.Utils;
  * $Id: ServerIORStorePlugin.java,v 1.2 2003/06/26 11:45:07 rbegg Exp $
  */
 
-public interface ServerIORStorePlugin
-{
+public interface ServerIORStorePlugin {
     public void initialise() throws Exception;
 
     public void storeIOR(String serverName, String serverIOR) throws Exception;

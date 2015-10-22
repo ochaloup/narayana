@@ -38,8 +38,7 @@ import com.hp.mwtests.ts.jta.common.Synchronization;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-03
  */
-public class TransactionSynchronizationRegistryTest
-{
+public class TransactionSynchronizationRegistryTest {
     @Test
     public void testTSR() throws Exception {
 

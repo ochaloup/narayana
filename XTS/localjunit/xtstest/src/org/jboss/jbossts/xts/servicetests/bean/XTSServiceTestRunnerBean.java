@@ -30,21 +30,38 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 /**
- * A service bean used to run XTS service tests at JBoss startup. A specific test is configurerd by setting an
- * environment variable. It will normally execute in a JVM configured to use the Byteman agent and an appropriately
+ * A service bean used to run XTS service tests at JBoss startup. A specific
+ * test is configurerd by setting an environment variable. It will normally
+ * execute in a JVM configured to use the Byteman agent and an appropriately
  * defined Byteman rule set.
  */
 
-public class XTSServiceTestRunnerBean
-        implements ServletContextListener // since we ahve toi use a war and web.xml wee
-                                          // run this as a listener rather than as via jboss-beans.xml
+public class XTSServiceTestRunnerBean implements ServletContextListener // since
+                                                                        // we
+                                                                        // ahve
+                                                                        // toi
+                                                                        // use a
+                                                                        // war
+                                                                        // and
+                                                                        // web.xml
+                                                                        // wee
+                                                                        // run
+                                                                        // this
+                                                                        // as a
+                                                                        // listener
+                                                                        // rather
+                                                                        // than
+                                                                        // as
+                                                                        // via
+                                                                        // jboss-beans.xml
 {
     /**
      * The context has been initialized.
-     * @param servletContextEvent The servlet context event.
+     * 
+     * @param servletContextEvent
+     *            The servlet context event.
      */
-    public void contextInitialized(final ServletContextEvent servletContextEvent)
-    {
+    public void contextInitialized(final ServletContextEvent servletContextEvent) {
         try {
             start();
         } catch (Exception e) {
@@ -54,10 +71,11 @@ public class XTSServiceTestRunnerBean
 
     /**
      * The context is about to be destroyed.
-     * @param servletContextEvent The servlet context event.
+     * 
+     * @param servletContextEvent
+     *            The servlet context event.
      */
-    public void contextDestroyed(final ServletContextEvent servletContextEvent)
-    {
+    public void contextDestroyed(final ServletContextEvent servletContextEvent) {
         try {
             stop();
         } catch (Exception e) {
@@ -65,22 +83,22 @@ public class XTSServiceTestRunnerBean
         }
     }
 
-    public XTSServiceTestRunnerBean()
-    {
+    public XTSServiceTestRunnerBean() {
         testName = System.getProperty(TEST_NAME_KEY);
         testInstance = null;
     }
 
     /**
      * the service start method which adds a thread to run the current test
+     * 
      * @throws Exception
      */
-    public void start() throws Exception
-    {
+    public void start() throws Exception {
         log.info("Starting XTSServiceTestRunner");
 
-        // ensure that the xts service test AT recovery helper module is registered
-        
+        // ensure that the xts service test AT recovery helper module is
+        // registered
+
         TestATRecoveryModule.register();
         TestBARecoveryModule.register();
 
@@ -97,7 +115,7 @@ public class XTSServiceTestRunnerBean
             }
 
             try {
-                testInstance = (XTSServiceTest)testClass.newInstance();
+                testInstance = (XTSServiceTest) testClass.newInstance();
             } catch (InstantiationException ie) {
                 log.warn("XTSServiceTestRunner : cannot instantiate test class " + testName, ie);
                 throw new Exception("XTSServiceTestRunner : cannot instantiate test class " + testName, ie);
@@ -106,12 +124,12 @@ public class XTSServiceTestRunnerBean
                 throw new Exception("XTSServiceTestRunner : cannot access constructor for test class " + testName, iae);
             }
 
-            // since we are running in the AS startup thread we need a separate thread for the test
+            // since we are running in the AS startup thread we need a separate
+            // thread for the test
 
             testThread = new Thread() {
                 private XTSServiceTest test = testInstance;
-                public void run()
-                {
+                public void run() {
                     testInstance.run();
                 }
             };
@@ -123,11 +141,12 @@ public class XTSServiceTestRunnerBean
     }
 
     /**
-     * teh service stop method which joins the thread running the current test if it exists
+     * teh service stop method which joins the thread running the current test
+     * if it exists
+     * 
      * @throws Exception
      */
-    public void stop() throws Exception
-    {
+    public void stop() throws Exception {
         log.info("Stopping XTSServiceTestRunner");
 
         if (testThread != null) {
@@ -138,7 +157,8 @@ public class XTSServiceTestRunnerBean
             log.info("Joined test thread " + testName);
         }
 
-        // ensure that the xts service test AT recovery helper module is unregistered
+        // ensure that the xts service test AT recovery helper module is
+        // unregistered
 
         TestATRecoveryModule.unregister();
         TestBARecoveryModule.unregister();

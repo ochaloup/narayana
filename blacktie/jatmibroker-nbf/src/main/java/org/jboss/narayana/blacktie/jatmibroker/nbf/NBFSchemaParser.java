@@ -62,9 +62,9 @@ public class NBFSchemaParser {
 
                         while (type != null) {
                             String typeName = type.getName();
-                            if (typeName != null
-                                    && (typeName.equals("long") || typeName.equals("string") || typeName.equals("integer")
-                                            || typeName.equals("float") || typeName.endsWith("_type"))) {
+                            if (typeName != null && (typeName.equals("long") || typeName.equals("string")
+                                    || typeName.equals("integer") || typeName.equals("float")
+                                    || typeName.endsWith("_type"))) {
                                 log.debug(typeName);
                                 flds.put(name, typeName);
                                 break;

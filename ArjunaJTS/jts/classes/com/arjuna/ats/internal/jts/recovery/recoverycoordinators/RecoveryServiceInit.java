@@ -24,9 +24,7 @@
  */
 package com.arjuna.ats.internal.jts.recovery.recoverycoordinators;
 
-
-public interface RecoveryServiceInit 
-{
+public interface RecoveryServiceInit {
 
     boolean startRCservice();
 

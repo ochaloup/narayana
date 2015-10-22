@@ -1,6 +1,5 @@
 package org.jboss.narayana.rest.integration.api;
 
-
 /**
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
@@ -25,16 +24,16 @@ public class HeuristicException extends Exception {
         final String message = "Heuristic exception was thrown with heuristic type: ";
 
         switch (heuristicType) {
-            case HEURISTIC_COMMIT:
+            case HEURISTIC_COMMIT :
                 return message + "heuristic commit";
 
-            case HEURISTIC_HAZARD:
+            case HEURISTIC_HAZARD :
                 return message + "heuristic hazard";
 
-            case HEURISTIC_MIXED:
+            case HEURISTIC_MIXED :
                 return message + "heuristic mixed";
 
-            case HEURISTIC_ROLLBACK:
+            case HEURISTIC_ROLLBACK :
                 return message + "heuristic rollback";
         }
 

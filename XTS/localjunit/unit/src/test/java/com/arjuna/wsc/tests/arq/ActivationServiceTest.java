@@ -48,42 +48,35 @@ public class ActivationServiceTest extends BaseWSCTest {
     }
 
     @Test
-    public void testKnownCoordinationType()
-            throws Exception
-            {
-        final String messageID = "testKnownCoordinationType" ;
-        final String coordinationTypeURI = TestUtil.COORDINATION_TYPE ;
+    public void testKnownCoordinationType() throws Exception {
+        final String messageID = "testKnownCoordinationType";
+        final String coordinationTypeURI = TestUtil.COORDINATION_TYPE;
 
-        try
-        {
-            final CoordinationContextType coordinationContext = ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageID, coordinationTypeURI, null, null) ;
+        try {
+            final CoordinationContextType coordinationContext = ActivationCoordinator.createCoordinationContext(
+                    TestUtil11.activationCoordinatorService, messageID, coordinationTypeURI, null, null);
 
             assertNotNull(coordinationContext);
-            assertNotNull(coordinationContext.getCoordinationType()) ;
+            assertNotNull(coordinationContext.getCoordinationType());
             assertEquals(TestUtil.COORDINATION_TYPE, coordinationContext.getCoordinationType());
-            assertNotNull(coordinationContext.getRegistrationService()) ;
-        }
-        catch (final Throwable th)
-        {
+            assertNotNull(coordinationContext.getRegistrationService());
+        } catch (final Throwable th) {
             fail("Unexpected exception: " + th);
         }
-            }
+    }
 
     @Test
-    public void testUnknownCoordinationType()
-            throws Exception
-            {
-        final String messageID = "testUnknownCoordinationType" ;
-        final String coordinationTypeURI = TestUtil.UNKNOWN_COORDINATION_TYPE ;
-        try
-        {
-            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageID, coordinationTypeURI, null, null) ;
+    public void testUnknownCoordinationType() throws Exception {
+        final String messageID = "testUnknownCoordinationType";
+        final String coordinationTypeURI = TestUtil.UNKNOWN_COORDINATION_TYPE;
+        try {
+            ActivationCoordinator.createCoordinationContext(TestUtil11.activationCoordinatorService, messageID,
+                    coordinationTypeURI, null, null);
+            fail("Expected exception: InvalidCreateParametersException");
+        } catch (final InvalidCreateParametersException icpe) {
+        } // Ignore, expected
+        catch (final Throwable th) {
             fail("Expected exception: InvalidCreateParametersException");
         }
-        catch (final InvalidCreateParametersException icpe) {} // Ignore, expected
-        catch (final Throwable th)
-        {
-            fail("Expected exception: InvalidCreateParametersException");
-        }
-            }
+    }
 }

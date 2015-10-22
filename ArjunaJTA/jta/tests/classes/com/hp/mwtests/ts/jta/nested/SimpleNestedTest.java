@@ -39,14 +39,13 @@ import org.junit.Test;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.hp.mwtests.ts.jta.common.TestResource;
 
-public class SimpleNestedTest
-{
+public class SimpleNestedTest {
     @Test
-    public void testEnabled () throws Exception
-    {
+    public void testEnabled() throws Exception {
         jtaPropertyManager.getJTAEnvironmentBean().setSupportSubtransactions(true);
 
-        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         transactionManager.begin();
 
@@ -65,5 +64,6 @@ public class SimpleNestedTest
         transactionManager.commit();
     }
 
-    // testDisabled moved to its own class, as it needs separate jvm to allow different property value in static init.
+    // testDisabled moved to its own class, as it needs separate jvm to allow
+    // different property value in static init.
 }

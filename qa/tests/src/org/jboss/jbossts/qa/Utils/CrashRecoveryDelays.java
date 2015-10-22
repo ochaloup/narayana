@@ -33,8 +33,7 @@ import java.net.Socket;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2009-09
  */
-public class CrashRecoveryDelays
-{
+public class CrashRecoveryDelays {
     public static void awaitRecoveryArjunaCore() throws InterruptedException {
         doRecovery();
     }
@@ -48,7 +47,8 @@ public class CrashRecoveryDelays
     }
 
     public static void awaitRecoveryCR08(int num_clients) throws InterruptedException {
-        // due to the way CachedRecoveredTransaction/StatusChecker handle TRANSIENT some of these tests need two passes
+        // due to the way CachedRecoveredTransaction/StatusChecker handle
+        // TRANSIENT some of these tests need two passes
         awaitRecovery(2, num_clients);
     }
 
@@ -64,35 +64,36 @@ public class CrashRecoveryDelays
         awaitRecovery(2, 1);
     }
 
-/*
-    // old, slow method - sleep long enough to ensure periodic cr will have occurred.
-    private static void awaitRecovery(int num_cycles, int num_clients) throws InterruptedException
-    {
-        // Note: this assumes the client is running with the same config as the rec mgr process.
-        RecoveryEnvironmentBean recoveryEnvironmentBean = recoveryPropertyManager.getRecoveryEnvironmentBean();
-        int recoveryCycleTime = recoveryEnvironmentBean.getPeriodicRecoveryPeriod()+recoveryEnvironmentBean.getRecoveryBackoffPeriod();
-        // this timing may be a little tight on some older/busy systems
-        // consider increasing the per-client fudge factor a bit...
-        int delay = ((num_cycles*recoveryCycleTime)+(num_clients*10))*1000;
-        System.out.println("Sleeping for " + delay + " ms.");
-        Thread.sleep(delay);
-    }
-*/
+    /*
+     * // old, slow method - sleep long enough to ensure periodic cr will have
+     * occurred. private static void awaitRecovery(int num_cycles, int
+     * num_clients) throws InterruptedException { // Note: this assumes the
+     * client is running with the same config as the rec mgr process.
+     * RecoveryEnvironmentBean recoveryEnvironmentBean =
+     * recoveryPropertyManager.getRecoveryEnvironmentBean(); int
+     * recoveryCycleTime = recoveryEnvironmentBean.getPeriodicRecoveryPeriod()+
+     * recoveryEnvironmentBean.getRecoveryBackoffPeriod(); // this timing may be
+     * a little tight on some older/busy systems // consider increasing the
+     * per-client fudge factor a bit... int delay =
+     * ((num_cycles*recoveryCycleTime)+(num_clients*10))*1000;
+     * System.out.println("Sleeping for " + delay + " ms.");
+     * Thread.sleep(delay); }
+     */
 
-    private static void awaitRecovery(int num_cycles, int num_clients) throws InterruptedException
-    {
-        num_cycles *= getDelayFactor(); // on some machines we may need to wait longer for recovery to complete
+    private static void awaitRecovery(int num_cycles, int num_clients) throws InterruptedException {
+        num_cycles *= getDelayFactor(); // on some machines we may need to wait
+                                        // longer for recovery to complete
 
-        for(int i = 0; i < num_cycles; i++) {
+        for (int i = 0; i < num_cycles; i++) {
             if (i != 0)
-                awaitReplayCompletion(5); // add a delay to accommodate slower test machines
+                awaitReplayCompletion(5); // add a delay to accommodate slower
+                                            // test machines
             doRecovery();
         }
     }
 
     // prod the recovery manager via its socket. This avoid any sleep delay.
-    private static void doRecovery() throws InterruptedException
-    {
+    private static void doRecovery() throws InterruptedException {
         int port = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryPort();
         String host = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryAddress();
 
@@ -100,9 +101,8 @@ public class CrashRecoveryDelays
         PrintStream out = null;
         Socket sckt = null;
 
-        try
-        {
-            sckt = new Socket(host,port);
+        try {
+            sckt = new Socket(host, port);
 
             in = new BufferedReader(new InputStreamReader(sckt.getInputStream()));
             out = new PrintStream(sckt.getOutputStream());
@@ -114,32 +114,27 @@ public class CrashRecoveryDelays
             // Receive pong message
             String inMessage = in.readLine();
 
-            if(!inMessage.equals("DONE")) {
-                System.err.println("Recovery failed with message: "+inMessage);
+            if (!inMessage.equals("DONE")) {
+                System.err.println("Recovery failed with message: " + inMessage);
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             try {
-                if ( in != null )
-                {
+                if (in != null) {
                     in.close();
                 }
 
-                if ( out != null )
-                {
+                if (out != null) {
                     out.close();
                 }
 
                 if (sckt != null)
                     sckt.close();
-            } catch(Exception e) {}
+            } catch (Exception e) {
+            }
         }
-   }
+    }
 
     /////////////////
 
@@ -153,7 +148,7 @@ public class CrashRecoveryDelays
 
     public static void awaitReplayCompletionCR02() throws InterruptedException {
         awaitRecovery(1, 1);
-        //awaitReplayCompletion(5); // was 60
+        // awaitReplayCompletion(5); // was 60
     }
 
     public static void awaitReplayCompletionCR02(int scaleFactor) throws InterruptedException {
@@ -162,7 +157,7 @@ public class CrashRecoveryDelays
 
     public static void awaitReplayCompletionCR05() throws InterruptedException {
         awaitRecovery(1, 1);
-        //awaitReplayCompletion(10); // was 60
+        // awaitReplayCompletion(10); // was 60
     }
 
     public static void awaitReplayCompletionCR05(int scaleFactor) throws InterruptedException {
@@ -173,8 +168,7 @@ public class CrashRecoveryDelays
         awaitReplayCompletion(10); // was 5
     }
 
-    private static void awaitReplayCompletion(int seconds) throws InterruptedException
-    {
+    private static void awaitReplayCompletion(int seconds) throws InterruptedException {
         Thread.sleep(getDelayFactor() * seconds * 1000);
     }
 

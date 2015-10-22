@@ -20,9 +20,7 @@ public class SuspendTransactionTest {
     }
 
     @Test
-    public void testSuspendTransaction()
-            throws Exception
-            {
+    public void testSuspendTransaction() throws Exception {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
 
@@ -30,6 +28,6 @@ public class SuspendTransactionTest {
 
         TxContext ctx = tm.suspend();
 
-        System.out.println("Suspended: "+ctx);
-            }
+        System.out.println("Suspended: " + ctx);
+    }
 }

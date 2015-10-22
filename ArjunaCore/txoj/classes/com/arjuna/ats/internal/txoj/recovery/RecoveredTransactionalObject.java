@@ -69,24 +69,20 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  * uncommitted.
  */
 
-public class RecoveredTransactionalObject extends StateManager
-{
-    protected RecoveredTransactionalObject(Uid objectUid, String originalType, ParticipantStore participantStore)
-    {
+public class RecoveredTransactionalObject extends StateManager {
+    protected RecoveredTransactionalObject(Uid objectUid, String originalType, ParticipantStore participantStore) {
         _ourUid = objectUid;
         _type = originalType;
         _participantStore = participantStore;
         _transactionStatusConnectionMgr = new TransactionStatusConnectionManager();
 
         if (txojLogger.logger.isDebugEnabled()) {
-            txojLogger.logger.debug("RecoveredTransactionalObject created for "+_ourUid);
+            txojLogger.logger.debug("RecoveredTransactionalObject created for " + _ourUid);
         }
     }
 
-    protected final void replayPhase2 ()
-    {
-        if (findHoldingTransaction())
-        {
+    protected final void replayPhase2() {
+        if (findHoldingTransaction()) {
             /*
              * There is a transaction holding this in uncommitted state find out
              * what the Status is. We have no idea what type of transaction it
@@ -94,14 +90,14 @@ public class RecoveredTransactionalObject extends StateManager
              */
 
             if (txojLogger.logger.isDebugEnabled()) {
-                txojLogger.logger.debug("TO held by transaction "+_owningTransactionUid);
+                txojLogger.logger.debug("TO held by transaction " + _owningTransactionUid);
             }
 
-            int tranStatus = _transactionStatusConnectionMgr
-                    .getTransactionStatus(_owningTransactionUid);
+            int tranStatus = _transactionStatusConnectionMgr.getTransactionStatus(_owningTransactionUid);
 
             if (txojLogger.logger.isDebugEnabled()) {
-                txojLogger.logger.debug("RecoveredTransactionalObject - transaction status "+ActionStatus.stringForm(tranStatus));
+                txojLogger.logger.debug(
+                        "RecoveredTransactionalObject - transaction status " + ActionStatus.stringForm(tranStatus));
             }
 
             boolean inactive = false;
@@ -109,9 +105,9 @@ public class RecoveredTransactionalObject extends StateManager
             if (tranStatus == ActionStatus.INVALID) // should be
                                                     // ActionStatus.NO_ACTION
             {
-                if (txojLogger.logger.isDebugEnabled())
-                {
-                    txojLogger.logger.debug("transaction Status from original application "+Integer.toString(tranStatus)+" and inactive: "+inactive);
+                if (txojLogger.logger.isDebugEnabled()) {
+                    txojLogger.logger.debug("transaction Status from original application "
+                            + Integer.toString(tranStatus) + " and inactive: " + inactive);
                 }
 
                 inactive = true;
@@ -124,17 +120,14 @@ public class RecoveredTransactionalObject extends StateManager
              * eventually.
              */
 
-            if ((tranStatus == ActionStatus.ABORTED) || inactive)
-            {
+            if ((tranStatus == ActionStatus.ABORTED) || inactive) {
                 rollback();
-            }
-            else
+            } else
                 commit();
-        }
-        else
-        {
+        } else {
             if (txojLogger.logger.isDebugEnabled()) {
-                txojLogger.logger.debug("RecoveredTransactionalObject.replayPhase2 - cannot find/no holding transaction");
+                txojLogger.logger
+                        .debug("RecoveredTransactionalObject.replayPhase2 - cannot find/no holding transaction");
             }
         }
     }
@@ -144,18 +137,14 @@ public class RecoveredTransactionalObject extends StateManager
      * if there is such a transaction
      */
 
-    private final boolean findHoldingTransaction ()
-    {
+    private final boolean findHoldingTransaction() {
         InputObjectState uncommittedState = null;
 
         _originalProcessUid = new Uid(Uid.nullUid());
 
-        try
-        {
+        try {
             uncommittedState = _participantStore.read_uncommitted(_ourUid, _type);
-        }
-        catch (ObjectStoreException e)
-        {
+        } catch (ObjectStoreException e) {
             txojLogger.i18NLogger.warn_recovery_RecoveredTransactionalObject_6(e);
 
             return false; // probably
@@ -169,49 +158,39 @@ public class RecoveredTransactionalObject extends StateManager
         _originalProcessUid = null;
         _owningTransactionUid = null;
 
-        try
-        {
+        try {
             Header hdr = new Header();
-            
+
             unpackHeader(uncommittedState, hdr);
 
             _originalProcessUid = hdr.getProcessId();
             _owningTransactionUid = hdr.getTxId();
-            
+
             if (txojLogger.logger.isDebugEnabled()) {
-                txojLogger.logger.debug("RecoveredTransactionalObject::findHoldingTransaction - uid is "+_owningTransactionUid);
+                txojLogger.logger.debug(
+                        "RecoveredTransactionalObject::findHoldingTransaction - uid is " + _owningTransactionUid);
             }
 
             return _owningTransactionUid.notEquals(Uid.nullUid());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             txojLogger.i18NLogger.warn_recovery_RecoveredTransactionalObject_8(e);
         }
 
         return false;
     }
 
-    private final void rollback ()
-    {
-        try
-        {
+    private final void rollback() {
+        try {
             _participantStore.remove_uncommitted(_ourUid, _type);
-        }
-        catch (ObjectStoreException e)
-        {
+        } catch (ObjectStoreException e) {
             txojLogger.i18NLogger.warn_recovery_RecoveredTransactionalObject_9(_ourUid, e);
         }
     }
 
-    private final void commit ()
-    {
-        try
-        {
+    private final void commit() {
+        try {
             _participantStore.commit_state(_ourUid, _type);
-        }
-        catch (ObjectStoreException e)
-        {
+        } catch (ObjectStoreException e) {
             txojLogger.i18NLogger.warn_recovery_RecoveredTransactionalObject_10(_ourUid, e);
         }
     }

@@ -36,10 +36,10 @@ import static org.jboss.logging.annotations.Message.Format.*;
 public interface wstI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 43001, value = "Invalid outcome enumeration: {0}", format = MESSAGE_FORMAT)
@@ -92,21 +92,25 @@ public interface wstI18NLogger {
 
     @Message(id = 43017, value = "Unexpected exception while sending InvalidStateFault to participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43018, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_4();
 
-//    @Message(id = 43019, value = "Unexpected exception while sending Faulted", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_CoordinatorCompletionCoordinatorProcessorImpl_sendFaulted_1();
+    // @Message(id = 43019, value = "Unexpected exception while sending
+    // Faulted", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_CoordinatorCompletionCoordinatorProcessorImpl_sendFaulted_1();
 
     @Message(id = 43020, value = "Complete called on unknown participant", format = MESSAGE_FORMAT)
     public String get_messaging_CoordinatorCompletionParticipantProcessorImpl_complete_3();
 
     @Message(id = 43021, value = "Unexpected exception while sending InvalidStateFault to coordinator for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43022, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_4();
@@ -166,24 +170,32 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_messaging_CoordinatorProcessorImpl_soapFault_2(String arg0);
 
-//    @Message(id = 43037, value = "Ignoring completed called on unidentified coordinator until recovery pass is complete: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_ParticipantCompletionCoordinatorProcessorImpl_completed_3(String arg0);
+    // @Message(id = 43037, value = "Ignoring completed called on unidentified
+    // coordinator until recovery pass is complete: {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_ParticipantCompletionCoordinatorProcessorImpl_completed_3(String
+    // arg0);
 
     @Message(id = 43038, value = "Unexpected exception while sending InvalidStateFault to participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43039, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_4();
 
-//    @Message(id = 43040, value = "Unexpected exception while sending Faulted", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_ParticipantCompletionCoordinatorProcessorImpl_sendFaulted_1();
+    // @Message(id = 43040, value = "Unexpected exception while sending
+    // Faulted", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_ParticipantCompletionCoordinatorProcessorImpl_sendFaulted_1();
 
     @Message(id = 43041, value = "Unexpected exception while sending InvalidStateFault to coordinator for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43042, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_4();
@@ -216,9 +228,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_messaging_ParticipantProcessorImpl_prepare_2(String arg0);
 
-//    @Message(id = 43050, value = "Prepare request dropped pending WS-AT participant recovery manager initialization for participant: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_ParticipantProcessorImpl_prepare_3(String arg0);
+    // @Message(id = 43050, value = "Prepare request dropped pending WS-AT
+    // participant recovery manager initialization for participant: {0}", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_messaging_ParticipantProcessorImpl_prepare_3(String
+    // arg0);
 
     @Message(id = 43051, value = "Unexpected exception thrown from rollback", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -278,25 +293,37 @@ public interface wstI18NLogger {
     @Message(id = 43067, value = "Unknown error", format = MESSAGE_FORMAT)
     public String get_messaging_TerminatorParticipantProcessorImpl_8();
 
-//    @Message(id = 43068, value = "Unable to write recovery record during completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_completed_1(String arg0);
+    // @Message(id = 43068, value = "Unable to write recovery record during
+    // completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_CoordinatorCompletionParticipantEngine_completed_1(String
+    // arg0);
 
-//    @Message(id = 43069, value = "Unable to delete recovery record during completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_completed_2(String arg0);
+    // @Message(id = 43069, value = "Unable to delete recovery record during
+    // completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_CoordinatorCompletionParticipantEngine_completed_2(String
+    // arg0);
 
-//    @Message(id = 43070, value = "Unable to delete recovery record during close for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeClose_2(String arg0);
+    // @Message(id = 43070, value = "Unable to delete recovery record during
+    // close for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeClose_2(String
+    // arg0);
 
     @Message(id = 43071, value = "Faulted exception from participant compensate for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_1(Throwable arg0);
 
-//    @Message(id = 43072, value = "Unable to delete recovery record during compensate for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_3(String arg0);
+    // @Message(id = 43072, value = "Unable to delete recovery record during
+    // compensate for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_3(String
+    // arg0);
 
     @Message(id = 43073, value = "Unable to write log record during participant complete for WS-BA  parfticipant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -306,9 +333,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_faulted_1(String arg0);
 
-//    @Message(id = 43075, value = "Unknown error: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_CoordinatorCompletionParticipantEngine_getStatus_1(String arg0);
+    // @Message(id = 43075, value = "Unknown error: {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_CoordinatorCompletionParticipantEngine_getStatus_1(String
+    // arg0);
 
     @Message(id = 43076, value = "Unable to delete recovery record during soapFault processing for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -353,9 +383,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_messaging_engines_ParticipantCompletionParticipantEngine_faulted_1(String arg0);
 
-//    @Message(id = 43087, value = "Unknown error: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_ParticipantCompletionParticipantEngine_getStatus_1(String arg0);
+    // @Message(id = 43087, value = "Unknown error: {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_ParticipantCompletionParticipantEngine_getStatus_1(String
+    // arg0);
 
     @Message(id = 43088, value = "Unable to delete recovery record during soapFault processing for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -377,9 +410,11 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_messaging_engines_ParticipantEngine_commitDecision_3(String arg0);
 
-//    @Message(id = 43093, value = "Unexpected result from participant prepare: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_messaging_engines_ParticipantEngine_executePrepare_2(String arg0);
+    // @Message(id = 43093, value = "Unexpected result from participant prepare:
+    // {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_messaging_engines_ParticipantEngine_executePrepare_2(String arg0);
 
     @Message(id = 43094, value = "could not delete recovery record for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -440,7 +475,8 @@ public interface wstI18NLogger {
 
     @Message(id = 43110, value = "Unexpected exception while sending InvalidStateFault to participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_wst11_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_wst11_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43111, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_wst11_messaging_CoordinatorCompletionCoordinatorProcessorImpl_getStatus_4();
@@ -481,9 +517,11 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_compensate_5(String arg0);
 
-//    @Message(id = 43121, value = "Complete called on unknown participant", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_complete_3();
+    // @Message(id = 43121, value = "Complete called on unknown participant",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_complete_3();
 
     @Message(id = 43122, value = "Complete request dropped pending WS-BA participant recovery manager initialization for participant: {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -497,17 +535,23 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_complete_6(String arg0);
 
-//    @Message(id = 43125, value = "Unexpected exception thrown from failed:", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_failed_1();
+    // @Message(id = 43125, value = "Unexpected exception thrown from failed:",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_failed_1();
 
-//    @Message(id = 43126, value = "Failed called on unknown participant: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_failed_2(String arg0);
+    // @Message(id = 43126, value = "Failed called on unknown participant: {0}",
+    // format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_failed_2(String
+    // arg0);
 
     @Message(id = 43127, value = "Unexpected exception while sending InvalidStateFault to coordinator for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43128, value = "GetStatus requested for unknown coordinator completion participant", format = MESSAGE_FORMAT)
     public String get_wst11_messaging_CoordinatorCompletionParticipantProcessorImpl_getStatus_4();
@@ -559,17 +603,23 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_CoordinatorProcessorImpl_soapFault_2(String arg0);
 
-//    @Message(id = 43141, value = "Unexpected exception thrown from cannot complete:", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_cannotComplete_1();
+    // @Message(id = 43141, value = "Unexpected exception thrown from cannot
+    // complete:", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_cannotComplete_1();
 
-//    @Message(id = 43142, value = "Cannot complete called on unknown coordinator: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_cannotComplete_2(String arg0);
+    // @Message(id = 43142, value = "Cannot complete called on unknown
+    // coordinator: {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_cannotComplete_2(String
+    // arg0);
 
     @Message(id = 43143, value = "Unexpected exception while sending InvalidStateFault to participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43144, value = "GetStatus requested for unknown participant completion participant", format = MESSAGE_FORMAT)
     public String get_wst11_messaging_ParticipantCompletionCoordinatorProcessorImpl_getStatus_4();
@@ -612,7 +662,8 @@ public interface wstI18NLogger {
 
     @Message(id = 43154, value = "Unexpected exception while sending InvalidStateFault to coordinator for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = INFO)
-    public void info_wst11_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_3(String arg0, @Cause() Throwable arg1);
+    public void info_wst11_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43155, value = "GetStatus requested for unknown participant completion participant", format = MESSAGE_FORMAT)
     public String get_wst11_messaging_ParticipantCompletionParticipantProcessorImpl_getStatus_4();
@@ -706,21 +757,33 @@ public interface wstI18NLogger {
     @Message(id = 43180, value = "Invalid coordinator completion coordinator state", format = MESSAGE_FORMAT)
     public String get_wst11_messaging_engines_CoordinatorCompletionCoordinatorEngine_sendInvalidStateFault_2();
 
-//    @Message(id = 43181, value = "Unable to write recovery record during completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_completed_1(String arg0);
+    // @Message(id = 43181, value = "Unable to write recovery record during
+    // completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_completed_1(String
+    // arg0);
 
-//    @Message(id = 43182, value = "Unable to delete recovery record during completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_completed_2(String arg0);
+    // @Message(id = 43182, value = "Unable to delete recovery record during
+    // completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_completed_2(String
+    // arg0);
 
-//    @Message(id = 43183, value = "Unable to delete recovery record during close for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_executeClose_2(String arg0);
+    // @Message(id = 43183, value = "Unable to delete recovery record during
+    // close for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_executeClose_2(String
+    // arg0);
 
-//    @Message(id = 43184, value = "Unable to delete recovery record during compensate for WS-BA participant {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_3(String arg0);
+    // @Message(id = 43184, value = "Unable to delete recovery record during
+    // compensate for WS-BA participant {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_executeCompensate_3(String
+    // arg0);
 
     @Message(id = 43185, value = "Unable to write log record during participant complete for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -730,9 +793,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_failed_1(String arg0);
 
-//    @Message(id = 43187, value = "Unknown error: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_getStatus_1(String arg0);
+    // @Message(id = 43187, value = "Unknown error: {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_CoordinatorCompletionParticipantEngine_getStatus_1(String
+    // arg0);
 
     @Message(id = 43188, value = "Unable to delete recovery record during soapFault processing for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -751,7 +817,8 @@ public interface wstI18NLogger {
 
     @Message(id = 43192, value = "Unexpected exception while sending UnknownTransaction for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_wst11_messaging_engines_CoordinatorEngine_sendUnknownTransaction_2(String arg0, @Cause() Throwable arg1);
+    public void warn_wst11_messaging_engines_CoordinatorEngine_sendUnknownTransaction_2(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43193, value = "Unable to write recovery record during completed for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -773,9 +840,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_engines_ParticipantCompletionParticipantEngine_failed_1(String arg0);
 
-//    @Message(id = 43198, value = "Unknown error: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_ParticipantCompletionParticipantEngine_getStatus_1(String arg0);
+    // @Message(id = 43198, value = "Unknown error: {0}", format =
+    // MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_ParticipantCompletionParticipantEngine_getStatus_1(String
+    // arg0);
 
     @Message(id = 43199, value = "Unable to delete recovery record during soapFault processing for WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -789,9 +859,11 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_engines_ParticipantCompletionParticipantEngine_soapFault_3(String arg0);
 
-//    @Message(id = 43202, value = "Exception rolling back participant", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_ParticipantEngine_commitDecision_1();
+    // @Message(id = 43202, value = "Exception rolling back participant", format
+    // = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_ParticipantEngine_commitDecision_1();
 
     @Message(id = 43203, value = "Unable to delete recovery record during prepare for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -801,9 +873,12 @@ public interface wstI18NLogger {
     @LogMessage(level = WARN)
     public void warn_wst11_messaging_engines_ParticipantEngine_commitDecision_3(String arg0);
 
-//    @Message(id = 43205, value = "Unexpected result from participant prepare: {0}", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_wst11_messaging_engines_ParticipantEngine_executePrepare_2(String arg0);
+    // @Message(id = 43205, value = "Unexpected result from participant prepare:
+    // {0}", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void
+    // warn_wst11_messaging_engines_ParticipantEngine_executePrepare_2(String
+    // arg0);
 
     @Message(id = 43206, value = "could not delete recovery record for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -849,11 +924,13 @@ public interface wstI18NLogger {
 
     @Message(id = 43217, value = "XML stream exception restoring recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_restoreState_1(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_restoreState_1(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43218, value = "I/O exception saving restoring state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_restoreState_2(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_restoreState_2(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43219, value = "Could not save recovery state for non-serializable durable WS-AT participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -861,22 +938,26 @@ public interface wstI18NLogger {
 
     @Message(id = 43220, value = "XML stream exception saving recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_saveState_2(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_saveState_2(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43221, value = "I/O exception saving recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_saveState_3(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_at_ATParticipantRecoveryRecord_saveState_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43222, value = "participant {0} has no saved recovery state to recover", format = MESSAGE_FORMAT)
     public String get_recovery_participant_ba_BAParticipantRecoveryRecord_restoreParticipant_1(String arg0);
 
     @Message(id = 43223, value = "XML stream exception restoring recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_restoreState_1(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_restoreState_1(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43224, value = "I/O exception saving restoring state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_restoreState_2(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_restoreState_2(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43225, value = "Could not save recovery state for non-serializable WS-BA participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -884,11 +965,13 @@ public interface wstI18NLogger {
 
     @Message(id = 43226, value = "XML stream exception saving recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_saveState_2(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_saveState_2(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43227, value = "I/O exception saving recovery state for participant {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_saveState_3(String arg0, @Cause() Throwable arg1);
+    public void warn_recovery_participant_ba_BAParticipantRecoveryRecord_saveState_3(String arg0,
+            @Cause() Throwable arg1);
 
     @Message(id = 43228, value = "SystemException thrown from rollback: {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
@@ -935,14 +1018,14 @@ public interface wstI18NLogger {
     public void warn_messaging_engines_ParticipantCompletionParticipantEngine_executeClose_1(Throwable arg0);
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in numeric sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in numeric sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
      */
 }

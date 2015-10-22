@@ -45,38 +45,30 @@ import com.arjuna.ats.internal.txoj.abstractrecords.LockRecord;
  * @since JTS 1.0.
  */
 
-class LockRecordTypeMap implements RecordTypeMap
-{
+class LockRecordTypeMap implements RecordTypeMap {
     @SuppressWarnings("unchecked")
-    public Class getRecordClass ()
-    {
+    public Class getRecordClass() {
         return LockRecord.class;
     }
-    
-    public int getType ()
-    {
+
+    public int getType() {
         return RecordType.LOCK;
     }
 }
 
-public class Implementations
-{
-    public static synchronized boolean added ()
-    {
+public class Implementations {
+    public static synchronized boolean added() {
         return _added;
     }
 
-    public static synchronized void initialise ()
-    {
-        if (!_added)
-        {
+    public static synchronized void initialise() {
+        if (!_added) {
             RecordTypeManager.manager().add(new LockRecordTypeMap());
             _added = true;
         }
     }
 
-    private Implementations()
-    {
+    private Implementations() {
     }
 
     private static boolean _added = false;
@@ -84,8 +76,7 @@ public class Implementations
     /**
      * Static block triggers initialisation of lock record type map.
      */
-    static
-    {
+    static {
         initialise();
     }
 

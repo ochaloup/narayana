@@ -48,75 +48,62 @@ import com.arjuna.ats.jdbc.TransactionalDriver;
  * user/password/url/dynamic_class options. If the connection we have cached
  * has been closed, then create a new one.
  */
-public class ConnectionManager
-{
+public class ConnectionManager {
 
     /*
      * Connections are pooled for the duration of a transaction.
      */
-    public static synchronized Connection create (String dbUrl, Properties info) throws SQLException
-    {
+    public static synchronized Connection create(String dbUrl, Properties info) throws SQLException {
         String user = info.getProperty(TransactionalDriver.userName);
         String passwd = info.getProperty(TransactionalDriver.password);
         String dynamic = info.getProperty(TransactionalDriver.dynamicClass);
         String poolConnections = info.getProperty(TransactionalDriver.poolConnections, "true");
-        
+
         if (dynamic == null)
             dynamic = "";
 
         boolean poolingEnabled = "true".equalsIgnoreCase(poolConnections);
-        
-        if (poolingEnabled)
-        {
+
+        if (poolingEnabled) {
             Iterator<ConnectionImple> iterator = _connections.iterator();
-            while (iterator.hasNext())
-            {
+            while (iterator.hasNext()) {
                 ConnectionImple conn = iterator.next();
                 ConnectionControl connControl = conn.connectionControl();
                 TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
                 Transaction tx1, tx2 = null;
 
                 tx1 = connControl.transaction();
-                try
-                {
+                try {
                     tx2 = tm.getTransaction();
-                }
-                catch (javax.transaction.SystemException se)
-                {
+                } catch (javax.transaction.SystemException se) {
                     /* Ignore: tx2 is null already */
                 }
 
                 /* Check transaction and database connection. */
-                if ((tx1 != null && tx1.equals(tx2))
-                        && connControl.url().equals(dbUrl)
-                        && connControl.user().equals(user)
-                        && connControl.password().equals(passwd)
-                        && connControl.dynamicClass().equals(dynamic))
-                {
-                    try
-                    {
+                if ((tx1 != null && tx1.equals(tx2)) && connControl.url().equals(dbUrl)
+                        && connControl.user().equals(user) && connControl.password().equals(passwd)
+                        && connControl.dynamicClass().equals(dynamic)) {
+                    try {
                         /*
                          * Should not overload the meaning of closed. Change!
                          */
 
-                        if (!conn.isClosed())
-                        {
-                            // ConnectionImple does not actually implement Connection, but its
-                            // concrete child classes do. See ConnectionImple javadoc.
-                            return (Connection)conn;
+                        if (!conn.isClosed()) {
+                            // ConnectionImple does not actually implement
+                            // Connection, but its
+                            // concrete child classes do. See ConnectionImple
+                            // javadoc.
+                            return (Connection) conn;
                         }
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                         SQLException sqlException = new SQLException(ex.getMessage());
                         sqlException.initCause(ex);
                         throw sqlException;
                     }
-                }
-                else
-                {
-                    // no longer being used by a transaction, so let's discard. JBTM-764
+                } else {
+                    // no longer being used by a transaction, so let's discard.
+                    // JBTM-764
 
                     if (tx1 == null)
                         iterator.remove();
@@ -127,20 +114,19 @@ public class ConnectionManager
         ConnectionImple conn = new ConnectionImple(dbUrl, info);
 
         /*
-       * Will replace any old (closed) connection which had the
-       * same connection information.
-       */
+         * Will replace any old (closed) connection which had the same
+         * connection information.
+         */
 
         if (poolingEnabled)
             _connections.add(conn);
 
         // ConnectionImple does not actually implement Connection, but its
         // concrete child classes do. See ConnectionImple javadoc.
-        return (Connection)conn;
+        return (Connection) conn;
     }
 
-    public static synchronized void remove (ConnectionImple conn)
-    {
+    public static synchronized void remove(ConnectionImple conn) {
         _connections.remove(conn);
     }
 

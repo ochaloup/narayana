@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.RawSubtransactionAwareResources02Clients3;
  * $Id: Client005.java,v 1.2 2003/06/26 11:45:04 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawSubtransactionAwareResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -64,12 +63,9 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 
-public class Client005
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client005 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -94,13 +90,10 @@ public class Client005
 
             OTS.current().rollback_only();
 
-            try
-            {
+            try {
                 OTS.current().commit(false);
                 correct = false;
-            }
-            catch (TRANSACTION_ROLLEDBACK transactionRolledback)
-            {
+            } catch (TRANSACTION_ROLLEDBACK transactionRolledback) {
             }
 
             OTS.current().commit(true);
@@ -109,33 +102,28 @@ public class Client005
             correct = correct && service2.is_correct();
             correct = correct && service3.is_correct();
 
-            correct = correct && (service1.get_subtransaction_aware_resource_trace(0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
-            correct = correct && (service2.get_subtransaction_aware_resource_trace(0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
-            correct = correct && (service3.get_subtransaction_aware_resource_trace(0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
+            correct = correct && (service1.get_subtransaction_aware_resource_trace(
+                    0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
+            correct = correct && (service2.get_subtransaction_aware_resource_trace(
+                    0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
+            correct = correct && (service3.get_subtransaction_aware_resource_trace(
+                    0) == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client005.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client005.main: " + exception);
             exception.printStackTrace(System.err);
         }

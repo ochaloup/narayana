@@ -23,9 +23,7 @@ public class CompensateTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoBusinessParticipant.class,
-                ParticipantCompletionCoordinatorRules.class);
+        return WarDeployment.getDeployment(DemoBusinessParticipant.class, ParticipantCompletionCoordinatorRules.class);
     }
 
     @BeforeClass()
@@ -39,9 +37,7 @@ public class CompensateTest {
     }
 
     @Test
-    public void testCompensate()
-            throws Exception
-            {
+    public void testCompensate() throws Exception {
         ParticipantCompletionCoordinatorRules.setParticipantCount(1);
 
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
@@ -58,7 +54,7 @@ public class CompensateTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
@@ -66,5 +62,5 @@ public class CompensateTest {
         uba.cancel();
 
         assertTrue(p.passed());
-            }
+    }
 }

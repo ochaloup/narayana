@@ -41,19 +41,16 @@ import com.arjuna.ats.arjuna.TopLevelAction;
 import com.hp.mwtests.ts.txoj.common.exceptions.TestException;
 import com.hp.mwtests.ts.txoj.common.resources.AtomicObject;
 
-public class NestedTopLevelAction
-{
+public class NestedTopLevelAction {
     @Test
-    public void test()
-    {
+    public void test() {
         AtomicAction A = new AtomicAction();
         TopLevelAction B = new TopLevelAction();
         AtomicAction C = new AtomicAction();
         AtomicObject foo1 = new AtomicObject();
         AtomicObject foo2 = new AtomicObject();
 
-        try
-        {
+        try {
             A.begin();
 
             foo1.set(5);
@@ -92,9 +89,7 @@ public class NestedTopLevelAction
             assertEquals(7, val2);
 
             C.commit();
-        }
-        catch (TestException e)
-        {
+        } catch (TestException e) {
             A.abort();
             B.abort();
             C.abort();

@@ -51,13 +51,12 @@ import com.arjuna.ats.jta.TransactionManager;
 import com.arjuna.ats.jts.ExplicitInterposition;
 import com.arjuna.ats.jbossatx.logging.jbossatxLogger;
 
-
-
-
-public class PropagationContextManager implements
-        TransactionPropagationContextFactory,
-        TransactionPropagationContextImporter, ObjectFactory, Serializable
-{
+public class PropagationContextManager
+        implements
+            TransactionPropagationContextFactory,
+            TransactionPropagationContextImporter,
+            ObjectFactory,
+            Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -66,8 +65,7 @@ public class PropagationContextManager implements
      * thread is not associated with a transaction.
      */
 
-    public Object getTransactionPropagationContext ()
-    {
+    public Object getTransactionPropagationContext() {
         if (jbossatxLogger.logger.isTraceEnabled()) {
             jbossatxLogger.logger.trace("PropagationContextManager.getTransactionPropagationContext - called");
         }
@@ -75,31 +73,23 @@ public class PropagationContextManager implements
         final String threadId = ThreadUtil.getThreadId();
         ControlWrapper theControl;
 
-        if (threadId != null)
-        {
-            theControl = OTSImpleManager.current().contextManager().current(
-                    threadId);
-        }
-        else
-        {
+        if (threadId != null) {
+            theControl = OTSImpleManager.current().contextManager().current(threadId);
+        } else {
             theControl = OTSImpleManager.current().contextManager().current();
         }
 
-        try
-        {
-            final PropagationContext cxt = theControl.get_coordinator()
-                    .get_txcontext();
+        try {
+            final PropagationContext cxt = theControl.get_coordinator().get_txcontext();
             PropagationContextWrapper pcw = new PropagationContextWrapper(cxt);
 
             if (jbossatxLogger.logger.isTraceEnabled()) {
-                jbossatxLogger.logger.trace("PropagationContextManager.getTransactionPropagationContext() - returned tpc = "
-                        + pcw);
+                jbossatxLogger.logger
+                        .trace("PropagationContextManager.getTransactionPropagationContext() - returned tpc = " + pcw);
             }
 
             return pcw;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
         }
 
         return null;
@@ -111,29 +101,23 @@ public class PropagationContextManager implements
      * a type unknown to this factory.
      */
 
-    public Object getTransactionPropagationContext (Transaction tx)
-    {
+    public Object getTransactionPropagationContext(Transaction tx) {
         if (jbossatxLogger.logger.isTraceEnabled()) {
-            jbossatxLogger.logger.trace("PropagationContextManager.getTransactionPropagationContext(Transaction) - called tx = "
-                    + tx);
+            jbossatxLogger.logger.trace(
+                    "PropagationContextManager.getTransactionPropagationContext(Transaction) - called tx = " + tx);
         }
 
         Transaction oldTx = null;
         Object tpc = null;
-        javax.transaction.TransactionManager tm = TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = TransactionManager.transactionManager();
 
-        try
-        {
+        try {
             oldTx = tm.getTransaction();
 
-            if ((tx == null) || (tx.equals(oldTx)))
-            {
+            if ((tx == null) || (tx.equals(oldTx))) {
                 // we are being called in the context of this transaction
                 tpc = getTransactionPropagationContext();
-            }
-            else
-            {
+            } else {
                 tm.suspend();
                 tm.resume(tx);
 
@@ -142,15 +126,13 @@ public class PropagationContextManager implements
                 tm.suspend();
                 tm.resume(oldTx);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         if (jbossatxLogger.logger.isTraceEnabled()) {
-            jbossatxLogger.logger.trace("PropagationContextManager.getTransactionPropagationContext(Transaction) - returned tpc = "
-                    + tpc);
+            jbossatxLogger.logger.trace(
+                    "PropagationContextManager.getTransactionPropagationContext(Transaction) - returned tpc = " + tpc);
         }
 
         return tpc;
@@ -166,53 +148,42 @@ public class PropagationContextManager implements
      * <code>null</code>, or if it represents a <code>null</code> transaction.
      */
 
-    public Transaction importTransactionPropagationContext (Object tpc)
-    {
+    public Transaction importTransactionPropagationContext(Object tpc) {
         if (jbossatxLogger.logger.isTraceEnabled()) {
-            jbossatxLogger.logger.trace("PropagationContextManager.importTransactionPropagationContext(Object) - called tpc = "
-                    + tpc);
+            jbossatxLogger.logger.trace(
+                    "PropagationContextManager.importTransactionPropagationContext(Object) - called tpc = " + tpc);
         }
 
-        javax.transaction.TransactionManager tm = TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = TransactionManager.transactionManager();
 
-        if (tpc instanceof PropagationContextWrapper)
-        {
-            try
-            {
-                PropagationContext omgTpc = ((PropagationContextWrapper) tpc)
-                        .getPropagationContext();
-                ExplicitInterposition ei = new ExplicitInterposition(omgTpc,
-                        true);
+        if (tpc instanceof PropagationContextWrapper) {
+            try {
+                PropagationContext omgTpc = ((PropagationContextWrapper) tpc).getPropagationContext();
+                ExplicitInterposition ei = new ExplicitInterposition(omgTpc, true);
                 Transaction newTx = tm.getTransaction();
 
                 if (jbossatxLogger.logger.isTraceEnabled()) {
-                    jbossatxLogger.logger.trace("PropagationContextManager.importTransactionPropagationContext(Object) - transaction = "
-                            + newTx);
+                    jbossatxLogger.logger
+                            .trace("PropagationContextManager.importTransactionPropagationContext(Object) - transaction = "
+                                    + newTx);
                 }
 
                 ei.unregisterTransaction();
 
                 return newTx;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 jbossatxLogger.i18NLogger.error_jts_PropagationContextManager_exception(e);
 
                 return null;
             }
-        }
-        else
-        {
+        } else {
             jbossatxLogger.i18NLogger.error_jts_PropagationContextManager_unknownctx();
 
             return null;
         }
     }
 
-    public Object getObjectInstance (Object obj, Name name, Context nameCtx,
-            Hashtable environment) throws Exception
-    {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
         return new PropagationContextManager();
     }
 }

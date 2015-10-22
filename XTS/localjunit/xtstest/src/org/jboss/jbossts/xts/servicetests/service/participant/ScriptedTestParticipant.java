@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 /**
- * Generic participant class which enables scripting of participant behaviour via a list of commands
+ * Generic participant class which enables scripting of participant behaviour
+ * via a list of commands
  */
 
 public class ScriptedTestParticipant implements Serializable {
@@ -14,23 +15,19 @@ public class ScriptedTestParticipant implements Serializable {
     protected List<String> commands;
 
     // constructor for recovery only
-    protected ScriptedTestParticipant()
-    {
+    protected ScriptedTestParticipant() {
     }
 
-    protected ScriptedTestParticipant(String id)
-    {
+    protected ScriptedTestParticipant(String id) {
         this.id = id;
         commands = new ArrayList<String>();
     }
 
-    public void addCommand(String command)
-    {
+    public void addCommand(String command) {
         commands.add(command);
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 }

@@ -48,7 +48,8 @@ public class WSBACoordinatorCompletionParticipantTest {
 
         LifecycleImpl lifecycle = new LifecycleImpl();
         ServiceInvocationMeta serviceInvocationMeta = new ServiceInvocationMeta(lifecycle, LifecycleImpl.class, null);
-        WSBACoordinatorCompletionParticipant participant = new WSBACoordinatorCompletionParticipant(serviceInvocationMeta, new HashMap());
+        WSBACoordinatorCompletionParticipant participant = new WSBACoordinatorCompletionParticipant(
+                serviceInvocationMeta, new HashMap());
 
         participant.cancel();
         participant.close();
@@ -60,15 +61,20 @@ public class WSBACoordinatorCompletionParticipantTest {
         participant.unknown();
 
         List<Class<? extends Annotation>> actualOrder = lifecycle.getExecutionOrder();
-        assertOrder(actualOrder, Cancel.class, Close.class, Compensate.class, Complete.class, ConfirmCompleted.class, Error.class, Status.class, Unknown.class);
+        assertOrder(actualOrder, Cancel.class, Close.class, Compensate.class, Complete.class, ConfirmCompleted.class,
+                Error.class, Status.class, Unknown.class);
     }
 
-    private void assertOrder(List<Class<? extends Annotation>> actualOrder, Class<? extends Annotation>... expectedOrder) {
+    private void assertOrder(List<Class<? extends Annotation>> actualOrder,
+            Class<? extends Annotation>... expectedOrder) {
 
         org.junit.Assert.assertEquals(Arrays.asList(expectedOrder), actualOrder);
     }
 
-    public class LifecycleImpl implements BusinessAgreementWithCoordinatorCompletionParticipant, ConfirmCompletedParticipant {
+    public class LifecycleImpl
+            implements
+                BusinessAgreementWithCoordinatorCompletionParticipant,
+                ConfirmCompletedParticipant {
 
         private List<Class<? extends Annotation>> executionOrder = new ArrayList<Class<? extends Annotation>>();
 

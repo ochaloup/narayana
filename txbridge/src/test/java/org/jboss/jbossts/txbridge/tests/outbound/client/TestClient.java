@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-01
  */
-@WebServlet(name="Outbound Test Client Servlet", urlPatterns=TestClient.URL_PATTERN)
+@WebServlet(name = "Outbound Test Client Servlet", urlPatterns = TestClient.URL_PATTERN)
 public class TestClient extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -68,16 +68,18 @@ public class TestClient extends HttpServlet {
     /**
      * Initialise the servlet.
      *
-     * @param config The servlet configuration.
+     * @param config
+     *            The servlet configuration.
      */
-    public void init(final ServletConfig config)
-            throws ServletException {
+    public void init(final ServletConfig config) throws ServletException {
         try {
             Context ic = new InitialContext();
             userTransaction = (UserTransaction) ic.lookup("java:comp/UserTransaction");
 
-            URL wsdlLocation = new URL("http://" + getLocalHost() + ":8080/txbridge-outbound-tests-service/TestServiceImpl?wsdl");
-            QName serviceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/", "TestServiceImplService");
+            URL wsdlLocation = new URL(
+                    "http://" + getLocalHost() + ":8080/txbridge-outbound-tests-service/TestServiceImpl?wsdl");
+            QName serviceName = new QName("http://client.outbound.tests.txbridge.jbossts.jboss.org/",
+                    "TestServiceImplService");
 
             Service service = Service.create(wsdlLocation, serviceName);
             testService = service.getPort(TestService.class);

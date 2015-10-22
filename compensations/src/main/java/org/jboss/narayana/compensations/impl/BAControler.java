@@ -1,6 +1,5 @@
 package org.jboss.narayana.compensations.impl;
 
-
 import org.jboss.narayana.compensations.api.CompensationHandler;
 import org.jboss.narayana.compensations.api.ConfirmationHandler;
 import org.jboss.narayana.compensations.api.TransactionLoggedHandler;
@@ -27,6 +26,6 @@ public interface BAControler {
     public Object getCurrentTransaction() throws Exception;
 
     public ParticipantManager enlist(Class<? extends CompensationHandler> compensationHandlerClass,
-                                     Class<? extends ConfirmationHandler> confirmationHandlerClass,
-                                     Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception;
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass) throws Exception;
 }

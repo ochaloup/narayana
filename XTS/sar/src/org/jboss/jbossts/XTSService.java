@@ -41,13 +41,13 @@ public class XTSService implements XTSServiceMBean {
     private int taskManagerMinWorkerCount = 0;
     private int taskManagerMaxWorkerCount = 10;
 
-    public XTSService() {}
+    public XTSService() {
+    }
 
-    public void start() throws Exception
-    {
+    public void start() throws Exception {
         XTSLogger.logger.info("JBossTS XTS Transaction Service - starting");
 
-        //  execute startup for all registered initialisations
+        // execute startup for all registered initialisations
 
         XTSEnvironmentBean xtsEnvironmentBean = XTSPropertyManager.getXTSEnvironmentBean();
         Iterator<String> iterator = xtsEnvironmentBean.getXtsInitialisations().iterator();
@@ -70,7 +70,7 @@ public class XTSService implements XTSServiceMBean {
             }
 
             try {
-                XTSInitialisation initialisation = (XTSInitialisation)clazz.newInstance();
+                XTSInitialisation initialisation = (XTSInitialisation) clazz.newInstance();
                 initialisation.startup();
                 xtsInitialisations.add(initialisation);
             } catch (InstantiationException ie) {
@@ -83,17 +83,16 @@ public class XTSService implements XTSServiceMBean {
         TaskManagerInitialisation();
     }
 
-    public void stop() throws Exception
-    {
+    public void stop() throws Exception {
         XTSLogger.logger.info("JBossTS XTS Transaction Service - stopping");
 
-        TaskManager.getManager().shutdown() ; // com.arjuna.services.framework.admin.TaskManagerInitialisation
+        TaskManager.getManager().shutdown(); // com.arjuna.services.framework.admin.TaskManagerInitialisation
 
         // shutdown the activity service reaper
 
         ActivityReaper.shutdown();
 
-        //  execute shutdown for all registered initialisations
+        // execute shutdown for all registered initialisations
 
         Iterator<XTSInitialisation> iterator = xtsInitialisations.iterator();
 
@@ -105,11 +104,10 @@ public class XTSService implements XTSServiceMBean {
         xtsInitialisations.clear();
     }
 
-    private void TaskManagerInitialisation()
-    {
-        final TaskManager taskManager = TaskManager.getManager() ;
-        taskManager.setMinimumWorkerCount(taskManagerMinWorkerCount) ;
-        taskManager.setMaximumWorkerCount(taskManagerMaxWorkerCount) ;
+    private void TaskManagerInitialisation() {
+        final TaskManager taskManager = TaskManager.getManager();
+        taskManager.setMinimumWorkerCount(taskManagerMinWorkerCount);
+        taskManager.setMaximumWorkerCount(taskManagerMaxWorkerCount);
     }
 
     private List<XTSInitialisation> xtsInitialisations = new ArrayList<XTSInitialisation>();

@@ -32,14 +32,14 @@ package com.arjuna.orbportability.internal.orbspecific.ibmorb.orb.implementation
 
 import com.arjuna.orbportability.internal.orbspecific.orb.implementations.ORBBase;
 
-public class ibmorb_7_1 extends ORBBase
-{
-    public ibmorb_7_1()
-    {
-//    System.setProperty("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
-//    System.setProperty("org.omg.CORBA.ORBSingletonClass", "com.sun.corba.se.impl.orb.ORBSingleton");
+public class ibmorb_7_1 extends ORBBase {
+    public ibmorb_7_1() {
+        // System.setProperty("org.omg.CORBA.ORBClass",
+        // "com.sun.corba.se.impl.orb.ORBImpl");
+        // System.setProperty("org.omg.CORBA.ORBSingletonClass",
+        // "com.sun.corba.se.impl.orb.ORBSingleton");
 
-      System.setProperty("org.omg.CORBA.ORBClass", "com.ibm.CORBA.iiop.ORB");
-      System.setProperty("org.omg.CORBA.ORBSingletonClass", "com.ibm.rmi.corba.ORBSingleton");
+        System.setProperty("org.omg.CORBA.ORBClass", "com.ibm.CORBA.iiop.ORB");
+        System.setProperty("org.omg.CORBA.ORBSingletonClass", "com.ibm.rmi.corba.ORBSingleton");
     }
 }

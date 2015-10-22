@@ -12,7 +12,6 @@ import com.arjuna.wscf.tests.TwoPhaseParticipant;
 import com.arjuna.wscf.tests.WSCF11TestUtils;
 import com.arjuna.wscf.tests.WarDeployment;
 
-
 @RunWith(Arquillian.class)
 public class AddParticipantTest {
 
@@ -22,27 +21,22 @@ public class AddParticipantTest {
     }
 
     @Test
-    public void testAddParticipant()
-            throws Exception
-            {
+    public void testAddParticipant() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         CoordinatorManager cm = CoordinatorManagerFactory.coordinatorManager();
 
-        try
-        {
+        try {
             cm.begin("TwoPhase11HLS");
 
             cm.enlistParticipant(new TwoPhaseParticipant(null));
 
-            System.out.println("Started: "+cm.identifier()+"\n");
+            System.out.println("Started: " + cm.identifier() + "\n");
 
             cm.confirm();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSCF11TestUtils.cleanup(cm);
             throw ex;
         }
-            }
+    }
 }

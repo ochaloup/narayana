@@ -36,23 +36,25 @@ import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImpl
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class ArjunaTransactionImpleWrapper extends ArjunaTransactionImple implements ActionBeanWrapperInterface {
     UidWrapper wrapper;
     ActionBean action;
     boolean activated;
 
-    public ArjunaTransactionImpleWrapper () {
+    public ArjunaTransactionImpleWrapper() {
         this(Uid.nullUid());
     }
 
-    public ArjunaTransactionImpleWrapper (Uid uid) {
+    public ArjunaTransactionImpleWrapper(Uid uid) {
         super(uid);
     }
-    public ArjunaTransactionImpleWrapper (ActionBean action, UidWrapper w) {
+    public ArjunaTransactionImpleWrapper(ActionBean action, UidWrapper w) {
         super(w.getUid());
         this.wrapper = w;
         this.action = action;
@@ -65,7 +67,7 @@ public class ArjunaTransactionImpleWrapper extends ArjunaTransactionImple implem
         return activated;
     }
 
-    public String type () {
+    public String type() {
         String name = UidWrapper.getRecordWrapperTypeName();
 
         if (name != null)
@@ -87,17 +89,22 @@ public class ArjunaTransactionImpleWrapper extends ArjunaTransactionImple implem
     }
 
     public void unregister() {
-        
+
     }
 
     public RecordList getRecords(ParticipantStatus type) {
         switch (type) {
-            default:
-            case PREPARED: return preparedList;
-            case FAILED: return failedList;
-            case HEURISTIC: return heuristicList;
-            case PENDING: return pendingList;
-            case READONLY: return readonlyList;
+            default :
+            case PREPARED :
+                return preparedList;
+            case FAILED :
+                return failedList;
+            case HEURISTIC :
+                return heuristicList;
+            case PENDING :
+                return pendingList;
+            case READONLY :
+                return readonlyList;
         }
     }
 

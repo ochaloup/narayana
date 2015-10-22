@@ -44,15 +44,13 @@ import com.arjuna.orbportability.RootOA;
 import com.hp.mwtests.ts.jts.orbspecific.resources.AtomicObject;
 import com.hp.mwtests.ts.jts.orbspecific.resources.AtomicWorker1;
 
-public class AtomicObject1
-{
+public class AtomicObject1 {
     private final static int START_VALUE_1 = 10;
     private final static int START_VALUE_2 = 101;
     private final static int EXPECTED_VALUE = START_VALUE_1 + START_VALUE_2;
 
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
@@ -62,7 +60,7 @@ public class AtomicObject1
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         AtomicWorker1.init();
@@ -73,9 +71,9 @@ public class AtomicObject1
         System.out.println(AtomicWorker1.atomicObject_1.get_uid());
         System.out.println(AtomicWorker1.atomicObject_2.get_uid());
 
-        assertTrue( AtomicWorker1.atomicObject_1.set(START_VALUE_1) );
+        assertTrue(AtomicWorker1.atomicObject_1.set(START_VALUE_1));
 
-        assertTrue( AtomicWorker1.atomicObject_2.set(START_VALUE_2) );
+        assertTrue(AtomicWorker1.atomicObject_2.set(START_VALUE_2));
 
         AtomicWorker1.get12('m', 0);
         AtomicWorker1.get21('m', 0);
@@ -86,16 +84,13 @@ public class AtomicObject1
         AtomicWorker1.get12('m', 0);
         AtomicWorker1.get21('m', 0);
 
-        try
-        {
+        try {
             int value1 = AtomicWorker1.get1();
             int value2 = AtomicWorker1.get2();
 
-            assertEquals(EXPECTED_VALUE, (value1 + value2) );
+            assertEquals(EXPECTED_VALUE, (value1 + value2));
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace(System.err);
             fail();
         }
@@ -104,4 +99,3 @@ public class AtomicObject1
         myORB.shutdown();
     }
 }
-

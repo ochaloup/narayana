@@ -33,12 +33,11 @@ package com.hp.mwtests.ts.jta.timeout;
 
 import org.junit.Test;
 
-public class SimpleTest
-{
+public class SimpleTest {
     @Test
-    public void test() throws Exception
-    {
-        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    public void test() throws Exception {
+        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         transactionManager.setTransactionTimeout(3);
 
@@ -46,12 +45,9 @@ public class SimpleTest
 
         Thread.currentThread().sleep(4000);
 
-        try
-        {
+        try {
             transactionManager.commit();
-        }
-        catch (final javax.transaction.RollbackException ex)
-        {
+        } catch (final javax.transaction.RollbackException ex) {
             // expected
         }
     }

@@ -47,52 +47,48 @@ import com.arjuna.ats.internal.jts.recovery.recoverycoordinators.GenericRecovery
 import com.hp.mwtests.ts.jts.orbspecific.resources.DemoResource;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class JacORBGenericRecoveryCreatorSuccessUnitTest extends TestBase
-{    
-    public void beforeSetupClass()
-    {
+public class JacORBGenericRecoveryCreatorSuccessUnitTest extends TestBase {
+    public void beforeSetupClass() {
         // persistent POAs can't be anonymous, need a name:
         System.setProperty("jacorb.implname", "arjuna");
     }
-    
+
     @After
-    public void tearDown() throws Exception
-    {
+    public void tearDown() throws Exception {
         System.clearProperty("jacorb.implname");
-        
+
         super.tearDown();
     }
-    
+
     @Test
-    public void testSuccess () throws Exception
-    {
+    public void testSuccess() throws Exception {
         JacOrbRCServiceInit init = new JacOrbRCServiceInit();
         JacOrbRecoveryInit rinit = new JacOrbRecoveryInit();
-        
+
         init.startRCservice();
-        
+
         RecoveryCreator creator = RecoveryCreator.getCreator();
         GenericRecoveryCreator generic = null;
-        
+
         if (creator instanceof GenericRecoveryCreator)
             generic = (GenericRecoveryCreator) creator;
-        
+
         assertTrue(generic != null);
-        
+
         DemoResource demo = new DemoResource();
         ArjunaTransactionImple tx = new ArjunaTransactionImple(null);
         Object[] params = new Object[1];
-        
+
         params[0] = tx;
-        
+
         RecoveryCoordinator rc = generic.create(demo.getResource(), params);
-        
+
         assertTrue(rc != null);
-        
+
         generic.destroy(rc);
-        
+
         generic.destroyAll(params);
-        
+
         JacOrbRCServiceInit.shutdownRCService();
     }
 }

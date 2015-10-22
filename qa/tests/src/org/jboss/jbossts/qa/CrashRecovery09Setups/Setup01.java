@@ -58,7 +58,6 @@ package org.jboss.jbossts.qa.CrashRecovery09Setups;
  * $Id: Setup01.java,v 1.2 2003/06/26 11:43:45 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery09.*;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
 
@@ -67,17 +66,13 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class Setup01
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Setup01 {
+    public static void main(String[] args) {
+        try {
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -89,8 +84,7 @@ public class Setup01
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -98,9 +92,7 @@ public class Setup01
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -110,9 +102,7 @@ public class Setup01
 
             statement.close();
             connection.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Setup01.main: " + exception);
         }
     }

@@ -73,12 +73,10 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
  * 
  * TODO you have to set max_allowed_packet for large reaps on mysql
  */
-public class CommitMarkableResourceRecordRecoveryModule implements
-        RecoveryModule {
+public class CommitMarkableResourceRecordRecoveryModule implements RecoveryModule {
     // 'type' within the Object Store for AtomicActions.
     private static final String ATOMIC_ACTION_TYPE = RecoverConnectableAtomicAction.ATOMIC_ACTION_TYPE;
-    private static final String CONNECTABLE_ATOMIC_ACTION_TYPE =
-        RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE;
+    private static final String CONNECTABLE_ATOMIC_ACTION_TYPE = RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE;
 
     private InitialContext context;
 
@@ -106,41 +104,31 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 
     private TransactionStatusConnectionManager transactionStatusConnectionMgr;
 
-    private static JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator
-            .getDefaultInstance(JTAEnvironmentBean.class);
+    private static JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
     private Map<String, String> commitMarkableResourceTableNameMap = jtaEnvironmentBean
             .getCommitMarkableResourceTableNameMap();
     private Map<String, List<Xid>> completedBranches = new HashMap<String, List<Xid>>();
     private boolean inFirstPass;
-    private static String defaultTableName = jtaEnvironmentBean
-            .getDefaultCommitMarkableTableName();
+    private static String defaultTableName = jtaEnvironmentBean.getDefaultCommitMarkableTableName();
 
-    public CommitMarkableResourceRecordRecoveryModule() throws NamingException,
-            ObjectStoreException {
+    public CommitMarkableResourceRecordRecoveryModule() throws NamingException, ObjectStoreException {
         context = new InitialContext();
-        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator
-                .getDefaultInstance(JTAEnvironmentBean.class);
-        jndiNamesToContact.addAll(jtaEnvironmentBean
-                .getCommitMarkableResourceJNDINames());
-        
+        JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class);
+        jndiNamesToContact.addAll(jtaEnvironmentBean.getCommitMarkableResourceJNDINames());
+
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger
-                    .trace("CommitMarkableResourceRecordRecoveryModule::list to contact");
+            tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule::list to contact");
             for (String jndiName : jndiNamesToContact) {
-                tsLogger.logger
-                        .trace("CommitMarkableResourceRecordRecoveryModule::in list: "
-                                + jndiName);
+                tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule::in list: " + jndiName);
             }
-            tsLogger.logger
-                    .trace("CommitMarkableResourceRecordRecoveryModule::list to contact complete");
+            tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule::list to contact complete");
         }
 
         List<String> xaRecoveryNodes = jtaEnvironmentBean.getXaRecoveryNodes();
         if (xaRecoveryNodes.size() == 0) {
             jtaLogger.i18NLogger.info_recovery_noxanodes();
             whereFilter = "";
-        } else if (xaRecoveryNodes
-                .contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)) {
+        } else if (xaRecoveryNodes.contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)) {
             whereFilter = "";
         } else {
             StringBuffer buffer = new StringBuffer();
@@ -148,8 +136,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements
             while (iterator.hasNext()) {
                 buffer.append("\'" + iterator.next() + "\',");
             }
-            whereFilter = " where transactionManagerID in ( "
-                    + buffer.substring(0, buffer.length() - 1) + ")";
+            whereFilter = " where transactionManagerID in ( " + buffer.substring(0, buffer.length() - 1) + ")";
         }
 
         if (recoveryStore == null) {
@@ -158,15 +145,12 @@ public class CommitMarkableResourceRecordRecoveryModule implements
         transactionStatusConnectionMgr = new TransactionStatusConnectionManager();
     }
 
-    public void notifyOfCompletedBranch(String commitMarkableResourceJndiName,
-            Xid xid) {
+    public void notifyOfCompletedBranch(String commitMarkableResourceJndiName, Xid xid) {
         synchronized (completedBranches) {
-            List<Xid> completedXids = completedBranches
-                    .get(commitMarkableResourceJndiName);
+            List<Xid> completedXids = completedBranches.get(commitMarkableResourceJndiName);
             if (completedXids == null) {
                 completedXids = new ArrayList<Xid>();
-                completedBranches.put(commitMarkableResourceJndiName,
-                        completedXids);
+                completedBranches.put(commitMarkableResourceJndiName, completedXids);
             }
             completedXids.add(xid);
         }
@@ -191,8 +175,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements
             delete(e.getKey(), e.getValue());
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger
-                    .trace("CommitMarkableResourceRecordRecoveryModule::periodicWorkFirstPass");
+            tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule::periodicWorkFirstPass");
         }
 
         this.committedXidsToJndiNames.clear();
@@ -218,34 +201,27 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                 String jndiName = iterator.next();
                 try {
                     if (tsLogger.logger.isTraceEnabled()) {
-                        tsLogger.logger
-                                .trace("CommitMarkableResourceRecordRecoveryModule::connecting to: " + jndiName);
+                        tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule::connecting to: " + jndiName);
                     }
-                    DataSource dataSource = (DataSource) context
-                            .lookup(jndiName);
+                    DataSource dataSource = (DataSource) context.lookup(jndiName);
                     Connection connection = dataSource.getConnection();
                     try {
-                        Statement createStatement = connection
-                                .createStatement();
+                        Statement createStatement = connection.createStatement();
                         try {
-                            String tableName = commitMarkableResourceTableNameMap
-                                    .get(jndiName);
+                            String tableName = commitMarkableResourceTableNameMap.get(jndiName);
                             if (tableName == null) {
                                 tableName = defaultTableName;
                             }
                             ResultSet rs = createStatement
-                                    .executeQuery("SELECT xid,actionuid from "
-                                            + tableName + whereFilter);
+                                    .executeQuery("SELECT xid,actionuid from " + tableName + whereFilter);
                             try {
                                 int i = 0;
                                 while (rs.next()) {
                                     i++;
                                     byte[] xidAsBytes = rs.getBytes(1);
 
-                                    ByteArrayInputStream bais = new ByteArrayInputStream(
-                                            xidAsBytes);
-                                    DataInputStream dis = new DataInputStream(
-                                            bais);
+                                    ByteArrayInputStream bais = new ByteArrayInputStream(xidAsBytes);
+                                    DataInputStream dis = new DataInputStream(bais);
                                     XID _theXid = new XID();
                                     _theXid.formatID = dis.readInt();
                                     _theXid.gtrid_length = dis.readInt();
@@ -256,23 +232,18 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                                     XidImple xid = new XidImple(_theXid);
                                     byte[] actionuidAsBytes = new byte[Uid.UID_SIZE];
                                     byte[] bytes = rs.getBytes(2);
-                                    System.arraycopy(bytes, 0,
-                                            actionuidAsBytes, 0, bytes.length);
+                                    System.arraycopy(bytes, 0, actionuidAsBytes, 0, bytes.length);
 
                                     committedXidsToJndiNames.put(xid, jndiName);
                                     if (tsLogger.logger.isTraceEnabled()) {
-                                        tsLogger.logger
-                                                .trace("committedXidsToJndiNames.put"
-                                                        + xid + " " + jndiName);
+                                        tsLogger.logger.trace("committedXidsToJndiNames.put" + xid + " " + jndiName);
                                     }
                                     // Populate the map of possible GCable Xids
                                     Uid actionuid = new Uid(actionuidAsBytes);
-                                    Map<Xid, Uid> map = jndiNamesToPossibleXidsForGC
-                                            .get(jndiName);
+                                    Map<Xid, Uid> map = jndiNamesToPossibleXidsForGC.get(jndiName);
                                     if (map == null) {
                                         map = new HashMap<Xid, Uid>();
-                                        jndiNamesToPossibleXidsForGC.put(
-                                                jndiName, map);
+                                        jndiNamesToPossibleXidsForGC.put(jndiName, map);
                                     }
                                     map.put(xid, actionuid);
                                 }
@@ -280,16 +251,14 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                                 try {
                                     rs.close();
                                 } catch (SQLException e) {
-                                    tsLogger.logger.warn(
-                                            "Could not close resultset", e);
+                                    tsLogger.logger.warn("Could not close resultset", e);
                                 }
                             }
                         } finally {
                             try {
                                 createStatement.close();
                             } catch (SQLException e) {
-                                tsLogger.logger.warn(
-                                        "Could not close statement", e);
+                                tsLogger.logger.warn("Could not close statement", e);
                             }
                         }
                         queriedResourceManagers.add(jndiName);
@@ -297,20 +266,16 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                         try {
                             connection.close();
                         } catch (SQLException e) {
-                            tsLogger.logger.warn("Could not close connection",
-                                    e);
+                            tsLogger.logger.warn("Could not close connection", e);
                         }
 
                     }
                 } catch (NamingException e) {
-                    tsLogger.logger.debug(
-                            "Could not lookup CommitMarkableResource: "
-                                    + jndiName, e);
+                    tsLogger.logger.debug("Could not lookup CommitMarkableResource: " + jndiName, e);
                 } catch (SQLException e) {
                     tsLogger.logger.warn("Could not handle connection", e);
                 } catch (IOException e) {
-                    tsLogger.logger.warn(
-                            "Could not lookup write data to select", e);
+                    tsLogger.logger.warn("Could not lookup write data to select", e);
                 }
             }
 
@@ -321,55 +286,48 @@ public class CommitMarkableResourceRecordRecoveryModule implements
             // ATOMIC_ACTION_TYPE and remove the CONNECTABLE_ATOMIC_ACTION_TYPE
             // reference
             try {
-                ObjectStoreIterator transactionUidEnum = new ObjectStoreIterator(
-                        recoveryStore, CONNECTABLE_ATOMIC_ACTION_TYPE);
+                ObjectStoreIterator transactionUidEnum = new ObjectStoreIterator(recoveryStore,
+                        CONNECTABLE_ATOMIC_ACTION_TYPE);
                 Uid currentUid = transactionUidEnum.iterate();
                 while (Uid.nullUid().notEquals(currentUid)) {
 
                     // Make sure it isn't garbage from a failure to move before:
-                    InputObjectState state = recoveryStore.read_committed(
-                            currentUid, ATOMIC_ACTION_TYPE);
+                    InputObjectState state = recoveryStore.read_committed(currentUid, ATOMIC_ACTION_TYPE);
                     if (state != null) {
-                        if (!recoveryStore.remove_committed(currentUid,
-                                CONNECTABLE_ATOMIC_ACTION_TYPE)) {
-                            tsLogger.logger.debug("Could not remove a: "
-                                    + CONNECTABLE_ATOMIC_ACTION_TYPE + " uid: "
-                                    + currentUid);
+                        if (!recoveryStore.remove_committed(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE)) {
+                            tsLogger.logger.debug(
+                                    "Could not remove a: " + CONNECTABLE_ATOMIC_ACTION_TYPE + " uid: " + currentUid);
                         }
                     } else {
                         state = recoveryStore.read_committed(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE);
-                        // TX may have been in progress and cleaned up by now 
+                        // TX may have been in progress and cleaned up by now
                         if (state != null) {
                             RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
                                     CONNECTABLE_ATOMIC_ACTION_TYPE, currentUid, state);
-    
+
                             if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
-                                String commitMarkableResourceJndiName = rcaa
-                                        .getCommitMarkableResourceJndiName();
+                                String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
                                 // Check if the resource manager is online yet
-                                if (queriedResourceManagers
-                                        .contains(commitMarkableResourceJndiName)) {
-    
-                                    // If it is remove the CRR and move it back and
+                                if (queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
+
+                                    // If it is remove the CRR and move it back
+                                    // and
                                     // let
                                     // the
                                     // next stage update it
-                                    moveRecord(currentUid,
-                                            CONNECTABLE_ATOMIC_ACTION_TYPE,
-                                            ATOMIC_ACTION_TYPE);
+                                    moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
                                 }
                             } else {
                                 if (tsLogger.logger.isTraceEnabled()) {
                                     tsLogger.logger.trace("Moving " + currentUid + " back to being an AA");
                                 }
-                                // It is now safe to move it back to being an AA so that it can call getNewXAResourceRecord
-                                moveRecord(currentUid,
-                                        CONNECTABLE_ATOMIC_ACTION_TYPE,
-                                        ATOMIC_ACTION_TYPE);                                
+                                // It is now safe to move it back to being an AA
+                                // so that it can call getNewXAResourceRecord
+                                moveRecord(currentUid, CONNECTABLE_ATOMIC_ACTION_TYPE, ATOMIC_ACTION_TYPE);
                             }
                         }
                     }
-                    
+
                     currentUid = transactionUidEnum.iterate();
                 }
             } catch (ObjectStoreException | IOException ex) {
@@ -383,49 +341,45 @@ public class CommitMarkableResourceRecordRecoveryModule implements
             // records
             // moved in stage 2
             if (tsLogger.logger.isDebugEnabled()) {
-                tsLogger.logger.debug("processing " + ATOMIC_ACTION_TYPE
-                        + " transactions");
+                tsLogger.logger.debug("processing " + ATOMIC_ACTION_TYPE + " transactions");
             }
             try {
-                ObjectStoreIterator transactionUidEnum = new ObjectStoreIterator(
-                        recoveryStore, ATOMIC_ACTION_TYPE);
+                ObjectStoreIterator transactionUidEnum = new ObjectStoreIterator(recoveryStore, ATOMIC_ACTION_TYPE);
                 Uid currentUid = transactionUidEnum.iterate();
                 while (Uid.nullUid().notEquals(currentUid)) {
 
                     // Retrieve the transaction status from its
                     // original
                     // process.
-                    if (!isTransactionInMidFlight(transactionStatusConnectionMgr
-                            .getTransactionStatus(ATOMIC_ACTION_TYPE,
-                                    currentUid))) {
+                    if (!isTransactionInMidFlight(
+                            transactionStatusConnectionMgr.getTransactionStatus(ATOMIC_ACTION_TYPE, currentUid))) {
 
-                        InputObjectState state = recoveryStore.read_committed(
-                                currentUid, ATOMIC_ACTION_TYPE);
+                        InputObjectState state = recoveryStore.read_committed(currentUid, ATOMIC_ACTION_TYPE);
                         if (state != null) {
                             // Try to load it is a BasicAction that has a
                             // ConnectedResourceRecord
-                            RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
-                                    ATOMIC_ACTION_TYPE, currentUid, state);
+                            RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(ATOMIC_ACTION_TYPE,
+                                    currentUid, state);
                             // Check if it did have a ConnectedResourceRecord
                             if (rcaa.containsIncompleteCommitMarkableResourceRecord()) {
-                                String commitMarkableResourceJndiName = rcaa
-                                        .getCommitMarkableResourceJndiName();
+                                String commitMarkableResourceJndiName = rcaa.getCommitMarkableResourceJndiName();
                                 // If it did, check if the resource manager was
                                 // online
-                                if (!queriedResourceManagers
-                                        .contains(commitMarkableResourceJndiName)) {
-                                    // If the resource manager wasn't online, move
+                                if (!queriedResourceManagers.contains(commitMarkableResourceJndiName)) {
+                                    // If the resource manager wasn't online,
+                                    // move
                                     // it
-                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE,
-                                            CONNECTABLE_ATOMIC_ACTION_TYPE);
+                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE, CONNECTABLE_ATOMIC_ACTION_TYPE);
                                 } else {
                                     // Update the completed outcome for the 1PC
                                     // resource
-                                    rcaa.updateCommitMarkableResourceRecord(committedXidsToJndiNames.get(rcaa.getXid()) != null);
-                                    // Swap the type to avoid the rest of recovery round processing this TX as it already called getNewXAResourceRecord
-                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE,
-                                            CONNECTABLE_ATOMIC_ACTION_TYPE);
-                                    
+                                    rcaa.updateCommitMarkableResourceRecord(
+                                            committedXidsToJndiNames.get(rcaa.getXid()) != null);
+                                    // Swap the type to avoid the rest of
+                                    // recovery round processing this TX as it
+                                    // already called getNewXAResourceRecord
+                                    moveRecord(currentUid, ATOMIC_ACTION_TYPE, CONNECTABLE_ATOMIC_ACTION_TYPE);
+
                                 }
                             }
                         }
@@ -437,9 +391,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements
             }
         } catch (IllegalStateException e) {
             // Thrown when AS is shutting down and we attempt a lookup
-            tsLogger.logger.debug(
-                    "Could not lookup datasource, AS is shutting down: "
-                            + e.getMessage(), e);
+            tsLogger.logger.debug("Could not lookup datasource, AS is shutting down: " + e.getMessage(), e);
         }
         inFirstPass = false;
     }
@@ -459,19 +411,16 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 
                 // Refresh our list of all the indoubt connectable atomic
                 // actions
-                if (recoveryStore.allObjUids(CONNECTABLE_ATOMIC_ACTION_TYPE,
-                        aa_uids)) {
+                if (recoveryStore.allObjUids(CONNECTABLE_ATOMIC_ACTION_TYPE, aa_uids)) {
                     preparedAtomicActions.addAll(convertToList(aa_uids));
 
                     // Iterate the list that we were able to contact
-                    Iterator<String> jndiNames = queriedResourceManagers
-                            .iterator();
+                    Iterator<String> jndiNames = queriedResourceManagers.iterator();
                     while (jndiNames.hasNext()) {
                         String jndiName = jndiNames.next();
                         List<Xid> toDelete = new ArrayList<Xid>();
 
-                        Map<Xid, Uid> map = jndiNamesToPossibleXidsForGC
-                                .get(jndiName);
+                        Map<Xid, Uid> map = jndiNamesToPossibleXidsForGC.get(jndiName);
                         if (map != null) {
                             for (Map.Entry<Xid, Uid> entry : map.entrySet()) {
                                 Xid next = entry.getKey();
@@ -485,18 +434,13 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                         delete(jndiName, toDelete);
                     }
                 } else {
-                    tsLogger.logger
-                            .warn("Could not read data from object store");
+                    tsLogger.logger.warn("Could not read data from object store");
                 }
             } else {
-                tsLogger.logger
-                        .warn("Could not read "
-                                + CONNECTABLE_ATOMIC_ACTION_TYPE
-                                + " from object store");
+                tsLogger.logger.warn("Could not read " + CONNECTABLE_ATOMIC_ACTION_TYPE + " from object store");
             }
         } catch (ObjectStoreException e) {
-            tsLogger.logger.warn("Could not read " + ATOMIC_ACTION_TYPE
-                    + " from object store", e);
+            tsLogger.logger.warn("Could not read " + ATOMIC_ACTION_TYPE + " from object store", e);
         }
     }
 
@@ -504,11 +448,11 @@ public class CommitMarkableResourceRecordRecoveryModule implements
      * Can only be called after the first phase has executed
      * 
      * @param xid
-     * @throws ObjectStoreException if the resource manager was offline
+     * @throws ObjectStoreException
+     *             if the resource manager was offline
      * @return whether the Xid was commited by the resource manager
      */
-    public synchronized boolean wasCommitted(String jndiName, Xid xid)
-            throws ObjectStoreException {
+    public synchronized boolean wasCommitted(String jndiName, Xid xid) throws ObjectStoreException {
         if (!queriedResourceManagers.contains(jndiName) || committedXidsToJndiNames.get(xid) == null) {
             periodicWorkFirstPass();
         }
@@ -554,71 +498,63 @@ public class CommitMarkableResourceRecordRecoveryModule implements
         boolean inFlight = false;
 
         switch (status) {
-        // these states can only come from a process that is still alive
-        case ActionStatus.RUNNING:
-        case ActionStatus.ABORT_ONLY:
-        case ActionStatus.PREPARING:
-        case ActionStatus.COMMITTING:
-        case ActionStatus.ABORTING:
-        case ActionStatus.PREPARED:
-            inFlight = true;
-            break;
+            // these states can only come from a process that is still alive
+            case ActionStatus.RUNNING :
+            case ActionStatus.ABORT_ONLY :
+            case ActionStatus.PREPARING :
+            case ActionStatus.COMMITTING :
+            case ActionStatus.ABORTING :
+            case ActionStatus.PREPARED :
+                inFlight = true;
+                break;
 
-        // the transaction is apparently still there, but has completed its
-        // phase2. should be safe to redo it.
-        case ActionStatus.COMMITTED:
-        case ActionStatus.H_COMMIT:
-        case ActionStatus.H_MIXED:
-        case ActionStatus.H_HAZARD:
-        case ActionStatus.ABORTED:
-        case ActionStatus.H_ROLLBACK:
-            inFlight = false;
-            break;
+            // the transaction is apparently still there, but has completed its
+            // phase2. should be safe to redo it.
+            case ActionStatus.COMMITTED :
+            case ActionStatus.H_COMMIT :
+            case ActionStatus.H_MIXED :
+            case ActionStatus.H_HAZARD :
+            case ActionStatus.ABORTED :
+            case ActionStatus.H_ROLLBACK :
+                inFlight = false;
+                break;
 
-        // this shouldn't happen
-        case ActionStatus.INVALID:
-        default:
-            inFlight = false;
+            // this shouldn't happen
+            case ActionStatus.INVALID :
+            default :
+                inFlight = false;
         }
 
         return inFlight;
     }
 
-    private void moveRecord(Uid uid, String from, String to)
-            throws ObjectStoreException {
+    private void moveRecord(Uid uid, String from, String to) throws ObjectStoreException {
         RecoveryStore recoveryStore = StoreManager.getRecoveryStore();
 
         InputObjectState state = recoveryStore.read_committed(uid, from);
         if (state != null) {
-            if (!recoveryStore.write_committed(uid, to, new OutputObjectState(
-                    state))) {
-                tsLogger.logger.error("Could not move an: " + to + " uid: "
-                        + uid);
+            if (!recoveryStore.write_committed(uid, to, new OutputObjectState(state))) {
+                tsLogger.logger.error("Could not move an: " + to + " uid: " + uid);
             } else if (!recoveryStore.remove_committed(uid, from)) {
-                tsLogger.logger.error("Could not remove a: " + from + " uid: "
-                        + uid);
+                tsLogger.logger.error("Could not remove a: " + from + " uid: " + uid);
             }
         } else {
-            tsLogger.logger
-                    .error("Could not read an: " + from + " uid: " + uid);
+            tsLogger.logger.error("Could not read an: " + from + " uid: " + uid);
         }
     }
 
     private void delete(String jndiName, List<Xid> completedXids) {
-        int batchSize = jtaEnvironmentBean
-                .getCommitMarkableResourceRecordDeleteBatchSize();
-        Integer integer = jtaEnvironmentBean
-                .getCommitMarkableResourceRecordDeleteBatchSizeMap().get(
-                        jndiName);
+        int batchSize = jtaEnvironmentBean.getCommitMarkableResourceRecordDeleteBatchSize();
+        Integer integer = jtaEnvironmentBean.getCommitMarkableResourceRecordDeleteBatchSizeMap().get(jndiName);
         if (integer != null) {
             batchSize = integer;
         }
         try {
             while (completedXids.size() > 0) {
 
-                int sendingSize = batchSize < 0 ? completedXids.size()
-                        : completedXids.size() < batchSize ? completedXids
-                                .size() : batchSize;
+                int sendingSize = batchSize < 0
+                        ? completedXids.size()
+                        : completedXids.size() < batchSize ? completedXids.size() : batchSize;
 
                 StringBuffer buffer = new StringBuffer();
                 for (int i = 0; i < sendingSize; i++) {
@@ -626,39 +562,30 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                 }
                 if (buffer.length() > 0) {
                     Connection connection = null;
-                    DataSource dataSource = (DataSource) context
-                            .lookup(jndiName);
+                    DataSource dataSource = (DataSource) context.lookup(jndiName);
                     try {
                         connection = dataSource.getConnection();
                         connection.setAutoCommit(false);
 
-                        String tableName = commitMarkableResourceTableNameMap
-                                .get(jndiName);
+                        String tableName = commitMarkableResourceTableNameMap.get(jndiName);
                         if (tableName == null) {
                             tableName = defaultTableName;
                         }
-                        String sql = "DELETE from " + tableName
-                                + " where xid in ("
-                                + buffer.substring(0, buffer.length() - 1)
-                                + ")";
+                        String sql = "DELETE from " + tableName + " where xid in ("
+                                + buffer.substring(0, buffer.length() - 1) + ")";
                         if (tsLogger.logger.isTraceEnabled()) {
-                            tsLogger.logger
-                                    .trace("Attempting to delete number of entries: "
-                                            + buffer.length());
+                            tsLogger.logger.trace("Attempting to delete number of entries: " + buffer.length());
                         }
-                        PreparedStatement prepareStatement = connection
-                                .prepareStatement(sql);
+                        PreparedStatement prepareStatement = connection.prepareStatement(sql);
                         List<Xid> deleted = new ArrayList<Xid>();
                         try {
 
                             for (int i = 0; i < sendingSize; i++) {
-                                XidImple xid = (XidImple) completedXids
-                                        .remove(0);
+                                XidImple xid = (XidImple) completedXids.remove(0);
                                 deleted.add(xid);
                                 XID toSave = xid.getXID();
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                DataOutputStream dos = new DataOutputStream(
-                                        baos);
+                                DataOutputStream dos = new DataOutputStream(baos);
                                 dos.writeInt(toSave.formatID);
                                 dos.writeInt(toSave.gtrid_length);
                                 dos.writeInt(toSave.bqual_length);
@@ -666,17 +593,12 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                                 dos.write(toSave.data);
                                 dos.flush();
 
-                                prepareStatement.setBytes(i + 1,
-                                        baos.toByteArray());
+                                prepareStatement.setBytes(i + 1, baos.toByteArray());
                             }
-                            int executeUpdate = prepareStatement
-                                    .executeUpdate();
+                            int executeUpdate = prepareStatement.executeUpdate();
                             if (executeUpdate != sendingSize) {
-                                tsLogger.logger
-                                        .error("Update was not successful, expected: "
-                                                + sendingSize
-                                                + " actual:"
-                                                + executeUpdate);
+                                tsLogger.logger.error("Update was not successful, expected: " + sendingSize + " actual:"
+                                        + executeUpdate);
                                 connection.rollback();
                             } else {
                                 connection.commit();
@@ -684,22 +606,17 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                                 committedXidsToJndiNames.keySet().removeAll(deleted);
                             }
                         } catch (IOException e) {
-                            tsLogger.logger
-                                    .warn("Could not generate prepareStatement paramaters",
-                                            e);
+                            tsLogger.logger.warn("Could not generate prepareStatement paramaters", e);
                         } finally {
                             try {
                                 prepareStatement.close();
                             } catch (SQLException e) {
-                                tsLogger.logger
-                                        .warn("Could not close the prepared statement",
-                                                e);
+                                tsLogger.logger.warn("Could not close the prepared statement", e);
                             }
                         }
 
                     } catch (SQLException e) {
-                        tsLogger.logger.warn("Could not handle the connection",
-                                e);
+                        tsLogger.logger.warn("Could not handle the connection", e);
                         // the connection is unavailable so try again later
                         break;
                     } finally {
@@ -707,23 +624,18 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                             try {
                                 connection.close();
                             } catch (SQLException e) {
-                                tsLogger.logger.warn(
-                                        "Could not close the connection", e);
+                                tsLogger.logger.warn("Could not close the connection", e);
                             }
                         }
                     }
                 }
             }
         } catch (NamingException e) {
-            tsLogger.logger
-                    .warn("Could not lookup commitMarkable: " + jndiName);
-            tsLogger.logger.debug("Could not lookup commitMarkable: "
-                    + jndiName, e);
+            tsLogger.logger.warn("Could not lookup commitMarkable: " + jndiName);
+            tsLogger.logger.debug("Could not lookup commitMarkable: " + jndiName, e);
         } catch (IllegalStateException e) {
             // Thrown when AS is shutting down and we attempt a lookup
-            tsLogger.logger.debug(
-                    "Could not lookup datasource, AS is shutting down: "
-                            + e.getMessage(), e);
+            tsLogger.logger.debug("Could not lookup datasource, AS is shutting down: " + e.getMessage(), e);
         }
     }
 }

@@ -58,22 +58,17 @@ package org.jboss.jbossts.qa.CrashRecovery06Impls;
  * $Id: ServiceImpl01.java,v 1.2 2003/06/26 11:43:39 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery06.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 import org.omg.CosTransactions.*;
 
-public class ServiceImpl01 implements ServiceOperations
-{
-    public ServiceImpl01()
-    {
+public class ServiceImpl01 implements ServiceOperations {
+    public ServiceImpl01() {
     }
 
-    public void setup_oper(Control ctrl)
-    {
-        try
-        {
+    public void setup_oper(Control ctrl) {
+        try {
             _resourceImpl = new ResourceImpl01();
             ResourcePOATie servant = new ResourcePOATie(_resourceImpl);
 
@@ -81,28 +76,20 @@ public class ServiceImpl01 implements ServiceOperations
             _resource = ResourceHelper.narrow(OAInterface.corbaReference(servant));
 
             _recoveryCoordinator = ctrl.get_coordinator().register_resource(_resource);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("ServiceImpl01.setup_oper: " + exception);
             exception.printStackTrace(System.err);
             _isCorrect = false;
         }
     }
 
-    public boolean check_oper()
-    {
+    public boolean check_oper() {
         boolean correct = true;
 
-        try
-        {
+        try {
             Status status = _recoveryCoordinator.replay_completion(null);
-        }
-        catch (OBJECT_NOT_EXIST objectNotExist)
-        {
-        }
-        catch (Exception exception)
-        {
+        } catch (OBJECT_NOT_EXIST objectNotExist) {
+        } catch (Exception exception) {
             System.err.println("ServiceImpl01.check_oper: " + exception);
             exception.printStackTrace(System.err);
             correct = false;
@@ -111,8 +98,7 @@ public class ServiceImpl01 implements ServiceOperations
         return correct;
     }
 
-    public boolean is_correct()
-    {
+    public boolean is_correct() {
         return _isCorrect;
     }
 

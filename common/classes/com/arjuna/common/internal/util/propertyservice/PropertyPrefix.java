@@ -26,13 +26,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to set the default property name prefix for EnvironmentBean classes
+ * Annotation used to set the default property name prefix for EnvironmentBean
+ * classes
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface PropertyPrefix
-{
+public @interface PropertyPrefix {
     String prefix();
 }

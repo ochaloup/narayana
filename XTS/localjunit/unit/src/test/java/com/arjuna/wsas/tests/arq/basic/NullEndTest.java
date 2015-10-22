@@ -19,27 +19,20 @@ public class NullEndTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                WSASTestUtils.class);
+        return WarDeployment.getDeployment(WSASTestUtils.class);
     }
 
     @Test
-    public void testNullEnd()
-            throws Exception
-            {
+    public void testNullEnd() throws Exception {
         UserActivity ua = UserActivityFactory.userActivity();
-        try
-        {
+        try {
             ua.end();
             fail("should have thrown NoActivityException");
-        }
-        catch (NoActivityException ex)
-        {
+        } catch (NoActivityException ex) {
             // it's ok if we arrive here?
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             WSASTestUtils.cleanup(ua);
             throw ex;
         }
-            }
+    }
 }

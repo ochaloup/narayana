@@ -28,7 +28,6 @@ import javax.naming.Context;
 import java.util.Hashtable;
 import java.util.Map;
 
-
 public class JndiProvider {
 
     private static NamingBeanImpl jnpServer = new NamingBeanImpl();
@@ -63,7 +62,7 @@ public class JndiProvider {
                         props.getDatabaseUser(), props.getDatabasePassword());
             else
                 dataSourceManager.registerDataSource(props.getBinding(), props.getDriver(), props.getDatabaseName(),
-                        props.getHost(), props.getPort(), props.getDatabaseUser(),props.getDatabasePassword());
+                        props.getHost(), props.getPort(), props.getDatabaseUser(), props.getDatabasePassword());
         }
     }
 }

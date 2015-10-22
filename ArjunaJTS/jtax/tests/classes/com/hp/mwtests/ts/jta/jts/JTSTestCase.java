@@ -28,21 +28,17 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
+public class JTSTestCase {
+    private ORB orb;
+    private RootOA oa;
 
-public class JTSTestCase
-{
-    private ORB orb ;
-    private RootOA oa ;
-    
     @Before
-    public void setUp()
-        throws Exception
-    {
+    public void setUp() throws Exception {
         System.out.println("Before...");
 
         orb = ORB.getInstance("test");
         oa = OA.getRootOA(orb);
-        
+
         orb.initORB(new String[0], null);
         oa.initOA();
 
@@ -51,17 +47,13 @@ public class JTSTestCase
     }
 
     @After
-    public void tearDown()
-        throws Exception
-    {
+    public void tearDown() throws Exception {
         System.out.println("After...");
 
-        if (oa != null)
-        {
+        if (oa != null) {
             oa.destroy();
         }
-        if (orb != null)
-        {
+        if (orb != null) {
             orb.shutdown();
         }
     }

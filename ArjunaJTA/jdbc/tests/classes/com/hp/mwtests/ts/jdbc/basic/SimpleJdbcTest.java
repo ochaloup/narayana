@@ -27,21 +27,17 @@ public class SimpleJdbcTest {
     @Test
     public void test() throws Exception {
         arjPropertyManager.getCoreEnvironmentBean().setNodeIdentifier("1");
-        System.setProperty("java.naming.factory.initial",
-                "org.apache.naming.java.javaURLContextFactory");
+        System.setProperty("java.naming.factory.initial", "org.apache.naming.java.javaURLContextFactory");
         System.setProperty("java.naming.factory.url.pkgs", "org.apache.naming");
-        final DataSource dataSource1 = getDataSource(DB_USER1, "oracle: "
-                + DB_USER1);
-        final DataSource dataSource2 = getDataSource(DB_USER2, "oracle: "
-                + DB_USER2);
+        final DataSource dataSource1 = getDataSource(DB_USER1, "oracle: " + DB_USER1);
+        final DataSource dataSource2 = getDataSource(DB_USER2, "oracle: " + DB_USER2);
 
         prepare(dataSource1);
         prepare(dataSource2);
 
-        final UserTransaction userTransaction = com.arjuna.ats.jta.UserTransaction
-                .userTransaction();
+        final UserTransaction userTransaction = com.arjuna.ats.jta.UserTransaction.userTransaction();
         userTransaction.begin();
-        
+
         final Connection connection1 = dataSource1.getConnection();
         final Connection connection2 = dataSource2.getConnection();
 
@@ -65,47 +61,34 @@ public class SimpleJdbcTest {
         if (resultSet.next()) {
             connection.prepareStatement("DROP TABLE jta_test").execute();
         }
-        connection.prepareStatement(
-                "CREATE TABLE jta_test (some_string VARCHAR2(10))").execute();
+        connection.prepareStatement("CREATE TABLE jta_test (some_string VARCHAR2(10))").execute();
     }
 
-    private static DataSource getDataSource(String user, String resourceName)
-            throws NamingException, SQLException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, NoSuchMethodException,
-            SecurityException, ClassNotFoundException {
+    private static DataSource getDataSource(String user, String resourceName) throws NamingException, SQLException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+            NoSuchMethodException, SecurityException, ClassNotFoundException {
         InitialContext initialContext = prepareInitialContext();
 
         Class clazz = Class.forName("oracle.jdbc.xa.client.OracleXADataSource");
         XADataSource xaDataSource = (XADataSource) clazz.newInstance();
-        clazz.getMethod("setDriverType", new Class[] { String.class }).invoke(
-                xaDataSource, new Object[] { "thin" });
-        clazz.getMethod("setServerName", new Class[] { String.class }).invoke(
-                xaDataSource, new Object[] { DB_HOST });
-        clazz.getMethod("setNetworkProtocol", new Class[] { String.class })
-                .invoke(xaDataSource, new Object[] { "tcp" });
-        clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                .invoke(xaDataSource, new Object[] { DB_SID });
-        clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                xaDataSource, new Object[] { user });
-        clazz.getMethod("setPassword", new Class[] { String.class }).invoke(
-                xaDataSource, new Object[] { user });
-        clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                xaDataSource, new Object[] { 1521 });
+        clazz.getMethod("setDriverType", new Class[]{String.class}).invoke(xaDataSource, new Object[]{"thin"});
+        clazz.getMethod("setServerName", new Class[]{String.class}).invoke(xaDataSource, new Object[]{DB_HOST});
+        clazz.getMethod("setNetworkProtocol", new Class[]{String.class}).invoke(xaDataSource, new Object[]{"tcp"});
+        clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(xaDataSource, new Object[]{DB_SID});
+        clazz.getMethod("setUser", new Class[]{String.class}).invoke(xaDataSource, new Object[]{user});
+        clazz.getMethod("setPassword", new Class[]{String.class}).invoke(xaDataSource, new Object[]{user});
+        clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(xaDataSource, new Object[]{1521});
 
         final String name = "java:/comp/env/jdbc/" + user;
         initialContext.bind(name, xaDataSource);
 
-        DriverManagerDataSource dataSource = new DriverManagerDataSource(
-                "jdbc:arjuna:" + name);
-        dataSource
-                .setDriverClassName("com.arjuna.ats.jdbc.TransactionalDriver");
+        DriverManagerDataSource dataSource = new DriverManagerDataSource("jdbc:arjuna:" + name);
+        dataSource.setDriverClassName("com.arjuna.ats.jdbc.TransactionalDriver");
 
         return dataSource;
     }
 
-    private static InitialContext prepareInitialContext()
-            throws NamingException {
+    private static InitialContext prepareInitialContext() throws NamingException {
         final InitialContext initialContext = new InitialContext();
 
         try {

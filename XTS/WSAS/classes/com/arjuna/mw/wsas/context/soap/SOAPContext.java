@@ -38,11 +38,12 @@ import com.arjuna.mw.wsas.context.Context;
 /**
  */
 
-public interface SOAPContext extends Context
-{
+public interface SOAPContext extends Context {
     /**
      * Serialise the SOAP context into a DOM node.
-     * @param element The element to contain the serialisation.
+     * 
+     * @param element
+     *            The element to contain the serialisation.
      * @return the element added.
      */
     public Element serialiseToElement(final Element element);

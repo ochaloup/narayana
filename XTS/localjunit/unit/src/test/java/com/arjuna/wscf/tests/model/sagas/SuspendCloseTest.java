@@ -24,22 +24,19 @@ public class SuspendCloseTest {
     }
 
     @Test
-    public void testSuspendClose()
-            throws Exception
-            {
+    public void testSuspendClose() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try
-        {
+        try {
             ua.begin("Sagas11HLS");
 
-            System.out.println("Started: "+ua.identifier()+"\n");
+            System.out.println("Started: " + ua.identifier() + "\n");
 
             ActivityHierarchy hier = ua.suspend();
 
-            System.out.println("Suspended: "+hier+"\n");
+            System.out.println("Suspended: " + hier + "\n");
 
             if (ua.currentActivity() != null) {
                 WSCF11TestUtils.cleanup(ua);
@@ -47,15 +44,11 @@ public class SuspendCloseTest {
             }
 
             ua.close();
-        }
-        catch (NoCoordinatorException ex)
-        {
+        } catch (NoCoordinatorException ex) {
             WSCF11TestUtils.cleanup(ua);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-            }
+    }
 }

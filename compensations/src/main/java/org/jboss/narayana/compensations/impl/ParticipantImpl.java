@@ -39,7 +39,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
-public class ParticipantImpl implements BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant {
+public class ParticipantImpl
+        implements
+            BusinessAgreementWithParticipantCompletionParticipant,
+            ConfirmCompletedParticipant {
 
     private static final Map<Object, AtomicInteger> PARTICIPANT_COUNTERS = new HashMap<>();
 
@@ -51,7 +54,9 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     private ClassLoader applicationClassloader;
     private Object currentTX;
 
-    public ParticipantImpl(Class<? extends CompensationHandler> compensationHandlerClass, Class<? extends ConfirmationHandler> confirmationHandlerClass, Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
+    public ParticipantImpl(Class<? extends CompensationHandler> compensationHandlerClass,
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
 
         this.compensationHandler = compensationHandlerClass;
         this.confirmationHandler = confirmationHandlerClass;
@@ -107,7 +112,7 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
 
     @Override
     public void cancel() throws FaultedException, WrongStateException, SystemException {
-        //TODO: Do nothing?
+        // TODO: Do nothing?
     }
 
     @Override
@@ -134,7 +139,7 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
 
     @Override
     public String status() throws SystemException {
-        //TODO: what to do here?
+        // TODO: what to do here?
         return null;
     }
 
@@ -149,7 +154,8 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     }
 
     /**
-     * Increments the counter of the Compensations participants in the transaction.
+     * Increments the counter of the Compensations participants in the
+     * transaction.
      */
     private void incrementParticipantsCounter() {
 
@@ -165,8 +171,9 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     }
 
     /**
-     * Decrements the counter of the Compensations participants in the transaction.
-     * CompensationContext of the current transaction is destroyed once the counter reaches 0.
+     * Decrements the counter of the Compensations participants in the
+     * transaction. CompensationContext of the current transaction is destroyed
+     * once the counter reaches 0.
      */
     private void decrementParticipantsCounter() {
 

@@ -41,25 +41,23 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.utils.XAUtils;
 import com.arjuna.ats.jta.xa.XidImple;
 
-public class RecoveryTest
-{
+public class RecoveryTest {
     @Test
-    public void test()
-    {
+    public void test() {
         Vector xaRecoveryNodes = new Vector();
         xaRecoveryNodes.add("2");
 
-        System.err.println("Bogus XA node name: "+"2");
+        System.err.println("Bogus XA node name: " + "2");
 
         XidImple xid = new XidImple(new Uid());
         String nodeName = XAUtils.getXANodeName(xid);
 
         // should fail.
 
-        System.err.println("XA node name: "+nodeName);
-        System.err.println("Xid to recover: "+xid);
+        System.err.println("XA node name: " + nodeName);
+        System.err.println("Xid to recover: " + xid);
 
-        assertFalse( xaRecoveryNodes.contains(nodeName) );
+        assertFalse(xaRecoveryNodes.contains(nodeName));
     }
 
 }

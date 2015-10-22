@@ -30,25 +30,22 @@ import com.arjuna.mw.wst11.UserTransaction;
 import com.arjuna.wstx.tests.arq.WarDeployment;
 
 @RunWith(Arquillian.class)
-public class PrintTransactionTest
-{
+public class PrintTransactionTest {
     @Deployment
     public static WebArchive createDeployment() {
         return WarDeployment.getDeployment();
     }
 
     @Test
-    public void testPrintTransaction()
-            throws Exception
-            {
+    public void testPrintTransaction() throws Exception {
         UserTransaction ut = UserTransaction.getUserTransaction();
 
         ut.begin();
 
-        System.out.println("Started: "+ut);
+        System.out.println("Started: " + ut);
 
         ut.commit();
 
-        System.out.println("\nCurrent: "+ut);
-            }
+        System.out.println("\nCurrent: " + ut);
+    }
 }

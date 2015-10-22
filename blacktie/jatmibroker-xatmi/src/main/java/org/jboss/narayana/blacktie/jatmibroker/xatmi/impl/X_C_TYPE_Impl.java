@@ -36,7 +36,8 @@ public class X_C_TYPE_Impl extends BufferImpl implements X_C_TYPE {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list of types, to contain, int, short, long, byte, float, double and arrays of those types
+     * The list of types, to contain, int, short, long, byte, float, double and
+     * arrays of those types
      */
     private static List<Class> types = new ArrayList<Class>();
 
@@ -44,18 +45,21 @@ public class X_C_TYPE_Impl extends BufferImpl implements X_C_TYPE {
      * Populate the types
      */
     static {
-        Class[] x_c_typeType = new Class[] { int.class, short.class, long.class, byte.class, float.class, double.class,
-                int[].class, short[].class, long[].class, byte[].class, float[].class, double[].class, byte[][].class };
+        Class[] x_c_typeType = new Class[]{int.class, short.class, long.class, byte.class, float.class, double.class,
+                int[].class, short[].class, long[].class, byte[].class, float[].class, double[].class, byte[][].class};
         for (int i = 0; i < x_c_typeType.length; i++) {
             types.add(x_c_typeType[i]);
         }
     }
 
     /**
-     * The constructor is hidden as the <code>Connection</code> factory method should be used instead. ConnectionImpl#tpalloc(String, String)
+     * The constructor is hidden as the <code>Connection</code> factory method
+     * should be used instead. ConnectionImpl#tpalloc(String, String)
      * 
-     * @param subtype The subtype of the buffer
-     * @throws ConnectionException In case the buffer does not exist
+     * @param subtype
+     *            The subtype of the buffer
+     * @throws ConnectionException
+     *             In case the buffer does not exist
      * @throws ConfigurationException
      */
     public X_C_TYPE_Impl(String subtype) throws ConnectionException, ConfigurationException {
@@ -65,9 +69,11 @@ public class X_C_TYPE_Impl extends BufferImpl implements X_C_TYPE {
     /**
      * Get the short value identified by the key.
      * 
-     * @param key The key to use
+     * @param key
+     *            The key to use
      * @return The short value
-     * @throws ConnectionException In case the key is not part of the structure.
+     * @throws ConnectionException
+     *             In case the key is not part of the structure.
      */
     public short getShort(String key) throws ConnectionException {
         return ((Short) getAttributeValue(key, short.class)).shortValue();
@@ -76,9 +82,12 @@ public class X_C_TYPE_Impl extends BufferImpl implements X_C_TYPE {
     /**
      * Set the short value
      * 
-     * @param key The value to set
-     * @param value The value to use
-     * @throws ConnectionException In case the key is unknown.
+     * @param key
+     *            The value to set
+     * @param value
+     *            The value to use
+     * @throws ConnectionException
+     *             In case the key is unknown.
      */
     public void setShort(String key, short value) throws ConnectionException {
         setAttributeValue(key, short.class, value);

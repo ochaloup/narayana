@@ -32,14 +32,12 @@ import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 /**
  * Simple record used to test AtomicAction
  */
-public class BasicStateRecord extends StateManager
-{
+public class BasicStateRecord extends StateManager {
     /**
      * This constructor will be the default and will not make the object
      * persistent allowing the test to run quicker.
      */
-    public BasicStateRecord()
-    {
+    public BasicStateRecord() {
         super();
         qautil.qadebug("starting construction");
         activate();
@@ -49,12 +47,10 @@ public class BasicStateRecord extends StateManager
     }
 
     /**
-     * This constructor will be used with the crashrecovery group
-     * of tests to ensure the objects state has been persisted to
-     * disk.
+     * This constructor will be used with the crashrecovery group of tests to
+     * ensure the objects state has been persisted to disk.
      */
-    public BasicStateRecord(int id)
-    {
+    public BasicStateRecord(int id) {
         super(ObjectType.ANDPERSISTENT);
 
         qautil.qadebug("starting construction");
@@ -66,11 +62,10 @@ public class BasicStateRecord extends StateManager
     }
 
     /**
-     * This constructor will be used to recreate an object after a
-     * crash has occured.
+     * This constructor will be used to recreate an object after a crash has
+     * occured.
      */
-    public BasicStateRecord(Uid oldId)
-    {
+    public BasicStateRecord(Uid oldId) {
         super(oldId, ObjectType.ANDPERSISTENT);
 
         qautil.qadebug("starting construction");
@@ -80,24 +75,21 @@ public class BasicStateRecord extends StateManager
         qautil.qadebug("ending construction");
     }
 
-    public int typeIs()
-    {
+    public int typeIs() {
         return RecordType.USER_DEF_FIRST0;
     }
 
     /**
-     * My methods to test abstract record is being processed correctly by the transaction
-     * manager.
+     * My methods to test abstract record is being processed correctly by the
+     * transaction manager.
      */
-    public void increase()
-    {
+    public void increase() {
 
         qautil.qadebug("start increase");
         activate();
         modified();
         mValue++;
-        if (BasicAction.Current() == null)
-        {
+        if (BasicAction.Current() == null) {
             deactivate();
         }
         qautil.qadebug("end increase");
@@ -106,60 +98,48 @@ public class BasicStateRecord extends StateManager
     /**
      * Get value should realy use activate etc we will look into this.
      */
-    public int getValue()
-    {
+    public int getValue() {
         return mValue;
     }
 
     /**
      * Override method to indicate we want this object to be saved.
      */
-    public boolean doSave()
-    {
+    public boolean doSave() {
         return true;
     }
 
-    public boolean save_state(OutputObjectState objectState, int objectType)
-    {
+    public boolean save_state(OutputObjectState objectState, int objectType) {
 
         qautil.qadebug("save state called when value = " + mValue);
         super.save_state(objectState, objectType);
-        try
-        {
+        try {
             objectState.packInt(mValue);
             return true;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             qautil.debug("BasicAbstractRecord.save_state: ", exception);
             return false;
         }
     }
 
-    public boolean restore_state(InputObjectState objectState, int objectType)
-    {
+    public boolean restore_state(InputObjectState objectState, int objectType) {
 
         qautil.qadebug("restore state called");
         super.restore_state(objectState, objectType);
-        try
-        {
+        try {
             mValue = objectState.unpackInt();
             qautil.qadebug("value restored = " + mValue);
             return true;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             qautil.debug("BasicAbstractRecord.restore_state: ", exception);
             return false;
         }
     }
 
-    public String type()
-    {
+    public String type() {
         return "/StateManager/BasicStateRecord";
     }
 
     private int mValue = 0;
     private int mId = 0;
 }
-

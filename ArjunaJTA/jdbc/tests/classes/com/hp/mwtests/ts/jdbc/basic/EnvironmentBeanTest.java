@@ -34,8 +34,7 @@ import com.arjuna.ats.jdbc.common.JDBCEnvironmentBean;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest
-{
+public class EnvironmentBeanTest {
     @Test
     public void testJDBCEnvironmentBean() throws Exception {
         // reflection won't work on this one :-(

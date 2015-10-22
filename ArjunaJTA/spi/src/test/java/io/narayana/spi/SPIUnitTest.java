@@ -55,10 +55,11 @@ import static org.junit.Assert.*;
  *      followed by  COMMIT TRANSACTION xid
  *  now disconnect (since h2 only allows a single user connection)
  */
-public class SPIUnitTest
-{
-    private String userTransactionJNDIContext = jtaPropertyManager.getJTAEnvironmentBean().getUserTransactionJNDIContext();
-    private String transactionManagerJNDIContext =  jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext();
+public class SPIUnitTest {
+    private String userTransactionJNDIContext = jtaPropertyManager.getJTAEnvironmentBean()
+            .getUserTransactionJNDIContext();
+    private String transactionManagerJNDIContext = jtaPropertyManager.getJTAEnvironmentBean()
+            .getTransactionManagerJNDIContext();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -79,7 +80,8 @@ public class SPIUnitTest
         UserTransaction txn = (UserTransaction) new InitialContext().lookup(userTransactionJNDIContext);
         TransactionServiceFactory.stop();
 
-        // UserTransaction should still work even thought the TF has been stopped
+        // UserTransaction should still work even thought the TF has been
+        // stopped
         txn.begin();
         txn.commit();
 
@@ -208,10 +210,11 @@ public class SPIUnitTest
 
     @Test
     public void testSynchronization() throws Exception {
-        TestSynchronization synch =  new TestSynchronization() ;
+        TestSynchronization synch = new TestSynchronization();
 
         UserTransaction txn = (UserTransaction) new InitialContext().lookup(userTransactionJNDIContext);
-        TransactionManager transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJNDIContext);
+        TransactionManager transactionManager = (TransactionManager) new InitialContext()
+                .lookup(transactionManagerJNDIContext);
 
         txn.begin();
 

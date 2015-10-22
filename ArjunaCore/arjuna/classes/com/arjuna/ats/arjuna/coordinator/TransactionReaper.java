@@ -56,27 +56,24 @@ import com.arjuna.ats.internal.arjuna.coordinator.ReaperWorkerThread;
  * @since JTS 1.0.
  */
 
-public class TransactionReaper
-{
+public class TransactionReaper {
 
     public static final String NORMAL = "NORMAL";
 
     public static final String DYNAMIC = "DYNAMIC";
 
-    public static final String PERIODIC = "PERIODIC"; // the new name for 'NORMAL'
+    public static final String PERIODIC = "PERIODIC"; // the new name for
+                                                        // 'NORMAL'
 
-    private TransactionReaper(long checkPeriod)
-    {
+    private TransactionReaper(long checkPeriod) {
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("TransactionReaper::TransactionReaper ( " + checkPeriod
-                    + " )");
+            tsLogger.logger.trace("TransactionReaper::TransactionReaper ( " + checkPeriod + " )");
         }
 
         _checkPeriod = checkPeriod;
     }
 
-    public final long checkingPeriod()
-    {
+    public final long checkingPeriod() {
         if (_dynamic) {
             return nextDynamicCheckTime.get() - System.currentTimeMillis();
         } else {
@@ -86,7 +83,7 @@ public class TransactionReaper
             // dynamic model
 
             final ReaperElement head = _reaperElements.getFirst();
-            if(head != null) {
+            if (head != null) {
                 if (head._status != ReaperElement.RUN) {
                     long waitTime = head.getAbsoluteTimeout() - System.currentTimeMillis();
                     if (waitTime < _checkPeriod) {
@@ -100,17 +97,15 @@ public class TransactionReaper
     }
 
     /**
-     * process all entries in the timeout queue which have
-     * expired. entries for newly expired transactions are passed
-     * to a worker thread for cancellation and requeued for
-     * subsequent progress checks. the worker is given a kick if
-     * such checks find it is wedged.
+     * process all entries in the timeout queue which have expired. entries for
+     * newly expired transactions are passed to a worker thread for cancellation
+     * and requeued for subsequent progress checks. the worker is given a kick
+     * if such checks find it is wedged.
      * 
      * Timeout is given in milliseconds.
      */
 
-    public final void check()
-    {
+    public final void check() {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("TransactionReaper::check ()");
         }
@@ -118,7 +113,7 @@ public class TransactionReaper
         do {
             final ReaperElement reaperElement;
 
-            synchronized(this) {
+            synchronized (this) {
                 final long now = System.currentTimeMillis();
                 final long next = nextDynamicCheckTime.get();
 
@@ -131,21 +126,24 @@ public class TransactionReaper
                 }
 
                 reaperElement = _reaperElements.getFirst();
-                // TODO close window where first can change - maybe record nextDynamicCheckTime before probing first,
-                // then use compareAndSet? Although something will need to check before sleeping anyhow...
+                // TODO close window where first can change - maybe record
+                // nextDynamicCheckTime before probing first,
+                // then use compareAndSet? Although something will need to check
+                // before sleeping anyhow...
                 if (reaperElement == null) {
                     nextDynamicCheckTime.set(Long.MAX_VALUE);
                     return;
                 } else {
                     final long nextTimeout = reaperElement.getAbsoluteTimeout();
-                    if(nextTimeout > now) {
+                    if (nextTimeout > now) {
                         nextDynamicCheckTime.set(nextTimeout);
                         return; // nothing to do yet.
                     }
                 }
             }
 
-            tsLogger.i18NLogger.warn_coordinator_TransactionReaper_18(reaperElement._control.get_uid(), reaperElement.statusName());
+            tsLogger.i18NLogger.warn_coordinator_TransactionReaper_18(reaperElement._control.get_uid(),
+                    reaperElement.statusName());
 
             // if we have to synchronize on multiple objects we always
             // do so in a fixed order ReaperElement before Reaper and
@@ -153,9 +151,9 @@ public class TransactionReaper
             // ensure we don't deadlock. We never sychronize on the
             // reaper and the cancel queue at the same time.
 
-            synchronized(reaperElement) {
+            synchronized (reaperElement) {
                 switch (reaperElement._status) {
-                    case ReaperElement.RUN: {
+                    case ReaperElement.RUN : {
                         // this tx has just timed out. remove it from the
                         // TX list, update the timeout to take account of
                         // cancellation period and reinsert as a cancelled
@@ -167,20 +165,21 @@ public class TransactionReaper
                         reinsertElement(reaperElement, _cancelWaitPeriod);
 
                         if (tsLogger.logger.isTraceEnabled()) {
-                            tsLogger.logger.trace("Reaper scheduling TX for cancellation " + reaperElement._control.get_uid());
+                            tsLogger.logger
+                                    .trace("Reaper scheduling TX for cancellation " + reaperElement._control.get_uid());
                         }
 
                         // insert into cancellation queue for a worker
                         // thread to process and then make sure a worker
                         // thread is awake
 
-                        synchronized(_workQueue) {
+                        synchronized (_workQueue) {
                             _workQueue.add(reaperElement);
                             _workQueue.notifyAll();
                         }
                     }
-                    break;
-                    case ReaperElement.SCHEDULE_CANCEL: {
+                        break;
+                    case ReaperElement.SCHEDULE_CANCEL : {
                         // hmm, a worker is taking its time to
                         // start processing this scheduled entry.
                         // we may just be running slow ... but the
@@ -196,22 +195,23 @@ public class TransactionReaper
                         reinsertElement(reaperElement, _cancelWaitPeriod);
 
                         if (tsLogger.logger.isTraceEnabled()) {
-                            tsLogger.logger.trace("Reaper deferring interrupt for TX scheduled for cancel " + reaperElement._control.get_uid());
+                            tsLogger.logger.trace("Reaper deferring interrupt for TX scheduled for cancel "
+                                    + reaperElement._control.get_uid());
                         }
                     }
-                    break;
-                    case ReaperElement.CANCEL: {
+                        break;
+                    case ReaperElement.CANCEL : {
                         // ok, the worker must be wedged under a
                         // call to cancel() -- kick the thread and
                         // reschedule the element for a later
                         // check to ensure the thread responded to
                         // the kick
-                        
+
                         StringBuilder sb = new StringBuilder();
                         for (StackTraceElement element : reaperElement._worker.getStackTrace()) {
                             sb.append(element.toString());
                             sb.append("\n");
-                        }                        
+                        }
                         tsLogger.i18NLogger.wedged_reaperelement(sb.toString());
 
                         reaperElement._status = ReaperElement.CANCEL_INTERRUPTED;
@@ -223,11 +223,12 @@ public class TransactionReaper
                         // log that we interrupted cancel()
 
                         if (tsLogger.logger.isTraceEnabled()) {
-                            tsLogger.logger.trace("TransactionReaper::check interrupting cancel in progress for " + reaperElement._control.get_uid());
+                            tsLogger.logger.trace("TransactionReaper::check interrupting cancel in progress for "
+                                    + reaperElement._control.get_uid());
                         }
                     }
-                    break;
-                    case ReaperElement.CANCEL_INTERRUPTED: {
+                        break;
+                    case ReaperElement.CANCEL_INTERRUPTED : {
                         // cancellation got truly wedged -- mark
                         // the element as a zombie so the worker
                         // exits when (if?) it wakes up and create
@@ -237,17 +238,20 @@ public class TransactionReaper
 
                         reaperElement._status = ReaperElement.ZOMBIE;
 
-                        synchronized(this) {
+                        synchronized (this) {
                             _zombieCount++;
 
                             if (tsLogger.logger.isTraceEnabled()) {
-                                tsLogger.logger.trace("Reaper " + Thread.currentThread() + " got a zombie " + reaperElement._worker + " (zombie count now " + _zombieCount + ") cancelling " + reaperElement._control.get_uid());
+                                tsLogger.logger.trace("Reaper " + Thread.currentThread() + " got a zombie "
+                                        + reaperElement._worker + " (zombie count now " + _zombieCount + ") cancelling "
+                                        + reaperElement._control.get_uid());
                             }
 
                             if (_zombieCount == _zombieMax) {
                                 // log zombie overflow error call()
 
-                                tsLogger.i18NLogger.error_coordinator_TransactionReaper_5(Integer.toString(_zombieCount));
+                                tsLogger.i18NLogger
+                                        .error_coordinator_TransactionReaper_5(Integer.toString(_zombieCount));
                             }
                         }
 
@@ -274,24 +278,26 @@ public class TransactionReaper
 
                                 // log a successful preventCommit()
 
-                                tsLogger.i18NLogger.warn_coordinator_TransactionReaper_10(reaperElement._control.get_uid());
+                                tsLogger.i18NLogger
+                                        .warn_coordinator_TransactionReaper_10(reaperElement._control.get_uid());
 
                                 notifyListeners(reaperElement._control, false);
                             } else {
                                 // log a failed preventCommit()
 
-                                tsLogger.i18NLogger.warn_coordinator_TransactionReaper_11(reaperElement._control.get_uid());
+                                tsLogger.i18NLogger
+                                        .warn_coordinator_TransactionReaper_11(reaperElement._control.get_uid());
                             }
-                        }
-                        catch (Exception e1) {
+                        } catch (Exception e1) {
                             // log an exception under preventCommit()
 
-                            tsLogger.i18NLogger.warn_coordinator_TransactionReaper_12(reaperElement._control.get_uid(), e1);
+                            tsLogger.i18NLogger.warn_coordinator_TransactionReaper_12(reaperElement._control.get_uid(),
+                                    e1);
                         }
                     }
-                    break;
-                    case ReaperElement.FAIL:
-                    case ReaperElement.COMPLETE: {
+                        break;
+                    case ReaperElement.FAIL :
+                    case ReaperElement.COMPLETE : {
                         // ok, the worker should remove the tx
                         // from the transactions queue very soon
                         // but we need to progress to the next
@@ -300,7 +306,7 @@ public class TransactionReaper
 
                         removeElementReaper(reaperElement);
                     }
-                    break;
+                        break;
 
                 }
             }
@@ -309,33 +315,30 @@ public class TransactionReaper
     }
 
     /**
-     * called by check, this method removes and reinserts an element in the timeout
-     * ordered set, recalculating the next wakeup time accordingly.
+     * called by check, this method removes and reinserts an element in the
+     * timeout ordered set, recalculating the next wakeup time accordingly.
      */
-    private void reinsertElement(ReaperElement e, long delay)
-    {
+    private void reinsertElement(ReaperElement e, long delay) {
         synchronized (this) {
             long newWakeup = _reaperElements.reorder(e, delay);
-            nextDynamicCheckTime.set(newWakeup); // TODO - set should be atomic with reorder?
+            nextDynamicCheckTime.set(newWakeup); // TODO - set should be atomic
+                                                    // with reorder?
         }
     }
 
-    public final void waitForCancellations()
-    {
+    public final void waitForCancellations() {
         synchronized (_workQueue) {
             try {
                 while (_workQueue.isEmpty()) {
                     _workQueue.wait();
                 }
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
         }
     }
 
-    public final void doCancellations()
-    {
-        for (; ;) {
+    public final void doCancellations() {
+        for (;;) {
             ReaperElement e;
 
             // see if we have any cancellations to process
@@ -343,8 +346,7 @@ public class TransactionReaper
             synchronized (_workQueue) {
                 try {
                     e = _workQueue.remove(0);
-                }
-                catch (IndexOutOfBoundsException ioobe) {
+                } catch (IndexOutOfBoundsException ioobe) {
                     break;
                 }
             }
@@ -353,7 +355,8 @@ public class TransactionReaper
             // progress state to CANCEL and call cancel()
 
             if (tsLogger.logger.isTraceEnabled()) {
-                tsLogger.logger.trace("Reaper Worker " + Thread.currentThread() + " attempting to cancel " + e._control.get_uid());
+                tsLogger.logger.trace(
+                        "Reaper Worker " + Thread.currentThread() + " attempting to cancel " + e._control.get_uid());
             }
 
             boolean cancelled = false;
@@ -373,7 +376,7 @@ public class TransactionReaper
                 if (e._control.running()) {
 
                     // try to cancel the transaction, note that if the
-                    // transaction previously failed to abort due to a 
+                    // transaction previously failed to abort due to a
                     // runtimeexception being raised by the AbstractRecord
                     // implementation then the transaction will effectively
                     // remain untouched and afterCompletion will not be called.
@@ -382,16 +385,17 @@ public class TransactionReaper
                         cancelled = true;
 
                         if (TxStats.enabled()) {
-                            // note that we also count timeouts as application rollbacks via
-                            // the stats unpdate in the TwoPhaseCoordinator cancel() method.
+                            // note that we also count timeouts as application
+                            // rollbacks via
+                            // the stats unpdate in the TwoPhaseCoordinator
+                            // cancel() method.
                             TxStats.getInstance().incrementTimeouts();
                         }
 
                         notifyListeners(e._control, true);
                     }
                 }
-            }
-            catch (Exception e1) {
+            } catch (Exception e1) {
                 exception = e1;
             }
 
@@ -410,7 +414,7 @@ public class TransactionReaper
                     ReaperWorkerThread worker = (ReaperWorkerThread) Thread.currentThread();
                     worker.shutdown();
 
-                    synchronized(this) {
+                    synchronized (this) {
                         _zombieCount--;
                     }
 
@@ -422,8 +426,7 @@ public class TransactionReaper
                     // after returning
 
                     break;
-                } else if (cancelled &&
-                        e._status == ReaperElement.CANCEL_INTERRUPTED) {
+                } else if (cancelled && e._status == ReaperElement.CANCEL_INTERRUPTED) {
                     // ok the call to cancel() returned true but
                     // we cannot trust it because the reaper sent
                     // the thread an interrupt
@@ -432,9 +435,7 @@ public class TransactionReaper
                     e._status = ReaperElement.FAIL;
                     e.notifyAll();
                 } else {
-                    e._status = (cancelled
-                            ? ReaperElement.COMPLETE
-                            : ReaperElement.FAIL);
+                    e._status = (cancelled ? ReaperElement.COMPLETE : ReaperElement.FAIL);
                     e.notifyAll();
                 }
             }
@@ -448,7 +449,8 @@ public class TransactionReaper
                         e._control.get_uid());
             } else if (e._control.running()) {
                 if (exception != null) {
-                    tsLogger.i18NLogger.warn_coordinator_TransactionReaper_9(Thread.currentThread().toString(), e._control.get_uid(), exception);
+                    tsLogger.i18NLogger.warn_coordinator_TransactionReaper_9(Thread.currentThread().toString(),
+                            e._control.get_uid(), exception);
                 } else {
                     tsLogger.i18NLogger.warn_coordinator_TransactionReaper_8(Thread.currentThread().toString(),
                             e._control.get_uid());
@@ -468,11 +470,11 @@ public class TransactionReaper
                         tsLogger.i18NLogger.warn_coordinator_TransactionReaper_15(Thread.currentThread().toString(),
                                 e._control.get_uid());
                     }
-                }
-                catch (Exception e1) {
+                } catch (Exception e1) {
                     // log an exception under preventCommit()
 
-                    tsLogger.i18NLogger.warn_coordinator_TransactionReaper_16(Thread.currentThread().toString(), e._control.get_uid(), e1);
+                    tsLogger.i18NLogger.warn_coordinator_TransactionReaper_16(Thread.currentThread().toString(),
+                            e._control.get_uid(), e1);
                 }
             }
 
@@ -484,44 +486,40 @@ public class TransactionReaper
      * @return the number of items in the reaper's list.
      * @since JTS 2.2.
      *
-     * Note: this is a) expensive and b) an approximation. Should be called only by test code.
+     *        Note: this is a) expensive and b) an approximation. Should be
+     *        called only by test code.
      */
-    public final long numberOfTransactions()
-    {
+    public final long numberOfTransactions() {
         return _reaperElements.size();
     }
 
     /**
-     * Return the number of timeouts registered.
-     * Note: this is a) expensive and b) an approximation. Should be called only by test code.
+     * Return the number of timeouts registered. Note: this is a) expensive and
+     * b) an approximation. Should be called only by test code.
      *
      * @return The number of timeouts registered.
      */
-    public final long numberOfTimeouts()
-    {
+    public final long numberOfTimeouts() {
         return _timeouts.size();
     }
 
-    public final void addListener(ReaperMonitor listener)
-    {
+    public final void addListener(ReaperMonitor listener) {
         _listeners.add(listener);
     }
 
-    public final boolean removeListener(ReaperMonitor listener)
-    {
+    public final boolean removeListener(ReaperMonitor listener) {
         return _listeners.remove(listener);
     }
 
     /**
      * timeout is given in seconds, but we work in milliseconds.
      *
-     * Attempting to insert an element that is already present is an error (IllegalStateException)
+     * Attempting to insert an element that is already present is an error
+     * (IllegalStateException)
      */
-    public final void insert(Reapable control, int timeout)
-    {
+    public final void insert(Reapable control, int timeout) {
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("TransactionReaper::insert ( " + control + ", " + timeout
-                    + " )");
+            tsLogger.logger.trace("TransactionReaper::insert ( " + control + ", " + timeout + " )");
         }
 
         /*
@@ -535,10 +533,14 @@ public class TransactionReaper
 
         _lifetime.addAndGet(timeout);
 
-        // insert the element only if it's not already present. We check _timeouts first, as elements
-        // maybe temporarily removed and reinserted in _reaperElements, so that is not as good a check.
-        // We use lazy eval to ensure we insert to _reaperElements only if we inserted to _timeouts.
-        // Note: removal works in reverse order i.e. _reaperElements then _timeouts.
+        // insert the element only if it's not already present. We check
+        // _timeouts first, as elements
+        // maybe temporarily removed and reinserted in _reaperElements, so that
+        // is not as good a check.
+        // We use lazy eval to ensure we insert to _reaperElements only if we
+        // inserted to _timeouts.
+        // Note: removal works in reverse order i.e. _reaperElements then
+        // _timeouts.
         if ((_timeouts.putIfAbsent(reaperElement._control, reaperElement) == null)) {
             _reaperElements.add(reaperElement);
         } else {
@@ -551,17 +553,20 @@ public class TransactionReaper
     }
 
     /**
-     * Reset the next wakeup time, when a new element has a timeout earlier than the currently scheduled wakeup.
+     * Reset the next wakeup time, when a new element has a timeout earlier than
+     * the currently scheduled wakeup.
      *
-     * @param newCheckTime absolute time in ms.
+     * @param newCheckTime
+     *            absolute time in ms.
      */
-    private void updateCheckTimeForEarlierInsert(long newCheckTime)
-    {
+    private void updateCheckTimeForEarlierInsert(long newCheckTime) {
         synchronized (this) {
             long oldCheckTime = nextDynamicCheckTime.get();
             while (newCheckTime < oldCheckTime) {
                 if (nextDynamicCheckTime.compareAndSet(oldCheckTime, newCheckTime)) {
-                    notifyAll(); // force recalc of next wakeup time, taking into account the newly inserted element(s)
+                    notifyAll(); // force recalc of next wakeup time, taking
+                                    // into account the newly inserted
+                                    // element(s)
                 } else {
                     oldCheckTime = nextDynamicCheckTime.get();
                 }
@@ -569,9 +574,9 @@ public class TransactionReaper
         }
     }
 
-    // takes an Object because OTSManager.destroyControl(Control|ControlImple) uses PseudoControlWrapper not Reapable
-    public final void remove(Object control)
-    {
+    // takes an Object because OTSManager.destroyControl(Control|ControlImple)
+    // uses PseudoControlWrapper not Reapable
+    public final void remove(Object control) {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("TransactionReaper::remove ( " + control + " )");
         }
@@ -611,14 +616,13 @@ public class TransactionReaper
      * @param control
      * @return the remaining time in milliseconds.
      */
-    public final long getRemainingTimeoutMills(Object control)
-    {
-        // arg is an Object because ArjunaTransactionImple.propagationContext does not have a Reapable
+    public final long getRemainingTimeoutMills(Object control) {
+        // arg is an Object because ArjunaTransactionImple.propagationContext
+        // does not have a Reapable
 
         if ((_timeouts.isEmpty()) || (control == null)) {
             if (tsLogger.logger.isTraceEnabled()) {
-                tsLogger.logger.trace("TransactionReaper::getRemainingTimeout for " + control
-                        + " returning 0");
+                tsLogger.logger.trace("TransactionReaper::getRemainingTimeout for " + control + " returning 0");
             }
 
             return 0;
@@ -635,7 +639,8 @@ public class TransactionReaper
         }
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("TransactionReaper::getRemainingTimeoutMillis for "+control+" returning "+timeout);
+            tsLogger.logger
+                    .trace("TransactionReaper::getRemainingTimeoutMillis for " + control + " returning " + timeout);
         }
 
         return timeout;
@@ -648,14 +653,13 @@ public class TransactionReaper
      * Return in seconds!
      *
      * Takes an Object because TransactionFactoryImple.getTransactionInfo and
-     * ArjunaTransactionImple.propagationContext use it and don't have a Reapable.
+     * ArjunaTransactionImple.propagationContext use it and don't have a
+     * Reapable.
      */
-    public final int getTimeout(Object control)
-    {
+    public final int getTimeout(Object control) {
         if ((_timeouts.isEmpty()) || (control == null)) {
             if (tsLogger.logger.isTraceEnabled()) {
-                tsLogger.logger.trace("TransactionReaper::getTimeout for " + control
-                        + " returning 0");
+                tsLogger.logger.trace("TransactionReaper::getTimeout for " + control + " returning 0");
             }
 
             return 0;
@@ -665,51 +669,48 @@ public class TransactionReaper
 
         int timeout = (reaperElement == null ? 0 : reaperElement._timeout);
 
-        tsLogger.logger.trace("TransactionReaper::getTimeout for "+control+" returning "+timeout);
+        tsLogger.logger.trace("TransactionReaper::getTimeout for " + control + " returning " + timeout);
 
         return timeout;
     }
 
     /*
-    * Terminate the transaction reaper. This is a synchronous operation
-    * and will only return once the reaper has been shutdown cleanly.
-    *
-    * Note, this method assumes that the transaction system has been
-    * shutdown already so no new transactions can be created, or we
-    * could be here for a long time!
-    *
-    * @param waitForTransactions if <code>true</code> then the reaper will
-    * wait until all transactions have terminated (or been terminated by it).
-    * If <code>false</code> then the reaper will call setRollbackOnly on all
-    * the transactions.
-    */
+     * Terminate the transaction reaper. This is a synchronous operation and
+     * will only return once the reaper has been shutdown cleanly.
+     *
+     * Note, this method assumes that the transaction system has been shutdown
+     * already so no new transactions can be created, or we could be here for a
+     * long time!
+     *
+     * @param waitForTransactions if <code>true</code> then the reaper will wait
+     * until all transactions have terminated (or been terminated by it). If
+     * <code>false</code> then the reaper will call setRollbackOnly on all the
+     * transactions.
+     */
 
-    private final void shutdown(boolean waitForTransactions)
-    {
+    private final void shutdown(boolean waitForTransactions) {
         // the reaper thread synchronizes and waits on this
 
         synchronized (this) {
             _inShutdown = true;
 
             /*
-                * If the caller does not want to wait for the normal transaction timeout
-                * periods to elapse before terminating, then we first start by enabling
-                * our time machine!
-                */
+             * If the caller does not want to wait for the normal transaction
+             * timeout periods to elapse before terminating, then we first start
+             * by enabling our time machine!
+             */
 
             if (!waitForTransactions) {
                 _reaperElements.setAllTimeoutsToZero();
             }
 
             /*
-                * Wait for all of the transactions to
-                * terminate normally.
-                */
+             * Wait for all of the transactions to terminate normally.
+             */
             while (!_reaperElements.isEmpty()) {
                 try {
                     this.wait();
-                }
-                catch (final Exception ex) {
+                } catch (final Exception ex) {
                 }
             }
 
@@ -719,8 +720,7 @@ public class TransactionReaper
         }
         try {
             _reaperThread.join();
-        }
-        catch (final Exception ex) {
+        } catch (final Exception ex) {
         }
 
         _reaperThread = null;
@@ -736,24 +736,23 @@ public class TransactionReaper
 
         try {
             _reaperWorkerThread.join();
-        }
-        catch (final Exception ex) {
+        } catch (final Exception ex) {
         }
 
         _reaperWorkerThread = null;
     }
 
     // called (indirectly) by user code doing removals on e.g. commit/rollback
-    // does not reset the wakeup time - we prefer leaving an unnecessary wakeup as it's
+    // does not reset the wakeup time - we prefer leaving an unnecessary wakeup
+    // as it's
     // cheaper than locking to recalculate the new time here.
-    private final void removeElementClient(ReaperElement reaperElement)
-    {
-        _reaperElements.remove(reaperElement);        
+    private final void removeElementClient(ReaperElement reaperElement) {
+        _reaperElements.remove(reaperElement);
         _timeouts.remove(reaperElement._control);
 
         // don't recalc time, just wake up as planned
 
-        if(_inShutdown) {
+        if (_inShutdown) {
             synchronized (this) {
                 this.notifyAll(); // TODO: use different lock for shutdown?
             }
@@ -761,15 +760,15 @@ public class TransactionReaper
     }
 
     /*
-      * Remove element from list and trigger waiter if we are
-      * being shutdown.
-      *
-      */
-    // called internally by the reaper when removing elements - note the different
-    // behaviour with regard to check time recalculation. Here we need to ensure the
+     * Remove element from list and trigger waiter if we are being shutdown.
+     *
+     */
+    // called internally by the reaper when removing elements - note the
+    // different
+    // behaviour with regard to check time recalculation. Here we need to ensure
+    // the
     // new time is correct.
-    private final void removeElementReaper(ReaperElement reaperElement)
-    {
+    private final void removeElementReaper(ReaperElement reaperElement) {
         _reaperElements.remove(reaperElement);
         _timeouts.remove(reaperElement._control);
 
@@ -777,21 +776,18 @@ public class TransactionReaper
 
             // TODO set needs tobe atomic to getFirst?
             ReaperElement first = _reaperElements.getFirst();
-            if(first != null) {
+            if (first != null) {
                 nextDynamicCheckTime.set(first.getAbsoluteTimeout());
             } else {
                 nextDynamicCheckTime.set(Long.MAX_VALUE);
-                if(_inShutdown) {
+                if (_inShutdown) {
                     this.notifyAll(); // TODO: use different lock for shutdown?
                 }
             }
         }
     }
 
-
-
-    private final void notifyListeners(Reapable element, boolean rollback)
-    {
+    private final void notifyListeners(Reapable element, boolean rollback) {
         // notify listeners. Ignore errors.
 
         for (int i = 0; i < _listeners.size(); i++) {
@@ -800,8 +796,7 @@ public class TransactionReaper
                     _listeners.get(i).rolledBack(element.get_uid());
                 else
                     _listeners.get(i).markedRollbackOnly(element.get_uid());
-            }
-            catch (final Throwable ex) {
+            } catch (final Throwable ex) {
                 // ignore
             }
         }
@@ -811,10 +806,8 @@ public class TransactionReaper
      * Currently we let the reaper thread run at same priority as other threads.
      * Could get priority from environment.
      */
-    public static synchronized void instantiate()
-    {
-        if (TransactionReaper._theReaper == null)
-        {
+    public static synchronized void instantiate() {
+        if (TransactionReaper._theReaper == null) {
             if (tsLogger.logger.isTraceEnabled()) {
                 tsLogger.logger.trace("TransactionReaper::instantiate()");
             }
@@ -840,7 +833,8 @@ public class TransactionReaper
             }
             TransactionReaper._theReaper = new TransactionReaper(checkPeriod);
 
-            TransactionReaper._theReaper._cancelWaitPeriod = arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperCancelWaitPeriod();
+            TransactionReaper._theReaper._cancelWaitPeriod = arjPropertyManager.getCoordinatorEnvironmentBean()
+                    .getTxReaperCancelWaitPeriod();
 
             // must give TX at least 10 millisecs to
             // respond to cancel
@@ -849,7 +843,8 @@ public class TransactionReaper
                 TransactionReaper._theReaper._cancelWaitPeriod = 10;
             }
 
-            TransactionReaper._theReaper._cancelFailWaitPeriod = arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperCancelFailWaitPeriod();
+            TransactionReaper._theReaper._cancelFailWaitPeriod = arjPropertyManager.getCoordinatorEnvironmentBean()
+                    .getTxReaperCancelFailWaitPeriod();
 
             // must give TX at least 10 millisecs to
             // respond to cancel
@@ -858,7 +853,8 @@ public class TransactionReaper
                 TransactionReaper._theReaper._cancelFailWaitPeriod = 10;
             }
 
-            TransactionReaper._theReaper._zombieMax = arjPropertyManager.getCoordinatorEnvironmentBean().getTxReaperZombieMax();
+            TransactionReaper._theReaper._zombieMax = arjPropertyManager.getCoordinatorEnvironmentBean()
+                    .getTxReaperZombieMax();
 
             // we start bleating if the zombie count
             // reaches zombieMax so it has to be at
@@ -883,94 +879,96 @@ public class TransactionReaper
     }
 
     /**
-     * Starting with 4.8, this method will always return an instance, will never return null.
-     * This causes the reaper to be instantiated unnecessarily in some cases, but that's cheaper
-     * than the alternatives.
+     * Starting with 4.8, this method will always return an instance, will never
+     * return null. This causes the reaper to be instantiated unnecessarily in
+     * some cases, but that's cheaper than the alternatives.
      *
      * @return a TransactionReaper singleton.
      */
     public static TransactionReaper transactionReaper() {
-        if(_theReaper == null) {
+        if (_theReaper == null) {
             instantiate();
         }
         return _theReaper;
     }
 
     /**
-     * Terminate the transaction reaper. This is a synchronous operation
-     * and will only return once the reaper has been shutdown cleanly.
+     * Terminate the transaction reaper. This is a synchronous operation and
+     * will only return once the reaper has been shutdown cleanly.
      * 
-     * Note, this method assumes that the transaction system has been
-     * shutdown already so no new transactions can be created, or we
-     * could be here for a long time!
+     * Note, this method assumes that the transaction system has been shutdown
+     * already so no new transactions can be created, or we could be here for a
+     * long time!
      *
-     * @param waitForTransactions if <code>true</code> then the reaper will
-     *                            wait until all transactions have terminated (or been terminated by it).
-     *                            If <code>false</code> then the reaper will call setRollbackOnly on all
-     *                            the transactions.
+     * @param waitForTransactions
+     *            if <code>true</code> then the reaper will wait until all
+     *            transactions have terminated (or been terminated by it). If
+     *            <code>false</code> then the reaper will call setRollbackOnly
+     *            on all the transactions.
      */
 
-    public static synchronized void terminate(boolean waitForTransactions)
-    {
+    public static synchronized void terminate(boolean waitForTransactions) {
         if (_theReaper != null) {
             _theReaper.shutdown(waitForTransactions);
             _theReaper = null;
         }
     }
 
-    public static boolean isDynamic()
-    {
+    public static boolean isDynamic() {
         return _dynamic;
     }
 
-    public static synchronized long transactionLifetime()
-    {
+    public static synchronized long transactionLifetime() {
         return _lifetime.get();
     }
 
     public static final long defaultCheckPeriod = 120000; // in milliseconds
     public static final long defaultCancelWaitPeriod = 500; // in milliseconds
-    public static final long defaultCancelFailWaitPeriod = 500; // in milliseconds
+    public static final long defaultCancelFailWaitPeriod = 500; // in
+                                                                // milliseconds
     public static final int defaultZombieMax = 8;
 
-    static final synchronized void reset()
-    {
+    static final synchronized void reset() {
         _theReaper = null;
     }
 
     private final ReaperElementManager _reaperElements = new ReaperElementManager();
 
-    // The keys are actually Reapable, as that's what insert takes. However, some functions use get(Object)
-    // and rely on clever hashcode/equals behaviour, especially for the JTS. Thus the generics key type is Object.
+    // The keys are actually Reapable, as that's what insert takes. However,
+    // some functions use get(Object)
+    // and rely on clever hashcode/equals behaviour, especially for the JTS.
+    // Thus the generics key type is Object.
     private final ConcurrentMap<Object, ReaperElement> _timeouts = new ConcurrentHashMap<Object, ReaperElement>();
 
     private final List<ReaperElement> _workQueue = new LinkedList<ReaperElement>();
 
-    private final Vector<ReaperMonitor> _listeners = new Vector<ReaperMonitor>(); // TODO sync properly
+    private final Vector<ReaperMonitor> _listeners = new Vector<ReaperMonitor>(); // TODO
+                                                                                    // sync
+                                                                                    // properly
 
     private long _checkPeriod = 0;
 
-    // Although it is atomic, writes (but not reads) need to by synchronized(this) i.e. on the TransactionReaper instance
-    // in order to ensure proper timing with respect to wait/notify and wakeups on the _reaperElements queue.
+    // Although it is atomic, writes (but not reads) need to by
+    // synchronized(this) i.e. on the TransactionReaper instance
+    // in order to ensure proper timing with respect to wait/notify and wakeups
+    // on the _reaperElements queue.
     private final AtomicLong nextDynamicCheckTime = new AtomicLong(Long.MAX_VALUE);
 
     /**
-     * number of millisecs delay afer a cancel() is scheduled
-     * before the reaper tries to interrupt the worker thread
-     * executing the cancel()
+     * number of millisecs delay afer a cancel() is scheduled before the reaper
+     * tries to interrupt the worker thread executing the cancel()
      */
     private long _cancelWaitPeriod = 0;
 
     /**
-     * number of millisecs delay afer a worker thread is
-     * interrupted before the reaper writes the it off as a zombie
-     * and starts a new thread
+     * number of millisecs delay afer a worker thread is interrupted before the
+     * reaper writes the it off as a zombie and starts a new thread
      */
     private long _cancelFailWaitPeriod = 0;
 
     /**
-     * threshold for count of non-exited zombies at which system
-     * starts logging error messages
+     * threshold for count of non-exited zombies at which system starts logging
+     * error messages
      */
     private int _zombieMax = 0;
 

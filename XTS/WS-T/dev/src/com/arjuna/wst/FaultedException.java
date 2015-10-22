@@ -39,18 +39,14 @@ package com.arjuna.wst;
  * @since 1.0.
  */
 
-public class FaultedException extends Exception
-{
-    
-    public FaultedException ()
-    {
-    super();
+public class FaultedException extends Exception {
+
+    public FaultedException() {
+        super();
     }
 
-    public FaultedException (String s)
-    {
-    super(s);
+    public FaultedException(String s) {
+        super(s);
     }
 
 }
-

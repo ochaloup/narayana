@@ -38,7 +38,6 @@ public class TestTPRecv extends TestCase {
         ConnectionFactory connectionFactory = ConnectionFactory.getConnectionFactory();
         connection = connectionFactory.getConnection();
 
-
         sendbuf = (X_OCTET) connection.tpalloc("X_OCTET", null);
         sendbuf.setByteArray("recv".getBytes());
     }

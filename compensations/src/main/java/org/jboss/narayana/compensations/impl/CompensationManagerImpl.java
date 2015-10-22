@@ -22,7 +22,6 @@
 
 package org.jboss.narayana.compensations.impl;
 
-
 import org.jboss.narayana.compensations.api.CompensationManager;
 
 /**

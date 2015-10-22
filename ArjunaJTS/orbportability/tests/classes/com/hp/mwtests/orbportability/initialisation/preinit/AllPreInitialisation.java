@@ -30,13 +30,11 @@
  */
 package com.hp.mwtests.orbportability.initialisation.preinit;
 
-public class AllPreInitialisation
-{
-    public AllPreInitialisation()
-    {
+public class AllPreInitialisation {
+    public AllPreInitialisation() {
         System.out.println("AllPreInitialisation: called");
         _called = true;
     }
 
-    public static boolean   _called = false;
+    public static boolean _called = false;
 }

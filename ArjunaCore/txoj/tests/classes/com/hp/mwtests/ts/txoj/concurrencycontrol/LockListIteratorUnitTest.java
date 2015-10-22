@@ -38,16 +38,14 @@ import org.junit.Test;
 import com.arjuna.ats.internal.txoj.LockList;
 import com.arjuna.ats.internal.txoj.LockListIterator;
 
-public class LockListIteratorUnitTest
-{
+public class LockListIteratorUnitTest {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         LockList list = new LockList();
         LockListIterator iter = new LockListIterator(list);
-        
+
         assertEquals(iter.iterate(), null);
-        
+
         iter.reset();
     }
 }

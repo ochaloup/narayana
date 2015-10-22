@@ -33,12 +33,11 @@ import com.sun.corba.se.spi.ior.ObjectId;
 import org.omg.CosTransactions.RecoveryCoordinatorHelper;
 
 /**
- * Construct a recovery IOR for use with the default ORB bundled with the default JDK
+ * Construct a recovery IOR for use with the default ORB bundled with the
+ * default JDK
  */
-public class RecoverIOR
-{
-    static String getIORFromString(org.omg.CORBA.ORB orb, String str, String Key )
-    {
+public class RecoverIOR {
+    static String getIORFromString(org.omg.CORBA.ORB orb, String str, String Key) {
         com.sun.corba.se.spi.orb.ORB sun_orb = (com.sun.corba.se.spi.orb.ORB) orb;
 
         // calculate the new object key

@@ -33,18 +33,14 @@ package com.arjuna.ats.internal.txoj;
 
 import com.arjuna.ats.txoj.Lock;
 
+public class LockList {
 
-public class LockList
-{
-
-    public LockList()
-    {
+    public LockList() {
         count = 0;
         head = null;
     }
 
-    public void finalize ()
-    {
+    public void finalize() {
         @SuppressWarnings("unused")
         Lock temp;
 
@@ -57,15 +53,12 @@ public class LockList
      * otherwise. Insertion fails if a matching lock already exists in the list.
      */
 
-    public final boolean insert (Lock newlock)
-    {
+    public final boolean insert(Lock newlock) {
         LockListIterator next = new LockListIterator(this);
         Lock current = null;
 
-        while ((current = next.iterate()) != null)
-        {
-            if (current.equals(newlock))
-            {
+        while ((current = next.iterate()) != null) {
+            if (current.equals(newlock)) {
                 return false;
             }
         }
@@ -79,8 +72,7 @@ public class LockList
      * Pop the first element off the list and return it.
      */
 
-    public final Lock pop ()
-    {
+    public final Lock pop() {
         Lock current;
 
         if (count == 0)
@@ -99,8 +91,7 @@ public class LockList
      * be the old head, and then set head to be the new element.
      */
 
-    public final void push (Lock newLock)
-    {
+    public final void push(Lock newLock) {
         LockFriend.setLink(newLock, head);
         head = newLock;
         count++;
@@ -113,28 +104,25 @@ public class LockList
      * indicates a bug in the caller.
      */
 
-    public final void forgetNext (Lock current)
-    {
+    public final void forgetNext(Lock current) {
         if (count > 0) /* something there to forget */
         {
             if (current == null)
                 head = LockFriend.getLink(head);
-            else
-            {
+            else {
                 Lock nextOne = LockFriend.getLink(current);
 
                 /* See if at list end */
 
                 if (nextOne != null)
                     LockFriend.setLink(current, LockFriend.getLink(nextOne));
-                else
-                {
+                else {
                     /*
                      * Probably an error - being asked to forget element after
                      * end of list
                      */
                     count++;
-                    LockFriend.setLink(current, null);  /* force end of list */
+                    LockFriend.setLink(current, null); /* force end of list */
                 }
             }
 
@@ -142,8 +130,7 @@ public class LockList
         }
     }
 
-    public final int entryCount ()
-    {
+    public final int entryCount() {
         return count;
     }
 

@@ -54,14 +54,12 @@ import com.arjuna.mwlabs.wst.util.PersistableParticipantHelper;
  * @since 1.0.
  */
 
-public class DurableTwoPhaseCommitParticipant implements Participant
-{
+public class DurableTwoPhaseCommitParticipant implements Participant {
     // default ctor for crash recovery
     public DurableTwoPhaseCommitParticipant() {
     }
 
-    public DurableTwoPhaseCommitParticipant (Durable2PCParticipant resource, String identifier)
-    {
+    public DurableTwoPhaseCommitParticipant(Durable2PCParticipant resource, String identifier) {
         _resource = resource;
         _id = identifier;
     }
@@ -72,40 +70,30 @@ public class DurableTwoPhaseCommitParticipant implements Participant
      * @return the participant's vote or a cancel vote the aprticipant is null
      *
      */
-    public Vote prepare () throws InvalidParticipantException,
-            WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, SystemException
-    {
-        try
-        {
-            if (_resource != null)
-            {
+    public Vote prepare() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, SystemException {
+        try {
+            if (_resource != null) {
                 com.arjuna.wst.Vote vt = _resource.prepare();
 
-                if (vt instanceof com.arjuna.wst.ReadOnly)
-                {
+                if (vt instanceof com.arjuna.wst.ReadOnly) {
                     _readonly = true;
 
                     return new VoteReadOnly();
-                }
-                else
-                {
+                } else {
                     if (vt instanceof com.arjuna.wst.Prepared)
                         return new VoteConfirm();
-                    else
-                    {
+                    else {
                         _rolledback = true;
 
                         return new VoteCancel();
                     }
                 }
-            }
-            else
+            } else
                 return new VoteCancel();
         }
-        //    catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
-        catch (com.arjuna.wst.WrongStateException ex)
-        {
+        // catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
+        catch (com.arjuna.wst.WrongStateException ex) {
             throw new WrongStateException(ex.toString());
         }
         /*
@@ -114,16 +102,15 @@ public class DurableTwoPhaseCommitParticipant implements Participant
          * (com.arjuna.mw.wst.exceptions.HeuristicMixedException ex) { throw new
          * HeuristicMixedException(ex.toString()); }
          */
-        //    catch (com.arjuna.mw.wst.exceptions.SystemException ex)
-        catch (com.arjuna.wst.SystemException ex)
-        {
-            if(ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
+        // catch (com.arjuna.mw.wst.exceptions.SystemException ex)
+        catch (com.arjuna.wst.SystemException ex) {
+            if (ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
                 // log an error here or else the participant may be left hanging
                 // waiting for a prepare
                 wstxLogger.i18NLogger.warn_mwlabs_wst_at_participants_DurableTwoPhaseCommitParticipant_prepare_1(_id);
                 throw new SystemCommunicationException(ex.toString());
             } else {
-            throw new SystemException(ex.toString());
+                throw new SystemException(ex.toString());
             }
         }
     }
@@ -132,45 +119,39 @@ public class DurableTwoPhaseCommitParticipant implements Participant
      * attempt to commit the participant
      *
      */
-    public void confirm () throws InvalidParticipantException,
-            WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, HeuristicCancelException, SystemException
-    {
-        if (_resource != null)
-        {
-            try
-            {
-                if (!_readonly)
-                {
+    public void confirm() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, HeuristicCancelException, SystemException {
+        if (_resource != null) {
+            try {
+                if (!_readonly) {
                     _resource.commit();
                 }
             }
-            //        catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
-            catch (com.arjuna.wst.WrongStateException ex)
-            {
+            // catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
+            catch (com.arjuna.wst.WrongStateException ex) {
                 throw new WrongStateException(ex.toString());
             }
             /*
-             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex) {
-             * throw new HeuristicHazardException(ex.toString()); } catch
+             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex)
+             * { throw new HeuristicHazardException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicMixedException ex) { throw
              * new HeuristicMixedException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicRollbackException ex) {
              * throw new HeuristicCancelException(ex.toString()); }
              */
-            //        catch (com.arjuna.mw.wst.exceptions.SystemException ex)
-            catch (com.arjuna.wst.SystemException ex)
-            {
-                if(ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
-                    // log an error here -- we will end up writing a heuristic transaction record too
-                    wstxLogger.i18NLogger.warn_mwlabs_wst_at_participants_DurableTwoPhaseCommitParticipant_confirm_1(_id);
+            // catch (com.arjuna.mw.wst.exceptions.SystemException ex)
+            catch (com.arjuna.wst.SystemException ex) {
+                if (ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
+                    // log an error here -- we will end up writing a heuristic
+                    // transaction record too
+                    wstxLogger.i18NLogger
+                            .warn_mwlabs_wst_at_participants_DurableTwoPhaseCommitParticipant_confirm_1(_id);
                     throw new SystemCommunicationException(ex.toString());
                 } else {
                     throw new SystemException(ex.toString());
                 }
             }
-        }
-        else
+        } else
             throw new InvalidParticipantException();
     }
 
@@ -178,76 +159,63 @@ public class DurableTwoPhaseCommitParticipant implements Participant
      * attempt to cancel the participant
      *
      */
-    public void cancel () throws InvalidParticipantException,
-            WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, HeuristicConfirmException, SystemException
-    {
-        if (_resource != null)
-        {
-            try
-            {
+    public void cancel() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, HeuristicConfirmException, SystemException {
+        if (_resource != null) {
+            try {
                 if (!_rolledback)
                     _resource.rollback();
             }
-            //        catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
-            catch (com.arjuna.wst.WrongStateException ex)
-            {
+            // catch (com.arjuna.mw.wst.exceptions.WrongStateException ex)
+            catch (com.arjuna.wst.WrongStateException ex) {
                 throw new WrongStateException(ex.toString());
             }
             /*
-             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex) {
-             * throw new HeuristicHazardException(ex.toString()); } catch
+             * catch (com.arjuna.mw.wst.exceptions.HeuristicHazardException ex)
+             * { throw new HeuristicHazardException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicMixedException ex) { throw
              * new HeuristicMixedException(ex.toString()); } catch
              * (com.arjuna.mw.wst.exceptions.HeuristicCommitException ex) {
              * throw new HeuristicConfirmException(ex.toString()); }
              */
-            //        catch (com.arjuna.mw.wst.exceptions.SystemException ex)
-            catch (com.arjuna.wst.SystemException ex)
-            {
-                if(ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
-                    // log an error here -- if the participant is dead it will retry anyway
-                    wstxLogger.i18NLogger.error_mwlabs_wst_at_participants_DurableTwoPhaseCommitParticipant_cancel_1(_id);
+            // catch (com.arjuna.mw.wst.exceptions.SystemException ex)
+            catch (com.arjuna.wst.SystemException ex) {
+                if (ex instanceof com.arjuna.wst.stub.SystemCommunicationException) {
+                    // log an error here -- if the participant is dead it will
+                    // retry anyway
+                    wstxLogger.i18NLogger
+                            .error_mwlabs_wst_at_participants_DurableTwoPhaseCommitParticipant_cancel_1(_id);
                     throw new SystemCommunicationException(ex.toString());
                 } else {
                     throw new SystemException(ex.toString());
                 }
             }
-        }
-        else
+        } else
             throw new InvalidParticipantException();
     }
 
     // TODO mark ParticipantCancelledException explicitly?
 
-    public void confirmOnePhase () throws InvalidParticipantException,
-            WrongStateException, HeuristicHazardException,
-            HeuristicMixedException, HeuristicCancelException, SystemException
-    {
-        if (_resource != null)
-        {
+    public void confirmOnePhase() throws InvalidParticipantException, WrongStateException, HeuristicHazardException,
+            HeuristicMixedException, HeuristicCancelException, SystemException {
+        if (_resource != null) {
             Vote v = null;
 
-            try
-            {
+            try {
                 v = prepare();
-            }
-            catch (Exception ex)
-            {
-                // either the prepare timed out or the participant was invalid or in an
+            } catch (Exception ex) {
+                // either the prepare timed out or the participant was invalid
+                // or in an
                 // invalid state
-                
+
                 ex.printStackTrace();
 
                 v = new VoteCancel();
             }
 
-                        if (v instanceof VoteReadOnly)
-                        {
-                            _readonly = true;
-                        }
-                        else if (v instanceof VoteCancel)
-            {
+            if (v instanceof VoteReadOnly) {
+                _readonly = true;
+            } else if (v instanceof VoteCancel) {
                 _rolledback = false;
 
                 // TODO only do this if we didn't return VoteCancel
@@ -259,79 +227,55 @@ public class DurableTwoPhaseCommitParticipant implements Participant
                     // return an exception which indicates a failed transaction
                 }
                 throw new ParticipantCancelledException();
-            }
-            else
-            {
-                if (v instanceof VoteConfirm)
-                {
-                    try
-                    {
+            } else {
+                if (v instanceof VoteConfirm) {
+                    try {
                         confirm();
-                    }
-                    catch (HeuristicHazardException ex)
-                    {
+                    } catch (HeuristicHazardException ex) {
                         throw ex;
-                    }
-                    catch (HeuristicMixedException ex)
-                    {
+                    } catch (HeuristicMixedException ex) {
                         throw ex;
-                    }
-                    catch (HeuristicCancelException ex)
-                    {
+                    } catch (HeuristicCancelException ex) {
                         throw ex;
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         throw new HeuristicHazardException();
                     }
-                }
-                else
-                {
+                } else {
                     cancel(); // TODO error
 
                     throw new HeuristicHazardException();
                 }
             }
-        }
-        else
+        } else
             throw new InvalidParticipantException();
     }
 
-    public void forget () throws InvalidParticipantException,
-            WrongStateException, SystemException
-    {
+    public void forget() throws InvalidParticipantException, WrongStateException, SystemException {
     }
 
-    public void unknown () throws SystemException
-    {
+    public void unknown() throws SystemException {
         /*
          * If the transaction is unknown, then we assume it rolled back.
          */
 
-        try
-        {
+        try {
             cancel();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             // TODO
         }
     }
 
-    public String id () throws SystemException
-    {
+    public String id() throws SystemException {
         return _id;
     }
 
-    public boolean save_state (OutputObjectState os)
-    {
-        return PersistableParticipantHelper.save_state(os, _resource) ;
+    public boolean save_state(OutputObjectState os) {
+        return PersistableParticipantHelper.save_state(os, _resource);
     }
 
-    public boolean restore_state (InputObjectState os)
-    {
-        _resource = (Durable2PCParticipant)PersistableParticipantHelper.restore_state(os) ;
-        return true ;
+    public boolean restore_state(InputObjectState os) {
+        _resource = (Durable2PCParticipant) PersistableParticipantHelper.restore_state(os);
+        return true;
     }
 
     private Durable2PCParticipant _resource;

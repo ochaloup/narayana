@@ -50,7 +50,7 @@ public class DbTester {
         connections = new HashMap<String, Connection>();
 
         for (DbProps props : dbConfigs.values())
-            connections.put(props.getBinding(),  getDataSource(props.getBinding()).getConnection());
+            connections.put(props.getBinding(), getDataSource(props.getBinding()).getConnection());
 
         createTables(clearTables);
         fault = System.getProperty("spitest.fault", "");
@@ -71,13 +71,16 @@ public class DbTester {
     }
 
     public void doInserts() throws SQLException, NamingException, RollbackException, SystemException {
-        /* for testing recovery use a sorted set to ensure that postresql is enlisted into any transaction after h2
-         * and if fault injection is required then the dummy resource is enlisted before postresql
+        /*
+         * for testing recovery use a sorted set to ensure that postresql is
+         * enlisted into any transaction after h2 and if fault injection is
+         * required then the dummy resource is enlisted before postresql
          */
         SortedSet<String> keys = new TreeSet<String>(connections.keySet());
 
         if ("XA_RBROLLBACK".equalsIgnoreCase(fault)) {
-            // the first participant will throw a rollback exception during the commit phase resulting in a transaction rollback
+            // the first participant will throw a rollback exception during the
+            // commit phase resulting in a transaction rollback
             injectFault(ASFailureType.XARES_COMMIT, ASFailureMode.XAEXCEPTION, "XA_RBROLLBACK");
         }
 
@@ -112,7 +115,8 @@ public class DbTester {
 
     public void assertRowCounts(int extraRows) throws SQLException {
         for (Map.Entry<String, Connection> entry : connections.entrySet()) {
-            Assert.assertEquals(entry.getKey(), counts.get(entry.getKey()) + extraRows, countRows(connections.get(entry.getKey()), "CEYLONKV"));
+            Assert.assertEquals(entry.getKey(), counts.get(entry.getKey()) + extraRows,
+                    countRows(connections.get(entry.getKey()), "CEYLONKV"));
         }
     }
 
@@ -121,10 +125,8 @@ public class DbTester {
     }
 
     public void createTables(boolean clearTables) throws SQLException {
-        String sql = "CREATE TABLE CEYLONKV " +
-                "(key VARCHAR(255) not NULL, " +
-                " val VARCHAR(255), " +
-                " PRIMARY KEY ( key ))";
+        String sql = "CREATE TABLE CEYLONKV " + "(key VARCHAR(255) not NULL, " + " val VARCHAR(255), "
+                + " PRIMARY KEY ( key ))";
 
         for (Connection connection : connections.values()) {
             Statement statement = connection.createStatement();
@@ -150,13 +152,12 @@ public class DbTester {
         }
     }
 
-
     private int countRows(Connection connection, String tableName) throws SQLException {
         int count = 0;
         Statement s1 = connection.createStatement();
         ResultSet rs = s1.executeQuery("select count(*) from " + tableName);
 
-        while (rs.next()){
+        while (rs.next()) {
             count = rs.getInt(1);
         }
 
@@ -166,10 +167,11 @@ public class DbTester {
         return count;
     }
 
-    private void injectFault(ASFailureType type, ASFailureMode mode, String modeArg) throws RollbackException, SystemException, NamingException {
+    private void injectFault(ASFailureType type, ASFailureMode mode, String modeArg)
+            throws RollbackException, SystemException, NamingException {
         ASFailureSpec fault = new ASFailureSpec("fault", mode, modeArg, type);
-        TransactionManager transactionManager =
-                (TransactionManager) new InitialContext().lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
+        TransactionManager transactionManager = (TransactionManager) new InitialContext()
+                .lookup(jtaPropertyManager.getJTAEnvironmentBean().getTransactionManagerJNDIContext());
         transactionManager.getTransaction().enlistResource(new DummyXAResource(fault));
     }
 
@@ -183,10 +185,10 @@ public class DbTester {
         }
     }
 
-    public void printResultSet(String title, ResultSet rs, String ... colNames) throws SQLException {
+    public void printResultSet(String title, ResultSet rs, String... colNames) throws SQLException {
         System.out.println(title);
 
-        while(rs.next()) {
+        while (rs.next()) {
             for (String colName : colNames) {
                 String colVal = rs.getString(colName);
                 System.out.printf("%s: %s ", colName, colVal);

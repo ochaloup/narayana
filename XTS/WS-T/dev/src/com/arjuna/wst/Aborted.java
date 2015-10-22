@@ -32,10 +32,9 @@
 package com.arjuna.wst;
 
 /**
- * Aborted: the participant has aborted and the transaction should also
- * attempt to do so.
+ * Aborted: the participant has aborted and the transaction should also attempt
+ * to do so.
  */
 
-public class Aborted implements Vote
-{
+public class Aborted implements Vote {
 }

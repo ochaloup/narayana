@@ -39,11 +39,9 @@ import org.omg.CosTransactions.Status;
 import java.sql.*;
 import java.util.Properties;
 
-public class JDBCNumberTableImpl02 implements NumberTableOperations
-{
-    public JDBCNumberTableImpl02(String databaseURL, String databaseUser, String databasePassword, String databaseDynamicClass, int timeout)
-            throws InvocationException
-    {
+public class JDBCNumberTableImpl02 implements NumberTableOperations {
+    public JDBCNumberTableImpl02(String databaseURL, String databaseUser, String databasePassword,
+            String databaseDynamicClass, int timeout) throws InvocationException {
         _dbUser = databaseUser;
         _databaseTimeout = timeout;
         _databaseURL = databaseURL;
@@ -51,320 +49,239 @@ public class JDBCNumberTableImpl02 implements NumberTableOperations
         _databasePassword = databasePassword;
         _databaseDynamicClass = databaseDynamicClass;
 
-        try
-        {
+        try {
             Connection _connection = getConnection();
             DatabaseMetaData dbmd = _connection.getMetaData();
-            if (dbmd.getDatabaseProductName().startsWith("Microsoft"))
-            {
+            if (dbmd.getDatabaseProductName().startsWith("Microsoft")) {
                 System.err.println("SQLServer message");
                 _useTimeout = true;
                 _message = "was deadlocked on";
-            }
-            else if (dbmd.getDatabaseProductName().equals("DBMS:cloudscape"))
-            {
+            } else if (dbmd.getDatabaseProductName().equals("DBMS:cloudscape")) {
                 System.err.println("setting CLOUD message");
                 _message = "A lock could not be obtained";
-            }
-            else if (dbmd.getDatabaseProductName().equals("FirstSQL/J"))
-            {
+            } else if (dbmd.getDatabaseProductName().equals("FirstSQL/J")) {
                 _useTimeout = true;
             }
             _connection.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println("JDBCNumberTableImpl02.JDBCNumberTableImpl02: " + e);
             throw new InvocationException();
         }
     }
 
-    public void get(String name, IntHolder value)
-            throws InvocationException
-    {
+    public void get(String name, IntHolder value) throws InvocationException {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
 
-        try
-        {
+        try {
             System.err.println("-- get called --");
             connection = getConnection();
             statement = connection.createStatement();
 
-            if (_useTimeout)
-            {
+            if (_useTimeout) {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
             System.err.println("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
-            resultSet = statement.executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
+            resultSet = statement
+                    .executeQuery("SELECT Value FROM " + _dbUser + "_NumberTable WHERE Name = \'" + name + "\'");
             resultSet.next();
             value.value = resultSet.getInt("Value");
-            if (resultSet.next())
-            {
+            if (resultSet.next()) {
                 throw new Exception();
             }
-        }
-        catch (java.sql.SQLException sqlException)
-        {
+        } catch (java.sql.SQLException sqlException) {
             System.err.println("JDBCNumberTableImpl02.get: " + sqlException);
-            // Check error message to see if it is a "can't serialize access" message
+            // Check error message to see if it is a "can't serialize access"
+            // message
             String message = sqlException.getMessage();
 
-            if ((message != null) && (message.indexOf("Connection is already associated with a different transaction") != -1))
-            {
-                try
-                {
-                    if (connection != null)
-                    {
+            if ((message != null)
+                    && (message.indexOf("Connection is already associated with a different transaction") != -1)) {
+                try {
+                    if (connection != null) {
                         connection.close();
                     }
                     get(name, value);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Extra exception: " + e);
                 }
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCNumberTableImpl02.get: " + exception);
             throw new InvocationException(Reason.ReasonUnknown);
-        }
-        finally
-        {
-            if ("true".equals(System.getProperty("qa.debug")))
-            {
+        } finally {
+            if ("true".equals(System.getProperty("qa.debug"))) {
                 System.err.println("Performing explicit commit for non-transaction operation");
             }
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
-            {
-                try
-                {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
+                try {
                     connection.commit();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug")))
-            {
+            if ("true".equals(System.getProperty("qa.debug"))) {
                 System.err.println("Closing connection");
             }
-            try
-            {
-                if (resultSet != null)
-                {
+            try {
+                if (resultSet != null) {
                     resultSet.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try
-            {
-                if (statement != null)
-                {
+            try {
+                if (statement != null) {
                     statement.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try
-            {
-                if (connection != null)
-                {
+            try {
+                if (connection != null) {
                     connection.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void set(String name, int value)
-            throws InvocationException
-    {
+    public void set(String name, int value) throws InvocationException {
         Connection connection = null;
         Statement statement = null;
 
-        try
-        {
+        try {
             System.err.println("-- set called --");
             connection = getConnection();
 
             statement = connection.createStatement();
-            if (_useTimeout)
-            {
+            if (_useTimeout) {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
-            System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
-            statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
-        }
-        catch (java.sql.SQLException sqlException)
-        {
+            System.err.println(
+                    "UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
+            statement.executeUpdate(
+                    "UPDATE " + _dbUser + "_NumberTable SET Value = " + value + " WHERE Name = \'" + name + "\'");
+        } catch (java.sql.SQLException sqlException) {
             System.err.println("JDBCNumberTableImpl02.set: " + sqlException);
 
-            // Check error message to see if it is a "can't serialize access" message
+            // Check error message to see if it is a "can't serialize access"
+            // message
             String message = sqlException.getMessage();
 
-            if ((message != null) && (message.indexOf(_message) != -1))
-            {
+            if ((message != null) && (message.indexOf(_message) != -1)) {
                 throw new InvocationException(Reason.ReasonCantSerializeAccess);
             }
             throw new InvocationException(Reason.ReasonUnknown);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCNumberTableImpl02.set: " + exception);
             throw new InvocationException(Reason.ReasonUnknown);
-        }
-        finally
-        {
-            if ("true".equals(System.getProperty("qa.debug")))
-            {
+        } finally {
+            if ("true".equals(System.getProperty("qa.debug"))) {
                 System.err.println("Performing explicit commit for non-transaction operation");
             }
-            if (OTS.current().get_status().value() == Status._StatusNoTransaction)
-            {
-                try
-                {
+            if (OTS.current().get_status().value() == Status._StatusNoTransaction) {
+                try {
                     connection.commit();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Ignoring exception: " + e);
                     e.printStackTrace(System.err);
                 }
             }
-            if ("true".equals(System.getProperty("qa.debug")))
-            {
+            if ("true".equals(System.getProperty("qa.debug"))) {
                 System.err.println("Closing connection");
             }
-            try
-            {
-                if (statement != null)
-                {
+            try {
+                if (statement != null) {
                     statement.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
-            try
-            {
-                if (connection != null)
-                {
+            try {
+                if (connection != null) {
                     connection.close();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Ignoring exception: " + e);
                 e.printStackTrace(System.err);
             }
         }
     }
 
-    public void increase(String name)
-            throws InvocationException
-    {
+    public void increase(String name) throws InvocationException {
         Connection connection = null;
         Statement statement = null;
 
-        try
-        {
+        try {
             System.err.println("-- increase --");
             connection = getConnection();
 
             statement = connection.createStatement();
-            if (_useTimeout)
-            {
+            if (_useTimeout) {
                 statement.setQueryTimeout(_databaseTimeout);
             }
 
-            System.err.println("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
-            statement.executeUpdate("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+            System.err
+                    .println("UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
+            statement.executeUpdate(
+                    "UPDATE " + _dbUser + "_NumberTable SET Value = Value + 1 WHERE NAME = \'" + name + "\'");
 
             statement.close();
             connection.close();
-        }
-        catch (java.sql.SQLException sqlException)
-        {
+        } catch (java.sql.SQLException sqlException) {
             System.err.println("JDBCNumberTableImpl02.increase: " + sqlException);
 
-            // Check error message to see if it is a "can't serialize access" message
+            // Check error message to see if it is a "can't serialize access"
+            // message
             String message = sqlException.getMessage();
 
-            if ((message != null) && (message.indexOf(_message) != -1))
-            {
+            if ((message != null) && (message.indexOf(_message) != -1)) {
                 throw new InvocationException(Reason.ReasonCantSerializeAccess);
             }
 
-            if ((message != null) && (message.indexOf("Connection is already associated with a different transaction") != -1))
-            {
-                try
-                {
-                    if (connection != null)
-                    {
+            if ((message != null)
+                    && (message.indexOf("Connection is already associated with a different transaction") != -1)) {
+                try {
+                    if (connection != null) {
                         connection.close();
                     }
                     increase(name);
-                }
-                catch (InvocationException ie)
-                {
+                } catch (InvocationException ie) {
                     System.err.println("Invoc exception pass this to client");
-                    if (ie.myreason == Reason.ReasonCantSerializeAccess)
-                    {
+                    if (ie.myreason == Reason.ReasonCantSerializeAccess) {
                         throw new InvocationException(Reason.ReasonCantSerializeAccess);
-                    }
-                    else
-                    {
+                    } else {
                         throw new InvocationException(Reason.ReasonUnknown);
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Extra exception: " + e);
                 }
             }
             throw new InvocationException(Reason.ReasonUnknown);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCNumberTableImpl02.increase: " + exception);
             throw new InvocationException();
         }
     }
 
-    private Connection getConnection()
-            throws Exception
-    {
+    private Connection getConnection() throws Exception {
         Connection connection = null;
 
-        if ("true".equals(System.getProperty("qa.debug")))
-        {
+        if ("true".equals(System.getProperty("qa.debug"))) {
             System.err.println("Setting up connection");
         }
-        try
-        {
-            if (_databaseDynamicClass != null)
-            {
+        try {
+            if (_databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, _dbUser);
@@ -372,20 +289,15 @@ public class JDBCNumberTableImpl02 implements NumberTableOperations
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, _databaseDynamicClass);
 
                 connection = DriverManager.getConnection(_databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(_databaseURL, _dbUser, _databasePassword);
             }
 
-            if ("true".equals(System.getProperty("qa.debug")))
-            {
+            if ("true".equals(System.getProperty("qa.debug"))) {
                 System.err.println("connection = " + connection);
                 System.err.println("Database URL = " + _databaseURL);
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCNumberTableImpl02.getConnection: " + exception);
             throw new Exception("error in getConnection:" + exception);
         }

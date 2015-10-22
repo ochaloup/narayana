@@ -31,20 +31,16 @@ package org.jboss.jbossts.qa.Utils;
 
 import java.io.*;
 
-public class CSFTestWrapper
-{
-    public static void main(String[] args)
-    {
+public class CSFTestWrapper {
+    public static void main(String[] args) {
         CSFTestWrapper wrapper;
 
         wrapper = new CSFTestWrapper(args);
         wrapper.execute();
     }
 
-    public CSFTestWrapper(String[] args)
-    {
-        if (args != null)
-        {
+    public CSFTestWrapper(String[] args) {
+        if (args != null) {
             mDeploy = args[0];
         }
 
@@ -52,86 +48,60 @@ public class CSFTestWrapper
         createFiles();
     }
 
-    public void execute()
-    {
+    public void execute() {
         runComand();
     }
 
-    public void createFiles()
-    {
+    public void createFiles() {
         String outputDirectory = mFile.getAbsolutePath();
-        try
-        {
+        try {
             outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("."));
             int startofchange = outputDirectory.indexOf("config");
             String s = outputDirectory.substring(0, startofchange);
             s = s + "res";
             s = s + outputDirectory.substring(startofchange + 6, outputDirectory.length());
             outputDirectory = s;
-        }
-        catch (StringIndexOutOfBoundsException siobe)
-        {
+        } catch (StringIndexOutOfBoundsException siobe) {
             System.out.println("test name error");
         }
 
-        try
-        {
+        try {
             File testDirectory = new File(outputDirectory);
-            if (!testDirectory.isDirectory())
-            {
+            if (!testDirectory.isDirectory()) {
                 testDirectory.mkdirs();
             }
 
             mOutStream = new File(outputDirectory + File.separator + sTitle + "_out");
-            if (!mOutStream.isFile())
-            {
+            if (!mOutStream.isFile()) {
                 mOutStream.createNewFile();
             }
 
             mErrStream = new File(outputDirectory + File.separator + sTitle + "_err");
-            if (!mOutStream.isFile())
-            {
+            if (!mOutStream.isFile()) {
                 mErrStream.createNewFile();
             }
-        }
-        catch (IOException io)
-        {
+        } catch (IOException io) {
             System.out.println("create exception " + io);
         }
 
-        try
-        {
-            mOutPrintWriter = new PrintStream(
-                    new BufferedOutputStream(
-                            new FileOutputStream(mOutStream)), true);
-            mErrPrintWriter = new PrintStream(
-                    new BufferedOutputStream(
-                            new FileOutputStream(mErrStream)), true);
-        }
-        catch (Exception e)
-        {
+        try {
+            mOutPrintWriter = new PrintStream(new BufferedOutputStream(new FileOutputStream(mOutStream)), true);
+            mErrPrintWriter = new PrintStream(new BufferedOutputStream(new FileOutputStream(mErrStream)), true);
+        } catch (Exception e) {
             System.out.println("print stream exception " + e);
         }
 
     }
 
-    public void runComand()
-    {
-        Thread mMainThread = new Thread("comand thread " + sTitle)
-        {
-            public void run()
-            {
-                try
-                {
+    public void runComand() {
+        Thread mMainThread = new Thread("comand thread " + sTitle) {
+            public void run() {
+                try {
                     mComand = sEmbeddor + " " + mDeploy;
                     mProcess = Runtime.getRuntime().exec(mComand);
-                }
-                catch (OutOfMemoryError ome)
-                {
+                } catch (OutOfMemoryError ome) {
                     System.out.println("Out of memeory end test = " + ome);
-                }
-                catch (IOException io)
-                {
+                } catch (IOException io) {
                     System.out.println("runtime exception " + io);
                 }
                 outputToDisplay();
@@ -140,52 +110,35 @@ public class CSFTestWrapper
         mMainThread.start();
     }
 
-    public void outputToDisplay()
-    {
-        Thread mOutReader = new Thread()
-        {
-            public void run()
-            {
-                try
-                {
+    public void outputToDisplay() {
+        Thread mOutReader = new Thread() {
+            public void run() {
+                try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(mProcess.getInputStream()));
                     String line = br.readLine();
-                    while ((!isInterrupted() && line != null))
-                    {
+                    while ((!isInterrupted() && line != null)) {
                         line = line.trim();
                         writeToLog(line, true);
                         line = br.readLine();
                     }
-                }
-                catch (InterruptedIOException e)
-                {
-                }
-                catch (Exception e)
-                {
+                } catch (InterruptedIOException e) {
+                } catch (Exception e) {
                 }
             }
         };
 
-        Thread mErrReader = new Thread()
-        {
-            public void run()
-            {
-                try
-                {
+        Thread mErrReader = new Thread() {
+            public void run() {
+                try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(mProcess.getErrorStream()));
                     String line = br.readLine();
-                    while ((!isInterrupted() && line != null))
-                    {
+                    while ((!isInterrupted() && line != null)) {
                         line = line.trim();
                         writeToLog(line, false);
                         line = br.readLine();
                     }
-                }
-                catch (InterruptedIOException e)
-                {
-                }
-                catch (Exception e)
-                {
+                } catch (InterruptedIOException e) {
+                } catch (Exception e) {
                 }
             }
         };
@@ -193,12 +146,9 @@ public class CSFTestWrapper
         mOutReader.start();
         mErrReader.start();
 
-        try
-        {
+        try {
             mProcess.waitFor();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("process exception");
         }
 
@@ -206,50 +156,39 @@ public class CSFTestWrapper
         mErrPrintWriter.close();
     }
 
-    public void writeToLog(String s, boolean b)
-    {
-        if (b)
-        {
+    public void writeToLog(String s, boolean b) {
+        if (b) {
             mOutPrintWriter.println(s);
-        }
-        else
-        {
+        } else {
             mErrPrintWriter.println(s);
         }
 
-        //all the qa system needs to see is passed
-        if (s.endsWith(sPassedResult))
-        {
+        // all the qa system needs to see is passed
+        if (s.endsWith(sPassedResult)) {
             System.out.println("Passed");
             startTimer();
         }
 
-        if (s.endsWith(sFailedResult))
-        {
+        if (s.endsWith(sFailedResult)) {
             System.out.println("Failed");
             startTimer();
         }
     }
 
     /**
-     * On some systems HP-UX the embeddor process is not ending so
-     * lets stop it here.
+     * On some systems HP-UX the embeddor process is not ending so lets stop it
+     * here.
      */
-    private void startTimer()
-    {
-        try
-        {
-            //sleep for 15 seconds
+    private void startTimer() {
+        try {
+            // sleep for 15 seconds
             Thread.currentThread().sleep(15000);
             // if process has not stopped kill the process
-            if (mProcess != null)
-            {
+            if (mProcess != null) {
                 mProcess.destroy();
                 mProcess = null;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println("error in sleep");
         }
     }

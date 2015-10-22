@@ -28,13 +28,10 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 import com.arjuna.ats.jts.OTSManager;
 
-public class NestedTrx extends PerformanceTest
-{
-    protected void work() throws Exception
-    {
-        try
-        {
-            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
+public class NestedTrx extends PerformanceTest {
+    protected void work() throws Exception {
+        try {
+            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
             OA oa = OA.getRootOA(orb);
 
             String ref1 = getServiceConfig(0);
@@ -55,20 +52,15 @@ public class NestedTrx extends PerformanceTest
             // nested commit
             OTSManager.get_current().commit(true);
 
-            if (isParameterDefined("-commit"))
-            {
+            if (isParameterDefined("-commit")) {
                 // top level commit
                 OTSManager.get_current().commit(true);
-            }
-            else
-            {
+            } else {
                 // top level rollback
                 OTSManager.get_current().rollback();
             }
-        }
-        catch (Exception e)
-        {
-            System.err.println("Unexpected exception: "+e);
+        } catch (Exception e) {
+            System.err.println("Unexpected exception: " + e);
 
             e.printStackTrace();
         }

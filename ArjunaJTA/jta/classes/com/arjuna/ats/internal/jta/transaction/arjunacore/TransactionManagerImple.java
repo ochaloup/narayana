@@ -38,17 +38,15 @@ import javax.transaction.Transaction;
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
-public class TransactionManagerImple extends BaseTransaction implements
-        javax.transaction.TransactionManager, javax.naming.spi.ObjectFactory
-{
+public class TransactionManagerImple extends BaseTransaction
+        implements
+            javax.transaction.TransactionManager,
+            javax.naming.spi.ObjectFactory {
 
-    public TransactionManagerImple()
-    {
+    public TransactionManagerImple() {
     }
 
-    public Transaction getTransaction()
-            throws javax.transaction.SystemException
-    {
+    public Transaction getTransaction() throws javax.transaction.SystemException {
         return TransactionImple.getTransaction();
     }
 
@@ -56,25 +54,20 @@ public class TransactionManagerImple extends BaseTransaction implements
      * @return the suspended transaction.
      */
 
-    public Transaction suspend() throws javax.transaction.SystemException
-    {
+    public Transaction suspend() throws javax.transaction.SystemException {
         if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("TransactionImpleManager.suspend");
         }
 
-        try
-        {
+        try {
             TransactionImple tx = TransactionImple.getTransaction();
 
-            if (tx != null)
-            {
+            if (tx != null) {
                 tx.getAtomicAction().suspend();
             }
 
             return tx;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             javax.transaction.SystemException systemException = new javax.transaction.SystemException(e.toString());
             systemException.initCause(e);
             throw systemException;
@@ -86,9 +79,8 @@ public class TransactionManagerImple extends BaseTransaction implements
      * cannot call resume.
      */
 
-    public void resume(Transaction which) throws InvalidTransactionException,
-            java.lang.IllegalStateException, javax.transaction.SystemException
-    {
+    public void resume(Transaction which)
+            throws InvalidTransactionException, java.lang.IllegalStateException, javax.transaction.SystemException {
         if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("TransactionImpleManager.resume");
         }
@@ -100,29 +92,23 @@ public class TransactionManagerImple extends BaseTransaction implements
          * thread.
          */
 
-        if ((which == null) || (which instanceof TransactionImple))
-        {
+        if ((which == null) || (which instanceof TransactionImple)) {
             TransactionImple theTransaction = (TransactionImple) which;
 
-            try
-            {
+            try {
                 AtomicAction act = ((theTransaction == null) ? null : theTransaction.getAtomicAction());
 
                 if (!AtomicAction.resume(act))
                     throw new InvalidTransactionException();
 
                 theTransaction = null;
-            }
-            catch (final Exception e2)
-            {
+            } catch (final Exception e2) {
                 javax.transaction.SystemException systemException = new javax.transaction.SystemException();
                 systemException.initCause(e2);
                 throw systemException;
             }
-        }
-        else
-            throw new InvalidTransactionException("Illegal type is: "
-                    + which);
+        } else
+            throw new InvalidTransactionException("Illegal type is: " + which);
     }
 
     /**
@@ -135,9 +121,7 @@ public class TransactionManagerImple extends BaseTransaction implements
      * @return the instance of the transaction manager
      * @throws Exception
      */
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-            Hashtable environment) throws Exception
-    {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
         return this;
     }
 }

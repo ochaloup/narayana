@@ -35,26 +35,28 @@ import java.util.Map;
 
 /**
  * Base client.
+ * 
  * @author kevin
  */
-public class SoapFaultClient
-{
+public class SoapFaultClient {
     /**
      * Send a fault.
-     * @param soapFault The SOAP fault.
-     * @param map addressing context initialised with to and message ID.
-     * @param action The action URI for the request.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param soapFault
+     *            The SOAP fault.
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param action
+     *            The action URI for the request.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
-    public static void sendSoapFault(final SoapFault11 soapFault,
-                                     final MAP map,
-                                     final String action)
-        throws SoapFault11, IOException
-    {
-        if (action != null)
-        {
-            soapFault.setAction(action) ;
+    public static void sendSoapFault(final SoapFault11 soapFault, final MAP map, final String action)
+            throws SoapFault11, IOException {
+        if (action != null) {
+            soapFault.setAction(action);
         }
 
         final org.jboss.jbossts.xts.soapfault.SoapFaultPortType faultPort = getSoapFaultPort(map, action);
@@ -64,33 +66,39 @@ public class SoapFaultClient
 
     /**
      * fetch a coordinator activation service unique to the current thread
+     * 
      * @return
      */
-    private static synchronized SoapFaultService getSoapFaultService()
-    {
+    private static synchronized SoapFaultService getSoapFaultService() {
         if (soapFaultService.get() == null) {
-            // we don't supply wsdl on the client side -- we want this client to address the various
-            // different versions of the service which bind the fault WebMethod using different
-            // soap actions. the annotations on the service and port supply all the info needed
+            // we don't supply wsdl on the client side -- we want this client to
+            // address the various
+            // different versions of the service which bind the fault WebMethod
+            // using different
+            // soap actions. the annotations on the service and port supply all
+            // the info needed
             // to create the service and port on the client side.
-            // soapFaultService.set(new SoapFaultService(null, new QName("http://jbossts.jboss.org/xts/soapfault", "SoapFaultService")));
+            // soapFaultService.set(new SoapFaultService(null, new
+            // QName("http://jbossts.jboss.org/xts/soapfault",
+            // "SoapFaultService")));
             soapFaultService.set(new SoapFaultService());
         }
         return soapFaultService.get();
     }
 
     private static org.jboss.jbossts.xts.soapfault.SoapFaultPortType getSoapFaultPort(final MAP map,
-                                                      final String action)
-    {
+            final String action) {
         SoapFaultService service = getSoapFaultService();
-        SoapFaultPortType port = service.getPort(org.jboss.jbossts.xts.soapfault.SoapFaultPortType.class, new AddressingFeature(true, true));
-        BindingProvider bindingProvider = (BindingProvider)port;
+        SoapFaultPortType port = service.getPort(org.jboss.jbossts.xts.soapfault.SoapFaultPortType.class,
+                new AddressingFeature(true, true));
+        BindingProvider bindingProvider = (BindingProvider) port;
         String to = map.getTo();
         /*
-         * we no longer have to add the JaxWS WSAddressingClientHandler because we can specify the WSAddressing feature
-        List<Handler> customHandlerChain = new ArrayList<Handler>();
-        customHandlerChain.add(new WSAddressingClientHandler());
-        bindingProvider.getBinding().setHandlerChain(customHandlerChain);
+         * we no longer have to add the JaxWS WSAddressingClientHandler because
+         * we can specify the WSAddressing feature List<Handler>
+         * customHandlerChain = new ArrayList<Handler>();
+         * customHandlerChain.add(new WSAddressingClientHandler());
+         * bindingProvider.getBinding().setHandlerChain(customHandlerChain);
          */
 
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
@@ -102,13 +110,12 @@ public class SoapFaultClient
         return port;
     }
 
-    private static org.jboss.jbossts.xts.soapfault.SoapFaultPortType getSoapFaultPort(final W3CEndpointReference endpoint,
-                                                      final MAP map,
-                                                      final String action)
-    {
+    private static org.jboss.jbossts.xts.soapfault.SoapFaultPortType getSoapFaultPort(
+            final W3CEndpointReference endpoint, final MAP map, final String action) {
         SoapFaultService service = getSoapFaultService();
-        org.jboss.jbossts.xts.soapfault.SoapFaultPortType port = service.getPort(endpoint, org.jboss.jbossts.xts.soapfault.SoapFaultPortType.class, new AddressingFeature(true, true));
-        BindingProvider bindingProvider = (BindingProvider)port;
+        org.jboss.jbossts.xts.soapfault.SoapFaultPortType port = service.getPort(endpoint,
+                org.jboss.jbossts.xts.soapfault.SoapFaultPortType.class, new AddressingFeature(true, true));
+        BindingProvider bindingProvider = (BindingProvider) port;
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
         MAP requestMap = AddressingHelper.outboundMap(requestContext);
         if (action != null) {
@@ -117,11 +124,12 @@ public class SoapFaultClient
         AddressingHelper.installCallerProperties(map, requestMap);
         String to = requestMap.getTo();
         /*
-         * we no longer have to add the JaxWS WSAddressingClientHandler because we can specify the WSAddressing feature
-        List<Handler> customHandlerChain = new ArrayList<Handler>();
-        customHandlerChain.add(new WSAddressingClientHandler());
-        bindingProvider.getBinding().setHandlerChain(customHandlerChain);
-        */
+         * we no longer have to add the JaxWS WSAddressingClientHandler because
+         * we can specify the WSAddressing feature List<Handler>
+         * customHandlerChain = new ArrayList<Handler>();
+         * customHandlerChain.add(new WSAddressingClientHandler());
+         * bindingProvider.getBinding().setHandlerChain(customHandlerChain);
+         */
         AddressingHelper.configureRequestContext(requestContext, to, action);
 
         return port;

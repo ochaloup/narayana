@@ -42,8 +42,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
-public class Resource01
-        implements XAResource, Referenceable, Serializable
+public class Resource01 implements XAResource, Referenceable, Serializable
 
 {
     public static final int NOCRASH = 0;
@@ -57,60 +56,58 @@ public class Resource01
 
     private int crashIn;
     private int recoverIn;
-    private boolean recovering = false;
-    ;
+    private boolean recovering = false;;
     private String resultsFile;
     private Xid _currentXid;
     private Reference _reference;
 
-    public Resource01(int crash, String results)
-    {
+    public Resource01(int crash, String results) {
         crashIn = crash;
         resultsFile = results;
         myLog(ERR, "Resource01(" + crash + ", " + results + ")");
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void start(Xid xid, int flags) throws XAException
-    {
+    public void start(Xid xid, int flags) throws XAException {
         myLog(ERR, "start(" + xid + "," + flags + ")");
         _currentXid = xid;
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void end(Xid xid, int flags) throws XAException
-    {
+    public void end(Xid xid, int flags) throws XAException {
         myLog(ERR, "end(" + xid + ", " + flags + ")");
         _currentXid = null;
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public int prepare(Xid xid) throws XAException
-    {
+    public int prepare(Xid xid) throws XAException {
         myLog(ERR, "prepare(" + xid + ")");
-        if (crashIn == PREPARE)
-        {
+        if (crashIn == PREPARE) {
             myLog(ERR, "Crashing in prepare");
             myLog(OUT, "Passed");
             System.exit(0);
         }
-        if (crashIn == ROLLBACK)
-        {
+        if (crashIn == ROLLBACK) {
             throw (new XAException(XAException.XA_RBROLLBACK));
         }
         /* Crash in commit, rollback or no crash. */
@@ -118,90 +115,81 @@ public class Resource01
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void commit(Xid xid, boolean onePhase) throws XAException
-    {
+    public void commit(Xid xid, boolean onePhase) throws XAException {
         myLog(ERR, "commit(" + xid + ", " + onePhase + ")");
-        if (crashIn == COMMIT)
-        {
+        if (crashIn == COMMIT) {
             myLog(ERR, "Crashing in commit");
             myLog(OUT, "Passed");
             System.exit(0);
         }
-        if (recovering)
-        {
-            if (recoverIn == COMMIT)
-            {
+        if (recovering) {
+            if (recoverIn == COMMIT) {
                 myLog(ERR, "Recovery Passed");
-            }
-            else
-            {
+            } else {
                 myLog(ERR, "Recovery Failed");
             }
         }
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void rollback(Xid xid) throws XAException
-    {
+    public void rollback(Xid xid) throws XAException {
         myLog(ERR, "rollback(" + xid + ")");
-        if (crashIn == ROLLBACK)
-        {
+        if (crashIn == ROLLBACK) {
             myLog(ERR, "Crashing in rollback");
             myLog(OUT, "Passed");
             System.exit(0);
         }
-        if (recovering)
-        {
-            if (recoverIn == PREPARE || recoverIn == ROLLBACK)
-            {
+        if (recovering) {
+            if (recoverIn == PREPARE || recoverIn == ROLLBACK) {
                 myLog(ERR, "Recovery Passed");
-            }
-            else
-            {
+            } else {
                 myLog(ERR, "Recovery Failed");
             }
         }
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void forget(Xid xid) throws XAException
-    {
+    public void forget(Xid xid) throws XAException {
         myLog(ERR, "forget(" + xid + ")");
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public Xid[] recover(int flag) throws XAException
-    {
+    public Xid[] recover(int flag) throws XAException {
         myLog(ERR, "recover(" + flag + ")");
         return null;
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public boolean isSameRM(XAResource other) throws XAException
-    {
+    public boolean isSameRM(XAResource other) throws XAException {
         myLog(ERR, "isSameRM(" + other + ")");
         return (false);
     }
@@ -209,73 +197,62 @@ public class Resource01
     /**
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public int getTransactionTimeout() throws XAException
-    {
+    public int getTransactionTimeout() throws XAException {
         myLog(ERR, "getTransactionTimeout()");
         return 10;
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public boolean setTransactionTimeout(int seconds) throws XAException
-    {
+    public boolean setTransactionTimeout(int seconds) throws XAException {
         myLog(ERR, "setTransactionTimeout(seconds)");
         return true;
     }
 
-    private void myLog(int where, String msg)
-    {
-        try
-        {
+    private void myLog(int where, String msg) {
+        try {
             FileWriter fw = new FileWriter(resultsFile, true);
             PrintWriter pw = new PrintWriter(fw);
             pw.println(msg);
             pw.flush();
             pw.close();
             fw.close();
-            if (where == OUT)
-            {
+            if (where == OUT) {
                 System.out.println(msg);
             }
-            if (where == ERR)
-            {
+            if (where == ERR) {
                 System.err.println(msg);
             }
-        }
-        catch (Throwable ex)
-        {
+        } catch (Throwable ex) {
             System.err.println("myLog() caught an exception");
             ex.printStackTrace();
         }
     }
 
-    public void setReference(Reference _reference)
-    {
+    public void setReference(Reference _reference) {
         myLog(ERR, "setReference(" + _reference + ")");
         this._reference = _reference;
     }
 
-    public Reference getReference() throws NamingException
-    {
+    public Reference getReference() throws NamingException {
         myLog(ERR, "getReference()");
         return _reference;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException
-    {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         myLog(ERR, "writeObject() (Serialise)");
         out.writeInt(crashIn);
         out.writeObject(resultsFile);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         recoverIn = in.readInt();
         resultsFile = (String) in.readObject();
         recovering = true;

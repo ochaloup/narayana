@@ -43,31 +43,28 @@ import com.arjuna.orbportability.RootOA;
 
 import java.io.File;
 
-public class TestBase
-{   
+public class TestBase {
     @Before
-    public void setUp () throws Exception
-    {
+    public void setUp() throws Exception {
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
     }
-    
+
     @After
-    public void tearDown () throws Exception
-    {
+    public void tearDown() throws Exception {
         myOA.destroy();
         myORB.shutdown();
     }
 
-    public void emptyObjectStore()
-    {
-        String objectStoreDirName = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class).getObjectStoreDir();
+    public void emptyObjectStore() {
+        String objectStoreDirName = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class)
+                .getObjectStoreDir();
 
         System.out.println("Emptying " + objectStoreDirName);
 
@@ -76,16 +73,10 @@ public class TestBase
         removeContents(objectStoreDir);
     }
 
-    public void removeContents(File directory)
-    {
-        if ((directory != null) &&
-                directory.isDirectory() &&
-                (!directory.getName().equals("")) &&
-                (!directory.getName().equals("/")) &&
-                (!directory.getName().equals("\\")) &&
-                (!directory.getName().equals(".")) &&
-                (!directory.getName().equals("..")))
-        {
+    public void removeContents(File directory) {
+        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
+                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
+                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
             File[] contents = directory.listFiles();
 
             if (contents != null) {

@@ -46,67 +46,60 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.ServerControl;
 import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.arjuna.ServerTopLevelAction;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class ServerTopLevelActionUnitTest extends TestBase
-{
+public class ServerTopLevelActionUnitTest extends TestBase {
     @Test
-    public void testCommit () throws Exception
-    {
+    public void testCommit() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerTopLevelAction act = new ServerTopLevelAction(sc);
-        
+
         assertEquals(act.prepare(), Vote.VoteReadOnly);
-        
-        try
-        {
+
+        try {
             act.commit();
-            
+
             fail();
+        } catch (final INVALID_TRANSACTION ex) {
         }
-        catch (final INVALID_TRANSACTION ex)
-        {
-        }
-        
+
         assertTrue(act.getReference() != null);
     }
-    
+
     @Test
-    public void testCommitOnePhase () throws Exception
-    {
+    public void testCommitOnePhase() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerTopLevelAction act = new ServerTopLevelAction(sc);
 
         act.commit_one_phase();
-        
+
         assertTrue(act.type() != null);
     }
-    
+
     @Test
-    public void testRollback () throws Exception
-    {
+    public void testRollback() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerTopLevelAction act = new ServerTopLevelAction(sc);
-        
+
         assertEquals(act.prepare(), Vote.VoteReadOnly);
-        
-        try
-        {
+
+        try {
             act.rollback();
-            
+
             fail();
+        } catch (final INVALID_TRANSACTION ex) {
         }
-        catch (final INVALID_TRANSACTION ex)
-        {
-        }
-        
+
         act.forget();
     }
 }

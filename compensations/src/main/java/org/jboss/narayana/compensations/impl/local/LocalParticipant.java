@@ -41,16 +41,16 @@ import org.jboss.narayana.compensations.impl.ParticipantImpl;
  */
 public class LocalParticipant implements BAParticipant, Participant {
 
-
     private ParticipantImpl participant;
     private String participantId;
 
     public LocalParticipant(Class<? extends CompensationHandler> compensationHandlerClass,
-                            Class<? extends ConfirmationHandler> confirmationHandlerClass,
-                            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass,
-                            Object currentTX, String participantId) {
+            Class<? extends ConfirmationHandler> confirmationHandlerClass,
+            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX,
+            String participantId) {
 
-        participant = new ParticipantImpl(compensationHandlerClass, confirmationHandlerClass, transactionLoggedHandlerClass, currentTX);
+        participant = new ParticipantImpl(compensationHandlerClass, confirmationHandlerClass,
+                transactionLoggedHandlerClass, currentTX);
         this.participantId = participantId;
     }
 
@@ -102,7 +102,7 @@ public class LocalParticipant implements BAParticipant, Participant {
 
     @Override
     public void forget() throws InvalidParticipantException, WrongStateException, SystemException {
-        //TODO: garbage collect if required
+        // TODO: garbage collect if required
     }
 
     @Override
@@ -114,14 +114,14 @@ public class LocalParticipant implements BAParticipant, Participant {
     @Override
     public boolean save_state(OutputObjectState os) {
 
-        //TODO: save state
+        // TODO: save state
         return true;
     }
 
     @Override
     public boolean restore_state(InputObjectState os) {
 
-        //TODO: restore state
+        // TODO: restore state
         return true;
     }
 }

@@ -70,30 +70,26 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * An implementation of CosTransactions::Control
  * 
  * @author Mark Little (mark@arjuna.com)
- * @version $Id: ControlImple.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: ControlImple.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
  */
 
-public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
-{
+public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA {
 
     /**
      * Create a new instance with the specified parent.
      */
 
-    public ControlImple (Control parentCon, ArjunaTransactionImple parentTran)
-    {
+    public ControlImple(Control parentCon, ArjunaTransactionImple parentTran) {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::ControlImple ( Control parentCon, "
-                    + ((parentTran != null) ? parentTran.get_uid()
-                    : Uid.nullUid()) + " )");
+                    + ((parentTran != null) ? parentTran.get_uid() : Uid.nullUid()) + " )");
         }
 
         _theTerminator = null;
         _theCoordinator = null;
         _parentControl = parentCon;
-        _transactionHandle = new ArjunaTransactionImple(_parentControl,
-                parentTran);
+        _transactionHandle = new ArjunaTransactionImple(_parentControl, parentTran);
         _theUid = _transactionHandle.get_uid();
         _transactionImpl = null;
         _myControl = null;
@@ -110,20 +106,15 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         addControl();
     }
 
-    public void finalize () throws Throwable
-    {
+    public void finalize() throws Throwable {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple.finalize ()");
         }
 
-        if (!_destroyed)
-        {
-            try
-            {
+        if (!_destroyed) {
+            try {
                 destroy();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
             }
         }
 
@@ -146,8 +137,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * local ones.
      */
 
-    public Uid get_uid ()
-    {
+    public Uid get_uid() {
         return _theUid;
     }
 
@@ -155,8 +145,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * @return the transaction implementation.
      */
 
-    public final ArjunaTransactionImple getImplHandle ()
-    {
+    public final ArjunaTransactionImple getImplHandle() {
         return _transactionHandle;
     }
 
@@ -164,16 +153,14 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * @return the CORBA Control object.
      */
 
-    public final synchronized Control getControl ()
-    {
+    public final synchronized Control getControl() {
         /*
          * If we have been committed then the reference will be null. There is
          * no point in recreating it and in some cases (e.g., JacORB) this will
          * in fact cause an exception to be thrown.
          */
 
-        if ((_myControl == null) && (!_destroyed))
-        {
+        if ((_myControl == null) && (!_destroyed)) {
             ORBManager.getPOA().objectIsReady(this);
 
             _myControl = com.arjuna.ArjunaOTS.ActionControlHelper.narrow(ORBManager.getPOA().corbaReference(this));
@@ -190,9 +177,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         return _myControl;
     }
 
-    public Terminator get_terminator () throws SystemException,
-            org.omg.CosTransactions.Unavailable
-    {
+    public Terminator get_terminator() throws SystemException, org.omg.CosTransactions.Unavailable {
         if ((_transactionHandle != null) && (_theTerminator == null))
             createTransactionHandle();
 
@@ -202,9 +187,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
             throw new Unavailable();
     }
 
-    public Coordinator get_coordinator () throws SystemException,
-            org.omg.CosTransactions.Unavailable
-    {
+    public Coordinator get_coordinator() throws SystemException, org.omg.CosTransactions.Unavailable {
         if ((_transactionHandle != null) && (_theCoordinator == null))
             createTransactionHandle();
 
@@ -214,20 +197,15 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
             throw new Unavailable();
     }
 
-    public void set_terminator (Terminator terminator) throws SystemException,
-            org.omg.CosTransactions.Unavailable
-    {
+    public void set_terminator(Terminator terminator) throws SystemException, org.omg.CosTransactions.Unavailable {
         throw new org.omg.CosTransactions.Unavailable();
     }
 
-    public void set_coordinator (Coordinator coordinator)
-            throws SystemException, org.omg.CosTransactions.Unavailable
-    {
+    public void set_coordinator(Coordinator coordinator) throws SystemException, org.omg.CosTransactions.Unavailable {
         throw new org.omg.CosTransactions.Unavailable();
     }
 
-    public Control getParentControl () throws Unavailable, SystemException
-    {
+    public Control getParentControl() throws Unavailable, SystemException {
         if (_parentControl != null)
             return _parentControl;
         else
@@ -243,18 +221,14 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * subsequent clients which indicates they no longer have a valid reference.
      */
 
-    public synchronized void destroy () throws ActiveTransaction,
-            ActiveThreads, BadControl, Destroyed, SystemException
-    {
+    public synchronized void destroy() throws ActiveTransaction, ActiveThreads, BadControl, Destroyed, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("Control::destroy called for "
-                    + get_uid());
+            jtsLogger.logger.trace("Control::destroy called for " + get_uid());
         }
 
         canDestroy();
 
-        try
-        {
+        try {
             _destroyed = true;
 
             removeControl();
@@ -264,8 +238,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
              * disconnect either.
              */
 
-            if (_myControl != null)
-            {
+            if (_myControl != null) {
                 ORBManager.getPOA().shutdownObject(this);
                 _myControl = null;
             }
@@ -275,83 +248,65 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
              * implementation.
              */
 
-            if (_transactionHandle != null)
-            {
+            if (_transactionHandle != null) {
                 _transactionHandle.setControlHandle(null); // for gc
                 _transactionHandle = null;
             }
 
             tidyup();
-        }
-        catch (Exception e)
-        {
-            throw new BAD_OPERATION(
-                    "ControlImple "
-                            + jtsLogger.i18NLogger.get_orbspecific_destroyfailed()
-                            + e);
+        } catch (Exception e) {
+            throw new BAD_OPERATION("ControlImple " + jtsLogger.i18NLogger.get_orbspecific_destroyfailed() + e);
         }
     }
 
-    public ControlImple getParentImple ()
-    {
-        BasicAction parent = ((_transactionHandle != null) ? _transactionHandle.parent()
-                : null);
+    public ControlImple getParentImple() {
+        BasicAction parent = ((_transactionHandle != null) ? _transactionHandle.parent() : null);
 
-        if (parent != null)
-        {
-            try
-            {
-                synchronized (ControlImple.allControls)
-                {
+        if (parent != null) {
+            try {
+                synchronized (ControlImple.allControls) {
                     return (ControlImple) ControlImple.allControls.get(parent.get_uid());
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 return null;
             }
-        }
-        else
+        } else
             return null;
     }
 
-    public String toString ()
-    {
+    public String toString() {
         return "ControlImple < " + get_uid() + " >";
     }
 
-    public boolean equals (java.lang.Object obj)
-    {
-        if (obj instanceof ControlImple)
-        {
+    public boolean equals(java.lang.Object obj) {
+        if (obj instanceof ControlImple) {
             if (((ControlImple) obj).get_uid().equals(get_uid()))
                 return true;
         }
 
         return false;
     }
-    
+
     /**
      * In the case that the transaction is terminated by the reaper then it will
-     * also be tidied up. This means that the internal handle to the real transaction
-     * instance will be nulled out. In that case we cache the status just before removing
-     * the handle and this method can be used to obtain it.
+     * also be tidied up. This means that the internal handle to the real
+     * transaction instance will be nulled out. In that case we cache the status
+     * just before removing the handle and this method can be used to obtain it.
      * 
      * @return the final termination status of the transaction.
-     * @throws IllegalStateException thrown if the transaction is still available.
+     * @throws IllegalStateException
+     *             thrown if the transaction is still available.
      */
-    
-    public org.omg.CosTransactions.Status getFinalStatus () throws IllegalStateException
-    {
+
+    public org.omg.CosTransactions.Status getFinalStatus() throws IllegalStateException {
         if (getImplHandle() != null)
             throw new IllegalStateException();
         else
             return _finalStatus;
     }
 
-    protected synchronized void canDestroy () throws ActiveTransaction,
-            ActiveThreads, BadControl, Destroyed, SystemException
-    {
+    protected synchronized void canDestroy()
+            throws ActiveTransaction, ActiveThreads, BadControl, Destroyed, SystemException {
         canDestroy(true);
     }
 
@@ -362,13 +317,10 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * transaction regardless.
      */
 
-    protected synchronized void canDestroy (boolean force)
-            throws ActiveTransaction, ActiveThreads, BadControl, Destroyed,
-            SystemException
-    {
+    protected synchronized void canDestroy(boolean force)
+            throws ActiveTransaction, ActiveThreads, BadControl, Destroyed, SystemException {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("Control::canDestroy ( "
-                    + force + " ) called for " + get_uid());
+            jtsLogger.logger.trace("Control::canDestroy ( " + force + " ) called for " + get_uid());
         }
 
         if (_destroyed)
@@ -376,14 +328,10 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
 
         if (_transactionHandle != null) // not a proxy control.
         {
-            if ((_transactionHandle.activeThreads() != 0) && (!force))
-            {
+            if ((_transactionHandle.activeThreads() != 0) && (!force)) {
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("ControlImple::canDestroy for "
-                            + get_uid()
-                            + " - transaction has "
-                            + _transactionHandle.activeThreads()
-                            + " active threads.");
+                    jtsLogger.logger.trace("ControlImple::canDestroy for " + get_uid() + " - transaction has "
+                            + _transactionHandle.activeThreads() + " active threads.");
                 }
 
                 throw new ActiveThreads();
@@ -391,27 +339,20 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
 
             boolean active = false;
 
-            try
-            {
-                if ((force)
-                        || ((_transactionHandle.status() == ActionStatus.CREATED)
-                                || (_transactionHandle.status() == ActionStatus.ABORTED) || (_transactionHandle.status() == ActionStatus.COMMITTED)))
-                {
+            try {
+                if ((force) || ((_transactionHandle.status() == ActionStatus.CREATED)
+                        || (_transactionHandle.status() == ActionStatus.ABORTED)
+                        || (_transactionHandle.status() == ActionStatus.COMMITTED))) {
                     active = false;
-                }
-                else
+                } else
                     active = true; // might be committing, aborting, etc.
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 active = true;
             }
 
-            if (active)
-            {
+            if (active) {
                 if (jtsLogger.logger.isTraceEnabled()) {
-                    jtsLogger.logger.trace("Control::canDestroy for "
-                            + get_uid() + " - transaction active.");
+                    jtsLogger.logger.trace("Control::canDestroy for " + get_uid() + " - transaction active.");
                 }
 
                 throw new ActiveTransaction();
@@ -431,21 +372,17 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * transaction handle.
      */
 
-    protected ControlImple (Coordinator coordinator, Terminator terminator)
-    {
+    protected ControlImple(Coordinator coordinator, Terminator terminator) {
         this(coordinator, terminator, null, null);
     }
 
-    protected ControlImple (Coordinator coordinator, Terminator terminator, Uid uid)
-    {
+    protected ControlImple(Coordinator coordinator, Terminator terminator, Uid uid) {
         this(coordinator, terminator, null, uid);
     }
 
-    protected ControlImple (Coordinator coordinator, Terminator terminator, Control parentControl, Uid uid)
-    {
+    protected ControlImple(Coordinator coordinator, Terminator terminator, Control parentControl, Uid uid) {
         if (jtsLogger.logger.isTraceEnabled()) {
-            jtsLogger.logger.trace("ControlImple::ControlImple (Coordinator, Terminator, Control, "
-                    + uid + " )");
+            jtsLogger.logger.trace("ControlImple::ControlImple (Coordinator, Terminator, Control, " + uid + " )");
         }
 
         _theTerminator = terminator;
@@ -456,18 +393,13 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         _myControl = null;
         _destroyed = false;
 
-        if (uid == null)
-        {
+        if (uid == null) {
             UidCoordinator uidCoord = Helper.getUidCoordinator(coordinator);
 
-            if (uidCoord != null)
-            {
-                try
-                {
+            if (uidCoord != null) {
+                try {
                     _theUid = Helper.getUid(uidCoord);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     /*
                      * Not an JBoss transaction, so allocate any Uid.
                      */
@@ -476,11 +408,9 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
                 }
 
                 uidCoord = null;
-            }
-            else
+            } else
                 _theUid = new Uid();
-        }
-        else
+        } else
             _theUid = uid;
 
         duplicateTransactionHandle(coordinator, terminator);
@@ -494,8 +424,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * the list of controls and assigning the Uid variable.
      */
 
-    protected ControlImple ()
-    {
+    protected ControlImple() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::ControlImple ()");
         }
@@ -510,20 +439,19 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         _destroyed = false;
     }
 
-    protected final void createTransactionHandle ()
-    {
+    protected final void createTransactionHandle() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::createTransactionHandle ()");
         }
 
         /* Create/bind the 2 IDL interfaces to the same implementation */
 
-        _transactionImpl = new com.arjuna.ArjunaOTS.ArjunaTransactionPOATie(
-                _transactionHandle);
+        _transactionImpl = new com.arjuna.ArjunaOTS.ArjunaTransactionPOATie(_transactionHandle);
 
         ORBManager.getPOA().objectIsReady(_transactionImpl);
 
-        ArjunaTransaction transactionReference = com.arjuna.ArjunaOTS.ArjunaTransactionHelper.narrow(ORBManager.getPOA().corbaReference(_transactionImpl));
+        ArjunaTransaction transactionReference = com.arjuna.ArjunaOTS.ArjunaTransactionHelper
+                .narrow(ORBManager.getPOA().corbaReference(_transactionImpl));
 
         _theCoordinator = com.arjuna.ArjunaOTS.UidCoordinatorHelper.narrow(transactionReference);
         _theTerminator = org.omg.CosTransactions.TerminatorHelper.narrow(transactionReference);
@@ -531,8 +459,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         transactionReference = null;
     }
 
-    protected final void duplicateTransactionHandle (Coordinator coord, Terminator term)
-    {
+    protected final void duplicateTransactionHandle(Coordinator coord, Terminator term) {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::duplicateTransactionHandle ()");
         }
@@ -545,47 +472,37 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * Transaction needs to call these methods to enable garbage collection to
      * occur.
      * 
-     * Note, we assume that one ContorlImple per transaction is maintained per address
-     * space, so that overwriting a previously added ControlImple for the same tx is
-     * not possible.
+     * Note, we assume that one ContorlImple per transaction is maintained per
+     * address space, so that overwriting a previously added ControlImple for
+     * the same tx is not possible.
      */
 
-    protected boolean addControl ()
-    {
+    protected boolean addControl() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::addControl ()");
         }
 
-        try
-        {
-            synchronized (ControlImple.allControls)
-            {
+        try {
+            synchronized (ControlImple.allControls) {
                 ControlImple.allControls.put(get_uid(), this);
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return false;
         }
 
         return true;
     }
 
-    protected boolean removeControl ()
-    {
+    protected boolean removeControl() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::removeControl ()");
         }
 
-        try
-        {
-            synchronized (ControlImple.allControls)
-            {
+        try {
+            synchronized (ControlImple.allControls) {
                 ControlImple.allControls.remove(get_uid());
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return false;
         }
 
@@ -598,8 +515,7 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
      * without synchronizing.
      */
 
-    protected final void tidyup ()
-    {
+    protected final void tidyup() {
         if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ControlImple::tidyup ()");
         }
@@ -607,25 +523,21 @@ public class ControlImple extends com.arjuna.ArjunaOTS.ActionControlPOA
         _myControl = null;
         _parentControl = null;
 
-        try
-        {
-            if (_transactionImpl != null)
-            {
+        try {
+            if (_transactionImpl != null) {
                 _finalStatus = _transactionImpl.get_status();
-                
+
                 ORBManager.getPOA().shutdownObject(_transactionImpl);
 
                 _transactionHandle = null;
                 _transactionImpl = null;
             }
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jtsLogger.i18NLogger.warn_orbspecific_tidyfail("ControlImple.tidyup", e);
         }
     }
-    
+
     /*
      * Make private, with public accessor.
      */

@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.RawResources02Clients1;
  * $Id: Client005.java,v 1.2 2003/06/26 11:44:43 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client005
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client005 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -94,29 +90,21 @@ public class Client005
 
             correct = correct && (service.get_resource_trace(0) == ResourceTrace.ResourceTraceRollback);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client005.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client005.main: " + exception);
             exception.printStackTrace(System.err);
         }

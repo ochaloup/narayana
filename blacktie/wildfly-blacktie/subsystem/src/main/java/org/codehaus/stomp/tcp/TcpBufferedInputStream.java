@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
-   * An optimized buffered input stream for Tcp
-      *
-   * @version $Revision: 50 $
+ * An optimized buffered input stream for Tcp
+ *
+ * @version $Revision: 50 $
  */
 public class TcpBufferedInputStream extends FilterInputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;

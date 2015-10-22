@@ -24,14 +24,14 @@ package org.jboss.jbossts.xts.servicetests.service;
 import javax.xml.ws.Endpoint;
 
 /**
- * A convenience class used to dynamically deploy XTS ServiceTest Service instances
+ * A convenience class used to dynamically deploy XTS ServiceTest Service
+ * instances
  *
- * Unfortunately, this cannot be used because JBossWS does not support the Endpoint API
+ * Unfortunately, this cannot be used because JBossWS does not support the
+ * Endpoint API
  */
-public class XTSServiceTestServiceManager
-{
-    public static void publish(String url)
-    {
+public class XTSServiceTestServiceManager {
+    public static void publish(String url) {
         Endpoint.publish(url, new XTSServiceTestPortTypeImpl());
     }
 }

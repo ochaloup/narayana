@@ -49,51 +49,42 @@ public class RegistrationServiceTest extends BaseWSCTest {
     }
 
     @Test
-    public void testKnownCoordinationType()
-            throws Exception
-            {
-        final String messageId = "testKnownCoordinationType" ;
-        final String protocolIdentifier = TestUtil.PROTOCOL_IDENTIFIER ;
-        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
+    public void testKnownCoordinationType() throws Exception {
+        final String messageId = "testKnownCoordinationType";
+        final String protocolIdentifier = TestUtil.PROTOCOL_IDENTIFIER;
+        final CoordinationContextType coordinationContext = new CoordinationContextType();
         CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
-        coordinationContext.setIdentifier(identifierInstance) ;
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setIdentifier(identifierInstance);
         identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try
-        {
-            final W3CEndpointReference registerResponse = RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
+        try {
+            final W3CEndpointReference registerResponse = RegistrationCoordinator.register(coordinationContext,
+                    messageId, participantEndpoint, protocolIdentifier);
 
-            assertNotNull(registerResponse) ;
+            assertNotNull(registerResponse);
+        } catch (final Throwable th) {
+            fail("Unexpected exception: " + th);
         }
-        catch (final Throwable th)
-        {
-            fail("Unexpected exception: " + th) ;
-        }
-            }
+    }
 
     @Test
-    public void testUnknownCoordinationType()
-            throws Exception
-            {
-        final String messageId = "testUnknownCoordinationType" ;
-        final String protocolIdentifier = TestUtil.UNKNOWN_PROTOCOL_IDENTIFIER ;
-        final CoordinationContextType coordinationContext = new CoordinationContextType() ;
+    public void testUnknownCoordinationType() throws Exception {
+        final String messageId = "testUnknownCoordinationType";
+        final String protocolIdentifier = TestUtil.UNKNOWN_PROTOCOL_IDENTIFIER;
+        final CoordinationContextType coordinationContext = new CoordinationContextType();
         CoordinationContextType.Identifier identifierInstance = new CoordinationContextType.Identifier();
-        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE) ;
-        coordinationContext.setIdentifier(identifierInstance) ;
+        coordinationContext.setCoordinationType(TestUtil.COORDINATION_TYPE);
+        coordinationContext.setIdentifier(identifierInstance);
         identifierInstance.setValue("identifier");
-        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue())) ;
+        coordinationContext.setRegistrationService(TestUtil11.getRegistrationEndpoint(identifierInstance.getValue()));
         W3CEndpointReference participantEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
-        try
-        {
-            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier) ;
+        try {
+            RegistrationCoordinator.register(coordinationContext, messageId, participantEndpoint, protocolIdentifier);
+        } catch (final InvalidProtocolException ipe) {
+        } catch (final Throwable th) {
+            fail("Unexpected exception: " + th);
         }
-        catch (final InvalidProtocolException ipe) {}
-        catch (final Throwable th)
-        {
-            fail("Unexpected exception: " + th) ;
-        }
-            }
+    }
 }

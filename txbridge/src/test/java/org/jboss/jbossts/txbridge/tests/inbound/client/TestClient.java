@@ -65,13 +65,15 @@ public class TestClient extends HttpServlet {
     /**
      * Initialise the servlet.
      *
-     * @param config The servlet configuration.
+     * @param config
+     *            The servlet configuration.
      */
-    public void init(final ServletConfig config)
-            throws ServletException {
+    public void init(final ServletConfig config) throws ServletException {
         try {
-            URL wsdlLocation = new URL("http://" + getLocalHost() + ":8080/txbridge-inbound-tests-service/TestServiceImpl?wsdl");
-            QName serviceName = new QName("http://client.inbound.tests.txbridge.jbossts.jboss.org/", "TestServiceImplService");
+            URL wsdlLocation = new URL(
+                    "http://" + getLocalHost() + ":8080/txbridge-inbound-tests-service/TestServiceImpl?wsdl");
+            QName serviceName = new QName("http://client.inbound.tests.txbridge.jbossts.jboss.org/",
+                    "TestServiceImplService");
 
             Service service = Service.create(wsdlLocation, serviceName);
             testService = service.getPort(TestService.class);

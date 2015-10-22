@@ -40,51 +40,45 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class DefaultTimeout
-{
+public class DefaultTimeout {
     @Test
-    public void test()
-    {
-    ORB myORB = null;
-    RootOA myOA = null;
+    public void test() {
+        ORB myORB = null;
+        RootOA myOA = null;
 
-    try
-    {
-        myORB = ORB.getInstance("test");
-        myOA = OA.getRootOA(myORB);
-        
-        myORB.initORB(new String[] {}, null);
-        myOA.initOA();
+        try {
+            myORB = ORB.getInstance("test");
+            myOA = OA.getRootOA(myORB);
 
-        ORBManager.setORB(myORB);
-        ORBManager.setPOA(myOA);
+            myORB.initORB(new String[]{}, null);
+            myOA.initOA();
 
-        int sleepTime = arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout();
-                
-        System.out.println("Thread "+Thread.currentThread()+" starting transaction.");
-        
-        OTSManager.get_current().begin();
+            ORBManager.setORB(myORB);
+            ORBManager.setPOA(myOA);
 
-        Thread.sleep(sleepTime*1000*2, 0);
+            int sleepTime = arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout();
 
-        System.out.println("Thread "+Thread.currentThread()+" committing transaction.");
+            System.out.println("Thread " + Thread.currentThread() + " starting transaction.");
 
-        OTSManager.get_current().commit(false);
+            OTSManager.get_current().begin();
 
-        System.out.println("Transaction committed. Timeout did not go off.");
-        System.out.println("Test did not complete successfully.");
-    }
-    catch (Exception e)
-    {
-        System.out.println("Caught exception: "+e);
-        System.out.println("Timeout went off.");
+            Thread.sleep(sleepTime * 1000 * 2, 0);
 
-        System.out.println("Test completed successfully.");
-    }
+            System.out.println("Thread " + Thread.currentThread() + " committing transaction.");
 
-    myOA.destroy();
-    myORB.shutdown();
+            OTSManager.get_current().commit(false);
+
+            System.out.println("Transaction committed. Timeout did not go off.");
+            System.out.println("Test did not complete successfully.");
+        } catch (Exception e) {
+            System.out.println("Caught exception: " + e);
+            System.out.println("Timeout went off.");
+
+            System.out.println("Test completed successfully.");
+        }
+
+        myOA.destroy();
+        myORB.shutdown();
     }
 
 }
-

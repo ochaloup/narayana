@@ -54,7 +54,8 @@ public class ServiceRegistrySecurityManagerTest {
 
     @Test
     public void testWithSecurityManager() {
-        final SinglePermissionSecurityManager testSecurityManager = new SinglePermissionSecurityManager(SERVICE_REGISTRY_PERMISSION_NAME);
+        final SinglePermissionSecurityManager testSecurityManager = new SinglePermissionSecurityManager(
+                SERVICE_REGISTRY_PERMISSION_NAME);
         System.setSecurityManager(testSecurityManager);
 
         Assert.assertNotNull(ServiceRegistry.getRegistry());

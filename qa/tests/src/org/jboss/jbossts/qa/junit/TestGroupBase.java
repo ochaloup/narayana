@@ -35,46 +35,49 @@ import java.util.Map;
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2009-05
  */
 
-public class TestGroupBase
-{
-    @Rule public final QATestNameRule testName = new QATestNameRule();
-    @Rule public final QATaskWatchman testWatcher = new QATaskWatchman(testName, "TEST-passes.txt", "TEST-failures.txt");
+public class TestGroupBase {
+    @Rule
+    public final QATestNameRule testName = new QATestNameRule();
+    @Rule
+    public final QATaskWatchman testWatcher = new QATaskWatchman(testName, "TEST-passes.txt", "TEST-failures.txt");
 
-    private static final boolean usingExecutionWrapper =
-        System.getProperty("additional.elements", "").contains(ExecutionWrapper.class.getCanonicalName());
+    private static final boolean usingExecutionWrapper = System.getProperty("additional.elements", "")
+            .contains(ExecutionWrapper.class.getCanonicalName());
 
     protected boolean isRecoveryManagerNeeded = false;
     private Task recoveryManager;
 
     private final List<Task> servers = new LinkedList<Task>();
-    private final Map<String,Integer> objectStoreNamesToTaskIds = new HashMap<String,Integer>();
+    private final Map<String, Integer> objectStoreNamesToTaskIds = new HashMap<String, Integer>();
     private int clientCount = 0;
     private int taskCount = 0;
     int port = 5000;
 
-    @Before public void setUp()
-    {
+    @Before
+    public void setUp() {
         clientCount = 0;
         taskCount = 0;
 
         // no need to do this here as it gets done in tearDown
         // TaskImpl.cleanupTasks();
 
-        Task emptyObjectStore = createTask("emptyObjectStore", org.jboss.jbossts.qa.Utils.EmptyObjectStore.class, Task.TaskType.EXPECT_PASS_FAIL, 480);
+        Task emptyObjectStore = createTask("emptyObjectStore", org.jboss.jbossts.qa.Utils.EmptyObjectStore.class,
+                Task.TaskType.EXPECT_PASS_FAIL, 480);
         emptyObjectStore.perform();
 
-        if(isRecoveryManagerNeeded) {
-            recoveryManager = createTask("server0", com.arjuna.ats.arjuna.recovery.RecoveryManager.class, Task.TaskType.EXPECT_READY, 960);
+        if (isRecoveryManagerNeeded) {
+            recoveryManager = createTask("server0", com.arjuna.ats.arjuna.recovery.RecoveryManager.class,
+                    Task.TaskType.EXPECT_READY, 960);
             recoveryManager.start("-test");
         }
     }
 
-    @After public void tearDown()
-    {
+    @After
+    public void tearDown() {
         stopServers();
 
-        if(isRecoveryManagerNeeded) {
-                recoveryManager.terminate();
+        if (isRecoveryManagerNeeded) {
+            recoveryManager.terminate();
         }
 
         TaskImpl.cleanupTasks();
@@ -82,17 +85,19 @@ public class TestGroupBase
         servers.clear();
         objectStoreNamesToTaskIds.clear();
 
-        Task emptyObjectStore = createTask("emptyObjectStore", org.jboss.jbossts.qa.Utils.EmptyObjectStore.class, Task.TaskType.EXPECT_PASS_FAIL, 480);
+        Task emptyObjectStore = createTask("emptyObjectStore", org.jboss.jbossts.qa.Utils.EmptyObjectStore.class,
+                Task.TaskType.EXPECT_PASS_FAIL, 480);
         emptyObjectStore.perform();
 
         try {
             Thread.sleep(3000);
-        } catch(InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
     }
 
     /**
-     * By default the group name for a test method is the name of the class
-     * with any TestGroup_ prefix removed.
+     * By default the group name for a test method is the name of the class with
+     * any TestGroup_ prefix removed.
      * 
      * @return the test group name for the current test.
      */
@@ -107,8 +112,8 @@ public class TestGroupBase
     protected void startServer(Class clazz, String... args) {
 
         Task server;
-        synchronized(servers) {
-            String name = "server_"+servers.size();
+        synchronized (servers) {
+            String name = "server_" + servers.size();
             server = createTask(name, clazz, Task.TaskType.EXPECT_READY, 480);
             servers.add(server);
         }
@@ -118,23 +123,23 @@ public class TestGroupBase
 
     private void stopServers() {
         // stop them in reverse order
-        while(!servers.isEmpty()) {
-            Task server = servers.remove(servers.size()-1);
+        while (!servers.isEmpty()) {
+            Task server = servers.remove(servers.size() - 1);
             server.terminate();
         }
     }
 
     protected void startAndWaitForClient(Class clazz, String... args) {
-        String name = "client_"+clientCount;
-        clientCount+=1;
+        String name = "client_" + clientCount;
+        clientCount += 1;
         Task client = createTask(name, clazz, Task.TaskType.EXPECT_PASS_FAIL, getTimeout(480));
         client.start(args);
         client.waitFor();
     }
 
     protected void startAndWaitForClientWithFixedStoreDir(Class clazz, String... args) {
-        String name = "client_"+clientCount;
-        clientCount+=1;
+        String name = "client_" + clientCount;
+        clientCount += 1;
         Task client = createTask(name, clazz, Task.TaskType.EXPECT_PASS_FAIL, getTimeout(480), "client");
         client.start(args);
         client.waitFor();
@@ -144,14 +149,17 @@ public class TestGroupBase
         return createTask(taskName, clazz, taskType, timeout, taskName);
     }
 
-    protected Task createTask(String taskName, Class clazz, Task.TaskType taskType, int timeout, String objectStoreDirBaseName) {
+    protected Task createTask(String taskName, Class clazz, Task.TaskType taskType, int timeout,
+            String objectStoreDirBaseName) {
 
         OutputStream out;
         int portOffsetId = taskCount;
         taskCount += 1;
 
-        String filename = "./testoutput/"+getTestGroupName()+"/"+(testName.getMethodName() == null ? "" : testName.getMethodName())+
-                (testName.getParameterSetNumber() == null ? "" : "_paramSet"+testName.getParameterSetNumber())+"/"+taskName+"_output.txt";
+        String filename = "./testoutput/" + getTestGroupName() + "/"
+                + (testName.getMethodName() == null ? "" : testName.getMethodName())
+                + (testName.getParameterSetNumber() == null ? "" : "_paramSet" + testName.getParameterSetNumber()) + "/"
+                + taskName + "_output.txt";
         try {
             File outFile = new File(filename);
             if (outFile.isDirectory()) {
@@ -163,22 +171,22 @@ public class TestGroupBase
             }
             out = new FileOutputStream(outFile);
 
-            File emmaCoverageFile = new File(directory, taskName+"-coverage.ec");
+            File emmaCoverageFile = new File(directory, taskName + "-coverage.ec");
 
             List<String> additionalCommandLineElements = new LinkedList<String>();
 
-            additionalCommandLineElements.add("-Demma.coverage.out.file="+emmaCoverageFile);
+            additionalCommandLineElements.add("-Demma.coverage.out.file=" + emmaCoverageFile);
 
             File objectStoreBaseDir = new File(directory, objectStoreDirBaseName);
 
-            if(objectStoreNamesToTaskIds.containsKey(objectStoreDirBaseName)) {
+            if (objectStoreNamesToTaskIds.containsKey(objectStoreDirBaseName)) {
                 portOffsetId = objectStoreNamesToTaskIds.get(objectStoreDirBaseName);
             } else {
                 objectStoreNamesToTaskIds.put(objectStoreDirBaseName, portOffsetId);
             }
 
-            additionalCommandLineElements.add("-DportOffsetId="+portOffsetId);
-            additionalCommandLineElements.add("-DObjectStoreBaseDir="+objectStoreBaseDir.getCanonicalPath());
+            additionalCommandLineElements.add("-DportOffsetId=" + portOffsetId);
+            additionalCommandLineElements.add("-DObjectStoreBaseDir=" + objectStoreBaseDir.getCanonicalPath());
             additionalCommandLineElements.add("-DRecoveryEnvironmentBean.recoveryListener=true"); // JBTM-810
 
             if (false) {
@@ -186,7 +194,8 @@ public class TestGroupBase
                 additionalCommandLineElements.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=" + port++);
             }
 
-            return new TaskImpl(taskName, clazz, taskType, new PrintStream(out, true), timeout, additionalCommandLineElements, directory);
+            return new TaskImpl(taskName, clazz, taskType, new PrintStream(out, true), timeout,
+                    additionalCommandLineElements, directory);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("createTask : could not open output stream for file " + filename);
@@ -199,12 +208,16 @@ public class TestGroupBase
      */
     protected void removeServerIORStore(String name, String... params) {
         // the old, slow way spawned a cleanup task:
-        //Task task = createTask(name, org.jboss.jbossts.qa.Utils.RemoveServerIORStore.class, Task.TaskType.EXPECT_PASS_FAIL, 1480);
-        //task.perform(params);
+        // Task task = createTask(name,
+        // org.jboss.jbossts.qa.Utils.RemoveServerIORStore.class,
+        // Task.TaskType.EXPECT_PASS_FAIL, 1480);
+        // task.perform(params);
 
         // the new, quick way does it in-process with the test harness.
-        // this may break if the tests are changed to use a different store implementation, as it
-        // does not bother with the plugin abstraction used by RemoveServerIORStore/ServerIORStore
+        // this may break if the tests are changed to use a different store
+        // implementation, as it
+        // does not bother with the plugin abstraction used by
+        // RemoveServerIORStore/ServerIORStore
         FileServerIORStore store = new FileServerIORStore();
         store.remove();
     }

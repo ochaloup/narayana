@@ -42,21 +42,19 @@ import com.arjuna.ats.internal.jts.interposition.resources.osi.OSIInterpositionC
 import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class OSIInterpositionUnitTest extends TestBase
-{
+public class OSIInterpositionUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         OTSImpleManager.current().begin();
-        
+
         PropagationContext ctx = OTSImpleManager.current().get_control().get_coordinator().get_txcontext();
         OSIInterpositionCreator creator = new OSIInterpositionCreator();
         Control cnt = creator.recreate(ctx);
         ControlImple impl = creator.recreateLocal(ctx);
-        
+
         assertTrue(cnt != null);
         assertTrue(impl != null);
-        
+
         OTSImpleManager.current().rollback();
     }
 }

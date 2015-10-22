@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.CrashRecovery08Clients;
  * $Id: Client01a.java,v 1.5 2003/07/31 12:28:07 jcoleman Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery08.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client01a
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client01a {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -83,42 +79,34 @@ public class Client01a
 
             ResourceTrace resourceTrace = null;
 
-            for (int index = 0; index < numberOfResources; index++)
-            {
+            for (int index = 0; index < numberOfResources; index++) {
                 resourceTrace = service.get_resource_trace(index);
                 correct = correct && (resourceTrace == ResourceTrace.ResourceTracePrepareCommit);
 
-                if (!correct)
-                {
-                    System.out.println("Test will fail because we have just received value " + resourceTrace.value() + " for resource " + index);
+                if (!correct) {
+                    System.out.println("Test will fail because we have just received value " + resourceTrace.value()
+                            + " for resource " + index);
                 }
             }
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
-                System.out.println("Test has failed because we got " + resourceTrace.value() + " for " + numberOfResources);
+            } else {
+                System.out.println(
+                        "Test has failed because we got " + resourceTrace.value() + " for " + numberOfResources);
 
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }

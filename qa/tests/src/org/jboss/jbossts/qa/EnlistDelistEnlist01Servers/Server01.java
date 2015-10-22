@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.EnlistDelistEnlist01Servers;
  * $Id: Server01.java,v 1.2 2003/06/26 11:43:56 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.EnlistDelistEnlist01.*;
 import org.jboss.jbossts.qa.EnlistDelistEnlist01Impls.EnlistDelistEnlistImpl01;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
@@ -64,13 +63,9 @@ import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-
-public class Server01
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server01 {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -87,7 +82,8 @@ public class Server01
             String databaseUser = JDBCProfileStore.databaseUser(profileName);
             String databasePassword = JDBCProfileStore.databasePassword(profileName);
 
-            EnlistDelistEnlistImpl01 enlistDelistEnlistImpl = new EnlistDelistEnlistImpl01(binding, databaseUser, databasePassword);
+            EnlistDelistEnlistImpl01 enlistDelistEnlistImpl = new EnlistDelistEnlistImpl01(binding, databaseUser,
+                    databasePassword);
             ServicePOATie servant = new ServicePOATie(enlistDelistEnlistImpl);
 
             OAInterface.objectIsReady(servant);
@@ -98,9 +94,7 @@ public class Server01
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server01.main: " + exception);
         }
     }

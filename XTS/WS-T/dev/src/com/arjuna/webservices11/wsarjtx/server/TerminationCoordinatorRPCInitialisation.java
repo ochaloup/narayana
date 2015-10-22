@@ -29,12 +29,11 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Terminator Participant service
+ * 
  * @author kevin
  */
-public class TerminationCoordinatorRPCInitialisation
-{
-    public static void startup()
-    {
+public class TerminationCoordinatorRPCInitialisation {
+    public static void startup() {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -58,16 +57,16 @@ public class TerminationCoordinatorRPCInitialisation
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" +  bindAddress + ":" + bindPort + coordinatorServiceURLPath;
+        final String baseUri = "http://" + bindAddress + ":" + bindPort + coordinatorServiceURLPath;
         final String uri = baseUri + "/" + ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME;
-        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
+        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
         final String secureUri = secureBaseUri + "/" + ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME, uri) ;
-        serviceRegistry.registerSecureServiceProvider(ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME, secureUri) ;
+        serviceRegistry.registerServiceProvider(ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME, uri);
+        serviceRegistry.registerSecureServiceProvider(ArjunaTX11Constants.TERMINATION_COORDINATOR_RPC_SERVICE_NAME,
+                secureUri);
     }
 
-    public static void shutdown()
-    {
+    public static void shutdown() {
     }
 }

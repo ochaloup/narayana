@@ -44,15 +44,14 @@ import com.arjuna.orbportability.internal.utils.PostSetLoader;
 import com.hp.mwtests.orbportability.initialisation.postset.AllPostSet;
 import com.hp.mwtests.orbportability.initialisation.postset.SinglePostSetUsingInterface;
 
-public class PostSetTest
-{
+public class PostSetTest {
     private final static String ORB_INSTANCE_NAME = "PostSetTestORB";
     private final static String ORB_INSTANCE_NAME2 = "PostSetTestORB2";
 
     @Test
-    public void test()
-    {
-        Map<String, String> testProps = opPropertyManager.getOrbPortabilityEnvironmentBean().getOrbInitializationProperties();
+    public void test() {
+        Map<String, String> testProps = opPropertyManager.getOrbPortabilityEnvironmentBean()
+                .getOrbInitializationProperties();
 
         testProps.put(PostSetLoader.generateORBPropertyName("com.arjuna.orbportability.orb"),
                 "com.hp.mwtests.orbportability.initialisation.postset.AllPostSet");
@@ -65,17 +64,17 @@ public class PostSetTest
         ORB orb2 = null;
 
         orb = ORB.getInstance(ORB_INSTANCE_NAME);
-        orb.initORB(new String[] {}, null);
+        orb.initORB(new String[]{}, null);
 
         orb2 = ORB.getInstance(ORB_INSTANCE_NAME2);
 
         orb2.setOrb(orb.orb());
 
-        assertTrue( AllPostSet._called );
+        assertTrue(AllPostSet._called);
 
-        assertTrue( SinglePostSetUsingInterface._called );
+        assertTrue(SinglePostSetUsingInterface._called);
 
-        assertEquals(orb2, SinglePostSetUsingInterface._passedObj );
+        assertEquals(orb2, SinglePostSetUsingInterface._passedObj);
 
         orb.destroy();
     }

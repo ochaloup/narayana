@@ -58,75 +58,64 @@ package org.jboss.jbossts.qa.CrashRecovery08Impls;
  * $Id: ServiceImpl02.java,v 1.3 2003/07/17 15:26:59 jcoleman Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery08.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.omg.CosTransactions.*;
 
-public class ServiceImpl02 implements ServiceOperations
-{
-    public ServiceImpl02(int objectNumber)
-    {
+public class ServiceImpl02 implements ServiceOperations {
+    public ServiceImpl02(int objectNumber) {
         _objectNumber = objectNumber;
     }
 
-    public void setup_oper(Control ctrl, int number_of_resources)
-    {
+    public void setup_oper(Control ctrl, int number_of_resources) {
         _resourceImpl = new ResourceImpl01[number_of_resources];
         _resource = new Resource[number_of_resources];
         _recoveryCoordinator = new RecoveryCoordinator[number_of_resources];
 
-        try
-        {
+        try {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
 
             interposition.registerTransaction(ctrl);
 
-            for (int index = 0; index < number_of_resources; index++)
-            {
+            for (int index = 0; index < number_of_resources; index++) {
                 _resourceImpl[index] = new ResourceImpl01(_objectNumber, index);
                 ResourcePOATie servant = new ResourcePOATie(_resourceImpl[index]);
 
                 OAInterface.objectIsReady(servant);
                 _resource[index] = ResourceHelper.narrow(OAInterface.corbaReference(servant));
 
-                _recoveryCoordinator[index] = OTS.current().get_control().get_coordinator().register_resource(_resource[index]);
+                _recoveryCoordinator[index] = OTS.current().get_control().get_coordinator()
+                        .register_resource(_resource[index]);
             }
 
             interposition.unregisterTransaction();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("ServiceImpl02.setup_oper: " + exception);
             exception.printStackTrace(System.err);
             _isCorrect = false;
-        }
-        catch (Error error)
-        {
+        } catch (Error error) {
             System.err.println("ServiceImpl02.setup_oper: " + error);
             error.printStackTrace(System.err);
             _isCorrect = false;
         }
     }
 
-    public boolean is_correct()
-    {
+    public boolean is_correct() {
         System.err.println("ServiceImpl02.is_correct: " + _isCorrect);
 
         return _isCorrect;
     }
 
-    public ResourceTrace get_resource_trace(int resource_number)
-    {
+    public ResourceTrace get_resource_trace(int resource_number) {
         ResourceTrace resourceTrace = ResourceTrace.ResourceTraceUnknown;
 
-        if ((resource_number >= 0) && (resource_number < _resourceImpl.length))
-        {
+        if ((resource_number >= 0) && (resource_number < _resourceImpl.length)) {
             resourceTrace = _resourceImpl[resource_number].getTrace();
         }
 
-        System.err.println("ServiceImpl02.get_resource_trace [O" + _objectNumber + ".R" + resource_number + "]: " + resourceTrace.value());
+        System.err.println("ServiceImpl02.get_resource_trace [O" + _objectNumber + ".R" + resource_number + "]: "
+                + resourceTrace.value());
 
         return resourceTrace;
     }

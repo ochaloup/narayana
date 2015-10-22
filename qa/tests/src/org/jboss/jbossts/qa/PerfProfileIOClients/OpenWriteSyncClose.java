@@ -36,12 +36,9 @@ import java.io.FileDescriptor;
 import java.io.RandomAccessFile;
 import java.util.Date;
 
-public class OpenWriteSyncClose
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class OpenWriteSyncClose {
+    public static void main(String[] args) {
+        try {
             String prefix = args[args.length - 3];
             int numberOfCalls = Integer.parseInt(args[args.length - 2]);
             int blockSize = Integer.parseInt(args[args.length - 1]);
@@ -53,8 +50,7 @@ public class OpenWriteSyncClose
 
             Date start = new Date();
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
                 FileDescriptor fileDescriptor = randomAccessFile.getFD();
 
@@ -74,17 +70,12 @@ public class OpenWriteSyncClose
 
             correct = PerformanceProfileStore.checkPerformance(prefix + "_OpenWriteSyncClose", operationDuration);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("OpenWriteSyncClose.main: " + exception);
             System.out.println("Failed");
         }

@@ -27,7 +27,6 @@ import org.junit.Test;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -53,7 +52,8 @@ public class SPIUnitTests {
 
         transactionManager.commit();
 
-        // verify that the resources were prepared and committed in the correct order
+        // verify that the resources were prepared and committed in the correct
+        // order
         Assert.assertEquals(resources.get(2), prepareOrder.get(0));
         Assert.assertEquals(resources.get(1), prepareOrder.get(1));
         Assert.assertEquals(resources.get(0), prepareOrder.get(2));

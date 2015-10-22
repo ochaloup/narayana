@@ -39,23 +39,19 @@ package com.arjuna.mw.wsas.status;
  * @since 1.0.
  */
 
-public class NoActivity implements Status
-{
+public class NoActivity implements Status {
 
-    public static NoActivity instance ()
-    {
-    return _instance;
+    public static NoActivity instance() {
+        return _instance;
     }
 
-    public String toString ()
-    {
-    return "Status.NoActivity";
+    public String toString() {
+        return "Status.NoActivity";
     }
 
-    private NoActivity ()
-    {
+    private NoActivity() {
     }
 
     private static final NoActivity _instance = new NoActivity();
-    
+
 }

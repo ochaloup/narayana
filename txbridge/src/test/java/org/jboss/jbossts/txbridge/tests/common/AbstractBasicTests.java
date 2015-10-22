@@ -56,9 +56,11 @@ public abstract class AbstractBasicTests {
         Archive<?> archive = ShrinkWrap.create(WebArchive.class, INBOUND_SERVICE_DEPLOYMENT_NAME + ".war")
                 .addPackage("org.jboss.jbossts.txbridge.tests.inbound.service")
                 .addPackage("org.jboss.jbossts.txbridge.tests.inbound.utility")
-//                .addAsManifestResource("inbound/jboss-beans.xml", "jboss-beans.xml")
+                // .addAsManifestResource("inbound/jboss-beans.xml",
+                // "jboss-beans.xml")
                 .addAsManifestResource(new StringAsset("Dependencies: org.jboss.xts,org.jboss.jts\n"), "MANIFEST.MF");
-//        archive.as(ZipExporter.class).exportTo(new File("/tmp/deployment.zip"), true);
+        // archive.as(ZipExporter.class).exportTo(new
+        // File("/tmp/deployment.zip"), true);
         return archive;
     }
 
@@ -74,7 +76,8 @@ public abstract class AbstractBasicTests {
                 .addClass(org.jboss.jbossts.txbridge.tests.outbound.service.TestServiceImpl.class)
                 .addPackage("org.jboss.jbossts.txbridge.tests.outbound.utility")
                 .addAsResource("outbound/jaxws-handlers-server.xml", "jaxws-handlers-server.xml")
-//                .addAsManifestResource("outbound/jboss-beans.xml", "jboss-beans.xml")
+                // .addAsManifestResource("outbound/jboss-beans.xml",
+                // "jboss-beans.xml")
                 .addAsManifestResource(new StringAsset("Dependencies: org.jboss.xts,org.jboss.jts\n"), "MANIFEST.MF");
         return archive;
     }
@@ -87,14 +90,12 @@ public abstract class AbstractBasicTests {
         return archive;
     }
 
-
     @BeforeClass
     public static void beforeClass() throws Exception {
         if (instrumentor == null) {
             instrumentor = new Instrumentor(new Submit(), 1199);
         }
     }
-
 
     protected void execute(String url) throws Exception {
         execute(url, true);

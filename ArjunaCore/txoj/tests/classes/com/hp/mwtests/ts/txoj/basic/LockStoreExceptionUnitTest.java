@@ -35,17 +35,15 @@ import org.junit.Test;
 
 import com.arjuna.ats.txoj.exceptions.LockStoreException;
 
-public class LockStoreExceptionUnitTest
-{
+public class LockStoreExceptionUnitTest {
     @Test
-    public void test()
-    {
+    public void test() {
         LockStoreException ex = new LockStoreException();
-        
+
         ex = new LockStoreException("Oops foobar!");
-        
+
         ex = new LockStoreException("Another issue!", new NullPointerException());
-        
+
         ex = new LockStoreException(new IllegalArgumentException());
     }
 }

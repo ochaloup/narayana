@@ -48,8 +48,7 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
  * @since JTS 1.2.4.
  */
 
-public class CheckedAction
-{
+public class CheckedAction {
     /**
      * Called during transaction termination if more than one thread is
      * associated with the transaction. The supplied information should be
@@ -59,8 +58,7 @@ public class CheckedAction
      * The default implementation simply prints a warning.
      */
 
-    public void check (boolean isCommit, Uid actUid, Hashtable list)
-    {
+    public void check(boolean isCommit, Uid actUid, Hashtable list) {
         if (isCommit)
             tsLogger.i18NLogger.warn_coordinator_CheckedAction_1(actUid, Integer.toString(list.size()));
         else
