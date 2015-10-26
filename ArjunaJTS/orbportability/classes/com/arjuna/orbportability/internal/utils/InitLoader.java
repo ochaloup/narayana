@@ -68,7 +68,7 @@ abstract class InitLoader {
 
             return;
         } else {
-            opLogger.i18NLogger.info_internal_utils_InitLoader_loading(initName, className);
+            opLogger.logger.debugf("Loading %s class - %s", initName, className);
 
             Class c = ClassloadingUtility.loadClass(className);
             if (c == null) {

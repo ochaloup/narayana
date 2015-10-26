@@ -116,7 +116,7 @@ public class RecoveryManagerImple {
                     tsLogger.i18NLogger.info_recovery_socketready(
                             Integer.toString(_periodicRecovery.getServerSocket().getLocalPort()));
                 } else {
-                    tsLogger.i18NLogger.info_recovery_localready();
+                    tsLogger.logger.debug("RecoveryManagerImple is ready. Socket listener is turned off.");
                 }
             }
         } catch (IOException ex) {

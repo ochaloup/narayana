@@ -125,7 +125,7 @@ public class ExpiredTransactionScanner implements ExpiryScanner {
             boolean moved = _recoveryStore.write_committed(newUid, _movedTypeName, new OutputObjectState(state));
 
             if (!moved) {
-                tsLogger.i18NLogger.info_recovery_ExpiredTransactionStatusManagerScanner_3(newUid);
+                tsLogger.logger.debugf("Removing old transaction status manager item %s", newUid);
             } else {
                 res = _recoveryStore.remove_committed(newUid, _typeName);
                 tsLogger.i18NLogger.warn_recovery_ExpiredTransactionStatusManagerScanner_6(newUid);
