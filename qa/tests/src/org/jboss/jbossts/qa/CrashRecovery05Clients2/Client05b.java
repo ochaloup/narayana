@@ -62,11 +62,10 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client05b {
+public class Client05b extends ClientBase {
     public static void main(String[] args) {
         try {
-            ORBInterface.initORB(args, null);
-            OAInterface.initOA();
+            init(args, null);
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
             BeforeCrashService service1 = BeforeCrashServiceHelper
@@ -108,8 +107,7 @@ public class Client05b {
         }
 
         try {
-            OAInterface.shutdownOA();
-            ORBInterface.shutdownORB();
+            fini();
         } catch (Exception exception) {
             System.err.println("Client05b.main: " + exception);
             exception.printStackTrace(System.err);

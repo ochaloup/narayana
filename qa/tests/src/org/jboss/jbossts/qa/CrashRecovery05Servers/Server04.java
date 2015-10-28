@@ -65,8 +65,10 @@ import org.jboss.jbossts.qa.Utils.ServerIORStore;
 public class Server04 {
     public static void main(String args[]) {
         try {
-            ORBInterface.initORB(args, null);
-            OAInterface.initOA();
+            if (ORBInterface.getORB() == null) {
+                ORBInterface.initORB(args, null);
+                OAInterface.initOA();
+            }
 
             AfterCrashServiceImpl01 afterCrashServiceImpl1 = new AfterCrashServiceImpl01(
                     args[args.length - 3].hashCode(), 0);

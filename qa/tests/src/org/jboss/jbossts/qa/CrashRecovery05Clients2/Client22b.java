@@ -63,11 +63,10 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 
-public class Client22b {
+public class Client22b extends ClientBase {
     public static void main(String[] args) {
         try {
-            ORBInterface.initORB(args, null);
-            OAInterface.initOA();
+            init(args, null);
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
             BeforeCrashService service1 = BeforeCrashServiceHelper
@@ -115,8 +114,7 @@ public class Client22b {
         }
 
         try {
-            OAInterface.shutdownOA();
-            ORBInterface.shutdownORB();
+            fini();
         } catch (Exception exception) {
             System.err.println("Client22b.main: " + exception);
             exception.printStackTrace(System.err);
