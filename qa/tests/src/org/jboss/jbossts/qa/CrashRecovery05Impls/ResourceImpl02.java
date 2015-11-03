@@ -133,7 +133,7 @@ public class ResourceImpl02 implements ResourceOperations {
         } else if (_resourceTrace == ResourceTrace.ResourceTraceCommitOnePhase) {
             _resourceTrace = ResourceTrace.ResourceTraceCommitOnePhaseForget;
         } else {
-            _resourceTrace = ResourceTrace.ResourceTraceUnknown;
+            // _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
         System.err.println("Return");
