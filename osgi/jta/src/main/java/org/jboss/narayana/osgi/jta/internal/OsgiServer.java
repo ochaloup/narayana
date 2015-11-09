@@ -106,6 +106,12 @@ public class OsgiServer implements ServiceTrackerCustomizer<XAResourceRecovery, 
                 transactionManagerService.getTransactionSynchronizationRegistry());
         register(UserTransaction.class, transactionManagerService.getUserTransaction());
 
+        try {
+            registrations.add(PlatformTransactionManagerImple.register(bundleContext,
+                    (OsgiTransactionManager) transactionManagerService.getTransactionManager()));
+        } catch (Throwable t) {
+            // Ignore, this is most certainly spring-tx which is not available
+        }
     }
 
     public void stop() {
