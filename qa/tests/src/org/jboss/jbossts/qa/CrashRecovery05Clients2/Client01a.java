@@ -98,10 +98,10 @@ public class Client01a extends ClientBase {
             service1.setup_oper(1);
             service2.setup_oper(1);
 
-            correct = correct && service1.check_oper(checkBehaviors1);
-            correct = correct && service2.check_oper(checkBehaviors2);
-            correct = correct && service1.is_correct();
-            correct = correct && service2.is_correct();
+            correct = updateResult(correct, service1.check_oper(checkBehaviors1));
+            correct = updateResult(correct, service2.check_oper(checkBehaviors2));
+            correct = updateResult(correct, service1.is_correct());
+            correct = updateResult(correct, service2.is_correct());
 
             CrashRecoveryDelays.awaitReplayCompletionCR05(5); // scale factor
                                                                 // could maybe
@@ -110,9 +110,12 @@ public class Client01a extends ClientBase {
             ResourceTrace resourceTrace1 = service1.get_resource_trace(0);
             ResourceTrace resourceTrace2 = service2.get_resource_trace(0);
 
-            correct = correct && ((resourceTrace1 == ResourceTrace.ResourceTraceNone)
-                    || (resourceTrace1 == ResourceTrace.ResourceTraceCommit));
-            correct = correct && (resourceTrace2 == ResourceTrace.ResourceTraceCommit);
+            System.out.printf("Client01a check: resourceTrace1=%d resourceTrace2=%d%n", resourceTrace1.value(),
+                    resourceTrace2.value());
+
+            correct = updateResult(correct, ((resourceTrace1 == ResourceTrace.ResourceTraceNone)
+                    || (resourceTrace1 == ResourceTrace.ResourceTraceCommit)));
+            correct = updateResult(correct, (resourceTrace2 == ResourceTrace.ResourceTraceCommit));
 
             if (correct) {
                 System.out.println("Passed");
@@ -131,5 +134,13 @@ public class Client01a extends ClientBase {
             System.err.println("Client01a.main: " + exception);
             exception.printStackTrace(System.err);
         }
+    }
+
+    private static int step = 0;
+
+    private static boolean updateResult(boolean prev, boolean value) {
+        step += 1;
+        System.out.printf("Client01a check: step %d %b%n", step, value);
+        return prev && value;
     }
 }
