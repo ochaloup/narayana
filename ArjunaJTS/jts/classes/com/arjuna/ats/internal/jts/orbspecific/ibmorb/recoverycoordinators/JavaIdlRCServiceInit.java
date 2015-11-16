@@ -118,7 +118,7 @@ public class JavaIdlRCServiceInit implements RecoveryServiceInit {
             String recoveryManagerPort = "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
             String recoveryManagerAddr = jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerAddress();
 
-            jtsLogger.i18NLogger.info_orbspecific_jacorb_recoverycoordinators_JacOrbRCServiceInit_6(recoveryManagerPort,
+            jtsLogger.logger.debugf("Starting RecoveryServer ORB on port %s and address %s", recoveryManagerPort,
                     recoveryManagerAddr);
 
             final Properties p = new Properties();
