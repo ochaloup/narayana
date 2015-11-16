@@ -65,6 +65,7 @@ public class ResourceImpl02 implements ResourceOperations {
     public ResourceImpl02(int objectNumber, int resourceNumber) {
         _objectNumber = objectNumber;
         _resourceNumber = resourceNumber;
+        _status = Status.StatusNoTransaction;
     }
 
     public Vote prepare() throws HeuristicMixed, HeuristicHazard {
@@ -76,6 +77,8 @@ public class ResourceImpl02 implements ResourceOperations {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
+        _status = Status.StatusPrepared;
+
         System.err.println("ReturnVoteCommit");
 
         return Vote.VoteCommit;
@@ -83,6 +86,9 @@ public class ResourceImpl02 implements ResourceOperations {
 
     public void rollback() throws HeuristicCommit, HeuristicMixed, HeuristicHazard {
         System.err.print("ResourceImpl02.rollback [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
+
+        if (isComplete())
+            return;
 
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceRollback;
@@ -92,11 +98,16 @@ public class ResourceImpl02 implements ResourceOperations {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
+        _status = Status.StatusRolledBack;
+
         System.err.println("Return");
     }
 
     public void commit() throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
         System.err.print("ResourceImpl02.commit [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
+
+        if (isComplete())
+            return;
 
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceCommit;
@@ -106,17 +117,24 @@ public class ResourceImpl02 implements ResourceOperations {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
+        _status = Status.StatusCommitted;
+
         System.err.println("Return");
     }
 
     public void commit_one_phase() throws HeuristicHazard {
         System.err.print("ResourceImpl02.commit_one_phase [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
+        if (isComplete())
+            return;
+
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceCommitOnePhase;
         } else {
             _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
+
+        _status = Status.StatusCommitted;
 
         System.err.println("Return");
     }
