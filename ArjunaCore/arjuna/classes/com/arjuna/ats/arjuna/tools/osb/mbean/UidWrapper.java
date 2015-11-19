@@ -21,10 +21,14 @@
  */
 package com.arjuna.ats.arjuna.tools.osb.mbean;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
+import javax.management.MBeanException;
+
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
 
 /**
@@ -89,8 +93,10 @@ public class UidWrapper {
 
     /**
      * Refresh the management view of the whole ObjectStore
+     * 
+     * @throws MBeanException
      */
-    public void probe() {
+    public void probe() throws MBeanException {
         if (browser != null)
             browser.probe();
     }

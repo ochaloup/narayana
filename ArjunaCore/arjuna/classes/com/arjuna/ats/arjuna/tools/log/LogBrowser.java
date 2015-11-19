@@ -247,7 +247,7 @@ class LogConsole {
         }
     }
 
-    private final void setLogId(String command) {
+    private final void setLogId(String command) throws ObjectStoreException, IOException {
         int index = command.indexOf(SPACE);
         int end = command.indexOf(END);
 
@@ -303,7 +303,7 @@ class LogConsole {
      * Is this a type/instance in the log that we support?
      */
 
-    private final boolean supportedLog(String logID) {
+    private final boolean supportedLog(String logID) throws ObjectStoreException, IOException {
         Uid id = new Uid(logID);
 
         if (id.equals(Uid.nullUid()))

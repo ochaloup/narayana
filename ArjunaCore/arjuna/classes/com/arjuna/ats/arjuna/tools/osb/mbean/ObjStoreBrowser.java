@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import javax.management.MBeanException;
+
 import com.arjuna.ats.arjuna.StateManager;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
@@ -363,8 +365,10 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
     /**
      * See if any new MBeans need to be registered or if any existing MBeans no
      * longer exist as ObjectStore entries.
+     * 
+     * @throws MBeanException
      */
-    public synchronized void probe() {
+    public synchronized void probe() throws MBeanException {
         Map<String, Collection<Uid>> currUidsForType = new HashMap<String, Collection<Uid>>();
 
         for (String type : getTypes())
@@ -442,17 +446,21 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
         return w;
     }
 
-    private Collection<Uid> getUids(String type) {
+    private Collection<Uid> getUids(String type) throws MBeanException {
         Collection<Uid> uids = new ArrayList<Uid>();
-        ObjectStoreIterator iter = new ObjectStoreIterator(StoreManager.getRecoveryStore(), type);
+        try {
+            ObjectStoreIterator iter = new ObjectStoreIterator(StoreManager.getRecoveryStore(), type);
 
-        while (true) {
-            Uid u = iter.iterate();
+            while (true) {
+                Uid u = iter.iterate();
 
-            if (u == null || Uid.nullUid().equals(u))
-                break;
+                if (u == null || Uid.nullUid().equals(u))
+                    break;
 
-            uids.add(u);
+                uids.add(u);
+            }
+        } catch (ObjectStoreException | IOException e) {
+            throw new MBeanException(e);
         }
 
         return uids;

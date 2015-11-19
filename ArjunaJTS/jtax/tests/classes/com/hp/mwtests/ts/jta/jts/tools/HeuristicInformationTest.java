@@ -26,14 +26,18 @@ import com.arjuna.ats.arjuna.coordinator.RecordType;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeManager;
 import com.arjuna.ats.arjuna.coordinator.abstractrecord.RecordTypeMap;
+import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.tools.osb.mbean.*;
 import com.arjuna.ats.arjuna.tools.osb.util.JMXServer;
 import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
 import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
+
 import org.junit.Test;
 import org.omg.CosTransactions.HeuristicHazard;
 
 import javax.management.*;
+
+import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -51,7 +55,7 @@ import static org.junit.Assert.*;
             // internal classes.
 public class HeuristicInformationTest extends JTSOSBTestBase {
 
-    public ObjStoreBrowser getOSB() {
+    public ObjStoreBrowser getOSB() throws MBeanException {
         OSBTypeHandler osbTypeHandler = new OSBTypeHandler(true,
                 "com.hp.mwtests.ts.jta.jts.tools.UserExtendedCrashRecord",
                 "com.arjuna.ats.arjuna.tools.osb.mbean.LogRecordWrapper", UserExtendedCrashRecord.record_type(), null);
