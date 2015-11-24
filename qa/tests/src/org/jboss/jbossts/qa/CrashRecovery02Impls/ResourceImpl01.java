@@ -68,6 +68,7 @@ public class ResourceImpl01 implements ResourceOperations {
         _objectNumber = objectNumber;
         _resourceNumber = resourceNumber;
         _resourceBehavior = resourceBehavior;
+        _status = Status.StatusNoTransaction;
     }
 
     public Vote prepare() throws HeuristicMixed, HeuristicHazard {
@@ -84,6 +85,8 @@ public class ResourceImpl01 implements ResourceOperations {
             System.exit(1);
         }
 
+        _status = Status.StatusPrepared;
+
         System.err.println("ReturnVoteCommit");
 
         return Vote.VoteCommit;
@@ -91,6 +94,9 @@ public class ResourceImpl01 implements ResourceOperations {
 
     public void rollback() throws HeuristicCommit, HeuristicMixed, HeuristicHazard {
         System.err.print("ResourceImpl01.rollback [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
+
+        if (isComplete())
+            return;
 
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceRollback;
@@ -113,11 +119,16 @@ public class ResourceImpl01 implements ResourceOperations {
             return;
         }
 
+        _status = Status.StatusRolledBack;
+
         System.err.println("Return");
     }
 
     public void commit() throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
         System.err.print("ResourceImpl01.commit [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
+
+        if (isComplete())
+            return;
 
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceCommit;
@@ -131,6 +142,8 @@ public class ResourceImpl01 implements ResourceOperations {
             System.err.println("Crash");
             System.exit(1);
         }
+
+        _status = Status.StatusCommitted;
 
         try {
             ServerIORStore
@@ -146,6 +159,9 @@ public class ResourceImpl01 implements ResourceOperations {
     public void commit_one_phase() throws HeuristicHazard {
         System.err.print("ResourceImpl01.commit_one_phase [O" + _objectNumber + ".R" + _resourceNumber + "]: ");
 
+        if (isComplete())
+            return;
+
         if (_resourceTrace == ResourceTrace.ResourceTraceNone) {
             _resourceTrace = ResourceTrace.ResourceTraceCommitOnePhase;
         } else {
@@ -156,6 +172,8 @@ public class ResourceImpl01 implements ResourceOperations {
             System.err.println("Crash");
             System.exit(1);
         }
+
+        _status = Status.StatusCommitted;
 
         try {
             ServerIORStore
@@ -180,7 +198,7 @@ public class ResourceImpl01 implements ResourceOperations {
         } else if (_resourceTrace == ResourceTrace.ResourceTraceCommitOnePhase) {
             _resourceTrace = ResourceTrace.ResourceTraceCommitOnePhaseForget;
         } else {
-            _resourceTrace = ResourceTrace.ResourceTraceUnknown;
+            // _resourceTrace = ResourceTrace.ResourceTraceUnknown;
         }
 
         if (_resourceBehavior.crash_behavior == CrashBehavior.CrashBehaviorCrashInForget) {
@@ -199,6 +217,40 @@ public class ResourceImpl01 implements ResourceOperations {
         return _resourceTrace;
     }
 
+    public boolean isComplete() {
+        return _status == Status.StatusCommitted || _status == Status.StatusRolledBack;
+    }
+
+    public Status updateStatus(Status hint) {
+        Status prev = _status;
+
+        System.err.printf("ResourceImpl01.updateStatus [O%d.R%d]: status=%d -> %d%n", _objectNumber, _resourceNumber,
+                _status.value(), hint.value());
+
+        if (_status == Status.StatusUnknown || _status == Status.StatusNoTransaction) {
+            try {
+                if (hint == Status.StatusCommitted) {
+                    System.err.printf("ResourceImpl01.updateStatus call commit()%n");
+                    commit();
+                } else if (hint == Status.StatusRolledBack) {
+                    System.err.printf("ResourceImpl01.updateStatus call rollback()%n");
+                    rollback();
+                } else {
+                    _status = hint;
+                }
+            } catch (Exception e) {
+                _status = hint;
+            }
+        }
+
+        return prev;
+    }
+
+    public Status getStatus() {
+        return _status;
+    }
+
+    private Status _status;
     private int _serviceNumber;
     private int _objectNumber;
     private int _resourceNumber;
