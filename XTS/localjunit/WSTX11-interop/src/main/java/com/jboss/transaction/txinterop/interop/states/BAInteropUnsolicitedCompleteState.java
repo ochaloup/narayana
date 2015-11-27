@@ -33,11 +33,6 @@ import com.jboss.transaction.txinterop.proxy.BaseHandler;
  */
 public class BAInteropUnsolicitedCompleteState extends InteropWaitState {
     /**
-     * The replaced flag.
-     */
-    private boolean replaced;
-
-    /**
      * Construct the unsolicited complete state.
      */
     public BAInteropUnsolicitedCompleteState() {
@@ -52,7 +47,7 @@ public class BAInteropUnsolicitedCompleteState extends InteropWaitState {
      * @return The handler or null if no rewriting required.
      */
     public ContentHandler getHandler(final ContentHandler nextHandler) {
-        return (replaced ? null : new RegistrationHandler(nextHandler));
+        return new RegistrationHandler(nextHandler);
     }
 
     /**
