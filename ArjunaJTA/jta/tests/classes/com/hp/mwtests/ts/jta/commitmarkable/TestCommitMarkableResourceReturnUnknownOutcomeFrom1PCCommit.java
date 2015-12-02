@@ -78,10 +78,9 @@ public class TestCommitMarkableResourceReturnUnknownOutcomeFrom1PCCommit {
         namingBeanImpl.start();
 
         resetPropertiesFile = System.getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
-        if (resetPropertiesFile == null) {
-            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
-                    "commitmarkableresourcejbossts-properties.xml");
-        }
+        System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
+                "commitmarkableresourcejbossts-properties.xml");
+
         manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
     }
 
