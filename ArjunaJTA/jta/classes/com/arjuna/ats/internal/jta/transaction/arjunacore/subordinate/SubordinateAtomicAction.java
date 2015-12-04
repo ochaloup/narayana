@@ -155,6 +155,9 @@ public class SubordinateAtomicAction extends com.arjuna.ats.internal.jta.transac
         switch (super.getHeuristicDecision()) {
             case TwoPhaseOutcome.PREPARE_OK :
             case TwoPhaseOutcome.FINISH_OK :
+                if (super.failedList != null && super.failedList.size() > 0) {
+                    return ActionStatus.COMMITTING;
+                }
                 toReturn = super.status();
                 break;
             case TwoPhaseOutcome.HEURISTIC_ROLLBACK :

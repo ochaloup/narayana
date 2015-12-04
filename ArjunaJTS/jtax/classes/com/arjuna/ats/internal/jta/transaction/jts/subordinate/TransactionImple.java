@@ -154,6 +154,8 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
      * Drive the subordinate transaction to commit. It must have previously been
      * prepared.
      *
+     * @return true if the transaction was committed
+     *
      * @throws IllegalStateException
      *             thrown if the transaction has not been prepared or is
      *             unknown.
@@ -166,7 +168,7 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
      *             thrown if some other error occurs.
      */
 
-    public void doCommit() throws IllegalStateException, HeuristicMixedException, HeuristicRollbackException,
+    public boolean doCommit() throws IllegalStateException, HeuristicMixedException, HeuristicRollbackException,
             HeuristicCommitException, SystemException {
         try {
             SubordinateAtomicTransaction subAct = (SubordinateAtomicTransaction) super._theTransaction;
@@ -177,8 +179,9 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
                 case ActionStatus.H_COMMIT :
                     throw new HeuristicCommitException();
                 case ActionStatus.COMMITTED :
-                case ActionStatus.COMMITTING :
                     break;
+                case ActionStatus.COMMITTING :
+                    return false;
                 case ActionStatus.ABORTED :
                 case ActionStatus.ABORTING :
                 case ActionStatus.H_ROLLBACK :
@@ -202,6 +205,7 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
         } finally {
             TransactionImple.removeTransaction(this);
         }
+        return true;
     }
 
     /**

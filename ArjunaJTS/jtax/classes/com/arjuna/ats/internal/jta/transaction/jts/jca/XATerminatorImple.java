@@ -76,8 +76,9 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
             {
                 if (onePhase)
                     tx.doOnePhaseCommit();
-                else
-                    tx.doCommit();
+                else if (!tx.doCommit()) {
+                    throw new XAException(XAException.XAER_RMFAIL);
+                }
 
                 SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
             } else

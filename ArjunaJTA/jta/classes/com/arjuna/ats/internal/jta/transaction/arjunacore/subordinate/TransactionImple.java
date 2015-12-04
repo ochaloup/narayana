@@ -141,7 +141,7 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.ar
         }
     }
 
-    public void doCommit() throws IllegalStateException, HeuristicMixedException, HeuristicRollbackException,
+    public boolean doCommit() throws IllegalStateException, HeuristicMixedException, HeuristicRollbackException,
             javax.transaction.SystemException {
         try {
             SubordinateAtomicAction subAct = (SubordinateAtomicAction) super._theTransaction;
@@ -150,10 +150,12 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.ar
 
             switch (res) {
                 case ActionStatus.COMMITTED :
-                case ActionStatus.COMMITTING :
                 case ActionStatus.H_COMMIT :
                     TransactionImple.removeTransaction(this);
                     break;
+                case ActionStatus.COMMITTING :
+                    TransactionImple.removeTransaction(this);
+                    return false;
                 case ActionStatus.ABORTED :
                 case ActionStatus.ABORTING :
                     throw new HeuristicRollbackException();
@@ -178,6 +180,7 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.ar
             unexpectedConditionException.initCause(ex);
             throw unexpectedConditionException;
         }
+        return true;
     }
 
     public void doRollback() throws IllegalStateException, HeuristicMixedException, HeuristicCommitException,

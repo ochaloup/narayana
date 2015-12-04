@@ -521,6 +521,8 @@ public class SubordinateTestCase {
         t.enlistResource(xaResource);
 
         final XATerminator xaTerminator = SubordinationManager.getXATerminator();
+        Xid[] recover1 = xaTerminator.recover(XAResource.TMSTARTRSCAN);
+        xaTerminator.recover(XAResource.TMENDRSCAN);
 
         xaTerminator.prepare(xid);
 
@@ -532,7 +534,21 @@ public class SubordinateTestCase {
          * to child.
          */
 
-        xaTerminator.commit(xid, false);
+        try {
+            xaTerminator.commit(xid, false);
+            fail("Expected an error");
+        } catch (XAException e) {
+            assertTrue(e.errorCode == XAException.XAER_RMFAIL);
+        }
+
+        Xid[] recover2 = xaTerminator.recover(XAResource.TMSTARTRSCAN);
+        xaTerminator.recover(XAResource.TMENDRSCAN);
+
+        if (recover1 == null) {
+            recover1 = new Xid[0];
+        }
+        int difference = recover2.length - recover1.length;
+        assertTrue("" + difference, difference == 1);
     }
 
     @Test
