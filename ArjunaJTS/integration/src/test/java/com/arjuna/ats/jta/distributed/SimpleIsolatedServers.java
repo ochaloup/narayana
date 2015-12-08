@@ -175,111 +175,117 @@ public class SimpleIsolatedServers {
         assertTrue("" + completionCounter.getCommitCount("1000"), completionCounter.getCommitCount("1000") == 0);
         assertTrue("" + completionCounter.getRollbackCount("1000"), completionCounter.getRollbackCount("1000") == 0);
         final CompletionCountLock phase2CommitAborted = new CompletionCountLock();
-        {
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    int startingTimeout = 0;
-                    try {
-                        LocalServer originalServer = getLocalServer("1000");
-                        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                        Thread.currentThread().setContextClassLoader(originalServer.getClassLoader());
-                        TransactionManager transactionManager = originalServer.getTransactionManager();
-                        transactionManager.setTransactionTimeout(startingTimeout);
-                        transactionManager.begin();
-                        Transaction originalTransaction = transactionManager.getTransaction();
-                        int remainingTimeout = (int) (originalServer.getTimeLeftBeforeTransactionTimeout() / 1000);
-                        Xid currentXid = originalServer.getCurrentXid();
-                        originalServer.storeRootTransaction();
-                        transactionManager.suspend();
-                        DataReturnedFromRemoteServer performTransactionalWork = performTransactionalWork(
-                                new LinkedList<String>(Arrays.asList(new String[]{"2000"})), remainingTimeout,
-                                currentXid, 2, false, false);
-                        transactionManager.resume(originalTransaction);
-                        XAResource proxyXAResource = originalServer.generateProxyXAResource("2000",
-                                performTransactionalWork.getProxyRequired());
-                        originalTransaction.enlistResource(proxyXAResource);
-                        originalServer.removeRootTransaction(currentXid);
-                        transactionManager.commit();
-                        Thread.currentThread().setContextClassLoader(classLoader);
-                    } catch (ExecuteException e) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    } catch (LinkageError t) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    } catch (Throwable t) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    }
-                }
-            }, "Orphan-creator");
-            thread.start();
-        }
-
-        {
-            Thread thread = new Thread(new Runnable() {
-                public void run() {
-                    int startingTimeout = 0;
-                    try {
-                        LocalServer originalServer = getLocalServer("2000");
-                        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                        Thread.currentThread().setContextClassLoader(originalServer.getClassLoader());
-                        TransactionManager transactionManager = originalServer.getTransactionManager();
-                        transactionManager.setTransactionTimeout(startingTimeout);
-                        transactionManager.begin();
-                        Transaction originalTransaction = transactionManager.getTransaction();
-                        int remainingTimeout = (int) (originalServer.getTimeLeftBeforeTransactionTimeout() / 1000);
-                        Xid currentXid = originalServer.getCurrentXid();
-                        originalServer.storeRootTransaction();
-                        transactionManager.suspend();
-                        DataReturnedFromRemoteServer performTransactionalWork = performTransactionalWork(
-                                new LinkedList<String>(Arrays.asList(new String[]{"1000"})), remainingTimeout,
-                                currentXid, 2, false, false);
-                        transactionManager.resume(originalTransaction);
-                        XAResource proxyXAResource = originalServer.generateProxyXAResource("1000",
-                                performTransactionalWork.getProxyRequired());
-                        originalTransaction.enlistResource(proxyXAResource);
-                        originalServer.removeRootTransaction(currentXid);
-                        transactionManager.commit();
-                        Thread.currentThread().setContextClassLoader(classLoader);
-                    } catch (ExecuteException e) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    } catch (LinkageError t) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    } catch (Throwable t) {
-                        System.err.println("Should be a thread death but cest la vie");
-                        synchronized (phase2CommitAborted) {
-                            phase2CommitAborted.incrementCount();
-                            phase2CommitAborted.notify();
-                        }
-                    }
-                }
-            }, "Orphan-creator");
-            thread.start();
-        }
         synchronized (phase2CommitAborted) {
+            {
+                Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        int startingTimeout = 0;
+                        try {
+                            LocalServer originalServer = getLocalServer("1000");
+                            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                            Thread.currentThread().setContextClassLoader(originalServer.getClassLoader());
+                            TransactionManager transactionManager = originalServer.getTransactionManager();
+                            transactionManager.setTransactionTimeout(startingTimeout);
+                            transactionManager.begin();
+                            Transaction originalTransaction = transactionManager.getTransaction();
+                            int remainingTimeout = (int) (originalServer.getTimeLeftBeforeTransactionTimeout() / 1000);
+                            Xid currentXid = originalServer.getCurrentXid();
+                            originalServer.storeRootTransaction();
+                            transactionManager.suspend();
+                            DataReturnedFromRemoteServer performTransactionalWork = performTransactionalWork(
+                                    new LinkedList<String>(Arrays.asList(new String[]{"2000"})), remainingTimeout,
+                                    currentXid, 2, false, false);
+                            transactionManager.resume(originalTransaction);
+                            XAResource proxyXAResource = originalServer.generateProxyXAResource("2000",
+                                    performTransactionalWork.getProxyRequired());
+                            originalTransaction.enlistResource(proxyXAResource);
+                            originalServer.removeRootTransaction(currentXid);
+                            transactionManager.commit();
+                            Thread.currentThread().setContextClassLoader(classLoader);
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (ExecuteException e) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (LinkageError t) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (Throwable t) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        }
+                    }
+                }, "Orphan-creator");
+                thread.start();
+            }
+
+            {
+                Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        int startingTimeout = 0;
+                        try {
+                            LocalServer originalServer = getLocalServer("2000");
+                            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                            Thread.currentThread().setContextClassLoader(originalServer.getClassLoader());
+                            TransactionManager transactionManager = originalServer.getTransactionManager();
+                            transactionManager.setTransactionTimeout(startingTimeout);
+                            transactionManager.begin();
+                            Transaction originalTransaction = transactionManager.getTransaction();
+                            int remainingTimeout = (int) (originalServer.getTimeLeftBeforeTransactionTimeout() / 1000);
+                            Xid currentXid = originalServer.getCurrentXid();
+                            originalServer.storeRootTransaction();
+                            transactionManager.suspend();
+                            DataReturnedFromRemoteServer performTransactionalWork = performTransactionalWork(
+                                    new LinkedList<String>(Arrays.asList(new String[]{"1000"})), remainingTimeout,
+                                    currentXid, 2, false, false);
+                            transactionManager.resume(originalTransaction);
+                            XAResource proxyXAResource = originalServer.generateProxyXAResource("1000",
+                                    performTransactionalWork.getProxyRequired());
+                            originalTransaction.enlistResource(proxyXAResource);
+                            originalServer.removeRootTransaction(currentXid);
+                            transactionManager.commit();
+                            Thread.currentThread().setContextClassLoader(classLoader);
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (ExecuteException e) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (LinkageError t) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        } catch (Throwable t) {
+                            System.err.println("Should be a thread death but cest la vie");
+                            synchronized (phase2CommitAborted) {
+                                phase2CommitAborted.incrementCount();
+                                phase2CommitAborted.notify();
+                            }
+                        }
+                    }
+                }, "Orphan-creator");
+                thread.start();
+            }
             int waitedCount = 0;
-            while (phase2CommitAborted.getCount() < 2) {
+            while (waitedCount < 2) {
                 phase2CommitAborted.wait(50000);
                 waitedCount++;
-                if (waitedCount > 2 && phase2CommitAborted.getCount() < 2) {
+                if (waitedCount == 2 && phase2CommitAborted.getCount() < 2) {
                     fail("Servers were not aborted");
                 }
             }
@@ -518,7 +524,7 @@ public class SimpleIsolatedServers {
      * can be recovered
      */
     @Test
-    @BMScript("leave-subordinate-orphan")
+    @BMScript("leave-subordinate-orphan2")
     public void testOnePhaseSubordinateOrphan() throws Exception {
         System.out.println("testOnePhaseSubordinateOrphan");
         assertTrue("" + completionCounter.getCommitCount("3000"), completionCounter.getCommitCount("3000") == 0);
@@ -550,6 +556,9 @@ public class SimpleIsolatedServers {
                     originalServer.removeRootTransaction(currentXid);
                     transactionManager.commit();
                     Thread.currentThread().setContextClassLoader(classLoader);
+                    synchronized (phase2CommitAborted) {
+                        phase2CommitAborted.notify();
+                    }
                 } catch (ExecuteException e) {
                     System.err.println("Should be a thread death but cest la vie");
                     synchronized (phase2CommitAborted) {
@@ -752,7 +761,6 @@ public class SimpleIsolatedServers {
      * Top down recovery of a prepared transaction
      */
     @Test
-    // @BMScript("fail2pc")
     public void testRecovery2() throws Exception {
         System.out.println("testRecovery");
         for (String nodeName : serverNodeNames) {
@@ -772,7 +780,7 @@ public class SimpleIsolatedServers {
 
                         try {
                             doRecursiveTransactionalWork2(startingTimeout, nodesToFlowTo, true, false);
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             e.printStackTrace();
                             errors.incrementCount();
 
@@ -795,7 +803,7 @@ public class SimpleIsolatedServers {
         getLocalServer("2000").doRecoveryManagerScan(true);
         getLocalServer("1000").doRecoveryManagerScan(false);
 
-        assertTrue("" + completionCounter.getCommitCount("1000"), completionCounter.getCommitCount("1000") == 2);
+        assertTrue("" + completionCounter.getCommitCount("1000"), completionCounter.getCommitCount("1000") == 1);
         assertTrue("" + completionCounter.getCommitCount("2000"), completionCounter.getCommitCount("2000") == 2);
         assertTrue("" + completionCounter.getCommitCount("3000"), completionCounter.getCommitCount("3000") == 1);
         for (String nodeName : serverNodeNames) {
@@ -957,7 +965,7 @@ public class SimpleIsolatedServers {
         XAResource proxyXAResource = originalServer.generateProxyXAResource("2000", migratedXid);
         originalTransaction.enlistResource(proxyXAResource);
         originalServer.removeRootTransaction(currentXid);
-        Thread.currentThread().sleep((subordinateTimeout + 2) * 1000);
+        Thread.sleep((subordinateTimeout + 2) * 1000);
         try {
             transactionManager.commit();
             fail("Did not rollback");
@@ -975,8 +983,8 @@ public class SimpleIsolatedServers {
         System.out.println("testMigrateTransactionParentTimeout");
         tearDown();
         setup();
-        int rootTimeout = 20;
-        int subordinateTimeout = 60; // artificially high to ensure the timeout
+        int rootTimeout = 5;
+        int subordinateTimeout = 10; // artificially high to ensure the timeout
                                         // is performed by the parent
         LocalServer originalServer = getLocalServer("1000");
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -1315,7 +1323,7 @@ public class SimpleIsolatedServers {
                 // transactions and performance issues
                 if (dataReturnedFromRemoteServer.getProxyRequired() != null) {
                     XAResource proxyXAResource = currentServer.generateProxyXAResource(nextServerNodeName,
-                            dataReturnedFromRemoteServer.getProxyRequired());
+                            dataReturnedFromRemoteServer.getProxyRequired(), true);
                     transaction.enlistResource(proxyXAResource);
                     transaction.registerSynchronization(
                             currentServer.generateProxySynchronization(nextServerNodeName, toMigrate));
