@@ -1336,7 +1336,10 @@ public class BasicAction extends StateManager {
 
                 ActionManager.manager().remove(get_uid());
             } else {
-                if (prepare(reportHeuristics) == TwoPhaseOutcome.PREPARE_NOTOK) {
+                int prepareStatus = prepare(reportHeuristics);
+
+                if (prepareStatus == TwoPhaseOutcome.PREPARE_NOTOK
+                        || prepareStatus == TwoPhaseOutcome.ONE_PHASE_ERROR) {
                     tsLogger.i18NLogger.warn_coordinator_BasicAction_36(get_uid());
 
                     if (heuristicDecision != TwoPhaseOutcome.PREPARE_OK) {
@@ -1613,10 +1616,11 @@ public class BasicAction extends StateManager {
 
     /**
      * Second phase of the two-phase commit protocol for committing actions.
-     * This operation first invokes the doCommit operation on the preparedList.
-     * This ensures that the appropriate commit operation is performed on each
-     * entry which is then either deleted (top_level) or merged into the
-     * parent's pendingList.
+     * Phase 2 should only be called if phase 1 has completed successfully. This
+     * operation first invokes the doCommit operation on the preparedList. This
+     * ensures that the appropriate commit operation is performed on each entry
+     * which is then either deleted (top_level) or merged into the parent's
+     * pendingList.
      *
      * Processing of the readonlyList is different in that if the action is
      * top_level then all records in the readonlyList are deleted without
@@ -1945,7 +1949,9 @@ public class BasicAction extends StateManager {
 
             ActionManager.manager().remove(get_uid());
 
-            return TwoPhaseOutcome.PREPARE_ONE_PHASE_COMMITTED;
+            return actionStatus == ActionStatus.ABORTED
+                    ? TwoPhaseOutcome.ONE_PHASE_ERROR
+                    : TwoPhaseOutcome.PREPARE_ONE_PHASE_COMMITTED;
         }
 
         if ((p != TwoPhaseOutcome.PREPARE_OK) && (p != TwoPhaseOutcome.PREPARE_READONLY)) {
