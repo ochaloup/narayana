@@ -132,9 +132,9 @@ public class HornetqJournalStore {
                     envBean.getMaxIO(), envBean.isLogRates());
         }
 
-        journal = new JournalImpl(envBean.getFileSize(), envBean.getMinFiles(), envBean.getCompactMinFiles(),
-                envBean.getCompactPercentage(), sequentialFileFactory, envBean.getFilePrefix(),
-                envBean.getFileExtension(), envBean.getMaxIO());
+        journal = new JournalImpl(envBean.getFileSize(), envBean.getMinFiles(), envBean.getPoolSize(),
+                envBean.getCompactMinFiles(), envBean.getCompactPercentage(), sequentialFileFactory,
+                envBean.getFilePrefix(), envBean.getFileExtension(), envBean.getMaxIO());
     }
 
     /**
