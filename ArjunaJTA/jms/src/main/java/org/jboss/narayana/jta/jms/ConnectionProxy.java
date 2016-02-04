@@ -57,7 +57,7 @@ public class ConnectionProxy implements Connection {
     @Override
     public Session createSession(boolean transacted, int acknowledgeMode) throws JMSException {
         if (transactionHelper.isTransactionAvailable()) {
-            return createAndEnlistSession();
+            return createAndRegisterSession();
         }
 
         return xaConnection.createSession(transacted, acknowledgeMode);
@@ -125,12 +125,12 @@ public class ConnectionProxy implements Connection {
                 maxMessages);
     }
 
-    private Session createAndEnlistSession() throws JMSException {
+    private Session createAndRegisterSession() throws JMSException {
         XASession xaSession = xaConnection.createXASession();
         Session session = new SessionProxy(xaSession, transactionHelper);
 
         try {
-            transactionHelper.enlistResource(xaSession.getXAResource());
+            transactionHelper.registerXAResource(xaSession.getXAResource());
         } catch (JMSException e) {
             xaSession.close();
             throw e;
