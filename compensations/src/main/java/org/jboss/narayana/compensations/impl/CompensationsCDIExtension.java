@@ -55,6 +55,7 @@ public class CompensationsCDIExtension implements Extension {
         bbd.addAnnotatedType(bm.createAnnotatedType(TxConfirmInterceptor.class));
         bbd.addAnnotatedType(bm.createAnnotatedType(TxLoggedInterceptor.class));
         bbd.addAnnotatedType(bm.createAnnotatedType(CancelOnFailureInterceptor.class));
+        bbd.addAnnotatedType(bm.createAnnotatedType(CompensatableActionProducer.class));
     }
 
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
