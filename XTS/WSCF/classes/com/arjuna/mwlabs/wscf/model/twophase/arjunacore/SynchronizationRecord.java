@@ -73,6 +73,7 @@ public class SynchronizationRecord implements com.arjuna.ats.arjuna.coordinator.
 
                 return true;
             } catch (Exception ex) {
+                wscfLogger.i18NLogger.warn_model_twophase_arjunacore_SynchronizationRecord_2(ex);
                 return false;
             }
         } else
