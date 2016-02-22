@@ -225,51 +225,52 @@ public class ActionStatusService implements Service {
             if (_recoveryStore.allTypes(types)) {
                 String theTypeName = null;
 
-                try {
-                    boolean endOfList = false;
+                boolean endOfList = false;
 
-                    while (!endOfList) {
-                        // extract a type
-                        theTypeName = types.unpackString();
+                while (!endOfList) {
+                    // extract a type
+                    theTypeName = types.unpackString();
 
-                        if (theTypeName.compareTo("") == 0) {
-                            endOfList = true;
-                        } else {
-                            InputObjectState uids = new InputObjectState();
+                    if (theTypeName.compareTo("") == 0) {
+                        endOfList = true;
+                    } else {
+                        InputObjectState uids = new InputObjectState();
 
-                            try {
-                                boolean endOfUids = false;
+                        boolean endOfUids = false;
 
-                                if (_recoveryStore.allObjUids(theTypeName, uids)) {
-                                    Uid theUid = null;
+                        if (_recoveryStore.allObjUids(theTypeName, uids)) {
+                            Uid theUid = null;
 
-                                    while (!endOfUids) {
-                                        // extract a uid
-                                        theUid = UidHelper.unpackFrom(uids);
+                            while (!endOfUids) {
+                                // extract a uid
+                                theUid = UidHelper.unpackFrom(uids);
 
-                                        if (theUid.equals(Uid.nullUid())) {
-                                            endOfUids = true;
-                                        } else if (theUid.equals(tranUid)) {
-                                            // add to vector
-                                            matchingUidVector.addElement(tranUid);
-                                            matchingUidTypeVector.addElement(theTypeName);
-                                            tsLogger.i18NLogger.info_recovery_ActionStatusService_4(tranUid);
-                                        }
-                                    }
+                                if (theUid.equals(Uid.nullUid())) {
+                                    endOfUids = true;
+                                } else if (theUid.equals(tranUid)) {
+                                    // add to vector
+                                    matchingUidVector.addElement(tranUid);
+                                    matchingUidTypeVector.addElement(theTypeName);
+                                    tsLogger.i18NLogger.info_recovery_ActionStatusService_4(tranUid);
                                 }
-                            } catch (Exception ex) {
-                                tsLogger.i18NLogger.warn_recovery_ActionStatusService_5(tranUid, ex);
                             }
+                        } else {
+                            return action_status; // Errors contacting recovery
+                                                    // store for the list of
+                                                    // uids it has for a type so
+                                                    // return INVALID state
                         }
                     }
-                } catch (IOException ex) {
-                    tsLogger.i18NLogger.warn_recovery_ActionStatusService_5(tranUid, ex);
-                } catch (Exception ex) {
-                    tsLogger.i18NLogger.warn_recovery_ActionStatusService_5(tranUid, ex);
                 }
+            } else {
+                return action_status; // Errors contacting recovery store for
+                                        // the list of types it holds so return
+                                        // INVALID state
             }
         } catch (Exception ex) {
             tsLogger.i18NLogger.warn_recovery_ActionStatusService_5(tranUid, ex);
+            return action_status; // Read invalid data from the objectstore so
+                                    // return INVALID state
         }
 
         int uidVectorSize = matchingUidVector.size();
