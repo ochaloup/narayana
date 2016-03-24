@@ -104,15 +104,12 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable {
      * we can do is leave the transaction alone.
      */
     public int cancel() {
-        if (TxStats.enabled())
-            TxStats.getInstance().incrementApplicationRollbacks();
-
         if (parent() != null)
             parent().removeChildAction(this);
 
         // beforeCompletion();
 
-        int outcome = super.Abort();
+        int outcome = super.Abort(true);
 
         if (outcome == ActionStatus.ABORTED) {
             afterCompletion(outcome);
