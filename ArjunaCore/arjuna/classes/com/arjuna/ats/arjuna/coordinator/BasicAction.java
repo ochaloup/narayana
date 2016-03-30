@@ -1433,8 +1433,23 @@ public class BasicAction extends StateManager {
      *
      * @return <code>ActionStatus</code> indicating outcome.
      */
-
     protected synchronized int Abort() {
+        return Abort(false);
+    }
+
+    /**
+     * This is the user callable abort operation. It is invoked prior to the
+     * start of two-phase commit and hence only processes records in the
+     * pendingList (the other lists should be empty).
+     *
+     * Does not change the calling thread's notion of the current transaction.
+     *
+     * @param applicationAbort
+     *            indicates whether or not this is an application abort
+     *
+     * @return <code>ActionStatus</code> indicating outcome.
+     */
+    protected synchronized int Abort(boolean applicationAbort) {
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("BasicAction::Abort() for action-id " + get_uid());
         }
@@ -1490,8 +1505,12 @@ public class BasicAction extends StateManager {
 
         actionStatus = ActionStatus.ABORTED;
 
-        if (TxStats.enabled())
+        if (TxStats.enabled()) {
             TxStats.getInstance().incrementAbortedTransactions();
+
+            if (applicationAbort)
+                TxStats.getInstance().incrementApplicationRollbacks();
+        }
 
         return actionStatus;
     }
