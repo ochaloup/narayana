@@ -73,7 +73,7 @@ public class ExecutionWrapper {
             // strip off the trailing '/emptyObjectStore' to get the test rather
             // than task dir
             objectStoreBaseDirBaseName = objectStoreBaseDirBaseName.substring(0,
-                    objectStoreBaseDirBaseName.lastIndexOf("/"));
+                    objectStoreBaseDirBaseName.lastIndexOf(System.getProperty("file.separator")));
 
             File directory = new File(objectStoreBaseDirBaseName);
 
