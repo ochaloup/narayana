@@ -31,7 +31,6 @@ import org.jboss.narayana.compensations.api.CompensationHandler;
 import org.jboss.narayana.compensations.api.ConfirmationHandler;
 import org.jboss.narayana.compensations.api.TransactionLoggedHandler;
 
-import javax.enterprise.inject.spi.BeanManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,35 +45,27 @@ public class ParticipantImpl
 
     private static final Map<Object, AtomicInteger> PARTICIPANT_COUNTERS = new HashMap<>();
 
-    private Class<? extends CompensationHandler> compensationHandler;
-    private Class<? extends ConfirmationHandler> confirmationHandler;
-    private Class<? extends TransactionLoggedHandler> transactionLoggedHandler;
+    private CompensationHandler compensationHandler;
 
-    private BeanManager beanManager;
+    private ConfirmationHandler confirmationHandler;
+
+    private TransactionLoggedHandler transactionLoggedHandler;
+
     private ClassLoader applicationClassloader;
+
     private Object currentTX;
 
-    public ParticipantImpl(Class<? extends CompensationHandler> compensationHandlerClass,
-            Class<? extends ConfirmationHandler> confirmationHandlerClass,
-            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
+    public ParticipantImpl(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
+            TransactionLoggedHandler transactionLoggedHandler, Object currentTX) {
 
-        this.compensationHandler = compensationHandlerClass;
-        this.confirmationHandler = confirmationHandlerClass;
-        this.transactionLoggedHandler = transactionLoggedHandlerClass;
+        this.compensationHandler = compensationHandler;
+        this.confirmationHandler = confirmationHandler;
+        this.transactionLoggedHandler = transactionLoggedHandler;
         this.currentTX = currentTX;
 
-        beanManager = BeanManagerUtil.getBeanManager();
         applicationClassloader = Thread.currentThread().getContextClassLoader();
 
         incrementParticipantsCounter();
-    }
-
-    private <T extends Object> T instantiate(Class<T> clazz) {
-
-        if (clazz == null) {
-            return null;
-        }
-        return BeanManagerUtil.createBeanInstance(clazz, beanManager);
     }
 
     @Override
@@ -85,8 +76,7 @@ public class ParticipantImpl
             ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(applicationClassloader);
 
-            TransactionLoggedHandler handler = instantiate(transactionLoggedHandler);
-            handler.transactionLogged(confirmed);
+            transactionLoggedHandler.transactionLogged(confirmed);
 
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
@@ -101,8 +91,7 @@ public class ParticipantImpl
             Thread.currentThread().setContextClassLoader(applicationClassloader);
             CompensationContext.setTxContextToExtend(currentTX);
 
-            ConfirmationHandler handler = instantiate(confirmationHandler);
-            handler.confirm();
+            confirmationHandler.confirm();
 
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
@@ -125,8 +114,7 @@ public class ParticipantImpl
                 Thread.currentThread().setContextClassLoader(applicationClassloader);
                 CompensationContext.setTxContextToExtend(currentTX);
 
-                CompensationHandler handler = instantiate(compensationHandler);
-                handler.compensate();
+                compensationHandler.compensate();
 
                 Thread.currentThread().setContextClassLoader(origClassLoader);
             }

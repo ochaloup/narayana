@@ -44,12 +44,11 @@ public class RemoteParticipant
 
     private ParticipantImpl participant;
 
-    public RemoteParticipant(Class<? extends CompensationHandler> compensationHandlerClass,
-            Class<? extends ConfirmationHandler> confirmationHandlerClass,
-            Class<? extends TransactionLoggedHandler> transactionLoggedHandlerClass, Object currentTX) {
+    public RemoteParticipant(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
+            TransactionLoggedHandler transactionLoggedHandler, Object currentTX) {
 
-        participant = new ParticipantImpl(compensationHandlerClass, confirmationHandlerClass,
-                transactionLoggedHandlerClass, currentTX);
+        participant = new ParticipantImpl(compensationHandler, confirmationHandler, transactionLoggedHandler,
+                currentTX);
     }
 
     @Override
