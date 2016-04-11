@@ -1,19 +1,15 @@
-package org.jboss.narayana.compensations.impl.remote;
+package org.jboss.narayana.compensations.impl.local;
 
-import com.arjuna.mw.wst.TxContext;
-import com.arjuna.mw.wst11.BusinessActivityManager;
-import com.arjuna.mw.wst11.BusinessActivityManagerFactory;
-import com.arjuna.mw.wst11.UserBusinessActivityFactory;
-import com.arjuna.wst.SystemException;
-import com.arjuna.wst.TransactionRolledBackException;
-import com.arjuna.wst.UnknownTransactionException;
-import com.arjuna.wst.WrongStateException;
-import com.arjuna.wst11.BAParticipantManager;
+import com.arjuna.mw.wsas.activity.ActivityHierarchy;
+import com.arjuna.mw.wsas.exceptions.SystemException;
+import com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException;
+import com.arjuna.mw.wscf.model.sagas.exceptions.CoordinatorCancelledException;
+import com.arjuna.mw.wscf11.model.sagas.CoordinatorManagerFactory;
 import org.jboss.narayana.compensations.api.CompensationHandler;
 import org.jboss.narayana.compensations.api.ConfirmationHandler;
 import org.jboss.narayana.compensations.api.TransactionCompensatedException;
 import org.jboss.narayana.compensations.api.TransactionLoggedHandler;
-import org.jboss.narayana.compensations.impl.BAControler;
+import org.jboss.narayana.compensations.impl.BAController;
 import org.jboss.narayana.compensations.impl.BeanManagerUtil;
 import org.jboss.narayana.compensations.impl.CompensationManagerImpl;
 import org.jboss.narayana.compensations.impl.CompensationManagerState;
@@ -24,33 +20,31 @@ import java.util.UUID;
 /**
  * @author paul.robinson@redhat.com 19/04/2014
  */
-public class RemoteBAControler implements BAControler {
+public class LocalBAController implements BAController {
 
     @Override
-    public void beginBusinessActivity() throws WrongStateException, SystemException {
+    public void beginBusinessActivity() throws Exception {
 
-        UserBusinessActivityFactory.userBusinessActivity().begin();
+        CoordinatorManagerFactory.coordinatorManager().begin("Sagas11HLS");
         CompensationManagerImpl.resume(new CompensationManagerState());
     }
 
     @Override
-    public void closeBusinessActivity()
-            throws WrongStateException, UnknownTransactionException, TransactionRolledBackException, SystemException {
+    public void closeBusinessActivity() throws Exception {
 
-        UserBusinessActivityFactory.userBusinessActivity().close();
+        CoordinatorManagerFactory.coordinatorManager().close();
         CompensationManagerImpl.suspend();
     }
 
     @Override
-    public void cancelBusinessActivity() throws WrongStateException, UnknownTransactionException, SystemException {
+    public void cancelBusinessActivity() throws Exception {
 
-        UserBusinessActivityFactory.userBusinessActivity().cancel();
+        CoordinatorManagerFactory.coordinatorManager().cancel();
         CompensationManagerImpl.suspend();
     }
 
     @Override
-    public void completeBusinessActivity(final boolean isException)
-            throws WrongStateException, UnknownTransactionException, SystemException {
+    public void completeBusinessActivity(final boolean isException) throws Exception {
 
         if (CompensationManagerImpl.isCompensateOnly() && !isException) {
             cancelBusinessActivity();
@@ -60,7 +54,7 @@ public class RemoteBAControler implements BAControler {
         } else {
             try {
                 closeBusinessActivity();
-            } catch (TransactionRolledBackException e) {
+            } catch (CoordinatorCancelledException e) {
                 throw new TransactionCompensatedException("Failed to close transaction", e);
             }
         }
@@ -69,31 +63,28 @@ public class RemoteBAControler implements BAControler {
     public boolean isBARunning() {
 
         try {
-
-            BusinessActivityManager businessActivityManager = BusinessActivityManagerFactory.businessActivityManager();
-            if (businessActivityManager == null) {
-                return false;
-            }
-            return BusinessActivityManagerFactory.businessActivityManager().currentTransaction() != null;
+            return CoordinatorManagerFactory.coordinatorManager().currentActivity() != null;
         } catch (SystemException e) {
+            return false;
+        } catch (ProtocolNotRegisteredException e) {
             return false;
         }
     }
 
     public Object suspend() throws Exception {
 
-        return BusinessActivityManagerFactory.businessActivityManager().suspend();
+        return CoordinatorManagerFactory.coordinatorManager().suspend();
     }
 
     public void resume(Object context) throws Exception {
 
-        BusinessActivityManagerFactory.businessActivityManager().resume((TxContext) context);
+        CoordinatorManagerFactory.coordinatorManager().resume((ActivityHierarchy) context);
     }
 
     @Override
     public Object getCurrentTransaction() throws Exception {
 
-        return BusinessActivityManagerFactory.businessActivityManager().currentTransaction();
+        return CoordinatorManagerFactory.coordinatorManager().currentActivity();
     }
 
     @Override
@@ -112,12 +103,13 @@ public class RemoteBAControler implements BAControler {
     public ParticipantManager enlist(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
             TransactionLoggedHandler transactionLoggedHandler) throws Exception {
 
-        RemoteParticipant participant = new RemoteParticipant(compensationHandler, confirmationHandler,
-                transactionLoggedHandler, getCurrentTransaction());
-        BAParticipantManager baParticipantManager = BusinessActivityManagerFactory.businessActivityManager()
-                .enlistForBusinessAgreementWithParticipantCompletion(participant, String.valueOf(UUID.randomUUID()));
+        String participantId = String.valueOf(UUID.randomUUID());
+        LocalParticipant participant = new LocalParticipant(compensationHandler, confirmationHandler,
+                transactionLoggedHandler, getCurrentTransaction(), participantId);
 
-        return new RemoteParticipantManager(baParticipantManager);
+        CoordinatorManagerFactory.coordinatorManager().enlistParticipant(participant);
+
+        return new LocalParticipantManager(participantId);
     }
 
     private <T> T instantiate(Class<T> clazz) {
