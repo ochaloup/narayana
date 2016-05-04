@@ -1606,6 +1606,18 @@ public interface arjunaI18NLogger {
     @LogMessage(level = WARN)
     public void warn_multiple_threads(Uid objectUid, String key, String string);
 
+    @Message(id = 12382, value = "Action id {0} could not be transitioned to committed", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_objectstore_JDBCImple_nothingtocommit(String string);
+
+    @Message(id = 12383, value = "Action id {0} could not be updated during write_state", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_objectstore_JDBCImple_nothingtoupdate(String string);
+
+    @Message(id = 12384, value = "Action id {0} could not be inserted during write_state", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_objectstore_JDBCImple_nothingtoinsert(String string);
+
     /*
      * Allocate new messages directly above this notice. - id: use the next id
      * number in numeric sequence. Don't reuse ids. The first two digits of the

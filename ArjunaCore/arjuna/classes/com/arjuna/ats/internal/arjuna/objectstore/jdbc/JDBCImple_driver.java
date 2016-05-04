@@ -74,12 +74,11 @@ public abstract class JDBCImple_driver {
         try {
             connection = jdbcAccess.getConnection();
             // Delete any previously committed state
-            pstmt = connection.prepareStatement(
-                    "DELETE FROM " + tableName + " WHERE UidString = ? AND TypeName = ? AND StateType = ?");
+            pstmt = connection.prepareStatement("DELETE FROM " + tableName
+                    + " WHERE UidString = ? AND TypeName = ? AND StateType = " + StateStatus.OS_COMMITTED);
 
             pstmt.setString(1, objUid.stringForm());
             pstmt.setString(2, typeName);
-            pstmt.setInt(3, 1);
 
             int rowcount = pstmt.executeUpdate();
             if (rowcount > 0) {
@@ -87,9 +86,8 @@ public abstract class JDBCImple_driver {
             }
 
             // now do the commit itself:
-            pstmt2 = connection.prepareStatement(
-                    "UPDATE " + tableName + " SET StateType = 1 WHERE UidString = ? AND TypeName = ? AND StateType = "
-                            + StateStatus.OS_UNCOMMITTED);
+            pstmt2 = connection.prepareStatement("UPDATE " + tableName + " SET StateType = " + StateStatus.OS_COMMITTED
+                    + " WHERE UidString = ? AND TypeName = ? AND StateType = " + StateStatus.OS_UNCOMMITTED);
 
             pstmt2.setString(1, objUid.stringForm());
             pstmt2.setString(2, typeName);
@@ -99,6 +97,7 @@ public abstract class JDBCImple_driver {
                 connection.commit();
                 result = true;
             } else {
+                tsLogger.i18NLogger.warn_objectstore_JDBCImple_nothingtocommit(objUid.stringForm());
                 connection.rollback();
             }
 
@@ -611,12 +610,16 @@ public abstract class JDBCImple_driver {
                         pstmt2.setInt(2, stateType);
                         pstmt2.setString(3, typeName);
                         pstmt2.setString(4, objUid.stringForm());
-                        pstmt2.executeUpdate();
+                        int executeUpdate = pstmt2.executeUpdate();
+                        if (executeUpdate != 0) {
+                            result = true;
+                        } else {
+                            tsLogger.i18NLogger.warn_objectstore_JDBCImple_nothingtoupdate(objUid.toString());
+                        }
                     } finally {
                         pstmt2.close();
                     }
                 } else {
-                    connection.commit();
                     // not in database, do insert:
                     PreparedStatement pstmt2 = connection.prepareStatement("INSERT INTO " + tableName
                             + " (StateType,Hidden,TypeName,UidString,ObjectState) VALUES (?,0,?,?,?)");
@@ -626,14 +629,18 @@ public abstract class JDBCImple_driver {
                         pstmt2.setString(3, objUid.stringForm());
                         pstmt2.setBytes(4, b);
 
-                        pstmt2.executeUpdate();
+                        int executeUpdate = pstmt2.executeUpdate();
+                        if (executeUpdate != 0) {
+                            result = true;
+                        } else {
+                            tsLogger.i18NLogger.warn_objectstore_JDBCImple_nothingtoinsert(objUid.toString());
+                        }
                     } finally {
                         pstmt2.close();
                     }
                 }
 
                 connection.commit();
-                result = true;
             } catch (Exception e) {
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_writefailed(e);
             } finally {
