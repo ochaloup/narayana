@@ -53,11 +53,15 @@ public class ConnectionSynchronization implements Synchronization {
 
     public void afterCompletion(int status) {
         try {
-            _theConnection.close();
+            if (_theConnection != null && !_theConnection.isClosed()) {
+                _theConnection.close();
+            }
         } catch (Exception ex) {
         }
         try {
-            _recoveryConnection.closeCloseCurrentConnection();
+            if (_recoveryConnection != null) {
+                _recoveryConnection.closeCloseCurrentConnection();
+            }
         } catch (Exception ex) {
         }
     }

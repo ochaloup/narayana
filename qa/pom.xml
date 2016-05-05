@@ -229,6 +229,16 @@
 
   <profiles>
     <profile>
+        <id>postgresql</id>
+        <dependencies>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${version.postgresql}</version>
+            </dependency>
+        </dependencies>
+    </profile>
+    <profile>
       <id>IDE</id>
       <build>
         <plugins>
