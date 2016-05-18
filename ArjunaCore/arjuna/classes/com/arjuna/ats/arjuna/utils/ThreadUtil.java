@@ -20,6 +20,10 @@
  */
 package com.arjuna.ats.arjuna.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Provides utilities to manage thread ids.
  */
@@ -27,11 +31,11 @@ public class ThreadUtil {
     /**
      * The ID associated with the thread.
      */
-    private static final ThreadLocal THREAD_ID = new ThreadLocal();
+    private static final Map<Thread, String> THREAD_ID = new HashMap<Thread, String>();
     /**
      * The thread id counter.
      */
-    private static long id;
+    private static AtomicLong id = new AtomicLong();
 
     /**
      * Get the string ID for the current thread.
@@ -50,14 +54,26 @@ public class ThreadUtil {
      * @return The thread id
      */
     public static String getThreadId(final Thread thread) {
-        final Object id = THREAD_ID.get();
+        final String id = THREAD_ID.get(thread);
         if (id != null) {
-            return (String) id;
+            return id;
         }
 
         final String newId = getNextId();
-        THREAD_ID.set(newId);
+        THREAD_ID.put(thread, newId);
         return newId;
+    }
+
+    /**
+     * As the association is stored in a map callers need to ensure they remove
+     * from the thread when the threadID is no longer required.
+     * 
+     * @param thread
+     *            The thread to remove from the map
+     * @return The ID that matched the thread
+     */
+    public static String removeThreadId(final Thread thread) {
+        return THREAD_ID.remove(thread);
     }
 
     /**
@@ -65,7 +81,7 @@ public class ThreadUtil {
      * 
      * @return The next thread id.
      */
-    private static synchronized String getNextId() {
-        return "TSThread:" + Long.toHexString(++id);
+    private static String getNextId() {
+        return Long.toHexString(id.incrementAndGet());
     }
 }

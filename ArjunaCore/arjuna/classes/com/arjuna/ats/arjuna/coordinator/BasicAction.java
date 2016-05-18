@@ -585,7 +585,7 @@ public class BasicAction extends StateManager {
 
     public final boolean removeChildThread() // current thread
     {
-        return removeChildThread(ThreadUtil.getThreadId());
+        return removeChildThread(ThreadUtil.removeThreadId(Thread.currentThread()));
     }
 
     /**
