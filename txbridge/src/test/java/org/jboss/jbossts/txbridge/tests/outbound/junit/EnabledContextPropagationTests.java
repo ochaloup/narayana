@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -143,7 +144,7 @@ public final class EnabledContextPropagationTests {
     public void testNonTransactionlServiceWithoutFeature(@ArquillianResource URL baseURL) throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
-        parameters.add(new BasicNameValuePair("isTransaction", "ture"));
+        parameters.add(new BasicNameValuePair("isTransaction", "true"));
         parameters.add(new BasicNameValuePair("isWSATService", "false"));
         parameters.add(new BasicNameValuePair("clientType", String.valueOf(TestATClient.CLIENT_WITHOUT_FEATURES)));
 
@@ -198,7 +199,8 @@ public final class EnabledContextPropagationTests {
      * Tests transactional invocation to non-transaction service with enabled
      * JTAOverWSATFeature.
      *
-     * No two-phase commit calls are expected.
+     * Calls to the service will fail when the Web service does not support
+     * WS-AT.
      *
      * @throws Exception
      */
@@ -208,13 +210,16 @@ public final class EnabledContextPropagationTests {
             throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
-        parameters.add(new BasicNameValuePair("isTransaction", "ture"));
+        parameters.add(new BasicNameValuePair("isTransaction", "true"));
         parameters.add(new BasicNameValuePair("isWSATService", "false"));
         parameters.add(new BasicNameValuePair("isJTAOverWSATFeatureEnabled", "true"));
         parameters.add(new BasicNameValuePair("clientType", String.valueOf(TestATClient.CLIENT_WITH_JTA_FEATURE)));
-
-        List<String> invocations = makeRequest(baseURL, parameters);
-        assertInvocations(invocations);
+        try {
+            makeRequest(baseURL, parameters);
+            Assert.fail("'MustUnderstand headers' exception should be thrown.");
+        } catch (HttpResponseException e) {
+            // this is expected
+        }
     }
 
     // Tests with disabled JTAOverWSATFeature features
@@ -274,7 +279,7 @@ public final class EnabledContextPropagationTests {
             throws Exception {
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
         parameters.add(new BasicNameValuePair("isCommit", "true"));
-        parameters.add(new BasicNameValuePair("isTransaction", "ture"));
+        parameters.add(new BasicNameValuePair("isTransaction", "true"));
         parameters.add(new BasicNameValuePair("isWSATService", "false"));
         parameters.add(new BasicNameValuePair("isJTAOverWSATFeatureEnabled", "false"));
         parameters.add(new BasicNameValuePair("clientType", String.valueOf(TestATClient.CLIENT_WITH_JTA_FEATURE)));
