@@ -253,17 +253,8 @@ public class ConnectionImple implements Connection {
      * This needs to be reworked in light of experience and requirements.
      */
     public void close() throws SQLException {
+        boolean delayClose = false;
         try {
-            /*
-             * Need to know whether this particular connection has outstanding
-             * resources waiting for it. If not then we can close, otherwise we
-             * can't.
-             */
-
-            if (!_transactionalDriverXAConnectionConnection.inuse()) {
-                ConnectionManager.remove(this); // finalize?
-            }
-
             /*
              * Delist resource if within a transaction.
              */
@@ -276,8 +267,6 @@ public class ConnectionImple implements Connection {
              * this. Also only delist if the transaction is the one the
              * connection is enlisted with!
              */
-
-            boolean delayClose = false;
 
             if (tx != null) {
                 if (_transactionalDriverXAConnectionConnection.validTransaction(tx)) {
@@ -317,29 +306,12 @@ public class ConnectionImple implements Connection {
                         }
                     }
 
-                    tx.registerSynchronization(
-                            new ConnectionSynchronization(null, _transactionalDriverXAConnectionConnection));
                     if (delayClose) {
-                        tx.registerSynchronization(new ConnectionSynchronization(_theConnection, null));
-
-                        _theConnection = null;
+                        tx.registerSynchronization(new ConnectionSynchronization(this));
                     }
                 } else
                     throw new SQLException(jdbcLogger.i18NLogger.get_closeerrorinvalidtx(tx.toString()));
-            } else {
-                _transactionalDriverXAConnectionConnection.closeCloseCurrentConnection();
             }
-
-            if (!delayClose) // close now
-            {
-                if (!_theConnection.isClosed()) {
-                    _theConnection.close();
-                }
-
-                _theConnection = null;
-            }
-
-            // what about connections without xaCon?
         } catch (IllegalStateException ex) {
             // transaction not running, so ignore.
         } catch (SQLException sqle) {
@@ -348,6 +320,25 @@ public class ConnectionImple implements Connection {
             SQLException sqlException = new SQLException(jdbcLogger.i18NLogger.get_closeerror());
             sqlException.initCause(e1);
             throw sqlException;
+        } finally {
+            if (!delayClose) {
+                closeImpl();
+            }
+        }
+    }
+
+    void closeImpl() throws SQLException {
+        try {
+            ConnectionManager.remove(this);
+            if (!_theConnection.isClosed()) {
+                _theConnection.close();
+            }
+            if (_transactionalDriverXAConnectionConnection != null) {
+                _transactionalDriverXAConnectionConnection.closeCloseCurrentConnection();
+            }
+        } finally {
+            _theConnection = null;
+            _transactionalDriverXAConnectionConnection = null;
         }
     }
 
@@ -356,8 +347,6 @@ public class ConnectionImple implements Connection {
          * A connection may appear closed to a thread if another thread has
          * bound it to a different transaction.
          */
-
-        checkTransaction();
 
         if (_theConnection == null)
             return false; // not opened yet. // TODO why don't we return true
@@ -736,11 +725,8 @@ public class ConnectionImple implements Connection {
 
     final void reset() {
         try {
-            if (_theConnection != null)
-                _theConnection.close();
+            closeImpl();
         } catch (Exception ex) {
-        } finally {
-            _theConnection = null;
         }
     }
 
