@@ -1618,6 +1618,12 @@ public interface arjunaI18NLogger {
     @LogMessage(level = WARN)
     public void warn_objectstore_JDBCImple_nothingtoinsert(String string);
 
+    @Message(id = 12385, value = "Could not read from object store", format = MESSAGE_FORMAT)
+    public String warn_objectstore_JDBCImple_readfailed_message();
+
+    @Message(id = 12386, value = "Unexpected state type {0}", format = MESSAGE_FORMAT)
+    String unexpected_state_type(int stateType);
+
     /*
      * Allocate new messages directly above this notice. - id: use the next id
      * number in numeric sequence. Don't reuse ids. The first two digits of the

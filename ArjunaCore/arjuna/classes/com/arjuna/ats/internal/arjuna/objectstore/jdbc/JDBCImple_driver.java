@@ -45,6 +45,7 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.exceptions.FatalError;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
+import com.arjuna.ats.arjuna.objectstore.ObjectStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.jdbc.JDBCAccess;
 import com.arjuna.ats.arjuna.state.InputObjectState;
@@ -537,13 +538,15 @@ public abstract class JDBCImple_driver {
                         result = new InputObjectState(objUid, typeName, buffer);
                     } else {
                         tsLogger.i18NLogger.warn_objectstore_JDBCImple_readfailed();
+                        throw new ObjectStoreException(
+                                tsLogger.i18NLogger.warn_objectstore_JDBCImple_readfailed_message());
                     }
                 }
 
                 connection.commit();
             } catch (Exception e) {
-                result = null;
                 tsLogger.i18NLogger.warn_objectstore_JDBCImple_14(e);
+                throw new ObjectStoreException(e);
             } finally {
                 if (rs != null) {
                     try {
@@ -567,6 +570,8 @@ public abstract class JDBCImple_driver {
                     }
                 }
             }
+        } else {
+            throw new ObjectStoreException(tsLogger.i18NLogger.unexpected_state_type(stateType));
         }
 
         return result;
