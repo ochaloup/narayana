@@ -73,10 +73,24 @@ public class SubordinateAtomicAction
         _activated = activate(); // if this fails, we'll retry later.
     }
 
+    /**
+     * Recovery SAA. If the record is removed and peekXidOnly is true then the
+     * Xid will be null.
+     *
+     * @param actId
+     * @param peekXidOnly
+     * @throws ObjectStoreException
+     * @throws IOException
+     */
     public SubordinateAtomicAction(Uid actId, boolean peekXidOnly) throws ObjectStoreException, IOException {
         super(actId);
         if (peekXidOnly) {
             InputObjectState os = StoreManager.getParticipantStore().read_committed(objectUid, type());
+            if (os == null) {
+                // This will have been logged by the ObjectStore during
+                // ShadowingStore::read_state as an INFO if there was no content
+                return;
+            }
             unpackHeader(os, new Header());
             boolean haveXid = os.unpackBoolean();
 
@@ -128,6 +142,11 @@ public class SubordinateAtomicAction
         return "/StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction/SubordinateAtomicAction/JCA";
     }
 
+    /**
+     * If the record was removed Xid will be null
+     *
+     * @return
+     */
     public final Xid getXid() {
         // could be null if activation failed.
 
