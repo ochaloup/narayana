@@ -259,7 +259,7 @@ public class ServerTransaction extends ArjunaTransactionImple {
 
         org.omg.CosTransactions.Status s = get_status();
 
-        if ((s == org.omg.CosTransactions.Status.StatusCommitted)
+        if ((s == org.omg.CosTransactions.Status.StatusCommitted && preparedList.size() == 0)
                 || (s == org.omg.CosTransactions.Status.StatusRolledBack)) {
             int status = finalStatus();
 
