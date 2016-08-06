@@ -94,6 +94,18 @@ public class RESTRecord extends AbstractRecord {
         this.commitOnePhaseURI = commitOnePhaseURI;
     }
 
+    public String getCoordinatorURI() {
+        return coordinatorURI;
+    }
+
+    public String getTxId() {
+        return txId;
+    }
+
+    public String getRecoveryURI() {
+        return recoveryURI;
+    }
+
     String getParticipantURI() {
         return participantURI;
     }

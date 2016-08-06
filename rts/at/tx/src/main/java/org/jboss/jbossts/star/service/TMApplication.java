@@ -46,10 +46,6 @@ public class TMApplication extends Application {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
     public TMApplication(Class<?>... extraClasses) {
-        Collections.addAll(classes, resourceClasses);
-        Collections.addAll(classes, mappers);
-        Collections.addAll(classes, extraClasses);
-
         // singletons.addAll(Arrays.asList(resources));
         try {
             // TODO move
@@ -69,6 +65,10 @@ public class TMApplication extends Application {
                     return RecordType.RESTAT_RECORD;
                 }
             });
+
+            Collections.addAll(classes, resourceClasses);
+            Collections.addAll(classes, mappers);
+            Collections.addAll(classes, extraClasses);
         } catch (Throwable e) {
             log.warnf("TM JAX-RS application failed to start: %s", e.getMessage());
         }
@@ -88,6 +88,4 @@ public class TMApplication extends Application {
             HttpResponseMapper.class, NotFoundMapper.class};
 
     private static Class<?>[] resourceClasses = {Coordinator.class,};
-
-    private static Object[] resources = {new Coordinator(),};
 }
