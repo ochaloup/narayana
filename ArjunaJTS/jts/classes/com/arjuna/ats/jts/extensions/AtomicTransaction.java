@@ -524,12 +524,13 @@ public class AtomicTransaction {
                 AtomicTransaction tx = (AtomicTransaction) obj;
                 ControlWrapper txControl = tx._theAction;
 
-                if ((_theAction == null) && (txControl == null))
+                if ((_theAction == null) && (txControl == null)) {
                     return true;
-                else if (_theAction != null) {
+                } else if (_theAction == null) {
                     return false;
-                } else
+                } else {
                     return _theAction.equals(txControl);
+                }
             } catch (Exception e) {
             }
         }
