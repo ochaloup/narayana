@@ -31,6 +31,7 @@
 
 package com.arjuna.mwlabs.wscf.model.sagas.arjunacore;
 
+import java.nio.charset.StandardCharsets;
 import com.arjuna.ats.arjuna.common.Uid;
 
 import com.arjuna.mw.wscf.common.CoordinatorId;
@@ -48,13 +49,13 @@ public class CoordinatorIdImple extends Uid implements CoordinatorId {
     public CoordinatorIdImple() {
         super();
 
-        _value = stringForm().getBytes();
+        _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
 
     public CoordinatorIdImple(String id) {
         super(id);
 
-        _value = stringForm().getBytes();
+        _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
 
     public CoordinatorIdImple(Uid id) {

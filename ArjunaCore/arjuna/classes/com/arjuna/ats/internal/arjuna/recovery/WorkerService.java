@@ -38,6 +38,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryDriver;
@@ -49,8 +50,8 @@ public class WorkerService implements Service {
     }
 
     public void doWork(InputStream is, OutputStream os) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(is));
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(os));
+        BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
 
         try {
             String request = in.readLine();

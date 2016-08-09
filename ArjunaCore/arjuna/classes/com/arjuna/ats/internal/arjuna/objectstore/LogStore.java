@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.SyncFailedException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -636,7 +637,7 @@ public class LogStore extends FileSystemStore {
 
         if (tName != null) {
             int imageSize = (int) state.length();
-            byte[] uidString = objUid.stringForm().getBytes();
+            byte[] uidString = objUid.stringForm().getBytes(StandardCharsets.UTF_8);
             int buffSize = _redzone.length + uidString.length + imageSize + 8; // don't
                                                                                 // put
                                                                                 // in
@@ -944,7 +945,7 @@ public class LogStore extends FileSystemStore {
                     oFile.setLength(_maxFileSize);
 
                     for (int i = 0; i < objectStates.size(); i++) {
-                        byte[] uidString = objectStates.get(i).stateUid().stringForm().getBytes();
+                        byte[] uidString = objectStates.get(i).stateUid().stringForm().getBytes(StandardCharsets.UTF_8);
                         int buffSize = _redzone.length + uidString.length + objectStates.get(i).buffer().length + 8;
                         java.nio.ByteBuffer buff = java.nio.ByteBuffer.allocate(buffSize);
 
@@ -1059,7 +1060,7 @@ public class LogStore extends FileSystemStore {
 
                             iFile.read(uidString);
 
-                            Uid txId = new Uid(new String(uidString));
+                            Uid txId = new Uid(new String(uidString, StandardCharsets.UTF_8));
                             int imageSize = iFile.readInt();
                             byte[] imageState = new byte[imageSize];
 
