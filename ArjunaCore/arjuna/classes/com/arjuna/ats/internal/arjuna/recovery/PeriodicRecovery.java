@@ -303,6 +303,8 @@ public class PeriodicRecovery extends Thread {
      */
 
     public void run() {
+        doInitialWait();
+
         boolean finished = false;
 
         do {
@@ -711,6 +713,22 @@ public class PeriodicRecovery extends Thread {
     }
 
     /**
+     * wait for the initial required recovery delay or less if the scanning
+     * status or scan mode changes
+     */
+    private void doInitialWait() {
+        if (_periodicRecoveryInitilizationOffset > 0) {
+            try {
+                synchronized (_stateLock) {
+                    _stateLock.wait(_periodicRecoveryInitilizationOffset * 1000L);
+                }
+            } catch (InterruptedException e) {
+                // we can ignore this exception
+            }
+        }
+    }
+
+    /**
      * wait until the we move out of SUSPENDED mode
      *
      * <b>Caveats:</b> this must only be called when synchronized on
@@ -921,6 +939,9 @@ public class PeriodicRecovery extends Thread {
         if (_backoffPeriod != _defaultBackoffPeriod && tsLogger.logger.isDebugEnabled()) {
             tsLogger.logger.debug("PeriodicRecovery" + ": Backoff period set to " + _backoffPeriod + " seconds");
         }
+
+        _periodicRecoveryInitilizationOffset = recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .getPeriodicRecoveryInitilizationOffset();
     }
 
     // this refers to the modules specified in the recovery manager
@@ -942,6 +963,12 @@ public class PeriodicRecovery extends Thread {
      * attempts
      */
     private int _recoveryPeriod = 0;
+
+    /**
+     * Time in seconds for which the periodic recovery thread waits to start
+     * initial scan.
+     */
+    private int _periodicRecoveryInitilizationOffset = 0;
 
     /**
      * default value for _backoffPeriod if not specified via
