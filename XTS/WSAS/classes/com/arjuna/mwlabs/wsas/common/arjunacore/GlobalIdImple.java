@@ -31,6 +31,7 @@
 
 package com.arjuna.mwlabs.wsas.common.arjunacore;
 
+import java.nio.charset.StandardCharsets;
 import com.arjuna.ats.arjuna.common.Uid;
 
 import com.arjuna.mw.wsas.common.GlobalId;
@@ -48,13 +49,13 @@ public class GlobalIdImple extends Uid implements GlobalId {
     public GlobalIdImple() {
         super();
 
-        _value = stringForm().getBytes();
+        _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
 
     public GlobalIdImple(String id) {
         super(id);
 
-        _value = stringForm().getBytes();
+        _value = stringForm().getBytes(StandardCharsets.UTF_8);
     }
 
     public byte[] value() {

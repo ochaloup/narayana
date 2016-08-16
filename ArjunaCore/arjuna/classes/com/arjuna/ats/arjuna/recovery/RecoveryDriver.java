@@ -38,6 +38,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 
@@ -110,9 +111,11 @@ public class RecoveryDriver {
             try {
                 // streams to and from the RecoveryManager
 
-                BufferedReader fromServer = new BufferedReader(new InputStreamReader(connectorSocket.getInputStream()));
+                BufferedReader fromServer = new BufferedReader(
+                        new InputStreamReader(connectorSocket.getInputStream(), StandardCharsets.UTF_8));
 
-                PrintWriter toServer = new PrintWriter(new OutputStreamWriter(connectorSocket.getOutputStream()));
+                PrintWriter toServer = new PrintWriter(
+                        new OutputStreamWriter(connectorSocket.getOutputStream(), StandardCharsets.UTF_8));
 
                 toServer.println(scanType);
 
