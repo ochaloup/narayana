@@ -253,7 +253,7 @@ public class ControlWrapper implements Reapable {
                     throw new Unavailable();
             }
         } catch (NullPointerException ex) {
-            throw new TRANSACTION_ROLLEDBACK();
+            return;
         }
     }
 
