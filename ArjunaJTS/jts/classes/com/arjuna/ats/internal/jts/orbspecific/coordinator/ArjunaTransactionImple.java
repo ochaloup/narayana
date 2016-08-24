@@ -444,6 +444,12 @@ public class ArjunaTransactionImple extends com.arjuna.ats.arjuna.coordinator.Tw
             destroyAction();
 
             status = super.status();
+        } else if ((status == ActionStatus.ABORTING) || (status == ActionStatus.ABORTED)
+                || (status == ActionStatus.H_ROLLBACK)) {
+            if (jtsLogger.logger.isInfoEnabled()) {
+                jtsLogger.i18NLogger.info_rollback_aborted_transaction(get_transaction_name());
+            }
+            return;
         } else {
             /*
              * Differentiate between us ending the transaction and some other
