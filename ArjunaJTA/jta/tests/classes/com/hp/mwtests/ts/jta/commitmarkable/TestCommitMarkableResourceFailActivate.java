@@ -148,7 +148,6 @@ public class TestCommitMarkableResourceFailActivate extends TestCommitMarkableRe
 
         // Run the scan to clear the content
         manager.scan();
-        manager.scan();
 
         assertTrue(xaResource.wasCommitted());
         assertFalse(xaResource.wasRolledback());
