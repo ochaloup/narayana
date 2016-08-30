@@ -53,6 +53,7 @@ import com.arjuna.ats.arjuna.logging.tsLogger;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StateStatus;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
+import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
@@ -137,15 +138,20 @@ public class XARecoveryModule implements RecoveryModule {
     }
 
     public synchronized void periodicWorkFirstPass() {
-        // JBTM-1354 allow a second thread to execute the first pass but make
-        // sure it is only done once per scan (TMSTART/ENDSCAN)
-        synchronized (scanState) {
-            if (!getScanState().equals(ScanStates.IDLE))
-                return;
-
-            setScanState(ScanStates.FIRST_PASS); // synchronized uses a
-                                                    // reentrant lock
+        // JBTM-1354 JCA needs to be able to recover XAResources associated with
+        // a subordinate transaction so we have to do at least
+        // the start scan to make sure that we have loaded all the XAResources
+        // we possibly can to assist subordinate transactions recovering
+        // the reason we can't do bottom up recovery is if this server has an
+        // XAResource which tries to recover a remote server (e.g. distributed
+        // JTA)
+        // then we get deadlock on the secondpass
+        if (getScanState() == ScanStates.BETWEEN_PASSES) {
+            periodicWorkSecondPass();
         }
+
+        setScanState(ScanStates.FIRST_PASS); // synchronized uses a reentrant
+                                                // lock
 
         if (jtaLogger.logger.isDebugEnabled()) {
             jtaLogger.logger.debugv("{0} - first pass", _logName);
@@ -190,7 +196,7 @@ public class XARecoveryModule implements RecoveryModule {
         setScanState(ScanStates.BETWEEN_PASSES);
     }
 
-    public void periodicWorkSecondPass() {
+    public synchronized void periodicWorkSecondPass() {
         setScanState(ScanStates.SECOND_PASS);
 
         if (jtaLogger.logger.isDebugEnabled()) {
@@ -220,6 +226,27 @@ public class XARecoveryModule implements RecoveryModule {
         setScanState(ScanStates.IDLE);
     }
 
+    public static XARecoveryModule getRegisteredXARecoveryModule() {
+        if (registeredXARecoveryModule == null) {
+            RecoveryManager recMan = RecoveryManager.manager();
+            Vector recoveryModules = recMan.getModules();
+
+            if (recoveryModules != null) {
+                Enumeration modules = recoveryModules.elements();
+
+                while (modules.hasMoreElements()) {
+                    RecoveryModule m = (RecoveryModule) modules.nextElement();
+
+                    if (m instanceof XARecoveryModule) {
+                        registeredXARecoveryModule = (XARecoveryModule) m;
+                        break;
+                    }
+                }
+            }
+        }
+        return registeredXARecoveryModule;
+    }
+
     public String id() {
         return "XARecoveryModule:" + _recoveryManagerClass;
     }
@@ -232,16 +259,17 @@ public class XARecoveryModule implements RecoveryModule {
      *         transaction.
      */
     private XAResource getNewXAResource(Xid xid) {
-        // JBTM-1354 JCA needs to be able to recover XAResources associated with
-        // a subordinate transaction so we have to do at least
-        // the start scan to make sure that we have loaded all the XAResources
-        // we possibly can to assist subordinate transactions recovering
-        // the reason we can't do bottom up recovery is if this server has an
-        // XAResource which tries to recover a remote server (e.g. distributed
-        // JTA)
-        // then we get deadlock on the secondpass
-        periodicWorkFirstPass();
+        XAResource toReturn = getTheKey(xid);
 
+        if (toReturn == null) {
+            periodicWorkFirstPass();
+            toReturn = getTheKey(xid);
+        }
+
+        return toReturn;
+    }
+
+    private XAResource getTheKey(Xid xid) {
         if (_xidScans != null) {
             Enumeration<XAResource> keys = _xidScans.keys();
 
@@ -257,7 +285,6 @@ public class XARecoveryModule implements RecoveryModule {
                 }
             }
         }
-
         return null;
     }
 
@@ -962,4 +989,5 @@ public class XARecoveryModule implements RecoveryModule {
 
     private Set<String> contactedJndiNames = new HashSet<String>();
 
+    private static XARecoveryModule registeredXARecoveryModule;
 }
