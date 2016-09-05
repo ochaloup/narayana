@@ -214,16 +214,6 @@ public class XATerminator extends XATerminatorImple implements ExtendedJBossXATe
 
     @Override
     public Transaction getTransaction(Xid xid) {
-        final XidImple xidImple;
-
-        if (xid != null && xid.getFormatId() == XATxConverter.FORMAT_ID) {
-            XidImple toImport = new XidImple(xid);
-            XATxConverter.setSubordinateNodeName(toImport.getXID(), TxControl.getXANodeName());
-            xidImple = new XidImple(toImport);
-        } else {
-            xidImple = new XidImple(xid);
-        }
-
-        return TransactionImple.getTransaction((xidImple).getTransactionUid());
+        return TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
     }
 }
