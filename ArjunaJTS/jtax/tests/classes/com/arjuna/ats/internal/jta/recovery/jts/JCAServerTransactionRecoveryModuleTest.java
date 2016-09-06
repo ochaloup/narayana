@@ -72,7 +72,7 @@ public class JCAServerTransactionRecoveryModuleTest {
     }
 
     @Test
-    public void testIdempotentLoad() throws XAException, RollbackException, SystemException {
+    public void testReloadStateAcceptable() throws XAException, RollbackException, SystemException {
         JCAServerTransactionRecoveryModule module = new JCAServerTransactionRecoveryModule();
         XATerminator terminator = new XATerminatorImple();
         Xid xid = new Xid() {
@@ -148,7 +148,9 @@ public class JCAServerTransactionRecoveryModuleTest {
         });
         terminator.prepare(xid);
         module.periodicWorkFirstPass();
+        module.periodicWorkSecondPass();
         module.periodicWorkFirstPass();
+        module.periodicWorkSecondPass();
         assertFalse(commitCalled);
         terminator.commit(xid, false);
         assertTrue(commitCalled);
