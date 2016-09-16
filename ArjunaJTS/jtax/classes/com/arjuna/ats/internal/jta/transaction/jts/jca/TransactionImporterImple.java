@@ -83,7 +83,7 @@ public class TransactionImporterImple implements TransactionImporter {
         if (xid == null)
             throw new IllegalArgumentException();
 
-        return addImportedTransaction(null, new XidImple(xid), xid, timeout);
+        return addImportedTransaction(null, new SubordinateXidImple(xid), xid, timeout);
     }
 
     public SubordinateTransaction recoverTransaction(Uid actId) throws XAException {
@@ -117,7 +117,7 @@ public class TransactionImporterImple implements TransactionImporter {
         if (xid == null)
             throw new IllegalArgumentException();
 
-        AtomicReference<SubordinateTransaction> holder = _transactions.get(new XidImple(xid));
+        AtomicReference<SubordinateTransaction> holder = _transactions.get(new SubordinateXidImple(xid));
         SubordinateTransaction tx = holder == null ? null : holder.get();
 
         if (tx == null) {
@@ -158,7 +158,7 @@ public class TransactionImporterImple implements TransactionImporter {
         if (xid == null)
             throw new IllegalArgumentException();
 
-        _transactions.remove(new XidImple(xid));
+        _transactions.remove(new SubordinateXidImple(xid));
     }
 
     /**
