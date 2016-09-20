@@ -57,7 +57,7 @@ public class FileProcessId implements com.arjuna.ats.arjuna.utils.Process {
 
     public int getpid() {
         if (FileProcessId.processId == 0) {
-            synchronized (FileProcessId.hexStart) {
+            synchronized (FileProcessId.lock) {
                 /*
                  * All of this is just to ensure uniqueness!
                  */
@@ -112,5 +112,7 @@ public class FileProcessId implements com.arjuna.ats.arjuna.utils.Process {
     private static int processId = 0;
 
     private static final String hexStart = "0x";
+
+    private static final Object lock = new Object();
 
 }
