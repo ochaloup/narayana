@@ -42,7 +42,6 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransac
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateXidImple;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporter;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
-import com.arjuna.ats.jta.xa.XidImple;
 import org.jboss.tm.TransactionImportResult;
 
 public class TransactionImporterImple implements TransactionImporter {
@@ -61,7 +60,12 @@ public class TransactionImporterImple implements TransactionImporter {
      */
 
     public SubordinateTransaction importTransaction(Xid xid) throws XAException {
-        return (SubordinateTransaction) importTransaction(xid, 0).getTransaction();
+        return (SubordinateTransaction) importRemoteTransaction(xid, 0).getTransaction();
+    }
+
+    @Override
+    public SubordinateTransaction importTransaction(Xid xid, int timeout) throws XAException {
+        return (SubordinateTransaction) importRemoteTransaction(xid, timeout).getTransaction();
     }
 
     /**
@@ -79,7 +83,7 @@ public class TransactionImporterImple implements TransactionImporter {
      *             thrown if there are any errors.
      */
 
-    public TransactionImportResult importTransaction(Xid xid, int timeout) throws XAException {
+    public TransactionImportResult importRemoteTransaction(Xid xid, int timeout) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -173,7 +177,7 @@ public class TransactionImporterImple implements TransactionImporter {
      */
     private TransactionImportResult addImportedTransaction(TransactionImple recoveredTransaction, Xid mapKey, Xid xid,
             int timeout) {
-        TransactionImportResult toReturn = new TransactionImportResult();
+        boolean isNew = false;
         SubordinateXidImple importedXid = new SubordinateXidImple(mapKey);
         // We need to store the imported transaction in a volatile field holder
         // so that it can be shared between threads
@@ -206,13 +210,12 @@ public class TransactionImporterImple implements TransactionImporter {
                 if (txn == null) {
                     txn = new TransactionImple(timeout, xid);
                     holder.set(txn);
-                    toReturn.setSubordinateCreated(true);
+                    isNew = true;
                 }
             }
         }
 
-        toReturn.setTransaction(txn);
-        return toReturn;
+        return new TransactionImportResult(txn, isNew);
     }
 
     private static ConcurrentHashMap<Xid, AtomicReference<SubordinateTransaction>> _transactions = new ConcurrentHashMap<>();

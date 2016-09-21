@@ -117,6 +117,11 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
         return ((SubordinateAtomicTransaction) _theTransaction).getXid();
     }
 
+    @Override
+    public Object getId() {
+        return get_uid();
+    }
+
     public void recover() {
         getControlWrapper().getImple().getImplHandle().activate();
     }
