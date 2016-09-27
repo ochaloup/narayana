@@ -76,7 +76,7 @@ public class OSBTypeHandler {
                                 // InvocationTargetException,
                                 // IllegalAccessException,
                                 // InstantiationException
-            tsLogger.i18NLogger.info_osb_HeaderStateCtorFail(e);
+            tsLogger.i18NLogger.info_osb_HeaderStateCtorInfo(e.getMessage());
             return new HeaderStateReader();
         }
     }
