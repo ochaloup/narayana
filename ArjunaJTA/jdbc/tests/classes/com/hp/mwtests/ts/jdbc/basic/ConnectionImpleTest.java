@@ -26,7 +26,6 @@ import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.internal.jdbc.ConnectionImple;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -37,11 +36,11 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,7 +57,7 @@ public class ConnectionImpleTest {
     private XAConnection xaConnection;
 
     @Mock
-    private Connection connection;
+    private ConnectionImple connection;
 
     @Mock
     private XAResource xaResource;
@@ -98,7 +97,7 @@ public class ConnectionImpleTest {
 
     @Test
     public void checkIfConnectionIsClosedWithoutTransaction() throws SQLException {
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         connectionToTest.isClosed();
         verify(connection, times(1)).isClosed();
@@ -107,17 +106,16 @@ public class ConnectionImpleTest {
     @Test
     public void checkIfConnectionIsClosedWithTransaction() throws Exception {
         transactionManager.begin();
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         connectionToTest.isClosed();
         verify(connection, times(1)).isClosed();
     }
 
     @Test
-    @Ignore // https://issues.jboss.org/browse/JBTM-2676
     public void checkIfConnectionIsClosedInAfterCompletion() throws Exception {
         transactionManager.begin();
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         transactionManager.getTransaction().registerSynchronization(new Synchronization() {
             @Override
@@ -129,7 +127,7 @@ public class ConnectionImpleTest {
                 try {
                     connectionToTest.isClosed();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    fail("Could not check isClosed on connection: " + e.getMessage());
                 }
             }
         });
@@ -139,7 +137,7 @@ public class ConnectionImpleTest {
 
     @Test
     public void closeConnectionWithoutTransaction() throws SQLException {
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         connectionToTest.close();
         verify(connection, times(1)).close();
@@ -152,7 +150,7 @@ public class ConnectionImpleTest {
                                                                         // driver
                                                                         // does
                                                                         // this
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         connectionToTest.close();
         verify(connection, times(1)).close();
@@ -163,14 +161,13 @@ public class ConnectionImpleTest {
      * https://issues.jboss.org/browse/JBTM-2676
      */
     @Test
-    @Ignore // https://issues.jboss.org/browse/JBTM-2676
     public void closeConnectionInAfterCompletion() throws Exception {
         transactionManager.begin();
         transactionManager.getTransaction().enlistResource(xaResource); // Normally
                                                                         // driver
                                                                         // does
                                                                         // this
-        Connection connectionToTest = getConnectionToTest();
+        ConnectionImple connectionToTest = getConnectionToTest();
         connectionToTest.clearWarnings(); // Initialises the connection
         transactionManager.getTransaction().registerSynchronization(new Synchronization() {
             @Override
@@ -190,7 +187,7 @@ public class ConnectionImpleTest {
         verify(connection, times(1)).close();
     }
 
-    private Connection getConnectionToTest() throws SQLException {
+    private ConnectionImple getConnectionToTest() throws SQLException {
         return new ConnectionImple(null, null, null, null, xaDataSource);
     }
 
