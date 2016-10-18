@@ -444,7 +444,7 @@ public class XATerminatorImple
             tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
         } catch (XAException xae) {
             if (xae.errorCode == XAException.XA_RBROLLBACK) {
-                // do nothing as already rolled back
+                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
                 return;
             }
             throw xae;

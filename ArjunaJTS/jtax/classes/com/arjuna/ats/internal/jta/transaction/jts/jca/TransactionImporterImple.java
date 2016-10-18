@@ -34,6 +34,7 @@ package com.arjuna.ats.internal.jta.transaction.jts.jca;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 
@@ -136,6 +137,15 @@ public class TransactionImporterImple implements TransactionImporter {
             return null;
         }
 
+        // https://issues.jboss.org/browse/JBTM-927
+        try {
+            if (tx.getStatus() == javax.transaction.Status.STATUS_ROLLEDBACK) {
+                throw new XAException(XAException.XA_RBROLLBACK);
+            }
+        } catch (SystemException e) {
+            throw new XAException(XAException.XA_RBROLLBACK);
+        }
+
         if (tx.baseXid() == null) {
             /*
              * Try recovery again. If it fails we'll throw a RETRY to the caller
@@ -162,7 +172,23 @@ public class TransactionImporterImple implements TransactionImporter {
         if (xid == null)
             throw new IllegalArgumentException();
 
-        _transactions.remove(new SubordinateXidImple(xid));
+        AtomicReference<SubordinateTransaction> remove = _transactions.remove(new SubordinateXidImple(xid));
+        if (remove != null) {
+            synchronized (remove) {
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionImple transactionImple = (com.arjuna.ats.internal.jta.transaction.jts.TransactionImple) remove
+                        .get();
+                while (transactionImple == null) {
+                    try {
+                        remove.wait();
+                        transactionImple = (com.arjuna.ats.internal.jta.transaction.jts.TransactionImple) remove.get();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new XAException(XAException.XAER_RMFAIL);
+                    }
+                }
+                TransactionImple.removeTransaction(transactionImple);
+            }
+        }
     }
 
     /**
@@ -198,6 +224,7 @@ public class TransactionImporterImple implements TransactionImporter {
                 recoveredTransaction.recordTransaction();
                 txn = recoveredTransaction;
                 holder.set(txn);
+                holder.notifyAll();
             }
         }
 
@@ -210,6 +237,7 @@ public class TransactionImporterImple implements TransactionImporter {
                 if (txn == null) {
                     txn = new TransactionImple(timeout, xid);
                     holder.set(txn);
+                    holder.notifyAll();
                     isNew = true;
                 }
             }
