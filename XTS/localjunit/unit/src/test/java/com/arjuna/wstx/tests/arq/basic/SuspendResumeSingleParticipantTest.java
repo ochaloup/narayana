@@ -17,14 +17,11 @@ public class SuspendResumeSingleParticipantTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoDurableParticipant.class);
+        return WarDeployment.getDeployment(DemoDurableParticipant.class);
     }
 
     @Test
-    public void testSuspendResumeSingleParticipant()
-            throws Exception
-            {
+    public void testSuspendResumeSingleParticipant() throws Exception {
         UserTransaction ut = UserTransaction.getUserTransaction();
         TransactionManager tm = TransactionManager.getTransactionManager();
         DemoDurableParticipant p = new DemoDurableParticipant();
@@ -35,18 +32,18 @@ public class SuspendResumeSingleParticipantTest {
 
             TxContext ctx = tm.suspend();
 
-            System.out.println("Suspended: "+ctx);
+            System.out.println("Suspended: " + ctx);
 
             tm.resume(ctx);
 
             System.out.println("\nResumed\n");
-        }  catch (Exception eouter) {
+        } catch (Exception eouter) {
             try {
                 ut.rollback();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
         ut.commit();
-            }
+    }
 }

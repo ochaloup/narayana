@@ -33,14 +33,11 @@ import com.arjuna.ats.arjuna.AtomicAction;
  * $Id: AtomicObjectTest3.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class AbortObject extends Thread
-{
-    public AbortObject ()
-        {
-        }
+public class AbortObject extends Thread {
+    public AbortObject() {
+    }
 
-    public void run ()
-        {
+    public void run() {
         int thr = nextThreadId;
 
         nextThreadId++;
@@ -59,8 +56,8 @@ public class AbortObject extends Thread
 
         AtomicObjectTest3.indent(thr, 0);
         System.out.println("abort");
-        }
+    }
 
     private static int nextThreadId = 3;
 
-    }
+}

@@ -43,78 +43,64 @@ import javax.xml.parsers.*;
  * @since 1.0.
  */
 
-public class DomUtil
-{
+public class DomUtil {
 
-    public static final org.w3c.dom.Text getTextNode (org.w3c.dom.Node element, String name)
-    {
-    org.w3c.dom.Node child = getNode(element, name);
-    
-    if (child != null)
-        return (org.w3c.dom.Text) child.getFirstChild();
-    else
-        return null;
+    public static final org.w3c.dom.Text getTextNode(org.w3c.dom.Node element, String name) {
+        org.w3c.dom.Node child = getNode(element, name);
+
+        if (child != null)
+            return (org.w3c.dom.Text) child.getFirstChild();
+        else
+            return null;
     }
 
-    public static final org.w3c.dom.Node getNode (org.w3c.dom.Node element, String name)
-    {
-    org.w3c.dom.Node child = null;
-    
-    if (element != null)
-    {
-        org.w3c.dom.NodeList children = element.getChildNodes();
-        
-        for (int i = 0; i < children.getLength(); i++)
-        {
-        org.w3c.dom.Node item = children.item(i);
-        
-        if (item.getNodeName().equals(name))
-        {
-            child = item;
+    public static final org.w3c.dom.Node getNode(org.w3c.dom.Node element, String name) {
+        org.w3c.dom.Node child = null;
 
-            break;
-        }
-        else
-        {
-            if (item.hasChildNodes())
-            {
-            child = getNode(item, name);
-            
-            if (child != null)
-                break;
+        if (element != null) {
+            org.w3c.dom.NodeList children = element.getChildNodes();
+
+            for (int i = 0; i < children.getLength(); i++) {
+                org.w3c.dom.Node item = children.item(i);
+
+                if (item.getNodeName().equals(name)) {
+                    child = item;
+
+                    break;
+                } else {
+                    if (item.hasChildNodes()) {
+                        child = getNode(item, name);
+
+                        if (child != null)
+                            break;
+                    }
+                }
             }
         }
+
+        return child;
+    }
+
+    public static final String nodeAsString(org.w3c.dom.Node node) {
+        // TODO put back
+
+        // DOMWriterImpl domWriter = new DOMWriterImpl();
+
+        // return domWriter.writeToString(node);
+
+        return node.toString();
+    }
+
+    public static final DocumentBuilder getDocumentBuilder() {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            return factory.newDocumentBuilder();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-    }
-    
-    return child;
-    }
 
-    public static final String nodeAsString (org.w3c.dom.Node node)
-    {
-    // TODO put back
-
-    //    DOMWriterImpl domWriter = new DOMWriterImpl();
-
-    //    return domWriter.writeToString(node);
-
-    return node.toString();
-    }
-
-    public static final DocumentBuilder getDocumentBuilder ()
-    {
-    try
-    {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        
-        return factory.newDocumentBuilder();
-    }
-    catch (Exception ex)
-    {
-        ex.printStackTrace();
-    }
-    
-    return null;
+        return null;
     }
 
 }

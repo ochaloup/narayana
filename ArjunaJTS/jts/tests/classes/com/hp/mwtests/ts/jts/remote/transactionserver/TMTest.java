@@ -43,18 +43,15 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 import com.arjuna.orbportability.Services;
 
-public class TMTest
-{
-    public static void main (String[] args) throws Exception
-    {
+public class TMTest {
+    public static void main(String[] args) throws Exception {
         TMTest theTest = new TMTest();
-        
+
         theTest.test();
     }
-    
+
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -64,9 +61,8 @@ public class TMTest
         Services serv = new Services(myORB);
 
         int resolver = Services.getResolver();
-        
-        try
-        {
+
+        try {
             String[] params = new String[1];
 
             params[0] = Services.otsKind;
@@ -75,22 +71,17 @@ public class TMTest
 
             params = null;
             theOTS = TransactionFactoryHelper.narrow(obj);
-        }
-        catch (Exception e)
-        {
-            fail("Unexpected bind exception: "+e);
+        } catch (Exception e) {
+            fail("Unexpected bind exception: " + e);
             e.printStackTrace(System.err);
         }
 
         System.out.println("Creating transaction.");
 
-        try
-        {
+        try {
             topLevelControl = theOTS.create(0);
-        }
-        catch (Exception e)
-        {
-            fail("Create call failed: "+e);
+        } catch (Exception e) {
+            fail("Create call failed: " + e);
             e.printStackTrace(System.err);
         }
 

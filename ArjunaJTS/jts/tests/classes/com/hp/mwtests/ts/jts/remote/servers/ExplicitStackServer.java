@@ -38,32 +38,27 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.ExplicitStackImple;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-public class ExplicitStackServer
-{
-    public static void main(String[] args) throws Exception
-    {
+public class ExplicitStackServer {
+    public static void main(String[] args) throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
 
         String refFile = args[0];
 
-        ExplicitStackPOATie theObject = new ExplicitStackPOATie (new ExplicitStackImple());
+        ExplicitStackPOATie theObject = new ExplicitStackPOATie(new ExplicitStackImple());
 
         myOA.objectIsReady(theObject);
 
         Services serv = new Services(myORB);
 
-        try
-        {
+        try {
             TestUtility.registerService(refFile, myORB.orb().object_to_string(myOA.corbaReference(theObject)));
 
             System.out.println("Ready");
 
             myOA.run();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

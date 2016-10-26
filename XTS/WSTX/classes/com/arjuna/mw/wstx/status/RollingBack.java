@@ -41,23 +41,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class RollingBack implements Status
-{
+public class RollingBack implements Status {
 
-    public static RollingBack instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "Status.RollingBack";
+    public static RollingBack instance() {
+        return _instance;
     }
 
-    private RollingBack ()
-    {
+    public String toString() {
+        return "Status.RollingBack";
+    }
+
+    private RollingBack() {
     }
 
     private static final RollingBack _instance = new RollingBack();
-    
+
 }

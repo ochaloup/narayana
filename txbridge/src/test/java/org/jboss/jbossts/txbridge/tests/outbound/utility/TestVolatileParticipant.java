@@ -32,10 +32,10 @@ public class TestVolatileParticipant implements Volatile2PCParticipant {
     private static Logger log = Logger.getLogger(TestVolatileParticipant.class);
 
     /**
-     * Perform any work necessary to allow it to either commit or rollback
-     * the work performed by the Web service under the scope of the
-     * transaction. The implementation is free to do whatever it needs to in
-     * order to fulfill the implicit contract between it and the coordinator.
+     * Perform any work necessary to allow it to either commit or rollback the
+     * work performed by the Web service under the scope of the transaction. The
+     * implementation is free to do whatever it needs to in order to fulfill the
+     * implicit contract between it and the coordinator.
      *
      * @return an indication of whether it can prepare or not.
      * @see com.arjuna.wst.Vote

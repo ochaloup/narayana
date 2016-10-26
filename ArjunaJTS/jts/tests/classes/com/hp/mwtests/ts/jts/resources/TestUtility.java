@@ -29,10 +29,8 @@ import java.io.InputStreamReader;
 /**
  * Useful util functions for JTS tests.
  */
-public class TestUtility
-{
-    public static String getService(String name) throws IOException
-    {
+public class TestUtility {
+    public static String getService(String name) throws IOException {
         String returnValue = null;
 
         BufferedReader fin = new BufferedReader(new InputStreamReader(new FileInputStream(name)));
@@ -42,27 +40,26 @@ public class TestUtility
         return returnValue;
     }
 
-    public static void registerService(String name, String ior) throws IOException
-    {
+    public static void registerService(String name, String ior) throws IOException {
         FileOutputStream fout = new FileOutputStream(name);
         fout.write(ior.getBytes());
         fout.close();
     }
 
     public static void assertTrue(boolean value) {
-        if(!value) {
+        if (!value) {
             fail("assertionFailed");
         }
     }
 
     public static void assertEquals(int a, int b) {
-        if(a != b) {
+        if (a != b) {
             fail("assertionFailed");
         }
     }
 
     public static void fail(String message) {
-        System.out.println("failing: "+message);
+        System.out.println("failing: " + message);
         System.out.println("Failed");
     }
 

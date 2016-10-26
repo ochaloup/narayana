@@ -68,10 +68,8 @@ public class TransactionScopedTest {
     @Deployment
     public static JavaArchive createTestArchive() {
 
-        return  ShrinkWrap.create(JavaArchive.class, "test.jar")
-                .addClass(TestCDITransactionScopeBean.class)
-                .addClass(TestCDITransactionScopeBean2.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        return ShrinkWrap.create(JavaArchive.class, "test.jar").addClass(TestCDITransactionScopeBean.class)
+                .addClass(TestCDITransactionScopeBean2.class).addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @After
@@ -88,13 +86,13 @@ public class TransactionScopedTest {
         timestamps.add(String.format("%d - %s (%s)%n", System.nanoTime(), Thread.currentThread().getId(), message));
     }
 
-    //Based on test case from JTA 1.2 spec
+    // Based on test case from JTA 1.2 spec
     private void testTxAssociationChange() throws Exception {
 
         transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         addTimestamp("begin1");
-        userTransaction.begin(); //tx1 begun
+        userTransaction.begin(); // tx1 begun
         assertTrue(testTxAssociationChangeBean.isPostConstructCalled());
         assertTrue(testTxAssociationChangeBean2.isPostConstructCalled());
 
@@ -107,7 +105,7 @@ public class TransactionScopedTest {
         assertContextUnavailable();
 
         addTimestamp("begin2");
-        userTransaction.begin(); //tx2 begun
+        userTransaction.begin(); // tx2 begun
         Assert.assertEquals(0, testTxAssociationChangeBean.getValue());
         Assert.assertEquals(0, testTxAssociationChangeBean2.getValue());
 
@@ -132,7 +130,8 @@ public class TransactionScopedTest {
     }
 
     @Test
-    // run the test sequentially to ensure that state from different scopes do not interfere with each other
+    // run the test sequentially to ensure that state from different scopes do
+    // not interfere with each other
     public void testTxAssociationChangeSequentially() throws Exception {
         final int TEST_RUNS = 2;
         final int EXPECTED_MINIMUM_DESTROY_CNT = TEST_RUNS + TestCDITransactionScopeBean.getPreDestroyCnt();
@@ -146,12 +145,14 @@ public class TransactionScopedTest {
             }
         }
 
-        // ensure that preDestroy was called on the bean at least TEST_RUNS times
+        // ensure that preDestroy was called on the bean at least TEST_RUNS
+        // times
         assertTrue(EXPECTED_MINIMUM_DESTROY_CNT <= TestCDITransactionScopeBean.getPreDestroyCnt());
     }
 
     @Test
-    // run the test concurrently to ensure that state from different scopes do not interfere with each other
+    // run the test concurrently to ensure that state from different scopes do
+    // not interfere with each other
     public void testTxAssociationChangeConcurrently() throws Exception {
         final int TEST_RUNS = 5;
         final int EXPECTED_MINIMUM_DESTROY_CNT = TEST_RUNS + TestCDITransactionScopeBean.getPreDestroyCnt();
@@ -180,7 +181,8 @@ public class TransactionScopedTest {
             }
         }
 
-        // ensure that preDestroy was called on the bean at least TEST_RUNS times
+        // ensure that preDestroy was called on the bean at least TEST_RUNS
+        // times
         assertTrue(EXPECTED_MINIMUM_DESTROY_CNT <= TestCDITransactionScopeBean.getPreDestroyCnt());
 
         for (String s : timestamps)
@@ -193,7 +195,7 @@ public class TransactionScopedTest {
             testTxAssociationChangeBean.getValue();
             Assert.fail("Accessing bean should have thrown a ContextNotActiveException as it should not be available");
         } catch (ContextNotActiveException e) {
-            //Expected
+            // Expected
         }
     }
 }

@@ -38,8 +38,8 @@ public class TestConfirmationHandler implements ConfirmationHandler {
     }
 
     public void confirm() {
-        System.out.println(
-                TestConfirmationHandler.class.getSimpleName() + ".confirm counter=" + INVOCATIONS_COUNTER.incrementAndGet());
+        System.out.println(TestConfirmationHandler.class.getSimpleName() + ".confirm counter="
+                + INVOCATIONS_COUNTER.incrementAndGet());
     }
 
 }

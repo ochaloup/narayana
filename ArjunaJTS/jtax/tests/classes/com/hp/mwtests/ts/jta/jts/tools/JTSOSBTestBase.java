@@ -58,10 +58,12 @@ import static org.junit.Assert.*;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class JTSOSBTestBase extends TestBase {
     @BeforeClass
     public static void beforeClass() {
@@ -80,13 +82,13 @@ public class JTSOSBTestBase extends TestBase {
     public static void initOrb() throws InvalidName {
         int recoveryOrbPort = jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
         final Properties p = new Properties();
-        p.setProperty("OAPort", ""+recoveryOrbPort);
-        p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""+recoveryOrbPort);
-        p.setProperty("com.sun.CORBA.POA.ORBServerId", ""+recoveryOrbPort);
+        p.setProperty("OAPort", "" + recoveryOrbPort);
+        p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", "" + recoveryOrbPort);
+        p.setProperty("com.sun.CORBA.POA.ORBServerId", "" + recoveryOrbPort);
 
         ORB orb = ORB.getInstance("test");
         OA oa = OA.getRootOA(orb);
-        orb.initORB(new String[] {}, p);
+        orb.initORB(new String[]{}, p);
         oa.initOA();
 
         ORBManager.setORB(orb);
@@ -101,8 +103,7 @@ public class JTSOSBTestBase extends TestBase {
     }
 
     @Before
-    public void beforeTest()
-    {
+    public void beforeTest() {
         emptyObjectStore();
     }
 
@@ -121,7 +122,7 @@ public class JTSOSBTestBase extends TestBase {
 
     private void showAllMBeans(MBeanServer mbs) {
         try {
-            Set<ObjectInstance> allBeans = mbs.queryMBeans(new ObjectName("jboss.jta:*"), null) ;
+            Set<ObjectInstance> allBeans = mbs.queryMBeans(new ObjectName("jboss.jta:*"), null);
             System.out.printf("%d MBeans:%n", allBeans.size());
             for (ObjectInstance oi : allBeans)
                 System.out.printf("\t%s%n", oi.getObjectName().getCanonicalName());
@@ -142,13 +143,14 @@ public class JTSOSBTestBase extends TestBase {
         try {
             String type = ObjStoreBrowser.canonicalType(txn.type());
 
-            StringBuilder beanName = new StringBuilder("jboss.jta:type=ObjectStore,itype=").
-                    append(type).append(",uid=").append(txn.get_uid().fileStringForm());
+            StringBuilder beanName = new StringBuilder("jboss.jta:type=ObjectStore,itype=").append(type).append(",uid=")
+                    .append(txn.get_uid().fileStringForm());
 
             System.out.printf("assertBeanWasCreated: bean name = %s%n", beanName);
 
             Set<ObjectInstance> transactions = mbs.queryMBeans(new ObjectName(beanName.toString()), null);
-            Set<ObjectInstance> participants = mbs.queryMBeans(new ObjectName(beanName.append(",puid=*").toString()), null);
+            Set<ObjectInstance> participants = mbs.queryMBeans(new ObjectName(beanName.append(",puid=*").toString()),
+                    null);
             Map<String, String> attributes;
 
             assertEquals(1, transactions.size());
@@ -169,11 +171,11 @@ public class JTSOSBTestBase extends TestBase {
         }
     }
 
-    private Map<String, String> getMBeanValues(MBeanServerConnection cnx, ObjectName on, String ... attributeNames)
+    private Map<String, String> getMBeanValues(MBeanServerConnection cnx, ObjectName on, String... attributeNames)
             throws InstanceNotFoundException, IOException, ReflectionException, IntrospectionException {
 
         if (attributeNames.length == 0) {
-            MBeanInfo info = cnx.getMBeanInfo( on );
+            MBeanInfo info = cnx.getMBeanInfo(on);
             MBeanAttributeInfo[] attributeArray = info.getAttributes();
             int i = 0;
             attributeNames = new String[attributeArray.length];
@@ -196,16 +198,20 @@ public class JTSOSBTestBase extends TestBase {
 
     /**
      * Generate a transaction log that contains a heuristic hazard
-     * @param txn a transaction of the desired type
-     * @return the number of participants that that will have generated a heuristic hazard
+     * 
+     * @param txn
+     *            a transaction of the desired type
+     * @return the number of participants that that will have generated a
+     *         heuristic hazard
      */
     protected int generatedHeuristicHazard(ArjunaTransactionImple txn) {
         ThreadActionData.purgeActions();
 
         ExtendedCrashRecord recs[] = {
-                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.NoCrash, ExtendedCrashRecord.CrashType.Normal),
-                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.CrashInCommit, ExtendedCrashRecord.CrashType.HeuristicHazard)
-        };
+                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.NoCrash,
+                        ExtendedCrashRecord.CrashType.Normal),
+                new ExtendedCrashRecord(ExtendedCrashRecord.CrashLocation.CrashInCommit,
+                        ExtendedCrashRecord.CrashType.HeuristicHazard)};
 
         txn.start();
 

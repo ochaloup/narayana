@@ -35,12 +35,9 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client15
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client15 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -54,18 +51,14 @@ public class Client15
 
             OTS.current().begin();
 
-            for (int index = 0; index < 10; index++)
-            {
+            for (int index = 0; index < 10; index++) {
                 String name = "Name_" + index;
                 String value = "Value_" + (9 - index);
 
-                try
-                {
+                try {
                     infoTable1.update(name, value);
                     infoTable2.update(name, value);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     correct = false;
                     System.err.println("Error in update : " + e);
                     e.printStackTrace(System.err);
@@ -74,45 +67,31 @@ public class Client15
 
             OTS.current().rollback();
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client15.main: " + exception);
             exception.printStackTrace(System.err);
-        }
-        finally
-        {
-// code change to stop database locking
-            try
-            {
-                if (OTS.current().get_control() != null)
-                {
+        } finally {
+            // code change to stop database locking
+            try {
+                if (OTS.current().get_control() != null) {
                     OTS.current().rollback();
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println("Finally has caught exception");
                 e.printStackTrace(System.err);
             }
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client15.main: " + exception);
             exception.printStackTrace(System.err);
         }

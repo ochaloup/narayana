@@ -30,85 +30,61 @@ import javax.transaction.xa.XAResource;
 /**
  * TODO
  */
-abstract public class BaseWrapper
-{
+abstract public class BaseWrapper {
     private UserTransaction tx;
 
-    protected void setUserTransaction(UserTransaction tx)
-    {
+    protected void setUserTransaction(UserTransaction tx) {
         this.tx = tx;
     }
 
     abstract public Transaction getTransaction() throws SystemException;
 
-    public int begin()
-    {
-        try
-        {
+    public int begin() {
+        try {
             tx.begin();
             return ActionStatus.RUNNING;
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             return ActionStatus.INVALID;
-        }
-        catch (NotSupportedException e)
-        {
+        } catch (NotSupportedException e) {
             return ActionStatus.INVALID;
         }
     }
 
-    public int commit()
-    {
+    public int commit() {
         if (tx == null)
             return ActionStatus.INVALID;
 
-        try
-        {
+        try {
             tx.commit();
             return ActionStatus.COMMITTED;
-        }
-        catch (HeuristicMixedException e)
-        {
+        } catch (HeuristicMixedException e) {
             return ActionStatus.H_MIXED;
-        }
-        catch (HeuristicRollbackException e)
-        {
+        } catch (HeuristicRollbackException e) {
             return ActionStatus.H_ROLLBACK;
-        }
-        catch (RollbackException e)
-        {
+        } catch (RollbackException e) {
             return ActionStatus.ABORTED;
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             return ActionStatus.INVALID;
         }
     }
 
-    public int abort()
-    {
+    public int abort() {
         if (tx == null)
             return ActionStatus.INVALID;
 
-        try
-        {
+        try {
             tx.rollback();
             return ActionStatus.ABORTED;
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             return ActionStatus.INVALID;
         }
     }
 
-    public int add(XAResource xares)
-    {
-        try
-        {
+    public int add(XAResource xares) {
+        try {
             getTransaction().enlistResource(xares);
-        }
-        catch (Exception e)  //RollbackException, IllegalStateException, SystemException
+        } catch (Exception e) // RollbackException, IllegalStateException,
+                                // SystemException
         {
             return AddOutcome.AR_REJECTED;
         }
@@ -116,14 +92,12 @@ abstract public class BaseWrapper
         return AddOutcome.AR_ADDED;
     }
 
-    protected XAResource toXAResource(AbstractRecord record, boolean verbose)
-    {
-//        return new com.hp.mwtests.ts.jta.common.DummyXA(verbose);
+    protected XAResource toXAResource(AbstractRecord record, boolean verbose) {
+        // return new com.hp.mwtests.ts.jta.common.DummyXA(verbose);
         return new org.jboss.jbossts.qa.CrashRecovery13Impls.RecoveryXAResource();
     }
 
-    public int add(AbstractRecord record)
-    {
+    public int add(AbstractRecord record) {
         return add(toXAResource(record, false));
     }
 

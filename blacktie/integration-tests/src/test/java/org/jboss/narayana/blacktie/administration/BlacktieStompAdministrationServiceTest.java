@@ -39,7 +39,8 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
     }
 
     /**
-     * Cannot test this without using a C server as unadvertise checks for a running server
+     * Cannot test this without using a C server as unadvertise checks for a
+     * running server
      * 
      * @throws ConnectionException
      */
@@ -73,7 +74,8 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
         processStompCommand("tpadvertise,foo,FOOTest,0,queue,WrongVersion,", 4);
     }
 
-    private void processStompCommand(String command, int expectation) throws ConnectionException, ConfigurationException {
+    private void processStompCommand(String command, int expectation)
+            throws ConnectionException, ConfigurationException {
         byte[] toSend = command.getBytes();
         X_OCTET buffer = (X_OCTET) connection.tpalloc("X_OCTET", null);
         buffer.setByteArray(toSend);
@@ -84,7 +86,8 @@ public class BlacktieStompAdministrationServiceTest extends TestCase {
         assertEquals(expectation, responseData[0]);
     }
 
-    private void processDomainCommand(String command, int expectation) throws ConnectionException, ConfigurationException {
+    private void processDomainCommand(String command, int expectation)
+            throws ConnectionException, ConfigurationException {
         byte[] toSend = command.getBytes();
         X_OCTET buffer = (X_OCTET) connection.tpalloc("X_OCTET", null);
         buffer.setByteArray(toSend);

@@ -52,10 +52,10 @@ public class XADSWrapper implements XADataSource, Serializable, Referenceable, D
     private String userName;
     private String password;
 
-
-    public XADSWrapper(String binding, String driver, String databaseName, String host, Integer port, String xaDSClassName, String userName, String password) {
+    public XADSWrapper(String binding, String driver, String databaseName, String host, Integer port,
+            String xaDSClassName, String userName, String password) {
         try {
-            xaDataSource = (XADataSource)Class.forName(xaDSClassName).newInstance();
+            xaDataSource = (XADataSource) Class.forName(xaDSClassName).newInstance();
             txDriverUrl = TransactionalDriver.arjunaDriver + binding;
 
             this.binding = binding;
@@ -70,20 +70,20 @@ public class XADSWrapper implements XADataSource, Serializable, Referenceable, D
             properties.put(TransactionalDriver.userName, userName);
             properties.put(TransactionalDriver.password, password);
             properties.put(TransactionalDriver.createDb, true);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new ExceptionInInitializerError(e);
         }
     }
 
     public void setProperty(String name, Object value)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        name = "set"+name.substring(0,1).toUpperCase()+name.substring(1);
+        name = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
 
         Class type = value.getClass();
-        if(value instanceof Integer) {
+        if (value instanceof Integer) {
             type = Integer.TYPE;
         }
-        if(value instanceof Boolean) {
+        if (value instanceof Boolean) {
             type = Boolean.TYPE;
         }
 
@@ -153,11 +153,8 @@ public class XADSWrapper implements XADataSource, Serializable, Referenceable, D
     /**
      * {@inheritDoc}
      */
-    public Reference getReference()  throws NamingException {
-        return XADSWrapperObjectFactory.getReference(getClass().getName(), binding,
-                driver, databaseName,
-                host, port,
+    public Reference getReference() throws NamingException {
+        return XADSWrapperObjectFactory.getReference(getClass().getName(), binding, driver, databaseName, host, port,
                 userName, password);
     }
 }
-

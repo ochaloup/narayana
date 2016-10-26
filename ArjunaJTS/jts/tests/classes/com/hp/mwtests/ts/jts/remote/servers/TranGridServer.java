@@ -41,11 +41,9 @@ import com.arjuna.orbportability.Services;
 import com.hp.mwtests.ts.jts.orbspecific.resources.trangrid_i;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 
-public class TranGridServer
-{
+public class TranGridServer {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -53,26 +51,22 @@ public class TranGridServer
         String serverName = "TranGrid";
         String refFile = "/tmp/trangrid.ref";
 
-        if (System.getProperty("os.name").startsWith("Windows"))
-        {
+        if (System.getProperty("os.name").startsWith("Windows")) {
             refFile = "C:\\temp\\trangrid.ref";
         }
 
         trangrid_i gridI = new trangrid_i((short) 100, (short) 100);
         Services serv = new Services(myORB);
 
-        try
-        {
+        try {
             TestUtility.registerService(refFile, myORB.orb().object_to_string(gridI.getReference()));
 
             System.out.println("**TranGrid server started**");
-            //assertReady();
+            // assertReady();
 
             myOA.run();
-        }
-        catch (Exception e)
-        {
-            fail("TranGrid server caught exception: "+e);
+        } catch (Exception e) {
+            fail("TranGrid server caught exception: " + e);
         }
 
         myOA.shutdownObject(gridI);
@@ -80,4 +74,3 @@ public class TranGridServer
         System.out.println("**TranGrid server exiting**");
     }
 }
-

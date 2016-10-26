@@ -34,8 +34,7 @@ package com.arjuna.wsc.common;
 /**
  */
 
-public interface Environment
-{
+public interface Environment {
     public static final String XTS_BIND_ADDRESS = "org.jboss.jbossts.xts.bind.address";
     public static final String XTS_BIND_PORT = "org.jboss.jbossts.xts.bind.port";
     public static final String XTS_SECURE_BIND_PORT = "org.jboss.jbossts.xts.bind.port.secure";

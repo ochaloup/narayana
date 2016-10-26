@@ -38,55 +38,50 @@ import com.arjuna.ats.arjuna.coordinator.ActionStatus;
  * Modified by nmcl.
  */
 
-public class OptimisticLockUnitTest extends TestCase
-{
+public class OptimisticLockUnitTest extends TestCase {
     @Transactional
     @Optimistic
-    public interface Atomic
-    {
+    public interface Atomic {
         public int get();
 
         public void set(int value);
     }
 
-    public class ExampleSTM implements Atomic
-    {
+    public class ExampleSTM implements Atomic {
         @ReadLock
         public int get() {
             return state;
         }
 
         @WriteLock
-        public void set(int value)
-        {
+        public void set(int value) {
             state = value;
         }
 
         private int state;
     }
 
-    public void testConflict() throws Exception
-    {
+    public void testConflict() throws Exception {
         Container<Atomic> theContainer1 = new Container<Atomic>();
         Container<Atomic> theContainer2 = new Container<Atomic>();
 
         final Atomic obj1 = theContainer1.create(new ExampleSTM());
-        
+
         AtomicAction act = new AtomicAction();
-        
+
         /*
-         * Make sure there's state on "disk" before we try to do anything
-         * with a shared instance.
+         * Make sure there's state on "disk" before we try to do anything with a
+         * shared instance.
          * 
          * https://issues.jboss.org/browse/JBTM-1732
          */
-        
+
         act.begin();
-        
+
         obj1.set(10);
-        
+
         act.commit();
-        
+
         final Atomic obj2 = theContainer2.clone(new ExampleSTM(), obj1);
 
         AtomicAction a = new AtomicAction();

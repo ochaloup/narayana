@@ -33,28 +33,20 @@ import com.arjuna.wst.UnknownTransactionException;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public class TestSystemExceptionBusinessActivityTerminator implements BusinessActivityTerminator
-{
-    public TestSystemExceptionBusinessActivityTerminator(W3CEndpointReference endpointReference)
-    {
+public class TestSystemExceptionBusinessActivityTerminator implements BusinessActivityTerminator {
+    public TestSystemExceptionBusinessActivityTerminator(W3CEndpointReference endpointReference) {
         this.endpointReference = endpointReference;
     }
 
-    public void close ()
-        throws TransactionRolledBackException, UnknownTransactionException, SystemException
-    {
+    public void close() throws TransactionRolledBackException, UnknownTransactionException, SystemException {
         throw new SystemException();
     }
 
-    public void cancel ()
-        throws UnknownTransactionException, SystemException
-    {
+    public void cancel() throws UnknownTransactionException, SystemException {
         throw new SystemException();
     }
 
-    public void complete ()
-        throws UnknownTransactionException, SystemException
-    {
+    public void complete() throws UnknownTransactionException, SystemException {
         throw new SystemException();
     }
 

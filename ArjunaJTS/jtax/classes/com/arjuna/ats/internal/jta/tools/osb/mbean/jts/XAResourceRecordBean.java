@@ -42,10 +42,12 @@ import com.arjuna.ats.jta.xa.XidImple;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class XAResourceRecordBean extends LogRecordWrapper implements XAResourceRecordBeanMBean {
     JTSXAResourceRecordWrapper xares;
     String className = "unavailable";
@@ -77,11 +79,21 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
         heuristic = xares.heuristic;
     }
 
-    public String getClassName() { return className; }
-    public String getEisProductName() { return eisProductName; }
-    public String getEisProductVersion() { return eisProductVersion; }
-    public String getJndiName() { return jndiName; }
-    public int getTimeout() { return timeout; }
+    public String getClassName() {
+        return className;
+    }
+    public String getEisProductName() {
+        return eisProductName;
+    }
+    public String getEisProductVersion() {
+        return eisProductVersion;
+    }
+    public String getJndiName() {
+        return jndiName;
+    }
+    public int getTimeout() {
+        return timeout;
+    }
 
     @Override
     public String getHeuristicStatus() {
@@ -109,13 +121,14 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
         return heuristic;
     }
 
-    public void setJtsXAResourceRecord(com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper jtsXAResourceRecord) {
+    public void setJtsXAResourceRecord(
+            com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper jtsXAResourceRecord) {
         this.jtsXAResourceRecord = jtsXAResourceRecord;
     }
 
     @Override
     public boolean forget() {
- //       return jtsXAResourceRecord.forgetHeuristic();
+        // return jtsXAResourceRecord.forgetHeuristic();
         return true;
     }
 
@@ -132,9 +145,12 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
     }
 
     /**
-     * Extension of an XAResource record for exposing the underlying XAResource which is protected
+     * Extension of an XAResource record for exposing the underlying XAResource
+     * which is protected
      */
-    public class JTSXAResourceRecordWrapper extends com.arjuna.ats.internal.jta.resources.jts.orbspecific.XAResourceRecord {
+    public class JTSXAResourceRecordWrapper
+            extends
+                com.arjuna.ats.internal.jta.resources.jts.orbspecific.XAResourceRecord {
         XidImple xidImple;
         int heuristic;
         AbstractRecord rec;
@@ -171,13 +187,11 @@ public class XAResourceRecordBean extends LogRecordWrapper implements XAResource
 
             return super.restoreState(os);
         }
-/*
-        @Override
-        public boolean forgetHeuristic() {
-            if (rec != null)
-                return rec.forgetHeuristic();
-
-            return super.forgetHeuristic();
-        }    */
+        /*
+         * @Override public boolean forgetHeuristic() { if (rec != null) return
+         * rec.forgetHeuristic();
+         * 
+         * return super.forgetHeuristic(); }
+         */
     }
 }

@@ -29,21 +29,18 @@ import org.jboss.jbossts.qa.performance.PerfTestInterfaceHelper;
 import org.jboss.jbossts.qa.performance.implementations.perftestwork.SingleResourceRegistration;
 import org.jboss.jbossts.qa.performance.implementations.perftestwork.SingleSubtranAwareResourceRegistration;
 
-public class NestedTwoPhaseServer
-{
+public class NestedTwoPhaseServer {
     /**
      * The main test method which must assert either a pass or a fail.
      */
-    public void run(String[] args)
-    {
-        try
-        {
+    public void run(String[] args) {
+        try {
             String serviceName = args[args.length - 2];
             String serviceName2 = args[args.length - 1];
 
             /**
-             * Retrieve ORB and OA references, intialise them
-             * and then set the OTSManager ORB and OA properties
+             * Retrieve ORB and OA references, intialise them and then set the
+             * OTSManager ORB and OA properties
              */
             ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
             OA oa = OA.getRootOA(orb);
@@ -68,10 +65,8 @@ public class NestedTwoPhaseServer
             System.out.println("Ready");
 
             orb.orb().run();
-        }
-        catch (Exception e)
-        {
-            System.err.println("Unexpected exception: "+e);
+        } catch (Exception e) {
+            System.err.println("Unexpected exception: " + e);
             e.printStackTrace(System.err);
             System.out.println("Failed");
         }

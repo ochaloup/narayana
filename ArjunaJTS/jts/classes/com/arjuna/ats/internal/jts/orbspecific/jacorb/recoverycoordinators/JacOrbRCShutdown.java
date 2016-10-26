@@ -33,16 +33,13 @@ package com.arjuna.ats.internal.jts.orbspecific.jacorb.recoverycoordinators;
 
 import com.arjuna.orbportability.oa.PreShutdown;
 
-public class JacOrbRCShutdown extends PreShutdown
-{
+public class JacOrbRCShutdown extends PreShutdown {
 
-    public JacOrbRCShutdown()
-    {
+    public JacOrbRCShutdown() {
         super("JacOrbRCShutdown");
     }
 
-    public void work ()
-    {
+    public void work() {
         JacOrbRCServiceInit.shutdownRCService();
     }
 

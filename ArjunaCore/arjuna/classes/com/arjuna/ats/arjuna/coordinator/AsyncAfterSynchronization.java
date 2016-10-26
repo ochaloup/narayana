@@ -29,9 +29,10 @@ import java.util.concurrent.Callable;
 public class AsyncAfterSynchronization implements Callable<Boolean> {
     private TwoPhaseCoordinator coordinator;
     private SynchronizationRecord synchronization;
-    private int                 _status;
+    private int _status;
 
-    public AsyncAfterSynchronization(TwoPhaseCoordinator coordinator, SynchronizationRecord synchronization, int status) {
+    public AsyncAfterSynchronization(TwoPhaseCoordinator coordinator, SynchronizationRecord synchronization,
+            int status) {
         this.coordinator = coordinator;
         this.synchronization = synchronization;
         this._status = status;
@@ -39,8 +40,10 @@ public class AsyncAfterSynchronization implements Callable<Boolean> {
 
     /**
      * Run the call
+     * 
      * @return true if the call was successful and false otherwise
-     * @throws Exception if the wrapped synchronisation throws an exception
+     * @throws Exception
+     *             if the wrapped synchronisation throws an exception
      */
     public Boolean call() throws Exception {
         // Synchronisations are executed with undefined transaction context.

@@ -48,7 +48,7 @@ public class DataCompensationHandler implements CompensationHandler {
                     dataAvailable = true;
                 }
             } catch (Exception e) {
-                //unavailable
+                // unavailable
             }
         }
     }

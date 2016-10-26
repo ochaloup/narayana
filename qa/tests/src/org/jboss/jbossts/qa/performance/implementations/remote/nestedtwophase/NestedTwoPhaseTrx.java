@@ -28,13 +28,10 @@ import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.OA;
 import com.arjuna.ats.jts.OTSManager;
 
-public class NestedTwoPhaseTrx extends PerformanceTest
-{
-    protected void work() throws Exception
-    {
-        try
-        {
-            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
+public class NestedTwoPhaseTrx extends PerformanceTest {
+    protected void work() throws Exception {
+        try {
+            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
             OA oa = OA.getRootOA(orb);
 
             String ref1 = getServiceConfig(0);
@@ -52,26 +49,20 @@ public class NestedTwoPhaseTrx extends PerformanceTest
             OTSManager.get_current().begin();
             d2.work();
 
-
-            if (isParameterDefined("-commit"))
-            {
+            if (isParameterDefined("-commit")) {
                 // nested commit
                 OTSManager.get_current().commit(true);
                 // top level commit
                 OTSManager.get_current().commit(true);
-            }
-            else
-            {
+            } else {
                 // nested rollback
                 OTSManager.get_current().rollback();
                 // top level rollback
                 OTSManager.get_current().rollback();
             }
 
-        }
-        catch (Exception e)
-        {
-            System.err.println("Unexpected exception: "+e);
+        } catch (Exception e) {
+            System.err.println("Unexpected exception: " + e);
             e.printStackTrace(System.err);
         }
 

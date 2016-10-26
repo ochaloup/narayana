@@ -26,17 +26,16 @@ import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.annotations.WriteLock;
 
 @Transactional
-public interface AtomicLinkedList
-{
+public interface AtomicLinkedList {
     @WriteLock
-    public void setPrev (AtomicLinkedList n);
-    
+    public void setPrev(AtomicLinkedList n);
+
     @ReadLock
-    public AtomicLinkedList getPrev ();
-    
+    public AtomicLinkedList getPrev();
+
     @WriteLock
-    public void setNext (AtomicLinkedList n);
-    
+    public void setNext(AtomicLinkedList n);
+
     @ReadLock
-    public AtomicLinkedList getNext ();
+    public AtomicLinkedList getNext();
 }

@@ -6,25 +6,29 @@ import java.util.TreeSet;
 import java.util.Iterator;
 
 /**
- * Task manager which ensures that processes created during unit tests are destroyed when they
- * do no complete after a suitable timeout.
+ * Task manager which ensures that processes created during unit tests are
+ * destroyed when they do no complete after a suitable timeout.
  */
-public class TaskReaper
-{
+public class TaskReaper {
     // api methods
-    // n.b  all internal methods synchronize on the value in the reaperLock field when they need
-    // exclusive access to the internal state. note that the api methods are not synchronized but
+    // n.b all internal methods synchronize on the value in the reaperLock field
+    // when they need
+    // exclusive access to the internal state. note that the api methods are not
+    // synchronized but
     // they should nto be called concurrently.
 
     /**
      * insert a task into the list of managed tasks
-     * @param task the task to be inserted
-     * @param absoluteTimeout the absolute system time measured in milliseconds from the epoch at which
-     * the task's process should be destroyed if it has not been removed from the list by then
+     * 
+     * @param task
+     *            the task to be inserted
+     * @param absoluteTimeout
+     *            the absolute system time measured in milliseconds from the
+     *            epoch at which the task's process should be destroyed if it
+     *            has not been removed from the list by then
      */
-    public void insert(TaskImpl task, long absoluteTimeout)
-    {
-        synchronized(reaperLock) {
+    public void insert(TaskImpl task, long absoluteTimeout) {
+        synchronized (reaperLock) {
             if (shutdown) {
                 throw new RuntimeException("invalid call to TaskReaper.insert after shutdown");
             }
@@ -38,13 +42,14 @@ public class TaskReaper
 
     /**
      * remove a task from the list of managed tasks
-     * @param task the task to be removed
-     * @return true if the task was present in the list and was removed before a timeout caused its
-     * process to be destroyed otherwise false
+     * 
+     * @param task
+     *            the task to be removed
+     * @return true if the task was present in the list and was removed before a
+     *         timeout caused its process to be destroyed otherwise false
      */
-    public boolean remove(TaskImpl task)
-    {
-        synchronized(reaperLock) {
+    public boolean remove(TaskImpl task) {
+        synchronized (reaperLock) {
             TaskReapable reapable = reapableMap.get(task);
             if (reapable != null) {
                 taskList.remove(reapable);
@@ -58,41 +63,46 @@ public class TaskReaper
 
     /**
      * check if there are any tasks in the list
+     * 
      * @return true if the list is empty otherwise false
      */
-    public boolean allClear()
-    {
+    public boolean allClear() {
         synchronized (reaperLock) {
             return taskList.isEmpty();
         }
     }
 
     /**
-     * remove any remaining tasks from the list, destroying their process, and return a count of the
-     * number of tasks which have failed to exit cleanly. this count includes tasks which have been killed
-     * because of timeouts as well as those destroyed under the call to clear().
+     * remove any remaining tasks from the list, destroying their process, and
+     * return a count of the number of tasks which have failed to exit cleanly.
+     * this count includes tasks which have been killed because of timeouts as
+     * well as those destroyed under the call to clear().
+     * 
      * @return a count of how many tasks exited abnormally.
-
+     * 
      */
-    public int clear()
-    {
+    public int clear() {
         int returnCount;
-        synchronized(reaperLock) {
-            // set the absolute timeout of every task to zero then wake up the reaper and wait for
+        synchronized (reaperLock) {
+            // set the absolute timeout of every task to zero then wake up the
+            // reaper and wait for
             // the list to empty
             SortedSet<TaskReapable> copyOfTaskList = new TreeSet<TaskReapable>(taskList);
             Iterator<TaskReapable> iterator = copyOfTaskList.iterator();
             while (iterator.hasNext()) {
                 TaskReapable reapable = iterator.next();
-                // absoluteTimeout value is part of the ordering, so we screw up the sorted set if we
-                // modify the obj in situ. remove, modify and reinsert to work around this.
+                // absoluteTimeout value is part of the ordering, so we screw up
+                // the sorted set if we
+                // modify the obj in situ. remove, modify and reinsert to work
+                // around this.
                 taskList.remove(reapable);
                 reapable.absoluteTimeout = 0;
                 taskList.add(reapable);
             }
             reaperLock.notify();
             // ok now wait until all the tasks have gone
-            // n.b this relies upon the caller not inserting new tasks while the clear operation is in progress!
+            // n.b this relies upon the caller not inserting new tasks while the
+            // clear operation is in progress!
             while (!taskList.isEmpty()) {
                 try {
                     reaperLock.wait();
@@ -108,11 +118,12 @@ public class TaskReaper
 
     /**
      * shut down the task manager
-     * @param immediate if true then shut down without destroying any task in the current list otherwise
-     * atempt to destroy all pending tasks.
+     * 
+     * @param immediate
+     *            if true then shut down without destroying any task in the
+     *            current list otherwise atempt to destroy all pending tasks.
      */
-    public void shutdown(boolean immediate)
-    {
+    public void shutdown(boolean immediate) {
         // unset the current reaper instance
 
         clearTheReaper(this);
@@ -121,13 +132,15 @@ public class TaskReaper
 
         synchronized (reaperLock) {
             shutdown = false;
-            // setting shutdownWait to false makes the reaper thread exit without clearing the list
+            // setting shutdownWait to false makes the reaper thread exit
+            // without clearing the list
             // setting it true makes it exit once all tasks have been destroyed
             if (immediate) {
                 shutdownWait = false;
             } else {
                 shutdownWait = true;
-                // set the absolute timeout of every task to zero then wake up the reaper and wait for
+                // set the absolute timeout of every task to zero then wake up
+                // the reaper and wait for
                 // the list to empty
                 Iterator<TaskReapable> iterator = taskList.iterator();
                 while (iterator.hasNext()) {
@@ -141,7 +154,7 @@ public class TaskReaper
             reaperLock.notify();
 
             // we don't get out of here until the reaper thread has exited
-            
+
             while (!threadShutdown) {
                 try {
                     reaperLock.wait();
@@ -153,11 +166,12 @@ public class TaskReaper
     }
 
     /**
-     * obtain a handle on the currently active reaper, creating a new one if there is no reaper active
+     * obtain a handle on the currently active reaper, creating a new one if
+     * there is no reaper active
+     * 
      * @return the reaper
      */
-    public static synchronized TaskReaper getReaper()
-    {
+    public static synchronized TaskReaper getReaper() {
         if (theReaper == null) {
             createReaper();
         }
@@ -166,12 +180,13 @@ public class TaskReaper
     }
 
     /**
-     * reset the current reaper instance to null. this is called from the current reaper instanmce's shutdown
-     * method to reset the current handle to null.
+     * reset the current reaper instance to null. this is called from the
+     * current reaper instanmce's shutdown method to reset the current handle to
+     * null.
      */
-    private static synchronized void clearTheReaper(TaskReaper theReaperReaped)
-    {
-        // if the current reaper still identifies the one we just shutdown then reset it to null
+    private static synchronized void clearTheReaper(TaskReaper theReaperReaped) {
+        // if the current reaper still identifies the one we just shutdown then
+        // reset it to null
 
         if (theReaper == theReaperReaped) {
             theReaper = null;
@@ -183,12 +198,12 @@ public class TaskReaper
     // package public access only for use by TaskReaperThread
 
     /**
-     * entry point for the task reaper thread to detect timed out tasks in the background. this should not
-     * be called anywhere except in TaskReaperThread.run
+     * entry point for the task reaper thread to detect timed out tasks in the
+     * background. this should not be called anywhere except in
+     * TaskReaperThread.run
      */
-    void check()
-    {
-        synchronized(reaperLock) {
+    void check() {
+        synchronized (reaperLock) {
             while (!shutdown || shutdownWait) {
                 if (taskList.isEmpty()) {
                     // wait as long as we need to
@@ -209,12 +224,15 @@ public class TaskReaper
                             // ignore -- we should never be interrupted here
                         }
                     } else {
-                        // we have a task to kill so kill it, wait a brief interval so we don't hog
-                        // the cpu and then loop to see if there are more to kill
+                        // we have a task to kill so kill it, wait a brief
+                        // interval so we don't hog
+                        // the cpu and then loop to see if there are more to
+                        // kill
                         if (timeout(first)) {
                             invalidCount++;
                         }
-                        // notify here in case a thread was trying to modify the list while we were doing
+                        // notify here in case a thread was trying to modify the
+                        // list while we were doing
                         // the timeout
                         reaperLock.notify();
                         try {
@@ -238,11 +256,10 @@ public class TaskReaper
     private boolean shutdown;
     private boolean shutdownWait;
     private boolean threadShutdown;
-    private Object reaperLock;    
+    private Object reaperLock;
     private TaskReaperThread reaperThread;
 
-    private TaskReaper()
-    {
+    private TaskReaper() {
         taskList = new TreeSet<TaskReapable>();
         reapableMap = new HashMap<TaskImpl, TaskReapable>();
         invalidCount = 0;
@@ -257,19 +274,19 @@ public class TaskReaper
     /**
      * start the task manager
      */
-    private static void createReaper()
-    {
+    private static void createReaper() {
         theReaper = new TaskReaper();
     }
 
     /**
-     * destroy a timed out task and remove it from the task list. n.b. this must be called when
-     * synchronized on the reaper lock
-     * @param reapable the task to be destroyed
+     * destroy a timed out task and remove it from the task list. n.b. this must
+     * be called when synchronized on the reaper lock
+     * 
+     * @param reapable
+     *            the task to be destroyed
      * @return true if the task exited invalidly otherwise false
      */
-    private boolean timeout(TaskReapable reapable)
-    {
+    private boolean timeout(TaskReapable reapable) {
         TaskImpl task = reapable.getTask();
         reapableMap.remove(task);
         taskList.remove(reapable);
@@ -277,20 +294,17 @@ public class TaskReaper
     }
 
     /**
-     * wrapper which associates a task with its absoulte timeout and provides a comparator which allows
-     * tasks to be sorted in order of absolute timeout
+     * wrapper which associates a task with its absoulte timeout and provides a
+     * comparator which allows tasks to be sorted in order of absolute timeout
      */
-    private static class TaskReapable implements Comparable<TaskReapable>
-    {
-        public TaskReapable(TaskImpl task, long absoluteTimeout)
-        {
+    private static class TaskReapable implements Comparable<TaskReapable> {
+        public TaskReapable(TaskImpl task, long absoluteTimeout) {
             long now = System.currentTimeMillis();
             this.absoluteTimeout = now + absoluteTimeout;
             this.task = task;
         }
 
-        public long getAbsoluteTimeout()
-        {
+        public long getAbsoluteTimeout() {
             return absoluteTimeout;
         }
 
@@ -323,14 +337,11 @@ public class TaskReaper
         }
     }
 
-    private static class TaskReaperThread extends Thread
-    {
-        public TaskReaperThread(TaskReaper reaper)
-        {
+    private static class TaskReaperThread extends Thread {
+        public TaskReaperThread(TaskReaper reaper) {
             this.reaper = reaper;
         }
-        public void run()
-        {
+        public void run() {
             reaper.check();
         }
 

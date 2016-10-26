@@ -29,8 +29,7 @@ import com.arjuna.ats.jts.common.JTSEnvironmentBean;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest
-{
+public class EnvironmentBeanTest {
     @Test
     public void testJTSEnvironmentBean() throws Exception {
         com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(new JTSEnvironmentBean());

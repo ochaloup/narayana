@@ -46,34 +46,26 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-class MyCheckedAction extends CheckedAction
-{
-    public synchronized void check (boolean isCommit, Uid actUid, Hashtable list)
-    {
+class MyCheckedAction extends CheckedAction {
+    public synchronized void check(boolean isCommit, Uid actUid, Hashtable list) {
         // don't do anything so that no warning message is printed!
     }
 }
 
-class TXThread extends Thread
-{
-    public TXThread (Control c)
-    {
+class TXThread extends Thread {
+    public TXThread(Control c) {
         cont = c;
     }
 
-    public void run ()
-    {
-        try
-        {
-            System.out.println("Thread "+Thread.currentThread()+" attempting to rollback transaction.");
+    public void run() {
+        try {
+            System.out.println("Thread " + Thread.currentThread() + " attempting to rollback transaction.");
 
             cont.get_terminator().rollback();
 
             System.out.println("Transaction rolled back. Checked transactions disabled.");
-        }
-        catch (Exception e)
-        {
-            System.out.println("Caught exception: "+e);
+        } catch (Exception e) {
+            System.out.println("Caught exception: " + e);
             System.out.println("Checked transactions enabled!");
         }
     }
@@ -82,20 +74,17 @@ class TXThread extends Thread
 
 }
 
-public class CheckedTransactions
-{
+public class CheckedTransactions {
     @Test
-    public void test()
-    {
+    public void test() {
         ORB myORB = null;
         RootOA myOA = null;
 
-        try
-        {
+        try {
             myORB = ORB.getInstance("test");
             myOA = OA.getRootOA(myORB);
 
-            myORB.initORB(new String[] {}, null);
+            myORB.initORB(new String[]{}, null);
             myOA.initOA();
 
             ORBManager.setORB(myORB);
@@ -103,7 +92,7 @@ public class CheckedTransactions
 
             Control tx = null;
 
-            System.out.println("Thread "+Thread.currentThread()+" starting transaction.");
+            System.out.println("Thread " + Thread.currentThread() + " starting transaction.");
 
             OTSImpleManager.current().setCheckedAction(new MyCheckedAction());
 
@@ -116,15 +105,13 @@ public class CheckedTransactions
             txThread.start();
             txThread.join();
 
-            System.out.println("Thread "+Thread.currentThread()+" committing transaction.");
+            System.out.println("Thread " + Thread.currentThread() + " committing transaction.");
 
             OTSImpleManager.current().commit(false);
 
             System.out.println("Transaction committed. Checked transactions enabled.");
-        }
-        catch (Exception e)
-        {
-            System.out.println("Caught exception: "+e);
+        } catch (Exception e) {
+            System.out.println("Caught exception: " + e);
             fail("Checked transactions disabled!");
         }
 
@@ -132,4 +119,3 @@ public class CheckedTransactions
         myORB.shutdown();
     }
 }
-

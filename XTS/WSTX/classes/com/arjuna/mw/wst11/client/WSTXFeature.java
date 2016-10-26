@@ -26,7 +26,8 @@ import javax.xml.ws.BindingProvider;
 import org.jboss.ws.api.configuration.AbstractClientFeature;
 
 /**
- * Web service feature is used to enable or disable WS-AT/WS-BA context propagation for specific port.
+ * Web service feature is used to enable or disable WS-AT/WS-BA context
+ * propagation for specific port.
  *
  * @author <a href="mailto:paul.robinson@redhat.com">Paul Robinson</a>
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
@@ -56,9 +57,12 @@ public final class WSTXFeature extends AbstractClientFeature {
     }
 
     /**
-     * Parametrised constructor creates either enabled or disabled WSTXFeature based on <code>enabled</code> parameter.
+     * Parametrised constructor creates either enabled or disabled WSTXFeature
+     * based on <code>enabled</code> parameter.
      *
-     * @param enabled true to create enabled WSTXFeature, false to create disabled WSTXFeature.
+     * @param enabled
+     *            true to create enabled WSTXFeature, false to create disabled
+     *            WSTXFeature.
      */
     public WSTXFeature(final boolean enabled) {
         super(WSTXFeature.class.getName());
@@ -66,10 +70,13 @@ public final class WSTXFeature extends AbstractClientFeature {
     }
 
     /**
-     * Sets <code>REQUEST_CONTEXT_KEY</code> value to <code>ENABLED_VALUE</code> if WSTXFeature is enabled.
+     * Sets <code>REQUEST_CONTEXT_KEY</code> value to <code>ENABLED_VALUE</code>
+     * if WSTXFeature is enabled.
      *
-     * Sets <code>REQUEST_CONTEXT_KEY</code> value to <code>DISABLED_VALUE</code> if WSTXFeature is disabled and
-     * <code>REQUEST_CONTEXT_KEY</code> value was not already set by another feature.
+     * Sets <code>REQUEST_CONTEXT_KEY</code> value to
+     * <code>DISABLED_VALUE</code> if WSTXFeature is disabled and
+     * <code>REQUEST_CONTEXT_KEY</code> value was not already set by another
+     * feature.
      */
     @Override
     protected void initializeBindingProvider(BindingProvider bp) {

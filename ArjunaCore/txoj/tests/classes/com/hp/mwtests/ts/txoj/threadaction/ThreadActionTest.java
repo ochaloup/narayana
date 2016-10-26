@@ -38,34 +38,29 @@ import static org.junit.Assert.assertEquals;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.hp.mwtests.ts.txoj.common.resources.BasicThreadedObject;
 
-public class ThreadActionTest
-{
+public class ThreadActionTest {
     @Test
-    public void test()
-    {
-    BasicThreadedObject object1 = new BasicThreadedObject(true);
-    BasicThreadedObject object2 = new BasicThreadedObject(false);
+    public void test() {
+        BasicThreadedObject object1 = new BasicThreadedObject(true);
+        BasicThreadedObject object2 = new BasicThreadedObject(false);
 
-    System.out.println("Main thread has action "+BasicAction.Current());
+        System.out.println("Main thread has action " + BasicAction.Current());
 
-    assertEquals(BasicAction.Current(), null);
-    
-    object1.start();
-    object2.start();
+        assertEquals(BasicAction.Current(), null);
 
-    Thread.yield();
-    
-    try
-    {
-        object1.join();
-        object2.join();
-    }
-    catch (InterruptedException e)
-    {
-    }
+        object1.start();
+        object2.start();
 
-    System.out.println("Main thread has action "+BasicAction.Current());
-    
-    assertEquals(BasicAction.Current(), null);
+        Thread.yield();
+
+        try {
+            object1.join();
+            object2.join();
+        } catch (InterruptedException e) {
+        }
+
+        System.out.println("Main thread has action " + BasicAction.Current());
+
+        assertEquals(BasicAction.Current(), null);
     }
 }

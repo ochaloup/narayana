@@ -39,8 +39,8 @@ public class HelpTest extends TestCase {
     public void tearDown() {
     }
 
-    public void testVersion() throws IOException, MalformedObjectNameException, NullPointerException, InstantiationException,
-            IllegalAccessException, ClassNotFoundException, ConfigurationException {
+    public void testVersion() throws IOException, MalformedObjectNameException, NullPointerException,
+            InstantiationException, IllegalAccessException, ClassNotFoundException, ConfigurationException {
         log.info("HelpTest::testVersion");
         String command = "help";
         if (commandHandler.handleCommand(command.split(" ")) != 0) {

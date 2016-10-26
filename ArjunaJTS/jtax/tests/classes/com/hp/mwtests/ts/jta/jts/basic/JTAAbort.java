@@ -40,25 +40,25 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class JTAAbort
-{
+public class JTAAbort {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
         javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
@@ -72,13 +72,13 @@ public class JTAAbort
 
         theTransaction.rollback();
 
-        System.out.println("\nTransaction now: "+theTransaction);
+        System.out.println("\nTransaction now: " + theTransaction);
 
-        System.out.println("\nThread associated: "+JTAHelper.stringForm(tm.getStatus()));
+        System.out.println("\nThread associated: " + JTAHelper.stringForm(tm.getStatus()));
 
         theTransaction = tm.suspend();
 
-        System.out.println("\nSuspended: "+theTransaction);
+        System.out.println("\nSuspended: " + theTransaction);
 
         tm.resume(theTransaction);
 

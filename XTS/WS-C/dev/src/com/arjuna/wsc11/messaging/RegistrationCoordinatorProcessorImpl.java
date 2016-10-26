@@ -40,95 +40,96 @@ import javax.xml.ws.ProtocolException;
 import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-
 /**
  * The Registration Coordinator processor.
+ * 
  * @author kevin
  */
-public class RegistrationCoordinatorProcessorImpl extends RegistrationCoordinatorProcessor
-{
+public class RegistrationCoordinatorProcessorImpl extends RegistrationCoordinatorProcessor {
     /**
      * Register the participant in the protocol.
-     * @param register The register request.
-     * @param map The addressing context.
-     * @param arjunaContext The arjuna context.
+     * 
+     * @param register
+     *            The register request.
+     * @param map
+     *            The addressing context.
+     * @param arjunaContext
+     *            The arjuna context.
      */
-    public RegisterResponseType register(final RegisterType register, final MAP map,
-        final ArjunaContext arjunaContext, final boolean isSecure)
-    {
-        final com.arjuna.wsc11.RegistrarMapper registrarMapper = RegistrarMapper.getFactory() ;
-        try
-        {
-            final String protocolIdentifier = register.getProtocolIdentifier() ;
-            final Registrar registrar = registrarMapper.getRegistrar(protocolIdentifier) ;
-            
-            if (registrar != null)
-            {
-                try
-                {
-                    final W3CEndpointReference participantProtocolService = register.getParticipantProtocolService() ;
+    public RegisterResponseType register(final RegisterType register, final MAP map, final ArjunaContext arjunaContext,
+            final boolean isSecure) {
+        final com.arjuna.wsc11.RegistrarMapper registrarMapper = RegistrarMapper.getFactory();
+        try {
+            final String protocolIdentifier = register.getProtocolIdentifier();
+            final Registrar registrar = registrarMapper.getRegistrar(protocolIdentifier);
+
+            if (registrar != null) {
+                try {
+                    final W3CEndpointReference participantProtocolService = register.getParticipantProtocolService();
                     final InstanceIdentifier instanceIdentifier = arjunaContext.getInstanceIdentifier();
-                    final W3CEndpointReference coordinationProtocolService =
-                            registrar.register(participantProtocolService, protocolIdentifier, instanceIdentifier, isSecure) ;
-                    final RegisterResponseType response = new RegisterResponseType() ;
+                    final W3CEndpointReference coordinationProtocolService = registrar
+                            .register(participantProtocolService, protocolIdentifier, instanceIdentifier, isSecure);
+                    final RegisterResponseType response = new RegisterResponseType();
 
                     response.setCoordinatorProtocolService(coordinationProtocolService);
                     return response;
-                }
-                catch (final AlreadyRegisteredException alreadyRegisteredException)
-                {
+                } catch (final AlreadyRegisteredException alreadyRegisteredException) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
-                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_1());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME)
+                            .addTextNode(
+                                    WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_1());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final InvalidProtocolException invalidProtocolException)
-                {
+                } catch (final InvalidProtocolException invalidProtocolException) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME);
-                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_2());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME);
+                    soapFault.addDetail()
+                            .addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME)
+                            .addTextNode(
+                                    WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_2());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final InvalidStateException InvalidStateException)
-                {
+                } catch (final InvalidStateException InvalidStateException) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME);
-                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_3());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME);
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_STATE_QNAME)
+                            .addTextNode(
+                                    WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_3());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final NoActivityException noActivityException)
-                {
+                } catch (final NoActivityException noActivityException) {
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
-                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_4());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME)
+                            .addTextNode(
+                                    WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_4());
                     throw new SOAPFaultException(soapFault);
-                }
-                catch (final Throwable th)
-                {
-                    if (WSCLogger.logger.isTraceEnabled())
-                    {
-                        WSCLogger.logger.tracev("Unexpected exception thrown from create:", th) ;
+                } catch (final Throwable th) {
+                    if (WSCLogger.logger.isTraceEnabled()) {
+                        WSCLogger.logger.tracev("Unexpected exception thrown from create:", th);
                     }
                     SOAPFactory factory = SOAPFactory.newInstance();
-                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
-                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME).addTextNode(th.getMessage());
+                    SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                            CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME);
+                    soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_CANNOT_REGISTER_QNAME)
+                            .addTextNode(th.getMessage());
                     throw new SOAPFaultException(soapFault);
                 }
-            }
-            else
-            {
-                if (WSCLogger.logger.isTraceEnabled())
-                {
-                    WSCLogger.logger.tracev("Register called for unknown protocol identifier: {0}", new Object[] {protocolIdentifier}) ;
+            } else {
+                if (WSCLogger.logger.isTraceEnabled()) {
+                    WSCLogger.logger.tracev("Register called for unknown protocol identifier: {0}",
+                            new Object[]{protocolIdentifier});
                 }
                 SOAPFactory factory = SOAPFactory.newInstance();
-                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(), CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME);
-                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME).addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_2());
+                SOAPFault soapFault = factory.createFault(SoapFaultType.FAULT_SENDER.getValue(),
+                        CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PROTOCOL_QNAME);
+                soapFault.addDetail().addDetailEntry(CoordinationConstants.WSCOOR_ERROR_CODE_INVALID_PARAMETERS_QNAME)
+                        .addTextNode(WSCLogger.i18NLogger.get_wsc11_messaging_RegistrationCoordinatorProcessorImpl_2());
                 throw new SOAPFaultException(soapFault);
             }
-        }
-        catch (SOAPException se)
-        {
+        } catch (SOAPException se) {
             se.printStackTrace(System.err);
             throw new ProtocolException(se);
         }

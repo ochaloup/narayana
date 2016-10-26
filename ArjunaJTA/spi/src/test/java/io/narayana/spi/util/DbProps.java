@@ -47,10 +47,11 @@ public class DbProps {
     private String databaseUser;
     private String databasePassword;
 
-    public DbProps() {}
+    public DbProps() {
+    }
 
-    public DbProps(String prefix, String binding, String driver, String databaseURL, String databaseName,
-                   String host, String portName, String databaseUser, String databasePassword) {
+    public DbProps(String prefix, String binding, String driver, String databaseURL, String databaseName, String host,
+            String portName, String databaseUser, String databasePassword) {
         this.binding = binding;
         this.driver = driver;
         this.databaseURL = databaseURL;
@@ -61,16 +62,19 @@ public class DbProps {
         this.databasePassword = databasePassword;
 
         if (binding == null || driver == null || databaseUser == null || databasePassword == null)
-            throw new IllegalArgumentException("Dbconfig group " + prefix + ": missing database properties for binding " + binding);
+            throw new IllegalArgumentException(
+                    "Dbconfig group " + prefix + ": missing database properties for binding " + binding);
 
         if (databaseURL == null && (databaseName == null || host == null || portName == null))
-            throw new IllegalArgumentException("Dbconfig group " + prefix + ": missing database URL or (databaseName, host and port) for binding " + binding);
+            throw new IllegalArgumentException("Dbconfig group " + prefix
+                    + ": missing database URL or (databaseName, host and port) for binding " + binding);
 
         if (portName != null) {
             try {
                 port = Integer.parseInt(portName);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Dbconfig group " + prefix + ": Invalid port number for binding " + binding);
+                throw new IllegalArgumentException(
+                        "Dbconfig group " + prefix + ": Invalid port number for binding " + binding);
             }
         }
     }
@@ -128,15 +132,12 @@ public class DbProps {
         for (String prefix : dbProp.split(",")) {
             prefix = prefix.trim();
             String binding = props.getProperty(prefix + '_' + BINDING);
-            dbConfigs.put(binding, new DbProps(prefix, binding,
-                    props.getProperty(prefix + '_' + DRIVER),
-                    props.getProperty(prefix + '_' + DATABASE_URL),
-                    props.getProperty(prefix + '_' + DATABASE_NAME),
-                    props.getProperty(prefix + '_' + HOST),
-                    props.getProperty(prefix + '_' + PORT),
-                    props.getProperty(prefix + '_' + DATABASE_USER),
-                    props.getProperty(prefix + '_' + DATABASE_PASSWORD))
-            );
+            dbConfigs.put(binding,
+                    new DbProps(prefix, binding, props.getProperty(prefix + '_' + DRIVER),
+                            props.getProperty(prefix + '_' + DATABASE_URL),
+                            props.getProperty(prefix + '_' + DATABASE_NAME), props.getProperty(prefix + '_' + HOST),
+                            props.getProperty(prefix + '_' + PORT), props.getProperty(prefix + '_' + DATABASE_USER),
+                            props.getProperty(prefix + '_' + DATABASE_PASSWORD)));
         }
 
         return dbConfigs;

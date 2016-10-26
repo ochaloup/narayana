@@ -41,24 +41,18 @@ import com.arjuna.mw.wsas.exceptions.SystemException;
  * @since 1.0.
  */
 
-public class UnexpectedException extends SystemException
-{
+public class UnexpectedException extends SystemException {
 
-    public UnexpectedException ()
-    {
-    super();
+    public UnexpectedException() {
+        super();
     }
 
-    public UnexpectedException (String s)
-    {
-    super(s);
+    public UnexpectedException(String s) {
+        super(s);
     }
 
-    public UnexpectedException (String s, int errorcode)
-    {
-    super(s, errorcode);
+    public UnexpectedException(String s, int errorcode) {
+        super(s, errorcode);
     }
-    
+
 }
-
-

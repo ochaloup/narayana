@@ -44,25 +44,23 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Wrapper which alters crash recovery configuration of the tests, such that they use a
- * uniq objectstore dir and in-process cr per process, rather than the previous behaviour
- * of having a shared dir and single cr mgr process per test.
+ * Wrapper which alters crash recovery configuration of the tests, such that
+ * they use a uniq objectstore dir and in-process cr per process, rather than
+ * the previous behaviour of having a shared dir and single cr mgr process per
+ * test.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com), 2010-04
  */
-public class ExecutionWrapper
-{
+public class ExecutionWrapper {
     private static final File recMgrFile = new File(System.getProperty("java.io.tmpdir"), "recMgrLockFile");
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         String className = args[0];
-        String[] subArgs = new String[args.length-1];
-        System.arraycopy(args, 1, subArgs, 0, args.length-1);
+        String[] subArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, subArgs, 0, args.length - 1);
 
-        if(className.equals("com.arjuna.ats.arjuna.recovery.RecoveryManager"))
-        {
-            if(!recMgrFile.createNewFile()) {
+        if (className.equals("com.arjuna.ats.arjuna.recovery.RecoveryManager")) {
+            if (!recMgrFile.createNewFile()) {
                 System.err.println("Recovery manager already running?");
                 System.exit(-1);
             }
@@ -70,56 +68,59 @@ public class ExecutionWrapper
             recMgrFile.deleteOnExit();
             System.out.println("Ready");
             Thread.sleep(Long.MAX_VALUE);
-        }
-        else if(className.equals("org.jboss.jbossts.qa.Utils.EmptyObjectStore"))
-        {
+        } else if (className.equals("org.jboss.jbossts.qa.Utils.EmptyObjectStore")) {
             String objectStoreBaseDirBaseName = System.getProperty("ObjectStoreBaseDir");
-            // strip off the trailing '/emptyObjectStore' to get the test rather than task dir
-            objectStoreBaseDirBaseName = objectStoreBaseDirBaseName.substring(0, objectStoreBaseDirBaseName.lastIndexOf(System.getProperty("file.separator")));
+            // strip off the trailing '/emptyObjectStore' to get the test rather
+            // than task dir
+            objectStoreBaseDirBaseName = objectStoreBaseDirBaseName.substring(0,
+                    objectStoreBaseDirBaseName.lastIndexOf(System.getProperty("file.separator")));
 
-            
             File directory = new File(objectStoreBaseDirBaseName);
-            
-            for(File candidateFile : directory.listFiles()) {
-                if(candidateFile.isDirectory()) {
-                    System.err.println("emptying "+candidateFile.getCanonicalPath());
+
+            for (File candidateFile : directory.listFiles()) {
+                if (candidateFile.isDirectory()) {
+                    System.err.println("emptying " + candidateFile.getCanonicalPath());
                     EmptyObjectStore.removeContents(candidateFile);
                 }
             }
-            
+
             System.out.println("Passed");
-        }
-        else
-        {
-            int portOffset = Integer.valueOf(System.getProperty("portOffsetId"))*20;
+        } else {
+            int portOffset = Integer.valueOf(System.getProperty("portOffsetId")) * 20;
 
             int recoveryOrbPortBase = jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort();
-            int recoveryOrbPort = recoveryOrbPortBase+portOffset;
+            int recoveryOrbPort = recoveryOrbPortBase + portOffset;
             jtsPropertyManager.getJTSEnvironmentBean().setRecoveryManagerPort(recoveryOrbPort);
 
             int recoveryManagerPortBase = recoveryPropertyManager.getRecoveryEnvironmentBean().getRecoveryPort();
-            int recoveryManagerPort = recoveryManagerPortBase+portOffset;
+            int recoveryManagerPort = recoveryManagerPortBase + portOffset;
             recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryPort(recoveryManagerPort);
 
-            System.out.println("using ports "+recoveryOrbPort+" and "+recoveryManagerPort);
+            System.out.println("using ports " + recoveryOrbPort + " and " + recoveryManagerPort);
 
             String objectStoreBaseDirBaseName = System.getProperty("ObjectStoreBaseDir");
-            File directory = new File(objectStoreBaseDirBaseName); // full path incl taskName, see TestGroupBase
+            File directory = new File(objectStoreBaseDirBaseName); // full path
+                                                                    // incl
+                                                                    // taskName,
+                                                                    // see
+                                                                    // TestGroupBase
 
             File hornetqStoreDir = new File(directory, "HornetQStore");
-            //additionalCommandLineElements.add("-DHornetqJournalEnvironmentBean.storeDir="+hornetqStoreDir);
+            // additionalCommandLineElements.add("-DHornetqJournalEnvironmentBean.storeDir="+hornetqStoreDir);
 
             BeanPopulator.getDefaultInstance(HornetqJournalEnvironmentBean.class)
-                .setStoreDir(hornetqStoreDir.getCanonicalPath());
+                    .setStoreDir(hornetqStoreDir.getCanonicalPath());
             BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class)
                     .setObjectStoreType("com.arjuna.ats.internal.arjuna.objectstore.hornetq.HornetqObjectStoreAdaptor");
-/*
-
-    [junit] Running org.jboss.jbossts.qa.junit.testgroup.TestGroup_txcore_recovery
-    [junit] Tests run: 36, Failures: 24, Errors: 0, Time elapsed: 971.637 sec
-    [junit] Test org.jboss.jbossts.qa.junit.testgroup.TestGroup_txcore_recovery FAILED
- */
-
+            /*
+             * 
+             * [junit] Running
+             * org.jboss.jbossts.qa.junit.testgroup.TestGroup_txcore_recovery
+             * [junit] Tests run: 36, Failures: 24, Errors: 0, Time elapsed:
+             * 971.637 sec [junit] Test
+             * org.jboss.jbossts.qa.junit.testgroup.TestGroup_txcore_recovery
+             * FAILED
+             */
 
             File ostoreDir = new File(directory, "ObjectStore");
             BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class)
@@ -129,14 +130,15 @@ public class ExecutionWrapper
             BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "stateStore")
                     .setObjectStoreDir(ostoreDir.getCanonicalPath());
 
-
             final Properties p = new Properties();
-            p.setProperty("OAPort", ""+recoveryOrbPort);
+            p.setProperty("OAPort", "" + recoveryOrbPort);
 
-            // for persistent servers the JavaIdl orb requires you to explicitly define which port the 
-            // server will run on and to provide a unique id per server per machine:
-            p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""+recoveryOrbPort);
-            p.setProperty("com.sun.CORBA.POA.ORBServerId", ""+recoveryOrbPort);
+            // for persistent servers the JavaIdl orb requires you to explicitly
+            // define which port the
+            // server will run on and to provide a unique id per server per
+            // machine:
+            p.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", "" + recoveryOrbPort);
+            p.setProperty("com.sun.CORBA.POA.ORBServerId", "" + recoveryOrbPort);
 
             initOrb(p, 10, recoveryOrbPort, args);
 
@@ -144,11 +146,11 @@ public class ExecutionWrapper
 
             Class clazz = Class.forName(className);
 
-            Method mainMethod = clazz.getMethod("main", new Class[] {subArgs.getClass()});
+            Method mainMethod = clazz.getMethod("main", new Class[]{subArgs.getClass()});
 
             before();
 
-            mainMethod.invoke(null, new Object[] {subArgs});
+            mainMethod.invoke(null, new Object[]{subArgs});
 
             after();
 
@@ -160,11 +162,15 @@ public class ExecutionWrapper
 
     /**
      * initialize the orb and OA
+     * 
      * @param orbProps
-     * @param retryCount when a socket is closed it transitions into the TIME_WAIT state so it is not always immediately
-     *                   available the next time the orb is initialized. To avoid this problem of rapid recycling of
-     *                   ports between tests we allow retries - note that there is a real time delay before
-     *                   each retry attempt to give the socket close protocol sufficient time to complete.
+     * @param retryCount
+     *            when a socket is closed it transitions into the TIME_WAIT
+     *            state so it is not always immediately available the next time
+     *            the orb is initialized. To avoid this problem of rapid
+     *            recycling of ports between tests we allow retries - note that
+     *            there is a real time delay before each retry attempt to give
+     *            the socket close protocol sufficient time to complete.
      * @param recoveryOrbPort
      * @param args
      */
@@ -172,7 +178,8 @@ public class ExecutionWrapper
         int i = 0;
 
         while (!isAvailable("127.0.0.1", recoveryOrbPort)) {
-            // probably recycling port allocation too fast. wait a bit and retry.
+            // probably recycling port allocation too fast. wait a bit and
+            // retry.
             if (i >= retryCount) {
                 System.err.printf("orb port %d still in use after %d seconds%n", recoveryOrbPort, (retryCount * 10));
                 fingerCulprit(recoveryOrbPort);
@@ -183,7 +190,8 @@ public class ExecutionWrapper
             System.err.printf("orb port %d is in use%n", recoveryOrbPort);
 
             try {
-                Thread.sleep(10000);  // was 2000 * i  CrashRecovery02_2_Test26 seems to take quite a while
+                Thread.sleep(10000); // was 2000 * i CrashRecovery02_2_Test26
+                                        // seems to take quite a while
             } catch (InterruptedException e1) {
                 throw new RuntimeException(e1);
             }
@@ -191,7 +199,8 @@ public class ExecutionWrapper
 
         try {
             ORBInterface.initORB(args, orbProps);
-            OAInterface.initializeOA(); // don't use initOA because it swallows exception!
+            OAInterface.initializeOA(); // don't use initOA because it swallows
+                                        // exception!
         } catch (InvalidName invalidName) {
             invalidName.printStackTrace();
 
@@ -212,12 +221,14 @@ public class ExecutionWrapper
     }
 
     /**
-     * Find out which process has a particular port open and print its pid, its command line and,
-     * if its a JVM its stack traces.
+     * Find out which process has a particular port open and print its pid, its
+     * command line and, if its a JVM its stack traces.
      *
-     * Only works on platforms that have the lsof command, the proc fs and the jstack command
+     * Only works on platforms that have the lsof command, the proc fs and the
+     * jstack command
      *
-     * @param port port number to debug
+     * @param port
+     *            port number to debug
      * @throws Exception
      */
     public static void fingerCulprit(int port) {
@@ -268,7 +279,7 @@ public class ExecutionWrapper
         return s;
     }
 
-    private static Process startProcess(String ... args) throws Exception {
+    private static Process startProcess(String... args) throws Exception {
         List<String> pArgs = new ArrayList<String>();
 
         for (String arg : args)
@@ -280,14 +291,12 @@ public class ExecutionWrapper
         return p;
     }
 
-    private static void before()
-    {
-        //System.out.println("before");
+    private static void before() {
+        // System.out.println("before");
     }
 
-    private static void after()
-    {
-        //System.out.println("after");
+    private static void after() {
+        // System.out.println("after");
         StoreManager.shutdown();
     }
 }

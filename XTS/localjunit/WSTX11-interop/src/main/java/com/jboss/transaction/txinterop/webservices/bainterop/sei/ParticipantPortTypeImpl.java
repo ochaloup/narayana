@@ -43,14 +43,13 @@ import org.xmlsoap.schemas.soap.envelope.Fault;
 /**
  * Implementation class for WSTX 1.1 AT Interop Test Initiator service
  */
-@WebService(name = "ParticipantPortType",
-        targetNamespace = "http://fabrikam123.com/wsba",
-        portName="ParticipantPortType",
+@WebService(name = "ParticipantPortType", targetNamespace = "http://fabrikam123.com/wsba", portName = "ParticipantPortType",
         // wsdlLocation="/WEB-INF/wsdl/interopba-participant-binding.wsdl",
-        serviceName="ParticipantService")
-@Addressing(required=true)
-@HandlerChain(file="participanthandlers.xml")
-public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaultPortType
+        serviceName = "ParticipantService")
+@Addressing(required = true)
+@HandlerChain(file = "participanthandlers.xml")
+public class ParticipantPortTypeImpl // implements ParticipantPortType,
+                                        // SoapFaultPortType
 {
 
     /**
@@ -64,10 +63,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "Cancel", action = "http://fabrikam123.com/wsba/Cancel")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/Cancel")
+    @Action(input = "http://fabrikam123.com/wsba/Cancel")
     @RequestWrapper(localName = "Cancel", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void cancel()
-    {
+    public void cancel() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -85,10 +83,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "Exit", action = "http://fabrikam123.com/wsba/Exit")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/Exit")
+    @Action(input = "http://fabrikam123.com/wsba/Exit")
     @RequestWrapper(localName = "Exit", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void exit()
-    {
+    public void exit() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -106,10 +103,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "Fail", action = "http://fabrikam123.com/wsba/Fail")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/Fail")
+    @Action(input = "http://fabrikam123.com/wsba/Fail")
     @RequestWrapper(localName = "Fail", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void fail()
-    {
+    public void fail() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -127,10 +123,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "CannotComplete", action = "http://fabrikam123.com/wsba/CannotComplete")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/CannotComplete")
+    @Action(input = "http://fabrikam123.com/wsba/CannotComplete")
     @RequestWrapper(localName = "CannotComplete", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void cannotComplete()
-    {
+    public void cannotComplete() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -148,10 +143,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "ParticipantCompleteClose", action = "http://fabrikam123.com/wsba/ParticipantCompleteClose")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/ParticipantCompleteClose")
+    @Action(input = "http://fabrikam123.com/wsba/ParticipantCompleteClose")
     @RequestWrapper(localName = "ParticipantCompleteClose", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void participantCompleteClose()
-    {
+    public void participantCompleteClose() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -169,10 +163,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "CoordinatorCompleteClose", action = "http://fabrikam123.com/wsba/CoordinatorCompleteClose")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/CoordinatorCompleteClose")
+    @Action(input = "http://fabrikam123.com/wsba/CoordinatorCompleteClose")
     @RequestWrapper(localName = "CoordinatorCompleteClose", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void coordinatorCompleteClose()
-    {
+    public void coordinatorCompleteClose() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -190,10 +183,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "UnsolicitedComplete", action = "http://fabrikam123.com/wsba/UnsolicitedComplete")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/UnsolicitedComplete")
+    @Action(input = "http://fabrikam123.com/wsba/UnsolicitedComplete")
     @RequestWrapper(localName = "UnsolicitedComplete", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void unsolicitedComplete()
-    {
+    public void unsolicitedComplete() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -211,10 +203,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "Compensate", action = "http://fabrikam123.com/wsba/Compensate")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/Compensate")
+    @Action(input = "http://fabrikam123.com/wsba/Compensate")
     @RequestWrapper(localName = "Compensate", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void compensate()
-    {
+    public void compensate() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -232,10 +223,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "CompensationFail", action = "http://fabrikam123.com/wsba/CompensationFail")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/CompensationFail")
+    @Action(input = "http://fabrikam123.com/wsba/CompensationFail")
     @RequestWrapper(localName = "CompensationFail", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void compensationFail()
-    {
+    public void compensationFail() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -253,10 +243,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "ParticipantCancelCompletedRace", action = "http://fabrikam123.com/wsba/ParticipantCancelCompletedRace")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/ParticipantCancelCompletedRace")
+    @Action(input = "http://fabrikam123.com/wsba/ParticipantCancelCompletedRace")
     @RequestWrapper(localName = "ParticipantCancelCompletedRace", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void participantCancelCompletedRace()
-    {
+    public void participantCancelCompletedRace() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -274,10 +263,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "MessageLossAndRecovery", action = "http://fabrikam123.com/wsba/MessageLossAndRecovery")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/MessageLossAndRecovery")
+    @Action(input = "http://fabrikam123.com/wsba/MessageLossAndRecovery")
     @RequestWrapper(localName = "MessageLossAndRecovery", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void messageLossAndRecovery()
-    {
+    public void messageLossAndRecovery() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -295,10 +283,9 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
      */
     @WebMethod(operationName = "MixedOutcome", action = "http://fabrikam123.com/wsba/MixedOutcome")
     @Oneway
-    @Action(input="http://fabrikam123.com/wsba/MixedOutcome")
+    @Action(input = "http://fabrikam123.com/wsba/MixedOutcome")
     @RequestWrapper(localName = "MixedOutcome", targetNamespace = "http://fabrikam123.com/wsba", className = "com.jboss.transaction.txinterop.webservices.bainterop.generated.TestMessageType")
-    public void mixedOutcome()
-    {
+    public void mixedOutcome() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
         CoordinationContextType coordinationContext = CoordinationContextManager.getContext(ctx);
@@ -314,17 +301,20 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
     /**
      * send an acknowledgement notifying a successfuly processed request
      *
-     * @param inboundMap identifes who to reply to and what message id the response should relate to
+     * @param inboundMap
+     *            identifes who to reply to and what message id the response
+     *            should relate to
      */
-    private void sendResponse(MAP inboundMap)
-    {
+    private void sendResponse(MAP inboundMap) {
         MAP outboundAddressProperties = AddressingHelper.createResponseContext(inboundMap, MessageId.getMessageId());
 
         try {
             InitiatorClient.getClient().sendResponse(outboundAddressProperties);
         } catch (Throwable th) {
             String to = outboundAddressProperties.getTo();
-            System.out.println("com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_1: unable to send response to " + to);
+            System.out.println(
+                    "com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_1: unable to send response to "
+                            + to);
             throw new ProtocolException(th);
         }
     }
@@ -332,27 +322,29 @@ public class ParticipantPortTypeImpl // implements ParticipantPortType, SoapFaul
     /**
      * send a soap fault notifying an unsuccessfuly processed request
      *
-     * @param inboundMap identifes who to reply to and what message id the fault message should relate to
+     * @param inboundMap
+     *            identifes who to reply to and what message id the fault
+     *            message should relate to
      */
-    private void sendSoapFault(MAP inboundMap, SoapFault11 sf)
-    {
+    private void sendSoapFault(MAP inboundMap, SoapFault11 sf) {
         MAP outboundAddressProperties = AddressingHelper.createResponseContext(inboundMap, MessageId.getMessageId());
 
         try {
             InitiatorClient.getClient().sendSoapFault(outboundAddressProperties, sf);
         } catch (Throwable th) {
-            System.out.println("com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_2: unable to log soap fault " + sf);
+            System.out.println(
+                    "com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_2: unable to log soap fault "
+                            + sf);
             throw new ProtocolException(th);
         }
     }
 
-
     public void soapFault(
-            @WebParam(name = "Fault", targetNamespace = "http://schemas.xmlsoap.org/soap/envelope/", partName = "fault")
-            Fault fault)
-    {
+            @WebParam(name = "Fault", targetNamespace = "http://schemas.xmlsoap.org/soap/envelope/", partName = "fault") Fault fault) {
         // hmm, probably ought not to happen -- just log this as an error
         SoapFault11 soapFaultInternal = SoapFault11.fromFault(fault);
-        System.out.println("com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_3: unexpected soap fault " + soapFaultInternal);
+        System.out.println(
+                "com.jboss.transaction.txinterop.webservices.bainterop.sei.ParticipantPortTypeImpl_3: unexpected soap fault "
+                        + soapFaultInternal);
     }
 }

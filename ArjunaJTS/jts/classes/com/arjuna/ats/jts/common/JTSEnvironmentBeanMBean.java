@@ -25,8 +25,7 @@ package com.arjuna.ats.jts.common;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public interface JTSEnvironmentBeanMBean
-{
+public interface JTSEnvironmentBeanMBean {
     boolean isTransactionManager();
 
     boolean isNeedTranContext();

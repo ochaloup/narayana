@@ -77,16 +77,13 @@ import java.util.Iterator;
  * @since 1.0.
  */
 
-public class ActivityImple
-{
+public class ActivityImple {
 
-    public ActivityImple (String coordinationType)
-    {
+    public ActivityImple(String coordinationType) {
         this(null, coordinationType);
     }
 
-    public ActivityImple (ActivityImple parent, String serviceType)
-    {
+    public ActivityImple(ActivityImple parent, String serviceType) {
         _parent = parent;
         _children = new Hashtable();
         _status = Created.instance();
@@ -111,14 +108,10 @@ public class ActivityImple
      *                Thrown in any other situation.
      */
 
-    public void start () throws WrongStateException, SystemException
-    {
-        try
-        {
+    public void start() throws WrongStateException, SystemException {
+        try {
             start(0);
-        }
-        catch (InvalidTimeoutException ex)
-        {
+        } catch (InvalidTimeoutException ex) {
         }
     }
 
@@ -142,44 +135,33 @@ public class ActivityImple
      *
      */
 
-    public void start (int timeout) throws WrongStateException,
-            InvalidTimeoutException, SystemException
-    {
+    public void start(int timeout) throws WrongStateException, InvalidTimeoutException, SystemException {
         if (timeout < 0)
             throw new InvalidTimeoutException();
 
-        synchronized (this)
-        {
+        synchronized (this) {
             _timeout = timeout;
 
-            if (_status.equals(Created.instance()))
-            {
-                try
-                {
+            if (_status.equals(Created.instance())) {
+                try {
                     if (_parent != null)
                         _parent.addChild(this);
-                }
-                catch (InvalidActivityException ex)
-                {
+                } catch (InvalidActivityException ex) {
                     _status = Completed.instance();
 
                     throw new WrongStateException(ex.toString());
                 }
 
-                if (_timeout > 0)
-                {
-                    if (!ActivityReaper.activityReaper(true).insert(this, _timeout))
-                    {
+                if (_timeout > 0) {
+                    if (!ActivityReaper.activityReaper(true).insert(this, _timeout)) {
                         setCompletionStatus(FailureOnly.instance());
                     }
                 }
 
                 _status = Active.instance();
-            }
-            else
+            } else
                 throw new WrongStateException(
-                        wsasLogger.i18NLogger.get_activity_ActivityImple_1()
-                                + " " + this + " " + _status);
+                        wsasLogger.i18NLogger.get_activity_ActivityImple_1() + " " + this + " " + _status);
         }
     }
 
@@ -207,9 +189,8 @@ public class ActivityImple
      * @see com.arjuna.mw.wsas.Outcome
      */
 
-    public Outcome end () throws InvalidActivityException, WrongStateException,
-            ProtocolViolationException, NoPermissionException, SystemException
-    {
+    public Outcome end() throws InvalidActivityException, WrongStateException, ProtocolViolationException,
+            NoPermissionException, SystemException {
         return end(_completionStatus);
     }
 
@@ -217,7 +198,8 @@ public class ActivityImple
      * Complete the activity with the completion status provided.
      *
      *
-     * @param cs The CompletionStatus to use.
+     * @param cs
+     *            The CompletionStatus to use.
      * 
      * @exception InvalidActivityException
      *                Thrown if the current activity is not known about by the
@@ -242,10 +224,8 @@ public class ActivityImple
      *
      */
 
-    public Outcome end (com.arjuna.mw.wsas.completionstatus.CompletionStatus cs)
-            throws InvalidActivityException, WrongStateException,
-            ProtocolViolationException, NoPermissionException, SystemException
-    {
+    public Outcome end(com.arjuna.mw.wsas.completionstatus.CompletionStatus cs) throws InvalidActivityException,
+            WrongStateException, ProtocolViolationException, NoPermissionException, SystemException {
         /*
          * TODO
          *
@@ -253,46 +233,36 @@ public class ActivityImple
          * completing.
          */
 
-        synchronized (this)
-        {
-            if (_status.equals(Active.instance()))
-            {
-                if (activeChildren())
-                {
+        synchronized (this) {
+            if (_status.equals(Active.instance())) {
+                if (activeChildren()) {
                     /*
                      * Can we do equivalent of rollback on all children and then
                      * rollback this?
                      */
 
                     throw new InvalidActivityException(
-                            wsasLogger.i18NLogger.get_activity_ActivityImple_2()
-                                    + " " + this);
+                            wsasLogger.i18NLogger.get_activity_ActivityImple_2() + " " + this);
                 }
 
                 Outcome result = null;
 
-                try
-                {
+                try {
                     setCompletionStatus(cs);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     // ignore and complete with the status we have.
                 }
 
                 _status = Completing.instance();
 
-                try
-                {
+                try {
                     HLS hls = HLSManager.getHighLevelService(_serviceType);
                     if (hls != null) {
                         result = hls.complete(getCompletionStatus());
                     } else {
                         result = new OutcomeImple(Failure.instance());
                     }
-                }
-                catch (SystemException ex)
-                {
+                } catch (SystemException ex) {
                     /*
                      * Currently if an exception occurs and we get here, then we
                      * forget all of the other outcomes and just return the
@@ -301,12 +271,10 @@ public class ActivityImple
                      * which have not?
                      */
 
-                    result = new OutcomeImple(new HLSException(ex),
-                            Failure.instance());
+                    result = new OutcomeImple(new HLSException(ex), Failure.instance());
                 }
 
-                if (_parent != null)
-                {
+                if (_parent != null) {
                     _parent.removeChild(this);
                     _parent = null;
                 }
@@ -316,18 +284,13 @@ public class ActivityImple
                 _result = result;
 
                 return _result;
-            }
-            else
-            {
+            } else {
                 if (_result != null)
                     return _result;
-                else
-                {
+                else {
                     // we can't have terminated yet!
 
-                    throw new WrongStateException(
-                            wsasLogger.i18NLogger.get_activity_ActivityImple_3()
-                                    + " " + _status);
+                    throw new WrongStateException(wsasLogger.i18NLogger.get_activity_ActivityImple_3() + " " + _status);
                 }
             }
         }
@@ -353,21 +316,15 @@ public class ActivityImple
      *
      */
 
-    public void setCompletionStatus (CompletionStatus endStatus)
-            throws WrongStateException, SystemException
-    {
-        synchronized (this)
-        {
-            if (_status.equals(Active.instance()))
-            {
+    public void setCompletionStatus(CompletionStatus endStatus) throws WrongStateException, SystemException {
+        synchronized (this) {
+            if (_status.equals(Active.instance())) {
                 completionValid(endStatus);
 
                 _completionStatus = endStatus;
-            }
-            else
+            } else
                 throw new WrongStateException(
-                        wsasLogger.i18NLogger.get_activity_ActivityImple_4()
-                                + " " + this + " " + _status);
+                        wsasLogger.i18NLogger.get_activity_ActivityImple_4() + " " + this + " " + _status);
         }
     }
 
@@ -383,10 +340,8 @@ public class ActivityImple
      * @return the termination status for the current activity, if any.
      */
 
-    public CompletionStatus getCompletionStatus () throws SystemException
-    {
-        synchronized (this)
-        {
+    public CompletionStatus getCompletionStatus() throws SystemException {
+        synchronized (this) {
             return _completionStatus;
         }
     }
@@ -401,8 +356,7 @@ public class ActivityImple
      *         timeout has been provided.
      */
 
-    public int getTimeout () throws SystemException
-    {
+    public int getTimeout() throws SystemException {
         return _timeout;
     }
 
@@ -416,10 +370,8 @@ public class ActivityImple
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status () throws SystemException
-    {
-        synchronized (this)
-        {
+    public com.arjuna.mw.wsas.status.Status status() throws SystemException {
+        synchronized (this) {
             return _status;
         }
     }
@@ -437,13 +389,11 @@ public class ActivityImple
      * @return the name of the activity.
      */
 
-    public String activityName () throws NoActivityException, SystemException
-    {
+    public String activityName() throws NoActivityException, SystemException {
         return "ActivityImple: " + toString();
     }
 
-    public String toString ()
-    {
+    public String toString() {
         return _activityId.stringForm();
     }
 
@@ -451,8 +401,7 @@ public class ActivityImple
      * @return the unique identifier for this activity.
      */
 
-    public GlobalId getGlobalId ()
-    {
+    public GlobalId getGlobalId() {
         return _activityId;
     }
 
@@ -460,8 +409,7 @@ public class ActivityImple
      * @return The parent of the activity, or null if it is top-level.
      */
 
-    public ActivityImple parent ()
-    {
+    public ActivityImple parent() {
         return _parent;
     }
 
@@ -469,15 +417,13 @@ public class ActivityImple
      *
      * @return the type of the coordinator employed for this activity
      */
-    public String serviceType()
-    {
+    public String serviceType() {
         return _serviceType;
     }
     /**
      */
 
-    public boolean equals (Object obj)
-    {
+    public boolean equals(Object obj) {
 
         if (obj == null)
             return false;
@@ -498,13 +444,11 @@ public class ActivityImple
      * element is the parent.
      */
 
-    public ActivityImple[] hierarchy ()
-    {
+    public ActivityImple[] hierarchy() {
         Stack hier = new Stack();
         ActivityImple ptr = this;
 
-        while (ptr != null)
-        {
+        while (ptr != null) {
             hier.push(ptr);
 
             ptr = ptr.parent();
@@ -532,20 +476,15 @@ public class ActivityImple
      *
      */
 
-    public final void completionValid (CompletionStatus cs)
-            throws WrongStateException
-    {
-        if (!_completionStatus.equals(cs))
-        {
+    public final void completionValid(CompletionStatus cs) throws WrongStateException {
+        if (!_completionStatus.equals(cs)) {
             if (_completionStatus.equals(FailureOnly.instance()))
                 throw new WrongStateException(
-                        wsasLogger.i18NLogger.get_activity_ActivityImple_5()
-                                + " " + _completionStatus + " " + cs);
+                        wsasLogger.i18NLogger.get_activity_ActivityImple_5() + " " + _completionStatus + " " + cs);
         }
     }
 
-    public int hashCode ()
-    {
+    public int hashCode() {
         return _activityId.hashCode();
     }
 
@@ -565,23 +504,15 @@ public class ActivityImple
      *
      */
 
-    final void addChild (ActivityImple child) throws WrongStateException,
-            InvalidActivityException, SystemException
-    {
+    final void addChild(ActivityImple child) throws WrongStateException, InvalidActivityException, SystemException {
         if (child == null)
-            throw new InvalidActivityException(
-                    wsasLogger.i18NLogger.get_activity_ActivityImple_6());
+            throw new InvalidActivityException(wsasLogger.i18NLogger.get_activity_ActivityImple_6());
 
-        synchronized (this)
-        {
-            if (_status.equals(Active.instance()))
-            {
+        synchronized (this) {
+            if (_status.equals(Active.instance())) {
                 _children.put(child.getGlobalId(), child);
-            }
-            else
-                throw new WrongStateException(
-                        wsasLogger.i18NLogger.get_activity_ActivityImple_7()
-                                + " " + _status);
+            } else
+                throw new WrongStateException(wsasLogger.i18NLogger.get_activity_ActivityImple_7() + " " + _status);
         }
     }
 
@@ -601,53 +532,35 @@ public class ActivityImple
      *
      */
 
-    final void removeChild (ActivityImple child) throws WrongStateException,
-            InvalidActivityException, SystemException
-    {
+    final void removeChild(ActivityImple child) throws WrongStateException, InvalidActivityException, SystemException {
         if (child == null)
-            throw new InvalidActivityException(
-                    wsasLogger.i18NLogger.get_activity_ActivityImple_8());
+            throw new InvalidActivityException(wsasLogger.i18NLogger.get_activity_ActivityImple_8());
 
-        synchronized (this)
-        {
-            if (_status.equals(Active.instance()))
-            {
+        synchronized (this) {
+            if (_status.equals(Active.instance())) {
                 if (_children.get(child.getGlobalId()) == null)
-                    throw new InvalidActivityException(
-                            wsasLogger.i18NLogger.get_activity_ActivityImple_9()
-                                    + child);
-            }
-            else
-                throw new WrongStateException(
-                        wsasLogger.i18NLogger.get_activity_ActivityImple_10()
-                                + _status);
+                    throw new InvalidActivityException(wsasLogger.i18NLogger.get_activity_ActivityImple_9() + child);
+            } else
+                throw new WrongStateException(wsasLogger.i18NLogger.get_activity_ActivityImple_10() + _status);
         }
     }
 
     /**
      * @return <code>true</code> if this activity has active children, <code>
-     * false</code>
-     *         otherwise.
+     * false</code> otherwise.
      */
 
-    private final boolean activeChildren ()
-    {
+    private final boolean activeChildren() {
         Enumeration e = _children.keys();
 
-        while (e.hasMoreElements())
-        {
+        while (e.hasMoreElements()) {
             ActivityImple child = (ActivityImple) _children.get(e.nextElement());
 
-            try
-            {
-                if ((child != null)
-                        && (child.status().equals(Active.instance())))
-                {
+            try {
+                if ((child != null) && (child.status().equals(Active.instance()))) {
                     return true;
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 return true; // what else can we do?
             }
         }

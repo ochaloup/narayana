@@ -45,11 +45,9 @@ import com.arjuna.ats.internal.jts.orbspecific.ibmorb.recoverycoordinators.JavaI
 import com.arjuna.ats.internal.jts.orbspecific.ibmorb.recoverycoordinators.JavaIdlRecoveryInit;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class IbmORBRecoveryUnitTest extends TestBase
-{
+public class IbmORBRecoveryUnitTest extends TestBase {
     @Test
-    public void testORBRCManager () throws Exception
-    {
+    public void testORBRCManager() throws Exception {
         JavaIdlRCManager manager = new JavaIdlRCManager();
         RecoveryCoordinator rc = manager.makeRC(new Uid(), new Uid(), new Uid(), false);
 
@@ -60,8 +58,7 @@ public class IbmORBRecoveryUnitTest extends TestBase
     }
 
     @Test
-    public void testORBRCShutdown () throws Exception
-    {
+    public void testORBRCShutdown() throws Exception {
         JavaIdlRCShutdown shutdown = new JavaIdlRCShutdown();
 
         shutdown.work();
@@ -69,8 +66,7 @@ public class IbmORBRecoveryUnitTest extends TestBase
 
     @Test
     @Ignore // TODO this needs fixing
-    public void testInit () throws Exception
-    {
+    public void testInit() throws Exception {
         JavaIdlRCServiceInit init = new JavaIdlRCServiceInit();
 
         assertFalse(init.startRCservice());
@@ -82,8 +78,7 @@ public class IbmORBRecoveryUnitTest extends TestBase
 
     @Test
     @Ignore // TODO this needs fixing
-    public void testRecoveryInit () throws Exception
-    {
+    public void testRecoveryInit() throws Exception {
         JavaIdlRCServiceInit init = new JavaIdlRCServiceInit();
 
         assertFalse(init.startRCservice());
@@ -92,21 +87,12 @@ public class IbmORBRecoveryUnitTest extends TestBase
 
         JavaIdlRCServiceInit.shutdownRCService();
     }
-/*
-    @Test
-    public void testRecoverIOR () throws Exception
-    {
-        try
-        {
-            String iorString = RecoverIOR.newObjectKey("foo", "bar");
-
-            assertTrue(iorString != null);
-
-            RecoverIOR.printIORinfo(iorString);
-        }
-        catch (final Exception ex)
-        {
-        }
-    }*/
+    /*
+     * @Test public void testRecoverIOR () throws Exception { try { String
+     * iorString = RecoverIOR.newObjectKey("foo", "bar");
+     * 
+     * assertTrue(iorString != null);
+     * 
+     * RecoverIOR.printIORinfo(iorString); } catch (final Exception ex) { } }
+     */
 }
-

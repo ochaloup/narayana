@@ -69,28 +69,24 @@ public class TestCommitMarkableResource extends TestCommitMarkableResourceBase {
         // Test code
         Utils.createTables(dataSource.getConnection());
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
         Connection localJDBCConnection = dataSource.getConnection();
         localJDBCConnection.setAutoCommit(false);
-        XAResource nonXAResource = new JDBCConnectableResource(
-                localJDBCConnection);
+        XAResource nonXAResource = new JDBCConnectableResource(localJDBCConnection);
         tm.getTransaction().enlistResource(nonXAResource);
 
         tm.getTransaction().enlistResource(new DummyXAResource());
 
-        localJDBCConnection.createStatement().execute(
-                "INSERT INTO foo (bar) VALUES (1)");
+        localJDBCConnection.createStatement().execute("INSERT INTO foo (bar) VALUES (1)");
 
         tm.commit();
 
         // This is test code, it allows us to verify that the correct XID was
         // removed
-        Xid committed = ((JDBCConnectableResource) nonXAResource)
-                .getStartedXid();
+        Xid committed = ((JDBCConnectableResource) nonXAResource).getStartedXid();
         assertNotNull(committed);
 
         // We can't just instantiate one as we need to be using the same one as
@@ -115,13 +111,11 @@ public class TestCommitMarkableResource extends TestCommitMarkableResourceBase {
         new InitialContext().rebind("commitmarkableresource", dataSource);
         // Run the first pass it will load the committed Xids into memory
         recoveryModule.periodicWorkFirstPass();
-        assertTrue(recoveryModule.wasCommitted("commitmarkableresource",
-                committed));
+        assertTrue(recoveryModule.wasCommitted("commitmarkableresource", committed));
         recoveryModule.periodicWorkSecondPass();
 
         // Make sure that the resource was GC'd by the CRRRM
-        assertFalse(recoveryModule.wasCommitted("commitmarkableresource",
-                committed));
+        assertFalse(recoveryModule.wasCommitted("commitmarkableresource", committed));
     }
 
 }

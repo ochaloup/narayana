@@ -34,25 +34,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-public class FileServerIORStore implements ServerIORStorePlugin
-{
-    public void initialise() throws Exception
-    {
+public class FileServerIORStore implements ServerIORStorePlugin {
+    public void initialise() throws Exception {
         // Ignore
     }
 
-    public void storeIOR(String serverName, String serverIOR) throws Exception
-    {
+    public void storeIOR(String serverName, String serverIOR) throws Exception {
         Properties serverIORs = new Properties();
 
-        try
-        {
+        try {
             FileInputStream serverIORsFileInputStream = new FileInputStream("ServerIORs");
             serverIORs.load(serverIORsFileInputStream);
             serverIORsFileInputStream.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
         }
 
         serverIORs.put(serverName, serverIOR);
@@ -62,8 +56,7 @@ public class FileServerIORStore implements ServerIORStorePlugin
         serverIORsFileOutputStream.close();
     }
 
-    public void removeIOR(String serverName) throws Exception
-    {
+    public void removeIOR(String serverName) throws Exception {
         Properties serverIORs = new Properties();
 
         FileInputStream serverIORsFileInputStream = new FileInputStream("ServerIORs");
@@ -77,8 +70,7 @@ public class FileServerIORStore implements ServerIORStorePlugin
         serverIORsFileOutputStream.close();
     }
 
-    public String loadIOR(String serverName) throws Exception
-    {
+    public String loadIOR(String serverName) throws Exception {
         String serverIOR = null;
 
         Properties serverIORs = new Properties();
@@ -92,16 +84,12 @@ public class FileServerIORStore implements ServerIORStorePlugin
         return serverIOR;
     }
 
-    public void remove()
-    {
-        try
-        {
+    public void remove() {
+        try {
             File file = new File("ServerIORs");
 
             file.delete();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Failed to remove \"ServerIORs\": " + exception);
         }
     }

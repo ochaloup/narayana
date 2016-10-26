@@ -35,7 +35,6 @@ import javax.jws.soap.SOAPBinding;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 
-
 /**
  * Implementation of a web service used by txbridge test cases.
  *

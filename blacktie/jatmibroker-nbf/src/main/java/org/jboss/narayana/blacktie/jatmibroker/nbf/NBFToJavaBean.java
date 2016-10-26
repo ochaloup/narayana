@@ -23,7 +23,8 @@ import java.util.Map.Entry;
 
 public class NBFToJavaBean {
 
-    private static final String JBossLicence = "/*\n" + "\tJBoss, Home of Professional Open Source Copyright 2008, Red Hat\n"
+    private static final String JBossLicence = "/*\n"
+            + "\tJBoss, Home of Professional Open Source Copyright 2008, Red Hat\n"
             + "\tMiddleware LLC, and others contributors as indicated by the @authors\n"
             + "\ttag. All rights reserved. See the copyright.txt in the distribution\n"
             + "\tfor a full listing of individual contributors. This copyrighted\n"
@@ -35,7 +36,8 @@ public class NBFToJavaBean {
             + "\tPURPOSE. See the GNU Lesser General Public License for more details.\n"
             + "\tYou should have received a copy of the GNU Lesser General Public\n"
             + "\tLicense, v.2.1 along with this distribution; if not, write to the Free\n"
-            + "\tSoftware Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA\n" + "\t02110-1301, USA.\n" + "*/\n";
+            + "\tSoftware Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA\n" + "\t02110-1301, USA.\n"
+            + "*/\n";
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
@@ -97,23 +99,23 @@ public class NBFToJavaBean {
                 } else if (type.endsWith("_type")) {
                     type = "BT_NBF";
                 }
-                content += "\tpublic " + type + " get" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length())
-                        + "(int index) throws Exception {\n";
+                content += "\tpublic " + type + " get" + name.substring(0, 1).toUpperCase()
+                        + name.substring(1, name.length()) + "(int index) throws Exception {\n";
                 content += "\t\treturn (" + type + ")buffer.btgetattribute(\"" + name + "\", index);\n";
                 content += "\t}\n\n";
 
-                content += "\tpublic void set" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length()) + "("
-                        + type + " value, int index) throws Exception {\n";
+                content += "\tpublic void set" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length())
+                        + "(" + type + " value, int index) throws Exception {\n";
                 content += "\t\tbuffer.btsetattribute(\"" + name + "\", index, value);\n";
                 content += "\t}\n\n";
 
-                content += "\tpublic void add" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length()) + "("
-                        + type + " value) throws Exception {\n";
+                content += "\tpublic void add" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length())
+                        + "(" + type + " value) throws Exception {\n";
                 content += "\t\tbuffer.btaddattribute(\"" + name + "\", value);\n";
                 content += "\t}\n\n";
 
-                content += "\tpublic void remove" + name.substring(0, 1).toUpperCase() + name.substring(1, name.length())
-                        + "(int index) throws Exception {\n";
+                content += "\tpublic void remove" + name.substring(0, 1).toUpperCase()
+                        + name.substring(1, name.length()) + "(int index) throws Exception {\n";
                 content += "\t\tbuffer.btdelattribute(\"" + name + "\", index);\n";
                 content += "\t}\n\n";
             }

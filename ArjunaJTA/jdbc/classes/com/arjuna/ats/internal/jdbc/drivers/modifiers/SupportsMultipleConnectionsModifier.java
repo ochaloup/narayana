@@ -41,26 +41,22 @@ public class SupportsMultipleConnectionsModifier implements XAModifier, Connecti
     }
 
     @Override
-    public XAConnection getConnection(XAConnection conn) throws SQLException,
-            NotImplementedException {
+    public XAConnection getConnection(XAConnection conn) throws SQLException, NotImplementedException {
         throw new NotImplementedException(); // NEVER CALLED
     }
 
     @Override
-    public boolean supportsMultipleConnections() throws SQLException,
-            NotImplementedException {
+    public boolean supportsMultipleConnections() throws SQLException, NotImplementedException {
         return true; // This ensures connection close is delayed
     }
 
     @Override
-    public void setIsolationLevel(Connection conn, int level)
-            throws SQLException, NotImplementedException {
+    public void setIsolationLevel(Connection conn, int level) throws SQLException, NotImplementedException {
         // Non-modifier path does not call this
     }
 
     @Override
-    public int xaStartParameters(int level) throws SQLException,
-            NotImplementedException {
+    public int xaStartParameters(int level) throws SQLException, NotImplementedException {
         return level;
     }
 

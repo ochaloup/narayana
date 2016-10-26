@@ -44,11 +44,9 @@ import com.arjuna.ats.internal.jts.orbspecific.javaidl.recoverycoordinators.Java
 import com.arjuna.ats.internal.jts.orbspecific.javaidl.recoverycoordinators.JavaIdlRecoveryInit;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class JavaIdlRecoveryUnitTest extends TestBase
-{
+public class JavaIdlRecoveryUnitTest extends TestBase {
     @Test
-    public void testORBRCManager () throws Exception
-    {
+    public void testORBRCManager() throws Exception {
         JavaIdlRCManager manager = new JavaIdlRCManager();
         RecoveryCoordinator rc = manager.makeRC(new Uid(), new Uid(), new Uid(), false);
 
@@ -59,16 +57,14 @@ public class JavaIdlRecoveryUnitTest extends TestBase
     }
 
     @Test
-    public void testORBRCShutdown () throws Exception
-    {
+    public void testORBRCShutdown() throws Exception {
         JavaIdlRCShutdown shutdown = new JavaIdlRCShutdown();
 
         shutdown.work();
     }
 
     @Test
-    public void testInit () throws Exception
-    {
+    public void testInit() throws Exception {
         JavaIdlRCServiceInit init = new JavaIdlRCServiceInit();
 
         assertFalse(init.startRCservice());
@@ -79,8 +75,7 @@ public class JavaIdlRecoveryUnitTest extends TestBase
     }
 
     @Test
-    public void testRecoveryInit () throws Exception
-    {
+    public void testRecoveryInit() throws Exception {
         JavaIdlRCServiceInit init = new JavaIdlRCServiceInit();
 
         assertFalse(init.startRCservice());
@@ -89,21 +84,12 @@ public class JavaIdlRecoveryUnitTest extends TestBase
 
         JavaIdlRCServiceInit.shutdownRCService();
     }
-/*
-    @Test
-    public void testRecoverIOR () throws Exception
-    {
-        try
-        {
-            String iorString = RecoverIOR.newObjectKey("foo", "bar");
-
-            assertTrue(iorString != null);
-
-            RecoverIOR.printIORinfo(iorString);
-        }
-        catch (final Exception ex)
-        {
-        }
-    }*/
+    /*
+     * @Test public void testRecoverIOR () throws Exception { try { String
+     * iorString = RecoverIOR.newObjectKey("foo", "bar");
+     * 
+     * assertTrue(iorString != null);
+     * 
+     * RecoverIOR.printIORinfo(iorString); } catch (final Exception ex) { } }
+     */
 }
-

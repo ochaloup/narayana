@@ -30,68 +30,57 @@ import org.jboss.stm.types.AtomicInteger;
 // TODO maybe pull all of this into a separate jar
 
 @Transactional
-public class AtomicIntegerImpl implements AtomicInteger
-{
-    public AtomicIntegerImpl ()
-    {
+public class AtomicIntegerImpl implements AtomicInteger {
+    public AtomicIntegerImpl() {
         this(0);
     }
-    
-    public AtomicIntegerImpl (int s)
-    {
+
+    public AtomicIntegerImpl(int s) {
         _state = s;
     }
-    
+
     @WriteLock
-    public void set (int val)
-    {
+    public void set(int val) {
         _state = val;
     }
-    
+
     @WriteLock
-    public AtomicInteger increment ()
-    {
+    public AtomicInteger increment() {
         _state++;
-        
+
         return this;
     }
-    
+
     @WriteLock
-    public AtomicInteger decrement ()
-    {
+    public AtomicInteger decrement() {
         _state--;
-        
+
         return this;
     }
-    
+
     @ReadLock
-    public int get ()
-    {
+    public int get() {
         return _state;
     }
-    
+
     @WriteLock
-    public AtomicInteger add (AtomicInteger obj)
-    {
-        if (obj != null)
-        {
+    public AtomicInteger add(AtomicInteger obj) {
+        if (obj != null) {
             _state += obj.get();
         }
-        
+
         return this;
     }
-    
+
     @WriteLock
-    public AtomicInteger subtract (AtomicInteger obj)
-    {
-        if (obj != null)
-        {
+    public AtomicInteger subtract(AtomicInteger obj) {
+        if (obj != null) {
             _state -= obj.get();
         }
-        
+
         return this;
     }
-    
+
     @State
     private int _state;
 }

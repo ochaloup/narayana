@@ -30,16 +30,15 @@ import org.junit.runners.model.Statement;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-03
  */
-public class QATestNameRule implements MethodRule
-{
+public class QATestNameRule implements MethodRule {
     private String groupName;
     private String methodName;
     private Integer parameterSetNumber;
 
     /**
-     * @return the name of the currently running test group.
-     * This is normally the (unqualified) name of the class being run, which
-     * may be a subclass of the one actually containing hte test method.
+     * @return the name of the currently running test group. This is normally
+     *         the (unqualified) name of the class being run, which may be a
+     *         subclass of the one actually containing hte test method.
      */
     public String getGroupName() {
         return groupName;
@@ -52,41 +51,42 @@ public class QATestNameRule implements MethodRule
         return methodName;
     }
 
-    public Integer getParameterSetNumber()
-    {
+    public Integer getParameterSetNumber() {
         return parameterSetNumber;
     }
 
-    public void setParameterSetNumber(Integer parameterSetNumber)
-    {
+    public void setParameterSetNumber(Integer parameterSetNumber) {
         this.parameterSetNumber = parameterSetNumber;
     }
 
     /**
-     * Modifies the method-running {@link org.junit.runners.model.Statement} to implement an additional
-     * test-running rule.
+     * Modifies the method-running {@link org.junit.runners.model.Statement} to
+     * implement an additional test-running rule.
      *
-     * @param base   The {@link org.junit.runners.model.Statement} to be modified
-     * @param method The method to be run
-     * @param target The object on with the method will be run.
-     * @return a new statement, which may be the same as {@code base},
-     *         a wrapper around {@code base}, or a completely new Statement.
+     * @param base
+     *            The {@link org.junit.runners.model.Statement} to be modified
+     * @param method
+     *            The method to be run
+     * @param target
+     *            The object on with the method will be run.
+     * @return a new statement, which may be the same as {@code base}, a wrapper
+     *         around {@code base}, or a completely new Statement.
      */
     @Override
-    public Statement apply(final Statement base, final FrameworkMethod method, final Object target)
-    {
+    public Statement apply(final Statement base, final FrameworkMethod method, final Object target) {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
                 methodName = method.getName();
-                
+
                 groupName = target.getClass().getSimpleName();
-                if(groupName.startsWith("TestGroup_")) {
+                if (groupName.startsWith("TestGroup_")) {
                     groupName = groupName.substring(10);
                 }
 
-                if(includeTest()) {
-                    base.evaluate(); // calls setUp, test, testDown - see BlockJUnit4ClassRunner.methodBlock
+                if (includeTest()) {
+                    base.evaluate(); // calls setUp, test, testDown - see
+                                        // BlockJUnit4ClassRunner.methodBlock
                 }
             }
         };
@@ -94,9 +94,10 @@ public class QATestNameRule implements MethodRule
 
     protected boolean includeTest() {
         String includePattern = System.getProperty("names");
-        if(includePattern != null && methodName != null) {
-            if(!methodName.matches(includePattern)) {
-                System.out.println("QATestNameRule.checkIncludes: skipping test "+methodName+" as it does not match 'names' pattern "+includePattern);
+        if (includePattern != null && methodName != null) {
+            if (!methodName.matches(includePattern)) {
+                System.out.println("QATestNameRule.checkIncludes: skipping test " + methodName
+                        + " as it does not match 'names' pattern " + includePattern);
                 return false;
             }
         }

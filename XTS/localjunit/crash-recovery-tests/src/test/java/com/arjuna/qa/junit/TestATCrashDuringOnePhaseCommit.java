@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class TestATCrashDuringOnePhaseCommit extends BaseCrashTest {
     public TestATCrashDuringOnePhaseCommit() {
-        scriptName ="ATCrashDuringOnePhaseCommit";
+        scriptName = "ATCrashDuringOnePhaseCommit";
     }
 
     @Test

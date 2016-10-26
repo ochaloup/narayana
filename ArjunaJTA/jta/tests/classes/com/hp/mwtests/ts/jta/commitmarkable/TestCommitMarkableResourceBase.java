@@ -52,17 +52,14 @@ public class TestCommitMarkableResourceBase {
             Utils.removeRecursive(file.toPath());
         }
 
-        System.setProperty("java.naming.factory.initial",
-                "org.jnp.interfaces.NamingContextFactory");
-        System.setProperty("java.naming.factory.url.pkgs",
-                "org.jboss.naming:org.jnp.interfaces");
+        System.setProperty("java.naming.factory.initial", "org.jnp.interfaces.NamingContextFactory");
+        System.setProperty("java.naming.factory.url.pkgs", "org.jboss.naming:org.jnp.interfaces");
         namingBeanImpl = new NamingBeanImpl();
         namingBeanImpl.start();
 
-        resetPropertiesFile = System
-                .getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
+        resetPropertiesFile = System.getProperty("com.arjuna.ats.arjuna.common.propertiesFile");
         System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
-                    "commitmarkableresourcejbossts-properties.xml");
+                "commitmarkableresourcejbossts-properties.xml");
 
         manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
     }
@@ -76,8 +73,7 @@ public class TestCommitMarkableResourceBase {
         namingBeanImpl = null;
 
         if (resetPropertiesFile != null) {
-            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile",
-                    resetPropertiesFile);
+            System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", resetPropertiesFile);
         } else {
             System.clearProperty("com.arjuna.ats.arjuna.common.propertiesFile");
         }

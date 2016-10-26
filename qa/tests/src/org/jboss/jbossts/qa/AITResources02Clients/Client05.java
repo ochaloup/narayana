@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client05.java,v 1.2 2003/06/26 11:43:10 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client05
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client05 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,37 +73,28 @@ public class Client05
 
             int numberOfCalls = 10;
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 pingPong.hit(index, pingPong, pingPong, null);
             }
 
             IntHolder pingPongValue = new IntHolder();
             pingPong.get(pingPongValue, null);
 
-            if (pingPongValue.value == numberOfCalls)
-            {
+            if (pingPongValue.value == numberOfCalls) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client05.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -20,10 +20,11 @@ public abstract class AbstractWSTXHandler implements SOAPHandler<SOAPMessageCont
     private final JaxWSHeaderContextProcessor delegateHandler = new JaxWSHeaderContextProcessor();
 
     /**
-     * Delegates message handling to the JaxWSHeaderContextProcessor if either WSTXFeature or default context propagation is
-     * enabled.
+     * Delegates message handling to the JaxWSHeaderContextProcessor if either
+     * WSTXFeature or default context propagation is enabled.
      *
-     * @see com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor#handleMessage(SOAPMessageContext, boolean)
+     * @see com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor#handleMessage(SOAPMessageContext,
+     *      boolean)
      *
      * @param context
      * @return true
@@ -38,8 +39,8 @@ public abstract class AbstractWSTXHandler implements SOAPHandler<SOAPMessageCont
     }
 
     /**
-     * Delegates fault handling to the JaxWSHeaderContextProcessor if either WSTXFeature or default context propagation is
-     * enabled.
+     * Delegates fault handling to the JaxWSHeaderContextProcessor if either
+     * WSTXFeature or default context propagation is enabled.
      *
      * @see com.arjuna.mw.wst11.client.JaxWSHeaderContextProcessor#handleFault(SOAPMessageContext)
      *
@@ -78,7 +79,8 @@ public abstract class AbstractWSTXHandler implements SOAPHandler<SOAPMessageCont
     }
 
     /**
-     * MustUnderstand parameter of WS-AT/WS-BA header must be set to true if WSTXFeature is enabled.
+     * MustUnderstand parameter of WS-AT/WS-BA header must be set to true if
+     * WSTXFeature is enabled.
      *
      * @param context
      * @return

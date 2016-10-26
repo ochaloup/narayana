@@ -56,41 +56,36 @@ package org.jboss.jbossts.qa.CrashRecovery05Servers;
  * $Id: Server05.java,v 1.4 2003/07/15 15:33:11 jcoleman Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery05.*;
 import org.jboss.jbossts.qa.CrashRecovery05Impls.BeforeCrashServiceImpl02;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server05
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server05 {
+    public static void main(String args[]) {
+        try {
             if (ORBInterface.getORB() == null) {
                 ORBInterface.initORB(args, null);
                 OAInterface.initOA();
             }
 
-            BeforeCrashServiceImpl02 beforeCrashServiceImpl = new BeforeCrashServiceImpl02(args[args.length - 2].hashCode(), 0);
+            BeforeCrashServiceImpl02 beforeCrashServiceImpl = new BeforeCrashServiceImpl02(
+                    args[args.length - 2].hashCode(), 0);
             BeforeCrashServicePOATie servant = new BeforeCrashServicePOATie(beforeCrashServiceImpl);
 
             OAInterface.objectIsReady(servant);
-            BeforeCrashService beforeCrashService = BeforeCrashServiceHelper.narrow(OAInterface.corbaReference(servant));
+            BeforeCrashService beforeCrashService = BeforeCrashServiceHelper
+                    .narrow(OAInterface.corbaReference(servant));
 
             ServerIORStore.storeIOR(args[args.length - 1], ORBInterface.orb().object_to_string(beforeCrashService));
 
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server05.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
-

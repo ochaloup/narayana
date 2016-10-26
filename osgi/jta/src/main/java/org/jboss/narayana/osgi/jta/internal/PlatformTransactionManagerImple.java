@@ -54,7 +54,8 @@ public class PlatformTransactionManagerImple extends JtaTransactionManager {
             }
             public void suspended(Transaction transaction) {
                 if (TransactionSynchronizationManager.isSynchronizationActive()) {
-                    List<TransactionSynchronization> suspendedSynchronizations = TransactionSynchronizationManager.getSynchronizations();
+                    List<TransactionSynchronization> suspendedSynchronizations = TransactionSynchronizationManager
+                            .getSynchronizations();
                     for (TransactionSynchronization suspendedSynchronization : suspendedSynchronizations) {
                         suspendedSynchronization.suspend();
                     }
@@ -64,21 +65,23 @@ public class PlatformTransactionManagerImple extends JtaTransactionManager {
                     boolean readOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
                     TransactionSynchronizationManager.setCurrentTransactionReadOnly(false);
                     TransactionSynchronizationManager.setActualTransactionActive(false);
-                    SuspendedResourcesHolder holder = new SuspendedResourcesHolder(suspendedSynchronizations, name, readOnly);
+                    SuspendedResourcesHolder holder = new SuspendedResourcesHolder(suspendedSynchronizations, name,
+                            readOnly);
                     suspendedResources.put(transaction, holder);
                 }
             }
         });
     }
 
-    public static ServiceRegistration register(BundleContext bundleContext, OsgiTransactionManager transactionManager) throws Exception {
+    public static ServiceRegistration register(BundleContext bundleContext, OsgiTransactionManager transactionManager)
+            throws Exception {
         PlatformTransactionManagerImple ptm = new PlatformTransactionManagerImple(transactionManager);
         return bundleContext.registerService(PlatformTransactionManager.class, ptm, null);
     }
 
     /**
-     * Holder for suspended resources.
-     * Used internally by <code>suspend</code> and <code>resume</code>.
+     * Holder for suspended resources. Used internally by <code>suspend</code>
+     * and <code>resume</code>.
      */
     private static class SuspendedResourcesHolder {
 
@@ -86,7 +89,8 @@ public class PlatformTransactionManagerImple extends JtaTransactionManager {
         private final String name;
         private final boolean readOnly;
 
-        public SuspendedResourcesHolder(List<TransactionSynchronization> suspendedSynchronizations, String name, boolean readOnly) {
+        public SuspendedResourcesHolder(List<TransactionSynchronization> suspendedSynchronizations, String name,
+                boolean readOnly) {
             this.suspendedSynchronizations = suspendedSynchronizations;
             this.name = name;
             this.readOnly = readOnly;

@@ -30,8 +30,9 @@ package org.jboss.narayana.compensations.api;
 public interface CompensationManager {
 
     /**
-     * Mark the transaction as "compensate only". This ensures that the compensation-based transaction
-     * will be cancelled and any completed work compensated.
+     * Mark the transaction as "compensate only". This ensures that the
+     * compensation-based transaction will be cancelled and any completed work
+     * compensated.
      */
     public void setCompensateOnly();
 

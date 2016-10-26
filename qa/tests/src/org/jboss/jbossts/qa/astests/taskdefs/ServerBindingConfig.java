@@ -39,8 +39,7 @@ import org.xml.sax.SAXException;
 /**
  * Helper class to read a JBoss AS bindings file
  */
-public class ServerBindingConfig
-{
+public class ServerBindingConfig {
     private static final String BINDING_MANAGER_NAME = "jboss.system:service=ServiceBindingManager";
     private static final String BINDING_MANAGER_CLASS = "org.jboss.services.binding.ServiceBindingManager";
     private static final String STORE_FACTORY_CLASS = "org.jboss.services.binding.XMLServicesStoreFactory";
@@ -49,20 +48,24 @@ public class ServerBindingConfig
     /**
      * Configure an AS to start up with a non-default set of bindings.
      *
-     * An mbean entry will be inserted into xmlFile with a name specified by bindingName.
-     * The file bindingXml will contain an entry with the name bindingName.
+     * An mbean entry will be inserted into xmlFile with a name specified by
+     * bindingName. The file bindingXml will contain an entry with the name
+     * bindingName.
      * 
-     * @param xmlFile   The file that is to recieve the binding service specification
-     * @param bindingName The name of the binding definition to use
-     * @param bindingXml file name of the file that contains a group of binding definitions
+     * @param xmlFile
+     *            The file that is to recieve the binding service specification
+     * @param bindingName
+     *            The name of the binding definition to use
+     * @param bindingXml
+     *            file name of the file that contains a group of binding
+     *            definitions
      * @throws IOException
      * @throws ParserConfigurationException
      * @throws org.xml.sax.SAXException
      * @throws TransformerException
      */
-    public static void setBinding(String xmlFile, String bindingName, String bindingXml) throws IOException, ParserConfigurationException,
-            org.xml.sax.SAXException, TransformerException
-    {
+    public static void setBinding(String xmlFile, String bindingName, String bindingXml)
+            throws IOException, ParserConfigurationException, org.xml.sax.SAXException, TransformerException {
         String xmlFileName = Utils.toFile(xmlFile).getAbsolutePath();
 
         System.out.println("update bindings:");
@@ -86,12 +89,10 @@ public class ServerBindingConfig
         // add an mbean entry for the server binding
         server2.appendChild(createBinding(doc2, bindingName, bindingXml));
 
-        for (int i=0; i< children.getLength(); i++)
-        {
+        for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
 
-            if ("mbean".equals(child.getNodeName()))
-            {
+            if ("mbean".equals(child.getNodeName())) {
                 String name = ((Element) child).getAttribute("name");
 
                 // ignore the original binding since we are creating a new one
@@ -108,8 +109,7 @@ public class ServerBindingConfig
         printDocument(doc2, xmlFileName);
     }
 
-    private static Element createBinding(Document document, String binding, String bindingXml)
-    {
+    private static Element createBinding(Document document, String binding, String bindingXml) {
         Element mbean = document.createElement("mbean");
 
         mbean.setAttribute("code", BINDING_MANAGER_CLASS);
@@ -122,8 +122,7 @@ public class ServerBindingConfig
         return mbean;
     }
 
-    private static Element createMbeanAttribute(Document document, String name, String cdata)
-    {
+    private static Element createMbeanAttribute(Document document, String name, String cdata) {
         Element element = document.createElement("attribute");
 
         element.setAttribute("name", name);
@@ -132,8 +131,8 @@ public class ServerBindingConfig
         return element;
     }
 
-    public static void printDocument(Document document, String fname){
-        try{
+    public static void printDocument(Document document, String fname) {
+        try {
 
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
@@ -146,40 +145,31 @@ public class ServerBindingConfig
                 result = new StreamResult(new FileWriter(fname));
 
             transformer.transform(source, result);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static Document getDocument(String xmlFile)
-    {
+    private static Document getDocument(String xmlFile) {
         Document doc = null;
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setValidating(false);
 
-        try
-        {
+        try {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             doc = documentBuilder.parse(xmlFile);
-        }
-        catch (ParserConfigurationException e)
-        {
+        } catch (ParserConfigurationException e) {
             System.out.println("Unable to locate an XML doc builder: " + e.getMessage());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Error parsing " + xmlFile + ' ' + e.getMessage());
         }
 
         return doc;
     }
 
-    public static Node findServiceConfig(String bindingsFile, String server, String service)
-    {
+    public static Node findServiceConfig(String bindingsFile, String server, String service) {
         Document doc = getDocument(bindingsFile);
 
         if (doc == null)
@@ -190,21 +180,16 @@ public class ServerBindingConfig
         return (node != null ? findNode(node, "service-config", "name", service) : null);
     }
 
-    public static String findBindingPort(Node node)
-    {
+    public static String findBindingPort(Node node) {
         node = findNode(node, "binding", "port", null);
 
         return (node != null ? ((Element) node).getAttribute("port") : null);
     }
 
-    private static int parseInt(String intValue, int defValue, String errMsg)
-    {
-        try
-        {
+    private static int parseInt(String intValue, int defValue, String errMsg) {
+        try {
             return (intValue != null ? Integer.parseInt(intValue) : defValue);
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             if (errMsg != null)
                 System.out.println(errMsg);
 
@@ -212,16 +197,14 @@ public class ServerBindingConfig
         }
     }
 
-    public static int lookupHttpPort(String bindingsFile, String server, int defValue)
-    {
+    public static int lookupHttpPort(String bindingsFile, String server, int defValue) {
         Node node = findServiceConfig(bindingsFile, server, "jboss:service=invoker,type=http");
         String port = findBindingPort(node);
 
         return parseInt(port, defValue, "Invalid port found in service-config for binding " + server);
     }
 
-    public static int lookupRmiPort(String bindingsFile, String server, int defValue)
-    {
+    public static int lookupRmiPort(String bindingsFile, String server, int defValue) {
         Node node = findServiceConfig(bindingsFile, server, "jboss:service=Naming");
         String port = findBindingPort(node);
 
@@ -230,26 +213,28 @@ public class ServerBindingConfig
 
     /**
      * Find a node with a given name and having a specified attribute
-     * @param node the node to start the search from
-     * @param nodeName the name of the xml node to look for the attribute
-     * @param attrName the name of the attribute to match against
-     * @param attrValue the value of the attribute to match against. If null
-     *  the first matching node with an attribute called attrName is returned
+     * 
+     * @param node
+     *            the node to start the search from
+     * @param nodeName
+     *            the name of the xml node to look for the attribute
+     * @param attrName
+     *            the name of the attribute to match against
+     * @param attrValue
+     *            the value of the attribute to match against. If null the first
+     *            matching node with an attribute called attrName is returned
      * @return the matching node
      */
-    private static Node findNode(Node node, String nodeName, String attrName, String attrValue)
-    {
-        if (node != null)
-        {
+    private static Node findNode(Node node, String nodeName, String attrName, String attrValue) {
+        if (node != null) {
             NodeList children = node.getChildNodes();
 
-            for (int i = 0; i < children.getLength(); i++)
-            {
+            for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
 
-                if (nodeName.equals(child.getNodeName()))
-                {
-                    // found a node of the correct type - now see if it has the given attribute
+                if (nodeName.equals(child.getNodeName())) {
+                    // found a node of the correct type - now see if it has the
+                    // given attribute
                     String value = ((Element) child).getAttribute(attrName);
 
                     if (attrName == null || attrValue == null || value.equals(attrValue))
@@ -263,16 +248,16 @@ public class ServerBindingConfig
         return null;
     }
 
-    public static void main(String[] args) throws IOException, ParserConfigurationException,
-            org.xml.sax.SAXException, TransformerException
-    {
+    public static void main(String[] args)
+            throws IOException, ParserConfigurationException, org.xml.sax.SAXException, TransformerException {
         if (args.length >= 3) {
             setBinding(args[0], args[1], args[2]);
         } else if (args.length == 2) {
             System.out.println("Rmi port: " + lookupRmiPort(args[0], args[1], -1));
             System.out.println("Http port: " + lookupHttpPort(args[0], args[1], -1));
         } else {
-            System.out.println("syntax: ServerBindingConfig <conf file path> <server binding name> <path of bindings file>");
+            System.out.println(
+                    "syntax: ServerBindingConfig <conf file path> <server binding name> <path of bindings file>");
         }
     }
 }

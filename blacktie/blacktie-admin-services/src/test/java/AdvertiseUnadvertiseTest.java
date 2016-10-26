@@ -35,19 +35,14 @@ public class AdvertiseUnadvertiseTest {
     public static Archive<?> createTestArchive() {
         final String ManifestMF = "Manifest-Version: 1.0\n"
                 + "Dependencies: org.jboss.jts,org.jboss.as.controller-client,org.jboss.dmr\n";
-        return ShrinkWrap
-                .create(WebArchive.class, "test.war")
+        return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(BlacktieStompAdministrationService.class, Authentication.class, AdministrationProxy.class,
                         BlacktieAdministration.class, ResponseMonitor.class)
-                        .addPackage(MDBBlacktieService.class.getPackage())
-                        .addPackage(BlackTieService.class.getPackage())
-                        .addPackage(TransactionException.class.getPackage())
-                        .addPackage(ConfigurationException.class.getPackage())
-                        .addPackage(Message.class.getPackage())
-                        .addPackage(X_OCTET_Impl.class.getPackage())
-                        .addAsResource("btconfig.xsd")
-                .addAsResource("btconfig.xml").setManifest(new StringAsset(ManifestMF))
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+                .addPackage(MDBBlacktieService.class.getPackage()).addPackage(BlackTieService.class.getPackage())
+                .addPackage(TransactionException.class.getPackage())
+                .addPackage(ConfigurationException.class.getPackage()).addPackage(Message.class.getPackage())
+                .addPackage(X_OCTET_Impl.class.getPackage()).addAsResource("btconfig.xsd").addAsResource("btconfig.xml")
+                .setManifest(new StringAsset(ManifestMF)).addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @Test

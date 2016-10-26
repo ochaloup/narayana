@@ -41,24 +41,20 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class Cleanup01
-{
-    public static void main(String[] args)
-    {
+public class Cleanup01 {
+    public static void main(String[] args) {
         boolean success = false;
         boolean trying = true;
         int tries = 0;
 
-        try
-        {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -70,8 +66,7 @@ public class Cleanup01
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -79,18 +74,14 @@ public class Cleanup01
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
             String tableName = JDBCProfileStore.getTableName(databaseUser, "Infotable");
-            
-            while (trying)
-            {
-                try
-                {
+
+            while (trying) {
+                try {
                     Statement statement = connection.createStatement();
 
                     System.err.println("DROP TABLE " + tableName);
@@ -101,60 +92,45 @@ public class Cleanup01
 
                     trying = false;
                     success = true;
-                    /* Server might have crashed and table might still be busy. */
-                }
-                catch (java.sql.SQLException s)
-                {
+                    /*
+                     * Server might have crashed and table might still be busy.
+                     */
+                } catch (java.sql.SQLException s) {
                     System.err.println("Cleanup01.main: " + s);
                     System.err.println("SQL state is: " + s.getSQLState());
-                    if (s.getSQLState() == "42000" ||    /* no table to drop */
-                            s.getSQLState() == "42S02" ||    /* table not found */
-                            s.getSQLState() == null)        /* connection failed */
+                    if (s.getSQLState() == "42000" || /* no table to drop */
+                            s.getSQLState() == "42S02" || /* table not found */
+                            s.getSQLState() == null) /* connection failed */
                     {
                         trying = false;
-                    }
-                    else
-                    {
+                    } else {
                         tries++;
-                        if (tries >= 6)
-                        {
+                        if (tries >= 6) {
                             trying = false;
                             System.err.println("Giving up.");
-                        }
-                        else
-                        {
-                            try
-                            {
+                        } else {
+                            try {
                                 System.err.println("Sleeping " + (tries * 10) + " seconds and re-trying ...");
                                 Thread.sleep(tries * 10000);
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 System.err.println("Cleanup01.main: " + e);
                                 trying = false;
                             }
                         }
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     System.err.println("Cleanup01.main: " + e);
                     trying = false;
                 }
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Cleanup01.main: " + exception);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Cleanup01.main: " + exception);
             exception.printStackTrace(System.err);
 

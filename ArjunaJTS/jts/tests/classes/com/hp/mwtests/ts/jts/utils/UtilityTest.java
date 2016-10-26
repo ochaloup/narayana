@@ -45,52 +45,45 @@ import com.arjuna.ats.internal.jts.recovery.transactions.RecoveryStatus;
 import com.arjuna.ats.jts.exceptions.ExceptionCodes;
 import com.arjuna.ats.jts.utils.Utility;
 
-public class UtilityTest
-{
+public class UtilityTest {
     @Test
-    public void test()
-    {
+    public void test() {
         Uid txId = new Uid();
         otid_t tid = Utility.uidToOtid(txId);
         Uid u = Utility.otidToUid(tid);
 
         assertTrue(txId.equals(u));
     }
-    
+
     @Test
-    public void testPrint ()
-    {
+    public void testPrint() {
         Utility.printStatus(new PrintWriter(System.err), org.omg.CosTransactions.Status.StatusNoTransaction);
-        
+
         String vote = Utility.stringVote(org.omg.CosTransactions.Vote.VoteCommit);
-        
+
         assertTrue(vote != null);
         assertEquals(vote, "CosTransactions::VoteCommit");
-        
+
         String status = Utility.stringStatus(org.omg.CosTransactions.Status.StatusNoTransaction);
-        
+
         assertTrue(status != null);
         assertEquals(status, "CosTransactions::StatusNoTransaction");
     }
-    
+
     @Test
-    public void testExceptions ()
-    {
+    public void testExceptions() {
         ExceptionCodes x = new ExceptionCodes();
-        
-        for (int i = ExceptionCodes.OTS_GENERAL_BASE; i < ExceptionCodes.NO_TXCONTEXT; i++)
-        {
+
+        for (int i = ExceptionCodes.OTS_GENERAL_BASE; i < ExceptionCodes.NO_TXCONTEXT; i++) {
             assertTrue(Utility.exceptionCode(i).length() > 1);
         }
     }
-    
+
     @Test
-    public void testReplayStatus ()
-    {
+    public void testReplayStatus() {
         RecoveryStatus s = new RecoveryStatus();
-        
-        for (int i = RecoveryStatus.NEW; i < RecoveryStatus.REPLAY_FAILED + 1; i++)
-        {
+
+        for (int i = RecoveryStatus.NEW; i < RecoveryStatus.REPLAY_FAILED + 1; i++) {
             assertTrue(RecoveryStatus.stringForm(i) != null);
         }
     }

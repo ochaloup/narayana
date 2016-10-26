@@ -56,39 +56,29 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients1;
  * $Id: Client01b.java,v 1.2 2003/06/26 11:43:30 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery05.CrashBehavior;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.omg.CosTransactions.HeuristicHazard;
 
-public class Client01b
-{
-    public static void main(String[] args)
-    {
+public class Client01b {
+    public static void main(String[] args) {
         ClientBeforeCrash beforeCrash = new ClientBeforeCrash(Client01b.class.getSimpleName());
 
-        try
-        {
+        try {
             beforeCrash.initOrb(args);
             beforeCrash.initCrashBehaviour(CrashBehavior.CrashBehaviorCrashInCommitOnePhase);
             beforeCrash.serviceSetup();
 
-            try
-            {
+            try {
                 OTS.current().commit(true);
-                beforeCrash.setCorrect(false);  // should have got a heuristic
-            }
-            catch (HeuristicHazard heuristicHazard)
-            {
+                beforeCrash.setCorrect(false); // should have got a heuristic
+            } catch (HeuristicHazard heuristicHazard) {
             }
 
             beforeCrash.reportStatus();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             beforeCrash.reportException(exception);
-        }
-        finally {
+        } finally {
             beforeCrash.shutdownOrb();
         }
     }

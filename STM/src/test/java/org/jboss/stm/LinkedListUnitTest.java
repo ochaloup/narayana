@@ -54,143 +54,127 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class LinkedListUnitTest extends TestCase
-{
+public class LinkedListUnitTest extends TestCase {
     @Transactional
-    public interface Node
-    {
-        public void setPrev (Node p);
-        public Node getPrev ();
-        
-        public void setNext (Node n);
-        public Node getNext ();
-        
-        public String nodeName ();
+    public interface Node {
+        public void setPrev(Node p);
+        public Node getPrev();
+
+        public void setNext(Node n);
+        public Node getNext();
+
+        public String nodeName();
     }
-    
-    public class NodeImple implements Node
-    {   
-        public NodeImple (String name)
-        {
+
+    public class NodeImple implements Node {
+        public NodeImple(String name) {
             _nodeName = name;
         }
-        
+
         @Override
-        public Node getNext ()
-        {
+        public Node getNext() {
             return _next;
         }
 
         @Override
-        public Node getPrev ()
-        {
-           return _prev;
+        public Node getPrev() {
+            return _prev;
         }
 
         @Override
-        public void setNext (Node n)
-        {
+        public void setNext(Node n) {
             _next = n;
         }
 
         @Override
-        public void setPrev (Node p)
-        {
+        public void setPrev(Node p) {
             _prev = p;
         }
-        
-        public String nodeName ()
-        {
+
+        public String nodeName() {
             return _nodeName;
         }
-       
+
         @SaveState
-        public void save_state (OutputObjectState os) throws IOException
-        {
+        public void save_state(OutputObjectState os) throws IOException {
             if (_prev == null)
                 os.packBoolean(false);
-            else
-            {
+            else {
                 os.packBoolean(true);
                 UidHelper.packInto(theContainer.getUidForHandle(_prev), os);
             }
-            
+
             if (_next == null)
                 os.packBoolean(false);
-            else
-            {
-                os.packBoolean(true); 
+            else {
+                os.packBoolean(true);
                 UidHelper.packInto(theContainer.getUidForHandle(_next), os);
             }
 
             os.packString(_nodeName);
         }
-        
+
         @RestoreState
-        public void restore_state (InputObjectState os) throws IOException
-        {
+        public void restore_state(InputObjectState os) throws IOException {
             boolean ptr = os.unpackBoolean();
-            
+
             if (ptr == false)
                 _prev = null;
-            else
-            {
+            else {
                 Uid id = UidHelper.unpackFrom(os);
                 _prev = theContainer.getHandle(id);
             }
 
             ptr = os.unpackBoolean();
-            
+
             if (ptr == false)
                 _next = null;
-            else
-            {
+            else {
                 Uid id = UidHelper.unpackFrom(os);
                 _next = theContainer.getHandle(id);
             }
 
             _nodeName = os.unpackString();
         }
-        
+
         @State
         private Node _prev;
-        
+
         @State
         private Node _next;
-        
+
         @State
         private String _nodeName = "";
     }
-    
-    public void testLinkedList () throws Exception
-    {
+
+    public void testLinkedList() throws Exception {
         NodeImple ni1 = new NodeImple("one");
         NodeImple ni2 = new NodeImple("two");
         NodeImple ni3 = new NodeImple("three");
         AtomicAction A = new AtomicAction();
-        
+
         Node h1 = theContainer.enlist(ni1);
         Node h2 = theContainer.enlist(ni2);
         Node h3 = theContainer.enlist(ni3);
-        
+
         h1.setNext(h2);
         h2.setPrev(h1);
-        
+
         assertEquals(h1.getPrev(), null);
         assertEquals(h2.getPrev().nodeName(), h1.nodeName());
-        
+
         A.begin();
-        
+
         h1.setNext(h3);
         h2.setPrev(null);
         h3.setPrev(h1);
-        
+
         A.abort();
-        
+
         assertEquals(h1.getNext().nodeName(), h2.nodeName());
         assertEquals(h1.getPrev(), null);
         assertEquals(h2.getPrev().nodeName(), h1.nodeName());
     }
-    
+
     public RecoverableContainer<Node> theContainer = new RecoverableContainer<Node>();
 }

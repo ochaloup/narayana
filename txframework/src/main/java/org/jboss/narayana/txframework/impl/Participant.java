@@ -40,7 +40,8 @@ public abstract class Participant {
 
     private Map txDataMap;
 
-    public Participant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap) throws ParticipantRegistrationException {
+    public Participant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap)
+            throws ParticipantRegistrationException {
 
         this.serviceInvocationMeta = serviceInvocationMeta;
         visibleMethods = getAllVisibleMethods(serviceInvocationMeta.getServiceClass());
@@ -76,7 +77,7 @@ public abstract class Participant {
 
         Method method = lifecycleEventMap.get(lifecycleEvent);
         if (method == null) {
-            //No handler registered
+            // No handler registered
             return null;
         }
 
@@ -89,7 +90,8 @@ public abstract class Participant {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Unable to invoke method '" + method.getName() + "' on '" + serviceInvocationMeta.getServiceClass().getName() + "'", e);
+            throw new RuntimeException("Unable to invoke method '" + method.getName() + "' on '"
+                    + serviceInvocationMeta.getServiceClass().getName() + "'", e);
         } finally {
             suspend();
         }

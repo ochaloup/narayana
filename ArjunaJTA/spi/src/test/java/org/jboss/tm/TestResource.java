@@ -26,12 +26,11 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.util.List;
 
-public class TestResource implements XAResource
-{
+public class TestResource implements XAResource {
     List<TestResource> prepareOrder = null;
     List<TestResource> endOrder = null;
 
-    public int prepare (Xid xid) throws XAException {
+    public int prepare(Xid xid) throws XAException {
         prepareOrder.add(this);
         return XA_OK;
     }
@@ -41,38 +40,38 @@ public class TestResource implements XAResource
         this.endOrder = endOrder;
     }
 
-    public void commit (Xid id, boolean onePhase) throws XAException {
+    public void commit(Xid id, boolean onePhase) throws XAException {
         endOrder.add(this);
     }
 
-    public void rollback (Xid xid) throws XAException {
+    public void rollback(Xid xid) throws XAException {
         endOrder.add(this);
     }
 
-    public void end (Xid xid, int flags) throws XAException {
+    public void end(Xid xid, int flags) throws XAException {
     }
 
-    public void forget (Xid xid) throws XAException {
+    public void forget(Xid xid) throws XAException {
     }
 
-    public int getTransactionTimeout () throws XAException {
+    public int getTransactionTimeout() throws XAException {
         return _timeout;
     }
 
-    public boolean isSameRM (XAResource xares) throws XAException {
+    public boolean isSameRM(XAResource xares) throws XAException {
         return false;
     }
 
-    public Xid[] recover (int flag) throws XAException {
+    public Xid[] recover(int flag) throws XAException {
         return null;
     }
 
-    public boolean setTransactionTimeout (int seconds) throws XAException {
+    public boolean setTransactionTimeout(int seconds) throws XAException {
         _timeout = seconds;
         return true;
     }
 
-    public void start (Xid xid, int flags) throws XAException {
+    public void start(Xid xid, int flags) throws XAException {
     }
 
     protected int _timeout = 0;

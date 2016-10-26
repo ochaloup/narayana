@@ -26,7 +26,6 @@ import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.MessageLogger;
 
-
 /**
  * @author <a href="mailto:zfeng@redhat.com">Amos Feng</a>
  *

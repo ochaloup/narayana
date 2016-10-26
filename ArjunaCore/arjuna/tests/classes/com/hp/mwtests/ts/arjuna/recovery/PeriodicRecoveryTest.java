@@ -33,7 +33,8 @@ import static org.junit.Assert.assertTrue;
 public class PeriodicRecoveryTest {
     @Test
     public void testInitialDelay() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        RecoveryEnvironmentBean bean = recoveryPropertyManager.getRecoveryEnvironmentBean().setPeriodicRecoveryInitilizationOffset(1);
+        RecoveryEnvironmentBean bean = recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .setPeriodicRecoveryInitilizationOffset(1);
         PeriodicRecovery periodicRecovery = new PeriodicRecovery(false, false);
         Method doInitialWait = periodicRecovery.getClass().getDeclaredMethod("doInitialWait");
         doInitialWait.setAccessible(true);

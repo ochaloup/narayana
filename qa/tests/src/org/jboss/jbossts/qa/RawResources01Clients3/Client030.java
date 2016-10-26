@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.RawResources01Clients3;
  * $Id: Client030.java,v 1.3 2003/07/07 13:43:27 jcoleman Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -64,12 +63,9 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
 
-public class Client030
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client030 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -115,14 +111,11 @@ public class Client030
 
             OTS.current().rollback_only();
 
-            try
-            {
+            try {
                 OTS.current().commit(false);
                 System.err.println("Commit succeeded when it shouldn't");
                 correct = false;
-            }
-            catch (TRANSACTION_ROLLEDBACK transactionRolledback)
-            {
+            } catch (TRANSACTION_ROLLEDBACK transactionRolledback) {
             }
 
             correct = correct && service1.is_correct() && service2.is_correct() && service3.is_correct();
@@ -135,29 +128,21 @@ public class Client030
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTraceRollback);
             correct = correct && (resourceTrace3 == ResourceTrace.ResourceTraceRollback);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client030.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client030.main: " + exception);
             exception.printStackTrace(System.err);
         }

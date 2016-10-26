@@ -1,6 +1,5 @@
 package org.jboss.narayana.compensations.internal;
 
-
 import javax.xml.namespace.QName;
 
 /**
@@ -11,15 +10,16 @@ import javax.xml.namespace.QName;
 public interface ParticipantManager {
 
     /**
-     * Notify transaction coordinator that participant has decided to leave the transaction and that it shouldn't be contacted.
+     * Notify transaction coordinator that participant has decided to leave the
+     * transaction and that it shouldn't be contacted.
      *
      * @throws Exception
      */
     public void exit() throws Exception;
 
-
     /**
-     * Notify transaction coordinator that all work was completed and participant is ready to complete the transaction.
+     * Notify transaction coordinator that all work was completed and
+     * participant is ready to complete the transaction.
      *
      * @throws Exception
      */

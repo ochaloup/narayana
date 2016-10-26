@@ -29,14 +29,11 @@ import com.arjuna.wst.WrongStateException;
 /**
  * The readonly durable 2PC participant
  */
-public class ReadonlyDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant
-{
+public class ReadonlyDurable2PCParticipant extends ParticipantAdapter implements Durable2PCParticipant {
     /**
      * Vote readonly.
      */
-    public Vote prepare()
-        throws WrongStateException, SystemException
-    {
-        return new ReadOnly() ;
-    }    
+    public Vote prepare() throws WrongStateException, SystemException {
+        return new ReadOnly();
+    }
 }

@@ -25,15 +25,16 @@ import java.util.Map;
 /**
  * General mechanism for running code during the execution of an ant target
  */
-public interface ClientAction
-{
+public interface ClientAction {
     /**
      * Execute code in the context of an ant target
      *
-     * @param config Configuration for this execution loaded from the ant script
-     * that triggered this action
-     * @param params Arbitary collection of name/value pairs passed in from the ant script
-     * that triggered this action
+     * @param config
+     *            Configuration for this execution loaded from the ant script
+     *            that triggered this action
+     * @param params
+     *            Arbitary collection of name/value pairs passed in from the ant
+     *            script that triggered this action
      * @return true to indicate that the action completed successfully
      * @see org.jboss.jbossts.qa.astests.taskdefs.ASClientTask
      */
@@ -43,7 +44,8 @@ public interface ClientAction
      * Cancel any executing operation
      *
      * @return true if the opeartion was cancelled
-     * @throws UnsupportedOperationException Not implemented
+     * @throws UnsupportedOperationException
+     *             Not implemented
      */
     boolean cancel() throws UnsupportedOperationException;
 }

@@ -20,8 +20,7 @@ public class JTARMErrorCommitTest {
     @Test
     public void test() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 

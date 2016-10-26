@@ -39,10 +39,9 @@ package com.arjuna.mw.wsas.context;
  * @since 1.0.
  */
 
-public interface Context
-{
+public interface Context {
     /**
      * @return the name of this context.
      */
-    public String identifier() ;
+    public String identifier();
 }

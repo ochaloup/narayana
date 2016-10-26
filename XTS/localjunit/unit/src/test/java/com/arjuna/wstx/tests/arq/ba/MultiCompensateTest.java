@@ -23,9 +23,7 @@ public class MultiCompensateTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoBusinessParticipant.class,
-                FailureBusinessParticipant.class,
+        return WarDeployment.getDeployment(DemoBusinessParticipant.class, FailureBusinessParticipant.class,
                 ParticipantCompletionCoordinatorRules.class);
     }
 
@@ -40,9 +38,7 @@ public class MultiCompensateTest {
     }
 
     @Test
-    public void testMultiCompensate()
-            throws Exception
-            {
+    public void testMultiCompensate() throws Exception {
         ParticipantCompletionCoordinatorRules.setParticipantCount(2);
 
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
@@ -50,7 +46,8 @@ public class MultiCompensateTest {
         com.arjuna.wst11.BAParticipantManager bpm1 = null;
         com.arjuna.wst11.BAParticipantManager bpm2 = null;
         DemoBusinessParticipant p = new DemoBusinessParticipant(DemoBusinessParticipant.COMPENSATE, "1241");
-        FailureBusinessParticipant fp = new FailureBusinessParticipant(FailureBusinessParticipant.FAIL_IN_COMPENSATE, "5680");
+        FailureBusinessParticipant fp = new FailureBusinessParticipant(FailureBusinessParticipant.FAIL_IN_COMPENSATE,
+                "5680");
         try {
             uba.begin();
 
@@ -62,12 +59,13 @@ public class MultiCompensateTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
-        // the cancel/compensate should succeed even though the participant fails to compensate
+        // the cancel/compensate should succeed even though the participant
+        // fails to compensate
         uba.cancel();
         assertTrue(p.passed());
-            }
+    }
 }

@@ -76,7 +76,7 @@ public class StompConnectService implements Service<StompConnectService> {
             connect.setXAConnectionFactoryName(connectionFactoryName);
             connect.start();
             BlacktieLogger.ROOT_LOGGER.info("Started StompConnect " + connect.getUri());
-        }catch(Exception e) {
+        } catch (Exception e) {
             throw new StartException(e);
         }
 
@@ -90,7 +90,7 @@ public class StompConnectService implements Service<StompConnectService> {
         try {
             connect.stop();
             BlacktieLogger.ROOT_LOGGER.info("Stopped StompConnect " + uri);
-        } catch(Exception e) {
+        } catch (Exception e) {
             BlacktieLogger.ROOT_LOGGER.error("Stopping StompConnect failed with " + e);
         }
     }

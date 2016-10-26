@@ -37,7 +37,8 @@ public class SessionClosingSynchronization implements Synchronization {
     private final Session session;
 
     /**
-     * @param session session to be closed.
+     * @param session
+     *            session to be closed.
      */
     public SessionClosingSynchronization(Session session) {
         this.session = session;

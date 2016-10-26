@@ -41,54 +41,42 @@ import org.jboss.jbossts.qa.CrashRecovery12Resources.Resource02;
 
 import javax.transaction.UserTransaction;
 
-public class Client01
-{
+public class Client01 {
     public static String resultsFile = "Client01.log";
 
-    public static void main(String[] args)
-    {
-        int crashIn = Resource01.NOCRASH;
-        ;
+    public static void main(String[] args) {
+        int crashIn = Resource01.NOCRASH;;
 
-        if (args.length >= 1)
-        {
-            if (args[0].startsWith("p") || args[0].startsWith("P"))
-            {
+        if (args.length >= 1) {
+            if (args[0].startsWith("p") || args[0].startsWith("P")) {
                 crashIn = Resource01.PREPARE;
             }
-            if (args[0].startsWith("c") || args[0].startsWith("C"))
-            {
+            if (args[0].startsWith("c") || args[0].startsWith("C")) {
                 crashIn = Resource01.COMMIT;
             }
-            if (args[0].startsWith("r") || args[0].startsWith("R"))
-            {
+            if (args[0].startsWith("r") || args[0].startsWith("R")) {
                 crashIn = Resource01.ROLLBACK;
             }
         }
-        if (args.length >= 2)
-        {
+        if (args.length >= 2) {
             resultsFile = args[1];
         }
 
-        try
-        {
+        try {
             ORB myORB = ORB.getInstance("Client01");
             RootOA myOA = OA.getRootOA(myORB);
 
             myORB.initORB(args, null);
             myOA.initOA();
 
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Failed");
         }
 
         System.out.println("Ready");
 
-        try
-        {
+        try {
             UserTransaction ut = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
             ut.begin();
@@ -100,13 +88,9 @@ public class Client01
 
             ut.commit();
             System.out.println("Passed");
-        }
-        catch (javax.transaction.RollbackException rbx)
-        {
+        } catch (javax.transaction.RollbackException rbx) {
             System.out.println("Passed");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Failed");
         }

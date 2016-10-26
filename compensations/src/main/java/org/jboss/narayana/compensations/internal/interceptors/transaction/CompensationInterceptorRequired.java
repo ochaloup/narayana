@@ -46,7 +46,8 @@ public class CompensationInterceptorRequired extends CompensationInterceptorBase
      *
      * @param ic
      * @return
-     * @throws Exception if request has failed.
+     * @throws Exception
+     *             if request has failed.
      */
     @AroundInvoke
     public Object intercept(final InvocationContext ic) throws Exception {

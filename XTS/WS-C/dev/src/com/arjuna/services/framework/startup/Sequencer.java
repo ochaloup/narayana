@@ -5,26 +5,30 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A manager which allows initializaton callabcks for a suite of related web apps to be registered and subsequently
- * run in a fixed order, irrespective of the order in which the application server initializes the web apps.
+ * A manager which allows initializaton callabcks for a suite of related web
+ * apps to be registered and subsequently run in a fixed order, irrespective of
+ * the order in which the application server initializes the web apps.
  *
- * Sequencer maintains two lists of independently managed callbacks, one for the WSCOOR 1.0 web app suite and one
- * for the WSCOOR 1.1 web app suite. When registering a callback listeners or servlets for a given web app supply a
- * sequence id and a web app id to identify i) the required sequence and ii) the entry in the sequence at which the
- * callback should be stored. If a web app registers multiple callbacks they are stored in the sequence entry as a
- * list in registration order. Once a web app has registered all its callbacks it closes the relevant entry. When
- * all entries in a sequence have been closed the entries are traversed in order and the callbacks in each entry are
- * triggered, thus ensuring that callbacks for web apps with lower sequence indices complete before callbacks with
- * higher indices are called.
+ * Sequencer maintains two lists of independently managed callbacks, one for the
+ * WSCOOR 1.0 web app suite and one for the WSCOOR 1.1 web app suite. When
+ * registering a callback listeners or servlets for a given web app supply a
+ * sequence id and a web app id to identify i) the required sequence and ii) the
+ * entry in the sequence at which the callback should be stored. If a web app
+ * registers multiple callbacks they are stored in the sequence entry as a list
+ * in registration order. Once a web app has registered all its callbacks it
+ * closes the relevant entry. When all entries in a sequence have been closed
+ * the entries are traversed in order and the callbacks in each entry are
+ * triggered, thus ensuring that callbacks for web apps with lower sequence
+ * indices complete before callbacks with higher indices are called.
  *
- * This version also includes a global latch which can be used to ensure that no callbacks are not processed until a
- * client lifts the latch. If the latch has already been lifted when the final element of a sequencer is closed the
- * callbacks are run straight away. If the latch is closed then the sequencer is installed in a deferred list. When
- * the latch is lifted the deferred list is scanned and callbacks are run for each sequencer found in the list.
+ * This version also includes a global latch which can be used to ensure that no
+ * callbacks are not processed until a client lifts the latch. If the latch has
+ * already been lifted when the final element of a sequencer is closed the
+ * callbacks are run straight away. If the latch is closed then the sequencer is
+ * installed in a deferred list. When the latch is lifted the deferred list is
+ * scanned and callbacks are run for each sequencer found in the list.
  *
- * User: adinn
- * Date: Nov 30, 2007
- * Time: 4:05:13 PM
+ * User: adinn Date: Nov 30, 2007 Time: 4:05:13 PM
  */
 public class Sequencer {
     // public API
@@ -34,22 +38,25 @@ public class Sequencer {
      */
 
     /**
-     *  index of startup sequence used for serialization of WSCOOR 1.0 initialization callbacks
+     * index of startup sequence used for serialization of WSCOOR 1.0
+     * initialization callbacks
      */
     public static final int SEQUENCE_WSCOOR10 = 0;
 
     /**
-     *  index of startup sequence used for serialization of WSCOOR 1.1 initialization callbacks
+     * index of startup sequence used for serialization of WSCOOR 1.1
+     * initialization callbacks
      */
     public static final int SEQUENCE_WSCOOR11 = SEQUENCE_WSCOOR10 + 1;
 
     /**
-     *  count of independent startup sequences.
+     * count of independent startup sequences.
      */
     public static final int SEQUENCE_MAX = SEQUENCE_WSCOOR11 + 1;
 
     /*
-     * indices for sequence of web apps we need to ensure start in the correct order
+     * indices for sequence of web apps we need to ensure start in the correct
+     * order
      */
 
     /**
@@ -103,45 +110,48 @@ public class Sequencer {
     public static final int WEBAPP_MAX11 = WEBAPP_WSTX11 + 1;
 
     /**
-     * notify end of callback registration for a web app associated with a given sequence
+     * notify end of callback registration for a web app associated with a given
+     * sequence
+     * 
      * @param webapp
      */
 
-    public static final void close(int sequence, int webapp)
-    {
+    public static final void close(int sequence, int webapp) {
         SEQUENCERS[sequence].close(webapp);
     }
 
     /**
      * a callback class specialised by client web apps to execute startup code
      */
-    public static abstract class Callback
-    {
+    public static abstract class Callback {
         /**
-         * construct a callback associated with a web app in a given startup sequence and automatically register it
-         * for subsequent execution
-         * @param sequence the sequence in which the web app is contained either WSCOOR_1_0 or WSCOOR_1_1
-         * @param webapp the web app with which this callback is associated
+         * construct a callback associated with a web app in a given startup
+         * sequence and automatically register it for subsequent execution
+         * 
+         * @param sequence
+         *            the sequence in which the web app is contained either
+         *            WSCOOR_1_0 or WSCOOR_1_1
+         * @param webapp
+         *            the web app with which this callback is associated
          */
-        public Callback(int sequence, int webapp)
-        {
+        public Callback(int sequence, int webapp) {
             register(this, sequence, webapp);
         }
 
         /**
-         * a callback method which is invoked invoked per callback in registration order per web app in web app
-         * order per sequence as soon as all callback lists in the sequence have been closed
+         * a callback method which is invoked invoked per callback in
+         * registration order per web app in web app order per sequence as soon
+         * as all callback lists in the sequence have been closed
          */
         public abstract void run();
     }
 
     /**
-     * undo the latch which initially delays running of any callback sequences. this is provided
-     * to enable the Service start routine to configure any necessary parameters before the
-     * listener callbacks are run.
+     * undo the latch which initially delays running of any callback sequences.
+     * this is provided to enable the Service start routine to configure any
+     * necessary parameters before the listener callbacks are run.
      */
-    public static void unlatch()
-    {
+    public static void unlatch() {
         synchronized (Sequencer.class) {
             latched = false;
         }
@@ -157,54 +167,56 @@ public class Sequencer {
     // private implementation
 
     /**
-     * a global latch used to defer running of callbacks until the XTS service is ready to
-     * let them run
+     * a global latch used to defer running of callbacks until the XTS service
+     * is ready to let them run
      */
     private static boolean latched = true;
 
     /**
      * a global list of all startup sequences
      */
-    private static final Sequencer[] SEQUENCERS =
-            {
-                    new Sequencer(WEBAPP_MAX10),
-                    new Sequencer(WEBAPP_MAX11)
-            };
-
+    private static final Sequencer[] SEQUENCERS = {new Sequencer(WEBAPP_MAX10), new Sequencer(WEBAPP_MAX11)};
 
     /**
-     * a list of sequencers for which invocation of callbacks has been deferred pending lifting of the sequencer latch
+     * a list of sequencers for which invocation of callbacks has been deferred
+     * pending lifting of the sequencer latch
      */
 
     private static List<Sequencer> deferred = new ArrayList<Sequencer>();
 
     /**
-     * method called by the Callback constructor to append a startup callback to the list for a web
-     * app in the appropriate startup sequence
-     * @param callback a callback to add to the list for the web app
-     * @param sequence the sequence in which the web app is contained either WSCOOR_1_0 or WSCOOR_1_1
-     * @param webapp the web app with which this callback is associated
+     * method called by the Callback constructor to append a startup callback to
+     * the list for a web app in the appropriate startup sequence
+     * 
+     * @param callback
+     *            a callback to add to the list for the web app
+     * @param sequence
+     *            the sequence in which the web app is contained either
+     *            WSCOOR_1_0 or WSCOOR_1_1
+     * @param webapp
+     *            the web app with which this callback is associated
      */
 
-    private static final void register(Callback callback, int sequence, int webapp)
-    {
+    private static final void register(Callback callback, int sequence, int webapp) {
         SEQUENCERS[sequence].register(callback, webapp);
     }
 
     /**
-     * each sequence contians an array of lists to hold callbacks registered per web app
+     * each sequence contians an array of lists to hold callbacks registered per
+     * web app
      */
     private List<Callback>[] callbacks;
 
     /**
-     * each sequence contains an array of flags per web app initially false and set to true when a web app has
-     * registered all its callbacks and called close
+     * each sequence contains an array of flags per web app initially false and
+     * set to true when a web app has registered all its callbacks and called
+     * close
      */
     private boolean[] closed;
 
     /**
-     * counter incremented each time a callback list is closed. callback processing is triggered when this reaches the
-     * sequence size count
+     * counter incremented each time a callback list is closed. callback
+     * processing is triggered when this reaches the sequence size count
      */
     private int closedCount;
 
@@ -214,22 +226,27 @@ public class Sequencer {
     private int sequenceSize;
 
     /**
-     * insert a callback into the list for a given web app associated with this sequence
-     * @param callback the callback to be registerd
-     * @param webapp the web app with which the callback is associated
+     * insert a callback into the list for a given web app associated with this
+     * sequence
+     * 
+     * @param callback
+     *            the callback to be registerd
+     * @param webapp
+     *            the web app with which the callback is associated
      */
-    private final void register(Callback callback, int webapp)
-    {
+    private final void register(Callback callback, int webapp) {
         callbacks[webapp].add(callback);
     }
 
     /**
-     * close the callback list associated with a given web app in this sequence and, if this is the last unclosed
-     * list, trigger execution of all callbacks in sequence order
-     * @param webapp the web app whose callback list is to be closed
+     * close the callback list associated with a given web app in this sequence
+     * and, if this is the last unclosed list, trigger execution of all
+     * callbacks in sequence order
+     * 
+     * @param webapp
+     *            the web app whose callback list is to be closed
      */
-    private final void close(int webapp)
-    {
+    private final void close(int webapp) {
         closed[webapp] = true;
         closedCount++;
         if (closedCount == sequenceSize) {
@@ -237,12 +254,12 @@ public class Sequencer {
         }
     }
 
-    private void runCallbacks()
-    {
-        // if the latch is lifted then run the callbacks otherwise defer them for the
+    private void runCallbacks() {
+        // if the latch is lifted then run the callbacks otherwise defer them
+        // for the
         // thread which raises the latch to run
 
-        synchronized(Sequencer.class) {
+        synchronized (Sequencer.class) {
             if (latched) {
                 deferred.add(this);
                 return;
@@ -259,12 +276,14 @@ public class Sequencer {
     }
 
     /**
-     * construct a Sequencer to manage registration and execution of callbacks associated with an ordered sequence
-     * of web apps
-     * @param sequenceSize count of the number of web apps for which callbacks are to be registered
+     * construct a Sequencer to manage registration and execution of callbacks
+     * associated with an ordered sequence of web apps
+     * 
+     * @param sequenceSize
+     *            count of the number of web apps for which callbacks are to be
+     *            registered
      */
-    private Sequencer(int sequenceSize)
-    {
+    private Sequencer(int sequenceSize) {
         this.sequenceSize = sequenceSize;
         callbacks = new ArrayList[sequenceSize];
         for (int i = 0; i < sequenceSize; i++) {

@@ -59,7 +59,8 @@ public class TestJDBCStoreOffline {
     public static boolean FAULT_JDBC = false;
 
     @Test
-    public void test() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException, NamingException {
+    public void test() throws NotSupportedException, SystemException, IllegalStateException, RollbackException,
+            SecurityException, HeuristicMixedException, HeuristicRollbackException, NamingException {
         arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreType(JDBCStore.class.getName());
         arjPropertyManager.getObjectStoreEnvironmentBean().setJdbcAccess(TestJDBCAccess.class.getName());
 
@@ -71,12 +72,17 @@ public class TestJDBCStoreOffline {
         assertTrue(commitCount == 1);
 
         FAULT_JDBC = true;
-        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Arrays.asList(new String[] { "1" }));
-        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceOrphanFilters(Arrays.asList(new XAResourceOrphanFilter[] { new com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter(), new com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter() }));
-        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveries(Arrays.asList(new XAResourceRecovery[] { new DummyXAResourceRecovery() }));
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Arrays.asList(new String[]{"1"}));
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setXaResourceOrphanFilters(Arrays.asList(new XAResourceOrphanFilter[]{
+                        new com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter(),
+                        new com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter()}));
+        jtaPropertyManager.getJTAEnvironmentBean()
+                .setXaResourceRecoveries(Arrays.asList(new XAResourceRecovery[]{new DummyXAResourceRecovery()}));
         jtaPropertyManager.getJTAEnvironmentBean().setOrphanSafetyInterval(1);
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(2);
-        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryModules(Arrays.asList(new RecoveryModule[] { new XARecoveryModule() }));
+        recoveryPropertyManager.getRecoveryEnvironmentBean()
+                .setRecoveryModules(Arrays.asList(new RecoveryModule[]{new XARecoveryModule()}));
         RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
         manager.scan();
 

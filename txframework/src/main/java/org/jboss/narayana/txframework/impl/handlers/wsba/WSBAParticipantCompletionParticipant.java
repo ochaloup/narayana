@@ -41,13 +41,18 @@ import org.jboss.narayana.txframework.impl.handlers.ParticipantRegistrationExcep
 import java.io.Serializable;
 import java.util.Map;
 
-public class WSBAParticipantCompletionParticipant extends Participant implements BusinessAgreementWithParticipantCompletionParticipant,
-        ConfirmCompletedParticipant, Serializable {
+public class WSBAParticipantCompletionParticipant extends Participant
+        implements
+            BusinessAgreementWithParticipantCompletionParticipant,
+            ConfirmCompletedParticipant,
+            Serializable {
 
-    public WSBAParticipantCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap) throws ParticipantRegistrationException {
+    public WSBAParticipantCompletionParticipant(ServiceInvocationMeta serviceInvocationMeta, Map txDataMap)
+            throws ParticipantRegistrationException {
 
         super(serviceInvocationMeta, txDataMap);
-        registerEventsOfInterest(Cancel.class, Close.class, Compensate.class, ConfirmCompleted.class, Error.class, Status.class, Unknown.class);
+        registerEventsOfInterest(Cancel.class, Close.class, Compensate.class, ConfirmCompleted.class, Error.class,
+                Status.class, Unknown.class);
     }
 
     public void error() throws SystemException {
@@ -71,8 +76,8 @@ public class WSBAParticipantCompletionParticipant extends Participant implements
     }
 
     public String status() throws SystemException {
-        //todo: return a default status
-        //todo: check impl returns a String
+        // todo: return a default status
+        // todo: check impl returns a String
         return (String) invoke(Status.class);
     }
 

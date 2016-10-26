@@ -32,12 +32,9 @@ import org.omg.CosTransactions.SubtransactionAwareResource;
 import org.omg.CosTransactions.Control;
 import org.omg.CosTransactions.Coordinator;
 
-public class SingleSubtranAwareResourceRegistration extends PerfTestInterfacePOA
-{
-    public void work() throws PerfTestException
-    {
-        try
-        {
+public class SingleSubtranAwareResourceRegistration extends PerfTestInterfacePOA {
+    public void work() throws PerfTestException {
+        try {
             /**
              * Retrieve ORB and OA references
              */
@@ -52,9 +49,7 @@ public class SingleSubtranAwareResourceRegistration extends PerfTestInterfacePOA
             oa.objectIsReady(resource);
             SubtransactionAwareResource res = SubtransactionAwareResourceHelper.narrow(oa.corbaReference(resource));
             coordinator.register_resource(res);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new PerfTestException();
         }
     }

@@ -44,55 +44,51 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.ServerControl;
 import com.arjuna.ats.internal.jts.orbspecific.interposition.resources.arjuna.ServerNestedAction;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class ServerNestedActionUnitTest extends TestBase
-{
+public class ServerNestedActionUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerNestedAction act = new ServerNestedAction(sc);
-        
-        try
-        {
+
+        try {
             act.prepare();
-            
+
             fail();
+        } catch (final BAD_OPERATION ex) {
         }
-        catch (final BAD_OPERATION ex)
-        {
-        }
-        
+
         act.commit();
         act.rollback();
         act.commit_one_phase();
-        
+
         assertTrue(act.theResource() != null);
     }
-    
+
     @Test
-    public void testNestedCommit () throws Exception
-    {
+    public void testNestedCommit() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerNestedAction act = new ServerNestedAction(sc);
-        
+
         act.commit_subtransaction(null);
     }
-    
+
     @Test
-    public void testNestedRollback () throws Exception
-    {
+    public void testNestedRollback() throws Exception {
         ControlImple cont = new ControlImple(null, null);
         Control theControl = cont.getControl();
         ArjunaTransactionImple tx = cont.getImplHandle();
-        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(), theControl.get_terminator()); 
+        ServerControl sc = new ServerControl(tx.get_uid(), theControl, tx, theControl.get_coordinator(),
+                theControl.get_terminator());
         ServerNestedAction act = new ServerNestedAction(sc);
-        
+
         act.rollback_subtransaction();
     }
 }

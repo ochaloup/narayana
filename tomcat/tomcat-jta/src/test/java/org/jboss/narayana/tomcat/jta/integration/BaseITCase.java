@@ -70,23 +70,22 @@ public class BaseITCase {
 
     @Deployment
     public static WebArchive getDeployment() {
-        File[] libraries = Maven.resolver().resolve(NARAYANA_DEPENDENCY, RESTEASY_DEPENDENCY, H2_DEPENDENCY).withTransitivity()
-                .asFile();
+        File[] libraries = Maven.resolver().resolve(NARAYANA_DEPENDENCY, RESTEASY_DEPENDENCY, H2_DEPENDENCY)
+                .withTransitivity().asFile();
 
         WebArchive archive = ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME + ".war")
-                .addClasses(TestApplication.class, TestExecutor.class, TestXAResource.class)
-                .addAsLibraries(libraries)
+                .addClasses(TestApplication.class, TestExecutor.class, TestXAResource.class).addAsLibraries(libraries)
                 .addAsManifestResource("context.xml", "context.xml")
                 .addAsResource("jbossts-properties.xml", "jbossts-properties.xml")
-                .addAsWebInfResource("web.xml", "web.xml")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+                .addAsWebInfResource("web.xml", "web.xml").addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         System.out.println(archive.toString(true));
         return archive;
     }
 
     @Before
     public void before() {
-        File objectStore = new File(System.getenv("CATALINA_HOME") + File.separator + "bin" + File.separator + "ObjectStore");
+        File objectStore = new File(
+                System.getenv("CATALINA_HOME") + File.separator + "bin" + File.separator + "ObjectStore");
         assertTrue("Failed to clear object store", deleteDirectory(objectStore));
         client = ClientBuilder.newClient();
     }

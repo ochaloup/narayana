@@ -18,7 +18,7 @@
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
-package com.arjuna.services.framework.task ;
+package com.arjuna.services.framework.task;
 
 import com.arjuna.webservices.logging.WSCLogger;
 
@@ -27,43 +27,36 @@ import com.arjuna.webservices.logging.WSCLogger;
  * 
  * @author kevin
  */
-public class TaskWorker implements Runnable
-{
+public class TaskWorker implements Runnable {
     /**
      * The associated task manager.
      */
-    private final TaskManager taskManager ;
+    private final TaskManager taskManager;
 
     /**
      * Construct the task worker.
      * 
-     * @param taskManager The task manager.
+     * @param taskManager
+     *            The task manager.
      */
-    TaskWorker(final TaskManager taskManager)
-    {
-        this.taskManager = taskManager ;
+    TaskWorker(final TaskManager taskManager) {
+        this.taskManager = taskManager;
     }
 
     /**
      * Execute the tasks.
      */
-    public void run()
-    {
-        while(true)
-        {
-            final Task task = taskManager.getTask() ;
+    public void run() {
+        while (true) {
+            final Task task = taskManager.getTask();
 
-            if (task == null)
-            {
-                break ;
+            if (task == null) {
+                break;
             }
 
-            try
-            {
-                task.executeTask() ;
-            }
-            catch (final Throwable th)
-            {
+            try {
+                task.executeTask();
+            } catch (final Throwable th) {
                 WSCLogger.i18NLogger.error_services_framework_task_TaskWorker_run_1(th);
             }
         }

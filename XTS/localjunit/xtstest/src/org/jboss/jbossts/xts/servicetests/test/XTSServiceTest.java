@@ -22,10 +22,10 @@
 package org.jboss.jbossts.xts.servicetests.test;
 
 /**
- * API implemented by classes which are used to execute a specific XTS service test
+ * API implemented by classes which are used to execute a specific XTS service
+ * test
  */
-public interface XTSServiceTest
-{
+public interface XTSServiceTest {
     public void run();
     public boolean isSuccessful();
     public Exception getException();

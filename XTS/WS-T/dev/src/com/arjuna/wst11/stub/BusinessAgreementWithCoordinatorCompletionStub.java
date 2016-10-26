@@ -49,189 +49,130 @@ import com.arjuna.wst.SystemException;
 import com.arjuna.wst.WrongStateException;
 import com.arjuna.wst11.messaging.engines.CoordinatorCompletionCoordinatorEngine;
 
-public class BusinessAgreementWithCoordinatorCompletionStub implements BusinessAgreementWithCoordinatorCompletionParticipant, PersistableParticipant
-{
-    private static final QName QNAME_BACCWS_PARTICIPANT = new QName("baccwsParticipant") ;
-    private CoordinatorCompletionCoordinatorEngine participant ;
+public class BusinessAgreementWithCoordinatorCompletionStub
+        implements
+            BusinessAgreementWithCoordinatorCompletionParticipant,
+            PersistableParticipant {
+    private static final QName QNAME_BACCWS_PARTICIPANT = new QName("baccwsParticipant");
+    private CoordinatorCompletionCoordinatorEngine participant;
 
     public BusinessAgreementWithCoordinatorCompletionStub(final CoordinatorCompletionCoordinatorEngine participant)
-        throws Exception
-    {
-        this.participant = participant ;
+            throws Exception {
+        this.participant = participant;
     }
 
     /**
      * donstructor for use during recovery
      */
-    public BusinessAgreementWithCoordinatorCompletionStub()
-    {
-        this.participant = null ;
+    public BusinessAgreementWithCoordinatorCompletionStub() {
+        this.participant = null;
     }
 
-    public synchronized void close ()
-        throws WrongStateException, SystemException
-    {
+    public synchronized void close() throws WrongStateException, SystemException {
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Canceling-Active -> illegal state
-         * Canceling-Completing -> illegal state
-         * Completing -> illegal state
-         * Completed -> illegal state
-         * Closing -> no response
-         * Compensating -> illegal state
-         * Faulting -> illegal state
-         * Faulting-Active -> illegal state
-         * Faulting-Compensating -> illegal state
-         * Exiting -> illegal state
-         * Ended -> ended
+         * Active -> illegal state Canceling -> illegal state Canceling-Active
+         * -> illegal state Canceling-Completing -> illegal state Completing ->
+         * illegal state Completed -> illegal state Closing -> no response
+         * Compensating -> illegal state Faulting -> illegal state
+         * Faulting-Active -> illegal state Faulting-Compensating -> illegal
+         * state Exiting -> illegal state Ended -> ended
          */
-        final State state = participant.close() ;
+        final State state = participant.close();
 
-        if (state == State.STATE_CLOSING)
-        {
-            throw new SystemException() ;
-        }
-        else if (state != State.STATE_ENDED)
-        {
-            throw new WrongStateException() ;
+        if (state == State.STATE_CLOSING) {
+            throw new SystemException();
+        } else if (state != State.STATE_ENDED) {
+            throw new WrongStateException();
         }
     }
 
-    public synchronized void cancel ()
-        throws FaultedException, WrongStateException, SystemException
-    {
+    public synchronized void cancel() throws FaultedException, WrongStateException, SystemException {
         /*
-         * Active -> illegal state
-         * Canceling -> no response
-         * Canceling-Active -> no response
-         * Canceling-Completing -> no response
-         * Completing -> illegal state
-         * Completed -> illegal state
-         * Closing -> illegal state
-         * Compensating -> illegal state
-         * Faulting -> illegal state
-         * Faulting-Active -> illegal state
-         * Faulting-Compensating -> illegal state
-         * Exiting -> illegal state
-         * Ended -> ended
+         * Active -> illegal state Canceling -> no response Canceling-Active ->
+         * no response Canceling-Completing -> no response Completing -> illegal
+         * state Completed -> illegal state Closing -> illegal state
+         * Compensating -> illegal state Faulting -> illegal state
+         * Faulting-Active -> illegal state Faulting-Compensating -> illegal
+         * state Exiting -> illegal state Ended -> ended
          */
-        final State state = participant.cancel() ;
+        final State state = participant.cancel();
 
-        if ((state == State.STATE_CANCELING) || (state == State.STATE_CANCELING_ACTIVE) ||
-            (state == State.STATE_CANCELING_COMPLETING))
-        {
-            throw new SystemException() ;
-        }
-        else if (state == State.STATE_FAILING_CANCELING)
-        {
+        if ((state == State.STATE_CANCELING) || (state == State.STATE_CANCELING_ACTIVE)
+                || (state == State.STATE_CANCELING_COMPLETING)) {
+            throw new SystemException();
+        } else if (state == State.STATE_FAILING_CANCELING) {
             throw new FaultedException();
-        }
-        else if (state != State.STATE_ENDED)
-        {
-            throw new WrongStateException() ;
+        } else if (state != State.STATE_ENDED) {
+            throw new WrongStateException();
         }
     }
 
-    public synchronized void compensate ()
-        throws FaultedException, WrongStateException, SystemException
-    {
+    public synchronized void compensate() throws FaultedException, WrongStateException, SystemException {
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Canceling-Active -> illegal state
-         * Canceling-Completing -> illegal state
-         * Completing -> illegal state
-         * Completed -> illegal state
-         * Closing -> illegal state
-         * Compensating -> no response
-         * Faulting -> illegal state
-         * Faulting-Active -> illegal state
-         * Faulting-Compensating -> fault
-         * Exiting -> illegal state
-         * Ended -> ended
+         * Active -> illegal state Canceling -> illegal state Canceling-Active
+         * -> illegal state Canceling-Completing -> illegal state Completing ->
+         * illegal state Completed -> illegal state Closing -> illegal state
+         * Compensating -> no response Faulting -> illegal state Faulting-Active
+         * -> illegal state Faulting-Compensating -> fault Exiting -> illegal
+         * state Ended -> ended
          */
-        final State state = participant.compensate() ;
-        if (state == State.STATE_COMPENSATING)
-        {
-            throw new SystemException() ;
-        }
-        else if (state == State.STATE_FAILING_COMPENSATING)
-        {
-            throw new FaultedException() ;
-        }
-        else if (state != State.STATE_ENDED)
-        {
-            throw new WrongStateException() ;
+        final State state = participant.compensate();
+        if (state == State.STATE_COMPENSATING) {
+            throw new SystemException();
+        } else if (state == State.STATE_FAILING_COMPENSATING) {
+            throw new FaultedException();
+        } else if (state != State.STATE_ENDED) {
+            throw new WrongStateException();
         }
     }
 
-    public synchronized void complete ()
-        throws WrongStateException, SystemException
-    {
+    public synchronized void complete() throws WrongStateException, SystemException {
         /*
-         * Active -> illegal state
-         * Canceling -> illegal state
-         * Canceling-Active -> illegal state
-         * Canceling-Completing -> canceling
-         * Completing -> no response
-         * Completed -> completed
-         * Closing -> illegal state
-         * Compensating -> illegal state
-         * Faulting -> illegal state
-         * Faulting-Active -> illegal state
-         * Faulting-Compensating -> fault
-         * Exiting -> exiting
-         * Ended -> illegal state
+         * Active -> illegal state Canceling -> illegal state Canceling-Active
+         * -> illegal state Canceling-Completing -> canceling Completing -> no
+         * response Completed -> completed Closing -> illegal state Compensating
+         * -> illegal state Faulting -> illegal state Faulting-Active -> illegal
+         * state Faulting-Compensating -> fault Exiting -> exiting Ended ->
+         * illegal state
          */
-        final State state = participant.complete() ;
-        if (state == State.STATE_COMPLETED)
-        {
-            return ;
+        final State state = participant.complete();
+        if (state == State.STATE_COMPLETED) {
+            return;
+        } else if ((state == State.STATE_FAILING_COMPENSATING) || (state == State.STATE_CANCELING_COMPLETING)
+                || (state == State.STATE_EXITING)) {
+            throw new SystemException();
         }
-        else if ((state == State.STATE_FAILING_COMPENSATING) || (state == State.STATE_CANCELING_COMPLETING) ||
-            (state == State.STATE_EXITING))
-        {
-            throw new SystemException() ;
-        }
-        throw new WrongStateException() ;
+        throw new WrongStateException();
     }
 
-    public String status ()
-        throws SystemException
-    {
-        final State state = participant.getStatus() ;
-        return (state == null ? null : state.getValue().getLocalPart()) ;
+    public String status() throws SystemException {
+        final State state = participant.getStatus();
+        return (state == null ? null : state.getValue().getLocalPart());
     }
 
-    public void unknown ()
-        throws SystemException
-    {
-        error() ;
+    public void unknown() throws SystemException {
+        error();
     }
 
-    public synchronized void error ()
-        throws SystemException
-    {
-        participant.cancel() ;
+    public synchronized void error() throws SystemException {
+        participant.cancel();
     }
 
-    public boolean saveState(final OutputObjectState oos)
-    {
-        try
-        {
-            oos.packString(participant.getId()) ;
+    public boolean saveState(final OutputObjectState oos) {
+        try {
+            oos.packString(participant.getId());
 
-            // n.b. just use toString() for the endpoint -- it uses the writeTo() method which calls a suitable marshaller
-            final StringWriter sw = new StringWriter() ;
-            final XMLStreamWriter writer = SoapUtils.getXMLStreamWriter(sw) ;
-            StreamHelper.writeStartElement(writer, QNAME_BACCWS_PARTICIPANT) ;
+            // n.b. just use toString() for the endpoint -- it uses the
+            // writeTo() method which calls a suitable marshaller
+            final StringWriter sw = new StringWriter();
+            final XMLStreamWriter writer = SoapUtils.getXMLStreamWriter(sw);
+            StreamHelper.writeStartElement(writer, QNAME_BACCWS_PARTICIPANT);
             String eprefText = participant.getParticipant().toString();
             writer.writeCData(eprefText);
-            StreamHelper.writeEndElement(writer, null, null) ;
-            writer.close() ;
+            StreamHelper.writeEndElement(writer, null, null);
+            writer.close();
 
-            oos.packString(sw.toString()) ;
+            oos.packString(sw.toString());
 
             final State state = participant.getStatus();
             final QName stateName = state.getValue();
@@ -242,24 +183,20 @@ public class BusinessAgreementWithCoordinatorCompletionStub implements BusinessA
             oos.packString(localPart != null ? localPart : "");
             oos.packString(prefix != null ? prefix : "");
 
-            return true ;
-        }
-        catch (final Throwable th)
-        {
+            return true;
+        } catch (final Throwable th) {
             WSTLogger.i18NLogger.error_wst11_stub_BusinessAgreementWithCoordinatorCompletionStub_2(th);
-            return false ;
+            return false;
         }
     }
 
-    public boolean restoreState(final InputObjectState ios)
-    {
-        try
-        {
+    public boolean restoreState(final InputObjectState ios) {
+        try {
             final String id = ios.unpackString();
             final String eprValue = ios.unpackString();
 
-            final XMLStreamReader reader = SoapUtils.getXMLStreamReader(new StringReader(eprValue)) ;
-            StreamHelper.checkNextStartTag(reader, QNAME_BACCWS_PARTICIPANT) ;
+            final XMLStreamReader reader = SoapUtils.getXMLStreamReader(new StringReader(eprValue));
+            StreamHelper.checkNextStartTag(reader, QNAME_BACCWS_PARTICIPANT);
             String eprefText = reader.getElementText();
             StreamSource source = new StreamSource(new StringReader(eprefText));
             final W3CEndpointReference endpointReference = new W3CEndpointReference(source);
@@ -277,21 +214,23 @@ public class BusinessAgreementWithCoordinatorCompletionStub implements BusinessA
             QName statename = new QName(ns, localPart, prefix);
             State state = State.toState11(statename);
 
-            // if we already have an engine from a previous recovery scan or because
-            // we had a heuristic outcome then reuse it with luck it will have been committed
+            // if we already have an engine from a previous recovery scan or
+            // because
+            // we had a heuristic outcome then reuse it with luck it will have
+            // been committed
             // or aborted between the last scan and this one
-            // note that whatever happens it will not have been removed from the table
+            // note that whatever happens it will not have been removed from the
+            // table
             // because it is marked as recovered
-            participant = (CoordinatorCompletionCoordinatorEngine) CoordinatorCompletionCoordinatorProcessor.getProcessor().getCoordinator(id);
+            participant = (CoordinatorCompletionCoordinatorEngine) CoordinatorCompletionCoordinatorProcessor
+                    .getProcessor().getCoordinator(id);
             if (participant == null) {
                 participant = new CoordinatorCompletionCoordinatorEngine(id, endpointReference, state, true);
             }
-            return true ;
-        }
-        catch (final Throwable th)
-        {
+            return true;
+        } catch (final Throwable th) {
             WSTLogger.i18NLogger.error_wst11_stub_BusinessAgreementWithCoordinatorCompletionStub_3(th);
-            return false ;
+            return false;
         }
     }
 }

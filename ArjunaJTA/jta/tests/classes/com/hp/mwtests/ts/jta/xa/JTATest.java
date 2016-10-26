@@ -52,10 +52,9 @@ public class JTATest {
     private XAException exception;
     protected boolean resource1Rollback;
     protected boolean resource2Rollback;
-    
+
     @Test
-    public void testRMFAILcommit1PC() throws Exception
-    {
+    public void testRMFAILcommit1PC() throws Exception {
         XAResource theResource = new XAResource() {
 
             @Override
@@ -124,8 +123,7 @@ public class JTATest {
     @Test
     public void test() throws Exception {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
@@ -138,11 +136,12 @@ public class JTATest {
         tm.rollback();
         assertTrue(rollbackCalled.getRollbackCalled());
     }
-    
+
     /**
-     * This is none-spec behaviour that some resource managers perform where they throw a RTE instead of return an XAException
-     * This test verifies that RTE will result in rollback in Narayana
-     *  
+     * This is none-spec behaviour that some resource managers perform where
+     * they throw a RTE instead of return an XAException This test verifies that
+     * RTE will result in rollback in Narayana
+     * 
      * @throws SecurityException
      * @throws IllegalStateException
      * @throws HeuristicMixedException
@@ -152,10 +151,10 @@ public class JTATest {
      * @throws RollbackException
      */
     @Test
-    public void testRollbackRTE() throws SecurityException, IllegalStateException, HeuristicMixedException, HeuristicRollbackException, SystemException, NotSupportedException, RollbackException {
+    public void testRollbackRTE() throws SecurityException, IllegalStateException, HeuristicMixedException,
+            HeuristicRollbackException, SystemException, NotSupportedException, RollbackException {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-            .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
@@ -172,7 +171,7 @@ public class JTATest {
                 resource1Rollback = true;
             }
         }));
-        
+
         assertTrue(theTransaction.enlistResource(new SimpleXAResource() {
 
             @Override
@@ -189,13 +188,13 @@ public class JTATest {
             assertTrue(resource2Rollback);
         }
     }
-    
-    
-    @Test
-    public void testHeuristicRollbackSuppressedException() throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException, HeuristicMixedException, HeuristicRollbackException {
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+    @Test
+    public void testHeuristicRollbackSuppressedException()
+            throws NotSupportedException, SystemException, IllegalStateException, RollbackException, SecurityException,
+            HeuristicMixedException, HeuristicRollbackException {
+
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 
@@ -206,13 +205,11 @@ public class JTATest {
             @Override
             public void start(Xid xid, int flags) throws XAException {
 
-                
             }
 
             @Override
             public void end(Xid xid, int flags) throws XAException {
 
-                
             }
 
             @Override
@@ -230,13 +227,11 @@ public class JTATest {
             @Override
             public void rollback(Xid xid) throws XAException {
 
-                
             }
 
             @Override
             public void forget(Xid xid) throws XAException {
 
-                
             }
 
             @Override
@@ -261,19 +256,18 @@ public class JTATest {
             public boolean setTransactionTimeout(int seconds) throws XAException {
 
                 return false;
-            }}));
+            }
+        }));
         assertTrue(theTransaction.enlistResource(new XAResource() {
 
             @Override
             public void start(Xid xid, int flags) throws XAException {
 
-                
             }
 
             @Override
             public void end(Xid xid, int flags) throws XAException {
 
-                
             }
 
             @Override
@@ -285,19 +279,16 @@ public class JTATest {
             @Override
             public void commit(Xid xid, boolean onePhase) throws XAException {
 
-                
             }
 
             @Override
             public void rollback(Xid xid) throws XAException {
 
-                
             }
 
             @Override
             public void forget(Xid xid) throws XAException {
 
-                
             }
 
             @Override
@@ -322,7 +313,8 @@ public class JTATest {
             public boolean setTransactionTimeout(int seconds) throws XAException {
 
                 return false;
-            }}));
+            }
+        }));
 
         try {
             tm.commit();
@@ -331,7 +323,7 @@ public class JTATest {
             e.printStackTrace();
             assertTrue(e.getSuppressed()[0] == exception);
         }
-        
+
     }
 
     private class XARMERRXAResource implements XAResource {
@@ -408,7 +400,7 @@ public class JTATest {
         }
 
     }
-    
+
     private abstract class SimpleXAResource implements XAResource {
 
         @Override

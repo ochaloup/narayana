@@ -38,8 +38,7 @@ package com.arjuna.ats.arjuna.utils;
  * @since JTS 1.0.
  */
 
-public interface Process
-{
+public interface Process {
 
     /**
      * @return the process id. This had better be unique between processes on
@@ -47,6 +46,6 @@ public interface Process
      * @since JTS 2.1.
      */
 
-    public int getpid ();
+    public int getpid();
 
 }

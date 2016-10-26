@@ -34,29 +34,24 @@ import com.arjuna.ats.arjuna.coordinator.listener.ReaperMonitor;
 
 @RunWith(BMUnitRunner.class)
 @BMScript("reaper")
-public class ReaperMonitorTest
-{
-    class DummyMonitor implements ReaperMonitor
-    {
-        public synchronized void rolledBack (Uid txId)
-        {
+public class ReaperMonitorTest {
+    class DummyMonitor implements ReaperMonitor {
+        public synchronized void rolledBack(Uid txId) {
             success = true;
             notify();
             notified = true;
         }
-        
-        public synchronized void markedRollbackOnly (Uid txId)
-        {
+
+        public synchronized void markedRollbackOnly(Uid txId) {
             success = false;
             notify();
             notified = true;
         }
-        
+
         public boolean success = false;
         public boolean notified = false;
 
-        public synchronized boolean checkSucceeded(int msecsTimeout)
-        {
+        public synchronized boolean checkSucceeded(int msecsTimeout) {
             if (!notified) {
                 try {
                     wait(msecsTimeout);
@@ -68,23 +63,23 @@ public class ReaperMonitorTest
             return success;
         }
     }
-    
+
     @Test
-    public void test()
-    {
+    public void test() {
         TransactionReaper reaper = TransactionReaper.transactionReaper();
         DummyMonitor listener = new DummyMonitor();
-       
+
         reaper.addListener(listener);
-        
+
         AtomicAction A = new AtomicAction();
 
         A.begin();
 
         /*
-         * the reaper byteman script will make sure we synchronize with the reaper after this call
-         * just before it schedules the reapable for processing. the timout in the check method is
-         * there in case something is really wrong and the reapable does not get cancelled
+         * the reaper byteman script will make sure we synchronize with the
+         * reaper after this call just before it schedules the reapable for
+         * processing. the timout in the check method is there in case something
+         * is really wrong and the reapable does not get cancelled
          */
         reaper.insert(A, 1);
 
@@ -92,7 +87,8 @@ public class ReaperMonitorTest
 
         assertTrue(reaper.removeListener(listener));
 
-        // insert a new transaction with a longer timeout and check that we can find the remaining time
+        // insert a new transaction with a longer timeout and check that we can
+        // find the remaining time
 
         A = new AtomicAction();
 

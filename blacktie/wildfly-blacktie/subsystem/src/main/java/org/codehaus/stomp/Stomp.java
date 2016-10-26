@@ -18,9 +18,10 @@
 package org.codehaus.stomp;
 
 /**
-   * The standard verbs and headers used for the <a href="http://stomp.codehaus.org/">STOMP</a> protocol.
-      *
-   * @version $Revision: 57 $
+ * The standard verbs and headers used for the
+ * <a href="http://stomp.codehaus.org/">STOMP</a> protocol.
+ *
+ * @version $Revision: 57 $
  */
 public interface Stomp {
     String NULL = "\u0000";

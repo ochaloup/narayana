@@ -29,7 +29,8 @@ public class IncompatibleArgsException extends Exception {
     /**
      * If the arguments are not compatible with this command.
      * 
-     * @param message The description of the problem.
+     * @param message
+     *            The description of the problem.
      */
     public IncompatibleArgsException(String message) {
         super(message);

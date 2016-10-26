@@ -43,7 +43,7 @@ public class TypesCommand implements Action {
     @Override
     public Object execute() throws Exception {
         List<String> types = osb.types();
-        for(String type : types) {
+        for (String type : types) {
             System.out.println(type);
         }
 

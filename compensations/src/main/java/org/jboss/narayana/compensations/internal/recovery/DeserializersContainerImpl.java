@@ -56,10 +56,12 @@ public class DeserializersContainerImpl implements DeserializersContainer {
     /**
      * Add deserializer to the container.
      * 
-     * After deserializer is added, tell the compensation context manager to restore it's resources, because there might be
-     * records in the recovery store which were not deserialized before.
+     * After deserializer is added, tell the compensation context manager to
+     * restore it's resources, because there might be records in the recovery
+     * store which were not deserialized before.
      * 
-     * @param deserializer a deserializer to be added to the container.
+     * @param deserializer
+     *            a deserializer to be added to the container.
      */
     @Override
     public void addDeserializer(Deserializer deserializer) {

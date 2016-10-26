@@ -1,6 +1,5 @@
 package com.hp.mwtests.ts.jta.tools;
 
-
 import com.arjuna.ats.arjuna.common.Uid;
 
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
@@ -13,8 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ForgetTest {
     @Test
-    public void testCommitHeuristic ()
-    {
+    public void testCommitHeuristic() {
         SampleOnePhaseResource res = new SampleOnePhaseResource(SampleOnePhaseResource.ErrorType.heurcom);
         XidImple xid = new XidImple(new Uid());
         XAOnePhaseResource xares = new XAOnePhaseResource(res, xid, null);
@@ -24,8 +22,7 @@ public class ForgetTest {
     }
 
     @Test
-    public void testRollbackHeuristic ()
-    {
+    public void testRollbackHeuristic() {
         SampleOnePhaseResource res = new SampleOnePhaseResource(SampleOnePhaseResource.ErrorType.heurrb);
         XidImple xid = new XidImple(new Uid());
         XAOnePhaseResource xares = new XAOnePhaseResource(res, xid, null);

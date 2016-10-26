@@ -54,7 +54,7 @@ import java.util.Set;
  * @author <a href="mailto:zfeng@redhat.com">Amos Feng</a>
  */
 
-public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
+public class ObjStoreBrowserImpl implements ObjStoreBrowserService {
     private ObjStoreBrowser osb;
     private PrintStream printStream;
     private List<String> recordTypes = new ArrayList<String>();
@@ -130,7 +130,8 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
         String osMBeanName = "jboss.jta:type=ObjectStore";
 
         if (itype != null) {
-            if (select(itype) == false) return;
+            if (select(itype) == false)
+                return;
             osMBeanName += ",itype=" + itype;
         } else if (currentType != null) {
             osMBeanName += ",itype=" + currentType;
@@ -153,7 +154,7 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
                 printStream.printf("Transaction: %s%n", oi.getObjectName());
                 printStream.printf("-----------------------------------%n");
 
-                String participantQuery =  transactionId + ",puid=*";
+                String participantQuery = transactionId + ",puid=*";
                 try {
                     Set<ObjectInstance> participants = mbs.queryMBeans(new ObjectName(participantQuery), null);
                     printAtrributes(printStream, "\t", mbs, oi);
@@ -162,7 +163,7 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
                         printStream.printf("\t\tParticipant: %s%n", poi);
                         printAtrributes(printStream, "\t\t\t", mbs, poi);
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
 
                 }
                 printStream.printf("%n");
@@ -172,7 +173,7 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
 
     private void printAtrributes(PrintStream printStream, String printPrefix, MBeanServer mbs, ObjectInstance oi)
             throws IntrospectionException, InstanceNotFoundException, ReflectionException {
-        MBeanInfo info = mbs.getMBeanInfo( oi.getObjectName() );
+        MBeanInfo info = mbs.getMBeanInfo(oi.getObjectName());
         MBeanAttributeInfo[] attributeArray = info.getAttributes();
         int i = 0;
         String[] attributeNames = new String[attributeArray.length];
@@ -184,7 +185,7 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
 
         for (javax.management.Attribute attribute : attributes.asList()) {
             Object value = attribute.getValue();
-            String v =  value == null ? "null" : value.toString();
+            String v = value == null ? "null" : value.toString();
 
             printStream.printf("%s%s=%s%n", printPrefix, attribute.getName(), v);
         }
@@ -253,7 +254,7 @@ public class ObjStoreBrowserImpl implements ObjStoreBrowserService{
 
     }
 
-    private final boolean supportedLog (String logID) throws ObjectStoreException, IOException {
+    private final boolean supportedLog(String logID) throws ObjectStoreException, IOException {
         Uid id = new Uid(logID);
 
         if (id.equals(Uid.nullUid())) {

@@ -58,95 +58,80 @@ package org.jboss.jbossts.qa.RawSubtransactionAwareResources02Impls;
  * $Id: SubtransactionAwareResourceImpl01.java,v 1.2 2003/06/26 11:45:04 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.RawSubtransactionAwareResources02.*;
 import org.omg.CosTransactions.*;
 
-public class SubtransactionAwareResourceImpl01 implements SubtransactionAwareResourceOperations
-{
-    public SubtransactionAwareResourceImpl01(int objectNumber, int subtransactionAwareResourceNumber)
-    {
+public class SubtransactionAwareResourceImpl01 implements SubtransactionAwareResourceOperations {
+    public SubtransactionAwareResourceImpl01(int objectNumber, int subtransactionAwareResourceNumber) {
         _donePrepare = false;
         _objectNumber = objectNumber;
         _subtransactionAwareResourceNumber = subtransactionAwareResourceNumber;
     }
 
-    public Vote prepare()
-            throws HeuristicMixed, HeuristicHazard
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.prepare [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return VoteCommit");
+    public Vote prepare() throws HeuristicMixed, HeuristicHazard {
+        System.err.println("SubtransactionAwareResourceImpl01.prepare [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return VoteCommit");
 
         _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
 
         return Vote.VoteCommit;
     }
 
-    public void rollback()
-            throws HeuristicCommit, HeuristicMixed, HeuristicHazard
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.rollback [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void rollback() throws HeuristicCommit, HeuristicMixed, HeuristicHazard {
+        System.err.println("SubtransactionAwareResourceImpl01.rollback [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
         _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
     }
 
-    public void commit()
-            throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.commit [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void commit() throws NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
+        System.err.println("SubtransactionAwareResourceImpl01.commit [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
         _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
     }
 
-    public void commit_one_phase()
-            throws HeuristicHazard
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.commit_one_phase [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void commit_one_phase() throws HeuristicHazard {
+        System.err.println("SubtransactionAwareResourceImpl01.commit_one_phase [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
         _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
     }
 
-    public void forget()
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.forget [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void forget() {
+        System.err.println("SubtransactionAwareResourceImpl01.forget [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
         _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
     }
 
-    public void rollback_subtransaction()
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.rollback_subtransaction [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void rollback_subtransaction() {
+        System.err.println("SubtransactionAwareResourceImpl01.rollback_subtransaction [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
-        if (_subtransactionAwareResourceTrace == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceNone)
-        {
+        if (_subtransactionAwareResourceTrace == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceNone) {
             _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceRollbackSubtransaction;
-        }
-        else
-        {
+        } else {
             _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
         }
     }
 
-    public void commit_subtransaction(Coordinator parent)
-    {
-        System.err.println("SubtransactionAwareResourceImpl01.commit_subtransaction [O" + _objectNumber + ".R" + _subtransactionAwareResourceNumber + "]: Return");
+    public void commit_subtransaction(Coordinator parent) {
+        System.err.println("SubtransactionAwareResourceImpl01.commit_subtransaction [O" + _objectNumber + ".R"
+                + _subtransactionAwareResourceNumber + "]: Return");
 
-        if (_subtransactionAwareResourceTrace == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceNone)
-        {
+        if (_subtransactionAwareResourceTrace == SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceNone) {
             _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceCommitSubtransaction;
-        }
-        else
-        {
+        } else {
             _subtransactionAwareResourceTrace = SubtransactionAwareResourceTrace.SubtransactionAwareResourceTraceUnknown;
         }
     }
 
-    public boolean isCorrect()
-    {
+    public boolean isCorrect() {
         return true;
     }
 
-    public SubtransactionAwareResourceTrace getTrace()
-    {
+    public SubtransactionAwareResourceTrace getTrace() {
         return _subtransactionAwareResourceTrace;
     }
 

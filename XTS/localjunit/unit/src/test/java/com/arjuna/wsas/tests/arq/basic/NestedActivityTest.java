@@ -19,37 +19,33 @@ public class NestedActivityTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                WSASTestUtils.class);
+        return WarDeployment.getDeployment(WSASTestUtils.class);
     }
 
     @Test
-    public void testNestedActivity()
-            throws Exception
-            {
+    public void testNestedActivity() throws Exception {
         UserActivity ua = UserActivityFactory.userActivity();
 
-        try
-        {
+        try {
             ua.start("dummy");
 
-            System.out.println("Started: "+ua.activityName());
+            System.out.println("Started: " + ua.activityName());
 
             ua.start("dummy");
 
             String nested = ua.activityName();
 
-            System.out.println("Started: "+nested);
+            System.out.println("Started: " + nested);
 
-            System.out.println("\nEnding: "+nested);
+            System.out.println("\nEnding: " + nested);
 
             ua.end();
 
             String parent = ua.activityName();
 
-            System.out.println("\nCurrent: "+parent);
+            System.out.println("\nCurrent: " + parent);
 
-            System.out.println("\nEnding: "+parent);
+            System.out.println("\nEnding: " + parent);
 
             ua.end();
 
@@ -63,11 +59,9 @@ public class NestedActivityTest {
 
             System.out.println("\nEnded.");
 
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSASTestUtils.cleanup(ua);
             throw ex;
         }
-            }
+    }
 }

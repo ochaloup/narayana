@@ -59,73 +59,61 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.lang.reflect.Field;
 
-public class TransactionImporterUnitTest extends TestBase
-{
+public class TransactionImporterUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         TransactionImporterImple importer = new TransactionImporterImple();
-        
-        try
-        {
+
+        try {
             importer.importTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.recoverTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.recoverTransaction(new Uid());
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.getImportedTransaction(null);
-            
+
             fail();
+        } catch (final IllegalArgumentException ex) {
         }
-        catch (final IllegalArgumentException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             importer.removeImportedTransaction(null);
-            
+
             fail();
-        }
-        catch (final IllegalArgumentException ex)
-        {
+        } catch (final IllegalArgumentException ex) {
         }
     }
 
     @Test
-    public void testDifferentInstanceFromRecovery() throws XAException, RollbackException, SystemException, HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException, NoSuchFieldException, IllegalAccessException {
+    public void testDifferentInstanceFromRecovery()
+            throws XAException, RollbackException, SystemException, HeuristicRollbackException, HeuristicMixedException,
+            HeuristicCommitException, NoSuchFieldException, IllegalAccessException {
         Uid uid = new Uid();
         XidImple xid = new XidImple(uid);
 
-        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
+        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter()
+                .importTransaction(xid);
 
-        // This is required because it JTS records are stored with a dynamic _savingUid
-        // Normally they are recovered using XATerminator but for this test I would like to stick to testing
+        // This is required because it JTS records are stored with a dynamic
+        // _savingUid
+        // Normally they are recovered using XATerminator but for this test I
+        // would like to stick to testing
         // transaction importer
         Field field = TransactionImple.class.getDeclaredField("_theTransaction");
         field.setAccessible(true);
@@ -144,8 +132,9 @@ public class TransactionImporterUnitTest extends TestBase
         Uid subordinateTransactionUid = (Uid) field.get(o);
         Xid subordinateTransactionXid = subordinateTransaction.baseXid();
 
-        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
-        assertTrue (subordinateTransaction == importedTransaction);
+        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter()
+                .getImportedTransaction(subordinateTransactionXid);
+        assertTrue(subordinateTransaction == importedTransaction);
         subordinateTransaction.enlistResource(new XAResource() {
 
             @Override
@@ -201,11 +190,14 @@ public class TransactionImporterUnitTest extends TestBase
         subordinateTransaction.doPrepare();
 
         Implementationsx.initialise();
-        SubordinateTransaction subordinateTransaction1 = SubordinationManager.getTransactionImporter().recoverTransaction(subordinateTransactionUid);
+        SubordinateTransaction subordinateTransaction1 = SubordinationManager.getTransactionImporter()
+                .recoverTransaction(subordinateTransactionUid);
         assertTrue(subordinateTransaction != subordinateTransaction1);
-        SubordinateTransaction importedTransaction1 = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
+        SubordinateTransaction importedTransaction1 = SubordinationManager.getTransactionImporter()
+                .getImportedTransaction(subordinateTransactionXid);
         assertTrue(importedTransaction != importedTransaction1);
-        SubordinateTransaction importedTransaction2 = SubordinationManager.getTransactionImporter().getImportedTransaction(subordinateTransactionXid);
+        SubordinateTransaction importedTransaction2 = SubordinationManager.getTransactionImporter()
+                .getImportedTransaction(subordinateTransactionXid);
         assertTrue(importedTransaction1 == importedTransaction2);
         importedTransaction2.doCommit();
     }

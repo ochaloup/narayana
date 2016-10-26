@@ -31,34 +31,36 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Initialise the interop initiator service.
+ * 
  * @author kevin
  */
-public class InitiatorInitialisation implements ServletContextListener
-{
+public class InitiatorInitialisation implements ServletContextListener {
     /**
      * The context has been initialized.
-     * @param servletContextEvent The servlet context event.
+     * 
+     * @param servletContextEvent
+     *            The servlet context event.
      */
-    public void contextInitialized(final ServletContextEvent servletContextEvent)
-    {
+    public void contextInitialized(final ServletContextEvent servletContextEvent) {
         ServletContext context = servletContextEvent.getServletContext();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
         int bindPort = wscEnvironmentBean.getBindPort11();
-        String baseURI = "http://" + bindAddress + ":" +  bindPort + "/sc007";
+        String baseURI = "http://" + bindAddress + ":" + bindPort + "/sc007";
         final String uri = baseURI + "/InitiatorService";
 
-        final ServiceRegistry serviceRegistry = ServiceRegistry.getRegistry() ;
-        serviceRegistry.registerServiceProvider(InteropConstants.SERVICE_INITIATOR, uri) ;
+        final ServiceRegistry serviceRegistry = ServiceRegistry.getRegistry();
+        serviceRegistry.registerServiceProvider(InteropConstants.SERVICE_INITIATOR, uri);
     }
 
     /**
      * The context is about to be destroyed.
-     * @param servletContextEvent The servlet context event.
+     * 
+     * @param servletContextEvent
+     *            The servlet context event.
      */
-    public void contextDestroyed(final ServletContextEvent servletContextEvent)
-    {
-        final ServiceRegistry serviceRegistry = ServiceRegistry.getRegistry() ;
-        serviceRegistry.removeServiceProvider(InteropConstants.SERVICE_INITIATOR) ;
+    public void contextDestroyed(final ServletContextEvent servletContextEvent) {
+        final ServiceRegistry serviceRegistry = ServiceRegistry.getRegistry();
+        serviceRegistry.removeServiceProvider(InteropConstants.SERVICE_INITIATOR);
     }
 }

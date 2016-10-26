@@ -27,18 +27,16 @@ import com.arjuna.wst11.messaging.*;
 
 /**
  * Initialise the transaction participant services.
+ * 
  * @author kevin
  */
-public class WSTParticipantInitialisation
-{
-    public static void startup()
-    {
-        ParticipantProcessor.setProcessor(new ParticipantProcessorImpl()) ;
-        CoordinatorCompletionParticipantProcessor.setProcessor(new CoordinatorCompletionParticipantProcessorImpl()) ;
-        ParticipantCompletionParticipantProcessor.setProcessor(new ParticipantCompletionParticipantProcessorImpl()) ;
+public class WSTParticipantInitialisation {
+    public static void startup() {
+        ParticipantProcessor.setProcessor(new ParticipantProcessorImpl());
+        CoordinatorCompletionParticipantProcessor.setProcessor(new CoordinatorCompletionParticipantProcessorImpl());
+        ParticipantCompletionParticipantProcessor.setProcessor(new ParticipantCompletionParticipantProcessorImpl());
     }
 
-    public static void shutdown()
-    {
+    public static void shutdown() {
     }
 }

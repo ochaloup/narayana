@@ -84,9 +84,7 @@ public class JmsRecoveryIntegrationTests extends AbstractIntegrationTests {
     }
 
     @Test
-    @BMRule(name = "Fail before commit", targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction",
-            targetMethod = "phase2Commit", targetLocation = "ENTRY", helper = "org.jboss.narayana.jta.jms.helpers.BytemanHelper",
-            action = "incrementCommitsCounter(); failFirstCommit($0.get_uid());")
+    @BMRule(name = "Fail before commit", targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "phase2Commit", targetLocation = "ENTRY", helper = "org.jboss.narayana.jta.jms.helpers.BytemanHelper", action = "incrementCommitsCounter(); failFirstCommit($0.get_uid());")
     public void shouldCrashBeforeCommitAndRecover() throws Exception {
         List<Xid> mockXids = new ArrayList<>();
         when(xaResourceMock.prepare(any(Xid.class))).then(i -> {
@@ -94,7 +92,7 @@ public class JmsRecoveryIntegrationTests extends AbstractIntegrationTests {
             return XAResource.XA_OK;
         });
         when(xaResourceMock.recover(anyInt())).then(i -> mockXids.toArray(new Xid[mockXids.size()]));
-        when(xaResourceRecoveryHelperMock.getXAResources()).thenReturn(new XAResource[] { xaResourceMock });
+        when(xaResourceRecoveryHelperMock.getXAResources()).thenReturn(new XAResource[]{xaResourceMock});
 
         TransactionManager.transactionManager().begin();
         TransactionManager.transactionManager().getTransaction().enlistResource(xaResourceMock);

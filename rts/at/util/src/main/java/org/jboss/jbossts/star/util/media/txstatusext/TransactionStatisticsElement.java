@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "statistics")
-@XmlType(propOrder = { "active", "prepared", "committed", "rolledback"})
+@XmlType(propOrder = {"active", "prepared", "committed", "rolledback"})
 public class TransactionStatisticsElement {
     private int active;
     private int prepared;

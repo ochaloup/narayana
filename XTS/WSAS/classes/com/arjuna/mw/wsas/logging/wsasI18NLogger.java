@@ -33,10 +33,10 @@ import static org.jboss.logging.annotations.Message.Format.*;
 public interface wsasI18NLogger {
 
     /*
-        Message IDs are unique and non-recyclable.
-        Don't change the purpose of existing messages.
-          (tweak the message text or params for clarification if you like).
-        Allocate new messages by following instructions at the bottom of the file.
+     * Message IDs are unique and non-recyclable. Don't change the purpose of
+     * existing messages. (tweak the message text or params for clarification if
+     * you like). Allocate new messages by following instructions at the bottom
+     * of the file.
      */
 
     @Message(id = 41001, value = "allHighLevelServices threw exception", format = MESSAGE_FORMAT)
@@ -47,9 +47,9 @@ public interface wsasI18NLogger {
     @LogMessage(level = WARN)
     public void warn_context_ContextManager_2(@Cause() Throwable arg0);
 
-//    @Message(id = 41003, value = "not found.", format = MESSAGE_FORMAT)
-//    @LogMessage(level = WARN)
-//    public void warn_utils_Configuration_1();
+    // @Message(id = 41003, value = "not found.", format = MESSAGE_FORMAT)
+    // @LogMessage(level = WARN)
+    // public void warn_utils_Configuration_1();
 
     @Message(id = 41004, value = "Failed to create doc", format = MESSAGE_FORMAT)
     public String get_utils_Configuration_2();
@@ -115,14 +115,14 @@ public interface wsasI18NLogger {
     public String get_activity_HLSManager_1();
 
     /*
-        Allocate new messages directly above this notice.
-          - id: use the next id number in numeric sequence. Don't reuse ids.
-          The first two digits of the id(XXyyy) denote the module
-            all message in this file should have the same prefix.
-          - value: default (English) version of the log message.
-          - level: according to severity semantics defined at http://docspace.corp.redhat.com/docs/DOC-30217
-          Debug and trace don't get i18n. Everything else MUST be i18n.
-          By convention methods with String return type have prefix get_,
-            all others are log methods and have prefix <level>_
+     * Allocate new messages directly above this notice. - id: use the next id
+     * number in numeric sequence. Don't reuse ids. The first two digits of the
+     * id(XXyyy) denote the module all message in this file should have the same
+     * prefix. - value: default (English) version of the log message. - level:
+     * according to severity semantics defined at
+     * http://docspace.corp.redhat.com/docs/DOC-30217 Debug and trace don't get
+     * i18n. Everything else MUST be i18n. By convention methods with String
+     * return type have prefix get_, all others are log methods and have prefix
+     * <level>_
      */
 }

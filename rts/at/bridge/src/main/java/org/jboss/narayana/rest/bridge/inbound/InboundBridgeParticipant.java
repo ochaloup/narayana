@@ -37,7 +37,6 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.io.Serializable;
 
-
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -175,13 +174,13 @@ public class InboundBridgeParticipant implements Participant, Serializable {
             LOG.warn(e.getMessage(), e);
 
             switch (e.errorCode) {
-                case XAException.XA_HEURCOM:
+                case XAException.XA_HEURCOM :
                     throw new HeuristicException(HeuristicType.HEURISTIC_COMMIT);
-                case XAException.XA_HEURRB:
+                case XAException.XA_HEURRB :
                     throw new HeuristicException(HeuristicType.HEURISTIC_ROLLBACK);
-                case XAException.XA_HEURMIX:
+                case XAException.XA_HEURMIX :
                     throw new HeuristicException(HeuristicType.HEURISTIC_MIXED);
-                case XAException.XA_HEURHAZ:
+                case XAException.XA_HEURHAZ :
                     throw new HeuristicException(HeuristicType.HEURISTIC_MIXED);
             }
         }
@@ -198,13 +197,13 @@ public class InboundBridgeParticipant implements Participant, Serializable {
             LOG.warn(e.getMessage(), e);
 
             switch (e.errorCode) {
-                case XAException.XA_HEURCOM:
+                case XAException.XA_HEURCOM :
                     throw new HeuristicException(HeuristicType.HEURISTIC_COMMIT);
-                case XAException.XA_HEURRB:
+                case XAException.XA_HEURRB :
                     throw new HeuristicException(HeuristicType.HEURISTIC_ROLLBACK);
-                case XAException.XA_HEURMIX:
+                case XAException.XA_HEURMIX :
                     throw new HeuristicException(HeuristicType.HEURISTIC_MIXED);
-                case XAException.XA_HEURHAZ:
+                case XAException.XA_HEURHAZ :
                     throw new HeuristicException(HeuristicType.HEURISTIC_MIXED);
             }
         }

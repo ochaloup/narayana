@@ -34,7 +34,6 @@ import org.junit.Test;
 import javax.enterprise.context.ContextNotActiveException;
 import javax.inject.Inject;
 
-
 /**
  * @author paul.robinson@redhat.com 22/03/2013
  */
@@ -127,10 +126,9 @@ public abstract class CompensationScopedTest {
             dummyData.getValue();
             Assert.fail("Context should not be active here");
         } catch (ContextNotActiveException e) {
-            //expected
+            // expected
         }
     }
-
 
     @Test
     public void testCompensationHandler() throws Exception {

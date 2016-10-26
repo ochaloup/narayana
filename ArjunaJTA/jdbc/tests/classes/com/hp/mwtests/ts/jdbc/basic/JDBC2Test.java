@@ -52,8 +52,7 @@ import org.junit.Test;
 import com.arjuna.ats.internal.jdbc.DynamicClass;
 import com.arjuna.ats.jdbc.TransactionalDriver;
 
-public class JDBC2Test
-{
+public class JDBC2Test {
     protected Connection conn = null;
     protected Connection conn2 = null;
     protected boolean commit = true;
@@ -63,57 +62,49 @@ public class JDBC2Test
     protected String url = null;
 
     @Before
-    public void setup() throws Exception
-    {
+    public void setup() throws Exception {
         url = "jdbc:arjuna:";
         Properties p = System.getProperties();
         p.put("jdbc.drivers", Driver.class.getName());
-        
+
         System.setProperties(p);
         DriverManager.registerDriver(new TransactionalDriver());
 
         dbProperties = new Properties();
-        
+
         JdbcDataSource ds = new JdbcDataSource();
         ds.setURL("jdbc:h2:./h2/foo");
         dbProperties.put(TransactionalDriver.XADataSource, ds);
-        
+
         conn = DriverManager.getConnection(url, dbProperties);
         conn2 = DriverManager.getConnection(url, dbProperties);
     }
 
     @Test
-    public void test() throws Exception
-    {
-        Statement stmt = null;  // non-tx statement
-        Statement stmtx = null;    // will be a tx-statement
+    public void test() throws Exception {
+        Statement stmt = null; // non-tx statement
+        Statement stmtx = null; // will be a tx-statement
 
-            stmt = conn.createStatement();  // non-tx statement
+        stmt = conn.createStatement(); // non-tx statement
 
-            try
-            {
-                stmt.executeUpdate("DROP TABLE test_table");
-                stmt.executeUpdate("DROP TABLE test_table2");
-        }
-            catch (Exception e)
-        {
-        // Ignore
+        try {
+            stmt.executeUpdate("DROP TABLE test_table");
+            stmt.executeUpdate("DROP TABLE test_table2");
+        } catch (Exception e) {
+            // Ignore
         }
 
-                stmt.executeUpdate("CREATE TABLE test_table (a INTEGER,b INTEGER)");
-                stmt.executeUpdate("CREATE TABLE test_table2 (a INTEGER,b INTEGER)");
+        stmt.executeUpdate("CREATE TABLE test_table (a INTEGER,b INTEGER)");
+        stmt.executeUpdate("CREATE TABLE test_table2 (a INTEGER,b INTEGER)");
 
         javax.transaction.UserTransaction tx = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
-        try
-        {
+        try {
             System.out.println("Starting top-level transaction.");
-
 
             tx.begin();
 
-            if (nested)
-            {
+            if (nested) {
                 System.out.println("Starting nested transaction.");
 
                 tx.begin();
@@ -121,8 +112,7 @@ public class JDBC2Test
 
             stmtx = conn.createStatement(); // will be a tx-statement
 
-            try
-            {
+            try {
                 System.out.println("\nAdding entries to table 1.");
 
                 stmtx.executeUpdate("INSERT INTO test_table (a, b) VALUES (1,2)");
@@ -131,47 +121,41 @@ public class JDBC2Test
 
                 System.out.println("\nInspecting table 1.");
 
-                    res1 = stmtx.executeQuery("SELECT * FROM test_table");
+                res1 = stmtx.executeQuery("SELECT * FROM test_table");
 
-                    int rowCount = 0;
+                int rowCount = 0;
 
-                    while (res1.next())
-                    {
-                        System.out.println("Column 1: " + res1.getInt(1));
-                        System.out.println("Column 2: " + res1.getInt(2));
+                while (res1.next()) {
+                    System.out.println("Column 1: " + res1.getInt(1));
+                    System.out.println("Column 2: " + res1.getInt(2));
 
-                        rowCount++;
-                    }
+                    rowCount++;
+                }
 
-                    if ( rowCount != 1)
-                    {
-                        throw new Exception("Number of rows = "+rowCount+", test was expecting 1");
-                    }
+                if (rowCount != 1) {
+                    throw new Exception("Number of rows = " + rowCount + ", test was expecting 1");
+                }
 
                 System.out.println("\nAdding entries to table 2.");
 
                 stmtx.executeUpdate("INSERT INTO test_table2 (a, b) VALUES (3,4)");
 
-                    res1 = stmtx.executeQuery("SELECT * FROM test_table2");
+                res1 = stmtx.executeQuery("SELECT * FROM test_table2");
 
                 System.out.println("\nInspecting table 2.");
 
-                    rowCount = 0;
+                rowCount = 0;
 
-                    while (res1.next())
-                    {
-                        System.out.println("Column 1: " + res1.getInt(1));
-                        System.out.println("Column 2: " + res1.getInt(2));
-                        rowCount++;
-                    }
+                while (res1.next()) {
+                    System.out.println("Column 1: " + res1.getInt(1));
+                    System.out.println("Column 2: " + res1.getInt(2));
+                    rowCount++;
+                }
 
-                    if ( rowCount != 1 )
-                    {
-                        throw new Exception("Row count = "+rowCount+", test was expecting 1");
-                    }
-            }
-            catch (SQLException e)
-            {
+                if (rowCount != 1) {
+                    throw new Exception("Row count = " + rowCount + ", test was expecting 1");
+                }
+            } catch (SQLException e) {
                 e.printStackTrace(System.err);
 
                 tx.rollback();
@@ -179,18 +163,13 @@ public class JDBC2Test
                 if (nested)
                     tx.rollback();
 
-                try
-                {
+                try {
                     conn.close();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                 }
 
                 fail();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace(System.err);
 
                 if (nested)
@@ -198,12 +177,9 @@ public class JDBC2Test
 
                 tx.rollback();
 
-                try
-                {
+                try {
                     conn.close();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                 }
 
                 fail();
@@ -211,14 +187,11 @@ public class JDBC2Test
 
             System.out.print("\nNow attempting to ");
 
-            if (commit)
-            {
+            if (commit) {
                 System.out.print("commit ");
 
                 tx.commit();
-            }
-            else
-            {
+            } else {
                 System.out.print("rollback ");
 
                 tx.rollback();
@@ -230,8 +203,7 @@ public class JDBC2Test
 
             tx.begin();
 
-            if (!reuseconn)
-            {
+            if (!reuseconn) {
                 conn = DriverManager.getConnection(url, dbProperties);
             }
 
@@ -239,40 +211,34 @@ public class JDBC2Test
 
             ResultSet res2 = null;
 
-                res2 = stmtx.executeQuery("SELECT * FROM test_table");
+            res2 = stmtx.executeQuery("SELECT * FROM test_table");
 
-                int rowCount = 0;
-                while (res2.next())
-                {
-                    System.out.println("Column 1: " + res2.getInt(1));
-                    System.out.println("Column 2: " + res2.getInt(2));
-                    rowCount++;
-                }
+            int rowCount = 0;
+            while (res2.next()) {
+                System.out.println("Column 1: " + res2.getInt(1));
+                System.out.println("Column 2: " + res2.getInt(2));
+                rowCount++;
+            }
 
-                if ( commit )
-                {
-                    if ( rowCount != 1 )
-                    {
-                        throw new Exception("Committed row count = "+rowCount+", test expected 1");
-                    }
+            if (commit) {
+                if (rowCount != 1) {
+                    throw new Exception("Committed row count = " + rowCount + ", test expected 1");
                 }
-                else
-                {
-                    if ( rowCount != 0 )
-                    {
-                        throw new Exception("Rolledback row count = "+rowCount+", test expected 0");
-                    }
+            } else {
+                if (rowCount != 0) {
+                    throw new Exception("Rolledback row count = " + rowCount + ", test expected 0");
                 }
+            }
 
-            conn.close(); // connections must be closed before committing a JTA transaction
+            conn.close(); // connections must be closed before committing a JTA
+                            // transaction
             tx.commit();
 
             tx.begin();
 
             assertTrue(conn.isClosed());
 
-            if (!reuseconn)
-            {
+            if (!reuseconn) {
                 conn = DriverManager.getConnection(url, dbProperties);
             }
 
@@ -280,53 +246,39 @@ public class JDBC2Test
 
             stmtx = conn.createStatement();
 
-                res2 = stmtx.executeQuery("SELECT * FROM test_table2");
+            res2 = stmtx.executeQuery("SELECT * FROM test_table2");
 
-                rowCount = 0;
+            rowCount = 0;
 
-                while (res2.next())
-                {
-                    System.out.println("Column 1: " + res2.getInt(1));
-                    System.out.println("Column 2: " + res2.getInt(2));
-                    rowCount++;
-                }
+            while (res2.next()) {
+                System.out.println("Column 1: " + res2.getInt(1));
+                System.out.println("Column 2: " + res2.getInt(2));
+                rowCount++;
+            }
 
-                if ( commit )
-                {
-                    if ( rowCount != 1 )
-                    {
-                        throw new Exception("Committed row count = "+rowCount+", test expected 1");
-                    }
+            if (commit) {
+                if (rowCount != 1) {
+                    throw new Exception("Committed row count = " + rowCount + ", test expected 1");
                 }
-                else
-                {
-                    if ( rowCount != 0 )
-                    {
-                        throw new Exception("Rolledback row count = "+rowCount+", test expected 0");
-                    }
+            } else {
+                if (rowCount != 0) {
+                    throw new Exception("Rolledback row count = " + rowCount + ", test expected 0");
                 }
+            }
 
             tx.commit();
-        }
-        catch (Exception ex)
-        {
-            try
-            {
+        } catch (Exception ex) {
+            try {
                 tx.rollback();
-            }
-            catch (Exception exp)
-            {
+            } catch (Exception exp) {
             }
 
             fail();
         }
 
-        try
-        {
+        try {
             conn.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
         }
     }
 

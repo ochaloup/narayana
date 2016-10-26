@@ -22,7 +22,6 @@ import javax.transaction.InvalidTransactionException;
 import javax.transaction.SystemException;
 import javax.annotation.PostConstruct;
 
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException;
@@ -39,8 +38,9 @@ import org.jboss.narayana.rest.bridge.inbound.InboundBridge;
 import org.jboss.narayana.rest.bridge.inbound.InboundBridgeManager;
 
 /**
- * MDB services implementations extend this class as it provides the core service template method. For non MDB services on the
- * Service interface need be implemented.
+ * MDB services implementations extend this class as it provides the core
+ * service template method. For non MDB services on the Service interface need
+ * be implemented.
  */
 public abstract class BlackTieService implements Service {
     /**
@@ -53,7 +53,7 @@ public abstract class BlackTieService implements Service {
     private String name;
 
     protected BlackTieService(String name) throws ConfigurationException {
-        //connectionFactory = ConnectionFactory.getConnectionFactory();
+        // connectionFactory = ConnectionFactory.getConnectionFactory();
         this.name = name;
     }
 
@@ -71,25 +71,29 @@ public abstract class BlackTieService implements Service {
         }
     }
 
-
     /**
-     * Entry points should pass control to this method as soon as reasonably possible.
+     * Entry points should pass control to this method as soon as reasonably
+     * possible.
      * 
-     * @param serviceName The name of the service
-     * @param message The message to process
+     * @param serviceName
+     *            The name of the service
+     * @param message
+     *            The message to process
      * @throws ConnectionException
-     * @throws ConnectionException In case communication fails
+     * @throws ConnectionException
+     *             In case communication fails
      * @throws ConfigurationException
      * @throws NamingException
      * @throws SystemException
      * @throws IllegalStateException
      * @throws InvalidTransactionException
-     * @throws TransactionException 
+     * @throws TransactionException
      */
-    protected void processMessage(String serviceName, Message message) throws ConnectionException, ConfigurationException,
-    NamingException, InvalidTransactionException, IllegalStateException, SystemException, TransactionException {
+    protected void processMessage(String serviceName, Message message)
+            throws ConnectionException, ConfigurationException, NamingException, InvalidTransactionException,
+            IllegalStateException, SystemException, TransactionException {
         log.trace("Service invoked");
-        if(connectionFactory == null) {
+        if (connectionFactory == null) {
             connectionFactory = ConnectionFactory.getConnectionFactory();
         }
         ConnectionImpl connection = (ConnectionImpl) connectionFactory.getConnection();
@@ -105,11 +109,13 @@ public abstract class BlackTieService implements Service {
             int flags = 0;
             String type = null;
             String subtype = null;
-            SessionImpl serviceSession = ((ConnectionImpl)connection).createServiceSession(serviceName, message.cd, message.replyTo);
+            SessionImpl serviceSession = ((ConnectionImpl) connection).createServiceSession(serviceName, message.cd,
+                    message.replyTo);
             InboundBridge inboundBridge = null;
             try {
                 boolean hasTPCONV = (message.flags & Connection.TPCONV) == Connection.TPCONV;
-                Boolean conversational = (Boolean) connectionFactory.getProperties().get("blacktie." + serviceName + ".conversational");
+                Boolean conversational = (Boolean) connectionFactory.getProperties()
+                        .get("blacktie." + serviceName + ".conversational");
                 log.trace(serviceName);
                 boolean isConversational = conversational == true;
                 if (hasTPCONV && isConversational) {
@@ -152,8 +158,8 @@ public abstract class BlackTieService implements Service {
                     buffer = (BufferImpl) connection.tpalloc(message.type, message.subtype);
                     buffer.deserialize(message.data);
                 }
-                TPSVCINFO tpsvcinfo = new TPSVCINFO_Impl(message.serviceName, buffer, message.flags, (hasTPCONV ? serviceSession
-                        : null), connection, message.len);
+                TPSVCINFO tpsvcinfo = new TPSVCINFO_Impl(message.serviceName, buffer, message.flags,
+                        (hasTPCONV ? serviceSession : null), connection, message.len);
                 log.debug("Prepared the data for passing to the service");
 
                 hasTx = (message.control != null && message.control.length() != 0);
@@ -164,10 +170,10 @@ public abstract class BlackTieService implements Service {
                     // make sure any foreign tx is resumed before calling
                     // the
                     // service routine
-                    if(message.control.startsWith("IOR")) {
+                    if (message.control.startsWith("IOR")) {
                         log.debug("resume OTS transaction");
                         JtsTransactionImple.resume(message.control);
-                    } else if(message.control.startsWith("http")) {
+                    } else if (message.control.startsWith("http")) {
                         log.debug("start inbound bridge");
                         inboundBridge = InboundBridgeManager.getInstance().createInboundBridge(message.control);
                         inboundBridge.start();
@@ -231,13 +237,13 @@ public abstract class BlackTieService implements Service {
                 }
             } finally {
                 if (hasTx) {
-                // and suspend it again
-                    if(message.control.startsWith("IOR")) {
+                    // and suspend it again
+                    if (message.control.startsWith("IOR")) {
                         log.debug("suspend OTS transaction");
                         JtsTransactionImple.suspend();
-                    } else if(message.control.startsWith("http")) {
+                    } else if (message.control.startsWith("http")) {
                         log.debug("inbound bridge stop");
-                        if(inboundBridge != null) {
+                        if (inboundBridge != null) {
                             inboundBridge.stop();
                         }
                     } else {

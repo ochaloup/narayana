@@ -57,111 +57,99 @@ public class TwoPCCoordinatorTest extends BaseWSTTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                ParticipantDetails.class,
-                TestParticipantProcessor.class);
+        return WarDeployment.getDeployment(ParticipantDetails.class, TestParticipantProcessor.class);
     }
 
-    private ParticipantProcessor origParticipantProcessor ;
+    private ParticipantProcessor origParticipantProcessor;
 
-    private TestParticipantProcessor testParticipantProcessor = new TestParticipantProcessor() ;
+    private TestParticipantProcessor testParticipantProcessor = new TestParticipantProcessor();
 
     @Before
-    public void setUp()
-            throws Exception
-            {
-        origParticipantProcessor = ParticipantProcessor.setProcessor(testParticipantProcessor) ;
-            }
+    public void setUp() throws Exception {
+        origParticipantProcessor = ParticipantProcessor.setProcessor(testParticipantProcessor);
+    }
 
     @Test
-    public void testSendPrepare()
-            throws Exception
-            {
-        final String messageId = "testSendPrepare" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1") ;
+    public void testSendPrepare() throws Exception {
+        final String messageId = "testSendPrepare";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1");
         final W3CEndpointReference participantEndpointReference = TestUtil.getParticipantEndpoint(null);
 
-        ParticipantClient.getClient().sendPrepare(participantEndpointReference, map, new InstanceIdentifier("sender")) ;
+        ParticipantClient.getClient().sendPrepare(participantEndpointReference, map, new InstanceIdentifier("sender"));
 
-        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000) ;
+        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000);
 
-        assertTrue(details.hasPrepare()) ;
+        assertTrue(details.hasPrepare());
 
         checkDetails(details, true, true, messageId, null);
-            }
+    }
 
     @Test
-    public void testSendCommit()
-            throws Exception
-            {
-        final String messageId = "testSendCommit" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2") ;
+    public void testSendCommit() throws Exception {
+        final String messageId = "testSendCommit";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2");
         final W3CEndpointReference participantEndpointReference = TestUtil.getParticipantEndpoint(null);
 
-        ParticipantClient.getClient().sendCommit(participantEndpointReference, map, new InstanceIdentifier("sender")) ;
+        ParticipantClient.getClient().sendCommit(participantEndpointReference, map, new InstanceIdentifier("sender"));
 
-        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000) ;
+        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000);
 
-        assertTrue(details.hasCommit()) ;
+        assertTrue(details.hasCommit());
 
         checkDetails(details, true, true, messageId, null);
-            }
+    }
 
     @Test
-    public void testSendRollback()
-            throws Exception
-            {
-        final String messageId = "testSendRollback" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("3") ;
+    public void testSendRollback() throws Exception {
+        final String messageId = "testSendRollback";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("3");
         final W3CEndpointReference participantEndpointReference = TestUtil.getParticipantEndpoint(null);
 
-        ParticipantClient.getClient().sendRollback(participantEndpointReference, map, new InstanceIdentifier("sender")) ;
+        ParticipantClient.getClient().sendRollback(participantEndpointReference, map, new InstanceIdentifier("sender"));
 
-        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000) ;
+        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000);
 
-        assertTrue(details.hasRollback()) ;
+        assertTrue(details.hasRollback());
 
         checkDetails(details, true, true, messageId, null);
-            }
+    }
 
     @Test
-    public void testSendError()
-            throws Exception
-            {
-        final String messageId = "testSendError" ;
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId) ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("4") ;
+    public void testSendError() throws Exception {
+        final String messageId = "testSendError";
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.participantServiceURI, messageId);
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("4");
 
-        final String reason = "testSendErrorReason" ;
-        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER ;
-        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME ;
-        final SoapFault soapFault = new SoapFault11(soapFaultType, subcode, reason) ;
+        final String reason = "testSendErrorReason";
+        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER;
+        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME;
+        final SoapFault soapFault = new SoapFault11(soapFaultType, subcode, reason);
 
-        ParticipantClient.getClient().sendSoapFault(map, soapFault, new InstanceIdentifier("sender")) ;
+        ParticipantClient.getClient().sendSoapFault(map, soapFault, new InstanceIdentifier("sender"));
 
-        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000) ;
-        final SoapFault receivedSoapFault = details.getSoapFault() ;
+        final ParticipantDetails details = testParticipantProcessor.getParticipantDetails(messageId, 10000);
+        final SoapFault receivedSoapFault = details.getSoapFault();
 
-        assertNotNull(receivedSoapFault) ;
-        assertEquals(soapFaultType, receivedSoapFault.getSoapFaultType()) ;
-        assertEquals(subcode, receivedSoapFault.getSubcode()) ;
-        assertEquals(reason, receivedSoapFault.getReason()) ;
+        assertNotNull(receivedSoapFault);
+        assertEquals(soapFaultType, receivedSoapFault.getSoapFaultType());
+        assertEquals(subcode, receivedSoapFault.getSubcode());
+        assertEquals(reason, receivedSoapFault.getReason());
 
         checkDetails(details, false, false, messageId, null);
-            }
+    }
 
     @After
-    public void tearDown()
-            throws Exception
-            {
-        ParticipantProcessor.setProcessor(origParticipantProcessor) ;
-            }
+    public void tearDown() throws Exception {
+        ParticipantProcessor.setProcessor(origParticipantProcessor);
+    }
     /**
-     * check the message details to see that they have the correct to, from and faultto address and message id, a
-     * none reply to address and an arjuna context containing the correct instannce identifier
+     * check the message details to see that they have the correct to, from and
+     * faultto address and message id, a none reply to address and an arjuna
+     * context containing the correct instannce identifier
+     * 
      * @param details
      * @param hasFrom
      * @param hasFaultTo
@@ -169,8 +157,8 @@ public class TwoPCCoordinatorTest extends BaseWSTTest {
      * @param instanceIdentifier
      */
 
-    private void checkDetails(ParticipantDetails details, boolean hasFrom, boolean hasFaultTo, String messageId, InstanceIdentifier instanceIdentifier)
-    {
+    private void checkDetails(ParticipantDetails details, boolean hasFrom, boolean hasFaultTo, String messageId,
+            InstanceIdentifier instanceIdentifier) {
         MAP inMAP = details.getMAP();
         ArjunaContext inArjunaContext = details.getArjunaContext();
 
@@ -195,8 +183,9 @@ public class TwoPCCoordinatorTest extends BaseWSTTest {
         if (instanceIdentifier == null) {
             assertNull(inArjunaContext);
         } else {
-            assertNotNull(inArjunaContext) ;
-            assertEquals(instanceIdentifier.getInstanceIdentifier(), inArjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
+            assertNotNull(inArjunaContext);
+            assertEquals(instanceIdentifier.getInstanceIdentifier(),
+                    inArjunaContext.getInstanceIdentifier().getInstanceIdentifier());
         }
     }
 }

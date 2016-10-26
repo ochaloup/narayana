@@ -42,25 +42,22 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class TransactionTest4
-{
+public class TransactionTest4 {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         ORB myORB = null;
         RootOA myOA = null;
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
-        try
-        {
+        try {
             OTSManager.get_current().begin();
 
             Control cont = OTSManager.get_current().get_control();
@@ -72,10 +69,8 @@ public class TransactionTest4
             cont = OTSManager.get_current().suspend();
 
             System.out.println("\nPassed.");
-        }
-        catch (Throwable e)
-        {
-            fail("caught: "+e);
+        } catch (Throwable e) {
+            fail("caught: " + e);
 
             e.printStackTrace();
         }

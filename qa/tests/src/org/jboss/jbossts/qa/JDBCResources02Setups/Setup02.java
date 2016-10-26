@@ -42,31 +42,27 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class Setup02
-{
-    public static void main(String[] args)
-    {
+public class Setup02 {
+    public static void main(String[] args) {
         boolean useSybaseLockingHack = false;
         boolean useShortIndexNames = false;
 
         boolean passed = true;
 
-        try
-        {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
-                if(driver.contains(".sybase.")) {
+                if (driver.contains(".sybase.")) {
                     useSybaseLockingHack = true;
                 }
-                if(driver.contains(".db2.")) {
+                if (driver.contains(".db2.")) {
                     useShortIndexNames = true;
                 }
 
@@ -79,8 +75,7 @@ public class Setup02
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -88,9 +83,7 @@ public class Setup02
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -98,16 +91,16 @@ public class Setup02
 
             String tableName = JDBCProfileStore.getTableName(databaseUser, "Infotable");
 
-            try
-            {
+            try {
                 System.err.println("DROP TABLE " + tableName);
                 statement.executeUpdate("DROP TABLE " + tableName);
-            }
-            catch (java.sql.SQLException s)
-            {
-                if(!(s.getSQLState().startsWith("42") // old ms sql 2000 drivers
-                        || s.getSQLState().equals("S0005") // ms sql 2005 drivers
-                        || s.getSQLState().equals("ZZZZZ"))) // sybase jConnect drivers
+            } catch (java.sql.SQLException s) {
+                if (!(s.getSQLState().startsWith("42") // old ms sql 2000
+                                                        // drivers
+                        || s.getSQLState().equals("S0005") // ms sql 2005
+                                                            // drivers
+                        || s.getSQLState().equals("ZZZZZ"))) // sybase jConnect
+                                                                // drivers
                 {
                     System.err.println("Setup01.main: " + s);
                     System.err.println("SQL state is: <" + s.getSQLState() + ">");
@@ -117,47 +110,46 @@ public class Setup02
             statement.executeUpdate("CREATE TABLE " + tableName + " (Name VARCHAR(64), Value VARCHAR(64))");
 
             String indexName = tableName;
-            // db2 only allows index names max length 18 (for us that is 14 + "_idx")
-            if(useShortIndexNames && tableName.length() > 14) {
+            // db2 only allows index names max length 18 (for us that is 14 +
+            // "_idx")
+            if (useShortIndexNames && tableName.length() > 14) {
                 indexName = tableName.substring(0, 14);
             }
 
-            // Create an Index for the table just created. Microsoft SQL requires an index for Row Locking.
-            System.err.println("CREATE UNIQUE INDEX " + indexName+"_idx " +
-                    "ON " + tableName + " (Name) ");
+            // Create an Index for the table just created. Microsoft SQL
+            // requires an index for Row Locking.
+            System.err.println("CREATE UNIQUE INDEX " + indexName + "_idx " + "ON " + tableName + " (Name) ");
 
-            try
-            {
-                statement.executeUpdate("CREATE UNIQUE INDEX " + indexName + "_idx " +
-                    "ON " + tableName + " (Name) ");
-            }
-            catch(SQLException s)
-            {
-                if(!useShortIndexNames) {
+            try {
+                statement.executeUpdate("CREATE UNIQUE INDEX " + indexName + "_idx " + "ON " + tableName + " (Name) ");
+            } catch (SQLException s) {
+                if (!useShortIndexNames) {
                     throw s;
                 }
 
-                // the shortening of the name may have made in non-uniq. Try a different name...
+                // the shortening of the name may have made in non-uniq. Try a
+                // different name...
                 s.printStackTrace(System.err);
-                indexName = "x"+Integer.toHexString(tableName.hashCode());
-                System.err.println("CREATE INDEX failed, retrying with hashcode in the hope it's a name collision problem");
-                System.err.println("CREATE UNIQUE INDEX " + indexName+"_idx " +"ON " + tableName + " (Name) ");
-                statement.executeUpdate("CREATE UNIQUE INDEX " + indexName + "_idx " +
-                    "ON " + tableName + " (Name) ");
+                indexName = "x" + Integer.toHexString(tableName.hashCode());
+                System.err.println(
+                        "CREATE INDEX failed, retrying with hashcode in the hope it's a name collision problem");
+                System.err.println("CREATE UNIQUE INDEX " + indexName + "_idx " + "ON " + tableName + " (Name) ");
+                statement.executeUpdate("CREATE UNIQUE INDEX " + indexName + "_idx " + "ON " + tableName + " (Name) ");
             }
 
-
-            // sybase uses coarse grained locking by default and XA tx branches appear to be loose coupled i.e. do not share locks.
-            // Unlike MSSQL, the presence of an index is not enough to cause the db to use row level locking. We need to configure
-            // it explicitly instead. Without this the tests that use more than one server i.e. db conn/branch may block.
-            if(useSybaseLockingHack) {
+            // sybase uses coarse grained locking by default and XA tx branches
+            // appear to be loose coupled i.e. do not share locks.
+            // Unlike MSSQL, the presence of an index is not enough to cause the
+            // db to use row level locking. We need to configure
+            // it explicitly instead. Without this the tests that use more than
+            // one server i.e. db conn/branch may block.
+            if (useSybaseLockingHack) {
                 // force use of row level locking
                 System.err.println("configuring sybase row level locking: ALTER TABLE " + tableName + " lock datarows");
                 statement.executeUpdate("ALTER TABLE " + tableName + " lock datarows");
             }
 
-            for (int index = 0; index < 10; index++)
-            {
+            for (int index = 0; index < 10; index++) {
                 String name = "Name_" + index;
                 String value = "Value_" + index;
 
@@ -167,34 +159,26 @@ public class Setup02
 
             statement.close();
             connection.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Setup02.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
             passed = false;
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Setup02.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
             passed = false;
         }
 
-        if (passed)
-        {
+        if (passed) {
             System.out.println("Passed");
-        }
-        else
-        {
+        } else {
             System.out.println("Failed");
         }
     }

@@ -35,45 +35,41 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class AtomicIntegerUnitTest extends TestCase
-{
-    public void test ()
-    {
+public class AtomicIntegerUnitTest extends TestCase {
+    public void test() {
         AtomicInteger ai = AtomicFactory.instance().createInteger();
-        
+
         assertEquals(ai.get(), 0);
-        
+
         ai.set(1);
-        
+
         assertEquals(ai.get(), 1);
-        
+
         AtomicInteger temp = AtomicFactory.instance().createInteger(667);
-        
+
         assertEquals(temp.get(), 667);
-        
+
         assertEquals(temp.subtract(ai).get(), 666);
-        
+
         assertEquals(ai.increment().get(), 2);
-        
+
         assertEquals(ai.decrement().get(), 1);
     }
-    
-    public void testTransaction ()
-    {
+
+    public void testTransaction() {
         AtomicAction act = new AtomicAction();
         AtomicInteger ai = AtomicFactory.instance().createInteger();
 
         assertEquals(ai.get(), 0);
-        
+
         /*
-         * Do this within a transaction so we can roll it all back
-         * afterwards.
+         * Do this within a transaction so we can roll it all back afterwards.
          */
 
         act.begin();
-        
+
         ai.set(1);
-        
+
         assertEquals(ai.get(), 1);
 
         act.abort();

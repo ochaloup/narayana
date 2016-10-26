@@ -25,44 +25,38 @@ public class SuspendParticipantTest {
     }
 
     @Test
-    public void testSuspendParticipant()
-            throws Exception
-            {
+    public void testSuspendParticipant() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         CoordinatorManager cm = CoordinatorManagerFactory.coordinatorManager();
 
-        try
-        {
+        try {
             cm.begin("TwoPhase11HLS");
 
             cm.enlistParticipant(new TwoPhaseParticipant("p1"));
             cm.enlistParticipant(new TwoPhaseParticipant("p2"));
             cm.enlistSynchronization(new TwoPhaseSynchronization());
 
-            System.out.println("Started: "+cm.identifier()+"\n");
+            System.out.println("Started: " + cm.identifier() + "\n");
 
             ActivityHierarchy hier = cm.suspend();
 
-            System.out.println("Suspended: "+hier+"\n");
+            System.out.println("Suspended: " + hier + "\n");
 
-            if (cm.currentActivity() != null)
-            {
+            if (cm.currentActivity() != null) {
                 WSCF11TestUtils.cleanup(cm);
 
                 fail("Hierarchy still active.");
             }
             cm.resume(hier);
 
-            System.out.println("Resumed: "+hier+"\n");
+            System.out.println("Resumed: " + hier + "\n");
 
             cm.confirm();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSCF11TestUtils.cleanup(cm);
 
             throw ex;
         }
-            }
+    }
 }

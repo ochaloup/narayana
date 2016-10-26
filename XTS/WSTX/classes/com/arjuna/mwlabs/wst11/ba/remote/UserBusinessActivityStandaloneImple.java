@@ -65,12 +65,9 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
  *
  */
 
-public class UserBusinessActivityStandaloneImple extends UserBusinessActivity
-{
-    public UserBusinessActivityStandaloneImple()
-    {
-        try
-        {
+public class UserBusinessActivityStandaloneImple extends UserBusinessActivity {
+    public UserBusinessActivityStandaloneImple() {
+        try {
             _activationCoordinatorService = XTSPropertyManager.getWSCEnvironmentBean().getCoordinatorURL11();
 
             /*
@@ -79,14 +76,13 @@ public class UserBusinessActivityStandaloneImple extends UserBusinessActivity
              * implementation.
              */
 
-            if (_activationCoordinatorService == null)
-            {
-                final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-                _activationCoordinatorService = serviceRegistry.getServiceURI(CoordinationConstants.ACTIVATION_SERVICE_NAME) ;
+            if (_activationCoordinatorService == null) {
+                final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance()
+                        .getServiceRegistry();
+                _activationCoordinatorService = serviceRegistry
+                        .getServiceURI(CoordinationConstants.ACTIVATION_SERVICE_NAME);
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             // TODO
 
             ex.printStackTrace();
@@ -97,198 +93,151 @@ public class UserBusinessActivityStandaloneImple extends UserBusinessActivity
         return null;
     }
 
-    public void begin () throws WrongStateException, SystemException
-    {
+    public void begin() throws WrongStateException, SystemException {
         begin(0);
     }
 
-    public void begin (int timeout) throws WrongStateException, SystemException
-    {
-        try
-        {
+    public void begin(int timeout) throws WrongStateException, SystemException {
+        try {
             if (_ctxManager.currentTransaction() != null)
                 throw new WrongStateException();
 
             Context ctx = startTransaction(timeout, null);
 
             _ctxManager.resume(new TxContextImple(ctx));
-        }
-        catch (InvalidCreateParametersException ex)
-        {
+        } catch (InvalidCreateParametersException ex) {
             tidyup();
 
             throw new SystemException(ex.toString());
-        }
-        catch (UnknownTransactionException ex)
-        {
+        } catch (UnknownTransactionException ex) {
             tidyup();
 
             throw new SystemException(ex.toString());
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             tidyup();
 
             throw ex;
         }
     }
 
-    public void close () throws TransactionRolledBackException, UnknownTransactionException, SystemException, WrongStateException
-    {
+    public void close()
+            throws TransactionRolledBackException, UnknownTransactionException, SystemException, WrongStateException {
         TxContextImple ctx = null;
 
-        try
-        {
+        try {
             ctx = (TxContextImple) _ctxManager.suspend();
             if (ctx == null) {
                 throw new WrongStateException();
             }
 
-            final String id = ctx.identifier() ;
-            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx) ;
+            final String id = ctx.identifier();
+            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx);
 
-            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id, terminatorCoordinatorRPC);
+            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id,
+                    terminatorCoordinatorRPC);
 
             terminatorRPCStub.close();
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             throw ex;
-        }
-        catch (TransactionRolledBackException ex)
-        {
+        } catch (TransactionRolledBackException ex) {
             throw ex;
-        }
-        catch (WrongStateException ex)
-        {
+        } catch (WrongStateException ex) {
             throw ex;
-        }
-        catch (UnknownTransactionException ex)
-        {
+        } catch (UnknownTransactionException ex) {
             throw ex;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
-        }
-        finally
-        {
+        } finally {
             tidyup();
         }
     }
 
-    public void cancel () throws UnknownTransactionException, SystemException, WrongStateException
-    {
+    public void cancel() throws UnknownTransactionException, SystemException, WrongStateException {
         TxContextImple ctx = null;
 
-        try
-        {
+        try {
             ctx = (TxContextImple) _ctxManager.suspend();
             if (ctx == null) {
                 throw new WrongStateException();
             }
 
-            final String id = ctx.identifier() ;
-            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx) ;
+            final String id = ctx.identifier();
+            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx);
 
-            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id, terminatorCoordinatorRPC);
+            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id,
+                    terminatorCoordinatorRPC);
 
             terminatorRPCStub.cancel();
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             throw ex;
-        }
-        catch (WrongStateException ex)
-        {
+        } catch (WrongStateException ex) {
             throw ex;
-        }
-        catch (UnknownTransactionException ex)
-        {
+        } catch (UnknownTransactionException ex) {
             throw ex;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
 
             throw new SystemException(ex.toString());
-        }
-        finally
-        {
+        } finally {
             tidyup();
         }
     }
 
-    public void complete () throws UnknownTransactionException, SystemException, WrongStateException
-    {
-        try
-        {
-            final TxContextImple ctx = ((TxContextImple) _ctxManager.currentTransaction()) ;
+    public void complete() throws UnknownTransactionException, SystemException, WrongStateException {
+        try {
+            final TxContextImple ctx = ((TxContextImple) _ctxManager.currentTransaction());
             if (ctx == null) {
                 throw new WrongStateException();
             }
-            final String id = ctx.identifier() ;
-            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx) ;
+            final String id = ctx.identifier();
+            final W3CEndpointReference terminatorCoordinatorRPC = getTerminationCoordinatorRPC(ctx);
 
-            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id, terminatorCoordinatorRPC);
+            BusinessActivityTerminatorRPCStub terminatorRPCStub = new BusinessActivityTerminatorRPCStub(id,
+                    terminatorCoordinatorRPC);
 
             terminatorRPCStub.complete();
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             throw ex;
-        }
-        catch (UnknownTransactionException ex)
-        {
+        } catch (UnknownTransactionException ex) {
             throw ex;
-        }
-        catch (WrongStateException ex)
-        {
+        } catch (WrongStateException ex) {
             throw ex;
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new SystemException(ex.toString());
         }
     }
 
-    public String transactionIdentifier ()
-    {
-        try
-        {
+    public String transactionIdentifier() {
+        try {
             return _ctxManager.currentTransaction().toString();
-        }
-        catch (SystemException ex)
-        {
+        } catch (SystemException ex) {
             return "Unknown";
-        }
-        catch (NullPointerException ex)
-        {
+        } catch (NullPointerException ex) {
             return "Unknown";
         }
     }
 
-    public String toString ()
-    {
+    public String toString() {
         return transactionIdentifier();
     }
 
-    public void beginSubordinate(int timeout) throws WrongStateException, SystemException
-    {
+    public void beginSubordinate(int timeout) throws WrongStateException, SystemException {
         throw new SystemException("UserBusinessActivityStandaloneImple does not support subordinate transactions");
     }
 
     /**
-     * fetch the coordination context type stashed in the current BA context implememtation
-     * and use it to construct an instance of the coordination context extension type we need to
-     * send down the wire to the activation coordinator
-     * @param current the current AT context implememtation
+     * fetch the coordination context type stashed in the current BA context
+     * implememtation and use it to construct an instance of the coordination
+     * context extension type we need to send down the wire to the activation
+     * coordinator
+     * 
+     * @param current
+     *            the current AT context implememtation
      * @return an instance of the coordination context extension type
      */
-    private CoordinationContext getContext(TxContextImple current)
-    {
+    private CoordinationContext getContext(TxContextImple current) {
         CoordinationContextType contextType = getContextType(current);
         CoordinationContext context = new CoordinationContext();
         context.setCoordinationType(contextType.getCoordinationType());
@@ -300,69 +249,57 @@ public class UserBusinessActivityStandaloneImple extends UserBusinessActivity
     }
 
     /**
-     * fetch the coordination context type stashed in the current BA context implememtation
-     * @param current the current AT context implememtation
-     * @return the coordination context type stashed in the current AT context implememtation
+     * fetch the coordination context type stashed in the current BA context
+     * implememtation
+     * 
+     * @param current
+     *            the current AT context implememtation
+     * @return the coordination context type stashed in the current AT context
+     *         implememtation
      */
-    private CoordinationContextType getContextType(TxContextImple current)
-    {
-        ContextImple contextImple = (ContextImple)current.context();
+    private CoordinationContextType getContextType(TxContextImple current) {
+        ContextImple contextImple = (ContextImple) current.context();
         return contextImple.getCoordinationContext();
     }
 
-    private final Context startTransaction (int timeout, TxContextImple current) throws InvalidCreateParametersException, SystemException
-    {
-        try
-        {
-            final Long expires = (timeout > 0 ? new Long(timeout) : null) ;
-            final String messageId = MessageId.getMessageId() ;
+    private final Context startTransaction(int timeout, TxContextImple current)
+            throws InvalidCreateParametersException, SystemException {
+        try {
+            final Long expires = (timeout > 0 ? new Long(timeout) : null);
+            final String messageId = MessageId.getMessageId();
             final CoordinationContext currentContext = (current != null ? getContext(current) : null);
             final CoordinationContextType coordinationContext = ActivationCoordinator.createCoordinationContext(
-                    _activationCoordinatorService, messageId, BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME, expires, currentContext) ;
-            if (coordinationContext == null)
-            {
+                    _activationCoordinatorService, messageId, BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME,
+                    expires, currentContext);
+            if (coordinationContext == null) {
                 throw new SystemException(
                         wstxLogger.i18NLogger.get_mwlabs_wst11_ba_remote_UserBusinessActivityImple_2());
             }
-            return new ContextImple(coordinationContext) ;
-        }
-        catch (final InvalidCreateParametersException icpe)
-        {
-            throw icpe ;
-        }
-        catch (final SoapFault sf)
-        {
-            throw new SystemException(sf.getMessage()) ;
-        }
-        catch (final Exception ex)
-        {
+            return new ContextImple(coordinationContext);
+        } catch (final InvalidCreateParametersException icpe) {
+            throw icpe;
+        } catch (final SoapFault sf) {
+            throw new SystemException(sf.getMessage());
+        } catch (final Exception ex) {
             throw new SystemException(ex.toString());
         }
     }
 
-    private W3CEndpointReference getTerminationCoordinatorRPC(final TxContextImple ctx)
-        throws SystemException
-    {
-        final CoordinationContextType coordinationContext = ctx.context().getCoordinationContext() ;
-        final String messageId = MessageId.getMessageId() ;
-        try
-        {
-            return RegistrationCoordinator.register(coordinationContext, messageId, null, ArjunaTXConstants.WSARJTX_PROTOCOL_TERMINATION_RPC) ;
-        }
-        catch (final Throwable th)
-        {
+    private W3CEndpointReference getTerminationCoordinatorRPC(final TxContextImple ctx) throws SystemException {
+        final CoordinationContextType coordinationContext = ctx.context().getCoordinationContext();
+        final String messageId = MessageId.getMessageId();
+        try {
+            return RegistrationCoordinator.register(coordinationContext, messageId, null,
+                    ArjunaTXConstants.WSARJTX_PROTOCOL_TERMINATION_RPC);
+        } catch (final Throwable th) {
             throw new SystemException(wstxLogger.i18NLogger.get_mwlabs_wst11_ba_remote_UserBusinessActivityImple_3());
         }
     }
 
-    private final void tidyup ()
-    {
-        try
-        {
+    private final void tidyup() {
+        try {
             _ctxManager.suspend();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

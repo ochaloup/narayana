@@ -57,13 +57,13 @@ public class EarArchiveTestLocal {
 
     @Deployment(name = "service")
     public static EnterpriseArchive getServiceDeployment() {
-        JavaArchive javaArchive = ShrinkWrap.create(JavaArchive.class, "compensations-ejb.jar")
-                .addClasses(TestConfirmationHandler.class, TestService.class, TestServiceImpl.class, TestServiceService.class)
+        JavaArchive javaArchive = ShrinkWrap
+                .create(JavaArchive.class, "compensations-ejb.jar").addClasses(TestConfirmationHandler.class,
+                        TestService.class, TestServiceImpl.class, TestServiceService.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
 
         EnterpriseArchive enterpriseArchive = ShrinkWrap.create(EnterpriseArchive.class, "service.ear")
-                .addAsModule(javaArchive)
-                .setApplicationXML("test-application.xml");
+                .addAsModule(javaArchive).setApplicationXML("test-application.xml");
 
         System.out.println(enterpriseArchive.toString(true));
 

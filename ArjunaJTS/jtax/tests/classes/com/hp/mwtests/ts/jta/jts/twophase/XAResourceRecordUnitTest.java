@@ -61,256 +61,223 @@ import com.hp.mwtests.ts.jta.common.TestResource;
 import com.hp.mwtests.ts.jta.jts.common.DummyXA;
 import com.hp.mwtests.ts.jta.jts.common.TestBase;
 
-class DummyXAResourceRecord extends XAResourceRecord
-{
-    public DummyXAResourceRecord (TransactionImple tx, XAResource res, Xid xid, Object[] params)
-    {
+class DummyXAResourceRecord extends XAResourceRecord {
+    public DummyXAResourceRecord(TransactionImple tx, XAResource res, Xid xid, Object[] params) {
         super(tx, res, xid, params);
     }
-    
-    public void setXAResource (XAResource res)
-    {
+
+    public void setXAResource(XAResource res) {
         super.setXAResource(res);
     }
-    
-    public int recover ()
-    {
+
+    public int recover() {
         return super.recover();
     }
 }
 
-
-public class XAResourceRecordUnitTest extends TestBase
-{
+public class XAResourceRecordUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void test() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         XAResourceRecord xares = new XAResourceRecord();
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
         Object[] params = new Object[1];
-        
+
         params[XAResourceRecord.XACONNECTION] = rc;
-        
+
         xares = new XAResourceRecord(new TransactionImple(), new DummyXA(false), new XidImple(new Uid()), params);
-        
+
         xares.merge(null);
         xares.alter(null);
-        
+
         assertTrue(xares.type() != null);
-        
+
         assertTrue(xares.toString() != null);
-        
+
         assertTrue(xares.get_uid().notEquals(Uid.nullUid()));
     }
-    
+
     @Test
-    public void testRecovery () throws Exception
-    {
+    public void testRecovery() throws Exception {
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
         Object[] params = new Object[1];
-        
+
         params[XAResourceRecord.XACONNECTION] = rc;
-        
-        DummyXAResourceRecord xares = new DummyXAResourceRecord(new TransactionImple(), new DummyXA(false), new XidImple(new Uid()), params);
-        
+
+        DummyXAResourceRecord xares = new DummyXAResourceRecord(new TransactionImple(), new DummyXA(false),
+                new XidImple(new Uid()), params);
+
         assertEquals(xares.getRecoveryCoordinator(), null);
-        
+
         assertEquals(xares.recover(), XARecoveryResource.FAILED_TO_RECOVER);
-        
+
         xares.setXAResource(null);
     }
-    
-    @Test
-    public void testPackUnpack () throws Exception
-    {
-        ThreadActionData.purgeActions();        
-        OTSImpleManager.current().contextManager().purgeActions();
 
-        XAResourceRecord xares;      
-        DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
-        Object[] params = new Object[1];
-        
-        params[XAResourceRecord.XACONNECTION] = rc;
-        
-        xares = new XAResourceRecord(new TransactionImple(), new DummyXA(false), new XidImple(new Uid()), params);
-        
-        OutputObjectState os = new OutputObjectState();
-        
-        assertTrue(xares.saveState(os));
-        
-        xares = new XAResourceRecord();
-        
-        InputObjectState is = new InputObjectState(os);
-        
-        assertTrue(xares.restoreState(is));
-    }
-    
     @Test
-    public void testReadonly () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testPackUnpack() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         XAResourceRecord xares;
-        
         DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
         Object[] params = new Object[1];
-        
+
         params[XAResourceRecord.XACONNECTION] = rc;
-        
+
+        xares = new XAResourceRecord(new TransactionImple(), new DummyXA(false), new XidImple(new Uid()), params);
+
+        OutputObjectState os = new OutputObjectState();
+
+        assertTrue(xares.saveState(os));
+
+        xares = new XAResourceRecord();
+
+        InputObjectState is = new InputObjectState(os);
+
+        assertTrue(xares.restoreState(is));
+    }
+
+    @Test
+    public void testReadonly() throws Exception {
+        ThreadActionData.purgeActions();
+        OTSImpleManager.current().contextManager().purgeActions();
+
+        XAResourceRecord xares;
+
+        DummyRecoverableXAConnection rc = new DummyRecoverableXAConnection();
+        Object[] params = new Object[1];
+
+        params[XAResourceRecord.XACONNECTION] = rc;
+
         xares = new XAResourceRecord(new TransactionImple(), new TestResource(true), new XidImple(new Uid()), params);
-        
-        try
-        {
+
+        try {
             xares.commit();
-            
+
             fail();
+        } catch (final NotPrepared ex) {
         }
-        catch (final NotPrepared ex)
-        {
-        }
-        
+
         assertEquals(xares.prepare(), Vote.VoteReadOnly);
     }
-    
+
     @Test
-    public void testCommitFailure () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testCommitFailure() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         FailureXAResource fxa = new FailureXAResource(FailureXAResource.FailLocation.commit);
         TransactionImple tx = new TransactionImple();
         XAResourceRecord xares = new XAResourceRecord(tx, fxa, tx.getTxId(), null);
-        
+
         assertEquals(xares.prepare(), Vote.VoteCommit);
-        
-        try
-        {
+
+        try {
             xares.commit();
-            
+
             fail();
+        } catch (final HeuristicMixed ex) {
         }
-        catch (final HeuristicMixed ex)
-        {      
-        }
-        
+
         xares.forget();
     }
-    
+
     @Test
-    public void testRollbackFailure () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testRollbackFailure() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         FailureXAResource fxa = new FailureXAResource(FailureXAResource.FailLocation.rollback);
         TransactionImple tx = new TransactionImple();
         XAResourceRecord xares = new XAResourceRecord(tx, fxa, tx.getTxId(), null);
-        
+
         assertEquals(xares.prepare(), Vote.VoteCommit);
-        
-        try
-        {
+
+        try {
             xares.rollback();
-            
+
             fail();
+        } catch (final HeuristicMixed ex) {
         }
-        catch (final HeuristicMixed ex)
-        {      
-        }
-        
+
         xares.forget();
     }
-    
+
     @Test
-    public void testValid2PC () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testValid2PC() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         TransactionImple tx = new TransactionImple();
         DummyXA res = new DummyXA(false);
         XAResourceRecord xares = new XAResourceRecord(tx, res, tx.getTxId(), null);
-        
+
         assertEquals(xares.prepare(), Vote.VoteCommit);
-        
+
         xares.commit();
     }
-    
+
     @Test
-    public void testValid1PC () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testValid1PC() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         TransactionImple tx = new TransactionImple();
         DummyXA res = new DummyXA(false);
         XAResourceRecord xares = new XAResourceRecord(tx, res, tx.getTxId(), null);
-        
+
         xares.commit_one_phase();
     }
-    
+
     @Test
-    public void testInvalid () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testInvalid() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         XAResourceRecord xares = new XAResourceRecord();
-        
+
         assertEquals(xares.getXid(), null);
         assertTrue(xares.uid() != null);
-        
-        try
-        {
+
+        try {
             xares.commit_one_phase();
-            
+
             fail();
+        } catch (final TRANSACTION_ROLLEDBACK ex) {
         }
-        catch (final TRANSACTION_ROLLEDBACK ex)
-        {
-        }
-        
+
         assertEquals(xares.prepare(), Vote.VoteRollback);
-        
+
         xares.rollback();
         xares.commit();
     }
-    
+
     @Test
-    public void testNested () throws Exception
-    {
-        ThreadActionData.purgeActions();        
+    public void testNested() throws Exception {
+        ThreadActionData.purgeActions();
         OTSImpleManager.current().contextManager().purgeActions();
 
         XAResourceRecord xares = new XAResourceRecord();
-        
+
         assertEquals(xares.prepare_subtransaction(), Vote.VoteRollback);
-        
-        try
-        {
+
+        try {
             xares.commit_subtransaction(null);
-            
+
             fail();
+        } catch (final UNKNOWN ex) {
         }
-        catch (final UNKNOWN ex)
-        {       
-        }
-        
-        try
-        {
+
+        try {
             xares.rollback_subtransaction();
-            
+
             fail();
+        } catch (final UNKNOWN ex) {
         }
-        catch (final UNKNOWN ex)
-        {       
-        }
-        
+
         assertFalse(xares.propagateOnAbort());
         assertFalse(xares.propagateOnCommit());
     }

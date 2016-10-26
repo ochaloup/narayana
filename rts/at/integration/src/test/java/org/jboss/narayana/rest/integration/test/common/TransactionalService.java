@@ -32,30 +32,33 @@ public final class TransactionalService {
 
     @GET
     public Response getParticipantInvocations(@QueryParam("participantId") final String participantId) {
-        ParticipantInformation information = ParticipantsContainer.getInstance().getParticipantInformation(participantId);
+        ParticipantInformation information = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         if (information == null) {
             return Response.status(404).build();
         }
 
-        final JSONArray jsonArray = new JSONArray(((LoggingParticipant)information.getParticipant()).getInvocations());
+        final JSONArray jsonArray = new JSONArray(((LoggingParticipant) information.getParticipant()).getInvocations());
 
         return Response.ok().entity(jsonArray.toString()).build();
     }
 
     @POST
     public String enlistParticipant(@QueryParam("participantEnlistmentUrl") final String participantEnlistmentUrl,
-                                    @QueryParam("vote") final String stringVote, @Context final UriInfo uriInfo) {
+            @QueryParam("vote") final String stringVote, @Context final UriInfo uriInfo) {
 
         final Vote vote = stringVoteToVote(stringVote);
         final LoggingParticipant participant = new LoggingParticipant(vote);
 
-        return ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, participantEnlistmentUrl, participant).toString();
+        return ParticipantsManagerFactory.getInstance().enlist(APPLICATION_ID, participantEnlistmentUrl, participant)
+                .toString();
     }
 
     @PUT
     public void registerDeserializer() {
-        ParticipantsManagerFactory.getInstance().registerDeserializer(APPLICATION_ID, new TestParticipantDeserializer());
+        ParticipantsManagerFactory.getInstance().registerDeserializer(APPLICATION_ID,
+                new TestParticipantDeserializer());
     }
 
     private Vote stringVoteToVote(final String stringVote) {

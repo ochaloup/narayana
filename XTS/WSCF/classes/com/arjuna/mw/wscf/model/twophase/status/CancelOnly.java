@@ -41,23 +41,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class CancelOnly implements Status
-{
+public class CancelOnly implements Status {
 
-    public static CancelOnly instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "org.w3c.wscf.twophase.status.CancelOnly";
+    public static CancelOnly instance() {
+        return _instance;
     }
 
-    private CancelOnly ()
-    {
+    public String toString() {
+        return "org.w3c.wscf.twophase.status.CancelOnly";
+    }
+
+    private CancelOnly() {
     }
 
     private static final CancelOnly _instance = new CancelOnly();
-    
+
 }

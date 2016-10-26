@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client10.java,v 1.2 2003/06/26 11:43:11 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client10
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client10 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,10 +73,8 @@ public class Client10
 
             int numberOfCalls = 10;
 
-            for (int index0 = 0; index0 < numberOfCalls; index0++)
-            {
-                for (int index1 = 0; index1 <= index0; index1++)
-                {
+            for (int index0 = 0; index0 < numberOfCalls; index0++) {
+                for (int index1 = 0; index1 <= index0; index1++) {
                     pingPong.bad_hit(index0, index1, pingPong, pingPong, null);
                 }
             }
@@ -88,29 +82,21 @@ public class Client10
             IntHolder pingPongValue = new IntHolder();
             pingPong.get(pingPongValue, null);
 
-            if (pingPongValue.value == 0)
-            {
+            if (pingPongValue.value == 0) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client10.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client10.main: " + exception);
             exception.printStackTrace(System.err);
         }

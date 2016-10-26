@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.JDBCResources02Servers;
  * $Id: Server01.java,v 1.2 2003/06/26 11:44:10 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.JDBCResources02.*;
 import org.jboss.jbossts.qa.JDBCResources02Impls.JDBCInfoTableImpl01;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
@@ -64,20 +63,16 @@ import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server01
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server01 {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 2];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -89,7 +84,8 @@ public class Server01
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
             int databaseTimeout = JDBCProfileStore.timeout(profileName);
 
-            JDBCInfoTableImpl01 jdbcInfoTableImpl = new JDBCInfoTableImpl01(databaseURL, databaseUser, databasePassword, databaseDynamicClass, databaseTimeout);
+            JDBCInfoTableImpl01 jdbcInfoTableImpl = new JDBCInfoTableImpl01(databaseURL, databaseUser, databasePassword,
+                    databaseDynamicClass, databaseTimeout);
             InfoTablePOATie servant = new InfoTablePOATie(jdbcInfoTableImpl);
 
             OAInterface.objectIsReady(servant);
@@ -100,11 +96,8 @@ public class Server01
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server01.main: " + exception);
         }
     }
 }
-

@@ -27,10 +27,10 @@ import com.arjuna.ats.arjuna.common.Uid;
 import org.jboss.tm.TransactionImportResult;
 
 /**
- * A TransactionImporter is used to manager the relationship with external SubordinateTransactions.
+ * A TransactionImporter is used to manager the relationship with external
+ * SubordinateTransactions.
  */
-public interface TransactionImporter
-{
+public interface TransactionImporter {
     /**
      * Create a subordinate transaction associated with the global transaction
      * inflow. No timeout is associated with the transaction.

@@ -24,23 +24,20 @@ public class SubtransactionCommitFailInPrepareTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoDurableParticipant.class,
-                DemoVolatileParticipant.class,
+        return WarDeployment.getDeployment(DemoDurableParticipant.class, DemoVolatileParticipant.class,
                 FailureParticipant.class);
     }
 
     @Test
-    public void testSubTransactionCommitFailInPrepare()
-            throws Exception
-            {
+    public void testSubTransactionCommitFailInPrepare() throws Exception {
         final UserTransaction ut = UserTransactionFactory.userTransaction();
         final UserTransaction ust = UserTransactionFactory.userSubordinateTransaction();
         final TransactionManager tm = TransactionManager.getTransactionManager();
 
         final DemoDurableParticipant p1 = new DemoDurableParticipant();
         final DemoVolatileParticipant p2 = new DemoVolatileParticipant();
-        final FailureParticipant p3 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE, FailureParticipant.WRONG_STATE);
+        final FailureParticipant p3 = new FailureParticipant(FailureParticipant.FAIL_IN_PREPARE,
+                FailureParticipant.WRONG_STATE);
         final DemoVolatileParticipant p4 = new DemoVolatileParticipant();
 
         ut.begin();
@@ -65,5 +62,5 @@ public class SubtransactionCommitFailInPrepareTest {
         assertTrue(p2.prepared() && p2.resolved() && !p2.passed());
         assertTrue(!p3.passed());
         assertTrue(p4.prepared() && p4.resolved() && !p4.passed());
-            }
+    }
 }

@@ -41,7 +41,9 @@ public class CompensationContext implements AlterableContext {
     private final CompensationContextStateManager compensationContextStateManager;
 
     /**
-     * @param compensationContextStateManager state manager responsible for holding all contexts and their beans.
+     * @param compensationContextStateManager
+     *            state manager responsible for holding all contexts and their
+     *            beans.
      */
     public CompensationContext(CompensationContextStateManager compensationContextStateManager) {
         this.compensationContextStateManager = compensationContextStateManager;
@@ -53,12 +55,13 @@ public class CompensationContext implements AlterableContext {
     }
 
     /**
-     * Get bean from the state manager. If bean doesn't exist it is created and added to the state manager's resources
-     * container.
+     * Get bean from the state manager. If bean doesn't exist it is created and
+     * added to the state manager's resources container.
      * 
      * @param contextual
      * @param creationalContext
-     * @return bean instance of the requested type or {@code null} if bean couldn't be created.
+     * @return bean instance of the requested type or {@code null} if bean
+     *         couldn't be created.
      */
     @Override
     public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
@@ -85,11 +88,12 @@ public class CompensationContext implements AlterableContext {
     }
 
     /**
-     * Get bean from the state manager. If bean doesn't exist it is created and added to the state manager's resources
-     * container.
+     * Get bean from the state manager. If bean doesn't exist it is created and
+     * added to the state manager's resources container.
      *
      * @param contextual
-     * @return bean instance of the requested type or {@code null} if bean couldn't be created.
+     * @return bean instance of the requested type or {@code null} if bean
+     *         couldn't be created.
      */
     @Override
     public <T> T get(Contextual<T> contextual) {

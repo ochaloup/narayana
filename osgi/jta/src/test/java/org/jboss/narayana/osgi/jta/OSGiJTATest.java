@@ -72,7 +72,7 @@ public class OSGiJTATest {
     }
 
     @Test
-    public  void testTransactionManager(@ArquillianResource Bundle bundle) throws Exception {
+    public void testTransactionManager(@ArquillianResource Bundle bundle) throws Exception {
         assertEquals("System Bundle ID", 0, context.getBundle().getBundleId());
 
         bundle.start();
@@ -81,7 +81,8 @@ public class OSGiJTATest {
         BundleContext context = bundle.getBundleContext();
         assertNotNull("BundleContext available", context);
 
-        ServiceTracker<TransactionManager, TransactionManager> tracker = new ServiceTracker<>(context, TransactionManager.class, null);
+        ServiceTracker<TransactionManager, TransactionManager> tracker = new ServiceTracker<>(context,
+                TransactionManager.class, null);
         tracker.open();
         TransactionManager tm = tracker.waitForService(10000);
 
@@ -90,7 +91,7 @@ public class OSGiJTATest {
                 System.out.println(b.getSymbolicName() + "/" + b.getVersion() + " = " + b.getState());
                 Dictionary<String, String> headers = b.getHeaders();
                 System.out.println("\tHeaders");
-                for (Enumeration<String> e = headers.keys(); e.hasMoreElements(); ) {
+                for (Enumeration<String> e = headers.keys(); e.hasMoreElements();) {
                     String key = e.nextElement();
                     String val = headers.get(key);
                     System.out.println("\t\t" + key + " = " + val);

@@ -62,7 +62,7 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * signatures may be slightly different.
  * 
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: ServerControlWrapper.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: ServerControlWrapper.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 3.3.
  */
 
@@ -71,26 +71,21 @@ import com.arjuna.ats.jts.logging.jtsLogger;
  * otherwise we would never know.
  */
 
-public class ServerControlWrapper extends ControlWrapper
-{
+public class ServerControlWrapper extends ControlWrapper {
 
-    public ServerControlWrapper (Control c)
-    {
+    public ServerControlWrapper(Control c) {
         super(c);
     }
 
-    public ServerControlWrapper (ControlImple impl)
-    {
+    public ServerControlWrapper(ControlImple impl) {
         super(impl);
     }
 
-    public ServerControlWrapper (Control c, ControlImple impl)
-    {
+    public ServerControlWrapper(Control c, ControlImple impl) {
         super(c, impl);
     }
 
-    public ServerControlWrapper (Control c, Uid u)
-    {
+    public ServerControlWrapper(Control c, Uid u) {
         super(c, u);
     }
 
@@ -98,58 +93,43 @@ public class ServerControlWrapper extends ControlWrapper
      * Override some Reapable methods.
      */
 
-    public int cancel ()
-    {
-        try
-        {
+    public int cancel() {
+        try {
             Interposition.destroy(super.get_uid());
 
             rollback();
 
             return ActionStatus.ABORTED;
-        }
-        catch (Unavailable ex)
-        {
+        } catch (Unavailable ex) {
             return ActionStatus.INVALID;
-        }
-        catch (NoTransaction ex)
-        {
+        } catch (NoTransaction ex) {
             return ActionStatus.NO_ACTION;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             jtsLogger.i18NLogger.warn_interposition_cwabort(ex);
 
             return ActionStatus.INVALID;
         }
     }
 
-    public ControlWrapper create_subtransaction () throws Unavailable,
-            Inactive, SubtransactionsUnavailable, SystemException
-    {
+    public ControlWrapper create_subtransaction()
+            throws Unavailable, Inactive, SubtransactionsUnavailable, SystemException {
         Coordinator coord = null;
 
-        try
-        {
+        try {
             coord = get_coordinator();
-        }
-        catch (SystemException e)
-        {
+        } catch (SystemException e) {
             coord = null;
         }
 
-        if (coord != null)
-        {
+        if (coord != null) {
             return new ServerControlWrapper(coord.create_subtransaction());
-        }
-        else
-        {
+        } else {
             if (jtsLogger.logger.isTraceEnabled()) {
-                jtsLogger.logger.trace("ServerControlWrapper::create_subtransaction - subtransaction parent is inactive.");
+                jtsLogger.logger
+                        .trace("ServerControlWrapper::create_subtransaction - subtransaction parent is inactive.");
             }
 
-            throw new INVALID_TRANSACTION(
-                    ExceptionCodes.UNAVAILABLE_COORDINATOR,
-                    CompletionStatus.COMPLETED_NO);
+            throw new INVALID_TRANSACTION(ExceptionCodes.UNAVAILABLE_COORDINATOR, CompletionStatus.COMPLETED_NO);
         }
     }
 

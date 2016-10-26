@@ -67,8 +67,8 @@ public class ListServersStatusTest extends TestCase {
         }
     }
 
-    public void testListServersStatusTestWithServers() throws IOException, MalformedObjectNameException, NullPointerException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public void testListServersStatusTestWithServers() throws IOException, MalformedObjectNameException,
+            NullPointerException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         log.info("ListServersStatusTest::testListServersStatusTestWithServers");
         if (commandHandler.handleCommand("startup testsui".split(" ")) != 0) {
             fail("Could not start the server");

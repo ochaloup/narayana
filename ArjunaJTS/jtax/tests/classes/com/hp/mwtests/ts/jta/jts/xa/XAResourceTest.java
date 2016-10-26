@@ -54,14 +54,16 @@ import com.arjuna.orbportability.RootOA;
 public class XAResourceTest {
     @Before
     public void setup() {
-//        System.setProperty("jacorb.implname", "1");
-//        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryActivatorClassNames(Arrays.asList(new String[] {com.arjuna.ats.internal.jts.orbspecific.recovery.RecoveryEnablement.class.getName()}));
+        // System.setProperty("jacorb.implname", "1");
+        // recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryActivatorClassNames(Arrays.asList(new
+        // String[]
+        // {com.arjuna.ats.internal.jts.orbspecific.recovery.RecoveryEnablement.class.getName()}));
     }
 
     @After
     public void tearDown() {
-//        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryActivatorClassNames(null);
-//        System.setProperty("jacorb.implname", "");
+        // recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryActivatorClassNames(null);
+        // System.setProperty("jacorb.implname", "");
     }
 
     @Test
@@ -69,15 +71,14 @@ public class XAResourceTest {
 
         ORB myORB = ORB.getInstance("test");
         RootOA myOA = OA.getRootOA(myORB);
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
 
         RecoveryManager.manager();
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 

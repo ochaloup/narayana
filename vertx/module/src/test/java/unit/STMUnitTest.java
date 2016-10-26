@@ -21,26 +21,25 @@ import org.junit.Test;
  */
 
 import com.arjuna.ats.arjuna.AtomicAction;
-import org.junit.Test;
 
-import static org.vertx.testtools.VertxAssert.*;
+import static org.junit.Assert.assertTrue;
 
 public class STMUnitTest {
 
-  @Test
-  public void testVerticle() {
-    STMVerticle vert = new STMVerticle();
+    @Test
+    public void testVerticle() {
+        STMVerticle vert = new STMVerticle();
 
-    // do something with verticle
+        // do something with verticle
 
-    AtomicAction A = new AtomicAction();
+        AtomicAction A = new AtomicAction();
 
-    A.begin();
+        A.begin();
 
-    int amount = vert.value();
+        int amount = vert.value();
 
-    A.abort();
+        A.abort();
 
-    assertTrue(vert.value() == amount);
-  }
+        assertTrue(vert.value() == amount);
+    }
 }

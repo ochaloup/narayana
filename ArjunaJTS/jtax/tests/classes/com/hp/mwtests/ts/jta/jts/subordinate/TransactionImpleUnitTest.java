@@ -46,114 +46,90 @@ import com.arjuna.ats.jta.exceptions.InactiveTransactionException;
 import com.arjuna.ats.jta.exceptions.InvalidTerminationStateException;
 import com.hp.mwtests.ts.jta.jts.common.TestBase;
 
-class DummyTransactionImple extends TransactionImple
-{
-    public DummyTransactionImple(AtomicTransaction imported)
-    {
+class DummyTransactionImple extends TransactionImple {
+    public DummyTransactionImple(AtomicTransaction imported) {
         super(imported);
     }
 
-    public void commitAndDisassociate () throws javax.transaction.RollbackException, javax.transaction.HeuristicMixedException, javax.transaction.HeuristicRollbackException, java.lang.SecurityException, javax.transaction.SystemException, java.lang.IllegalStateException
-    {
+    public void commitAndDisassociate() throws javax.transaction.RollbackException,
+            javax.transaction.HeuristicMixedException, javax.transaction.HeuristicRollbackException,
+            java.lang.SecurityException, javax.transaction.SystemException, java.lang.IllegalStateException {
         super.commitAndDisassociate();
     }
 
-    public void rollbackAndDisassociate () throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException
-    {
+    public void rollbackAndDisassociate()
+            throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException {
         super.rollbackAndDisassociate();
     }
 }
 
-
-public class TransactionImpleUnitTest extends TestBase
-{   
+public class TransactionImpleUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         OTSImpleManager.current().begin();
-        
-        TransactionImple tx = new TransactionImple(new SubordinateAtomicTransaction(new ServerControlWrapper(OTSImpleManager.current().get_control())));
-        
+
+        TransactionImple tx = new TransactionImple(
+                new SubordinateAtomicTransaction(new ServerControlWrapper(OTSImpleManager.current().get_control())));
+
         assertFalse(tx.equals(null));
         assertTrue(tx.equals(tx));
         assertFalse(tx.equals(new TransactionImple(new AtomicTransaction())));
         assertFalse(tx.equals(new Object()));
         assertTrue(tx.toString() != null);
-        
-        try
-        {
+
+        try {
             tx.commit();
-            
+
             fail();
+        } catch (final InvalidTerminationStateException ex) {
         }
-        catch (final InvalidTerminationStateException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             tx.rollback();
-            
+
             fail();
+        } catch (final InvalidTerminationStateException ex) {
         }
-        catch (final InvalidTerminationStateException ex)
-        {
-        }
-        
+
         tx.doBeforeCompletion();
-        
+
         tx.doPrepare();
-        
-        try
-        {
+
+        try {
             tx.doCommit();
-            
+
             fail();
+        } catch (final Throwable ex) {
         }
-        catch (final Throwable ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             tx.doRollback();
-            
+
             fail();
+        } catch (final Throwable ex) {
         }
-        catch (final Throwable ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             tx.doOnePhaseCommit();
-            
+
             fail();
+        } catch (final Throwable ex) {
         }
-        catch (final Throwable ex)
-        {
-        }
-        
+
         tx.doForget();
-        
+
         OTSImpleManager.current().rollback();
-        
+
         DummyTransactionImple dummy = new DummyTransactionImple(new AtomicTransaction());
-        
-        try
-        {
+
+        try {
             dummy.commitAndDisassociate();
+        } catch (final InactiveTransactionException ex) {
         }
-        catch (final InactiveTransactionException ex)
-        {
-        }
-        
-        try
-        {
+
+        try {
             dummy.rollbackAndDisassociate();
-        }
-        catch (final InactiveTransactionException ex)
-        {
+        } catch (final InactiveTransactionException ex) {
         }
     }
 }

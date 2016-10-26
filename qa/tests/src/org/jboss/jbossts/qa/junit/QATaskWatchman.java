@@ -9,15 +9,19 @@ import java.io.PrintStream;
 
 class QATaskWatchman extends TestWatchman {
     private long startTime;
-    private QATestNameRule testName; //t he test group and name
+    private QATestNameRule testName; // t he test group and name
     private String passFileName; // the file where which passes are reported
     private String failFileName; // the file where failures are reported
 
     /**
      * Assign streams where the test watcher will log test passes and failures
-     * @param testName the test group, not nul
-     * @param passFileName the file where passes are reported
-     * @param failFileName the file where failures are reported
+     * 
+     * @param testName
+     *            the test group, not nul
+     * @param passFileName
+     *            the file where passes are reported
+     * @param failFileName
+     *            the file where failures are reported
      */
     public QATaskWatchman(QATestNameRule testName, String passFileName, String failFileName) {
         this.testName = testName;
@@ -66,9 +70,8 @@ class QATaskWatchman extends TestWatchman {
         }
 
         if (testName != null && printStream != null) {
-            printStream.printf("%s %s %s (%dm%d.%03ds)\n",
-                testName.getGroupName(), testName.getMethodName(), message,
-                minutes, seconds, (millis % 1000));
+            printStream.printf("%s %s %s (%dm%d.%03ds)\n", testName.getGroupName(), testName.getMethodName(), message,
+                    minutes, seconds, (millis % 1000));
         }
     }
 }

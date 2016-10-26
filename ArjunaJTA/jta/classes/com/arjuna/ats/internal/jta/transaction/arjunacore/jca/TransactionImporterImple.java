@@ -48,8 +48,7 @@ import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
 import org.jboss.tm.TransactionImportResult;
 
-public class TransactionImporterImple implements TransactionImporter
-{
+public class TransactionImporterImple implements TransactionImporter {
 
     /**
      * Create a subordinate transaction associated with the global transaction
@@ -64,15 +63,11 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public SubordinateTransaction importTransaction(Xid xid)
-            throws XAException
-    {
+    public SubordinateTransaction importTransaction(Xid xid) throws XAException {
         return (SubordinateTransaction) importRemoteTransaction(xid, 0).getTransaction();
     }
 
-    public SubordinateTransaction importTransaction(Xid xid, int timeout)
-        throws XAException
-    {
+    public SubordinateTransaction importTransaction(Xid xid, int timeout) throws XAException {
         return (SubordinateTransaction) importRemoteTransaction(xid, timeout).getTransaction();
     }
 
@@ -91,16 +86,16 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public TransactionImportResult importRemoteTransaction(Xid xid, int timeout)
-            throws XAException
-    {
+    public TransactionImportResult importRemoteTransaction(Xid xid, int timeout) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
         /*
-         * the imported transaction map is keyed by xid and the xid used is the one created inside
-         * the TransactionImple ctor (it encodes the node name of this transaction manager) and is
-         * the one returned by TransactionImple#baseXid() so pass in the converted value (using convertXid).
+         * the imported transaction map is keyed by xid and the xid used is the
+         * one created inside the TransactionImple ctor (it encodes the node
+         * name of this transaction manager) and is the one returned by
+         * TransactionImple#baseXid() so pass in the converted value (using
+         * convertXid).
          */
         return addImportedTransaction(null, convertXid(xid), xid, timeout);
     }
@@ -114,9 +109,7 @@ public class TransactionImporterImple implements TransactionImporter
      * @throws javax.transaction.xa.XAException
      */
 
-    public TransactionImple recoverTransaction(Uid actId)
-            throws XAException
-    {
+    public TransactionImple recoverTransaction(Uid actId) throws XAException {
         if (actId == null)
             throw new IllegalArgumentException();
 
@@ -124,15 +117,15 @@ public class TransactionImporterImple implements TransactionImporter
 
         if (recovered.baseXid() == null)
             throw new IllegalArgumentException();
-        
+
         /*
          * Is the transaction already in the map? This may be the case because
          * we scan the object store periodically and may get Uids to recover for
          * transactions that are progressing normally, i.e., do not need
          * recovery. In which case, we need to ignore them:
          *
-         * ie calling addImportedTransaction with a non null value for recovered will
-         * call recovered.recordTransaction()
+         * ie calling addImportedTransaction with a non null value for recovered
+         * will call recovered.recordTransaction()
          */
 
         return (TransactionImple) addImportedTransaction(recovered, recovered.baseXid(), null, 0).getTransaction();
@@ -152,9 +145,7 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public SubordinateTransaction getImportedTransaction(Xid xid)
-            throws XAException
-    {
+    public SubordinateTransaction getImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -163,10 +154,12 @@ public class TransactionImporterImple implements TransactionImporter
 
         if (tx == null) {
             /*
-             * Remark: if holder != null and holder.get() == null then the setter is about to
-             * import the transaction but has not yet updated the holder. We implement the getter
-             * (the thing that is trying to terminate the imported transaction) as though the imported
-             * transaction only becomes observable when it has been fully imported.
+             * Remark: if holder != null and holder.get() == null then the
+             * setter is about to import the transaction but has not yet updated
+             * the holder. We implement the getter (the thing that is trying to
+             * terminate the imported transaction) as though the imported
+             * transaction only becomes observable when it has been fully
+             * imported.
              */
             return null;
         }
@@ -181,13 +174,11 @@ public class TransactionImporterImple implements TransactionImporter
             throw new XAException(XAException.XA_RBROLLBACK);
         }
 
-        if (!tx.activated())
-        {
+        if (!tx.activated()) {
             tx.recover();
 
             return tx;
-        }
-        else
+        } else
             return tx;
     }
 
@@ -201,8 +192,7 @@ public class TransactionImporterImple implements TransactionImporter
      *             thrown if there are any errors.
      */
 
-    public void removeImportedTransaction(Xid xid) throws XAException
-    {
+    public void removeImportedTransaction(Xid xid) throws XAException {
         if (xid == null)
             throw new IllegalArgumentException();
 
@@ -224,7 +214,6 @@ public class TransactionImporterImple implements TransactionImporter
         }
     }
 
-    
     public Set<Xid> getInflightXids(String parentNodeName) {
         Iterator<AtomicReference<TransactionImple>> iterator = _transactions.values().iterator();
         Set<Xid> toReturn = new HashSet<Xid>();
@@ -242,16 +231,20 @@ public class TransactionImporterImple implements TransactionImporter
     /**
      * This can be used for newly imported transactions or recovered ones.
      *
-     * @param recoveredTransaction If this is recovery
+     * @param recoveredTransaction
+     *            If this is recovery
      * @param mapKey
-     * @param xid if this is import
+     * @param xid
+     *            if this is import
      * @param timeout
      * @return
      */
-    private TransactionImportResult addImportedTransaction(TransactionImple recoveredTransaction, Xid mapKey, Xid xid, int timeout) {
+    private TransactionImportResult addImportedTransaction(TransactionImple recoveredTransaction, Xid mapKey, Xid xid,
+            int timeout) {
         boolean isNew = false;
         SubordinateXidImple importedXid = new SubordinateXidImple(mapKey);
-        // We need to store the imported transaction in a volatile field holder so that it can be shared between threads
+        // We need to store the imported transaction in a volatile field holder
+        // so that it can be shared between threads
         AtomicReference<TransactionImple> holder = new AtomicReference<>();
         AtomicReference<TransactionImple> existing;
 
@@ -261,8 +254,9 @@ public class TransactionImporterImple implements TransactionImporter
 
         TransactionImple txn = holder.get();
 
-        // Should only be called by the recovery system - this will replace the Transaction with one from disk
-        if (recoveredTransaction!= null) {
+        // Should only be called by the recovery system - this will replace the
+        // Transaction with one from disk
+        if (recoveredTransaction != null) {
             synchronized (holder) {
                 // now it's safe to add the imported transaction to the holder
                 recoveredTransaction.recordTransaction();
@@ -273,7 +267,8 @@ public class TransactionImporterImple implements TransactionImporter
         }
 
         if (txn == null) {
-            // retry the get under a lock - this double check idiom is safe because AtomicReference is effectively
+            // retry the get under a lock - this double check idiom is safe
+            // because AtomicReference is effectively
             // a volatile so can be concurrently accessed by multiple threads
             synchronized (holder) {
                 txn = holder.get();
@@ -289,8 +284,7 @@ public class TransactionImporterImple implements TransactionImporter
         return new TransactionImportResult(txn, isNew);
     }
 
-    private XidImple convertXid(Xid xid)
-    {
+    private XidImple convertXid(Xid xid) {
         if (xid != null && xid.getFormatId() == XATxConverter.FORMAT_ID) {
             XidImple toImport = new XidImple(xid);
             XATxConverter.setSubordinateNodeName(toImport.getXID(), TxControl.getXANodeName());
@@ -300,7 +294,5 @@ public class TransactionImporterImple implements TransactionImporter
         }
     }
 
-    private static ConcurrentHashMap<SubordinateXidImple, AtomicReference<TransactionImple>> _transactions =
-            new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<SubordinateXidImple, AtomicReference<TransactionImple>> _transactions = new ConcurrentHashMap<>();
 }
-

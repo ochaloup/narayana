@@ -33,10 +33,9 @@ package com.arjuna.orbportability.internal.orbspecific.versions;
 import com.arjuna.orbportability.ORBData;
 import com.arjuna.orbportability.ORBType;
 
-public class jacorb_2_0 implements ORBData
-{
-    public String getORBdata()
-    {
-        return "<orb-data><name>" + ORBType.jacorb+"</name><version><major>2</major><minor>0</minor></version><corba-version><major>2</major><minor>3</minor></corba-version></orb-data>";
+public class jacorb_2_0 implements ORBData {
+    public String getORBdata() {
+        return "<orb-data><name>" + ORBType.jacorb
+                + "</name><version><major>2</major><minor>0</minor></version><corba-version><major>2</major><minor>3</minor></corba-version></orb-data>";
     }
 }

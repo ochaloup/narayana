@@ -52,14 +52,16 @@ import static org.junit.Assert.assertTrue;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class JTSXARTest extends JTSOSBTestBase {
     void injectCommitException(String exceptionType) throws Exception {
-        XAFailureSpec fault = new XAFailureSpec(
-                "JTSXARTest", XAFailureMode.XAEXCEPTION, XAFailureType.XARES_COMMIT, exceptionType, 0);
+        XAFailureSpec fault = new XAFailureSpec("JTSXARTest", XAFailureMode.XAEXCEPTION, XAFailureType.XARES_COMMIT,
+                exceptionType, 0);
         XAException xae = XAFailureResource.getXAExceptionType(exceptionType);
         int expectedXAE = xae == null ? HeuristicStatus.UNKNOWN_XA_ERROR_CODE : xae.errorCode;
 
@@ -96,7 +98,8 @@ public class JTSXARTest extends JTSOSBTestBase {
                 throw e;
         }
 
-        // Validate that the correct MBeans were created to instrument the transaction and participants
+        // Validate that the correct MBeans were created to instrument the
+        // transaction and participants
         // and validate they have the correct heuristic status
         ObjStoreBrowser osb = createObjStoreBrowser(true);
 
@@ -118,8 +121,9 @@ public class JTSXARTest extends JTSOSBTestBase {
         injectCommitException("XA_HEURRB");
     }
 
-    private Set<UidWrapper> validateChildBeans(ObjStoreBrowser osb, String name, int expectedNumberOfChildBeans, int expectedXAE)
-            throws MalformedObjectNameException, ReflectionException, InstanceNotFoundException, AttributeNotFoundException, MBeanException {
+    private Set<UidWrapper> validateChildBeans(ObjStoreBrowser osb, String name, int expectedNumberOfChildBeans,
+            int expectedXAE) throws MalformedObjectNameException, ReflectionException, InstanceNotFoundException,
+            AttributeNotFoundException, MBeanException {
         MBeanServer mbs = JMXServer.getAgent().getServer();
         ObjectName txnON = new ObjectName(name);
         Object aid = mbs.getAttribute(txnON, "Id");
@@ -132,8 +136,11 @@ public class JTSXARTest extends JTSOSBTestBase {
         Set<UidWrapper> wrappers = new HashSet<UidWrapper>();
 
         for (ObjectName on : participants) {
-            //mbs.getAttributes(on, new String[] {"Id", "Type", "Status", "HeuristicStatus", "FormatId", "GlobalTransactionId", "NodeName", "BranchQualifier"});
-            AttributeList al = mbs.getAttributes(on, new String[] {"Id", "Status", "HeuristicStatus", "GlobalTransactionId"});
+            // mbs.getAttributes(on, new String[] {"Id", "Type", "Status",
+            // "HeuristicStatus", "FormatId", "GlobalTransactionId", "NodeName",
+            // "BranchQualifier"});
+            AttributeList al = mbs.getAttributes(on,
+                    new String[]{"Id", "Status", "HeuristicStatus", "GlobalTransactionId"});
 
             for (Attribute a : al.asList()) {
                 if ("Id".equals(a.getName())) {
@@ -148,12 +155,14 @@ public class JTSXARTest extends JTSOSBTestBase {
                     byte[] gtid = (byte[]) a.getValue();
                     Uid txOfXar = new Uid(gtid);
 
-                    // assert that the gtid of the participant matches the parent action
+                    // assert that the gtid of the participant matches the
+                    // parent action
                     assertEquals(txOfXar, uidOfTxn);
                 } else if ("HeuristicStatus".equals(a.getName())) {
                     HeuristicStatus hs = HeuristicStatus.valueOf(a.getValue().toString());
 
-                    // assert that the instrumented heuristic status has the expected value
+                    // assert that the instrumented heuristic status has the
+                    // expected value
                     assertEquals(hs.getXAErrorCode(), expectedXAE);
                 }
             }

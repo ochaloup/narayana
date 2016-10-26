@@ -22,7 +22,6 @@
 
 package org.jboss.narayana.compensations.internal;
 
-
 import org.jboss.narayana.compensations.api.CompensationManager;
 
 /**
@@ -33,8 +32,9 @@ public class CompensationManagerImpl implements CompensationManager {
     private static final ThreadLocal<CompensationManagerState> compensationManagerStateThreadLocal = new ThreadLocal<CompensationManagerState>();
 
     /**
-     * Mark the transaction as "compensate only". This ensures that the compensation-based transaction will be cancelled and any
-     * completed work compensated.
+     * Mark the transaction as "compensate only". This ensures that the
+     * compensation-based transaction will be cancelled and any completed work
+     * compensated.
      */
     @Override
     public void setCompensateOnly() {
@@ -46,7 +46,8 @@ public class CompensationManagerImpl implements CompensationManager {
     /**
      * Check if compensating transaction was marked as compensate-only.
      *
-     * @return {@code true} if the transaction was marked as compensate-only and {@code false} otherwise.
+     * @return {@code true} if the transaction was marked as compensate-only and
+     *         {@code false} otherwise.
      */
     public static boolean isCompensateOnly() {
 
@@ -59,7 +60,8 @@ public class CompensationManagerImpl implements CompensationManager {
     /**
      * Resume compensation manager by associating it with the current thread.
      *
-     * @param compensationManagerState state of the compensation manager.
+     * @param compensationManagerState
+     *            state of the compensation manager.
      */
     public static void resume(CompensationManagerState compensationManagerState) {
 
@@ -67,7 +69,8 @@ public class CompensationManagerImpl implements CompensationManager {
     }
 
     /**
-     * Suspend compensation manager by disassociating it from the current thread.
+     * Suspend compensation manager by disassociating it from the current
+     * thread.
      *
      * @return state of the suspended compensation manager.
      */

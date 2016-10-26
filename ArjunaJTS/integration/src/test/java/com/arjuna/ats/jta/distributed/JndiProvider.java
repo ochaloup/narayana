@@ -21,7 +21,6 @@
  */
 package com.arjuna.ats.jta.distributed;
 
-
 import org.jnp.server.NamingBeanImpl;
 
 import javax.naming.Context;

@@ -24,26 +24,31 @@ import java.util.Properties;
 import org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException;
 
 /**
- * The X_COMMON buffer type supports a subset of the types provided by the X_C_TYPE buffer in order to support more language
- * portable data exchange.
+ * The X_COMMON buffer type supports a subset of the types provided by the
+ * X_C_TYPE buffer in order to support more language portable data exchange.
  */
 public interface X_COMMON extends Buffer {
 
     /**
      * Get the short value identified by the key.
      * 
-     * @param key The key to use
+     * @param key
+     *            The key to use
      * @return The short value
-     * @throws ConnectionException In case the key is not part of the structure.
+     * @throws ConnectionException
+     *             In case the key is not part of the structure.
      */
     public short getShort(String key) throws ConnectionException;
 
     /**
      * Set the short value
      * 
-     * @param key The value to set
-     * @param value The value to use
-     * @throws ConnectionException In case the key is unknown.
+     * @param key
+     *            The value to set
+     * @param value
+     *            The value to use
+     * @throws ConnectionException
+     *             In case the key is unknown.
      */
     public void setShort(String key, short value) throws ConnectionException;
 

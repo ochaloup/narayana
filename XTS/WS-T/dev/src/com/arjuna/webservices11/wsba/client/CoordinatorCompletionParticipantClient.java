@@ -44,14 +44,14 @@ import java.io.IOException;
 
 /**
  * The Client side of the Coordinator Participant Coordinator.
+ * 
  * @author kevin
  */
-public class CoordinatorCompletionParticipantClient
-{
+public class CoordinatorCompletionParticipantClient {
     /**
      * The client singleton.
      */
-    private static final CoordinatorCompletionParticipantClient CLIENT = new CoordinatorCompletionParticipantClient() ;
+    private static final CoordinatorCompletionParticipantClient CLIENT = new CoordinatorCompletionParticipantClient();
 
     /**
      * The complete action.
@@ -103,8 +103,7 @@ public class CoordinatorCompletionParticipantClient
     /**
      * Construct the participant completion coordinator client.
      */
-    private CoordinatorCompletionParticipantClient()
-    {
+    private CoordinatorCompletionParticipantClient() {
         final MAPBuilder builder = PrivilegedMapBuilderFactory.getInstance().getBuilderInstance();
         completeAction = BusinessActivityConstants.WSBA_ACTION_COMPLETE;
         closeAction = BusinessActivityConstants.WSBA_ACTION_CLOSE;
@@ -117,24 +116,28 @@ public class CoordinatorCompletionParticipantClient
         statusAction = BusinessActivityConstants.WSBA_ACTION_STATUS;
 
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
-        final String coordinatorCompletionCoordinatorURIString =
-                serviceRegistry.getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_COORDINATOR_SERVICE_NAME, false) ;
-        final String secureCoordinatorCompletionCoordinatorURIString =
-                serviceRegistry.getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_COORDINATOR_SERVICE_NAME, true) ;
+        final String coordinatorCompletionCoordinatorURIString = serviceRegistry
+                .getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_COORDINATOR_SERVICE_NAME, false);
+        final String secureCoordinatorCompletionCoordinatorURIString = serviceRegistry
+                .getServiceURI(BusinessActivityConstants.COORDINATOR_COMPLETION_COORDINATOR_SERVICE_NAME, true);
         coordinatorCompletionCoordinator = builder.newEndpoint(coordinatorCompletionCoordinatorURIString);
         secureCoordinatorCompletionCoordinator = builder.newEndpoint(secureCoordinatorCompletionCoordinatorURIString);
     }
 
     /**
      * Send a complete request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendComplete(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -146,14 +149,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a close request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendClose(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -165,14 +172,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a cancel request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendCancel(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -184,14 +195,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a compensate request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendCompensate(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -203,14 +218,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a failed request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendFailed(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -222,14 +241,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send an exited request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendExited(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -241,14 +264,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send an exited request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendNotCompleted(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -260,14 +287,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a get status request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendGetStatus(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier)
-        throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -279,15 +310,18 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Send a status request.
-     * @param map addressing context initialised with to and message ID.
-     * @param identifier The identifier of the initiator.
-     * @throws com.arjuna.webservices.SoapFault For any errors.
-     * @throws java.io.IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param identifier
+     *            The identifier of the initiator.
+     * @throws com.arjuna.webservices.SoapFault
+     *             For any errors.
+     * @throws java.io.IOException
+     *             for any transport errors.
      */
     public void sendStatus(W3CEndpointReference endpoint, final MAP map, final InstanceIdentifier identifier,
-        final QName state)
-        throws SoapFault, IOException
-    {
+            final QName state) throws SoapFault, IOException {
         MAPEndpoint coordinator = getCoordinator(endpoint, map);
         AddressingHelper.installFromFaultTo(map, coordinator, identifier);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
@@ -300,28 +334,32 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * send a soap fault
-     * @param soapFault the fault to be sent
-     * @param endpoint the endpoint to send the fault to
-     * @param map addressing context to be used to send the fault
-     * @param faultAction the action to associate with the message
+     * 
+     * @param soapFault
+     *            the fault to be sent
+     * @param endpoint
+     *            the endpoint to send the fault to
+     * @param map
+     *            addressing context to be used to send the fault
+     * @param faultAction
+     *            the action to associate with the message
      */
     public void sendSoapFault(SoapFault11 soapFault, W3CEndpointReference endpoint, MAP map, String faultAction)
-            throws SoapFault, IOException
-    {
+            throws SoapFault, IOException {
         AddressingHelper.installNoneReplyTo(map);
         map.setAction(faultAction);
         BusinessAgreementWithCoordinatorCompletionParticipantPortType port;
         port = getPort(endpoint, map, faultAction);
-        Fault fault = ((SoapFault11)soapFault).toFault();
+        Fault fault = ((SoapFault11) soapFault).toFault();
         port.soapFault(fault);
     }
     /**
      * return a coordinator endpoint appropriate to the type of participant
+     * 
      * @param endpoint
      * @return either the secure coordinator endpoint or the non-secure endpoint
      */
-    MAPEndpoint getCoordinator(W3CEndpointReference endpoint, MAP map)
-    {
+    MAPEndpoint getCoordinator(W3CEndpointReference endpoint, MAP map) {
         String address;
         if (endpoint != null) {
             NativeEndpointReference nativeRef = EndpointHelper.transform(NativeEndpointReference.class, endpoint);
@@ -339,24 +377,25 @@ public class CoordinatorCompletionParticipantClient
 
     /**
      * Get the Completion Coordinator client singleton.
+     * 
      * @return The Completion Coordinator client singleton.
      */
-    public static CoordinatorCompletionParticipantClient getClient()
-    {
+    public static CoordinatorCompletionParticipantClient getClient() {
         return CLIENT;
     }
 
     /**
-     * obtain a port from the participant endpoint configured with the instance identifier handler and the supplied
-     * addressing properties supplemented with the given action
+     * obtain a port from the participant endpoint configured with the instance
+     * identifier handler and the supplied addressing properties supplemented
+     * with the given action
+     * 
      * @param participant
      * @param map
      * @param action
      * @return
      */
-    private BusinessAgreementWithCoordinatorCompletionParticipantPortType
-    getPort(final W3CEndpointReference participant, final MAP map, final String action)
-    {
+    private BusinessAgreementWithCoordinatorCompletionParticipantPortType getPort(
+            final W3CEndpointReference participant, final MAP map, final String action) {
         AddressingHelper.installNoneReplyTo(map);
         if (participant != null) {
             return WSBAClient.getCoordinatorCompletionParticipantPort(participant, action, map);

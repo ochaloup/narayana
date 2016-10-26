@@ -40,13 +40,15 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlists a cooprdinator completion participant with instructions to complete and close
- * without error then gets the web service to start a subordinate transaction and enlist several cooprdinator
- * completion participants for a second web service in the subtransaction also with instructions to complete
- * and close without error
+ * Starts a transaction and enlists a cooprdinator completion participant with
+ * instructions to complete and close without error then gets the web service to
+ * start a subordinate transaction and enlist several cooprdinator completion
+ * participants for a second web service in the subtransaction also with
+ * instructions to complete and close without error
  */
-public class MultiParticipantParticipantCompletionParticipantCloseTest extends XTSServiceTestBase implements XTSServiceTest
-{
+public class MultiParticipantParticipantCompletionParticipantCloseTest extends XTSServiceTestBase
+        implements
+            XTSServiceTest {
     public void run() {
 
         // wait a while so the service has time to start

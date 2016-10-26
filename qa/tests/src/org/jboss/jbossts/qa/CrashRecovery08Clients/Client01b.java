@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.CrashRecovery08Clients;
  * $Id: Client01b.java,v 1.2 2003/06/26 11:43:41 rbegg Exp $
  */
 
-
 import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import org.jboss.jbossts.qa.CrashRecovery08.*;
@@ -66,12 +65,9 @@ import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client01b
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client01b {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -90,33 +86,25 @@ public class Client01b
 
             correct = correct && service.is_correct();
 
-            if (correct)
-            {
+            if (correct) {
                 OTS.current().commit(true);
 
-                System.out.println("jjh: "+service.get_resource_trace(0));
+                System.out.println("jjh: " + service.get_resource_trace(0));
 
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client01b.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client01b.main: " + exception);
             exception.printStackTrace(System.err);
         }

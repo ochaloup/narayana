@@ -36,7 +36,6 @@ import org.codehaus.jettison.json.JSONArray;
 
 import com.arjuna.ats.jta.TransactionManager;
 
-
 /**
  * REST resource which uses XAResource.
  *

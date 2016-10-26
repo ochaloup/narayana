@@ -28,8 +28,8 @@ public class VolatileParticipantResource {
             LOG.trace("beforeCompletion request on VolatileParticipantResource. ParticipantId: " + participantId);
         }
 
-        final VolatileParticipant volatileParticipant =
-                ParticipantsContainer.getInstance().getVolatileParticipant(participantId);
+        final VolatileParticipant volatileParticipant = ParticipantsContainer.getInstance()
+                .getVolatileParticipant(participantId);
 
         if (volatileParticipant == null) {
             if (LOG.isTraceEnabled()) {
@@ -54,8 +54,8 @@ public class VolatileParticipantResource {
                     + ", content: " + content);
         }
 
-        final VolatileParticipant volatileParticipant =
-                ParticipantsContainer.getInstance().getVolatileParticipant(participantId);
+        final VolatileParticipant volatileParticipant = ParticipantsContainer.getInstance()
+                .getVolatileParticipant(participantId);
 
         if (volatileParticipant == null) {
             if (LOG.isTraceEnabled()) {

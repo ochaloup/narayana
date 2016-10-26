@@ -93,7 +93,8 @@ public class JCAServerTransactionRecoveryModuleTest {
             }
         };
         SubordinationManager.getTransactionImporter().importTransaction(xid);
-        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        SubordinateTransaction importedTransaction = SubordinationManager.getTransactionImporter()
+                .getImportedTransaction(xid);
         importedTransaction.enlistResource(new XAResource() {
             @Override
             public void commit(Xid xid, boolean b) throws XAException {

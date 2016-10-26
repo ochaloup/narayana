@@ -47,7 +47,8 @@ public final class ArquillianRecoveryTestUtils {
             + " -Dorg.jboss.jbossts.xts.transport.transportTimeout=" + TRANSPORT_TIMEOUT;
 
     public static final String BYTEMAN_VM_ARGUMENTS = BASE_VM_ARGUMENTS.replaceAll("=listen",
-            "=script:" + System.getProperty("project.build.directory") + "/test-classes/scripts/crash-recovery-rules.btm,boot:"
+            "=script:" + System.getProperty("project.build.directory")
+                    + "/test-classes/scripts/crash-recovery-rules.btm,boot:"
                     + System.getProperty("project.build.directory") + "/lib/byteman.jar,listen");
 
     private final ContainerController containerController;
@@ -98,7 +99,8 @@ public final class ArquillianRecoveryTestUtils {
     }
 
     private void clearObjectStore() {
-        File objectStore = new File(jbossHome + separator + "standalone" + separator + "data" + separator + "tx-object-store");
+        File objectStore = new File(
+                jbossHome + separator + "standalone" + separator + "data" + separator + "tx-object-store");
 
         if (objectStore.exists()) {
             if (!deleteDirectory(objectStore)) {

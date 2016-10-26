@@ -23,9 +23,7 @@ public class CloseTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoBusinessParticipant.class,
-                ParticipantCompletionCoordinatorRules.class);
+        return WarDeployment.getDeployment(DemoBusinessParticipant.class, ParticipantCompletionCoordinatorRules.class);
     }
 
     @BeforeClass()
@@ -39,10 +37,8 @@ public class CloseTest {
     }
 
     @Test
-    public void testClose()
-            throws Exception
-            {
-                ParticipantCompletionCoordinatorRules.setParticipantCount(1);
+    public void testClose() throws Exception {
+        ParticipantCompletionCoordinatorRules.setParticipantCount(1);
 
         UserBusinessActivity uba = UserBusinessActivity.getUserBusinessActivity();
         BusinessActivityManager bam = BusinessActivityManager.getBusinessActivityManager();
@@ -56,7 +52,7 @@ public class CloseTest {
         } catch (Exception eouter) {
             try {
                 uba.cancel();
-            } catch(Exception einner) {
+            } catch (Exception einner) {
             }
             throw eouter;
         }
@@ -64,5 +60,5 @@ public class CloseTest {
         uba.close();
 
         assertTrue(p.passed());
-            }
+    }
 }

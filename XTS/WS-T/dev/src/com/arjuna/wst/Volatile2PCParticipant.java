@@ -37,6 +37,5 @@ package com.arjuna.wst;
  * protocols.)
  */
 
-public interface Volatile2PCParticipant extends Participant
-{
+public interface Volatile2PCParticipant extends Participant {
 }

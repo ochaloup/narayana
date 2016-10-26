@@ -52,92 +52,77 @@ import com.arjuna.orbportability.OA;
 import com.arjuna.orbportability.ORB;
 import com.arjuna.orbportability.RootOA;
 
-public class WorkUnitTest
-{
-    class DummyWork implements Work
-    {       
-        public DummyWork ()
-        {
+public class WorkUnitTest {
+    class DummyWork implements Work {
+        public DummyWork() {
         }
-        
-        public void release ()
-        {
+
+        public void release() {
         }
-        
-        public void run ()
-        {
+
+        public void run() {
         }
     }
-    
+
     @Test
-    public void testWorkManager () throws Exception
-    {
+    public void testWorkManager() throws Exception {
         DummyWork work = new DummyWork();
         Transaction tx = new TransactionImple();
-        
+
         TxWorkManager.addWork(work, tx);
-        
-        try
-        {
+
+        try {
             TxWorkManager.addWork(new DummyWork(), tx);
-            
+
             fail();
+        } catch (final Throwable ex) {
         }
-        catch (final Throwable ex)
-        {
-        }
-        
+
         assertTrue(TxWorkManager.hasWork(tx));
-        
-        assertEquals(work, TxWorkManager.getWork(tx));       
-        
+
+        assertEquals(work, TxWorkManager.getWork(tx));
+
         TxWorkManager.removeWork(work, tx);
-        
+
         assertEquals(TxWorkManager.getWork(tx), null);
     }
-    
+
     @Test
-    public void testWorkSynchronization () throws Exception
-    {
+    public void testWorkSynchronization() throws Exception {
         Transaction tx = new TransactionImple();
         Synchronization ws = new WorkSynchronization(tx);
         DummyWork work = new DummyWork();
-        
+
         TxWorkManager.addWork(work, tx);
-        
-        try
-        {
+
+        try {
             ws.beforeCompletion();
-            
+
             fail();
+        } catch (final IllegalStateException ex) {
         }
-        catch (final IllegalStateException ex)
-        {
-        }
-        
+
         ws.afterCompletion(Status.STATUS_COMMITTED);
     }
-    
+
     @Before
-    public void setUp () throws Exception
-    {
+    public void setUp() throws Exception {
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
 
-        myORB.initORB(new String[] {}, null);
+        myORB.initORB(new String[]{}, null);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
     }
-    
+
     @After
-    public void tearDown () throws Exception
-    {
+    public void tearDown() throws Exception {
         myOA.destroy();
         myORB.shutdown();
     }
-    
+
     private ORB myORB = null;
     private RootOA myOA = null;
 }

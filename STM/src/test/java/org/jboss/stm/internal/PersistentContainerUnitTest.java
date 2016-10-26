@@ -44,158 +44,130 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class PersistentContainerUnitTest extends TestCase
-{
+public class PersistentContainerUnitTest extends TestCase {
 
-    public class TestObject extends LockManager
-    {
-        public TestObject ()
-        {
+    public class TestObject extends LockManager {
+        public TestObject() {
             super(ObjectType.ANDPERSISTENT);
         }
-        
-        public boolean save_state (OutputObjectState os)
-        {
+
+        public boolean save_state(OutputObjectState os) {
             return true;
         }
-        
-        public boolean restore_state (InputObjectState os)
-        {
+
+        public boolean restore_state(InputObjectState os) {
             return true;
         }
-        
-        public String type ()
-        {
+
+        public String type() {
             return "/StateManager/LockManager/TestObject";
         }
     }
-    
-    @Transactional
-    public interface Sample
-    {
-       public void myWork ();
-       
-       public void doSomeWork ();
 
-       public boolean doSomeOtherWork ();
-       
-       public void notTransactionalWork ();
-    }
-    
     @Transactional
-    public class SampleLockable implements Sample
-    {
-        public void myWork ()
-        {
+    public interface Sample {
+        public void myWork();
+
+        public void doSomeWork();
+
+        public boolean doSomeOtherWork();
+
+        public void notTransactionalWork();
+    }
+
+    @Transactional
+    public class SampleLockable implements Sample {
+        public void myWork() {
         }
-        
+
         @ReadLock
-        public void doSomeWork ()
-        {
+        public void doSomeWork() {
 
         }
 
         @WriteLock
-        public boolean doSomeOtherWork ()
-        {
+        public boolean doSomeOtherWork() {
             return true;
         }
-        
+
         @TransactionFree
-        public void notTransactionalWork ()
-        {
+        public void notTransactionalWork() {
         }
 
         @State
-        @SuppressWarnings(value={"unused"})
+        @SuppressWarnings(value = {"unused"})
         private int _isState;
-        
-        @SuppressWarnings(value={"unused"})
+
+        @SuppressWarnings(value = {"unused"})
         private int _isNotState;
     }
 
-    public void testInvalidEnlist ()
-    {
+    public void testInvalidEnlist() {
         PersistentContainer<TestObject> theContainer = new PersistentContainer<TestObject>();
         TestObject tester = new TestObject();
         boolean success = false;
-        
-        try
-        {
+
+        try {
             theContainer.enlist(tester);
-        }
-        catch (final IllegalArgumentException ex)
-        {
+        } catch (final IllegalArgumentException ex) {
             success = true;
         }
 
         assertTrue(success);
     }
-    
-    @SuppressWarnings(value={"unused"})
-    public void testValidEnlist ()
-    {
+
+    @SuppressWarnings(value = {"unused"})
+    public void testValidEnlist() {
         PersistentContainer<Sample> theContainer = new PersistentContainer<Sample>();
         SampleLockable tester = new SampleLockable();
         boolean success = true;
-        
-        try
-        {
+
+        try {
             Sample proxy = theContainer.enlist(tester);
-        }
-        catch (final Throwable ex)
-        {
+        } catch (final Throwable ex) {
             ex.printStackTrace();
-            
+
             success = false;
         }
-        
+
         assertTrue(success);
     }
-    
-    public void testGetUid ()
-    {
+
+    public void testGetUid() {
         PersistentContainer<Sample> theContainer = new PersistentContainer<Sample>();
         SampleLockable tester = new SampleLockable();
         boolean success = true;
-        
-        try
-        {
+
+        try {
             Sample proxy = theContainer.enlist(tester);
             Uid u = theContainer.getUidForOriginal(proxy);
-            
+
             assertNotNull(u);
-        }
-        catch (final Throwable ex)
-        {
+        } catch (final Throwable ex) {
             ex.printStackTrace();
-            
+
             success = false;
         }
-        
+
         assertTrue(success);
     }
-    
-    public void testMULTIPLE ()
-    {
+
+    public void testMULTIPLE() {
         PersistentContainer<Sample> theContainer = new PersistentContainer<Sample>(ObjectModel.MULTIPLE);
         SampleLockable tester = new SampleLockable();
         boolean success = true;
-        
-        try
-        {
+
+        try {
             Sample proxy = theContainer.enlist(tester);
-            
+
             proxy.doSomeWork();
             proxy.doSomeOtherWork();
-        }
-        catch (final Throwable ex)
-        {
+        } catch (final Throwable ex) {
             ex.printStackTrace();
-            
+
             success = false;
         }
-        
+
         assertTrue(success);
     }
 }

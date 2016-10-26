@@ -75,8 +75,8 @@ public class StompReceiverImpl implements Receiver {
         message.setHeaders(headers);
 
         StompManagement.send(message, outputStream);
-        org.jboss.narayana.blacktie.jatmibroker.core.transport.hybrid.stomp.Message receive = StompManagement.receive(socket,
-                inputStream);
+        org.jboss.narayana.blacktie.jatmibroker.core.transport.hybrid.stomp.Message receive = StompManagement
+                .receive(socket, inputStream);
         if (receive.getCommand().equals("ERROR")) {
             log.error(new String(receive.getBody()));
             throw new ConnectionException(Connection.TPENOENT, new String(receive.getBody()));

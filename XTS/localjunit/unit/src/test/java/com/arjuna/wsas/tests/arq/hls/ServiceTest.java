@@ -18,36 +18,29 @@ public class ServiceTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoHLS.class,
-                WSASTestUtils.class);
+        return WarDeployment.getDeployment(DemoHLS.class, WSASTestUtils.class);
     }
 
     @Test
-    public void testService()
-            throws Exception
-            {
+    public void testService() throws Exception {
         UserActivity ua = UserActivityFactory.userActivity();
         DemoHLS demoHLS = new DemoHLS();
-        try
-        {
+        try {
             ActivityManagerFactory.activityManager().addHLS(demoHLS);
             String coordinationType = demoHLS.identity();
 
             ua.start(coordinationType);
 
-            System.out.println("Started: "+ua.activityName());
+            System.out.println("Started: " + ua.activityName());
 
             ua.start(coordinationType);
 
-            System.out.println("Started: "+ua.activityName());
+            System.out.println("Started: " + ua.activityName());
 
             ua.end();
 
             ua.end();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSASTestUtils.cleanup(ua);
             throw ex;
         } finally {
@@ -59,7 +52,6 @@ public class ServiceTest {
                 // ignore this
             }
         }
-            }
+    }
 
 }
-

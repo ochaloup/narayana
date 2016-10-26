@@ -70,7 +70,7 @@ public class SimpleResourceXA_RETRY implements XAResource {
 
     public Xid[] recover(int flag) throws XAException {
         if (xid != null) {
-            return new Xid[] { xid };
+            return new Xid[]{xid};
         }
         return null;
     }

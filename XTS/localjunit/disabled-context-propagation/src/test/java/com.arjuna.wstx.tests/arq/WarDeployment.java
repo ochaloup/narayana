@@ -29,9 +29,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 public class WarDeployment {
     public static WebArchive getDeployment(Class<?>... args) {
-        WebArchive archive = ShrinkWrap
-                .create(WebArchive.class, "test.war")
-                .addClasses(args)
+        WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war").addClasses(args)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));

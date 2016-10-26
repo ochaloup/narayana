@@ -41,22 +41,18 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class Setup01
-{
-    public static void main(String[] args)
-    {
+public class Setup01 {
+    public static void main(String[] args) {
         boolean passed = true;
 
-        try
-        {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -68,8 +64,7 @@ public class Setup01
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -77,26 +72,24 @@ public class Setup01
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
             Statement statement = connection.createStatement();
 
             String tableName = JDBCProfileStore.getTableName(databaseUser, "Infotable");
-            
-            try
-            {
+
+            try {
                 System.err.println("DROP TABLE " + tableName);
                 statement.executeUpdate("DROP TABLE " + tableName);
-            }
-            catch (java.sql.SQLException s)
-            {
-                if(!(s.getSQLState().startsWith("42") // old ms sql 2000 drivers
-                        || s.getSQLState().equals("S0005") // ms sql 2005 drivers
-                        || s.getSQLState().equals("ZZZZZ"))) // sybase jConnect drivers
+            } catch (java.sql.SQLException s) {
+                if (!(s.getSQLState().startsWith("42") // old ms sql 2000
+                                                        // drivers
+                        || s.getSQLState().equals("S0005") // ms sql 2005
+                                                            // drivers
+                        || s.getSQLState().equals("ZZZZZ"))) // sybase jConnect
+                                                                // drivers
                 {
                     System.err.println("Setup01.main: " + s);
                     System.err.println("SQL state is: <" + s.getSQLState() + ">");
@@ -107,34 +100,26 @@ public class Setup01
 
             statement.close();
             connection.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Setup01.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
             passed = false;
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Setup01.main: " + exception);
             exception.printStackTrace(System.err);
             System.out.println("Failed");
             passed = false;
         }
 
-        if (passed)
-        {
+        if (passed) {
             System.out.println("Passed");
-        }
-        else
-        {
+        } else {
             System.out.println("Failed");
         }
 

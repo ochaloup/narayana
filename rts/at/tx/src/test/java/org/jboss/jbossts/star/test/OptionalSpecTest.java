@@ -47,10 +47,11 @@ public class OptionalSpecTest extends BaseTest {
         txn.startTx();
 
         /*
-        288Additional information about the transaction, such as the number of participants and their
-        289individual URIs, MAY be returned if the client specifies the application/txstatusext+xml and the
-        290implementation supports that type.
-        */
+         * 288Additional information about the transaction, such as the number
+         * of participants and their 289individual URIs, MAY be returned if the
+         * client specifies the application/txstatusext+xml and the
+         * 290implementation supports that type.
+         */
         CoordinatorElement elem = txn.getTransactionInfo();
 
         if (txn.getStatus() != HttpURLConnection.HTTP_UNSUPPORTED_TYPE) {
@@ -59,7 +60,8 @@ public class OptionalSpecTest extends BaseTest {
 
             Assert.assertEquals(elem.getStatus(), TransactionStatusElement.TransactionActive);
             Assert.assertEquals(elem.getTxnURI(), txn.getTxnUri());
-            //TODO             Assert.assertEquals(elem.getTerminatorURI(), txn.getTerminatorURI());
+            // TODO Assert.assertEquals(elem.getTerminatorURI(),
+            // txn.getTerminatorURI());
             Assert.assertEquals(elem.getDurableParticipantEnlistmentURI(), txn.getDurableParticipantEnlistmentURI());
             Assert.assertEquals(elem.getVolatileParticipantEnlistmentURI(), txn.getVolatileParticipantEnlistmentURI());
         } else {
@@ -78,10 +80,11 @@ public class OptionalSpecTest extends BaseTest {
             txn.enlistTestResource(PURL, false);
 
         /*
-        288Additional information about the transaction, such as the number of participants and their
-        289individual URIs, MAY be returned if the client specifies the application/txstatusext+xml and the
-        290implementation supports that type.
-        */
+         * 288Additional information about the transaction, such as the number
+         * of participants and their 289individual URIs, MAY be returned if the
+         * client specifies the application/txstatusext+xml and the
+         * 290implementation supports that type.
+         */
         CoordinatorElement elem = txn.getTransactionInfo();
 
         if (txn.getStatus() != HttpURLConnection.HTTP_UNSUPPORTED_TYPE) {
@@ -90,7 +93,8 @@ public class OptionalSpecTest extends BaseTest {
 
             Assert.assertEquals(elem.getStatus(), TransactionStatusElement.TransactionActive);
             Assert.assertEquals(elem.getTxnURI(), txn.getTxnUri());
-//TODO            Assert.assertEquals(elem.getTerminatorURI(), txn.getTerminatorURI());
+            // TODO Assert.assertEquals(elem.getTerminatorURI(),
+            // txn.getTerminatorURI());
             Assert.assertEquals(elem.getDurableParticipantEnlistmentURI(), txn.getDurableParticipantEnlistmentURI());
 
             List<TwoPhaseAwareParticipantElement> participants = elem.getTwoPhaseAware();
@@ -114,11 +118,13 @@ public class OptionalSpecTest extends BaseTest {
         txn.startTx();
 
         /*
-        262Performing a GET on the /transaction-manager URI returns a list of all transaction -coordinator
-        263URIs known to the coordinator (active and in recovery). The returned response MAY include a
-        264link header with rel attribute "statistics" linking to a resource that contains statistical information
-        265such as the number of transactions that have committed and aborted. The link MAY contain a
-        */
+         * 262Performing a GET on the /transaction-manager URI returns a list of
+         * all transaction -coordinator 263URIs known to the coordinator (active
+         * and in recovery). The returned response MAY include a 264link header
+         * with rel attribute "statistics" linking to a resource that contains
+         * statistical information 265such as the number of transactions that
+         * have committed and aborted. The link MAY contain a
+         */
         TransactionStatisticsElement stats1 = txn.getTransactionStatistics();
 
         txn.commitTx();
@@ -147,10 +153,11 @@ public class OptionalSpecTest extends BaseTest {
         txn2.startTx();
 
         /*
-        269Performing a GET on the transaction-manager URI with media type application/txstatusext+xml
-        270returns extended  information about the transaction-manager resource such as how long it has been
-        271up and all  transaction-coordinator URIs.
-        */
+         * 269Performing a GET on the transaction-manager URI with media type
+         * application/txstatusext+xml 270returns extended information about the
+         * transaction-manager resource such as how long it has been 271up and
+         * all transaction-coordinator URIs.
+         */
         tme1 = txn1.getTransactionManagerInfo();
         if (txn1.getStatus() == HttpsURLConnection.HTTP_UNSUPPORTED_TYPE) {
             log.warn("Not testing extended transaction manager info (reason not supported)");
@@ -199,15 +206,17 @@ public class OptionalSpecTest extends BaseTest {
         TxSupport txn = new TxSupport(60000);
         txn.startTx();
 
-        // enlist Transactional Participants and volatile participants with the transaction
+        // enlist Transactional Participants and volatile participants with the
+        // transaction
         for (int i = 0; i < workIds.length; i++) {
             /*
-             * the resource implementation will enlist in the volatile protocol twice:
-             * - once directly using the coordinator volatile-participant registration link
-             * - and then indirectly during participant enlistment by including a link header with
-             *  value TxLinkRel.VOLATILE_PARTICIPANT
-             * This will mean that two before and after synchronisations will be called resulting in a
-             * total of 4 synchronisations
+             * the resource implementation will enlist in the volatile protocol
+             * twice: - once directly using the coordinator volatile-participant
+             * registration link - and then indirectly during participant
+             * enlistment by including a link header with value
+             * TxLinkRel.VOLATILE_PARTICIPANT This will mean that two before and
+             * after synchronisations will be called resulting in a total of 4
+             * synchronisations
              */
             workIds[i] = txn.enlistTestResource(enlistUrl, true);
         }
@@ -216,7 +225,8 @@ public class OptionalSpecTest extends BaseTest {
 
         for (int i = 0; i < workIds.length; i++) {
             String syncCount = getResourceProperty(txn, PURL, workIds[i], "syncCount");
-            // there should have been 2 before and 2 after synchronisation calls:
+            // there should have been 2 before and 2 after synchronisation
+            // calls:
             Assert.assertEquals(syncCount, "4");
         }
     }
@@ -230,17 +240,20 @@ public class OptionalSpecTest extends BaseTest {
 
         Assert.assertEquals(TxStatusMediaType.TX_ROLLBACK_ONLY, txn.markTxRollbackOnly());
 
-        // enlisting a participant into a transaction that is marked rollback only should fail:
-        // 385If the transaction is not TransactionActive when registration is attempted, then the implementation
+        // enlisting a participant into a transaction that is marked rollback
+        // only should fail:
+        // 385If the transaction is not TransactionActive when registration is
+        // attempted, then the implementation
         // 386MUST return a 412 status code.
         for (int i = 0; i < workIds.length; i++) {
             /*
-             * the resource implementation will enlist in the volatile protocol twice:
-             * - once directly using the coordinator volatile-participant registration link
-             * - and then indirectly during participant enlistment by including a link header with
-             *  value TxLinkRel.VOLATILE_PARTICIPANT
-             * This will mean that two before and after synchronisations will be called resulting in a
-             * total of 4 synchronisations
+             * the resource implementation will enlist in the volatile protocol
+             * twice: - once directly using the coordinator volatile-participant
+             * registration link - and then indirectly during participant
+             * enlistment by including a link header with value
+             * TxLinkRel.VOLATILE_PARTICIPANT This will mean that two before and
+             * after synchronisations will be called resulting in a total of 4
+             * synchronisations
              */
             try {
                 workIds[i] = txn.enlistTestResource(enlistUrl, true);
@@ -261,29 +274,34 @@ public class OptionalSpecTest extends BaseTest {
         TxSupport txn = new TxSupport(60000);
         txn.startTx();
 
-        // enlist Transactional Participants and volatile participants with the transaction
+        // enlist Transactional Participants and volatile participants with the
+        // transaction
         for (int i = 0; i < workIds.length; i++) {
             /*
-             * the resource implementation will enlist in the volatile protocol twice:
-             * - once directly using the coordinator volatile-participant registration link
-             * - and then indirectly during participant enlistment by including a link header with
-             *  value TxLinkRel.VOLATILE_PARTICIPANT
-             * This will mean that two before and after synchronisations will be called resulting in a
-             * total of 4 synchronisations
+             * the resource implementation will enlist in the volatile protocol
+             * twice: - once directly using the coordinator volatile-participant
+             * registration link - and then indirectly during participant
+             * enlistment by including a link header with value
+             * TxLinkRel.VOLATILE_PARTICIPANT This will mean that two before and
+             * after synchronisations will be called resulting in a total of 4
+             * synchronisations
              */
             workIds[i] = txn.enlistTestResource(enlistUrl, true);
         }
         /*
-            555In this case the Volatile prepare phase executes prior to the Durable prepare where the
-            556transaction-coordinator sends a PUT request to the registered volatile-participant: only if this
-            557prepare succeeds will the Durable protocol be executed
+         * 555In this case the Volatile prepare phase executes prior to the
+         * Durable prepare where the 556transaction-coordinator sends a PUT
+         * request to the registered volatile-participant: only if this
+         * 557prepare succeeds will the Durable protocol be executed
          */
-        // the volatile participants should have failed the volatile prepare phase (  "?fault=V_PREPARE" in the url)
+        // the volatile participants should have failed the volatile prepare
+        // phase ( "?fault=V_PREPARE" in the url)
         Assert.assertEquals(TxStatusMediaType.TX_ROLLEDBACK, txn.commitTx());
 
         for (int i = 0; i < workIds.length; i++) {
             String syncCount = getResourceProperty(txn, PURL, workIds[i], "syncCount");
-            // there should have been 2 before and 2 after synchronisation calls:
+            // there should have been 2 before and 2 after synchronisation
+            // calls:
             Assert.assertEquals(syncCount, "4");
         }
     }

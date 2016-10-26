@@ -141,8 +141,8 @@ public final class InboundBridgeFilter implements ContainerRequestFilter, Contai
     }
 
     private boolean isBridgeRequired(final ContainerRequestContext requestContext) {
-        final ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker)
-                requestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
+        final ResourceMethodInvoker methodInvoker = (ResourceMethodInvoker) requestContext
+                .getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
 
         if (methodInvoker == null) {
             return false;

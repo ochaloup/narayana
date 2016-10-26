@@ -42,14 +42,12 @@ import com.arjuna.mw.wscf.api.UserCoordinatorService;
  * @since 1.0.
  */
 
-public interface TwoPhaseHLS extends HLS
-{
-    
-    public UserCoordinatorService coordinatorService ();
-    
-    public UserCoordinator userCoordinator ();
-    
-    public CoordinatorManager coordinatorManager ();
+public interface TwoPhaseHLS extends HLS {
+
+    public UserCoordinatorService coordinatorService();
+
+    public UserCoordinator userCoordinator();
+
+    public CoordinatorManager coordinatorManager();
 
 }
-

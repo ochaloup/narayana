@@ -67,24 +67,20 @@ import com.arjuna.mwlabs.wscf.utils.HLSProvider;
  * The ArjunaCore coordination service implementation.
  *
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: TwoPhaseHLSImple.java,v 1.6.4.1 2005/11/22 10:34:18 kconner Exp $
+ * @version $Id: TwoPhaseHLSImple.java,v 1.6.4.1 2005/11/22 10:34:18 kconner Exp
+ *          $
  * @since 1.0.
  */
 
 @HLSProvider(serviceType = TwoPhaseHLSImple.serviceType)
-public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
-{
+public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService {
     public final static String serviceType = "TwoPhase11HLS";
     public final static String coordinationType = "http://docs.oasis-open.org/ws-tx/wsat/2006/06";
 
-    public TwoPhaseHLSImple()
-    {
-        try
-        {
+    public TwoPhaseHLSImple() {
+        try {
             ActivityManagerFactory.activityManager().addHLS((HLS) this);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             throw new HLSError(ex.toString());
         }
 
@@ -92,18 +88,15 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
         _coordManager = new CoordinatorControl();
     }
 
-    public UserCoordinatorService coordinatorService ()
-    {
+    public UserCoordinatorService coordinatorService() {
         return this;
     }
 
-    public UserCoordinator userCoordinator ()
-    {
+    public UserCoordinator userCoordinator() {
         return _coordinatorService;
     }
 
-    public CoordinatorManager coordinatorManager ()
-    {
+    public CoordinatorManager coordinatorManager() {
         return _coordinatorService;
     }
 
@@ -111,22 +104,21 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * An activity has begun and is active on the current thread.
      */
 
-    public void begun () throws SystemException
-    {
+    public void begun() throws SystemException {
         _coordManager.begin();
     }
 
     /**
      * The current activity is completing with the specified completion status.
      *
-     * @param cs The completion status to use.
+     * @param cs
+     *            The completion status to use.
      *
      * @return The result of terminating the relationship of this HLS and the
      *         current activity.
      */
 
-    public Outcome complete (CompletionStatus cs) throws SystemException
-    {
+    public Outcome complete(CompletionStatus cs) throws SystemException {
         return _coordManager.complete(cs);
     }
 
@@ -134,8 +126,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * The activity has been suspended.
      */
 
-    public void suspended () throws SystemException
-    {
+    public void suspended() throws SystemException {
         _coordManager.suspend();
     }
 
@@ -143,8 +134,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * The activity has been resumed on the current thread.
      */
 
-    public void resumed () throws SystemException
-    {
+    public void resumed() throws SystemException {
         _coordManager.resume();
     }
 
@@ -152,8 +142,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * The activity has completed and is no longer active on the current thread.
      */
 
-    public void completed () throws SystemException
-    {
+    public void completed() throws SystemException {
         _coordManager.completed();
     }
 
@@ -161,8 +150,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * The HLS name.
      */
 
-    public String identity () throws SystemException
-    {
+    public String identity() throws SystemException {
         return serviceType;
     }
 
@@ -177,8 +165,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      *         if the order is not important.
      */
 
-    public int priority () throws SystemException
-    {
+    public int priority() throws SystemException {
         return 0;
     }
 
@@ -189,8 +176,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * @return a context object or null if no augmentation is necessary.
      */
 
-    public Context context () throws SystemException
-    {
+    public Context context() throws SystemException {
         ensureContextInitialised();
         if (CONTEXT_IMPLE_CLASS != null) {
             try {
@@ -208,27 +194,30 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
         }
     }
 
-    private void ensureContextInitialised() throws SystemException
-    {
+    private void ensureContextInitialised() throws SystemException {
         if (!initialised) {
-            synchronized(this) {
+            synchronized (this) {
                 if (!initialised) {
                     try {
-                        Class<?> factoryClass = ProtocolRegistry.sharedManager().getProtocolImplementation(coordinationType).getClass();
+                        Class<?> factoryClass = ProtocolRegistry.sharedManager()
+                                .getProtocolImplementation(coordinationType).getClass();
                         ContextProvider contextProvider = factoryClass.getAnnotation(ContextProvider.class);
                         String providerServiceType = contextProvider.serviceType();
                         if (!providerServiceType.equals(serviceType)) {
-                            throw new SystemException("Invalid serviceType for SOAPContext factory registered for Two Phase 1.1 service expecting " + serviceType + " got " + providerServiceType);
+                            throw new SystemException(
+                                    "Invalid serviceType for SOAPContext factory registered for Two Phase 1.1 service expecting "
+                                            + serviceType + " got " + providerServiceType);
                         }
                         Class contextClass = contextProvider.contextImplementation();
                         if (!SOAPContext.class.isAssignableFrom(contextClass)) {
-                            throw new SystemException("SOAPContext factory registered for Two Phase 1.1 service provides invalid context implementation");
+                            throw new SystemException(
+                                    "SOAPContext factory registered for Two Phase 1.1 service provides invalid context implementation");
                         }
                         CONTEXT_IMPLE_CLASS = contextClass;
                     } catch (ProtocolNotRegisteredException pnre) {
                         throw new SystemException("No SOAPContext factory registered for Two Phase 1.1 service");
                     } finally {
-                        // we  only do this once no matter what happens
+                        // we only do this once no matter what happens
                         initialised = true;
                     }
                 }
@@ -245,8 +234,9 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * This implementation only supports coordination at the end of the
      * activity.
      *
-     * @param cs The completion status to use when determining how to
-     *            execute the protocol.
+     * @param cs
+     *            The completion status to use when determining how to execute
+     *            the protocol.
      *
      * @exception com.arjuna.mw.wsas.exceptions.WrongStateException
      *                Thrown if the coordinator is in a state the does not allow
@@ -260,9 +250,8 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate (CompletionStatus cs) throws WrongStateException,
-            ProtocolViolationException, SystemException
-    {
+    public Outcome coordinate(CompletionStatus cs)
+            throws WrongStateException, ProtocolViolationException, SystemException {
         return _coordManager.coordinate(cs);
     }
 
@@ -276,8 +265,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * @see com.arjuna.mw.wsas.status.Status
      */
 
-    public com.arjuna.mw.wsas.status.Status status () throws SystemException
-    {
+    public com.arjuna.mw.wsas.status.Status status() throws SystemException {
         return _coordManager.status();
     }
 
@@ -291,9 +279,7 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      *         the current coordinator.
      */
 
-    public Qualifier[] qualifiers () throws NoCoordinatorException,
-            SystemException
-    {
+    public Qualifier[] qualifiers() throws NoCoordinatorException, SystemException {
         return _coordManager.qualifiers();
     }
 
@@ -304,14 +290,11 @@ public class TwoPhaseHLSImple implements TwoPhaseHLS, UserCoordinatorService
      * @return The unique identity of the current coordinator.
      */
 
-    public CoordinatorId identifier () throws NoCoordinatorException,
-            SystemException
-    {
+    public CoordinatorId identifier() throws NoCoordinatorException, SystemException {
         return _coordManager.identifier();
     }
 
-    public static String className ()
-    {
+    public static String className() {
         return TwoPhaseHLSImple.class.getName();
     }
 

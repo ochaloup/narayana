@@ -21,21 +21,26 @@ import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 
 public enum TxStatus {
-    TransactionRollbackOnly(ActionStatus.ABORT_ONLY, TwoPhaseOutcome.FINISH_OK),
-    TransactionRollingBack(ActionStatus.ABORTING, TwoPhaseOutcome.FINISH_ERROR),
-    TransactionRolledBack(ActionStatus.ABORTED, TwoPhaseOutcome.FINISH_OK),
-    TransactionCommitting(ActionStatus.COMMITTING, TwoPhaseOutcome.FINISH_ERROR),
-    TransactionCommitted(ActionStatus.COMMITTED, TwoPhaseOutcome.FINISH_OK),
-    TransactionHeuristicRollback(ActionStatus.H_ROLLBACK, TwoPhaseOutcome.HEURISTIC_ROLLBACK),
-    TransactionHeuristicCommit(ActionStatus.H_COMMIT, TwoPhaseOutcome.HEURISTIC_COMMIT),
-    TransactionHeuristicHazard(ActionStatus.H_HAZARD, TwoPhaseOutcome.HEURISTIC_HAZARD),
-    TransactionHeuristicMixed(ActionStatus.H_MIXED, TwoPhaseOutcome.HEURISTIC_MIXED),
-    TransactionPreparing(ActionStatus.PREPARING, TwoPhaseOutcome.FINISH_ERROR),  // TwoPhaseOutcome.PREPARE_NOTOK
-    TransactionPrepared(ActionStatus.PREPARED, TwoPhaseOutcome.PREPARE_OK),
-    TransactionActive(ActionStatus.RUNNING, TwoPhaseOutcome.FINISH_ERROR),
-    TransactionCommittedOnePhase(ActionStatus.NO_ACTION + 20, TwoPhaseOutcome.FINISH_OK),
-    TransactionReadOnly(ActionStatus.NO_ACTION + 21, TwoPhaseOutcome.PREPARE_READONLY),
-    TransactionStatusUnknown(ActionStatus.NO_ACTION + 23, TwoPhaseOutcome.FINISH_ERROR); // is this correct
+    TransactionRollbackOnly(ActionStatus.ABORT_ONLY, TwoPhaseOutcome.FINISH_OK), TransactionRollingBack(
+            ActionStatus.ABORTING, TwoPhaseOutcome.FINISH_ERROR), TransactionRolledBack(ActionStatus.ABORTED,
+                    TwoPhaseOutcome.FINISH_OK), TransactionCommitting(ActionStatus.COMMITTING,
+                            TwoPhaseOutcome.FINISH_ERROR), TransactionCommitted(ActionStatus.COMMITTED,
+                                    TwoPhaseOutcome.FINISH_OK), TransactionHeuristicRollback(ActionStatus.H_ROLLBACK,
+                                            TwoPhaseOutcome.HEURISTIC_ROLLBACK), TransactionHeuristicCommit(
+                                                    ActionStatus.H_COMMIT,
+                                                    TwoPhaseOutcome.HEURISTIC_COMMIT), TransactionHeuristicHazard(
+                                                            ActionStatus.H_HAZARD,
+                                                            TwoPhaseOutcome.HEURISTIC_HAZARD), TransactionHeuristicMixed(
+                                                                    ActionStatus.H_MIXED,
+                                                                    TwoPhaseOutcome.HEURISTIC_MIXED), TransactionPreparing(
+                                                                            ActionStatus.PREPARING,
+                                                                            TwoPhaseOutcome.FINISH_ERROR), // TwoPhaseOutcome.PREPARE_NOTOK
+    TransactionPrepared(ActionStatus.PREPARED, TwoPhaseOutcome.PREPARE_OK), TransactionActive(ActionStatus.RUNNING,
+            TwoPhaseOutcome.FINISH_ERROR), TransactionCommittedOnePhase(ActionStatus.NO_ACTION + 20,
+                    TwoPhaseOutcome.FINISH_OK), TransactionReadOnly(ActionStatus.NO_ACTION + 21,
+                            TwoPhaseOutcome.PREPARE_READONLY), TransactionStatusUnknown(ActionStatus.NO_ACTION + 23,
+                                    TwoPhaseOutcome.FINISH_ERROR); // is this
+                                                                    // correct
 
     private final int status;
     private final int twoPhaseOutcome;
@@ -45,8 +50,12 @@ public enum TxStatus {
         this.twoPhaseOutcome = twoPhaseOutcome;
     }
 
-    public int status() { return status; }
-    public int twoPhaseOutcome() { return twoPhaseOutcome; }
+    public int status() {
+        return status;
+    }
+    public int twoPhaseOutcome() {
+        return twoPhaseOutcome;
+    }
 
     public static boolean isPrepare(String status) {
         return fromStatus(status).equals(TxStatus.TransactionPrepared);
@@ -94,22 +103,22 @@ public enum TxStatus {
 
     public boolean isHeuristic() {
         switch (status) {
-            case ActionStatus.H_COMMIT:
-            case ActionStatus.H_HAZARD:
-            case ActionStatus.H_MIXED:
-            case ActionStatus.H_ROLLBACK:
+            case ActionStatus.H_COMMIT :
+            case ActionStatus.H_HAZARD :
+            case ActionStatus.H_MIXED :
+            case ActionStatus.H_ROLLBACK :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
 
     public boolean isComplete() {
         switch (status) {
-            case ActionStatus.COMMITTED:
-            case ActionStatus.ABORTED:
+            case ActionStatus.COMMITTED :
+            case ActionStatus.ABORTED :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
@@ -118,68 +127,67 @@ public enum TxStatus {
         return isComplete();
     }
 
-    public boolean isFinished()
-    {
+    public boolean isFinished() {
         switch (status) {
-            case ActionStatus.COMMITTED  :
-            case ActionStatus.H_COMMIT   :
-            case ActionStatus.H_MIXED    :
-            case ActionStatus.H_HAZARD   :
-            case ActionStatus.ABORTED    :
+            case ActionStatus.COMMITTED :
+            case ActionStatus.H_COMMIT :
+            case ActionStatus.H_MIXED :
+            case ActionStatus.H_HAZARD :
+            case ActionStatus.ABORTED :
             case ActionStatus.H_ROLLBACK :
                 return true;
 
-                //case ActionStatus.INVALID: throw ...
-            default:
+            // case ActionStatus.INVALID: throw ...
+            default :
                 return false;
         }
     }
 
     public boolean isActive() {
         switch (status) {
-            case ActionStatus.ABORT_ONLY:
-            case ActionStatus.ABORTING:
-            case ActionStatus.COMMITTING:
-            case ActionStatus.PREPARING:
-            case ActionStatus.PREPARED:
-            case ActionStatus.RUNNING:
+            case ActionStatus.ABORT_ONLY :
+            case ActionStatus.ABORTING :
+            case ActionStatus.COMMITTING :
+            case ActionStatus.PREPARING :
+            case ActionStatus.PREPARED :
+            case ActionStatus.RUNNING :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
 
-    public boolean isFinishing()
-    {
+    public boolean isFinishing() {
         switch (status) {
-            case ActionStatus.PREPARING  :
-            case ActionStatus.COMMITTING   :
-            case ActionStatus.ABORTING    :
+            case ActionStatus.PREPARING :
+            case ActionStatus.COMMITTING :
+            case ActionStatus.ABORTING :
                 return true;
-            default:
+            default :
                 return false;
         }
     }
 
-    public boolean hasHeuristic()
-    {
-        switch (status)
-        {
-            case ActionStatus.H_COMMIT   :
-            case ActionStatus.H_MIXED    :
-            case ActionStatus.H_HAZARD   :
+    public boolean hasHeuristic() {
+        switch (status) {
+            case ActionStatus.H_COMMIT :
+            case ActionStatus.H_MIXED :
+            case ActionStatus.H_HAZARD :
             case ActionStatus.H_ROLLBACK :
                 return true;
 
-            default:
+            default :
                 return false;
         }
     }
 
     /**
      * convert a string into an enum type.
-     * @param status  the name of the enum type
-     * @throws IllegalArgumentException if the input status value does not correspond to an enum name
+     * 
+     * @param status
+     *            the name of the enum type
+     * @throws IllegalArgumentException
+     *             if the input status value does not correspond to an enum name
      * @return enum type corresponding to status
      */
     public static TxStatus fromStatus(String status) {
@@ -192,32 +200,32 @@ public enum TxStatus {
 
     public static TxStatus fromActionStatus(int actionStatus) {
         switch (actionStatus) {
-        case ActionStatus.ABORT_ONLY:
-            return TransactionRollbackOnly;
-        case ActionStatus.ABORTING:
-            return TransactionRollingBack;
-        case ActionStatus.ABORTED:
-            return TransactionRolledBack;
-        case ActionStatus.COMMITTING:
-            return TransactionCommitting;
-        case ActionStatus.COMMITTED:
-            return TransactionCommitted;
-        case ActionStatus.H_ROLLBACK:
-            return TransactionHeuristicRollback;
-        case ActionStatus.H_COMMIT:
-            return TransactionHeuristicCommit;
-        case ActionStatus.H_HAZARD:
-            return TransactionHeuristicHazard;
-        case ActionStatus.H_MIXED:
-            return TransactionHeuristicMixed;
-        case ActionStatus.PREPARING:
-            return TransactionPreparing;
-        case ActionStatus.PREPARED:
-            return TransactionPrepared;
-        case ActionStatus.RUNNING:
-            return TransactionActive;
-        default:
-            return TransactionStatusUnknown;
+            case ActionStatus.ABORT_ONLY :
+                return TransactionRollbackOnly;
+            case ActionStatus.ABORTING :
+                return TransactionRollingBack;
+            case ActionStatus.ABORTED :
+                return TransactionRolledBack;
+            case ActionStatus.COMMITTING :
+                return TransactionCommitting;
+            case ActionStatus.COMMITTED :
+                return TransactionCommitted;
+            case ActionStatus.H_ROLLBACK :
+                return TransactionHeuristicRollback;
+            case ActionStatus.H_COMMIT :
+                return TransactionHeuristicCommit;
+            case ActionStatus.H_HAZARD :
+                return TransactionHeuristicHazard;
+            case ActionStatus.H_MIXED :
+                return TransactionHeuristicMixed;
+            case ActionStatus.PREPARING :
+                return TransactionPreparing;
+            case ActionStatus.PREPARED :
+                return TransactionPrepared;
+            case ActionStatus.RUNNING :
+                return TransactionActive;
+            default :
+                return TransactionStatusUnknown;
         }
     }
 }

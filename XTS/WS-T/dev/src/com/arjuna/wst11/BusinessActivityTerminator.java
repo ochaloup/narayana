@@ -37,10 +37,10 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
  * Not in the 1.1 specification. Supposed to use participant interface.
  */
 
-public interface BusinessActivityTerminator extends com.arjuna.wst.BusinessActivityTerminator
-{
+public interface BusinessActivityTerminator extends com.arjuna.wst.BusinessActivityTerminator {
     /**
-     * @return either the terminator or participant endpoint depending upon what type of terminator strub this is
+     * @return either the terminator or participant endpoint depending upon what
+     *         type of terminator strub this is
      */
-    public W3CEndpointReference getEndpoint() ;
+    public W3CEndpointReference getEndpoint();
 }

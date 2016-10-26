@@ -59,7 +59,8 @@ public final class TestServiceBAClient implements TestServiceBA {
         return client;
     }
 
-    public static TestServiceBA getClientWithWSTXFeature(final boolean isWSTXFeatureEnabled) throws MalformedURLException {
+    public static TestServiceBA getClientWithWSTXFeature(final boolean isWSTXFeatureEnabled)
+            throws MalformedURLException {
         TestServiceBAClient client = new TestServiceBAClient();
 
         Service service = Service.create(new URL(WSDL_URL), SERVICE_NAME);
@@ -112,7 +113,8 @@ public final class TestServiceBAClient implements TestServiceBA {
 
         if (baseAddress == null) {
             baseAddress = "http://localhost";
-        } else if (!baseAddress.toLowerCase().startsWith("http://") && !baseAddress.toLowerCase().startsWith("https://")) {
+        } else if (!baseAddress.toLowerCase().startsWith("http://")
+                && !baseAddress.toLowerCase().startsWith("https://")) {
             baseAddress = "http://" + baseAddress;
         }
 

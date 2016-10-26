@@ -35,15 +35,15 @@ import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
 
 /**
- * An XAResourceOrphanFilter which vetos rollback for xids which have an in-flight transaction.
+ * An XAResourceOrphanFilter which vetos rollback for xids which have an
+ * in-flight transaction.
  *
- * Warning: If this is enabled and the recovery manager cannot contact the transaction manager then branches will remain locked.
+ * Warning: If this is enabled and the recovery manager cannot contact the
+ * transaction manager then branches will remain locked.
  */
-public class JTAActionStatusServiceXAResourceOrphanFilter implements XAResourceOrphanFilter
-{
+public class JTAActionStatusServiceXAResourceOrphanFilter implements XAResourceOrphanFilter {
     @Override
-    public Vote checkXid(Xid xid)
-    {
+    public Vote checkXid(Xid xid) {
         if (xid.getFormatId() != XATxConverter.FORMAT_ID) {
             // we only care about Xids created by the JTA
             return Vote.ABSTAIN;
@@ -57,7 +57,8 @@ public class JTAActionStatusServiceXAResourceOrphanFilter implements XAResourceO
         if (jtaLogger.logger.isDebugEnabled()) {
             jtaLogger.logger.debug("node name of " + xid + " is " + nodeName);
         }
-        if (xaRecoveryNodes == null || xaRecoveryNodes.size() == 0 || (!xaRecoveryNodes.contains(nodeName) && !xaRecoveryNodes.contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES))) {
+        if (xaRecoveryNodes == null || xaRecoveryNodes.size() == 0 || (!xaRecoveryNodes.contains(nodeName)
+                && !xaRecoveryNodes.contains(NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES))) {
             return Vote.ABSTAIN;
         }
 

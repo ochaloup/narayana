@@ -44,7 +44,8 @@ public class AssumedCompleteHeuristicTransaction extends RecoveredTransaction {
         super(actionUid, ourTypeName);
 
         if (jtsLogger.logger.isDebugEnabled()) {
-            jtsLogger.logger.debug(AssumedCompleteHeuristicTransaction.class.getSimpleName() + " " + get_uid() + " created");
+            jtsLogger.logger
+                    .debug(AssumedCompleteHeuristicTransaction.class.getSimpleName() + " " + get_uid() + " created");
         }
     }
 
@@ -83,7 +84,7 @@ public class AssumedCompleteHeuristicTransaction extends RecoveredTransaction {
                 lastActiveTime = new Date();
             }
         }
-        
+
         return result;
     }
 
@@ -92,13 +93,13 @@ public class AssumedCompleteHeuristicTransaction extends RecoveredTransaction {
 
         if (result) {
             lastActiveTime = new Date();
-            
+
             try {
                 objectState.packLong(lastActiveTime.getTime());
             } catch (final IOException ex) {
             }
         }
-        
+
         return result;
     }
 

@@ -74,25 +74,19 @@ public class CrashRecoveryCommitReturnsXA_RETRY {
 
         List<String> recoveryModuleClassNames = new ArrayList<String>();
 
-        recoveryModuleClassNames
-                .add("com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule");
-        recoveryModuleClassNames
-                .add("com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule");
-        recoveryEnvironmentBean
-                .setRecoveryModuleClassNames(recoveryModuleClassNames);
+        recoveryModuleClassNames.add("com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule");
+        recoveryModuleClassNames.add("com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule");
+        recoveryEnvironmentBean.setRecoveryModuleClassNames(recoveryModuleClassNames);
         List<String> expiryScannerClassNames = new ArrayList<String>();
-        expiryScannerClassNames
-                .add("com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner");
-        recoveryEnvironmentBean
-                .setExpiryScannerClassNames(expiryScannerClassNames);
+        expiryScannerClassNames.add("com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner");
+        recoveryEnvironmentBean.setExpiryScannerClassNames(expiryScannerClassNames);
         recoveryEnvironmentBean.setRecoveryActivators(null);
         // start the recovery manager
 
         RecoveryManager.manager().initialize();
 
         XARecoveryModule xaRecoveryModule = null;
-        for (RecoveryModule recoveryModule : ((Vector<RecoveryModule>) RecoveryManager
-                .manager().getModules())) {
+        for (RecoveryModule recoveryModule : ((Vector<RecoveryModule>) RecoveryManager.manager().getModules())) {
             if (recoveryModule instanceof XARecoveryModule) {
                 xaRecoveryModule = (XARecoveryModule) recoveryModule;
                 break;
@@ -104,30 +98,27 @@ public class CrashRecoveryCommitReturnsXA_RETRY {
         }
 
         XAResource firstResource = new SimpleResource();
-        final SimpleResourceXA_RETRY secondResource = new SimpleResourceXA_RETRY(
-                this);
+        final SimpleResourceXA_RETRY secondResource = new SimpleResourceXA_RETRY(this);
 
-        xaRecoveryModule
-                .addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
+        xaRecoveryModule.addXAResourceRecoveryHelper(new XAResourceRecoveryHelper() {
 
-                    @Override
-                    public boolean initialise(String p) throws Exception {
-                        // TODO Auto-generated method stub
-                        return true;
-                    }
+            @Override
+            public boolean initialise(String p) throws Exception {
+                // TODO Auto-generated method stub
+                return true;
+            }
 
-                    @Override
-                    public XAResource[] getXAResources() throws Exception {
-                        // TODO Auto-generated method stub
-                        return new XAResource[] { secondResource };
-                    }
-                });
+            @Override
+            public XAResource[] getXAResources() throws Exception {
+                // TODO Auto-generated method stub
+                return new XAResource[]{secondResource};
+            }
+        });
 
         // ok, now drive a TX to completion. the script should ensure that the
         // recovery
 
-        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-                .transactionManager();
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();
 

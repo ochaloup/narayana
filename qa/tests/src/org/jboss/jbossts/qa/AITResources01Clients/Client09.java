@@ -56,18 +56,14 @@ package org.jboss.jbossts.qa.AITResources01Clients;
  * $Id: Client09.java,v 1.2 2003/06/26 11:43:07 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Client09
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client09 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -77,34 +73,25 @@ public class Client09
             int numberOfCalls = 1000;
 
             int index = 0;
-            while (index < numberOfCalls)
-            {
-                try
-                {
+            while (index < numberOfCalls) {
+                try {
                     counter.increase();
                     index++;
-                }
-                catch (InvocationException invocationException)
-                {
+                } catch (InvocationException invocationException) {
                 }
             }
 
             System.out.println("Passed");
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client09.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client09.main: " + exception);
             exception.printStackTrace(System.err);
         }

@@ -25,11 +25,7 @@ import java.util.*;
 
 public class Averager {
     public static void main(String[] args) {
-        Double[][] tests = {
-           { 2.0, 5.0, 6.0, 9.0, 12.0 },
-           { 2.0, 5.0, 6.0, 9.0, 12.0, 26.0 },
-           { 2.0 }
-        };
+        Double[][] tests = {{2.0, 5.0, 6.0, 9.0, 12.0}, {2.0, 5.0, 6.0, 9.0, 12.0, 26.0}, {2.0}};
 
         for (Double[] vals : tests) {
             List<Double> v1 = new ArrayList<Double>(Arrays.asList(vals));
@@ -69,7 +65,10 @@ public class Averager {
         double q1 = getQ1(values); // first interquartile
         double q3 = getQ3(values); // third interquartile
         double iqr = q3 - q1; // the interquartile range
-        double outlier = 1.5 * iqr; // an outlier is any data point more than 1.5 interquartile ranges (IQRs) below the first quartile or above the third quartile.
+        double outlier = 1.5 * iqr; // an outlier is any data point more than
+                                    // 1.5 interquartile ranges (IQRs) below the
+                                    // first quartile or above the third
+                                    // quartile.
         double lb = q1 - outlier;
         double ub = q3 + outlier;
 
@@ -77,7 +76,7 @@ public class Averager {
         Iterator<Double> i = values.iterator();
 
         while (i.hasNext()) {
-            double  value = i.next();
+            double value = i.next();
 
             if (value < lb || value > ub)
                 i.remove();
@@ -88,7 +87,7 @@ public class Averager {
         int sz = to - from + 1;
 
         if (sz % 2 == 0)
-             return (values.get(from + sz/2) + values.get(from + (sz/2) - 1) ) / 2;
+            return (values.get(from + sz / 2) + values.get(from + (sz / 2) - 1)) / 2;
         else
             return values.get(from + (sz / 2));
     }

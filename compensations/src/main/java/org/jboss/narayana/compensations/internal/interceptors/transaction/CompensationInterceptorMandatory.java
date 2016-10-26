@@ -46,15 +46,18 @@ public class CompensationInterceptorMandatory extends CompensationInterceptorBas
      *
      * @param ic
      * @return
-     * @throws TransactionalException if there is no active transaction.
-     * @throws Exception if request has failed.
+     * @throws TransactionalException
+     *             if there is no active transaction.
+     * @throws Exception
+     *             if request has failed.
      */
     @AroundInvoke
     public Object intercept(final InvocationContext ic) throws Exception {
 
         BAController baController = BAControllerFactory.getInstance();
         if (!baController.isBARunning()) {
-            throw new TransactionalException("Transaction is required for invocation", new TransactionRequiredException());
+            throw new TransactionalException("Transaction is required for invocation",
+                    new TransactionRequiredException());
         }
 
         return invokeInCallerTx(ic);

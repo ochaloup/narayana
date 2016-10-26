@@ -57,11 +57,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class TestBase
-{
+public class TestBase {
     @BeforeClass
-    public static void setUp () throws Exception
-    {
+    public static void setUp() throws Exception {
         final Map<String, String> orbInitializationProperties = new HashMap<String, String>();
         orbInitializationProperties.put("com.arjuna.orbportability.orb.PreInit1",
                 "com.arjuna.ats.internal.jts.recovery.RecoveryInit");
@@ -70,19 +68,20 @@ public class TestBase
 
         final Properties initORBProperties = new Properties();
         initORBProperties.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
-        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""
-                + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
+        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort",
+                "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
-        myORB.initORB(new String[] {}, initORBProperties);
+        myORB.initORB(new String[]{}, initORBProperties);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
-
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
         recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryListener(true);
 
@@ -97,18 +96,17 @@ public class TestBase
         recoveryManager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
         recoveryManager.initialize();
     }
-    
+
     @AfterClass
-    public static void tearDown () throws Exception
-    {
+    public static void tearDown() throws Exception {
         recoveryManager.terminate();
         myOA.destroy();
         myORB.shutdown(true);
     }
 
-    public void emptyObjectStore()
-    {
-        String objectStoreDirName = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class).getObjectStoreDir();
+    public void emptyObjectStore() {
+        String objectStoreDirName = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class)
+                .getObjectStoreDir();
 
         System.out.println("Emptying " + objectStoreDirName);
 
@@ -117,17 +115,11 @@ public class TestBase
         removeContents(objectStoreDir);
     }
 
-    public boolean removeContents(File directory)
-    {
+    public boolean removeContents(File directory) {
         boolean deleteParent = true;
-        if ((directory != null) &&
-                directory.isDirectory() &&
-                (!directory.getName().equals("")) &&
-                (!directory.getName().equals("/")) &&
-                (!directory.getName().equals("\\")) &&
-                (!directory.getName().equals(".")) &&
-                (!directory.getName().equals("..")))
-        {
+        if ((directory != null) && directory.isDirectory() && (!directory.getName().equals(""))
+                && (!directory.getName().equals("/")) && (!directory.getName().equals("\\"))
+                && (!directory.getName().equals(".")) && (!directory.getName().equals(".."))) {
             File[] contents = directory.listFiles();
 
             if (contents != null) {

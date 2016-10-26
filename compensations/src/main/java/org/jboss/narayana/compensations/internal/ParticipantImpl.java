@@ -49,12 +49,17 @@ import java.io.Serializable;
  *
  * @author paul.robinson@redhat.com 22/03/2013
  */
-public class ParticipantImpl implements BusinessAgreementWithParticipantCompletionParticipant, ConfirmCompletedParticipant,
-        PersistableParticipant {
+public class ParticipantImpl
+        implements
+            BusinessAgreementWithParticipantCompletionParticipant,
+            ConfirmCompletedParticipant,
+            PersistableParticipant {
 
     private static final Logger LOGGER = Logger.getLogger(ParticipantImpl.class);
 
-    private final ClassLoader applicationClassloader; // TODO do we need to persist it for recovery?
+    private final ClassLoader applicationClassloader; // TODO do we need to
+                                                        // persist it for
+                                                        // recovery?
 
     private final CompensationContextStateManager compensationContextStateManager;
 
@@ -73,28 +78,43 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Constructor used during recovery.
      *
-     * @param compensationContextStateManager compensation context manager instance.
-     * @param deserializerHelper deserializer helper instance to use when deserializing handlers.
+     * @param compensationContextStateManager
+     *            compensation context manager instance.
+     * @param deserializerHelper
+     *            deserializer helper instance to use when deserializing
+     *            handlers.
      */
     public ParticipantImpl(CompensationContextStateManager compensationContextStateManager,
             DeserializerHelper deserializerHelper) {
         this.compensationContextStateManager = compensationContextStateManager;
         this.deserializerHelper = deserializerHelper;
-        this.applicationClassloader = Thread.currentThread().getContextClassLoader(); // TODO is this ok?
+        this.applicationClassloader = Thread.currentThread().getContextClassLoader(); // TODO
+                                                                                        // is
+                                                                                        // this
+                                                                                        // ok?
     }
 
     /**
      * General use constructor.
      *
-     * As part of the object initialization this constructor also attaches this participant to the current compensation context.
+     * As part of the object initialization this constructor also attaches this
+     * participant to the current compensation context.
      *
-     * @param compensationHandler handler to be invoked if the transaction was compensated.
-     * @param confirmationHandler handler to be invoked if the transaction was closed.
-     * @param transactionLoggedHandler handler to be when compensatable work was completed.
-     * @param currentTransactionId id of the current transaction.
-     * @param participantId if of this participant.
-     * @param compensationContextStateManager compensation context manager instance.
-     * @param deserializerHelper deserializer helper instance to use when deserializing handlers.
+     * @param compensationHandler
+     *            handler to be invoked if the transaction was compensated.
+     * @param confirmationHandler
+     *            handler to be invoked if the transaction was closed.
+     * @param transactionLoggedHandler
+     *            handler to be when compensatable work was completed.
+     * @param currentTransactionId
+     *            id of the current transaction.
+     * @param participantId
+     *            if of this participant.
+     * @param compensationContextStateManager
+     *            compensation context manager instance.
+     * @param deserializerHelper
+     *            deserializer helper instance to use when deserializing
+     *            handlers.
      */
     public ParticipantImpl(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
             TransactionLoggedHandler transactionLoggedHandler, String currentTransactionId, String participantId,
@@ -113,9 +133,12 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     }
 
     /**
-     * Compensatable work was done, participant manager was notified of the completion, and recovery record was persisted.
+     * Compensatable work was done, participant manager was notified of the
+     * completion, and recovery record was persisted.
      * 
-     * @param confirmed true if the log record has been written and changes should be rolled forward and false
+     * @param confirmed
+     *            true if the log record has been written and changes should be
+     *            rolled forward and false
      */
     @Override
     public void confirmCompleted(boolean confirmed) {
@@ -132,11 +155,14 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Transaction has completed and confirmation handler should be invoked.
      * 
-     * After invoking confirmation handler participant is detached from the compensation context. And compensation context
-     * record in the object store is updated.
+     * After invoking confirmation handler participant is detached from the
+     * compensation context. And compensation context record in the object store
+     * is updated.
      * 
-     * @throws WrongStateException shouldn't be thrown.
-     * @throws SystemException shouldn't be thrown.
+     * @throws WrongStateException
+     *             shouldn't be thrown.
+     * @throws SystemException
+     *             shouldn't be thrown.
      */
     @Override
     public void close() throws WrongStateException, SystemException {
@@ -148,16 +174,20 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
             compensationContextStateManager.deactivate();
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
-        compensationContextStateManager.get(currentTransactionId).ifPresent(state -> state.detachParticipant(participantId));
+        compensationContextStateManager.get(currentTransactionId)
+                .ifPresent(state -> state.detachParticipant(participantId));
         compensationContextStateManager.persist(currentTransactionId);
     }
 
     /**
      * Transaction was canceled. In this case participant has nothing to do.
      *
-     * @throws FaultedException shouldn't be thrown.
-     * @throws WrongStateException shouldn't be thrown.
-     * @throws SystemException shouldn't be thrown.
+     * @throws FaultedException
+     *             shouldn't be thrown.
+     * @throws WrongStateException
+     *             shouldn't be thrown.
+     * @throws SystemException
+     *             shouldn't be thrown.
      */
     @Override
     public void cancel() throws FaultedException, WrongStateException, SystemException {
@@ -167,12 +197,16 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Transaction has failed and compensation handler should be invoked.
      *
-     * After invoking compensation handler participant is detached from the compensation context. And compensation context
-     * record in the object store is updated.
+     * After invoking compensation handler participant is detached from the
+     * compensation context. And compensation context record in the object store
+     * is updated.
      *
-     * @throws FaultedException shouldn't be thrown.
-     * @throws WrongStateException shouldn't be thrown.
-     * @throws SystemException shouldn't be thrown.
+     * @throws FaultedException
+     *             shouldn't be thrown.
+     * @throws WrongStateException
+     *             shouldn't be thrown.
+     * @throws SystemException
+     *             shouldn't be thrown.
      */
     @Override
     public void compensate() throws FaultedException, WrongStateException, SystemException {
@@ -184,7 +218,8 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
             compensationContextStateManager.deactivate();
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
-        compensationContextStateManager.get(currentTransactionId).ifPresent(state -> state.detachParticipant(participantId));
+        compensationContextStateManager.get(currentTransactionId)
+                .ifPresent(state -> state.detachParticipant(participantId));
         compensationContextStateManager.persist(currentTransactionId);
     }
 
@@ -208,12 +243,16 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Persist participant state to the provided {@link OutputObjectState}.
      * 
-     * Method persists transaction id, participant id, compensation handler, and confirmation handler.
+     * Method persists transaction id, participant id, compensation handler, and
+     * confirmation handler.
      * 
-     * Handlers must be serializable in order to be persisted, or else they will be ignored.
+     * Handlers must be serializable in order to be persisted, or else they will
+     * be ignored.
      * 
-     * @param state state to persist the participant.
-     * @return {@code true} if the participant was persisted successfully and {@code false} otherwise.
+     * @param state
+     *            state to persist the participant.
+     * @return {@code true} if the participant was persisted successfully and
+     *         {@code false} otherwise.
      */
     @Override
     public boolean saveState(OutputObjectState state) {
@@ -235,8 +274,10 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Restore participant from the provided {@link InputObjectState}.
      *
-     * @param state state to recrete participant from.
-     * @return {@code true} if participant was recreated successfully, and {@code false} otherwise.
+     * @param state
+     *            state to recrete participant from.
+     * @return {@code true} if participant was recreated successfully, and
+     *         {@code false} otherwise.
      */
     @Override
     public boolean restoreState(InputObjectState state) {
@@ -257,14 +298,14 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
 
     @Override
     public String toString() {
-        return "ParticipantImpl{currentTransactionId='" + currentTransactionId + "', compensationHandler=" + compensationHandler
-                + ", confirmationHandler=" + confirmationHandler + ", transactionLoggedHandler=" + transactionLoggedHandler
-                + ", applicationClassloader=" + applicationClassloader + "}";
+        return "ParticipantImpl{currentTransactionId='" + currentTransactionId + "', compensationHandler="
+                + compensationHandler + ", confirmationHandler=" + confirmationHandler + ", transactionLoggedHandler="
+                + transactionLoggedHandler + ", applicationClassloader=" + applicationClassloader + "}";
     }
 
     /**
-     * Check if handler is persistable. In order to be persistable handler has to implement Serializable interface and not be
-     * null.
+     * Check if handler is persistable. In order to be persistable handler has
+     * to implement Serializable interface and not be null.
      * 
      * @param handler
      * @return
@@ -276,14 +317,18 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Persist a handler to the provided {@link OutputObjectState}.
      * 
-     * If handler is serializable, it is serialized to a byte array and persisted to the {@link OutputObjectState} together
-     * with its class name.
+     * If handler is serializable, it is serialized to a byte array and
+     * persisted to the {@link OutputObjectState} together with its class name.
      *
-     * If handler is not serializable {@code false} value is written to the {@link OutputObjectState}.
+     * If handler is not serializable {@code false} value is written to the
+     * {@link OutputObjectState}.
      * 
-     * @param state state to persist handler to.
-     * @param handler handler to be persisted.
-     * @throws IOException if failure occurred when serializing the handler.
+     * @param state
+     *            state to persist handler to.
+     * @param handler
+     *            handler to be persisted.
+     * @throws IOException
+     *             if failure occurred when serializing the handler.
      */
     private <T> void packHandler(OutputObjectState state, T handler) throws IOException {
         if (!isHandlerPersistable(handler)) {
@@ -306,13 +351,17 @@ public class ParticipantImpl implements BusinessAgreementWithParticipantCompleti
     /**
      * Recreate a handler from the provided {@link InputObjectState}.
      *
-     * If handler is serialized into the provided {@link InputObjectState}, then {@link DeserializerHelper} is used to recreate
-     * it.
+     * If handler is serialized into the provided {@link InputObjectState}, then
+     * {@link DeserializerHelper} is used to recreate it.
      *
-     * @param state state to recreate a handler from.
-     * @param clazz handler type.
-     * @return instance of the handler if it was serialized into the provided state, or null if it wasn't.
-     * @throws IOException if failure occurred during deserialization.
+     * @param state
+     *            state to recreate a handler from.
+     * @param clazz
+     *            handler type.
+     * @return instance of the handler if it was serialized into the provided
+     *         state, or null if it wasn't.
+     * @throws IOException
+     *             if failure occurred during deserialization.
      */
     private <T> T unpackHandler(InputObjectState state, Class<T> clazz) throws IOException {
         if (!state.unpackBoolean()) {

@@ -114,8 +114,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
             .getDefaultInstance(JTAEnvironmentBean.class);
     private static final Map<String, String> commitMarkableResourceTableNameMap = jtaEnvironmentBean
             .getCommitMarkableResourceTableNameMap();
-    private static final String defaultTableName = jtaEnvironmentBean
-            .getDefaultCommitMarkableTableName();
+    private static final String defaultTableName = jtaEnvironmentBean.getDefaultCommitMarkableTableName();
     private boolean isPerformImmediateCleanupOfBranches = jtaEnvironmentBean
             .isPerformImmediateCleanupOfCommitMarkableResourceBranches();
     private Connection preparedConnection;
@@ -154,15 +153,13 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
         tableName = null;
     }
 
-    public CommitMarkableResourceRecord(TransactionImple tx,
-            ConnectableResource xaResource, final Xid xid,
-            BasicAction basicAction) throws IllegalStateException,
-            RollbackException, SystemException {
+    public CommitMarkableResourceRecord(TransactionImple tx, ConnectableResource xaResource, final Xid xid,
+            BasicAction basicAction) throws IllegalStateException, RollbackException, SystemException {
         super(new Uid(), null, ObjectType.ANDPERSISTENT);
 
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("CommitMarkableResourceRecord.CommitMarkableResourceRecord ( " + tx + ", " + xaResource + ", " 
-            + xid + ", " + basicAction + " ), record id=" + order());
+            tsLogger.logger.trace("CommitMarkableResourceRecord.CommitMarkableResourceRecord ( " + tx + ", "
+                    + xaResource + ", " + xid + ", " + basicAction + " ), record id=" + order());
         }
 
         this.connectableResource = xaResource;
@@ -174,24 +171,22 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
         this.basicAction = basicAction;
         heuristic = TwoPhaseOutcome.FINISH_OK;
 
-        String tableName = commitMarkableResourceTableNameMap
-                .get(commitMarkableJndiName);
+        String tableName = commitMarkableResourceTableNameMap.get(commitMarkableJndiName);
         if (tableName != null) {
             this.tableName = tableName;
         } else {
             this.tableName = defaultTableName;
         }
 
-        Boolean boolean1 = isPerformImmediateCleanupOfCommitMarkableResourceBranchesMap
-                .get(commitMarkableJndiName);
+        Boolean boolean1 = isPerformImmediateCleanupOfCommitMarkableResourceBranchesMap.get(commitMarkableJndiName);
         if (boolean1 != null) {
             isPerformImmediateCleanupOfBranches = boolean1;
         }
 
         if (isPerformImmediateCleanupOfBranches) {
-            // a session synch may enlist a CMR in a transaction so this sycnh must be correctly ordered 
-            new TransactionSynchronizationRegistryImple()
-                    .registerInterposedSynchronization(new Synchronization() {
+            // a session synch may enlist a CMR in a transaction so this sycnh
+            // must be correctly ordered
+            new TransactionSynchronizationRegistryImple().registerInterposedSynchronization(new Synchronization() {
 
                 @Override
                 public void beforeCompletion() {
@@ -204,20 +199,16 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 
                         Connection connection = null;
                         try {
-                            connection = ((Connection) connectableResource
-                                    .getConnection());
+                            connection = ((Connection) connectableResource.getConnection());
                             connection.setAutoCommit(false);
-                            String sql = "DELETE from "
-                                    + CommitMarkableResourceRecord.this.tableName
+                            String sql = "DELETE from " + CommitMarkableResourceRecord.this.tableName
                                     + " where xid in (?)";
-                            PreparedStatement prepareStatement = connection
-                                    .prepareStatement(sql);
+                            PreparedStatement prepareStatement = connection.prepareStatement(sql);
                             try {
 
                                 XID toSave = ((XidImple) xid).getXID();
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                DataOutputStream dos = new DataOutputStream(
-                                        baos);
+                                DataOutputStream dos = new DataOutputStream(baos);
                                 dos.writeInt(toSave.formatID);
                                 dos.writeInt(toSave.gtrid_length);
                                 dos.writeInt(toSave.bqual_length);
@@ -228,37 +219,30 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
                                 prepareStatement.setBytes(1, baos.toByteArray());
 
                                 if (prepareStatement.executeUpdate() != 1) {
-                                    tsLogger.logger
-                                            .error("Update was not successfull");
+                                    tsLogger.logger.error("Update was not successfull");
                                     connection.rollback();
                                 } else {
                                     connection.commit();
                                 }
                             } catch (IOException e) {
-                                tsLogger.logger
-                                        .warn("Could not generate prepareStatement paramaters",
-                                                e);
+                                tsLogger.logger.warn("Could not generate prepareStatement paramaters", e);
                             } finally {
                                 try {
                                     prepareStatement.close();
                                 } catch (SQLException e) {
-                                    tsLogger.logger
-                                            .warn("Could not close the prepared statement",
-                                                    e);
+                                    tsLogger.logger.warn("Could not close the prepared statement", e);
                                 }
                             }
                         } catch (Throwable e1) {
-                            tsLogger.logger
-                                    .warn("Could not delete CommitMarkableResourceRecord entry, will rely on RecoveryModule",
-                                            e1);
+                            tsLogger.logger.warn(
+                                    "Could not delete CommitMarkableResourceRecord entry, will rely on RecoveryModule",
+                                    e1);
                         } finally {
                             if (connection != null) {
                                 try {
                                     connection.close();
                                 } catch (SQLException e) {
-                                    tsLogger.logger
-                                            .warn("Could not close the preparedConnection",
-                                                    e);
+                                    tsLogger.logger.warn("Could not close the preparedConnection", e);
                                 }
                             }
                         }
@@ -266,9 +250,9 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
                 }
             });
         } else if (isNotifyRecoveryModuleOfCompletedBranches) {
-            // a session synch may enlist a CMR in a transaction so this sycnh must be correctly ordered 
-            new TransactionSynchronizationRegistryImple()
-                    .registerInterposedSynchronization(new Synchronization() {
+            // a session synch may enlist a CMR in a transaction so this sycnh
+            // must be correctly ordered
+            new TransactionSynchronizationRegistryImple().registerInterposedSynchronization(new Synchronization() {
 
                 @Override
                 public void beforeCompletion() {
@@ -278,9 +262,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
                 @Override
                 public void afterCompletion(int status) {
                     if (!onePhase && status == Status.STATUS_COMMITTED) {
-                        commitMarkableResourceRecoveryModule
-                                .notifyOfCompletedBranch(
-                                        commitMarkableJndiName, xid);
+                        commitMarkableResourceRecoveryModule.notifyOfCompletedBranch(commitMarkableJndiName, xid);
                     }
                 }
             });
@@ -330,15 +312,14 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
             os.packBoolean(hasCompleted);
             if (hasCompleted) {
                 os.packBoolean(committed);
-//                os.packInt(heuristic);
+                // os.packInt(heuristic);
             }
             os.packString(productName);
             os.packString(productVersion);
 
             res = super.save_state(os, t);
         } catch (Exception e) {
-            jtaLogger.logger.warn(
-                    "Could not save_state: " + XAHelper.xidToString(xid), e);
+            jtaLogger.logger.warn("Could not save_state: " + XAHelper.xidToString(xid), e);
         }
 
         return res;
@@ -359,7 +340,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 
             if (os.unpackBoolean()) {
                 committed = os.unpackBoolean();
-//                heuristic = os.unpackInt();
+                // heuristic = os.unpackInt();
             } else {
                 // This will return true if the
                 // CommitMarkableRecoveryModule is
@@ -372,8 +353,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
             res = super.restore_state(os, t);
         } catch (Exception e) {
             String resInfo = connectableResource == null ? "" : connectableResource.toString();
-            jtaLogger.i18NLogger.warn_resources_arjunacore_restorestateerror(
-                resInfo, XAHelper.xidToString(xid), e);
+            jtaLogger.i18NLogger.warn_resources_arjunacore_restorestateerror(resInfo, XAHelper.xidToString(xid), e);
         }
 
         return res;
@@ -386,20 +366,18 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
      */
     public int topLevelPrepare() {
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("CommitMarkableResourceRecord.topLevelPrepare for " + this + ", record id=" + order());
+            tsLogger.logger
+                    .trace("CommitMarkableResourceRecord.topLevelPrepare for " + this + ", record id=" + order());
         }
 
         try {
             PreparedStatement prepareStatement = null;
 
-            preparedConnection = (Connection) connectableResource
-                    .getConnection();
+            preparedConnection = (Connection) connectableResource.getConnection();
 
             try {
-                prepareStatement = preparedConnection
-                    .prepareStatement("insert into "
-                            + tableName
-                            + " (xid, transactionManagerID, actionuid) values (?,?,?)");
+                prepareStatement = preparedConnection.prepareStatement(
+                        "insert into " + tableName + " (xid, transactionManagerID, actionuid) values (?,?,?)");
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 DataOutputStream dos = new DataOutputStream(baos);
@@ -427,8 +405,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 
             return TwoPhaseOutcome.PREPARE_OK;
         } catch (Throwable t) {
-            tsLogger.logger.error(
-                    "Could not add recovery data to the 1PC resource", t);
+            tsLogger.logger.error("Could not add recovery data to the 1PC resource", t);
             return TwoPhaseOutcome.PREPARE_NOTOK;
         }
     }
@@ -457,7 +434,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
                 heuristic = handler.handleCMRRollbackError();
                 return heuristic;
             } catch (Throwable e) {
-                    jtaLogger.i18NLogger.warn_resources_arjunacore_rollbackerror(XAHelper.xidToString(xid),
+                jtaLogger.i18NLogger.warn_resources_arjunacore_rollbackerror(XAHelper.xidToString(xid),
                         connectableResource.toString(), "-", e);
                 return TwoPhaseOutcome.FINISH_ERROR;
             }
@@ -476,7 +453,8 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 
     public int topLevelOnePhaseCommit() {
         if (tsLogger.logger.isTraceEnabled()) {
-            tsLogger.logger.trace("CommitMarkableResourceRecord.topLevelOnePhaseCommit for " + this + ", record id=" + order());
+            tsLogger.logger.trace(
+                    "CommitMarkableResourceRecord.topLevelOnePhaseCommit for " + this + ", record id=" + order());
         }
 
         return commit(true);
@@ -502,7 +480,7 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
                 return heuristic;
             } catch (Throwable e) {
                 jtaLogger.i18NLogger.warn_resources_arjunacore_commitxaerror(XAHelper.xidToString(xid),
-                    connectableResource.toString(), "-", e);
+                        connectableResource.toString(), "-", e);
                 return TwoPhaseOutcome.FINISH_ERROR;
             } finally {
                 if (!isPerformImmediateCleanupOfBranches) {

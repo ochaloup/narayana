@@ -42,11 +42,9 @@ import com.hp.mwtests.ts.jta.common.FirstXAResource;
 import com.hp.mwtests.ts.jta.common.LastXAResource;
 import com.hp.mwtests.ts.jta.common.TestResource;
 
-public class JTAOrder
-{
+public class JTAOrder {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         XAResource theResource = new TestResource();
         FirstXAResource first = new FirstXAResource();
         LastXAResource last = new LastXAResource();

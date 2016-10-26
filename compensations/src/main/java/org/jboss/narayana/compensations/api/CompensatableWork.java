@@ -30,7 +30,8 @@ package org.jboss.narayana.compensations.api;
 public interface CompensatableWork {
 
     /**
-     * A method implementing work which can be confirmed and/or compensated by ConfirmationHandler and CompensationHandler.
+     * A method implementing work which can be confirmed and/or compensated by
+     * ConfirmationHandler and CompensationHandler.
      */
     void execute();
 

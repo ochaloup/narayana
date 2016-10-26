@@ -57,9 +57,10 @@ public final class EnabledContextPropagationTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return WarDeployment.getDeployment(TestServiceAT.class, TestServiceATImple.class,
-                TestServiceATClient.class, TestService.class, TestServiceImple.class, TestServiceClient.class,
-                WSTXFeature.class).addAsResource("context-handlers.xml");
+        return WarDeployment
+                .getDeployment(TestServiceAT.class, TestServiceATImple.class, TestServiceATClient.class,
+                        TestService.class, TestServiceImple.class, TestServiceClient.class, WSTXFeature.class)
+                .addAsResource("context-handlers.xml");
     }
 
     @After
@@ -104,7 +105,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context, WSTXFeature, and with enabled WSTX handler.
+     * Tests service invocation without transaction context, WSTXFeature, and
+     * with enabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -118,8 +120,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context, WSTXFeature, and with enabled WSTX
-     * handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context, WSTXFeature, and with enabled WSTX handler.
      *
      * No two phase commit calls and no exception is expected.
      */
@@ -165,7 +167,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context but with enabled WSTXFeature and with enabled WSTX handler.
+     * Tests service invocation without transaction context but with enabled
+     * WSTXFeature and with enabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -179,8 +182,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context but with enabled WSTXFeature, and with
-     * enabled WSTX handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context but with enabled WSTXFeature, and with enabled WSTX handler.
      *
      * SOAPFaultException is expected.
      */
@@ -194,7 +197,8 @@ public final class EnabledContextPropagationTest {
             client.increment();
             throw new RuntimeException("SOAPFaultException was expected");
         } catch (SOAPFaultException e) {
-            // TODO for some reason <code>@Test(expected = SOAPFaultException.class)</code> did not work.
+            // TODO for some reason <code>@Test(expected =
+            // SOAPFaultException.class)</code> did not work.
         }
     }
 
@@ -231,7 +235,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context but with disabled WSTXFeature and enabled WSTX handler.
+     * Tests service invocation without transaction context but with disabled
+     * WSTXFeature and enabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -245,8 +250,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context but with disabled WSTXFeature, and with
-     * enabled WSTX handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context but with disabled WSTXFeature, and with enabled WSTX handler.
      *
      * No two phase commit calls and no exceptions are expected.
      */
@@ -260,7 +265,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers
+     * JaxWSHeaderContextProcessor with binding provider manually.
      *
      * Prepare and commit calls are expected.
      *
@@ -278,7 +284,8 @@ public final class EnabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers
+     * JaxWSHeaderContextProcessor with binding provider manually.
      *
      * Rollback call is expected.
      *

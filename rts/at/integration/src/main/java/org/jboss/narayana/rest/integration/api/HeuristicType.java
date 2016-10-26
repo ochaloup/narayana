@@ -4,10 +4,7 @@ import org.jboss.jbossts.star.util.TxStatus;
 
 public enum HeuristicType {
 
-    HEURISTIC_ROLLBACK,
-    HEURISTIC_COMMIT,
-    HEURISTIC_HAZARD,
-    HEURISTIC_MIXED;
+    HEURISTIC_ROLLBACK, HEURISTIC_COMMIT, HEURISTIC_HAZARD, HEURISTIC_MIXED;
 
     public static HeuristicType fromTxStatus(final String status) {
         if (status.equals(TxStatus.TransactionHeuristicCommit.name())) {
@@ -25,16 +22,16 @@ public enum HeuristicType {
 
     public String toTxStatus() {
         switch (this) {
-            case HEURISTIC_COMMIT:
+            case HEURISTIC_COMMIT :
                 return TxStatus.TransactionHeuristicCommit.name();
 
-            case HEURISTIC_HAZARD:
+            case HEURISTIC_HAZARD :
                 return TxStatus.TransactionHeuristicHazard.name();
 
-            case HEURISTIC_MIXED:
+            case HEURISTIC_MIXED :
                 return TxStatus.TransactionHeuristicMixed.name();
 
-            case HEURISTIC_ROLLBACK:
+            case HEURISTIC_ROLLBACK :
                 return TxStatus.TransactionHeuristicRollback.name();
         }
 

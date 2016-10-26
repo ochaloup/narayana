@@ -26,7 +26,6 @@ import java.util.concurrent.Callable;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 
-
 /**
  * Executes the transaction.
  * 
@@ -34,18 +33,15 @@ import com.arjuna.ats.arjuna.AtomicAction;
  *
  */
 
-public class TransactionExecutorAbort implements Callable<Integer>
-{
-    public TransactionExecutorAbort (AtomicAction tx)
-    {
+public class TransactionExecutorAbort implements Callable<Integer> {
+    public TransactionExecutorAbort(AtomicAction tx) {
         _theTransaction = tx;
     }
 
     @Override
-    public Integer call () throws Exception
-    {
+    public Integer call() throws Exception {
         return new Integer(_theTransaction.abort());
     }
-    
+
     private AtomicAction _theTransaction;
 }

@@ -60,10 +60,14 @@ public class Response implements Serializable {
     /**
      * Services construct their responses using this constructor.
      * 
-     * @param rval The value the service wishes to use.
-     * @param rcode The code the service wants to respond with.
-     * @param buffer The buffer to return.
-     * @param flags The flags to respond with.
+     * @param rval
+     *            The value the service wishes to use.
+     * @param rcode
+     *            The code the service wants to respond with.
+     * @param buffer
+     *            The buffer to return.
+     * @param flags
+     *            The flags to respond with.
      */
     public Response(short rval, int rcode, Buffer buffer, int flags) {
         this.rval = rval;
@@ -73,14 +77,21 @@ public class Response implements Serializable {
     }
 
     /**
-     * When a client receives a response this is the method that is used by the core framework to assemble the response.
+     * When a client receives a response this is the method that is used by the
+     * core framework to assemble the response.
      * 
-     * @param cd The connection that actually received the response (may be different to expected if {@link ConnectionImpl#TPGETANY}
-     *        was used.
-     * @param rval The return value.
-     * @param rcode The return code.
-     * @param buffer The buffer response.
-     * @param flags The flags the service used.
+     * @param cd
+     *            The connection that actually received the response (may be
+     *            different to expected if {@link ConnectionImpl#TPGETANY} was
+     *            used.
+     * @param rval
+     *            The return value.
+     * @param rcode
+     *            The return code.
+     * @param buffer
+     *            The buffer response.
+     * @param flags
+     *            The flags the service used.
      */
     public Response(int cd, short rval, int rcode, Buffer buffer, int flags) {
         this.cd = cd;
@@ -127,7 +138,8 @@ public class Response implements Serializable {
     }
 
     /**
-     * Get the cd of the service that responded (may vary based on <code>Connection#TPGETANY</code>)
+     * Get the cd of the service that responded (may vary based on
+     * <code>Connection#TPGETANY</code>)
      * 
      * @return The connection descriptor
      */

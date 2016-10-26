@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.AITResources02Clients;
  * $Id: Client16.java,v 1.2 2003/06/26 11:43:11 rbegg Exp $
  */
 
-
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.AITResources02.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -65,12 +64,9 @@ import org.jboss.jbossts.qa.Utils.OTS;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.omg.CORBA.IntHolder;
 
-public class Client16
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client16 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -82,20 +78,17 @@ public class Client16
 
             Worker[] workers = new Worker[numberOfWorkers];
 
-            for (int index = 0; index < workers.length; index++)
-            {
+            for (int index = 0; index < workers.length; index++) {
                 workers[index] = new Worker(numberOfCalls, counter);
             }
 
-            for (int index = 0; index < workers.length; index++)
-            {
+            for (int index = 0; index < workers.length; index++) {
                 workers[index].start();
             }
 
             boolean correct = true;
 
-            for (int index = 0; index < workers.length; index++)
-            {
+            for (int index = 0; index < workers.length; index++) {
                 workers[index].join();
                 correct = correct && workers[index].isCorrect();
             }
@@ -109,75 +102,56 @@ public class Client16
 
             correct = correct && (value.value == (numberOfWorkers * numberOfCalls));
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client16.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client16.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 
-    private static class Worker extends Thread
-    {
-        public Worker(int numberOfCalls, Counter counter)
-        {
+    private static class Worker extends Thread {
+        public Worker(int numberOfCalls, Counter counter) {
             _numberOfCalls = numberOfCalls;
             _counter = counter;
         }
 
-        public void run()
-        {
-            try
-            {
+        public void run() {
+            try {
                 int index = 0;
-                while (index < _numberOfCalls)
-                {
+                while (index < _numberOfCalls) {
                     AtomicTransaction atomicTransaction = new AtomicTransaction();
 
                     atomicTransaction.begin();
 
-                    try
-                    {
+                    try {
                         _counter.increase(OTS.current().get_control());
                         index++;
                         atomicTransaction.commit(true);
-                    }
-                    catch (InvocationException invocationException)
-                    {
+                    } catch (InvocationException invocationException) {
                         atomicTransaction.rollback();
                     }
                 }
-            }
-            catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 System.err.println("Client16.Worker.run: " + exception);
                 exception.printStackTrace(System.err);
                 _correct = false;
             }
         }
 
-        public boolean isCorrect()
-        {
+        public boolean isCorrect() {
             return _correct;
         }
 
@@ -186,4 +160,3 @@ public class Client16
         private Counter _counter = null;
     }
 }
-

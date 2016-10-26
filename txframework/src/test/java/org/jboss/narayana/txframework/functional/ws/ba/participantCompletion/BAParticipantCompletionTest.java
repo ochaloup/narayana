@@ -64,10 +64,8 @@ public class BAParticipantCompletionTest {
 
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addPackages(false, BAParticipantCompletionTest.class.getPackage())
-                .addPackage(EventLog.class.getPackage())
-                .addClass(ParticipantCompletionCoordinatorRules.class)
-                .addClass(URLUtils.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
+                .addPackage(EventLog.class.getPackage()).addClass(ParticipantCompletionCoordinatorRules.class)
+                .addClass(URLUtils.class).addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
 
         archive.delete(ArchivePaths.create("META-INF/MANIFEST.MF"));
 
@@ -78,7 +76,6 @@ public class BAParticipantCompletionTest {
 
         return archive;
     }
-
 
     @BeforeClass()
     public static void submitBytemanScript() throws Exception {
@@ -165,7 +162,7 @@ public class BAParticipantCompletionTest {
             client.saveDataAutoComplete(ServiceCommand.THROW_APPLICATION_EXCEPTION);
             Assert.fail("Exception should have been thrown by now");
         } catch (SomeApplicationException e) {
-            //Exception expected
+            // Exception expected
         } finally {
             uba.cancel();
         }

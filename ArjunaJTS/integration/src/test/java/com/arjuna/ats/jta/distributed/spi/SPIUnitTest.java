@@ -75,16 +75,19 @@ public class SPIUnitTest {
 
         JTAEnvironmentBean jtaEnvironmentBean = jtaPropertyManager.getJTAEnvironmentBean();
 
-        jtaEnvironmentBean.setTransactionManagerClassName(com.arjuna.ats.jbossatx.jts.TransactionManagerDelegate.class.getName());
+        jtaEnvironmentBean
+                .setTransactionManagerClassName(com.arjuna.ats.jbossatx.jts.TransactionManagerDelegate.class.getName());
 
         JNDIManager.bindJTATransactionManagerImplementation(initialContext);
 
-        jtaEnvironmentBean.setTransactionSynchronizationRegistryClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionSynchronizationRegistryImple.class.getName());
+        jtaEnvironmentBean.setTransactionSynchronizationRegistryClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionSynchronizationRegistryImple.class.getName());
 
         JNDIManager.bindJTATransactionSynchronizationRegistryImplementation(initialContext);
 
         final com.arjuna.ats.jbossatx.jts.TransactionManagerService service = new com.arjuna.ats.jbossatx.jts.TransactionManagerService();
-        final ServerVMClientUserTransaction userTransaction = new ServerVMClientUserTransaction(service.getTransactionManager());
+        final ServerVMClientUserTransaction userTransaction = new ServerVMClientUserTransaction(
+                service.getTransactionManager());
 
         jtaEnvironmentBean.setUserTransaction(userTransaction);
 
@@ -106,7 +109,7 @@ public class SPIUnitTest {
     public static void setUp() throws Exception {
         Hashtable props = JndiProvider.start();
 
-        initialContext =  new InitialContext(props);
+        initialContext = new InitialContext(props);
 
         initJTS();
 
@@ -197,7 +200,7 @@ public class SPIUnitTest {
 
     @Test
     public void testSynchronization() throws Exception {
-        TestSynchronization synch =  new TestSynchronization() ;
+        TestSynchronization synch = new TestSynchronization();
 
         UserTransaction txn = getUserTransaction();
         TransactionManager transactionManager = getTransactionManager();

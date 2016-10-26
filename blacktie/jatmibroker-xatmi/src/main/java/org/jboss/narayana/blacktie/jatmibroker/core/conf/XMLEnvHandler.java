@@ -93,19 +93,21 @@ public class XMLEnvHandler extends DefaultHandler {
     }
 
     /**
-     * Search inputStr for sequences of the form ${VAR} and replace them with the result of System.getenv("VAR"); If the
-     * enviromment variable VAR is not set then the literal text "VAR" is used instead.
+     * Search inputStr for sequences of the form ${VAR} and replace them with
+     * the result of System.getenv("VAR"); If the enviromment variable VAR is
+     * not set then the literal text "VAR" is used instead.
      * 
-     * @param inputStr the pattern to match against
-     * @return the same string with sequences of the form ${VAR} replaced by the result of System.getenv("VAR") or "VAR" if that
-     *         returns null
+     * @param inputStr
+     *            the pattern to match against
+     * @return the same string with sequences of the form ${VAR} replaced by the
+     *         result of System.getenv("VAR") or "VAR" if that returns null
      */
     public String getenv(CharSequence inputStr) {
         String[] matches = new String[3];
         matches[0] = "";
         matches[2] = "";
         java.util.regex.Matcher matcher = pattern.matcher(inputStr);
-        //matcher.reset(inputStr);
+        // matcher.reset(inputStr);
 
         if (matcher.find()) {
             StringBuilder sb = new StringBuilder();
@@ -134,7 +136,8 @@ public class XMLEnvHandler extends DefaultHandler {
             }
 
             if (!expanded)
-                log.error("There is an unset environment variable within the configuration element/attribute: " + inputStr);
+                log.error("There is an unset environment variable within the configuration element/attribute: "
+                        + inputStr);
 
             for (int i = 0; i < matches.length; i++)
                 sb.append(matches[i]);
@@ -365,7 +368,7 @@ public class XMLEnvHandler extends DefaultHandler {
                     prop.setProperty("StompConnectPort", avalue);
                 }
             }
-        } else if(SOCKETSERVER.equals(localName)) {
+        } else if (SOCKETSERVER.equals(localName)) {
             for (int i = 0; i < atts.getLength(); i++) {
                 avalue = getenv(atts.getValue(i));
                 if (atts.getLocalName(i).equals("PORT")) {
@@ -402,7 +405,7 @@ public class XMLEnvHandler extends DefaultHandler {
                 if (attsLocalName.equals("name")) {
                     serviceName = atts.getValue(i);
                     String serviceServer = (String) prop.get("blacktie." + serviceName + ".server");
-            String type = (String) prop.get("blacktie." + serviceName + ".type");
+                    String type = (String) prop.get("blacktie." + serviceName + ".type");
                     if (serviceServer != null && !type.equals("topic")) {
                         log.warn("service " + serviceName + " has already been defined in " + serviceName);
                         throw new SAXException("Can not define the same service: " + serviceName);

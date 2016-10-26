@@ -42,31 +42,28 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.resources.arjunacore.SynchronizationImple;
 import com.hp.mwtests.ts.jta.common.Synchronization;
 
-public class SynchronizationUnitTest
-{
+public class SynchronizationUnitTest {
     @Test
-    public void testInvalid()
-    {
+    public void testInvalid() {
         SynchronizationImple sync = new SynchronizationImple(null);
-        
+
         assertTrue(sync.get_uid().notEquals(Uid.nullUid()));
-        
+
         assertFalse(sync.beforeCompletion());
         assertFalse(sync.afterCompletion(Status.STATUS_COMMITTED));
     }
-    
+
     @Test
-    public void testValid()
-    {
+    public void testValid() {
         SynchronizationImple sync = new SynchronizationImple(new Synchronization());
-        
+
         assertTrue(sync.get_uid().notEquals(Uid.nullUid()));
-        
+
         assertTrue(sync.beforeCompletion());
         assertTrue(sync.afterCompletion(Status.STATUS_COMMITTED));
-        
+
         SynchronizationImple comp = new SynchronizationImple(new Synchronization());
-        
+
         assertTrue(comp.compareTo(sync) != 0);
         assertTrue(sync.toString() != null);
     }

@@ -47,7 +47,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Class responsible for configuring and initializing Narayana JTA services for the servlet container.
+ * Class responsible for configuring and initializing Narayana JTA services for
+ * the servlet container.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -57,11 +58,11 @@ public class NarayanaJtaServletContextListener implements ServletContextListener
 
     private static final String DEFAULT_NODE_IDENTIFIER = "1";
 
-    private static final List<String> DEFAULT_RECOVERY_MODULES = Arrays.asList(AtomicActionRecoveryModule.class.getName(),
-            XARecoveryModule.class.getName());
+    private static final List<String> DEFAULT_RECOVERY_MODULES = Arrays
+            .asList(AtomicActionRecoveryModule.class.getName(), XARecoveryModule.class.getName());
 
-    private static final List<String> DEFAULT_ORPHAN_FILTERS = Arrays
-            .asList(JTATransactionLogXAResourceOrphanFilter.class.getName(), JTANodeNameXAResourceOrphanFilter.class.getName());
+    private static final List<String> DEFAULT_ORPHAN_FILTERS = Arrays.asList(
+            JTATransactionLogXAResourceOrphanFilter.class.getName(), JTANodeNameXAResourceOrphanFilter.class.getName());
 
     private static final List<String> DEFAULT_EXPIRY_SCANNERS = Arrays
             .asList(ExpiredTransactionStatusManagerScanner.class.getName());
@@ -69,17 +70,21 @@ public class NarayanaJtaServletContextListener implements ServletContextListener
     /**
      * Initialize and start Narayana JTA services.
      * <p>
-     * During the setup node identifier, recovery modules, orphan filters, and expiry scanners are setup. Configuration file
-     * will be used to get initial values. If one doesn't exist, following defaults will be used:
+     * During the setup node identifier, recovery modules, orphan filters, and
+     * expiry scanners are setup. Configuration file will be used to get initial
+     * values. If one doesn't exist, following defaults will be used:
      * <p>
      * <ul>
      * <li>Node identifier: "1"
-     * <li>Recovery modules: {@link AtomicActionRecoveryModule}, {@link XARecoveryModule}
-     * <li>Orphan filters: {@link JTATransactionLogXAResourceOrphanFilter}, {@link JTANodeNameXAResourceOrphanFilter}
+     * <li>Recovery modules: {@link AtomicActionRecoveryModule},
+     * {@link XARecoveryModule}
+     * <li>Orphan filters: {@link JTATransactionLogXAResourceOrphanFilter},
+     * {@link JTANodeNameXAResourceOrphanFilter}
      * <li>Expiry scanners: {@link ExpiredTransactionStatusManagerScanner}
      * </ul>
      * <p>
-     * After setup recovery manager, transaction status manager, and transaction reaper are started.
+     * After setup recovery manager, transaction status manager, and transaction
+     * reaper are started.
      * 
      * @param servletContextEvent
      */
@@ -96,8 +101,9 @@ public class NarayanaJtaServletContextListener implements ServletContextListener
     }
 
     /**
-     * First, stop recovery manager, transaction status manager, and transaction reaper. Then, remove transactional driver from
-     * jdbc driver manager's list.
+     * First, stop recovery manager, transaction status manager, and transaction
+     * reaper. Then, remove transactional driver from jdbc driver manager's
+     * list.
      * 
      * @param servletContextEvent
      */
@@ -107,13 +113,14 @@ public class NarayanaJtaServletContextListener implements ServletContextListener
         TransactionReaper.terminate(false);
         TxControl.disable(true);
         RecoveryManager.manager().terminate();
-        Collections.list(DriverManager.getDrivers()).stream().filter(d -> d instanceof TransactionalDriver).forEach(d -> {
-            try {
-                DriverManager.deregisterDriver(d);
-            } catch (SQLException e) {
-                LOGGER.log(Level.WARNING, e.getMessage(), e);
-            }
-        });
+        Collections.list(DriverManager.getDrivers()).stream().filter(d -> d instanceof TransactionalDriver)
+                .forEach(d -> {
+                    try {
+                        DriverManager.deregisterDriver(d);
+                    } catch (SQLException e) {
+                        LOGGER.log(Level.WARNING, e.getMessage(), e);
+                    }
+                });
     }
 
     /**
@@ -129,8 +136,8 @@ public class NarayanaJtaServletContextListener implements ServletContextListener
             }
         }
 
-        jtaPropertyManager.getJTAEnvironmentBean()
-                .setXaRecoveryNodes(Collections.singletonList(arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(
+                Collections.singletonList(arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
     }
 
     /**

@@ -47,24 +47,20 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  * @since JTS 1.0.
  */
 
-public class BasicLockStore extends LockStore
-{
+public class BasicLockStore extends LockStore {
 
     /*
      * This implementation is for purely local-applet locks, so we don't need
      * the key.
      */
 
-    public BasicLockStore()
-    {
+    public BasicLockStore() {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicLockStore.BasicLockStore()");
         }
     }
 
-    public InputObjectState read_state (Uid u, String tName)
-            throws LockStoreException
-    {
+    public InputObjectState read_state(Uid u, String tName) throws LockStoreException {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicLockStore.read_state(" + u + ", " + tName + ")");
         }
@@ -72,8 +68,7 @@ public class BasicLockStore extends LockStore
         return segmentStore.read_state(u, tName);
     }
 
-    public boolean remove_state (Uid u, String tName)
-    {
+    public boolean remove_state(Uid u, String tName) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicLockStore.remove_state(" + u + ", " + tName + ")");
         }
@@ -81,11 +76,9 @@ public class BasicLockStore extends LockStore
         return segmentStore.remove_state(u, tName);
     }
 
-    public boolean write_committed (Uid u, String tName, OutputObjectState state)
-    {
+    public boolean write_committed(Uid u, String tName, OutputObjectState state) {
         if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("BasicLockStore.write_committed(" + u + ", " + tName + ", "
-                    + state + ")");
+            txojLogger.logger.trace("BasicLockStore.write_committed(" + u + ", " + tName + ", " + state + ")");
         }
 
         return segmentStore.write_committed(u, tName, state);
@@ -95,24 +88,19 @@ public class BasicLockStore extends LockStore
 
 };
 
-class LockStoreSegment
-{
+class LockStoreSegment {
 
-    public LockStoreSegment()
-    {
+    public LockStoreSegment() {
         headOfList = null;
     }
 
-    public synchronized boolean write_committed (Uid u, String tName,
-            OutputObjectState state)
-    {
+    public synchronized boolean write_committed(Uid u, String tName, OutputObjectState state) {
         if (state.size() <= 0)
             return false;
 
         LockStoreList ptr = find(tName);
 
-        if (ptr == null)
-        {
+        if (ptr == null) {
             ptr = new LockStoreList(tName);
             ptr.setNext(headOfList);
 
@@ -124,9 +112,7 @@ class LockStoreSegment
         return true;
     }
 
-    public synchronized InputObjectState read_state (Uid u, String tName)
-            throws LockStoreException
-    {
+    public synchronized InputObjectState read_state(Uid u, String tName) throws LockStoreException {
         LockStoreList ptr = find(tName);
 
         if (ptr == null)
@@ -135,13 +121,11 @@ class LockStoreSegment
         return ptr.get(u);
     }
 
-    public synchronized boolean remove_state (Uid u, String tName)
-    {
+    public synchronized boolean remove_state(Uid u, String tName) {
         boolean found = false;
         LockStoreList ptr = headOfList;
 
-        while ((!found) && (ptr != null))
-        {
+        while ((!found) && (ptr != null)) {
             if (ptr.name().compareTo(tName) == 0)
                 found = true;
             else
@@ -156,18 +140,15 @@ class LockStoreSegment
         return true;
     }
 
-    public synchronized boolean remove_segment (String tName)
-    {
+    public synchronized boolean remove_segment(String tName) {
         boolean found = false;
         LockStoreList ptr = headOfList;
         LockStoreList trail = null;
 
-        while ((!found) && (ptr != null))
-        {
+        while ((!found) && (ptr != null)) {
             if (ptr.name().compareTo(tName) == 0)
                 found = true;
-            else
-            {
+            else {
                 trail = ptr;
                 ptr = ptr.getNext();
             }
@@ -175,8 +156,7 @@ class LockStoreSegment
 
         if (!found)
             return true;
-        else
-        {
+        else {
             if (trail == null) // remove headOfList
                 headOfList = ptr.getNext();
             else
@@ -188,13 +168,11 @@ class LockStoreSegment
         return true;
     }
 
-    private LockStoreList find (String tName)
-    {
+    private LockStoreList find(String tName) {
         boolean found = false;
         LockStoreList ptr = headOfList;
 
-        while ((!found) && (ptr != null))
-        {
+        while ((!found) && (ptr != null)) {
             if (ptr.name().compareTo(tName) == 0)
                 found = true;
             else
@@ -208,48 +186,39 @@ class LockStoreSegment
 
 };
 
-class LockStoreList
-{
+class LockStoreList {
 
-    public LockStoreList(String tName)
-    {
+    public LockStoreList(String tName) {
         _name = tName;
         _next = null;
     }
 
-    public String name ()
-    {
+    public String name() {
         return _name;
     }
 
-    public void setNext (LockStoreList n)
-    {
+    public void setNext(LockStoreList n) {
         _next = n;
     }
 
-    public LockStoreList getNext ()
-    {
+    public LockStoreList getNext() {
         return _next;
     }
 
-    public boolean add (Uid u, OutputObjectState state)
-    {
+    public boolean add(Uid u, OutputObjectState state) {
         LockStateStore ptr = find(u);
 
-        if (ptr == null)
-        {
+        if (ptr == null) {
             ptr = new LockStateStore(u, state);
             ptr._next = headOfList;
             headOfList = ptr;
-        }
-        else
+        } else
             ptr._state = state;
 
         return true;
     }
 
-    public InputObjectState get (Uid u) throws LockStoreException
-    {
+    public InputObjectState get(Uid u) throws LockStoreException {
         LockStateStore ptr = find(u);
 
         if (ptr == null)
@@ -258,18 +227,15 @@ class LockStoreList
             return new InputObjectState(ptr._state);
     }
 
-    public boolean remove (Uid u)
-    {
+    public boolean remove(Uid u) {
         boolean found = false;
         LockStateStore ptr = headOfList;
         LockStateStore trail = null;
 
-        while ((!found) && (ptr != null))
-        {
+        while ((!found) && (ptr != null)) {
             if (ptr._id.equals(u))
                 found = true;
-            else
-            {
+            else {
                 trail = ptr;
                 ptr = ptr._next;
             }
@@ -277,8 +243,7 @@ class LockStoreList
 
         if (!found)
             return false;
-        else
-        {
+        else {
             if (trail == null) // remove headOfList
                 headOfList = ptr._next;
             else
@@ -288,13 +253,11 @@ class LockStoreList
         return true;
     }
 
-    private LockStateStore find (Uid u)
-    {
+    private LockStateStore find(Uid u) {
         boolean found = false;
         LockStateStore ptr = headOfList;
 
-        while ((!found) && (ptr != null))
-        {
+        while ((!found) && (ptr != null)) {
             if (ptr._id.equals(u))
                 found = true;
             else
@@ -312,11 +275,9 @@ class LockStoreList
 
 }
 
-class LockStateStore
-{
+class LockStateStore {
 
-    public LockStateStore(Uid u, OutputObjectState s)
-    {
+    public LockStateStore(Uid u, OutputObjectState s) {
         _id = u;
         _state = s;
         _next = null;

@@ -22,15 +22,12 @@ public class ClientCrashBase {
     }
 
     public void shutdownOrb() {
-        try
-        {
+        try {
             if (didInitOrb) {
                 OAInterface.shutdownOA();
                 ORBInterface.shutdownORB();
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.printf("%s.main: ORB shutdown problem: %s%n", id, exception);
             exception.printStackTrace(System.err);
         }

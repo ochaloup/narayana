@@ -53,76 +53,65 @@ public class RegistrationTest extends BaseWSCTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                TestRegistrationCoordinatorProcessor.class,
-                RegisterDetails.class);
+        return WarDeployment.getDeployment(TestRegistrationCoordinatorProcessor.class, RegisterDetails.class);
     }
 
-    private RegistrationCoordinatorProcessor origRegistrationCoordinatorProcessor ;
+    private RegistrationCoordinatorProcessor origRegistrationCoordinatorProcessor;
 
-    private TestRegistrationCoordinatorProcessor testRegistrationCoordinatorProcessor = new TestRegistrationCoordinatorProcessor() ;
+    private TestRegistrationCoordinatorProcessor testRegistrationCoordinatorProcessor = new TestRegistrationCoordinatorProcessor();
 
     @Before
-    public void setUp()
-            throws Exception
-            {
-        origRegistrationCoordinatorProcessor = RegistrationCoordinatorProcessor.setCoordinator(testRegistrationCoordinatorProcessor) ;
+    public void setUp() throws Exception {
+        origRegistrationCoordinatorProcessor = RegistrationCoordinatorProcessor
+                .setCoordinator(testRegistrationCoordinatorProcessor);
         ServiceRegistry.getRegistry();
-            }
+    }
 
     @Test
-    public void testRequestWithoutInstanceIdentifier()
-            throws Exception
-            {
-        executeRequest("testRequestWithoutInstanceIdentifier", null) ;
-            }
+    public void testRequestWithoutInstanceIdentifier() throws Exception {
+        executeRequest("testRequestWithoutInstanceIdentifier", null);
+    }
 
     @Test
-    public void testRequestWithInstanceIdentifier()
-            throws Exception
-            {
-        executeRequest("testRequestWithInstanceIdentifier", new InstanceIdentifier("identifier")) ;
-            }
+    public void testRequestWithInstanceIdentifier() throws Exception {
+        executeRequest("testRequestWithInstanceIdentifier", new InstanceIdentifier("identifier"));
+    }
 
-    private void executeRequest(final String messageId, final InstanceIdentifier instanceIdentifier)
-            throws Exception
-            {
-        final String protocolIdentifier = "http://foo.example.org/bar" ;
-        final W3CEndpointReference participantProtocolEndpoint = TestUtil11.getProtocolParticipantEndpoint("participant");
+    private void executeRequest(final String messageId, final InstanceIdentifier instanceIdentifier) throws Exception {
+        final String protocolIdentifier = "http://foo.example.org/bar";
+        final W3CEndpointReference participantProtocolEndpoint = TestUtil11
+                .getProtocolParticipantEndpoint("participant");
         String identifier = (instanceIdentifier != null ? instanceIdentifier.getInstanceIdentifier() : null);
         W3CEndpointReference registerEndpoint = TestUtil11.getRegistrationEndpoint(identifier);
         RegisterType registerType = new RegisterType();
         registerType.setProtocolIdentifier(protocolIdentifier);
         registerType.setParticipantProtocolService(participantProtocolEndpoint);
-        RegistrationPortType port = WSCOORClient.getRegistrationPort(registerEndpoint, CoordinationConstants.WSCOOR_ACTION_REGISTER, messageId);
+        RegistrationPortType port = WSCOORClient.getRegistrationPort(registerEndpoint,
+                CoordinationConstants.WSCOOR_ACTION_REGISTER, messageId);
         port.registerOperation(registerType);
 
-        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000) ;
-        final RegisterType requestRegister = details.getRegister() ;
-        final MAP requestMap = details.getMAP() ;
-        final ArjunaContext requestArjunaContext = details.getArjunaContext() ;
+        final RegisterDetails details = testRegistrationCoordinatorProcessor.getRegisterDetails(messageId, 10000);
+        final RegisterType requestRegister = details.getRegister();
+        final MAP requestMap = details.getMAP();
+        final ArjunaContext requestArjunaContext = details.getArjunaContext();
 
         assertEquals(requestMap.getTo(), TestUtil11.registrationCoordinatorService);
         assertEquals(requestMap.getMessageID(), messageId);
 
-        if (instanceIdentifier == null)
-        {
-            assertNull(requestArjunaContext) ;
-        }
-        else
-        {
-            assertEquals(instanceIdentifier.getInstanceIdentifier(), requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
+        if (instanceIdentifier == null) {
+            assertNull(requestArjunaContext);
+        } else {
+            assertEquals(instanceIdentifier.getInstanceIdentifier(),
+                    requestArjunaContext.getInstanceIdentifier().getInstanceIdentifier());
         }
 
-        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier()) ;
-            }
+        assertEquals(protocolIdentifier, requestRegister.getProtocolIdentifier());
+    }
 
     @After
-    public void tearDown()
-            throws Exception
-            {
-        RegistrationCoordinatorProcessor.setCoordinator(origRegistrationCoordinatorProcessor) ;
-        origRegistrationCoordinatorProcessor = null ;
-        testRegistrationCoordinatorProcessor = null ;
-            }
+    public void tearDown() throws Exception {
+        RegistrationCoordinatorProcessor.setCoordinator(origRegistrationCoordinatorProcessor);
+        origRegistrationCoordinatorProcessor = null;
+        testRegistrationCoordinatorProcessor = null;
+    }
 }

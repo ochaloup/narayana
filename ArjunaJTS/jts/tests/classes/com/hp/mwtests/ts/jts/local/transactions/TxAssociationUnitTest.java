@@ -38,19 +38,17 @@ import org.junit.Test;
 import com.arjuna.ats.jts.extensions.DebugTxAssociation;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class TxAssociationUnitTest extends TestBase
-{
+public class TxAssociationUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         DebugTxAssociation tx = new DebugTxAssociation();
-        
+
         tx.begin(null);
         tx.commit(null);
         tx.rollback(null);
         tx.suspend(null);
         tx.resume(null);
-        
+
         assertEquals(tx.name(), "Debug");
     }
 }

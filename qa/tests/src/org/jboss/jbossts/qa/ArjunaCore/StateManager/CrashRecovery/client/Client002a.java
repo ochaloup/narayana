@@ -25,59 +25,46 @@ import org.jboss.jbossts.qa.ArjunaCore.Utils.BaseTestClient;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client002a extends BaseTestClient
-{
-    public static void main(String[] args)
-    {
+public class Client002a extends BaseTestClient {
+    public static void main(String[] args) {
         Client002a test = new Client002a(args);
     }
 
-    private Client002a(String[] args)
-    {
+    private Client002a(String[] args) {
         super(args);
     }
 
-    public void Test()
-    {
-        try
-        {
+    public void Test() {
+        try {
             setNumberOfCalls(3);
             setNumberOfResources(2);
             setUniquePrefix(1);
 
             CrashRecoveryDelays.awaitRecoveryArjunaCore();
 
-            //restore objects from uid's
+            // restore objects from uid's
             BasicStateRecord[] mStateRecordList = new BasicStateRecord[mNumberOfResources];
-            for (int j = 0; j < mNumberOfResources; j++)
-            {
+            for (int j = 0; j < mNumberOfResources; j++) {
                 String key = getResourceName("resource_" + j);
-                try
-                {
+                try {
                     mStateRecordList[j] = new BasicStateRecord(qautil.loadUid(key));
                     qautil.clearUid(key);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     Debug("Error when reading uid store");
                     mCorrect = false;
                 }
             }
 
-            //record should hav ebeen commited by recovery manager
-            for (int j = 0; j < mNumberOfResources; j++)
-            {
-                if (mStateRecordList[j].getValue() != 1)
-                {
+            // record should hav ebeen commited by recovery manager
+            for (int j = 0; j < mNumberOfResources; j++) {
+                if (mStateRecordList[j].getValue() != 1) {
                     Debug("value is incorrect: " + mStateRecordList[j].getValue());
                     mCorrect = false;
                 }
             }
 
             qaAssert(mCorrect);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Fail("Error in Client002a.test() :", e);
         }
     }

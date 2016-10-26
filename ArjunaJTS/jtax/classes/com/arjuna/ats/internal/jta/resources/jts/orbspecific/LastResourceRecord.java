@@ -55,104 +55,88 @@ import com.arjuna.ats.internal.jta.utils.jtaxLogger;
  * @version $Id$
  * @since ATS 4.1
  */
-public class LastResourceRecord extends XAResourceRecord
-{
+public class LastResourceRecord extends XAResourceRecord {
     /**
      * The Uid for all last xa resource records.
      */
-    private static final String UID = Uid.lastResourceUid().stringForm() ;
-    
+    private static final String UID = Uid.lastResourceUid().stringForm();
+
     /**
-     * Construct the record for last resource commit optimisation. 
-     * @param tx The current transaction.
-     * @param xaResource The associated XA resource.
-     * @param xid The X/Open transaction identifier.
-     * @param params Additional parameters.
+     * Construct the record for last resource commit optimisation.
+     * 
+     * @param tx
+     *            The current transaction.
+     * @param xaResource
+     *            The associated XA resource.
+     * @param xid
+     *            The X/Open transaction identifier.
+     * @param params
+     *            Additional parameters.
      */
-    public LastResourceRecord(final TransactionImple tx, final XAResource xaResource, final Xid xid, final Object[] params)
-    {
-        super(tx, xaResource, xid, params) ;
+    public LastResourceRecord(final TransactionImple tx, final XAResource xaResource, final Xid xid,
+            final Object[] params) {
+        super(tx, xaResource, xid, params);
     }
-    
+
     /**
      * The type id for this record.
      */
-    public int type_id()
-        throws SystemException
-    {
-        return RecordType.LASTRESOURCE ;
+    public int type_id() throws SystemException {
+        return RecordType.LASTRESOURCE;
     }
-    
+
     /**
      * The UID for this resource.
      */
-    public String uid()
-        throws SystemException
-    {
-        return UID ;
+    public String uid() throws SystemException {
+        return UID;
     }
-    
+
     /**
      * Commit this resource.
      */
-    public void commit()
-        throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard
-    {
+    public void commit() throws SystemException, NotPrepared, HeuristicRollback, HeuristicMixed, HeuristicHazard {
     }
-    
+
     /**
      * Prepare this resource.
      */
-    public Vote prepare()
-        throws HeuristicMixed, HeuristicHazard, SystemException
-    {
-        try
-        {
-            commit_one_phase() ;
-            return Vote.VoteCommit ;
-        }
-        catch (final TRANSACTION_ROLLEDBACK tr)
-        {
-            return Vote.VoteRollback ;
+    public Vote prepare() throws HeuristicMixed, HeuristicHazard, SystemException {
+        try {
+            commit_one_phase();
+            return Vote.VoteCommit;
+        } catch (final TRANSACTION_ROLLEDBACK tr) {
+            return Vote.VoteRollback;
         }
     }
-    
+
     /**
      * The type for saving state.
      */
-    public String type()
-    {
-        return "/CosTransactions/LastXAResourceRecord" ;
+    public String type() {
+        return "/CosTransactions/LastXAResourceRecord";
     }
 
-    public boolean saveRecord() throws SystemException
-    {
+    public boolean saveRecord() throws SystemException {
         return false;
     }
-    
-    public boolean shouldAdd(OTSAbstractRecord record) throws SystemException
-    {
-        if( record.type_id() == type_id() )
-        {
-            if(ALLOW_MULTIPLE_LAST_RESOURCES)
-            {
-                if (!_disableMLRWarning || (_disableMLRWarning && !_issuedWarning))
-                {
-                    jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_lastResource_multipleWarning(record.toString());
+
+    public boolean shouldAdd(OTSAbstractRecord record) throws SystemException {
+        if (record.type_id() == type_id()) {
+            if (ALLOW_MULTIPLE_LAST_RESOURCES) {
+                if (!_disableMLRWarning || (_disableMLRWarning && !_issuedWarning)) {
+                    jtaxLogger.i18NLogger
+                            .warn_jtax_resources_jts_orbspecific_lastResource_multipleWarning(record.toString());
                     _issuedWarning = true;
                 }
 
                 return true;
-            }
-            else
-            {
+            } else {
                 jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_lastResource_disallow(record.toString());
 
                 return false;
             }
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
@@ -164,18 +148,15 @@ public class LastResourceRecord extends XAResourceRecord
     private static boolean _issuedWarning = false;
 
     /**
-     * Static block writes warning messages to the log if either multiple last resources are enabled
-     * or multiple last resources warning is disabled.
+     * Static block writes warning messages to the log if either multiple last
+     * resources are enabled or multiple last resources warning is disabled.
      */
-    static
-    {
-        if (ALLOW_MULTIPLE_LAST_RESOURCES)
-        {
+    static {
+        if (ALLOW_MULTIPLE_LAST_RESOURCES) {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_lastResource_startupWarning();
         }
 
-        if (arjPropertyManager.getCoreEnvironmentBean().isDisableMultipleLastResourcesWarning())
-        {
+        if (arjPropertyManager.getCoreEnvironmentBean().isDisableMultipleLastResourcesWarning()) {
             jtaxLogger.i18NLogger.warn_jtax_resources_jts_orbspecific_lastResource_disableWarning();
 
             _disableMLRWarning = true;

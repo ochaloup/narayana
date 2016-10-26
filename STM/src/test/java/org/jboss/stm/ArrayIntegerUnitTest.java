@@ -48,78 +48,69 @@ import junit.framework.TestCase;
  * @author Mark Little
  */
 
-public class ArrayIntegerUnitTest extends TestCase
-{   
+public class ArrayIntegerUnitTest extends TestCase {
     @Transactional
-    public interface Atomic
-    {
-        public void change (int index, int value) throws Exception;
-        
-        public void set (int index, int value) throws Exception;
-        
-        public int get (int index) throws Exception;
+    public interface Atomic {
+        public void change(int index, int value) throws Exception;
+
+        public void set(int index, int value) throws Exception;
+
+        public int get(int index) throws Exception;
     }
-    
-    public class ArrayType implements Atomic
-    {   
+
+    public class ArrayType implements Atomic {
         @ReadLock
-        public int get (int index) throws Exception
-        {
+        public int get(int index) throws Exception {
             return state[index];
         }
 
         @WriteLock
-        public void set (int index, int value) throws Exception
-        {
+        public void set(int index, int value) throws Exception {
             state[index] = value;
         }
-        
+
         @WriteLock
-        public void change (int index, int value) throws Exception
-        {
+        public void change(int index, int value) throws Exception {
             state[index] += value;
         }
 
-        private Integer[] state = new Integer[10];  // ignore error checking for now
+        private Integer[] state = new Integer[10]; // ignore error checking for
+                                                    // now
     }
-    
-    public void testArrayType () throws Exception
-    {
+
+    public void testArrayType() throws Exception {
         RecoverableContainer<Atomic> theContainer = new RecoverableContainer<Atomic>();
         ArrayType basic = new ArrayType();
         boolean success = true;
         Atomic obj = null;
         int index = 5; // arbitrary value
-        
-        try
-        {
+
+        try {
             obj = theContainer.enlist(basic);
-        }
-        catch (final Throwable ex)
-        {
+        } catch (final Throwable ex) {
             ex.printStackTrace();
-            
+
             success = false;
         }
-        
+
         assertTrue(success);
-        
+
         AtomicAction a = new AtomicAction();
-        
+
         a.begin();
-        
+
         obj.set(index, 1234);
-        
+
         a.commit();
 
         assertEquals(obj.get(index), 1234);
-        
+
         a = new AtomicAction();
 
         a.begin();
 
         obj.change(index, 1);
-        
+
         a.abort();
 
         assertEquals(obj.get(index), 1234);

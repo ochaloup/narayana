@@ -39,30 +39,27 @@ package com.arjuna.mw.wscf.model.sagas.common;
  * @since 1.0.
  */
 
-public class CoordinationResult
-{
+public class CoordinationResult {
 
     public static final int CONFIRMED = 0;
     public static final int CANCELLED = 1;
     public static final int COMPENSATED = 2;
-    
+
     /**
      * @return a human-readable version of the outcome.
      */
 
-    public static String stringForm (int res)
-    {
-    switch (res)
-    {
-    case CANCELLED:
-        return "CoordinationResult.CANCELLED";
-    case CONFIRMED:
-        return "CoordinationResult.CONFIRMED";
-    case COMPENSATED:
-        return "CoordinationResult.COMPENSATED";
-    default:
-        return "Unknown - "+res;
+    public static String stringForm(int res) {
+        switch (res) {
+            case CANCELLED :
+                return "CoordinationResult.CANCELLED";
+            case CONFIRMED :
+                return "CoordinationResult.CONFIRMED";
+            case COMPENSATED :
+                return "CoordinationResult.COMPENSATED";
+            default :
+                return "Unknown - " + res;
+        }
     }
-    }
-    
+
 }

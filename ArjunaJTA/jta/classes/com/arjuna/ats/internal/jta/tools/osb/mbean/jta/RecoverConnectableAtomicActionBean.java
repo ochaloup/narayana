@@ -29,11 +29,15 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.RecoverConnectableAtomicA
 import java.io.IOException;
 
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
-public class RecoverConnectableAtomicActionBean extends JTAActionBean implements RecoverConnectableAtomicActionBeanMBean {
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
+public class RecoverConnectableAtomicActionBean extends JTAActionBean
+        implements
+            RecoverConnectableAtomicActionBeanMBean {
     RecoverConnectableAtomicAction connectableAtomicAction = null;
 
     public RecoverConnectableAtomicActionBean(UidWrapper w) {
@@ -43,8 +47,10 @@ public class RecoverConnectableAtomicActionBean extends JTAActionBean implements
     @Override
     protected ActionBeanWrapperInterface createWrapper(UidWrapper w, boolean activate) {
         try {
-            InputObjectState state = StoreManager.getRecoveryStore().read_committed(w.getUid(), RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE);
-            connectableAtomicAction = new RecoverConnectableAtomicAction(RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE, w.getUid(), state);
+            InputObjectState state = StoreManager.getRecoveryStore().read_committed(w.getUid(),
+                    RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE);
+            connectableAtomicAction = new RecoverConnectableAtomicAction(
+                    RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE, w.getUid(), state);
 
         } catch (ObjectStoreException e) {
             ;

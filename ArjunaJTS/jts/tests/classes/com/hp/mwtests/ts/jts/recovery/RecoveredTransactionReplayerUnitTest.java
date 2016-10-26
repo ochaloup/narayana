@@ -44,19 +44,15 @@ import com.hp.mwtests.ts.jts.resources.TestBase;
 
 import org.omg.CosTransactions.Status;
 
-
-public class RecoveredTransactionReplayerUnitTest extends TestBase
-{
+public class RecoveredTransactionReplayerUnitTest extends TestBase {
     @Test
-    public void testCommitted () throws Exception
-    {
+    public void testCommitted() throws Exception {
         /*
-         * Deliberately choose a Uid that doesn't represent a state
-         * on disk.
+         * Deliberately choose a Uid that doesn't represent a state on disk.
          * 
          * Use un-threaded.
          */
-        
+
         Uid dummyUid = new Uid();
         String dummyState = "/StateManager/DummyState";
         RecoveredTransactionReplayer replayer = new RecoveredTransactionReplayer(dummyUid, dummyState);
@@ -65,8 +61,8 @@ public class RecoveredTransactionReplayerUnitTest extends TestBase
         assertTrue(RecoveredTransactionReplayer.isPresent(dummyUid) != null);
 
         replayer.swapResource(dummyUid, res.getResource());
-        
-        replayer.run();  
+
+        replayer.run();
 
         assertTrue(RecoveredTransactionReplayer.isPresent(dummyUid) == null);
     }

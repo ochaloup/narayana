@@ -34,7 +34,8 @@ public final class VolatileParticipantResourceTestCase {
 
     private static final String BASE_URL = "http://localhost:" + TestPortProvider.getPort();
 
-    private static final String VOLATILE_PARTICIPANT_URL = BASE_URL + "/" + VolatileParticipantResource.BASE_PATH_SEGMENT;
+    private static final String VOLATILE_PARTICIPANT_URL = BASE_URL + "/"
+            + VolatileParticipantResource.BASE_PATH_SEGMENT;
 
     private static NettyJaxrsServer NETTY;
 

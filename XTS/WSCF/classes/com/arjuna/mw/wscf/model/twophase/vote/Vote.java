@@ -36,6 +36,5 @@ package com.arjuna.mw.wscf.model.twophase.vote;
  * @version $Id: Vote.java,v 1.1 2003/01/07 10:33:47 nmcl Exp $
  */
 
-public interface Vote
-{
+public interface Vote {
 }

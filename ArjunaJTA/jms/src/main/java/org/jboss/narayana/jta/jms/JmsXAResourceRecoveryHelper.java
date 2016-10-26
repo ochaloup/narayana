@@ -75,10 +75,12 @@ public class JmsXAResourceRecoveryHelper implements XAResourceRecoveryHelper, XA
     }
 
     /**
-     * If JMS connection was created successfully, returns an array with one instance of JmsXAResourceRecoveryHelper. Otherwise,
-     * returns an empty array.
+     * If JMS connection was created successfully, returns an array with one
+     * instance of JmsXAResourceRecoveryHelper. Otherwise, returns an empty
+     * array.
      *
-     * @return Array with one instance of JmsXAResourceRecoveryHelper or an empty array
+     * @return Array with one instance of JmsXAResourceRecoveryHelper or an
+     *         empty array
      */
     @Override
     public XAResource[] getXAResources() {
@@ -87,15 +89,16 @@ public class JmsXAResourceRecoveryHelper implements XAResourceRecoveryHelper, XA
                 jtaLogger.logger.trace("Returning XA resource: " + this);
             }
 
-            return new XAResource[] { this };
+            return new XAResource[]{this};
         }
 
         return new XAResource[0];
     }
 
     /**
-     * Delegates XAResource#recover call to the connected JMS resource. If provided argument is XAResource.TMENDRSCAN, then JMS
-     * connection will be closed at the end of the call.
+     * Delegates XAResource#recover call to the connected JMS resource. If
+     * provided argument is XAResource.TMENDRSCAN, then JMS connection will be
+     * closed at the end of the call.
      *
      * @param i
      * @throws XAException
@@ -194,7 +197,8 @@ public class JmsXAResourceRecoveryHelper implements XAResourceRecoveryHelper, XA
     }
 
     /**
-     * Delegates XAResource#getTransactionTimeout call to the connected JMS resource.
+     * Delegates XAResource#getTransactionTimeout call to the connected JMS
+     * resource.
      *
      * @return Transaction timeout value.
      * @throws XAException
@@ -205,7 +209,8 @@ public class JmsXAResourceRecoveryHelper implements XAResourceRecoveryHelper, XA
     }
 
     /**
-     * Delegates XAResource#setTransactionTimeout call to the connected JMS resource.
+     * Delegates XAResource#setTransactionTimeout call to the connected JMS
+     * resource.
      *
      * @param i
      * @return True if transaction timeout was set, or false if wasn't.

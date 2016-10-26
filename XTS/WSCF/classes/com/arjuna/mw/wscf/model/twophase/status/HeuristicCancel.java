@@ -42,23 +42,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class HeuristicCancel implements Status
-{
+public class HeuristicCancel implements Status {
 
-    public static HeuristicCancel instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "org.w3c.wscf.twophase.status.HeuristicCancel";
+    public static HeuristicCancel instance() {
+        return _instance;
     }
 
-    private HeuristicCancel ()
-    {
+    public String toString() {
+        return "org.w3c.wscf.twophase.status.HeuristicCancel";
+    }
+
+    private HeuristicCancel() {
     }
 
     private static final HeuristicCancel _instance = new HeuristicCancel();
-    
+
 }

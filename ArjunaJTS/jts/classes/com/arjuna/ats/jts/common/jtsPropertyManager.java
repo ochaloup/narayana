@@ -36,10 +36,8 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 /**
  * Property manager wrapper for the JTS module.
  */
-public class jtsPropertyManager
-{
-    public static JTSEnvironmentBean getJTSEnvironmentBean()
-    {
+public class jtsPropertyManager {
+    public static JTSEnvironmentBean getJTSEnvironmentBean() {
         return BeanPopulator.getDefaultInstance(JTSEnvironmentBean.class);
     }
 }

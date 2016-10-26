@@ -18,11 +18,9 @@ public class ResumeNullTransactionTest {
     }
 
     @Test
-    public void testResumeNullTransaction()
-            throws Exception
-            {
+    public void testResumeNullTransaction() throws Exception {
         TransactionManager ut = TransactionManager.getTransactionManager();
 
         ut.resume(null);
-            }
+    }
 }

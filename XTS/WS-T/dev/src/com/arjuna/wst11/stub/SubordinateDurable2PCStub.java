@@ -13,19 +13,22 @@ import org.jboss.jbossts.xts.recovery.participant.at.XTSATRecoveryManager;
 import org.jboss.jbossts.xts.recovery.participant.at.PersistableATParticipant;
 
 /**
- * A durable participant registered on behalf of an interposed WS-AT coordinator in order to ensure that
- * durable participants in the subtransaction prepared, committed and aborted at the right time.
+ * A durable participant registered on behalf of an interposed WS-AT coordinator
+ * in order to ensure that durable participants in the subtransaction prepared,
+ * committed and aborted at the right time.
  */
-public class SubordinateDurable2PCStub implements Durable2PCParticipant, PersistableParticipant, PersistableATParticipant
-{
+public class SubordinateDurable2PCStub
+        implements
+            Durable2PCParticipant,
+            PersistableParticipant,
+            PersistableATParticipant {
     /**
-     * normal constructor used when the subordinate coordinator is registered as a durable participant
-     * with its parent coordinator.
+     * normal constructor used when the subordinate coordinator is registered as
+     * a durable participant with its parent coordinator.
      *
      * @param coordinator
      */
-    public SubordinateDurable2PCStub(SubordinateATCoordinator coordinator)
-    {
+    public SubordinateDurable2PCStub(SubordinateATCoordinator coordinator) {
         this.coordinator = coordinator;
         this.coordinatorId = coordinator.get_uid().stringForm();
         this.recovered = false;
@@ -34,37 +37,40 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
     /**
      * empty constructor for use only during recovery
      */
-    public SubordinateDurable2PCStub()
-    {
+    public SubordinateDurable2PCStub() {
         this.coordinator = null;
         this.coordinatorId = null;
         this.recovered = true;
     }
 
     /**
-     * This will be called when the parent coordinator is preparing its durable participants and should ensure
-     * that the interposed cooordinator does the same.
+     * This will be called when the parent coordinator is preparing its durable
+     * participants and should ensure that the interposed cooordinator does the
+     * same.
      *
      * @return the Vote returned by the subordinate coordinator.
-     * @throws com.arjuna.wst.WrongStateException if the subordinate coordinator does the same
-     * @throws com.arjuna.wst.SystemException if the subordinate coordinator does the same
+     * @throws com.arjuna.wst.WrongStateException
+     *             if the subordinate coordinator does the same
+     * @throws com.arjuna.wst.SystemException
+     *             if the subordinate coordinator does the same
      */
     public Vote prepare() throws WrongStateException, SystemException {
-        switch (coordinator.prepare())
-        {
-            case TwoPhaseOutcome.PREPARE_OK:
+        switch (coordinator.prepare()) {
+            case TwoPhaseOutcome.PREPARE_OK :
                 return new Prepared();
-            case TwoPhaseOutcome.PREPARE_READONLY:
+            case TwoPhaseOutcome.PREPARE_READONLY :
                 return new ReadOnly();
-            case TwoPhaseOutcome.PREPARE_NOTOK:
-            default:
+            case TwoPhaseOutcome.PREPARE_NOTOK :
+            default :
                 return new Aborted();
         }
     }
 
     /**
-     * this will be called when the parent coordinator commits its durable participants and should ensure
-     * that the interposed cooordinator does the same
+     * this will be called when the parent coordinator commits its durable
+     * participants and should ensure that the interposed cooordinator does the
+     * same
+     * 
      * @throws com.arjuna.wst.WrongStateException
      * @throws com.arjuna.wst.SystemException
      */
@@ -78,7 +84,8 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
             if (coordinator == null) {
                 // try fetching coordinator from the recovery manager
                 recoveryManager = XTSATRecoveryManager.getRecoveryManager();
-                // check whether recovery has started before we check for the presence
+                // check whether recovery has started before we check for the
+                // presence
                 // of the subordinate coordinator
                 isRecoveryScanStarted = recoveryManager.isSubordinateCoordinatorRecoveryStarted();
                 coordinator = SubordinateATCoordinator.getRecoveredCoordinator(coordinatorId);
@@ -90,23 +97,27 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
                     // throw an exception causing the commit to be retried later
                     throw new SystemException();
                 }
-                // ok we have no transaction to commit so assume we already committed it and
+                // ok we have no transaction to commit so assume we already
+                // committed it and
                 // return without error
-            } else if(!coordinator.isActivated()) {
-                // the transaction was logged but has not yet been recovered successfully
+            } else if (!coordinator.isActivated()) {
+                // the transaction was logged but has not yet been recovered
+                // successfully
                 // throw an exception causing the commit to be retried later
-                    throw new SystemException();
+                throw new SystemException();
             } else {
                 int status = coordinator.status();
 
                 if (status == ActionStatus.PREPARED || status == ActionStatus.COMMITTING) {
-                    // ok, the commit process was not previously initiated so start it now
+                    // ok, the commit process was not previously initiated so
+                    // start it now
                     coordinator.commit();
                     SubordinateATCoordinator.removeActiveProxy(coordinatorId);
                     status = coordinator.status();
                 }
 
-                // check that we are not still committing because of a comms timeout
+                // check that we are not still committing because of a comms
+                // timeout
 
                 if (status == ActionStatus.COMMITTING) {
                     // throw an exception causing the commit to be retried later
@@ -117,8 +128,10 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
     }
 
     /**
-     * this will be called when the parent coordinator rolls back its durable participants and should ensure
-     * that the interposed cooordinator does the same
+     * this will be called when the parent coordinator rolls back its durable
+     * participants and should ensure that the interposed cooordinator does the
+     * same
+     * 
      * @throws com.arjuna.wst.WrongStateException
      * @throws com.arjuna.wst.SystemException
      */
@@ -135,21 +148,22 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
             if (coordinator == null) {
                 if (!isRecoveryScanStarted) {
                     // the subtransaction may still be waiting to be resolved
-                    // throw an exception causing the rollback to be retried later
+                    // throw an exception causing the rollback to be retried
+                    // later
                     throw new SystemException();
                 }
-            } else if(!coordinator.isActivated()) {
-                // the transaction was logged but has not yet been recovered successfully
+            } else if (!coordinator.isActivated()) {
+                // the transaction was logged but has not yet been recovered
+                // successfully
                 // throw an exception causing the rollback to be retried later
-                    throw new SystemException();
+                throw new SystemException();
             } else {
                 int status = coordinator.status();
 
-                if ((status ==  ActionStatus.ABORTED) ||
-                        (status == ActionStatus.H_ROLLBACK) ||
-                        (status == ActionStatus.ABORTING) ||
-                        (status == ActionStatus.ABORT_ONLY)) {
-                    // ok, the rollback process was not previously initiated so start it now
+                if ((status == ActionStatus.ABORTED) || (status == ActionStatus.H_ROLLBACK)
+                        || (status == ActionStatus.ABORTING) || (status == ActionStatus.ABORT_ONLY)) {
+                    // ok, the rollback process was not previously initiated so
+                    // start it now
                     coordinator.rollback();
                     SubordinateATCoordinator.removeActiveProxy(coordinatorId);
                     status = coordinator.status();
@@ -160,6 +174,7 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
 
     /**
      * this should never get called
+     * 
      * @throws com.arjuna.wst.SystemException
      */
     public void unknown() throws SystemException {
@@ -168,6 +183,7 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
 
     /**
      * this should never get called
+     * 
      * @throws com.arjuna.wst.SystemException
      */
     public void error() throws SystemException {
@@ -176,11 +192,14 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
 
     /**
      * Save the state of the particpant to the specified input object stream.
-     * @param oos The output output stream.
+     * 
+     * @param oos
+     *            The output output stream.
      * @return true if persisted, false otherwise.
      */
     public boolean saveState(OutputObjectState oos) {
-        // we need to save the id of the subordinate coordinator so we can identify it again
+        // we need to save the id of the subordinate coordinator so we can
+        // identify it again
         // when we are recreated
         try {
             oos.packString(coordinatorId);
@@ -191,12 +210,16 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
     }
 
     /**
-     * Restore the state of the particpant from the specified input object stream.
-     * @param ios The Input object stream.
+     * Restore the state of the particpant from the specified input object
+     * stream.
+     * 
+     * @param ios
+     *            The Input object stream.
      * @return true if restored, false otherwise.
      */
     public boolean restoreState(InputObjectState ios) {
-        // restore the subordinate coordinator id so we can check to ensure it has been committed
+        // restore the subordinate coordinator id so we can check to ensure it
+        // has been committed
         try {
             coordinatorId = ios.unpackString();
             SubordinateATCoordinator.addActiveProxy(coordinatorId);
@@ -209,8 +232,7 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
     /**
      * test if this participant is recovered
      */
-    public boolean isRecovered()
-    {
+    public boolean isRecovered() {
         return recovered;
     }
 
@@ -231,8 +253,9 @@ public class SubordinateDurable2PCStub implements Durable2PCParticipant, Persist
     private boolean recovered;
 
     /**
-     * this participant implements the PersistableATarticipant interface so it can save its state.
-     * recovery is managed by an XTS recovery module
+     * this participant implements the PersistableATarticipant interface so it
+     * can save its state. recovery is managed by an XTS recovery module
+     * 
      * @return the recover state for the stub
      * @throws Exception
      */

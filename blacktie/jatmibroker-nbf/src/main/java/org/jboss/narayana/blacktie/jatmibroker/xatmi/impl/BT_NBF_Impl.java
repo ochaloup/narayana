@@ -35,7 +35,8 @@ public class BT_NBF_Impl extends BufferImpl implements BT_NBF {
     private NBFParser parser;
     private String rootElement;
 
-    public BT_NBF_Impl(String subtype) throws org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException, ConnectionException {
+    public BT_NBF_Impl(String subtype)
+            throws org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException, ConnectionException {
         super("BT_NBF", subtype, false, null);
 
         rootElement = "</" + subtype + ">";
@@ -267,7 +268,8 @@ public class BT_NBF_Impl extends BufferImpl implements BT_NBF {
                             + buf.substring(pos + attrId.length() + 2 + length, size);
                     // log.info(buf.substring(0, pos + attrId.length() + 2));
                     // log.info(tmp);
-                    // log.info(buf.substring(pos + attrId.length() + 2 + length, size));
+                    // log.info(buf.substring(pos + attrId.length() + 2 +
+                    // length, size));
                     setRawData(buf.getBytes());
                 }
             }

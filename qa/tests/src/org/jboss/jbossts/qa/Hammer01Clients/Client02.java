@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.Hammer01Clients;
  * $Id: Client02.java,v 1.2 2003/06/26 11:43:57 rbegg Exp $
  */
 
-
 import com.arjuna.ats.jts.extensions.AtomicTransaction;
 import org.jboss.jbossts.qa.Hammer01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -67,12 +66,9 @@ import org.omg.CosTransactions.Status;
 
 import java.util.Random;
 
-public class Client02
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client02 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -87,34 +83,25 @@ public class Client02
             work(numberOfOperations);
 
             System.out.println("Passed");
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client02.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 
-    private static void work(int numberOfOperations)
-            throws Exception
-    {
+    private static void work(int numberOfOperations) throws Exception {
         int count = 0;
-        for (int i = 0; i < numberOfOperations; i++)
-        {
-            if (operation())
-            {
+        for (int i = 0; i < numberOfOperations; i++) {
+            if (operation()) {
                 count++;
             }
         }
@@ -122,21 +109,16 @@ public class Client02
         System.err.println("Work: done " + count + " of " + numberOfOperations);
     }
 
-    private static boolean operation()
-            throws Exception
-    {
+    private static boolean operation() throws Exception {
         boolean successful = false;
 
-        try
-        {
+        try {
             AtomicTransaction atomicTransaction = new AtomicTransaction();
 
-            try
-            {
+            try {
                 atomicTransaction.begin();
 
-                try
-                {
+                try {
                     int d = Math.abs(_random.nextInt() % 10) + 1;
 
                     int x0 = Math.abs(_random.nextInt() % _matrixWidth);
@@ -154,36 +136,25 @@ public class Client02
                     _matrix.set_value(x1, y1, location0Value.value - d);
 
                     successful = (x0 != x1) || (y0 != y1);
-                }
-                catch (InvocationException invocationException)
-                {
-                    if (invocationException.myreason != Reason.ReasonConcurrencyControl)
-                    {
+                } catch (InvocationException invocationException) {
+                    if (invocationException.myreason != Reason.ReasonConcurrencyControl) {
                         throw invocationException;
                     }
                 }
 
-                if (successful)
-                {
+                if (successful) {
                     atomicTransaction.commit(true);
-                }
-                else
-                {
+                } else {
                     atomicTransaction.rollback();
                 }
-            }
-            catch (Exception exception)
-            {
-                if (atomicTransaction.get_status() == Status.StatusActive)
-                {
+            } catch (Exception exception) {
+                if (atomicTransaction.get_status() == Status.StatusActive) {
                     atomicTransaction.rollback();
                 }
 
                 throw exception;
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client02.operation: " + exception);
             exception.printStackTrace(System.err);
             throw exception;

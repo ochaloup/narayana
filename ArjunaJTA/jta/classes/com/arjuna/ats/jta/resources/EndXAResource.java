@@ -33,6 +33,5 @@ package com.arjuna.ats.jta.resources;
 
 import javax.transaction.xa.XAResource;
 
-public interface EndXAResource extends XAResource
-{
+public interface EndXAResource extends XAResource {
 }

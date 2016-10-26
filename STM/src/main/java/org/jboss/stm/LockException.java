@@ -29,12 +29,10 @@ package org.jboss.stm;
  *
  */
 
-public class LockException extends RuntimeException
-{
-    public LockException (String reason)
-    {
+public class LockException extends RuntimeException {
+    public LockException(String reason) {
         super(reason);
     }
-    
+
     private static final long serialVersionUID = 1L;
 }

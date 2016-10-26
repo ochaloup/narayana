@@ -36,8 +36,7 @@ import java.util.Collection;
 /**
  * Utility class for interaction with a transaction log
  */
-public class TransactionLog
-{
+public class TransactionLog {
     /**
      * Default object type for recoveryStore operations
      */
@@ -45,41 +44,37 @@ public class TransactionLog
 
     private RecoveryStore recoveryStore;
 
-    public TransactionLog(String storeDir, String impleType)
-    {
+    public TransactionLog(String storeDir, String impleType) {
         init(storeDir, impleType);
     }
 
-    private void init(String storeDir, String impleType)
-    {
+    private void init(String storeDir, String impleType) {
         ObjectStoreEnvironmentBean objectStoreEnvironmentBean = arjPropertyManager.getObjectStoreEnvironmentBean();
         objectStoreEnvironmentBean.setObjectStoreDir(storeDir);
 
-        if (impleType != null)
-        {
-            try
-            {
+        if (impleType != null) {
+            try {
                 Class c = Class.forName(impleType);
-                
+
                 recoveryStore = (RecoveryStore) c.newInstance();
-            }
-            catch (final Throwable ex)
-            {
+            } catch (final Throwable ex) {
                 ex.printStackTrace();
             }
-        }
-        else
+        } else
             recoveryStore = StoreManager.getRecoveryStore();
     }
 
     /**
      * Remove any committed objects from the storer
-     * @param objectType the type of objects that should be removed
+     * 
+     * @param objectType
+     *            the type of objects that should be removed
      * @return the number of objects that were purged
-     * @throws ObjectStoreException the recoveryStore implementation was unable to remove a committed object
+     * @throws ObjectStoreException
+     *             the recoveryStore implementation was unable to remove a
+     *             committed object
      */
-    public int clearXids(String objectType) throws ObjectStoreException
-    {
+    public int clearXids(String objectType) throws ObjectStoreException {
         Collection<Uid> uids = getIds(objectType);
 
         for (Uid uid : uids)
@@ -88,58 +83,52 @@ public class TransactionLog
         return uids.size();
     }
 
-    public Collection<Uid> getIds(String objectType) throws ObjectStoreException
-    {
+    public Collection<Uid> getIds(String objectType) throws ObjectStoreException {
         return getIds(null, objectType);
     }
 
     /**
      * Get a list object ids for a given object type
      *
-     * @param ids holder for the returned uids
-     * @param objectType The type of object to search in the recoveryStore for
+     * @param ids
+     *            holder for the returned uids
+     * @param objectType
+     *            The type of object to search in the recoveryStore for
      * @return all objects of the given type
-     * @throws ObjectStoreException the recoveryStore implementation was unable retrieve all types of objects
+     * @throws ObjectStoreException
+     *             the recoveryStore implementation was unable retrieve all
+     *             types of objects
      */
-    public Collection<Uid> getIds(Collection<Uid> ids, String objectType) throws ObjectStoreException
-    {
+    public Collection<Uid> getIds(Collection<Uid> ids, String objectType) throws ObjectStoreException {
         if (ids == null)
-            ids = new ArrayList<Uid> ();
-
+            ids = new ArrayList<Uid>();
 
         InputObjectState types = new InputObjectState();
 
-        if (recoveryStore.allTypes(types))
-        {
+        if (recoveryStore.allTypes(types)) {
             String theName;
 
-            try
-            {
+            try {
                 boolean endOfList = false;
 
-                while (!endOfList)
-                {
+                while (!endOfList) {
                     theName = types.unpackString();
 
                     if (theName.compareTo("") == 0)
                         endOfList = true;
-                    else
-                    {
+                    else {
                         if (objectType != null && !theName.equals(objectType))
                             continue;
 
                         InputObjectState uids = new InputObjectState();
 
-                        if (recoveryStore.allObjUids(theName, uids))
-                        {
+                        if (recoveryStore.allObjUids(theName, uids)) {
                             Uid theUid = new Uid(Uid.nullUid());
 
-                            try
-                            {
+                            try {
                                 boolean endOfUids = false;
 
-                                while (!endOfUids)
-                                {
+                                while (!endOfUids) {
                                     theUid = UidHelper.unpackFrom(uids);
 
                                     if (theUid.equals(Uid.nullUid()))
@@ -147,9 +136,7 @@ public class TransactionLog
                                     else
                                         ids.add(theUid);
                                 }
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 // end of uids!
                             }
                         }
@@ -157,9 +144,7 @@ public class TransactionLog
                         System.out.println();
                     }
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 System.err.println(e);
 
                 // end of list!
@@ -169,8 +154,7 @@ public class TransactionLog
         return ids;
     }
 
-    public int getStatus(Uid uid)
-    {
+    public int getStatus(Uid uid) {
         AtomicAction action = new AtomicAction(uid);
 
         action.activate();

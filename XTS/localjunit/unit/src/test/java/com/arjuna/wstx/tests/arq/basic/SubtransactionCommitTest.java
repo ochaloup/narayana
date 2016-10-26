@@ -21,15 +21,11 @@ public class SubtransactionCommitTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                DemoDurableParticipant.class,
-                DemoVolatileParticipant.class);
+        return WarDeployment.getDeployment(DemoDurableParticipant.class, DemoVolatileParticipant.class);
     }
 
     @Test
-    public void testSubTransactionCommit()
-            throws Exception
-            {
+    public void testSubTransactionCommit() throws Exception {
         final UserTransaction ut = UserTransactionFactory.userTransaction();
         final UserTransaction ust = UserTransactionFactory.userSubordinateTransaction();
         final TransactionManager tm = TransactionManager.getTransactionManager();
@@ -56,5 +52,5 @@ public class SubtransactionCommitTest {
         assertTrue(p2.prepared() && p2.resolved() && p2.passed());
         assertTrue(p3.prepared() && p3.resolved() && p3.passed());
         assertTrue(p4.prepared() && p4.resolved() && p4.passed());
-            }
+    }
 }

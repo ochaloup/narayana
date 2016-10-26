@@ -35,7 +35,8 @@ public class X_OCTET_Impl extends BufferImpl implements X_OCTET {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Populated by the list of supported types for this buffer, in this case byte[]
+     * Populated by the list of supported types for this buffer, in this case
+     * byte[]
      */
     private static List<Class> types = new ArrayList<Class>();
 
@@ -43,16 +44,18 @@ public class X_OCTET_Impl extends BufferImpl implements X_OCTET {
      * Populate the list
      */
     static {
-        Class[] x_octetType = new Class[] { byte[].class };
+        Class[] x_octetType = new Class[]{byte[].class};
         for (int i = 0; i < x_octetType.length; i++) {
             types.add(x_octetType[i]);
         }
     }
 
     /**
-     * The constructor is hidden as it should be created from the Connection factory method.
+     * The constructor is hidden as it should be created from the Connection
+     * factory method.
      * 
-     * @param subtype Ignored, provided for reflective ease
+     * @param subtype
+     *            Ignored, provided for reflective ease
      * 
      * @throws ConnectionException
      * @throws ConfigurationException
@@ -64,7 +67,8 @@ public class X_OCTET_Impl extends BufferImpl implements X_OCTET {
     /**
      * Set the data of the buffer.
      * 
-     * @param bytes The data to set.
+     * @param bytes
+     *            The data to set.
      */
     public void setByteArray(byte[] bytes) {
         super.setRawData(bytes);

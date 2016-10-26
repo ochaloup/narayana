@@ -27,24 +27,21 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class PerformanceGraphFrame extends JFrame
-{
+public class PerformanceGraphFrame extends JFrame {
     private XYGraphingBean _graphingBean;
 
-    public PerformanceGraphFrame(PerformanceLogger p)
-    {
-        setTitle("Performance Graph ("+p.getDataName()+")");
+    public PerformanceGraphFrame(PerformanceLogger p) {
+        setTitle("Performance Graph (" + p.getDataName() + ")");
 
         _graphingBean = new XYGraphingBean();
         _graphingBean.addDataSeries(createDataSeries(p));
         _graphingBean.setXAxisLabel(p.getXAxisLabel());
         _graphingBean.setYAxisLabel(p.getYAxisLabel());
 
-        this.setSize(400,300);
+        this.setSize(400, 300);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e)
-            {
+            public void windowClosed(WindowEvent e) {
                 super.windowClosing(e);
 
                 System.exit(0);
@@ -53,21 +50,17 @@ public class PerformanceGraphFrame extends JFrame
         show();
     }
 
-
-    private XYDataSeries createDataSeries(PerformanceLogger logger)
-    {
+    private XYDataSeries createDataSeries(PerformanceLogger logger) {
         ArrayList data = logger.getData();
         XYDataSeries series = new XYDataSeries(Color.blue);
 
-        for (int count=0;count<data.size();count++)
-        {
-            XYData point = (XYData)data.get(count);
-            series.addPoint( new XYDataPoint( point.getX(), point.getY() ) );
+        for (int count = 0; count < data.size(); count++) {
+            XYData point = (XYData) data.get(count);
+            series.addPoint(new XYDataPoint(point.getX(), point.getY()));
         }
 
         return series;
     }
-
 
     /**
      * Paints the container. This forwards the paint to any lightweight
@@ -77,24 +70,24 @@ public class PerformanceGraphFrame extends JFrame
      * clipped by the current clipping setting in g, paint() will not be
      * forwarded to that child.
      *
-     * @param g the specified Graphics window
-     * @see   java.awt.Component#update(java.awt.Graphics)
+     * @param g
+     *            the specified Graphics window
+     * @see java.awt.Component#update(java.awt.Graphics)
      */
-    public void paint(Graphics g)
-    {
+    public void paint(Graphics g) {
         BufferedImage img = _graphingBean.createGraphImage(this.getWidth(), this.getHeight());
 
-        g.drawImage(img,0,0,this);
+        g.drawImage(img, 0, 0, this);
     }
 
     /**
-     * Just calls <code>paint(g)</code>.  This method was overridden to
-     * prevent an unnecessary call to clear the background.
+     * Just calls <code>paint(g)</code>. This method was overridden to prevent
+     * an unnecessary call to clear the background.
      *
-     * @param g the Graphics context in which to paint
+     * @param g
+     *            the Graphics context in which to paint
      */
-    public void update(Graphics g)
-    {
+    public void update(Graphics g) {
         paint(g);
     }
 }

@@ -36,11 +36,9 @@ import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import javax.transaction.xa.XAResource;
 import java.sql.SQLException;
 
-public class DummyXARecoveryResource implements XAResourceRecovery
-{
+public class DummyXARecoveryResource implements XAResourceRecovery {
 
-    public XAResource getXAResource() throws SQLException
-    {
+    public XAResource getXAResource() throws SQLException {
         count++;
 
         return new RecoveryXAResource();
@@ -49,33 +47,28 @@ public class DummyXARecoveryResource implements XAResourceRecovery
     /**
      * Initialise with all properties required to create the resource(s).
      *
-     * @param String p An arbitrary string from which initialization data
-     *               is obtained.
+     * @param String
+     *            p An arbitrary string from which initialization data is
+     *            obtained.
      * @return <code>true</code> if initialization happened successfully,
      *         <code>false</code> otherwise.
      */
 
-    public boolean initialise(String p) throws SQLException
-    {
+    public boolean initialise(String p) throws SQLException {
         return true;
     }
 
     /**
-     * Iterate through all of the resources this instance provides
-     * access to.
+     * Iterate through all of the resources this instance provides access to.
      *
-     * @return <code>true</code> if this instance can provide more
-     *         resources, <code>false</code> otherwise.
+     * @return <code>true</code> if this instance can provide more resources,
+     *         <code>false</code> otherwise.
      */
 
-    public boolean hasMoreResources()
-    {
-        if (count <= 1)
-        {
+    public boolean hasMoreResources() {
+        if (count <= 1) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }

@@ -29,12 +29,11 @@ import org.jboss.jbossts.xts.environment.XTSPropertyManager;
 
 /**
  * Activate the Completion Coordinator service
+ * 
  * @author kevin
  */
-public class CompletionCoordinatorRPCInitialisation
-{
-    public static void startup()
-    {
+public class CompletionCoordinatorRPCInitialisation {
+    public static void startup() {
         final ServiceRegistry serviceRegistry = PrivilegedServiceRegistryFactory.getInstance().getServiceRegistry();
         WSCEnvironmentBean wscEnvironmentBean = XTSPropertyManager.getWSCEnvironmentBean();
         String bindAddress = wscEnvironmentBean.getBindAddress11();
@@ -45,7 +44,6 @@ public class CompletionCoordinatorRPCInitialisation
         if (coordinatorServiceURLPath == null) {
             coordinatorServiceURLPath = "/ws-t11-coordinator";
         }
-
 
         if (bindAddress == null) {
             bindAddress = "localhost";
@@ -59,16 +57,18 @@ public class CompletionCoordinatorRPCInitialisation
             secureBindPort = 8443;
         }
 
-        final String baseUri = "http://" +  bindAddress + ":" + bindPort + coordinatorServiceURLPath;
+        final String baseUri = "http://" + bindAddress + ":" + bindPort + coordinatorServiceURLPath;
         final String uri = baseUri + "/" + AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME;
-        final String secureBaseUri = "https://" +  bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
-        final String secureUri = secureBaseUri + "/" + AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME;
+        final String secureBaseUri = "https://" + bindAddress + ":" + secureBindPort + coordinatorServiceURLPath;
+        final String secureUri = secureBaseUri + "/"
+                + AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME;
 
-        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME, uri) ;
-        serviceRegistry.registerSecureServiceProvider(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME, secureUri) ;
+        serviceRegistry.registerServiceProvider(AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME,
+                uri);
+        serviceRegistry.registerSecureServiceProvider(
+                AtomicTransactionConstants.COMPLETION_COORDINATOR_RPC_SERVICE_NAME, secureUri);
     }
 
-    public static void shutdown()
-    {
+    public static void shutdown() {
     }
 }

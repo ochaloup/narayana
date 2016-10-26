@@ -40,11 +40,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Starts a transaction and enlists a single participant with instructions to prepare and commit
- * without error
+ * Starts a transaction and enlists a single participant with instructions to
+ * prepare and commit without error
  */
-public class SingleParticipantCompletionParticipantCloseTest extends XTSServiceTestBase implements XTSServiceTest
-{
+public class SingleParticipantCompletionParticipantCloseTest extends XTSServiceTestBase implements XTSServiceTest {
     public void run() {
 
         // wait a while so the service has time to start
@@ -106,20 +105,13 @@ public class SingleParticipantCompletionParticipantCloseTest extends XTSServiceT
 
         /*
          * this can also be done by calling serve with a single block command
-        commands.add("serve");
-        commands.add("{service1}");
-        commands.add("block");
-        commands.add("enlistParticipantCompletion");
-        commands.add("close");
-        commands.add("bind");
-        commands.add("P1");
-        commands.add("0");
-        commands.add("next");
-        commands.add("completed");
-        commands.add("{P1}");
-        commands.add("endblock");
-        */
-        
+         * commands.add("serve"); commands.add("{service1}");
+         * commands.add("block"); commands.add("enlistParticipantCompletion");
+         * commands.add("close"); commands.add("bind"); commands.add("P1");
+         * commands.add("0"); commands.add("next"); commands.add("completed");
+         * commands.add("{P1}"); commands.add("endblock");
+         */
+
         try {
             processCommands(commands, results);
         } catch (Exception e) {

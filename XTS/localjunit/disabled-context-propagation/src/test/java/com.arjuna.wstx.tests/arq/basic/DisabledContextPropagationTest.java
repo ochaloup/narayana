@@ -48,7 +48,8 @@ import java.util.List;
 /**
  * Tests WSTXFeature and DisabledWSTXHandler with WS-AT protocol.
  *
- * <code>default-context-propagation</code> in standalone.xml has to be disabled.
+ * <code>default-context-propagation</code> in standalone.xml has to be
+ * disabled.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -57,9 +58,10 @@ public final class DisabledContextPropagationTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return WarDeployment.getDeployment(TestService.class, TestServiceImple.class,
-                TestServiceClient.class, TestServiceAT.class, TestServiceATImple.class, TestServiceATClient.class,
-                WSTXFeature.class).addAsResource("context-handlers.xml");
+        return WarDeployment
+                .getDeployment(TestService.class, TestServiceImple.class, TestServiceClient.class, TestServiceAT.class,
+                        TestServiceATImple.class, TestServiceATClient.class, WSTXFeature.class)
+                .addAsResource("context-handlers.xml");
     }
 
     @After
@@ -102,7 +104,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context, WSTXFeature, and with disabled WSTX handler.
+     * Tests service invocation without transaction context, WSTXFeature, and
+     * with disabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -116,8 +119,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context, WSTXFeature, and with disabled WSTX
-     * handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context, WSTXFeature, and with disabled WSTX handler.
      *
      * No two phase commit calls and no exception is expected.
      */
@@ -163,7 +166,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context but with enabled WSTXFeature and with disabled WSTX handler.
+     * Tests service invocation without transaction context but with enabled
+     * WSTXFeature and with disabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -177,8 +181,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context but with enabled WSTXFeature, and with
-     * disabled WSTX handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context but with enabled WSTXFeature, and with disabled WSTX handler.
      *
      * SOAPFaultException is expected.
      */
@@ -192,7 +196,8 @@ public final class DisabledContextPropagationTest {
             client.increment();
             throw new RuntimeException("SOAPFaultException was expected");
         } catch (SOAPFaultException e) {
-            // TODO for some reason <code>@Test(expected = SOAPFaultException.class)</code> did not work.
+            // TODO for some reason <code>@Test(expected =
+            // SOAPFaultException.class)</code> did not work.
         }
     }
 
@@ -229,7 +234,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation without transaction context but with disabled WSTXFeature and disabled WSTX handler.
+     * Tests service invocation without transaction context but with disabled
+     * WSTXFeature and disabled WSTX handler.
      *
      * No two phase commit calls are expected.
      */
@@ -243,8 +249,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests invocation to the non-transactional service without transaction context but with disabled WSTXFeature, and with
-     * disabled WSTX handler.
+     * Tests invocation to the non-transactional service without transaction
+     * context but with disabled WSTXFeature, and with disabled WSTX handler.
      *
      * No two phase commit calls and no exceptions are expected.
      */
@@ -258,7 +264,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers
+     * JaxWSHeaderContextProcessor with binding provider manually.
      *
      * Prepare and commit calls are expected.
      *
@@ -276,7 +283,8 @@ public final class DisabledContextPropagationTest {
     }
 
     /**
-     * Tests service invocation using client which registers JaxWSHeaderContextProcessor with binding provider manually.
+     * Tests service invocation using client which registers
+     * JaxWSHeaderContextProcessor with binding provider manually.
      *
      * Rollback call is expected.
      *

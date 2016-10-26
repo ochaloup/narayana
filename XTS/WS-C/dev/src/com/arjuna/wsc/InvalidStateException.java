@@ -26,14 +26,11 @@
 
 package com.arjuna.wsc;
 
-public class InvalidStateException extends Exception
-{
-    public InvalidStateException()
-    {
+public class InvalidStateException extends Exception {
+    public InvalidStateException() {
     }
 
-    public InvalidStateException(String message)
-    {
+    public InvalidStateException(String message) {
         super(message);
     }
 }

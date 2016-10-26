@@ -55,7 +55,8 @@ public class XMLParser {
     /**
      * Constructor
      * 
-     * @param handler - DefaultHandler for the SAX parser
+     * @param handler
+     *            - DefaultHandler for the SAX parser
      */
     private XMLParser(String xsdFilename, String env) throws ConfigurationException {
         this.handler = new XMLEnvHandler(properties);
@@ -115,7 +116,8 @@ public class XMLParser {
                 throw new ConfigurationException("Errors parse : " + env + " due to: " + t.getMessage(), t);
             }
         } else {
-            throw new ConfigurationException("Could not load the configuration file: " + env + " please update your CLASSPATH");
+            throw new ConfigurationException(
+                    "Could not load the configuration file: " + env + " please update your CLASSPATH");
         }
     }
 
@@ -123,7 +125,8 @@ public class XMLParser {
         return properties;
     }
 
-    public static void loadProperties(String schemaName, String configFile, Properties prop) throws ConfigurationException {
+    public static void loadProperties(String schemaName, String configFile, Properties prop)
+            throws ConfigurationException {
         log.trace("Detecting the filename");
         String env = configFile;
         String configDir = System.getenv("BLACKTIE_CONFIGURATION_DIR");

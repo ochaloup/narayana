@@ -42,12 +42,14 @@ import org.junit.runner.RunWith;
  * <a href="https://issues.jboss.org/browse/JBTM-2350">JBTM-2350</a>.
  * </p>
  * <p>
- * Test weather transaction management type(user transaction availability) is correctly restored when method
- * annotated {@link Transactional @Transactional} is invoked recursively.
+ * Test weather transaction management type(user transaction availability) is
+ * correctly restored when method annotated {@link Transactional @Transactional}
+ * is invoked recursively.
  * </p>
  *
- * @author <a href="mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz Krakowiak
- *         &lt;tomasz.krakowiak@efish.pl&gt;</a>
+ * @author <a href=
+ *         "mailto:Tomasz%20Krakowiak%20%3ctomasz.krakowiak@efish.pl%3c">Tomasz
+ *         Krakowiak &lt;tomasz.krakowiak@efish.pl&gt;</a>
  */
 @RunWith(Arquillian.class)
 public class RecursiveTransactionalTest {
@@ -66,8 +68,7 @@ public class RecursiveTransactionalTest {
 
     @Deployment
     public static WebArchive createTestArchive() {
-        return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
+        return ShrinkWrap.create(WebArchive.class, "test.war").addPackage("com.hp.mwtests.ts.jta.cdi.transactional")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -107,26 +108,21 @@ public class RecursiveTransactionalTest {
         boolean expectedAvailable = oppositeTransactionManagementType == TransactionManagementType.BEAN;
         Runnable runnable = helper.runWithTransactionManagement(oppositeTransactionManagementType, startTransaction,
                 helper.runAndCheckUserTransactionAvailability(
-                        helper.runInTxType(txType,
-                                helper.runInTxType(txType, DO_NOTHING)
-                        ),
-                        expectedAvailable
-                )
-        );
+                        helper.runInTxType(txType, helper.runInTxType(txType, DO_NOTHING)), expectedAvailable));
         runnable.run();
     }
 
     private TransactionManagementType oppositeTransactionManagementType(TxType txType) {
         switch (txType) {
-            case REQUIRED:
-            case REQUIRES_NEW:
-            case MANDATORY:
-            case SUPPORTS:
+            case REQUIRED :
+            case REQUIRES_NEW :
+            case MANDATORY :
+            case SUPPORTS :
                 return TransactionManagementType.BEAN;
-            case NOT_SUPPORTED:
-            case NEVER:
+            case NOT_SUPPORTED :
+            case NEVER :
                 return TransactionManagementType.CONTAINER;
-            default:
+            default :
                 throw new RuntimeException("Unexpected tx type " + txType);
         }
     }

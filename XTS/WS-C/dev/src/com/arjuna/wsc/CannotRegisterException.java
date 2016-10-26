@@ -24,14 +24,11 @@
 
 package com.arjuna.wsc;
 
-public class CannotRegisterException extends Exception
-{
-    public CannotRegisterException()
-    {
+public class CannotRegisterException extends Exception {
+    public CannotRegisterException() {
     }
 
-    public CannotRegisterException(String message)
-    {
+    public CannotRegisterException(String message) {
         super(message);
     }
 }

@@ -41,23 +41,19 @@ import com.arjuna.mw.wsas.status.Status;
  * @since 1.0.
  */
 
-public class Committing implements Status
-{
+public class Committing implements Status {
 
-    public static Committing instance ()
-    {
-    return _instance;
-    }
-    
-    public String toString ()
-    {
-    return "Status.Committing";
+    public static Committing instance() {
+        return _instance;
     }
 
-    private Committing ()
-    {
+    public String toString() {
+        return "Status.Committing";
+    }
+
+    private Committing() {
     }
 
     private static final Committing _instance = new Committing();
-    
+
 }

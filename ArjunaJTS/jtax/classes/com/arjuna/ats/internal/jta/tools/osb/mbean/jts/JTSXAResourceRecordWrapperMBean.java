@@ -7,5 +7,5 @@ import com.arjuna.ats.internal.jta.tools.osb.mbean.jta.XARecoveryResourceMBean;
  */
 public interface JTSXAResourceRecordWrapperMBean extends XARecoveryResourceMBean {
 
-    public void clearHeuristic() ;
+    public void clearHeuristic();
 }

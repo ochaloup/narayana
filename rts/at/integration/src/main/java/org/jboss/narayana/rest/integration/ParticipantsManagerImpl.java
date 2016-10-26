@@ -40,7 +40,8 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
     }
 
     @Override
-    public String enlist(final String applicationId, final String participantEnlistmentURL, final Participant participant) {
+    public String enlist(final String applicationId, final String participantEnlistmentURL,
+            final Participant participant) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("ParticipantsManagerImpl.enlist: applicationId=" + applicationId + ", participantEnlistmentURL="
                     + participantEnlistmentURL + ", participant=" + participant);
@@ -116,23 +117,23 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
                 .getParticipantInformation(participantId);
 
         switch (heuristicType) {
-            case HEURISTIC_ROLLBACK:
+            case HEURISTIC_ROLLBACK :
                 participantInformation.setStatus(TxStatus.TransactionHeuristicRollback.name());
                 break;
 
-            case HEURISTIC_COMMIT:
+            case HEURISTIC_COMMIT :
                 participantInformation.setStatus(TxStatus.TransactionHeuristicCommit.name());
                 break;
 
-            case HEURISTIC_HAZARD:
+            case HEURISTIC_HAZARD :
                 participantInformation.setStatus(TxStatus.TransactionHeuristicHazard.name());
                 break;
 
-            case HEURISTIC_MIXED:
+            case HEURISTIC_MIXED :
                 participantInformation.setStatus(TxStatus.TransactionHeuristicMixed.name());
                 break;
 
-            default:
+            default :
                 throw new IllegalArgumentException("Unknown heuristic type");
         }
 
@@ -155,8 +156,8 @@ public final class ParticipantsManagerImpl implements ParticipantsManager {
 
     private void enlistVolatileParticipant(final String participantUrl, final String volatileParticipantEnlistmentURL) {
         final StringBuilder linkHeader = new StringBuilder();
-        linkHeader.append("<").append(participantUrl).append(">; rel=\"")
-                .append(TxLinkNames.VOLATILE_PARTICIPANT).append("\"");
+        linkHeader.append("<").append(participantUrl).append(">; rel=\"").append(TxLinkNames.VOLATILE_PARTICIPANT)
+                .append("\"");
 
         final String participantLinkHeader = linkHeader.toString();
 

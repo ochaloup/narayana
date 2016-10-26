@@ -36,8 +36,7 @@ import javax.naming.InitialContext;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
-public class UserTransaction
-{
+public class UserTransaction {
 
     /**
      * Retrieve a reference to the user transaction.
@@ -45,16 +44,13 @@ public class UserTransaction
      * @return The user transaction bound to the appropriate JNDI context
      */
 
-    public static synchronized javax.transaction.UserTransaction userTransaction (InitialContext ctx)
-    {
+    public static synchronized javax.transaction.UserTransaction userTransaction(InitialContext ctx) {
         javax.transaction.UserTransaction userTransaction = null;
 
-        try
-        {
-            userTransaction = (javax.transaction.UserTransaction) ctx.lookup(jtaPropertyManager.getJTAEnvironmentBean().getUserTransactionJNDIContext());
-        }
-        catch (Exception e)
-        {
+        try {
+            userTransaction = (javax.transaction.UserTransaction) ctx
+                    .lookup(jtaPropertyManager.getJTAEnvironmentBean().getUserTransactionJNDIContext());
+        } catch (Exception e) {
             jtaLogger.i18NLogger.warn_UserTransaction_jndifailure(e);
         }
 
@@ -67,9 +63,8 @@ public class UserTransaction
      * @return The singleton UserTransaction reference. Can return null if the
      *         instantiation failed.
      */
-    
-    public static synchronized javax.transaction.UserTransaction userTransaction ()
-    {
+
+    public static synchronized javax.transaction.UserTransaction userTransaction() {
         return jtaPropertyManager.getJTAEnvironmentBean().getUserTransaction();
     }
 }

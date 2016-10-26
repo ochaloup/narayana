@@ -48,7 +48,7 @@ public class RecoverConnectableAtomicAction extends AtomicAction {
             throws ObjectStoreException, IOException {
         super(rcvUid);
         this.recoveringAs = type;
-        
+
         // Unpack BasicAction::save_state preamble
         Header hdr = new Header();
         unpackHeader(os, hdr);
@@ -86,8 +86,7 @@ public class RecoverConnectableAtomicAction extends AtomicAction {
 
     public void updateCommitMarkableResourceRecord(boolean committed) {
         activate();
-        CommitMarkableResourceRecord peekFront = (CommitMarkableResourceRecord) preparedList
-                .peekFront();
+        CommitMarkableResourceRecord peekFront = (CommitMarkableResourceRecord) preparedList.peekFront();
         peekFront.updateOutcome(committed);
         if (tsLogger.logger.isTraceEnabled()) {
             tsLogger.logger.trace("Moving " + get_uid() + " to an AAR so it won't get processed this time");

@@ -29,17 +29,16 @@ import javax.transaction.xa.Xid;
 /**
  * Implementation of XAResource for use in txbridge recovery tests.
  *
- * Note: TestXAResourceRecovered cannot directly extend TestXAResource, otherwise
- * TestXAResource will be every time instrumented together with TestXAResourceRecovered
- * which will deny the distinction between them and will increase the number of
- * known instrumented instances of TestXAResource, for example in InboundCrashRecoveryTests#testCrashOneLog
- * if the recovery process is run on the server side before the following assert:
- *   ...
- *   execute(baseURL + TestClient.URL_PATTERN, false);
- *   // if recovery process is run before the next assert and if TestXAResourceRecovered
- *   // extends TestXAResource then the assert will fail because of 2 known instances
- *   instrumentedTestXAResource.assertKnownInstances(1);
- *   ...
+ * Note: TestXAResourceRecovered cannot directly extend TestXAResource,
+ * otherwise TestXAResource will be every time instrumented together with
+ * TestXAResourceRecovered which will deny the distinction between them and will
+ * increase the number of known instrumented instances of TestXAResource, for
+ * example in InboundCrashRecoveryTests#testCrashOneLog if the recovery process
+ * is run on the server side before the following assert: ... execute(baseURL +
+ * TestClient.URL_PATTERN, false); // if recovery process is run before the next
+ * assert and if TestXAResourceRecovered // extends TestXAResource then the
+ * assert will fail because of 2 known instances
+ * instrumentedTestXAResource.assertKnownInstances(1); ...
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-01
  * @author Ivo Studensky (istudens@redhat.com)

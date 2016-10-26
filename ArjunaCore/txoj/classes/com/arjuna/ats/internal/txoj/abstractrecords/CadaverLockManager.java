@@ -50,11 +50,9 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  *
  */
 
-class CadaverLockManager extends LockManager
-{
+class CadaverLockManager extends LockManager {
 
-    public CadaverLockManager(Uid objUid, String tName)
-    {
+    public CadaverLockManager(Uid objUid, String tName) {
         super(objUid);
 
         objectTypeName = new String(tName);
@@ -68,18 +66,15 @@ class CadaverLockManager extends LockManager
      * Publically inherited functions
      */
 
-    public boolean restore_state (InputObjectState os, int t)
-    {
+    public boolean restore_state(InputObjectState os, int t) {
         return false;
     }
 
-    public boolean save_state (OutputObjectState os, int t)
-    {
+    public boolean save_state(OutputObjectState os, int t) {
         return false;
     }
 
-    public String type ()
-    {
+    public String type() {
         return objectTypeName;
     }
 

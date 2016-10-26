@@ -37,10 +37,9 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
-public class TransactionImple
-        extends
-        com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple implements SubordinateTransaction
-{
+public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple
+        implements
+            SubordinateTransaction {
 
     /**
      * Create a new transaction with the specified timeout.
@@ -48,13 +47,11 @@ public class TransactionImple
      * @deprecated Only used by tests
      */
 
-    public TransactionImple(int timeout)
-    {
+    public TransactionImple(int timeout) {
         this(timeout, null);
     }
 
-    public TransactionImple(int timeout, Xid importedXid)
-    {
+    public TransactionImple(int timeout, Xid importedXid) {
         super(new SubordinateAtomicAction(timeout, importedXid));
 
         TransactionImple.putTransaction(this);
@@ -67,19 +64,17 @@ public class TransactionImple
      *            the transaction state to recover.
      */
 
-    public TransactionImple(Uid actId)
-    {
+    public TransactionImple(Uid actId) {
         super(new SubordinateAtomicAction(actId));
 
         // don't put it into list here: it may already be there!
     }
-    
+
     public String getParentNodeName() {
-        return ((SubordinateAtomicAction)_theTransaction).getParentNodeName();
+        return ((SubordinateAtomicAction) _theTransaction).getParentNodeName();
     }
 
-    public final void recordTransaction()
-    {
+    public final void recordTransaction() {
         TransactionImple.putTransaction(this);
     }
 
@@ -87,8 +82,7 @@ public class TransactionImple
      * Overloads Object.equals()
      */
 
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("TransactionImple.equals");
         }
@@ -99,22 +93,18 @@ public class TransactionImple
         if (obj == this)
             return true;
 
-        if (obj instanceof TransactionImple)
-        {
+        if (obj instanceof TransactionImple) {
             return super.equals(obj);
         }
 
         return false;
     }
 
-    public String toString()
-    {
+    public String toString() {
         if (super._theTransaction == null)
             return "TransactionImple < jca-subordinate, NoTransaction >";
-        else
-        {
-            return "TransactionImple < jca-subordinate, "
-                    + super._theTransaction + " >";
+        else {
+            return "TransactionImple < jca-subordinate, " + super._theTransaction + " >";
         }
     }
 
@@ -126,8 +116,7 @@ public class TransactionImple
      *         imported.
      */
 
-    public final Xid baseXid()
-    {
+    public final Xid baseXid() {
         return ((SubordinateAtomicAction) _theTransaction).getXid();
     }
 
@@ -140,8 +129,7 @@ public class TransactionImple
      * Force this transaction to try to recover itself again.
      */
 
-    public void recover()
-    {
+    public void recover() {
         _theTransaction.activate();
     }
 
@@ -150,8 +138,7 @@ public class TransactionImple
      * again later.
      */
 
-    public boolean activated()
-    {
+    public boolean activated() {
         return ((SubordinateAtomicAction) _theTransaction).activated();
     }
 }

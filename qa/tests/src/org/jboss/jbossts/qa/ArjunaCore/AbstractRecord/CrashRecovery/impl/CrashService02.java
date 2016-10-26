@@ -30,25 +30,20 @@ import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import org.jboss.jbossts.qa.ArjunaCore.Utils.qautil;
 
-public class CrashService02
-{
-    public CrashService02(int res, int point, int type)
-    {
+public class CrashService02 {
+    public CrashService02(int res, int point, int type) {
         mNumberOfResources = res;
         mCrashPoint = point;
         mCrashType = type;
     }
 
-    public void setupOper(String uniquePrefix)
-    {
+    public void setupOper(String uniquePrefix) {
         mTransaction = (AtomicAction) AtomicAction.Current();
 
         mAbstractRecordList = new CrashAbstractRecord02[mNumberOfResources];
-        for (int i = 0; i < mNumberOfResources; i++)
-        {
+        for (int i = 0; i < mNumberOfResources; i++) {
             mAbstractRecordList[i] = new CrashAbstractRecord02(i, mCrashPoint, mCrashType, uniquePrefix);
-            if (mTransaction.add(mAbstractRecordList[i]) != AddOutcome.AR_ADDED)
-            {
+            if (mTransaction.add(mAbstractRecordList[i]) != AddOutcome.AR_ADDED) {
                 qautil.qadebug("Error when adding: " + i + " to atomic action");
                 mCorrect = false;
             }
@@ -56,12 +51,9 @@ public class CrashService02
 
     }
 
-    public void doWork(int work)
-    {
-        for (int j = 0; j < mNumberOfResources; j++)
-        {
-            for (int i = 0; i < work; i++)
-            {
+    public void doWork(int work) {
+        for (int j = 0; j < mNumberOfResources; j++) {
+            for (int i = 0; i < work; i++) {
                 mAbstractRecordList[j].increase();
             }
             mAbstractRecordList[j].setAction(1);

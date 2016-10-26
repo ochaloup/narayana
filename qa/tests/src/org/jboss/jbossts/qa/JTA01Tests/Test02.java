@@ -59,33 +59,27 @@ package org.jboss.jbossts.qa.JTA01Tests;
  * $Id: Test02.java,v 1.3 2004/03/19 14:34:36 nmcl Exp $
  */
 
-
 import org.jboss.jbossts.qa.Utils.Setup;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.Status;
 
-public class Test02
-{
-    public static void main(String[] args)
-    {
+public class Test02 {
+    public static void main(String[] args) {
         Setup orbClass = null;
 
-        try
-        {
+        try {
             boolean needOrb = true;
 
-            for (int i = 0; i < args.length; i++)
-            {
-                if (args[i].equals("-local"))
-                {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-local")) {
                     needOrb = false;
                 }
             }
 
-            if (needOrb)
-            {
-                Class c = Thread.currentThread().getContextClassLoader().loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
+            if (needOrb) {
+                Class c = Thread.currentThread().getContextClassLoader()
+                        .loadClass("org.jboss.jbossts.qa.Utils.OrbSetup");
 
                 orbClass = (Setup) c.newInstance();
 
@@ -94,7 +88,8 @@ public class Test02
 
             boolean correct = true;
 
-            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+            javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
+                    .transactionManager();
 
             correct = correct && (transactionManager.getTransaction() == null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
@@ -104,13 +99,10 @@ public class Test02
             correct = correct && (transactionManager.getTransaction() != null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_ACTIVE);
 
-            try
-            {
+            try {
                 transactionManager.begin();
                 correct = false;
-            }
-            catch (NotSupportedException notSupportedException)
-            {
+            } catch (NotSupportedException notSupportedException) {
             }
 
             correct = correct && (transactionManager.getTransaction() != null);
@@ -121,42 +113,29 @@ public class Test02
             correct = correct && (transactionManager.getTransaction() == null);
             correct = correct && (transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.print("Test02.main: ");
             exception.printStackTrace(System.err);
-        }
-        catch (Error error)
-        {
+        } catch (Error error) {
             System.out.println("Failed");
             System.err.print("Test02.main: ");
             error.printStackTrace(System.err);
         }
 
-        try
-        {
-            if (orbClass != null)
-            {
+        try {
+            if (orbClass != null) {
                 orbClass.stop();
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.print("Test02.main: ");
             exception.printStackTrace(System.err);
-        }
-        catch (Error error)
-        {
+        } catch (Error error) {
             System.err.print("Test02.main: ");
             error.printStackTrace(System.err);
         }

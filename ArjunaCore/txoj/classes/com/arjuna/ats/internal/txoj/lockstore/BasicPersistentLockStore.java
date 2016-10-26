@@ -52,16 +52,14 @@ import com.arjuna.ats.txoj.logging.txojLogger;
  * @since JTS 1.0.
  */
 
-public class BasicPersistentLockStore extends LockStore
-{
+public class BasicPersistentLockStore extends LockStore {
 
     /*
      * Ignore key as we can make use of the basic type information for this type
      * of store. Really only need it for shared memory.
      */
 
-    public BasicPersistentLockStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException
-    {
+    public BasicPersistentLockStore(ObjectStoreEnvironmentBean objectStoreEnvironmentBean) throws ObjectStoreException {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicPersistentLockStore.BasicPersistentLockStore()");
         }
@@ -75,60 +73,49 @@ public class BasicPersistentLockStore extends LockStore
         _lockStore = new ShadowingStore(objectStoreEnvironmentBean);
     }
 
-    public InputObjectState read_state (Uid u, String tName)
-            throws LockStoreException
-    {
+    public InputObjectState read_state(Uid u, String tName) throws LockStoreException {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicPersistentLockStore.read_state(" + u + ", " + tName + ")");
         }
 
-        try
-        {
-            return _lockStore.read_committed(u, LOCK_ROOT+tName);
-        }
-        catch (ObjectStoreException e)
-        {
+        try {
+            return _lockStore.read_committed(u, LOCK_ROOT + tName);
+        } catch (ObjectStoreException e) {
             throw new LockStoreException("Persistent store error.", e);
         }
     }
 
-    public boolean remove_state (Uid u, String tName)
-    {
+    public boolean remove_state(Uid u, String tName) {
         if (txojLogger.logger.isTraceEnabled()) {
             txojLogger.logger.trace("BasicPersistentLockStore.remove_state(" + u + ", " + tName + ")");
         }
 
-        try
-        {
-            return _lockStore.remove_committed(u, LOCK_ROOT+tName);
-        }
-        catch (ObjectStoreException e)
-        {
+        try {
+            return _lockStore.remove_committed(u, LOCK_ROOT + tName);
+        } catch (ObjectStoreException e) {
             return false;
         }
     }
 
-    public boolean write_committed (Uid u, String tName, OutputObjectState state)
-    {
+    public boolean write_committed(Uid u, String tName, OutputObjectState state) {
         if (txojLogger.logger.isTraceEnabled()) {
-            txojLogger.logger.trace("BasicPersistentLockStore.write_committed(" + u + ", " + tName + ", " + state + ")");
+            txojLogger.logger
+                    .trace("BasicPersistentLockStore.write_committed(" + u + ", " + tName + ", " + state + ")");
         }
 
-        try
-        {
-            return _lockStore.write_committed(u, LOCK_ROOT+tName, state);
-        }
-        catch (ObjectStoreException e)
-        {
+        try {
+            return _lockStore.write_committed(u, LOCK_ROOT + tName, state);
+        } catch (ObjectStoreException e) {
             return false;
         }
     }
 
     private ParticipantStore _lockStore;
-    
+
     /*
-     * At this time we just place locks in a different sub-tree within the main object store.
+     * At this time we just place locks in a different sub-tree within the main
+     * object store.
      */
-    
+
     private static final String LOCK_ROOT = "LockStore";
 }

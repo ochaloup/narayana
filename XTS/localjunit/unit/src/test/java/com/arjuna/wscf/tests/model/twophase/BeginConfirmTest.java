@@ -11,7 +11,6 @@ import com.arjuna.mw.wscf11.model.twophase.UserCoordinatorFactory;
 import com.arjuna.wscf.tests.WSCF11TestUtils;
 import com.arjuna.wscf.tests.WarDeployment;
 
-
 @RunWith(Arquillian.class)
 public class BeginConfirmTest {
 
@@ -21,25 +20,20 @@ public class BeginConfirmTest {
     }
 
     @Test
-    public void testBeginConfirm()
-            throws Exception
-            {
+    public void testBeginConfirm() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         UserCoordinator ua = UserCoordinatorFactory.userCoordinator();
 
-        try
-        {
+        try {
             ua.begin("TwoPhase11HLS");
 
-            System.out.println("Started: "+ua.identifier()+"\n");
+            System.out.println("Started: " + ua.identifier() + "\n");
 
             ua.confirm();
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSCF11TestUtils.cleanup(ua);
             throw ex;
         }
-            }
+    }
 }

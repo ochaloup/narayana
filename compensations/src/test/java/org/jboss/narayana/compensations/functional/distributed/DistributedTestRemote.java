@@ -60,13 +60,11 @@ public class DistributedTestRemote {
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addPackages(true, DistributedTestRemote.class.getPackage())
                 .addPackage(DummyCompensationHandler1.class.getPackage())
-                .addClass(ParticipantCompletionCoordinatorRules.class)
-                .addClass(URLUtils.class)
+                .addClass(ParticipantCompletionCoordinatorRules.class).addClass(URLUtils.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
 
         return archive;
     }
-
 
     @BeforeClass()
     public static void submitBytemanScript() throws Exception {
@@ -105,7 +103,6 @@ public class DistributedTestRemote {
 
     }
 
-
     @Test
     public void testClientDrivenCompensate() throws Exception {
 
@@ -119,7 +116,6 @@ public class DistributedTestRemote {
         Assert.assertEquals(true, client.wasCompensationHandlerInvoked());
     }
 
-
     @Test
     public void testRuntimeException() throws Exception {
 
@@ -128,7 +124,7 @@ public class DistributedTestRemote {
             client.saveData(true);
             Assert.fail("Exception should have been thrown by now");
         } catch (RuntimeException e) {
-            //Exception expected
+            // Exception expected
         }
 
         uba.cancel();
@@ -137,9 +133,8 @@ public class DistributedTestRemote {
         Assert.assertEquals(false, client.wasCompensationHandlerInvoked());
     }
 
-
     @Test
-    @Ignore //JBTM-1715
+    @Ignore // JBTM-1715
     public void testRuntimeExceptionCancelOnFailure() throws Exception {
 
         try {
@@ -147,14 +142,14 @@ public class DistributedTestRemote {
             client.saveDataCancelOnFailure(true);
             Assert.fail("Exception should have been thrown by now");
         } catch (RuntimeException e) {
-            //Expected
+            // Expected
         }
 
         try {
             uba.close();
             Assert.fail("TransactionRolledBackException should have been thrown by now");
         } catch (TransactionRolledBackException e) {
-            //Expected
+            // Expected
         }
 
         Assert.assertEquals(false, client.wasTransactionConfirmedHandlerInvoked());

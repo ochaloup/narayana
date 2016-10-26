@@ -36,8 +36,10 @@ public class BACoordinatorCompletionClient {
         URLUtils urlUtils = new URLUtils();
         URL wsdlLocation = new URL(urlUtils.getBaseUrl() + ":" + urlUtils.getBasePort()
                 + "/test/BACoordinatorCompletionService/BACoordinatorCompletion?wsdl");
-        QName serviceName = new QName("http://www.jboss.com/functional/ba/coordinatorcompletion/", "BACoordinatorCompletionService");
-        QName portName = new QName("http://www.jboss.com/functional/ba/coordinatorcompletion/", "BACoordinatorCompletionService");
+        QName serviceName = new QName("http://www.jboss.com/functional/ba/coordinatorcompletion/",
+                "BACoordinatorCompletionService");
+        QName portName = new QName("http://www.jboss.com/functional/ba/coordinatorcompletion/",
+                "BACoordinatorCompletionService");
 
         Service service = Service.create(wsdlLocation, serviceName);
         BACoordinatorCompletion client = service.getPort(portName, BACoordinatorCompletion.class, new WSTXFeature());
@@ -45,4 +47,3 @@ public class BACoordinatorCompletionClient {
         return client;
     }
 }
-

@@ -36,11 +36,9 @@ import org.junit.Test;
  * $Id: JTATransactionCommitTest.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class JTATransactionCommitTest
-{
+public class JTATransactionCommitTest {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         tm.begin();

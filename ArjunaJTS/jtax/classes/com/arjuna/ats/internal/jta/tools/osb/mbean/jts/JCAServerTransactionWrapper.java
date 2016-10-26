@@ -57,7 +57,7 @@ public class JCAServerTransactionWrapper extends ServerTransaction implements Ac
         return activated;
     }
 
-    public String type () {
+    public String type() {
         String name = UidWrapper.getRecordWrapperTypeName();
 
         if (name != null)
@@ -84,12 +84,17 @@ public class JCAServerTransactionWrapper extends ServerTransaction implements Ac
 
     public RecordList getRecords(ParticipantStatus type) {
         switch (type) {
-            default:
-            case PREPARED: return preparedList;
-            case FAILED: return failedList;
-            case HEURISTIC: return heuristicList;
-            case PENDING: return pendingList;
-            case READONLY: return readonlyList;
+            default :
+            case PREPARED :
+                return preparedList;
+            case FAILED :
+                return failedList;
+            case HEURISTIC :
+                return heuristicList;
+            case PENDING :
+                return pendingList;
+            case READONLY :
+                return readonlyList;
         }
     }
 

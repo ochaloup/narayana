@@ -33,20 +33,22 @@ import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.S
 import javax.transaction.xa.XAException;
 import java.io.IOException;
 
-
 /**
- * This class is purely used by the recovery system to load the transactions into memory so we can be sure
- * that bottom-up recovery could find a serverControl if the EIS has not called XATerminator::recover yet
+ * This class is purely used by the recovery system to load the transactions
+ * into memory so we can be sure that bottom-up recovery could find a
+ * serverControl if the EIS has not called XATerminator::recover yet
  */
 public class JCAServerTransactionRecoveryModule implements RecoveryModule {
 
     @Override
     public void periodicWorkFirstPass() {
-                /*
+        /*
          * Requires going through the objectstore for the states of imported
-         * transactions - this is just to make sure the server control are loaded into memory.
+         * transactions - this is just to make sure the server control are
+         * loaded into memory.
          *
-         * The XATerminatorImple::recover() method is used for actual crash recovery
+         * The XATerminatorImple::recover() method is used for actual crash
+         * recovery
          */
 
         try {
@@ -55,21 +57,17 @@ public class JCAServerTransactionRecoveryModule implements RecoveryModule {
 
             // only look in the JCA section of the object store
 
-            if (recoveryStore.allObjUids(ServerTransaction.getType(), states)
-                    && (states.notempty())) {
+            if (recoveryStore.allObjUids(ServerTransaction.getType(), states) && (states.notempty())) {
                 boolean finished = false;
 
                 do {
                     Uid uid = UidHelper.unpackFrom(states);
                     if (uid.notEquals(Uid.nullUid())) {
-                        SubordinationManager
-                                .getTransactionImporter().recoverTransaction(
-                                uid);
+                        SubordinationManager.getTransactionImporter().recoverTransaction(uid);
                     } else {
                         finished = true;
                     }
-                }
-                while (!finished);
+                } while (!finished);
             }
         } catch (ObjectStoreException | XAException | IOException e) {
             e.printStackTrace();

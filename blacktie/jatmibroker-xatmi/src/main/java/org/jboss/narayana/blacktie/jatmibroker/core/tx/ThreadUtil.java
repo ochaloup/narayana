@@ -45,7 +45,8 @@ public class ThreadUtil {
     /**
      * Get the string ID for the specified thread.
      * 
-     * @param thread The thread.
+     * @param thread
+     *            The thread.
      * @return The thread id
      */
     public static String getThreadId(final Thread thread) {

@@ -50,7 +50,8 @@ public class WSBAHandler implements ProtocolHandler {
 
     WSBATxControl wsbaTxControl = new WSBATxControlImpl();
 
-    public WSBAHandler(ServiceInvocationMeta serviceInvocationMeta, CompletionType completionType) throws TXFrameworkException {
+    public WSBAHandler(ServiceInvocationMeta serviceInvocationMeta, CompletionType completionType)
+            throws TXFrameworkException {
 
         this.serviceInvocationMeta = serviceInvocationMeta;
 
@@ -58,22 +59,29 @@ public class WSBAHandler implements ProtocolHandler {
             BusinessActivityManager businessActivityManager = BusinessActivityManagerFactory.businessActivityManager();
 
             if (completionType == CompletionType.COORDINATOR) {
-                WSBACoordinatorCompletionParticipant coordinatorCompletionParticipant = new WSBACoordinatorCompletionParticipant(serviceInvocationMeta, new HashMap());
-                participantManager = businessActivityManager.enlistForBusinessAgreementWithCoordinatorCompletion(coordinatorCompletionParticipant, serviceInvocationMeta.getServiceClass().getName() + UUID.randomUUID());
+                WSBACoordinatorCompletionParticipant coordinatorCompletionParticipant = new WSBACoordinatorCompletionParticipant(
+                        serviceInvocationMeta, new HashMap());
+                participantManager = businessActivityManager.enlistForBusinessAgreementWithCoordinatorCompletion(
+                        coordinatorCompletionParticipant,
+                        serviceInvocationMeta.getServiceClass().getName() + UUID.randomUUID());
                 participant = coordinatorCompletionParticipant;
             } else {
-                WSBAParticipantCompletionParticipant participantCompletionParticipant = new WSBAParticipantCompletionParticipant(serviceInvocationMeta, new HashMap());
-                participantManager = businessActivityManager.enlistForBusinessAgreementWithParticipantCompletion(participantCompletionParticipant,
+                WSBAParticipantCompletionParticipant participantCompletionParticipant = new WSBAParticipantCompletionParticipant(
+                        serviceInvocationMeta, new HashMap());
+                participantManager = businessActivityManager.enlistForBusinessAgreementWithParticipantCompletion(
+                        participantCompletionParticipant,
                         serviceInvocationMeta.getServiceClass().getName() + UUID.randomUUID());
                 participant = participantCompletionParticipant;
             }
 
         } catch (WrongStateException e) {
-            throw new ParticipantRegistrationException("Transaction was not in a state in which participants can be registered", e);
+            throw new ParticipantRegistrationException(
+                    "Transaction was not in a state in which participants can be registered", e);
         } catch (UnknownTransactionException e) {
             throw new ParticipantRegistrationException("Can't register a participant as the transaction in unknown", e);
         } catch (SystemException e) {
-            throw new ParticipantRegistrationException("A SystemException occurred when attempting to register a participant", e);
+            throw new ParticipantRegistrationException(
+                    "A SystemException occurred when attempting to register a participant", e);
         }
 
         WSBATxControlImpl.resume(participantManager);
@@ -88,8 +96,9 @@ public class WSBAHandler implements ProtocolHandler {
     @Override
     public void notifySuccess() throws TXFrameworkException {
 
-        //todo: find a better way of getting the current status of the TX
-        if (shouldComplete(serviceInvocationMeta.getServiceMethod()) && !((WSBATxControlImpl) wsbaTxControl).isCannotComplete()) {
+        // todo: find a better way of getting the current status of the TX
+        if (shouldComplete(serviceInvocationMeta.getServiceMethod())
+                && !((WSBATxControlImpl) wsbaTxControl).isCannotComplete()) {
             try {
                 participantManager.completed();
             } catch (WrongStateException e) {

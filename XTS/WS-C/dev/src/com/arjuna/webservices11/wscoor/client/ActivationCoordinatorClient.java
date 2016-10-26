@@ -31,43 +31,49 @@ import java.security.PrivilegedAction;
 
 /**
  * The Client side of the Activation Coordinator.
+ * 
  * @author kevin
  */
-public class ActivationCoordinatorClient
-{
+public class ActivationCoordinatorClient {
     /**
      * The client singleton.
      */
-    private static final ActivationCoordinatorClient CLIENT = new ActivationCoordinatorClient() ;
+    private static final ActivationCoordinatorClient CLIENT = new ActivationCoordinatorClient();
 
     /**
      * Construct the activation coordinator client.
      */
-    private ActivationCoordinatorClient()
-    {
+    private ActivationCoordinatorClient() {
     }
-    
+
     /**
      * Send a create coordination request.
-     * @param map addressing context initialised with to and message ID.
-     * @param coordinationType The type of the coordination.
-     * @param expires The expiry interval of the context.
-     * @param currentContext The current coordination context.
-     * @throws SoapFault For any errors.
-     * @throws IOException for any transport errors.
+     * 
+     * @param map
+     *            addressing context initialised with to and message ID.
+     * @param coordinationType
+     *            The type of the coordination.
+     * @param expires
+     *            The expiry interval of the context.
+     * @param currentContext
+     *            The current coordination context.
+     * @throws SoapFault
+     *             For any errors.
+     * @throws IOException
+     *             for any transport errors.
      */
-    public CreateCoordinationContextResponseType
-    sendCreateCoordination(final MAP map,
-        final String coordinationType, final Expires expires, final CoordinationContext currentContext)
-        throws SoapFault, IOException
-    {
-        final CreateCoordinationContextType request = new CreateCoordinationContextType() ;
-        request.setCoordinationType(coordinationType) ;
-        request.setExpires(expires) ;
+    public CreateCoordinationContextResponseType sendCreateCoordination(final MAP map, final String coordinationType,
+            final Expires expires, final CoordinationContext currentContext) throws SoapFault, IOException {
+        final CreateCoordinationContextType request = new CreateCoordinationContextType();
+        request.setCoordinationType(coordinationType);
+        request.setExpires(expires);
         if (currentContext != null) {
-            // structurally a CreateCoordinationContextType.CurrentContext and a CoordinationContext are the same i.e.
-            // they are a CoordinationContextType extended with an Any list. but the schema does not use one to define
-            // the other so, until we can generate them as the same type we have to interconvert here (and elsewhere)
+            // structurally a CreateCoordinationContextType.CurrentContext and a
+            // CoordinationContext are the same i.e.
+            // they are a CoordinationContextType extended with an Any list. but
+            // the schema does not use one to define
+            // the other so, until we can generate them as the same type we have
+            // to interconvert here (and elsewhere)
 
             CreateCoordinationContextType.CurrentContext current = new CreateCoordinationContextType.CurrentContext();
             current.setCoordinationType(currentContext.getCoordinationType());
@@ -77,11 +83,12 @@ public class ActivationCoordinatorClient
             current.getAny().addAll(currentContext.getAny());
             request.setCurrentContext(current);
         } else {
-            request.setCurrentContext(null) ;
+            request.setCurrentContext(null);
         }
 
         // get proxy with required message id and end point address
-        final ActivationPortType port = WSCOORClient.getActivationPort(map, CoordinationConstants.WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT);
+        final ActivationPortType port = WSCOORClient.getActivationPort(map,
+                CoordinationConstants.WSCOOR_ACTION_CREATE_COORDINATION_CONTEXT);
 
         // invoke remote method
         return createCoordinationContextOperation(port, request);
@@ -104,10 +111,10 @@ public class ActivationCoordinatorClient
 
     /**
      * Get the Activation Coordinator client singleton.
+     * 
      * @return The Activation Coordinator client singleton.
      */
-    public static ActivationCoordinatorClient getClient()
-    {
-        return CLIENT ;
+    public static ActivationCoordinatorClient getClient() {
+        return CLIENT;
     }
 }

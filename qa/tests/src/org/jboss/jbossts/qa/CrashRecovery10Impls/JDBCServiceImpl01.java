@@ -58,7 +58,6 @@ package org.jboss.jbossts.qa.CrashRecovery10Impls;
  * $Id: JDBCServiceImpl01.java,v 1.2 2003/06/26 11:43:47 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery10.*;
 import org.omg.CORBA.IntHolder;
 import org.omg.CosTransactions.Control;
@@ -69,17 +68,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class JDBCServiceImpl01 implements ServiceOperations
-{
-    public JDBCServiceImpl01(String rowName, String databaseURL, String databaseUser, String databasePassword, String databaseDynamicClass)
-            throws InvocationException
-    {
-        try
-        {
+public class JDBCServiceImpl01 implements ServiceOperations {
+    public JDBCServiceImpl01(String rowName, String databaseURL, String databaseUser, String databasePassword,
+            String databaseDynamicClass) throws InvocationException {
+        try {
             _rowName = rowName;
 
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -87,9 +82,7 @@ public class JDBCServiceImpl01 implements ServiceOperations
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 _connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 _connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -98,58 +91,43 @@ public class JDBCServiceImpl01 implements ServiceOperations
             statement.executeUpdate("INSERT Service SET Value = \'0\' WHERE Name = \'TheEntry\'");
 
             statement.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCServiceImpl01.JDBCServiceImpl01: " + exception);
             throw new InvocationException();
         }
     }
 
-    public void finalize()
-            throws Throwable
-    {
-        try
-        {
-            if (_connection != null)
-            {
+    public void finalize() throws Throwable {
+        try {
+            if (_connection != null) {
                 _connection.close();
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCServiceImpl01.finalize: " + exception);
             throw exception;
         }
     }
 
-    public void set(Control ctrl, int value)
-            throws InvocationException
-    {
-        try
-        {
+    public void set(Control ctrl, int value) throws InvocationException {
+        try {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
 
             interposition.registerTransaction(ctrl);
 
-            try
-            {
+            try {
                 Statement statement = _connection.createStatement();
 
-                statement.executeUpdate("UPDATE Service SET Value = \'" + value + "\' WHERE Name = \'" + _rowName + "\'");
+                statement.executeUpdate(
+                        "UPDATE Service SET Value = \'" + value + "\' WHERE Name = \'" + _rowName + "\'");
 
                 statement.close();
-            }
-            catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 System.err.println("JDBCServiceImpl01.set: " + exception);
 
                 interposition.unregisterTransaction();
 
                 throw new InvocationException();
-            }
-            catch (Error error)
-            {
+            } catch (Error error) {
                 System.err.println("JDBCServiceImpl01.set: " + error);
 
                 interposition.unregisterTransaction();
@@ -158,61 +136,45 @@ public class JDBCServiceImpl01 implements ServiceOperations
             }
 
             interposition.unregisterTransaction();
-        }
-        catch (InvocationException invocationException)
-        {
+        } catch (InvocationException invocationException) {
             throw invocationException;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCServiceImpl01.set: " + exception);
             throw new InvocationException();
         }
     }
 
-    public void get(Control ctrl, IntHolder value)
-            throws InvocationException
-    {
-        try
-        {
+    public void get(Control ctrl, IntHolder value) throws InvocationException {
+        try {
             com.arjuna.ats.jts.ExplicitInterposition interposition = new com.arjuna.ats.jts.ExplicitInterposition();
 
             interposition.registerTransaction(ctrl);
 
-            try
-            {
+            try {
                 Statement statement = _connection.createStatement();
 
-                ResultSet resultSet = statement.executeQuery("SELECT Value FROM Service WHERE Name = \'" + _rowName + "\'");
+                ResultSet resultSet = statement
+                        .executeQuery("SELECT Value FROM Service WHERE Name = \'" + _rowName + "\'");
                 resultSet.next();
                 value.value = resultSet.getInt("Value");
-                if (resultSet.next())
-                {
+                if (resultSet.next()) {
                     throw new Exception();
                 }
 
                 resultSet.close();
                 statement.close();
-            }
-            catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 System.err.println("JDBCServiceImpl01.select: " + exception);
                 throw new InvocationException();
-            }
-            catch (Error error)
-            {
+            } catch (Error error) {
                 System.err.println("JDBCServiceImpl01.select: " + error);
                 throw new InvocationException();
             }
 
             interposition.unregisterTransaction();
-        }
-        catch (InvocationException invocationException)
-        {
+        } catch (InvocationException invocationException) {
             throw invocationException;
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCServiceImpl01.get: " + exception);
             throw new InvocationException();
         }

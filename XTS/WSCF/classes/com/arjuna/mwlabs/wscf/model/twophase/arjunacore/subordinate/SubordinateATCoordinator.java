@@ -54,21 +54,19 @@ import java.util.Collection;
  * This class represents a specific coordination instance. It is essentially an
  * ArjunaCore TwoPhaseCoordinator, which gives us access to two-phase with
  * synchronization support but without thread management. This is the
- * subordinate coordinator implementation which we use when doing
- * interposition.
+ * subordinate coordinator implementation which we use when doing interposition.
  * 
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: SubordinateATCoordinator.java,v 1.1 2005/05/19 12:13:39 nmcl Exp $
+ * @version $Id: SubordinateATCoordinator.java,v 1.1 2005/05/19 12:13:39 nmcl
+ *          Exp $
  * @since 2.0.
  */
 
-public class SubordinateATCoordinator extends ATCoordinator
-{
+public class SubordinateATCoordinator extends ATCoordinator {
     /**
      * normal constructor
      */
-    public SubordinateATCoordinator()
-    {
+    public SubordinateATCoordinator() {
         super();
         activated = true;
         isReadonly = false;
@@ -77,8 +75,7 @@ public class SubordinateATCoordinator extends ATCoordinator
     /**
      * bridge wrapper constructor
      */
-    public SubordinateATCoordinator(String subordinateType)
-    {
+    public SubordinateATCoordinator(String subordinateType) {
         super();
         activated = true;
         isReadonly = false;
@@ -87,10 +84,10 @@ public class SubordinateATCoordinator extends ATCoordinator
 
     /**
      * constructor for recovered coordinator
+     * 
      * @param recovery
      */
-    public SubordinateATCoordinator(Uid recovery)
-    {
+    public SubordinateATCoordinator(Uid recovery) {
         super(recovery);
         activated = false;
         isReadonly = false;
@@ -106,8 +103,9 @@ public class SubordinateATCoordinator extends ATCoordinator
      * This implementation only supports coordination at the end of the
      * activity.
      * 
-     * @param     cs The completion status to use when determining how to
-     *            execute the protocol.
+     * @param cs
+     *            The completion status to use when determining how to execute
+     *            the protocol.
      * 
      * @exception WrongStateException
      *                Thrown if the coordinator is in a state the does not allow
@@ -121,50 +119,48 @@ public class SubordinateATCoordinator extends ATCoordinator
      * @return The result of executing the protocol, or null.
      */
 
-    public Outcome coordinate (CompletionStatus cs) throws WrongStateException,
-            ProtocolViolationException, SystemException
-    {
+    public Outcome coordinate(CompletionStatus cs)
+            throws WrongStateException, ProtocolViolationException, SystemException {
         throw new ProtocolViolationException();
     }
 
-    public int end (boolean reportHeuristics)
-    {
+    public int end(boolean reportHeuristics) {
         return ActionStatus.INVALID;
     }
-    
-    public int cancel ()
-    {
+
+    public int cancel() {
         return ActionStatus.INVALID;
     }
 
     /**
-     * this is driven by a volatile participant registered on behalf of the coordinator
+     * this is driven by a volatile participant registered on behalf of the
+     * coordinator
      *
      * @return true if the beforeCompletion succeeds otherwise false.
      */
-    public boolean prepareVolatile()
-    {
+    public boolean prepareVolatile() {
         return super.beforeCompletion();
     }
 
     /**
-     * this is driven by a durable participant registered on behalf of the coordinator and does a
-     * normal prepare mninus the before completion processing which has already been performed
+     * this is driven by a durable participant registered on behalf of the
+     * coordinator and does a normal prepare mninus the before completion
+     * processing which has already been performed
+     * 
      * @return the result of preparing the transaction
      */
 
-    public int prepare ()
-    {
+    public int prepare() {
         int status = super.prepare(true);
         isReadonly = (status == TwoPhaseOutcome.PREPARE_READONLY);
         return status;
     }
 
     /**
-     * this is driven by a volatile participant registered on behalf of the coordinator
+     * this is driven by a volatile participant registered on behalf of the
+     * coordinator
      */
-    public void commitVolatile()
-    {
+    public void commitVolatile() {
         if (isReadonly) {
             super.afterCompletion(ActionStatus.COMMITTED);
         } else {
@@ -173,45 +169,45 @@ public class SubordinateATCoordinator extends ATCoordinator
     }
 
     /**
-     * this is driven by a durable participant registered on behalf of the coordinator and does a
-     * normal commit minus the after completion processing which will be driven by a volatile
-     * participant also registerd for this coordinator..
+     * this is driven by a durable participant registered on behalf of the
+     * coordinator and does a normal commit minus the after completion
+     * processing which will be driven by a volatile participant also registerd
+     * for this coordinator..
      */
 
-    public void commit ()
-    {
+    public void commit() {
         super.phase2Commit(true);
 
         int status;
-        
-        switch (super.getHeuristicDecision())
-        {
-        case TwoPhaseOutcome.PREPARE_OK:
-        case TwoPhaseOutcome.FINISH_OK:
-            status = super.status();        
-            break;
-        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
-            status = ActionStatus.H_ROLLBACK;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_COMMIT:
-            status = ActionStatus.H_COMMIT;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_MIXED:
-            status = ActionStatus.H_MIXED;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_HAZARD:
-        default:
-            status = ActionStatus.H_HAZARD;
-            break;
+
+        switch (super.getHeuristicDecision()) {
+            case TwoPhaseOutcome.PREPARE_OK :
+            case TwoPhaseOutcome.FINISH_OK :
+                status = super.status();
+                break;
+            case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
+                status = ActionStatus.H_ROLLBACK;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_COMMIT :
+                status = ActionStatus.H_COMMIT;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_MIXED :
+                status = ActionStatus.H_MIXED;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_HAZARD :
+            default :
+                status = ActionStatus.H_HAZARD;
+                break;
         }
 
         this.finalStatus = status;
 
-        // if we have completed then remove the coordinator from the recovered coordinatros table
+        // if we have completed then remove the coordinator from the recovered
+        // coordinatros table
         if (status != ActionStatus.COMMITTING) {
             SubordinateATCoordinator.removeRecoveredCoordinator(this);
         }
-        
+
         // run any callback associated with this transaction
 
         runCallback(get_uid().stringForm());
@@ -219,10 +215,10 @@ public class SubordinateATCoordinator extends ATCoordinator
     }
 
     /**
-     * this is driven by a volatile participant registered on behalf of the coordinator
+     * this is driven by a volatile participant registered on behalf of the
+     * coordinator
      */
-    public void rollbackVolatile()
-    {
+    public void rollbackVolatile() {
         if (isReadonly) {
             super.afterCompletion(ActionStatus.ABORTED);
         } else {
@@ -231,35 +227,34 @@ public class SubordinateATCoordinator extends ATCoordinator
     }
 
     /**
-     * this is driven by a durable participant registered on behalf of the coordinator and does a
-     * normal commit minus the after completion processing which will be driven by a volatile
-     * participant also registerd for this coordinator..
+     * this is driven by a durable participant registered on behalf of the
+     * coordinator and does a normal commit minus the after completion
+     * processing which will be driven by a volatile participant also registerd
+     * for this coordinator..
      */
-    public void rollback ()
-    {
+    public void rollback() {
         super.phase2Abort(true);
-        
+
         int status;
-        
-        switch (super.getHeuristicDecision())
-        {
-        case TwoPhaseOutcome.PREPARE_OK:
-        case TwoPhaseOutcome.FINISH_OK:
-            status = super.status();
-            break;
-        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
-            status = ActionStatus.H_ROLLBACK;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_COMMIT:
-            status = ActionStatus.H_COMMIT;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_MIXED:
-            status = ActionStatus.H_MIXED;
-            break;
-        case TwoPhaseOutcome.HEURISTIC_HAZARD:
-        default:
-            status = ActionStatus.H_HAZARD;
-            break;
+
+        switch (super.getHeuristicDecision()) {
+            case TwoPhaseOutcome.PREPARE_OK :
+            case TwoPhaseOutcome.FINISH_OK :
+                status = super.status();
+                break;
+            case TwoPhaseOutcome.HEURISTIC_ROLLBACK :
+                status = ActionStatus.H_ROLLBACK;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_COMMIT :
+                status = ActionStatus.H_COMMIT;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_MIXED :
+                status = ActionStatus.H_MIXED;
+                break;
+            case TwoPhaseOutcome.HEURISTIC_HAZARD :
+            default :
+                status = ActionStatus.H_HAZARD;
+                break;
         }
 
         // iemove the coordinator from the recovered coordinatros table
@@ -268,101 +263,95 @@ public class SubordinateATCoordinator extends ATCoordinator
         // run any callback associated with this transaction
 
         runCallback(get_uid().stringForm());
-        
+
         this.finalStatus = status;
     }
 
     /**
-     * called by the durable participant during recovery processing
-     * TODO clarify when and why this gets called and what to do about it
+     * called by the durable participant during recovery processing TODO clarify
+     * when and why this gets called and what to do about it
      */
-    public void unknown()
-    {
+    public void unknown() {
     }
 
     /**
-     * called by the durable participant during recovery processing
-     * TODO clarify when and why this gets called and what to do about it
+     * called by the durable participant during recovery processing TODO clarify
+     * when and why this gets called and what to do about it
      */
-    public void error()
-    {
+    public void error() {
     }
 
     /**
-     * type string used to locate TX log records in the tx object store hierarchy
+     * type string used to locate TX log records in the tx object store
+     * hierarchy
      */
     public final static String TRANSACTION_TYPE = "/StateManager/BasicAction/AtomicAction/TwoPhaseCoordinator/TwoPhase/SubordinateATCoordinator";
 
-    public String type ()
-    {
+    public String type() {
         return TRANSACTION_TYPE;
     }
 
     /**
-     * unique string used as prefix for participant ids to ensure they can be identified at recovery
+     * unique string used as prefix for participant ids to ensure they can be
+     * identified at recovery
      */
     public static String PARTICIPANT_PREFIX = "org.jboss.jbossts.xts.at.subordinate.participant.";
 
     /**
-     * return a uid for the volatile participant registered on behalf of this corodinator
+     * return a uid for the volatile participant registered on behalf of this
+     * corodinator
      */
-    public String getVolatile2PhaseId()
-    {
+    public String getVolatile2PhaseId() {
         return PARTICIPANT_PREFIX + get_uid().stringForm() + "_V";
     }
 
     /**
-     * return a uid for the durable participant registered on behalf of this corodinator
+     * return a uid for the durable participant registered on behalf of this
+     * corodinator
      */
-    public String getDurable2PhaseId()
-    {
+    public String getDurable2PhaseId() {
         return PARTICIPANT_PREFIX + get_uid().stringForm() + "_D";
     }
 
-
-    protected static synchronized void addRecoveredCoordinator(SubordinateATCoordinator coordinator)
-    {
+    protected static synchronized void addRecoveredCoordinator(SubordinateATCoordinator coordinator) {
         recoveredCoordinators.put(coordinator.get_uid().stringForm(), coordinator);
     }
 
-    protected static synchronized void removeRecoveredCoordinator(SubordinateATCoordinator coordinator)
-    {
+    protected static synchronized void removeRecoveredCoordinator(SubordinateATCoordinator coordinator) {
         recoveredCoordinators.remove(coordinator.get_uid().stringForm());
     }
 
-    public static synchronized void addActiveProxy(String id)
-    {
+    public static synchronized void addActiveProxy(String id) {
         activeProxies.put(id, Boolean.TRUE);
     }
 
-    public static synchronized void removeActiveProxy(String id)
-    {
+    public static synchronized void removeActiveProxy(String id) {
         activeProxies.remove(id);
     }
 
-    protected void setActivated()
-    {
+    protected void setActivated() {
         activated = true;
     }
 
-    public boolean isActivated()
-    {
+    public boolean isActivated() {
         return activated;
     }
 
     /**
-     * test whether a transaction has been restored without its proxy participant. this indicates that
-     * we crashed between preparing the suborindate TX and logging the proxy participant.
+     * test whether a transaction has been restored without its proxy
+     * participant. this indicates that we crashed between preparing the
+     * suborindate TX and logging the proxy participant.
+     * 
      * @return whether the at is orphaned
      */
-    public boolean isOrphaned()
-    {
+    public boolean isOrphaned() {
         String id = get_uid().stringForm();
         if (isActiveProxy(id)) {
             return false;
         }
 
-        // the proxy may have been removed because this tx has been resolved while we were checking
+        // the proxy may have been removed because this tx has been resolved
+        // while we were checking
 
         if (getRecoveredCoordinator(id) == null) {
             return false;
@@ -373,33 +362,30 @@ public class SubordinateATCoordinator extends ATCoordinator
         return true;
     }
 
-    private static synchronized boolean isActiveProxy(String proxyId)
-    {
+    private static synchronized boolean isActiveProxy(String proxyId) {
         return activeProxies.get(proxyId) == Boolean.TRUE;
     }
 
-    public static synchronized SubordinateATCoordinator getRecoveredCoordinator(String coordinatorId)
-    {
+    public static synchronized SubordinateATCoordinator getRecoveredCoordinator(String coordinatorId) {
         return recoveredCoordinators.get(coordinatorId);
     }
 
-    public static synchronized SubordinateATCoordinator[] listRecoveredCoordinators()
-    {
+    public static synchronized SubordinateATCoordinator[] listRecoveredCoordinators() {
         Collection<SubordinateATCoordinator> values = recoveredCoordinators.values();
         int length = values.size();
         return values.toArray(new SubordinateATCoordinator[length]);
     }
 
     /**
-     * standard AT subordinate tx type for an AT subordinate created below another AT transaction
+     * standard AT subordinate tx type for an AT subordinate created below
+     * another AT transaction
      */
     public static final String SUBORDINATE_TX_TYPE_AT_AT = "org.jboss.jbossts.xts.at.at.subordinate";
 
-    public String getSubordinateType()
-    {
+    public String getSubordinateType() {
         return subordinateType;
     }
-    
+
     @Override
     public boolean save_state(OutputObjectState os, int ot) {
         // also need to save the subordinate type
@@ -424,34 +410,38 @@ public class SubordinateATCoordinator extends ATCoordinator
             } catch (IOException ioe) {
             }
         }
-        
+
         return false;
     }
 
     /**
-     * this saves the status after the subtransaction commit or rollback so it can be referred to during
-     * afterCompletion processing.
+     * this saves the status after the subtransaction commit or rollback so it
+     * can be referred to during afterCompletion processing.
      */
     private int finalStatus = ActionStatus.CREATED;
 
     /**
-     * flag identifying whether this coordinator is active, set true for normal transactions and false
-     * for recovered transactions until they are activated
+     * flag identifying whether this coordinator is active, set true for normal
+     * transactions and false for recovered transactions until they are
+     * activated
      */
     private boolean activated;
 
     /**
-     * flag identifying whether prepare returned READ_ONLY and hence whether special case handling of
-     * commitVolatile and rollbackVolatile calls is required
+     * flag identifying whether prepare returned READ_ONLY and hence whether
+     * special case handling of commitVolatile and rollbackVolatile calls is
+     * required
      */
     private boolean isReadonly;
 
     /**
-     * string identifying which type of subordinate transaction this is. the standard subordinate type is
-     * XTSATRecoveryManager.SUBORDINATE_TX_TYPE_AT_AT which identifies a subordinate of another AT transaction.
-     * Alternative types can occur as a result of transaction bridging e.g. the AT transaction may be a
-     * subordinate of an XA transaction. different types of subordinate can be scanned and rolled back
-     * independently from other subordinate types.
+     * string identifying which type of subordinate transaction this is. the
+     * standard subordinate type is
+     * XTSATRecoveryManager.SUBORDINATE_TX_TYPE_AT_AT which identifies a
+     * subordinate of another AT transaction. Alternative types can occur as a
+     * result of transaction bridging e.g. the AT transaction may be a
+     * subordinate of an XA transaction. different types of subordinate can be
+     * scanned and rolled back independently from other subordinate types.
      */
 
     private String subordinateType;
@@ -461,8 +451,9 @@ public class SubordinateATCoordinator extends ATCoordinator
     private static final HashMap<String, Boolean> activeProxies = new HashMap<String, Boolean>();
 
     /**
-     * we need to remove the association between parent and subordinate context at completion
-     * of commit or rollback -- we use a callback mechanism keyed by transaction id to achieve this
+     * we need to remove the association between parent and subordinate context
+     * at completion of commit or rollback -- we use a callback mechanism keyed
+     * by transaction id to achieve this
      */
 
     private static final HashMap<String, SubordinateCallback> callbacks = new HashMap<String, SubordinateCallback>();
@@ -470,28 +461,28 @@ public class SubordinateATCoordinator extends ATCoordinator
     /**
      * class implemented by any code which wishes to register a callabck
      */
-    public static abstract class SubordinateCallback
-    {
-        private SubordinateCallback next; // in case multiple callbacks are registered
+    public static abstract class SubordinateCallback {
+        private SubordinateCallback next; // in case multiple callbacks are
+                                            // registered
 
         public abstract void run();
     }
 
     /**
-     * register a callback to be called when a subordinate transaction with a specific key executes
-     * a commit or rollback. the callback will not be called in the case of a crash
+     * register a callback to be called when a subordinate transaction with a
+     * specific key executes a commit or rollback. the callback will not be
+     * called in the case of a crash
+     * 
      * @param key
      * @param callback
      */
-    public static void addCallback(String key, SubordinateCallback callback)
-    {
+    public static void addCallback(String key, SubordinateCallback callback) {
         SubordinateCallback old = callbacks.put(key, callback);
         // chian any existign callback so we ensure to call them all
         callback.next = old;
     }
 
-    private void runCallback(String key)
-    {
+    private void runCallback(String key) {
         SubordinateCallback callback = callbacks.get(key);
         while (callback != null) {
             callback.run();

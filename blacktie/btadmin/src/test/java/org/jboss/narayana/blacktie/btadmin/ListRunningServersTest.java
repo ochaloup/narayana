@@ -47,8 +47,8 @@ public class ListRunningServersTest extends TestCase {
         }
     }
 
-    public void testListRunningServersWithoutServers() throws IOException, MalformedObjectNameException, NullPointerException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public void testListRunningServersWithoutServers() throws IOException, MalformedObjectNameException,
+            NullPointerException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         log.info("ListRunningServersTest::testListRunningServersWithoutServers");
         String command = "listRunningServers";
         if (commandHandler.handleCommand(command.split(" ")) != 0) {
@@ -56,8 +56,8 @@ public class ListRunningServersTest extends TestCase {
         }
     }
 
-    public void testListRunningServersWithServers() throws IOException, MalformedObjectNameException, NullPointerException,
-            InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public void testListRunningServersWithServers() throws IOException, MalformedObjectNameException,
+            NullPointerException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         log.info("ListRunningServersTest::testListRunningServersWithServers");
         if (commandHandler.handleCommand("startup testsui".split(" ")) != 0) {
             fail("Could not start the server");

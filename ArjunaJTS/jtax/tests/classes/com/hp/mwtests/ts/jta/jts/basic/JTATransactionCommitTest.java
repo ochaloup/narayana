@@ -41,17 +41,16 @@ import com.hp.mwtests.ts.jta.jts.JTSTestCase;
  * $Id: JTATransactionCommitTest.java 2342 2006-03-30 13:06:17Z  $
  */
 
-public class JTATransactionCommitTest extends JTSTestCase
-{
+public class JTATransactionCommitTest extends JTSTestCase {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         /** Ensure underlying JTA implementation is JTS **/
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
-        try
-        {
+        try {
             TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
             System.out.println("Beginning new transaction");
@@ -67,11 +66,9 @@ public class JTATransactionCommitTest extends JTSTestCase
 
             System.out.println("Committing second transaction (via TransactionManager interface)");
             tm.commit();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace(System.err);
-            fail("Unexpected exception: "+e);
+            fail("Unexpected exception: " + e);
         }
     }
 }

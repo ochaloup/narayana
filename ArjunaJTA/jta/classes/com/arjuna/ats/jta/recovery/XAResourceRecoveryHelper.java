@@ -23,8 +23,8 @@ package com.arjuna.ats.jta.recovery;
 import javax.transaction.xa.XAResource;
 
 /**
- * Interface to be implemented by external entities that instantiate
- * and supply their own XAResources to the recovery system.
+ * Interface to be implemented by external entities that instantiate and supply
+ * their own XAResources to the recovery system.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */

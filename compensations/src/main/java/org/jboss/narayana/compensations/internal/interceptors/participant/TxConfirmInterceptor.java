@@ -43,7 +43,8 @@ import java.lang.reflect.Method;
 public class TxConfirmInterceptor extends ParticipantInterceptor {
 
     /**
-     * This request has a confirmation handler attached which has to be enlisted to the transaction.
+     * This request has a confirmation handler attached which has to be enlisted
+     * to the transaction.
      *
      * @param ic
      * @return

@@ -31,9 +31,6 @@
 
 package com.arjuna.orbportability.oa.core;
 
-
-
-
 import org.omg.CORBA.Policy;
 import org.omg.CORBA.SystemException;
 import org.omg.CORBA.ORBPackage.InvalidName;
@@ -53,14 +50,11 @@ import com.arjuna.orbportability.logging.opLogger;
  * @since JTS 2.1.
  */
 
-public class OA
-{
-    public OA(com.arjuna.orbportability.orb.core.ORB theORB)
-    {
+public class OA {
+    public OA(com.arjuna.orbportability.orb.core.ORB theORB) {
         _theORB = theORB;
 
-        try
-        {
+        try {
             Class<? extends POAImple> clazz = opPropertyManager.getOrbPortabilityEnvironmentBean().getPoaImpleClass();
 
             if (opLogger.logger.isTraceEnabled()) {
@@ -68,70 +62,53 @@ public class OA
             }
 
             _theOA = clazz.newInstance();
-        }
-        catch (Exception e)
-        {
-            throw new ExceptionInInitializerError( e );
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError(e);
         }
     }
 
-    public boolean initialised ()
-    {
+    public boolean initialised() {
         return _theOA.initialised();
     }
 
-    public void init () throws InvalidName, AdapterInactive, SystemException
-    {
+    public void init() throws InvalidName, AdapterInactive, SystemException {
         _theOA.init(_theORB);
     }
 
-    public void createPOA (String adapterName, Policy[] policies)
-            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive,
-            SystemException
-    {
+    public void createPOA(String adapterName, Policy[] policies)
+            throws AdapterAlreadyExists, InvalidPolicy, AdapterInactive, SystemException {
         _theOA.createPOA(adapterName, policies);
     }
 
-    public void destroyRootPOA () throws SystemException
-    {
+    public void destroyRootPOA() throws SystemException {
         _theOA.destroyRootPOA();
     }
 
-    public void destroyPOA (String adapterName) throws SystemException
-    {
+    public void destroyPOA(String adapterName) throws SystemException {
         _theOA.destroyPOA(adapterName);
     }
 
-    public org.omg.PortableServer.POA rootPoa () throws SystemException
-    {
+    public org.omg.PortableServer.POA rootPoa() throws SystemException {
         return _theOA.rootPoa();
     }
 
-    public void rootPoa (org.omg.PortableServer.POA thePOA)
-            throws SystemException
-    {
+    public void rootPoa(org.omg.PortableServer.POA thePOA) throws SystemException {
         _theOA.rootPoa(thePOA);
     }
 
-    public org.omg.PortableServer.POA poa (String adapterName)
-            throws SystemException
-    {
+    public org.omg.PortableServer.POA poa(String adapterName) throws SystemException {
         return _theOA.poa(adapterName);
     }
 
-    public void poa (String adapterName, org.omg.PortableServer.POA thePOA)
-            throws SystemException
-    {
+    public void poa(String adapterName, org.omg.PortableServer.POA thePOA) throws SystemException {
         _theOA.poa(adapterName, thePOA);
     }
 
-    public void run (String name) throws SystemException
-    {
+    public void run(String name) throws SystemException {
         _theOA.run(_theORB, name);
     }
 
-    public void run () throws SystemException
-    {
+    public void run() throws SystemException {
         _theOA.run(_theORB);
     }
 

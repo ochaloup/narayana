@@ -32,20 +32,19 @@ import org.jboss.stm.annotations.WriteLock;
  */
 
 @Transactional
-public interface AtomicArray<E>
-{
+public interface AtomicArray<E> {
     @ReadLock
-    public int size ();
-    
+    public int size();
+
     @ReadLock
-    public boolean isEmpty ();
-    
+    public boolean isEmpty();
+
     @WriteLock
-    public void empty ();
-    
+    public void empty();
+
     @ReadLock
-    public E get (int index);
-    
+    public E get(int index);
+
     @WriteLock
-    public void set (int index, E val);
+    public void set(int index, E val);
 }

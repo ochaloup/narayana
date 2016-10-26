@@ -37,10 +37,8 @@ import com.hp.mwtests.ts.jts.orbspecific.resources.setget_i;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 import com.hp.mwtests.ts.jts.utils.ServerORB;
 
-public class SetGetServer
-{
-    public static void main(String[] args) throws Exception
-    {
+public class SetGetServer {
+    public static void main(String[] args) throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -50,16 +48,13 @@ public class SetGetServer
         setget_i impl = new setget_i();
         Services serv = new Services(myORB);
 
-        try
-        {
+        try {
             TestUtility.registerService(refFile, myORB.orb().object_to_string(impl.getReference()));
 
             System.out.println("Ready");
             myOA.run();
-        }
-        catch (Exception e)
-        {
-            TestUtility.fail("SetGetServer caught exception: "+e);
+        } catch (Exception e) {
+            TestUtility.fail("SetGetServer caught exception: " + e);
         }
 
         myOA.shutdownObject(impl);

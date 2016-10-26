@@ -33,8 +33,9 @@ public class RemoteParticipantManager implements ParticipantManager {
     }
 
     /**
-     * Detach participant from the compensation context and tell compensation context manager to update its recovery record.
-     * Then notify remote transaction coordinator that participant has exited the transaction.
+     * Detach participant from the compensation context and tell compensation
+     * context manager to update its recovery record. Then notify remote
+     * transaction coordinator that participant has exited the transaction.
      * 
      * @throws WrongStateException
      * @throws UnknownTransactionException
@@ -48,8 +49,8 @@ public class RemoteParticipantManager implements ParticipantManager {
     }
 
     /**
-     * Tell compensation context manager to update its recovery record. And then notify remote transaction coordinator that
-     * participant has completed.
+     * Tell compensation context manager to update its recovery record. And then
+     * notify remote transaction coordinator that participant has completed.
      * 
      * @throws WrongStateException
      * @throws UnknownTransactionException

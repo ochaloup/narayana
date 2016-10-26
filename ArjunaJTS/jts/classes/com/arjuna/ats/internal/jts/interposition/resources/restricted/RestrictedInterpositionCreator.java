@@ -38,17 +38,14 @@ import org.omg.CosTransactions.PropagationContext;
 import com.arjuna.ats.internal.jts.interposition.FactoryCreator;
 import com.arjuna.ats.internal.jts.orbspecific.ControlImple;
 
-public class RestrictedInterpositionCreator implements FactoryCreator
-{
+public class RestrictedInterpositionCreator implements FactoryCreator {
 
-public ControlImple recreateLocal (PropagationContext ctx) throws SystemException
-    {
-    return RestrictedInterposition.create(ctx);
+    public ControlImple recreateLocal(PropagationContext ctx) throws SystemException {
+        return RestrictedInterposition.create(ctx);
     }
 
-public Control recreate (PropagationContext ctx) throws SystemException
-    {
-    return recreateLocal(ctx).getControl();
+    public Control recreate(PropagationContext ctx) throws SystemException {
+        return recreateLocal(ctx).getControl();
     }
 
 };

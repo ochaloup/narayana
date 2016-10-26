@@ -96,21 +96,17 @@ public abstract class AbstractIntegrationTests {
 
     protected void initNarayanaRecovery() {
         if (recoveryManager != null) {
-            throw new IntegrationTestRuntimeException(
-                    "Recovery manager is already running");
+            throw new IntegrationTestRuntimeException("Recovery manager is already running");
         }
 
         final List<String> recoveryExtensions = new ArrayList<>();
         recoveryExtensions.add(AtomicActionRecoveryModule.class.getName());
         recoveryExtensions.add(XARecoveryModule.class.getName());
 
-        recoveryPropertyManager.getRecoveryEnvironmentBean()
-                .setRecoveryModuleClassNames(recoveryExtensions);
-        recoveryPropertyManager.getRecoveryEnvironmentBean()
-                .setRecoveryBackoffPeriod(1);
+        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryModuleClassNames(recoveryExtensions);
+        recoveryPropertyManager.getRecoveryEnvironmentBean().setRecoveryBackoffPeriod(1);
 
-        recoveryManager =
-                RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
+        recoveryManager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
     }
 
     protected void initJms() throws Exception {
@@ -126,14 +122,13 @@ public abstract class AbstractIntegrationTests {
     }
 
     protected void initJmsRecovery() throws Exception {
-        registerRecoveryHelper(new JmsXAResourceRecoveryHelper(
-                (XAConnectionFactory) jmsServer.lookup(JmsHelper.FACTORY_NAME)));
+        registerRecoveryHelper(
+                new JmsXAResourceRecoveryHelper((XAConnectionFactory) jmsServer.lookup(JmsHelper.FACTORY_NAME)));
     }
 
     protected void registerRecoveryHelper(XAResourceRecoveryHelper helper) {
-        recoveryManager.getModules().stream()
-                .filter(m -> m instanceof XARecoveryModule).forEach(
-                    m -> ((XARecoveryModule) m).addXAResourceRecoveryHelper(helper));
+        recoveryManager.getModules().stream().filter(m -> m instanceof XARecoveryModule)
+                .forEach(m -> ((XARecoveryModule) m).addXAResourceRecoveryHelper(helper));
     }
 
 }

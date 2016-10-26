@@ -39,25 +39,21 @@ import org.junit.Test;
 
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 
-public class SimpleNestedDisabledTest
-{
+public class SimpleNestedDisabledTest {
     @Test
-    public void testDisabled () throws Exception
-    {
+    public void testDisabled() throws Exception {
         jtaPropertyManager.getJTAEnvironmentBean().setSupportSubtransactions(false);
 
-        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager.transactionManager();
+        javax.transaction.TransactionManager transactionManager = com.arjuna.ats.jta.TransactionManager
+                .transactionManager();
 
         transactionManager.begin();
 
-        try
-        {
+        try {
             transactionManager.begin();
 
             fail();
-        }
-        catch (final NotSupportedException ex)
-        {
+        } catch (final NotSupportedException ex) {
         }
 
         transactionManager.commit();

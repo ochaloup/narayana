@@ -47,43 +47,45 @@ import com.arjuna.orbportability.common.OrbPortabilityEnvironmentBean;
  * Should be configured via deploy/transaction-jboss-beans.xml
  *
  * @author Richard A. Begg (richard.begg@arjuna.com)
- * @version $Id: TransactionManagerService.java,v 1.17 2005/06/24 15:24:14 kconner Exp $
+ * @version $Id: TransactionManagerService.java,v 1.17 2005/06/24 15:24:14
+ *          kconner Exp $
  */
-public class TransactionManagerService extends com.arjuna.ats.jbossatx.jta.TransactionManagerService implements TransactionManagerServiceMBean
-{
+public class TransactionManagerService extends com.arjuna.ats.jbossatx.jta.TransactionManagerService
+        implements
+            TransactionManagerServiceMBean {
     final static String ORB_NAME = "jboss-atx";
 
     public TransactionManagerService() {
         mode = "JTS";
     }
 
-    public void start()
-    {
+    public void start() {
         throw new IllegalArgumentException("JTS mode startup requires an ORB to be provided");
     }
 
     /**
      *
-     * @param theCorbaORB an orb that the TM should use for JTS operations. The caller is responsible for
-     *                    shutting down and destroying this orb
+     * @param theCorbaORB
+     *            an orb that the TM should use for JTS operations. The caller
+     *            is responsible for shutting down and destroying this orb
      * @throws Exception
      */
-    public void start(org.omg.CORBA.ORB theCorbaORB) throws Exception
-    {
+    public void start(org.omg.CORBA.ORB theCorbaORB) throws Exception {
         jbossatxLogger.i18NLogger.info_jts_TransactionManagerService_start();
 
         // Create an ORB portability wrapper around the CORBA ORB services orb
         ORB orb = ORB.getInstance(ORB_NAME);
 
-        org.omg.PortableServer.POA rootPOA = org.omg.PortableServer.POAHelper.narrow(theCorbaORB.resolve_initial_references("RootPOA"));
+        org.omg.PortableServer.POA rootPOA = org.omg.PortableServer.POAHelper
+                .narrow(theCorbaORB.resolve_initial_references("RootPOA"));
 
         orb.setOrb(theCorbaORB);
         OA oa = OA.getRootOA(orb);
         oa.setPOA(rootPOA);
 
-        try
-        {
-            // OTSManager won't play nice unless we explicity bootstrap the portability layer:
+        try {
+            // OTSManager won't play nice unless we explicity bootstrap the
+            // portability layer:
             ORBManager.setORB(orb);
             ORBManager.setPOA(oa);
             OrbPortabilityEnvironmentBean env = BeanPopulator.getDefaultInstance(OrbPortabilityEnvironmentBean.class);
@@ -93,30 +95,27 @@ public class TransactionManagerService extends com.arjuna.ats.jbossatx.jta.Trans
             final int resolver = Services.getResolver();
 
             com.arjuna.ats.jts.TransactionServer.registerTransactionManager(resolver, orb, factory);
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
             throw new Exception(jbossatxLogger.i18NLogger.get_jts_TransactionManagerService_failed(), ex);
         }
     }
 
     /**
-     * Set whether the transaction propagation context manager should propagate a
-     * full PropagationContext (JTS) or just a cut-down version (for JTA).
+     * Set whether the transaction propagation context manager should propagate
+     * a full PropagationContext (JTS) or just a cut-down version (for JTA).
      *
      * @param propagateFullContext
      */
-    public void setPropagateFullContext(boolean propagateFullContext)
-    {
+    public void setPropagateFullContext(boolean propagateFullContext) {
         PropagationContextWrapper.setPropagateFullContext(propagateFullContext);
     }
 
     /**
-     * Retrieve whether the transaction propagation context manager should propagate a
-     * full PropagationContext (JTS) or just a cut-down version (for JTA).
+     * Retrieve whether the transaction propagation context manager should
+     * propagate a full PropagationContext (JTS) or just a cut-down version (for
+     * JTA).
      */
-    public boolean getPropagateFullContext()
-    {
+    public boolean getPropagateFullContext() {
         return PropagationContextWrapper.getPropagateFullContext();
     }
 }

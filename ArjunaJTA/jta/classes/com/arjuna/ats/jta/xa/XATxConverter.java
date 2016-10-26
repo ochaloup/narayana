@@ -45,26 +45,23 @@ import com.arjuna.ats.jta.logging.jtaLogger;
 
 /**
  * @author Mark Little (mark.little@arjuna.com)
- * @version $Id: XATxConverter.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: XATxConverter.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.0.
  */
 
-public class XATxConverter
-{
-    private static XAResourceRecordWrappingPlugin xaResourceRecordWrappingPlugin =
-            jtaPropertyManager.getJTAEnvironmentBean().getXAResourceRecordWrappingPlugin();
+public class XATxConverter {
+    private static XAResourceRecordWrappingPlugin xaResourceRecordWrappingPlugin = jtaPropertyManager
+            .getJTAEnvironmentBean().getXAResourceRecordWrappingPlugin();
     public static final int FORMAT_ID = 131077; // different from JTS ones.
 
-    static XID getXid (Uid uid, boolean branch, Integer eisName) throws IllegalStateException
-    {
+    static XID getXid(Uid uid, boolean branch, Integer eisName) throws IllegalStateException {
         if (branch)
             return getXid(uid, new Uid(), FORMAT_ID, eisName);
         else
             return getXid(uid, Uid.nullUid(), FORMAT_ID, eisName);
     }
 
-    public static Xid getXid (Uid uid, boolean branch, int formatId) throws IllegalStateException
-    {
+    public static Xid getXid(Uid uid, boolean branch, int formatId) throws IllegalStateException {
         XID xid;
         if (branch)
             xid = getXid(uid, new Uid(), formatId, null);
@@ -74,8 +71,7 @@ public class XATxConverter
         return new XidImple(xid);
     }
 
-    private static XID getXid(Uid uid, Uid branch, int formatId, Integer eisName) throws IllegalStateException
-    {
+    private static XID getXid(Uid uid, Uid branch, int formatId, Integer eisName) throws IllegalStateException {
         if (uid == null) {
             throw new IllegalStateException();
         }
@@ -83,7 +79,8 @@ public class XATxConverter
         XID xid = new XID();
         xid.formatID = formatId;
 
-        // gtrid is uid byte form followed by as many chars of the node name as will fit.
+        // gtrid is uid byte form followed by as many chars of the node name as
+        // will fit.
         byte[] gtridUid = uid.getBytes();
 
         if (gtridUid.length > XID.MAXGTRIDSIZE) {
@@ -97,15 +94,13 @@ public class XATxConverter
         }
 
         int nodeNameLengthToUse = nodeName.getBytes(StandardCharsets.UTF_8).length;
-        xid.gtrid_length = gtridUid.length+nodeNameLengthToUse;
+        xid.gtrid_length = gtridUid.length + nodeNameLengthToUse;
 
         // src, srcPos, dest, destPos, length
         System.arraycopy(gtridUid, 0, xid.data, 0, gtridUid.length);
         System.arraycopy(nodeName.getBytes(StandardCharsets.UTF_8), 0, xid.data, gtridUid.length, nodeNameLengthToUse);
-        
-        
-        if (branch.notEquals(Uid.nullUid()))
-        {
+
+        if (branch.notEquals(Uid.nullUid())) {
             // bqual is uid byte form plus EIS name.
             byte[] bqualUid = branch.getBytes();
 
@@ -114,22 +109,19 @@ public class XATxConverter
             }
 
             int spareBqualBytes = XID.MAXBQUALSIZE - (bqualUid.length + 4);
-           
-            xid.bqual_length = bqualUid.length+4+4;
+
+            xid.bqual_length = bqualUid.length + 4 + 4;
 
             // src, srcPos, dest, destPos, length
             int offset = xid.gtrid_length;
-            System.arraycopy (bqualUid, 0, xid.data, offset, bqualUid.length);
+            System.arraycopy(bqualUid, 0, xid.data, offset, bqualUid.length);
             setEisName(xid, eisName);
-        }
-        else
-        {
+        } else {
             /*
-             * Note: for some dbs we seem to be able to get
-             * away with setting the size field to the size
-             * of the actual branch. However, for Oracle,
-             * it appears as though it must always be 64.
-             * (At least for zero branches.)
+             * Note: for some dbs we seem to be able to get away with setting
+             * the size field to the size of the actual branch. However, for
+             * Oracle, it appears as though it must always be 64. (At least for
+             * zero branches.)
              */
             xid.data[xid.gtrid_length] = (byte) 0;
             xid.bqual_length = 64;
@@ -138,8 +130,7 @@ public class XATxConverter
         return xid;
     }
 
-    public static Uid getUid(XID xid)
-    {
+    public static Uid getUid(XID xid) {
         if (xid == null || xid.formatID != FORMAT_ID) {
             return Uid.nullUid();
         }
@@ -153,8 +144,7 @@ public class XATxConverter
     public static String getNodeName(XID xid) {
         // Arjuna.XID()
         // don't check the formatId - it may differ e.g. JTA vs. JTS.
-        if (xid.formatID != FORMAT_ID && xid.formatID != 131072
-                && xid.formatID != 131080) {
+        if (xid.formatID != FORMAT_ID && xid.formatID != 131072 && xid.formatID != 131080) {
             return null;
         }
 
@@ -165,7 +155,8 @@ public class XATxConverter
         // way to tell where it starts is to figure out how long the Uid is.
         int offset = Uid.UID_SIZE;
 
-        return new String(Arrays.copyOfRange(globalTransactionId, offset, globalTransactionId.length), StandardCharsets.UTF_8);
+        return new String(Arrays.copyOfRange(globalTransactionId, offset, globalTransactionId.length),
+                StandardCharsets.UTF_8);
     }
 
     public static void setSubordinateNodeName(XID theXid, String xaNodeName) {
@@ -185,7 +176,7 @@ public class XATxConverter
             byte[] nameAsBytes = xaNodeName.getBytes(StandardCharsets.UTF_8);
             System.arraycopy(nameAsBytes, 0, theXid.data, offset, length);
         }
-        theXid.bqual_length = Uid.UID_SIZE+4+4+length;
+        theXid.bqual_length = Uid.UID_SIZE + 4 + 4 + length;
     }
     public static String getSubordinateNodeName(XID xid) {
         // Arjuna.XID()
@@ -201,17 +192,14 @@ public class XATxConverter
         // way to tell where it starts is to figure out how long the Uid is.
         int offset = Uid.UID_SIZE + 4;
 
-        int length = (branchQualifier[offset++] << 24)
-                + ((branchQualifier[offset++] & 0xFF) << 16)
-                + ((branchQualifier[offset++] & 0xFF) << 8)
-                + (branchQualifier[offset++] & 0xFF);
+        int length = (branchQualifier[offset++] << 24) + ((branchQualifier[offset++] & 0xFF) << 16)
+                + ((branchQualifier[offset++] & 0xFF) << 8) + (branchQualifier[offset++] & 0xFF);
         if (length > 0) {
-            return new String(Arrays.copyOfRange(branchQualifier, offset, offset+length), StandardCharsets.UTF_8);
+            return new String(Arrays.copyOfRange(branchQualifier, offset, offset + length), StandardCharsets.UTF_8);
         } else {
             return null;
         }
     }
-
 
     public static void setBranchUID(XID xid, Uid uid) {
         if (xid == null || xid.formatID != FORMAT_ID) {
@@ -221,9 +209,8 @@ public class XATxConverter
         byte[] bqual = uid.getBytes();
         System.arraycopy(bqual, 0, xid.data, xid.gtrid_length, Uid.UID_SIZE);
     }
-    
-    public static Uid getBranchUid(XID xid)
-    {
+
+    public static Uid getBranchUid(XID xid) {
         if (xid == null || xid.formatID != FORMAT_ID) {
             return Uid.nullUid();
         }
@@ -236,7 +223,6 @@ public class XATxConverter
         Uid tx = new Uid(bqual);
         return tx;
     }
-
 
     public static void setEisName(XID theXid, Integer eisName) {
         if (theXid == null || theXid.formatID != FORMAT_ID) {
@@ -251,10 +237,9 @@ public class XATxConverter
         theXid.data[offset + 2] = (byte) (eisName >>> 8);
         theXid.data[offset + 3] = (byte) (eisName >>> 0);
     }
-    
-    public static Integer getEISName(XID xid)
-    {
-        if(xid == null || xid.formatID != FORMAT_ID) {
+
+    public static Integer getEISName(XID xid) {
+        if (xid == null || xid.formatID != FORMAT_ID) {
             return -1;
         }
 
@@ -262,14 +247,11 @@ public class XATxConverter
         // way to tell where it starts is to figure out how long the Uid is.
         int offset = xid.gtrid_length + Uid.UID_SIZE;
 
-        return (xid.data[offset + 0] << 24)
-                + ((xid.data[offset + 1] & 0xFF) << 16)
-                + ((xid.data[offset + 2] & 0xFF) << 8)
-                + (xid.data[offset + 3] & 0xFF);
+        return (xid.data[offset + 0] << 24) + ((xid.data[offset + 1] & 0xFF) << 16)
+                + ((xid.data[offset + 2] & 0xFF) << 8) + (xid.data[offset + 3] & 0xFF);
     }
 
-    public static String getXIDString(XID xid)
-    {
+    public static String getXIDString(XID xid) {
         // companion method to XID.toString - try to keep them in sync.
 
         StringBuilder stringBuilder = new StringBuilder();

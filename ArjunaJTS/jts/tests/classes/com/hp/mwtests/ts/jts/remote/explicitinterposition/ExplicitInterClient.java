@@ -43,10 +43,8 @@ import com.hp.mwtests.ts.jts.TestModule.SetGet;
 import com.hp.mwtests.ts.jts.TestModule.SetGetHelper;
 import com.hp.mwtests.ts.jts.resources.TestUtility;
 
-public class ExplicitInterClient
-{
-    public static void main(String[] args) throws Exception
-    {
+public class ExplicitInterClient {
+    public static void main(String[] args) throws Exception {
         ServerORB orb = new ServerORB();
         ORB myORB = orb.getORB();
         RootOA myOA = orb.getOA();
@@ -59,67 +57,54 @@ public class ExplicitInterClient
         SetGet SetGetVar = null;
         short h = 0;
 
-        try
-        {
+        try {
             current.begin();
             current.begin();
             current.begin();
-        }
-        catch (Exception e)
-        {
-            TestUtility.fail("Caught exception during begin: "+e);
+        } catch (Exception e) {
+            TestUtility.fail("Caught exception during begin: " + e);
             e.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             Services serv = new Services(myORB);
 
             SetGetVar = SetGetHelper.narrow(myORB.orb().string_to_object(TestUtility.getService(objectReference)));
-        }
-        catch (Exception ex)
-        {
-            TestUtility.fail("Failed to bind to setget server: "+ex);
+        } catch (Exception ex) {
+            TestUtility.fail("Failed to bind to setget server: " + ex);
             ex.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             theControl = current.get_control();
 
             SetGetVar.set((short) 2, theControl);
-            //        SetGetVar.set((short) 2, theControl);
+            // SetGetVar.set((short) 2, theControl);
 
             theControl = null;
 
             System.out.println("Set value.");
-        }
-        catch (Exception ex1)
-        {
-            TestUtility.fail("Unexpected system exception during set: "+ex1);
+        } catch (Exception ex1) {
+            TestUtility.fail("Unexpected system exception during set: " + ex1);
             ex1.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             System.out.println("committing first nested action");
 
             current.commit(true);
 
-            //        SetGetVar.set((short) 4, current.get_control());
+            // SetGetVar.set((short) 4, current.get_control());
 
             System.out.println("committing second nested action");
 
             current.commit(true);
-        }
-        catch (Exception sysEx)
-        {
-            TestUtility.fail("Caught unexpected exception during commit: "+sysEx);
+        } catch (Exception sysEx) {
+            TestUtility.fail("Caught unexpected exception during commit: " + sysEx);
             sysEx.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             theControl = current.get_control();
 
             h = SetGetVar.get(theControl);
@@ -127,22 +112,17 @@ public class ExplicitInterClient
             theControl = null;
 
             System.out.println("Got value.");
-        }
-        catch (Exception ex2)
-        {
-            TestUtility.fail("Unexpected system exception during get: "+ex2);
+        } catch (Exception ex2) {
+            TestUtility.fail("Unexpected system exception during get: " + ex2);
             ex2.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             current.commit(true);
 
             System.out.println("committed top-level action");
-        }
-        catch (Exception ep)
-        {
-            TestUtility.fail("Caught commit exception for top-level action: "+ep);
+        } catch (Exception ep) {
+            TestUtility.fail("Caught commit exception for top-level action: " + ep);
             ep.printStackTrace(System.err);
         }
 

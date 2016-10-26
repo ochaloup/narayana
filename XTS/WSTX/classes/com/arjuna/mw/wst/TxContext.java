@@ -32,9 +32,8 @@
 package com.arjuna.mw.wst;
 
 /**
- * This class represents a handle on a stack of transactions.
- * It should only be used for suspending and resuming the
- * thread-to-transaction association.
+ * This class represents a handle on a stack of transactions. It should only be
+ * used for suspending and resuming the thread-to-transaction association.
  *
  * The transaction at the top of the stack is the current transaction.
  *
@@ -43,20 +42,19 @@ package com.arjuna.mw.wst;
  * @since XTS 1.0.
  */
 
-public interface TxContext
-{
+public interface TxContext {
 
     /**
      * @return true if the context is valid, false otherwise.
      */
 
-    public boolean valid ();
+    public boolean valid();
 
     /**
-     * @return true if the parameter represents the same context as
-     * the target object, false otherwise.
+     * @return true if the parameter represents the same context as the target
+     *         object, false otherwise.
      */
 
-    public boolean equals (Object o);
+    public boolean equals(Object o);
 
 }

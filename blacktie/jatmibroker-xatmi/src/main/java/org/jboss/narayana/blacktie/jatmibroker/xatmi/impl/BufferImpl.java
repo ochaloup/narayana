@@ -163,18 +163,25 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Create a new buffer.
      * 
-     * @param type The type of the buffer
-     * @param subtype The subtype of the buffer
-     * @param requiresSerialization Is the buffer not an X_OCTET?
-     * @param supportedTypes The types supported by the buffer, see the individual buffers for more details
-     * @param properties The properties to use.
+     * @param type
+     *            The type of the buffer
+     * @param subtype
+     *            The subtype of the buffer
+     * @param requiresSerialization
+     *            Is the buffer not an X_OCTET?
+     * @param supportedTypes
+     *            The types supported by the buffer, see the individual buffers
+     *            for more details
+     * @param properties
+     *            The properties to use.
      * @throws ConfigurationException
-     * @throws ConnectionException If the buffer is not supported.
+     * @throws ConnectionException
+     *             If the buffer is not supported.
      * @see {@link X_OCTET_Impl}
      * @see {@link X_C_TYPE_Impl}
      * @see {@link X_COMMON_Impl}
      */
-    BufferImpl(String type, String subtype, boolean requiresSerialization, List<Class> supportedTypes) 
+    BufferImpl(String type, String subtype, boolean requiresSerialization, List<Class> supportedTypes)
             throws ConfigurationException, ConnectionException {
         this.type = type;
         this.subtype = subtype;
@@ -183,7 +190,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
 
         if (requiresSerialization) {
             Properties properties = ConnectionFactory.getConnectionFactory().getProperties();
-            Map<String, BufferStructure> buffers = (Map<String, BufferStructure>) properties.get("blacktie.domain.buffers");
+            Map<String, BufferStructure> buffers = (Map<String, BufferStructure>) properties
+                    .get("blacktie.domain.buffers");
             BufferStructure buffer = buffers.get(subtype);
             if (buffer == null) {
                 throw new ConfigurationException("Subtype was not registered: " + subtype);
@@ -225,16 +233,22 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Format the buffer.
      * 
-     * @param keys The keys
-     * @param types The types
-     * @param lengths The lengths
-     * @param counts The number of each array
-     * @throws ConnectionException In case the buffer does not match the format.
+     * @param keys
+     *            The keys
+     * @param types
+     *            The types
+     * @param lengths
+     *            The lengths
+     * @param counts
+     *            The number of each array
+     * @throws ConnectionException
+     *             In case the buffer does not match the format.
      */
     private void format(String[] keys, Class[] types, int[] lengths, int[] counts) throws ConnectionException {
         structure.clear();
         if (keys.length != types.length || types.length != lengths.length) {
-            throw new ConnectionException(ConnectionImpl.TPEINVAL, "Invalid format, each array description should be same length");
+            throw new ConnectionException(ConnectionImpl.TPEINVAL,
+                    "Invalid format, each array description should be same length");
         }
         this.keys = keys;
         this.types = types;
@@ -250,8 +264,10 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Deserialize the buffer.
      * 
-     * @param data The data to deserialize.
-     * @throws ConnectionException In case the data does not match the format defined.
+     * @param data
+     *            The data to deserialize.
+     * @throws ConnectionException
+     *             In case the data does not match the format defined.
      */
     public void deserialize(byte[] data) throws ConnectionException {
         currentPos = 0;
@@ -264,7 +280,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
                 DataInputStream dis = new DataInputStream(bais);
                 for (int i = 0; i < types.length; i++) {
                     if (!supportedTypes.contains(types[i])) {
-                        throw new ConnectionException(ConnectionImpl.TPEITYPE, "Cannot read type from buffer " + types[i]);
+                        throw new ConnectionException(ConnectionImpl.TPEITYPE,
+                                "Cannot read type from buffer " + types[i]);
                     }
 
                     try {
@@ -325,12 +342,14 @@ public abstract class BufferImpl implements Serializable, Buffer {
                             }
                             structure.put(keys[i], toRead);
                         } else {
-                            throw new ConnectionException(ConnectionImpl.TPEITYPE, "Could not deserialize: " + types[i]);
+                            throw new ConnectionException(ConnectionImpl.TPEITYPE,
+                                    "Could not deserialize: " + types[i]);
                         }
                     } catch (IOException e) {
-                        throw new ConnectionException(ConnectionImpl.TPEITYPE, "Could not parse the value as: " + keys[i]
-                                + " was not a " + types[i] + " and even if it was an array of that type its length was not: "
-                                + lengths[i]);
+                        throw new ConnectionException(ConnectionImpl.TPEITYPE,
+                                "Could not parse the value as: " + keys[i] + " was not a " + types[i]
+                                        + " and even if it was an array of that type its length was not: "
+                                        + lengths[i]);
                     }
                 }
             }
@@ -345,7 +364,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
      * Serialize the buffer.
      * 
      * @return The byte array for sending.
-     * @throws ConnectionException In case the data cannot be formatted correctly
+     * @throws ConnectionException
+     *             In case the data cannot be formatted correctly
      */
     public byte[] serialize() throws ConnectionException {
         currentPos = 0;
@@ -497,9 +517,9 @@ public abstract class BufferImpl implements Serializable, Buffer {
                         throw new ConnectionException(ConnectionImpl.TPEOTYPE, "Could not serialize: " + types[i]);
                     }
                 } catch (IOException e) {
-                    throw new ConnectionException(ConnectionImpl.TPEOTYPE, "Could not parse the value as: " + keys[i]
-                            + " was not a " + types[i] + " and even if it was an array of that type its length was not: "
-                            + lengths[i]);
+                    throw new ConnectionException(ConnectionImpl.TPEOTYPE,
+                            "Could not parse the value as: " + keys[i] + " was not a " + types[i]
+                                    + " and even if it was an array of that type its length was not: " + lengths[i]);
                 }
             }
             toReturn = baos.toByteArray();
@@ -515,9 +535,12 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Write a byte during serialization/
      * 
-     * @param dos The output stream to write to.
-     * @param b The byte to write.
-     * @throws IOException In case the output stream fails.
+     * @param dos
+     *            The output stream to write to.
+     * @param b
+     *            The byte to write.
+     * @throws IOException
+     *             In case the output stream fails.
      */
     private void writeByte(DataOutputStream dos, byte b) throws IOException {
         dos.writeByte(b);
@@ -528,61 +551,63 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Read a byte during deserialization.
      * 
-     * @param dis The input stream to read from
+     * @param dis
+     *            The input stream to read from
      * @return The byte
-     * @throws IOException In case the stream cannot be read.
+     * @throws IOException
+     *             In case the stream cannot be read.
      */
     private byte readByte(DataInputStream dis) throws IOException {
         currentPos += 1;
 
         byte x = dis.readByte();
         ByteBuffer bbuf = ByteBuffer.allocate(BYTE_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.put(x);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         return bbuf.get(0);
     }
 
     private void writeLong(DataOutputStream dos, long x) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(LONG_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.putLong(x);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
-        //long toWrite = bbuf.getLong(0);    
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
-        
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // long toWrite = bbuf.getLong(0);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
+
         byte[] data = new byte[8];
-        Arrays.fill(data, (byte)0);
+        Arrays.fill(data, (byte) 0);
         System.arraycopy(bbuf.array(), 4, data, 0, 4);
-        
-        //dos.write(bbuf.array(), 4, 4);
+
+        // dos.write(bbuf.array(), 4, 4);
         dos.write(data);
         currentPos += LONG_SIZE;
     }
 
     private long readLong(DataInputStream dis) throws IOException {
         currentPos += LONG_SIZE;
-        //long x = dis.readLong();
-         
+        // long x = dis.readLong();
+
         ByteBuffer bbuf = ByteBuffer.allocate(LONG_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         byte[] data = new byte[8];
-        Arrays.fill(data, (byte)0);
-        
+        Arrays.fill(data, (byte) 0);
+
         dis.read(data, 4, 4);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         bbuf.put(data);
         long x = bbuf.getLong(0);
-        //read the next 4 bytes
+        // read the next 4 bytes
         dis.read(data, 0, 4);
         return x;
     }
 
     private void writeInt(DataOutputStream dos, int x) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(INT_SIZE);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         bbuf.putInt(x);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         int toWrite = bbuf.getInt(0);
         dos.writeInt(toWrite);
         currentPos += INT_SIZE;
@@ -592,17 +617,17 @@ public abstract class BufferImpl implements Serializable, Buffer {
         currentPos += INT_SIZE;
         int x = dis.readInt();
         ByteBuffer bbuf = ByteBuffer.allocate(INT_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.putInt(x);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         return bbuf.getInt(0);
     }
 
     private void writeShort(DataOutputStream dos, short x) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(SHORT_SIZE);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         bbuf.putShort(x);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         short toWrite = bbuf.getShort(0);
         dos.writeShort(toWrite);
 
@@ -613,17 +638,17 @@ public abstract class BufferImpl implements Serializable, Buffer {
         currentPos += SHORT_SIZE;
         short x = dis.readShort();
         ByteBuffer bbuf = ByteBuffer.allocate(SHORT_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.putShort(x);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         return bbuf.getShort(0);
     }
 
     private void writeFloat(DataOutputStream dos, float x) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(FLOAT_SIZE);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         bbuf.putFloat(x);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         float toWrite = bbuf.getFloat(0);
         dos.writeFloat(toWrite);
 
@@ -634,17 +659,17 @@ public abstract class BufferImpl implements Serializable, Buffer {
         currentPos += FLOAT_SIZE;
         float x = dis.readFloat();
         ByteBuffer bbuf = ByteBuffer.allocate(FLOAT_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.putFloat(x);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         return bbuf.getFloat(0);
     }
 
     private void writeDouble(DataOutputStream dos, double x) throws IOException {
         ByteBuffer bbuf = ByteBuffer.allocate(DOUBLE_SIZE);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         bbuf.putDouble(x);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         double toWrite = bbuf.getDouble(0);
         dos.writeDouble(toWrite);
 
@@ -655,9 +680,9 @@ public abstract class BufferImpl implements Serializable, Buffer {
         currentPos += DOUBLE_SIZE;
         double x = dis.readDouble();
         ByteBuffer bbuf = ByteBuffer.allocate(DOUBLE_SIZE);
-        //bbuf.order(ByteOrder.LITTLE_ENDIAN);
+        // bbuf.order(ByteOrder.LITTLE_ENDIAN);
         bbuf.putDouble(x);
-        //bbuf.order(ByteOrder.BIG_ENDIAN);
+        // bbuf.order(ByteOrder.BIG_ENDIAN);
         return bbuf.getDouble(0);
     }
 
@@ -690,10 +715,13 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Get the value of an attribute.
      * 
-     * @param key The key
-     * @param type The type
+     * @param key
+     *            The key
+     * @param type
+     *            The type
      * @return The value
-     * @throws ConnectionException In case the message is not formatted yet.
+     * @throws ConnectionException
+     *             In case the message is not formatted yet.
      */
     protected Object getAttributeValue(String key, Class type) throws ConnectionException {
         if (!formatted) {
@@ -708,7 +736,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
         if (position == -1) {
             throw new ConnectionException(ConnectionImpl.TPEITYPE, "Key is not part of the structure: " + key);
         } else if (types[position] != type) {
-            throw new ConnectionException(ConnectionImpl.TPEITYPE, "Key is not request type, it is a: " + types[position]);
+            throw new ConnectionException(ConnectionImpl.TPEITYPE,
+                    "Key is not request type, it is a: " + types[position]);
 
         }
         return structure.get(key);
@@ -717,10 +746,14 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Set the value.
      * 
-     * @param key The key to set
-     * @param type The type of the value.
-     * @param value The value to use
-     * @throws ConnectionException In case the message is not formatted.
+     * @param key
+     *            The key to set
+     * @param type
+     *            The type of the value.
+     * @param value
+     *            The value to use
+     * @throws ConnectionException
+     *             In case the message is not formatted.
      */
     protected void setAttributeValue(String key, Class type, Object value) throws ConnectionException {
         if (!formatted) {
@@ -735,7 +768,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
         if (position == -1) {
             throw new ConnectionException(ConnectionImpl.TPEITYPE, "Key is not part of the structure: " + key);
         } else if (types[position] != type) {
-            throw new ConnectionException(ConnectionImpl.TPEITYPE, "Key is not request type, it is a: " + types[position]);
+            throw new ConnectionException(ConnectionImpl.TPEITYPE,
+                    "Key is not request type, it is a: " + types[position]);
 
         }
         structure.put(key, value);
@@ -744,7 +778,8 @@ public abstract class BufferImpl implements Serializable, Buffer {
     /**
      * Set the raw data, used by the X_OCTET buffer.
      * 
-     * @param bytes The data to use.
+     * @param bytes
+     *            The data to use.
      */
     protected void setRawData(byte[] bytes) {
         this.data = bytes;

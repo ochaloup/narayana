@@ -42,7 +42,8 @@ public final class RecoveryIntegrationTestCase extends AbstractIntegrationTestCa
     @Deployment(name = DEPLOYMENT_NAME, managed = false, testable = false)
     public static WebArchive getDeployment() {
         return ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME + ".war")
-                .addPackages(false, LoggingParticipant.class.getPackage()).addAsWebInfResource(new File("web.xml"), "web.xml")
+                .addPackages(false, LoggingParticipant.class.getPackage())
+                .addAsWebInfResource(new File("web.xml"), "web.xml")
                 .addAsManifestResource(new StringAsset(DEPENDENCIES), "MANIFEST.MF");
     }
 
@@ -115,7 +116,8 @@ public final class RecoveryIntegrationTestCase extends AbstractIntegrationTestCa
             try {
                 // Updates coordinator's active transactions list
                 txSupport.getTransactions();
-                // After successful recovery transaction is removed and 404 is returned.
+                // After successful recovery transaction is removed and 404 is
+                // returned.
                 status = txSupport.getTransactionInfo().getStatus();
             } catch (HttpResponseException e) {
             }
@@ -127,25 +129,27 @@ public final class RecoveryIntegrationTestCase extends AbstractIntegrationTestCa
     }
 
     private void enlistParticipant(final String enlistmentUrl, final Vote vote) throws Exception {
-        Response clientResponse = ClientBuilder.newClient().target(DEPLOYMENT_URL + "/" + TransactionalService.PATH_SEGMENT)
-                .queryParam("participantEnlistmentUrl", enlistmentUrl).queryParam("vote", vote.getClass().getName()).request()
-                .post(null);
+        Response clientResponse = ClientBuilder.newClient()
+                .target(DEPLOYMENT_URL + "/" + TransactionalService.PATH_SEGMENT)
+                .queryParam("participantEnlistmentUrl", enlistmentUrl).queryParam("vote", vote.getClass().getName())
+                .request().post(null);
 
         Assert.assertEquals(200, clientResponse.getStatus());
     }
 
     private void registerDeserializer() throws Exception {
-        Response clientResponse = ClientBuilder.newClient().target(DEPLOYMENT_URL + "/" + TransactionalService.PATH_SEGMENT)
-                .request().put(null);
+        Response clientResponse = ClientBuilder.newClient()
+                .target(DEPLOYMENT_URL + "/" + TransactionalService.PATH_SEGMENT).request().put(null);
 
         Assert.assertEquals(204, clientResponse.getStatus());
     }
 
     private JSONArray getParticipantsInformation() {
         try {
-            final Response response = ClientBuilder.newClient().target(DEPLOYMENT_URL + "/"
-                    + RestATManagementResource.BASE_URL_SEGMENT + "/"
-                    + RestATManagementResource.PARTICIPANTS_URL_SEGMENT).request().get();
+            final Response response = ClientBuilder.newClient()
+                    .target(DEPLOYMENT_URL + "/" + RestATManagementResource.BASE_URL_SEGMENT + "/"
+                            + RestATManagementResource.PARTICIPANTS_URL_SEGMENT)
+                    .request().get();
             return new JSONArray(response.readEntity(String.class));
         } catch (Exception e) {
             e.printStackTrace();

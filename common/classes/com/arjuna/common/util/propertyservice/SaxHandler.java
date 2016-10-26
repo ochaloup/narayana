@@ -62,7 +62,8 @@ public final class SaxHandler extends DefaultHandler {
     }
 
     /**
-     * Handles open tag, if its name is <code>entry</code> and has attribute <code>key</code>.
+     * Handles open tag, if its name is <code>entry</code> and has attribute
+     * <code>key</code>.
      */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -99,11 +100,13 @@ public final class SaxHandler extends DefaultHandler {
     }
 
     /**
-     * Returns attribute's value from the <code>attributes</code> container based on the <code>name</code>.
+     * Returns attribute's value from the <code>attributes</code> container
+     * based on the <code>name</code>.
      *
      * @param name
      * @param attributes
-     * @return String value of the attribute if such attribute exists and null otherwise.
+     * @return String value of the attribute if such attribute exists and null
+     *         otherwise.
      */
     private String getAttributeValue(final String name, final Attributes attributes) {
         for (int i = 0; i < attributes.getLength(); i++) {

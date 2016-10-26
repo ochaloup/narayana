@@ -29,7 +29,6 @@ public class BasicTestRemote extends BasicTest {
         return archive;
     }
 
-
     @BeforeClass()
     public static void submitBytemanScript() throws Exception {
 

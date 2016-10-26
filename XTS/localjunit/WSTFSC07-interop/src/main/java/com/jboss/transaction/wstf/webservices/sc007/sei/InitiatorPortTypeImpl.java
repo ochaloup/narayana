@@ -45,13 +45,12 @@ import javax.jws.soap.SOAPBinding;
 /**
  * Implementation class for WSTX 1.1 AT Interop Test Initiator service
  */
-@WebService(name = "InitiatorPortType",
-        targetNamespace = "http://www.wstf.org/sc007",
+@WebService(name = "InitiatorPortType", targetNamespace = "http://www.wstf.org/sc007",
         // wsdlLocation="/WEB-INF/wsdl/sc007.wsdl",
-        portName = "sc007InitiatorPort",
-        serviceName="sc007Service")
-@Addressing(required=true)
-public class InitiatorPortTypeImpl // implements InitiatorPortType, SoapFaultPortType
+        portName = "sc007InitiatorPort", serviceName = "sc007Service")
+@Addressing(required = true)
+public class InitiatorPortTypeImpl // implements InitiatorPortType,
+                                    // SoapFaultPortType
 {
 
     /**
@@ -65,29 +64,26 @@ public class InitiatorPortTypeImpl // implements InitiatorPortType, SoapFaultPor
      */
     @WebMethod(operationName = "Response", action = "http://www.wstf.org/docs/scenarios/sc007/Response")
     @Oneway
-    @Action(input="http://www.wstf.org/docs/scenarios/sc007/Response")
+    @Action(input = "http://www.wstf.org/docs/scenarios/sc007/Response")
     @RequestWrapper(localName = "Response", targetNamespace = "http://www.wstf.org/sc007", className = "com.jboss.transaction.wstf.webservices.sc007.generated.TestMessageType")
-    public void response()
-    {
+    public void response() {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
 
-        InitiatorProcessor.getInitiator().handleResponse(inboundMap) ;
+        InitiatorProcessor.getInitiator().handleResponse(inboundMap);
     }
 
     @WebMethod(operationName = "SoapFault", action = "http://www.wstf.org/docs/scenarios/sc007/SoapFault")
     @Oneway
-    @Action(input="http://www.wstf.org/docs/scenarios/sc007/SoapFault")
+    @Action(input = "http://www.wstf.org/docs/scenarios/sc007/SoapFault")
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
     public void soapFault(
-            @WebParam(name = "Fault", targetNamespace = "http://schemas.xmlsoap.org/soap/envelope/", partName = "parameters")
-            Fault fault)
-    {
+            @WebParam(name = "Fault", targetNamespace = "http://schemas.xmlsoap.org/soap/envelope/", partName = "parameters") Fault fault) {
         MessageContext ctx = webServiceCtx.getMessageContext();
         MAP inboundMap = AddressingHelper.inboundMap(ctx);
 
         SoapFault11 soapFaultInternal = SoapFault11.fromFault(fault);
-        InitiatorProcessor.getInitiator().handleSoapFault(soapFaultInternal, inboundMap) ;
+        InitiatorProcessor.getInitiator().handleSoapFault(soapFaultInternal, inboundMap);
     }
 
 }

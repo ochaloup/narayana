@@ -47,63 +47,63 @@ import com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerT
 import com.hp.mwtests.ts.jts.orbspecific.resources.demosync;
 import com.hp.mwtests.ts.jts.resources.TestBase;
 
-public class ServerTransactionUnitTest extends TestBase
-{
+public class ServerTransactionUnitTest extends TestBase {
     @Test
-    public void test () throws Exception
-    {
+    public void test() throws Exception {
         ServerTransaction sc = new ServerTransaction(new Uid(), null);
-        
+
         assertTrue(sc.type() != null);
         assertTrue(ServerTransaction.typeName() != null);
         assertTrue(sc.getSavingUid().notEquals(Uid.nullUid()));
-        
+
         OutputObjectState os = new OutputObjectState();
-        
+
         assertTrue(sc.save_state(os, ObjectType.ANDPERSISTENT));
-        
+
         InputObjectState is = new InputObjectState(os);
-        
+
         assertTrue(sc.restore_state(is, ObjectType.ANDPERSISTENT));
-        
+
         sc.setRecoveryCoordinator(null);
     }
-    
+
     @Test
-    public void testPrepareCommit () throws Exception
-    {
+    public void testPrepareCommit() throws Exception {
         ServerTransaction sc = new ServerTransaction(new Uid(), null);
 
         sc.register_synchronization(new demosync(false).getReference());
-        
+
         sc.doBeforeCompletion();
-        
+
         assertEquals(sc.doPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
         assertEquals(sc.doPhase2Commit(), TwoPhaseOutcome.FINISH_OK);
-        
+
         sc.doAfterCompletion(Status.StatusCommitted);
     }
-    
+
     @Test
-    public void testPrepareRollback () throws Exception
-    {
+    public void testPrepareRollback() throws Exception {
         ServerTransaction sc = new ServerTransaction(new Uid(), null);
 
-        assertEquals(sc.doPrepare(), TwoPhaseOutcome.PREPARE_READONLY);  // readonly so we commit here
-        assertEquals(sc.doPhase2Abort(), ActionStatus.ABORTED);  // Due to the readonly we allow the massage
+        assertEquals(sc.doPrepare(), TwoPhaseOutcome.PREPARE_READONLY); // readonly
+                                                                        // so we
+                                                                        // commit
+                                                                        // here
+        assertEquals(sc.doPhase2Abort(), ActionStatus.ABORTED); // Due to the
+                                                                // readonly we
+                                                                // allow the
+                                                                // massage
     }
-    
+
     @Test
-    public void testOnePhaseCommit () throws Exception
-    {
+    public void testOnePhaseCommit() throws Exception {
         ServerTransaction sc = new ServerTransaction(new Uid(), null);
 
         sc.doCommit(true);
     }
-    
+
     @Test
-    public void testRollback () throws Exception
-    {
+    public void testRollback() throws Exception {
         ServerTransaction sc = new ServerTransaction(new Uid(), null);
 
         sc.rollback();

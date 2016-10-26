@@ -48,145 +48,107 @@ import org.jboss.ws.api.addressing.MAP;
 import javax.xml.namespace.QName;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
-public class BusinessActivityTerminatorRPCStub implements BusinessActivityTerminator
-{
+public class BusinessActivityTerminatorRPCStub implements BusinessActivityTerminator {
     private W3CEndpointReference _terminationCoordinator = null;
-    private final String _id ;
+    private final String _id;
 
     public BusinessActivityTerminatorRPCStub(final String id, final W3CEndpointReference terminationCoordinator)
-        throws Exception
-    {
+            throws Exception {
         _terminationCoordinator = terminationCoordinator;
-        _id = id ;
+        _id = id;
     }
 
-    public void close ()
-        throws TransactionRolledBackException, UnknownTransactionException, SystemException
-    {
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
+    public void close() throws TransactionRolledBackException, UnknownTransactionException, SystemException {
+        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId());
 
-        try
-        {
-            TerminationCoordinatorRPCClient.getClient().sendClose(_terminationCoordinator, map, new InstanceIdentifier(_id)) ;
-        }
-        catch (SoapFault11 soapFault)
-        {
+        try {
+            TerminationCoordinatorRPCClient.getClient().sendClose(_terminationCoordinator, map,
+                    new InstanceIdentifier(_id));
+        } catch (SoapFault11 soapFault) {
             if ((ArjunaTXConstants.TRANSACTIONROLLEDBACK_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))) {
                 throw new TransactionRolledBackException(soapFault.getMessage());
-            }
-            else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
-                throw new UnknownTransactionException(soapFault.getMessage()) ;
+            } else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
+                throw new UnknownTransactionException(soapFault.getMessage());
             }
 
-            throw new SystemException(soapFault.getMessage()) ;
-        }
-        catch (Exception e)
-        {
+            throw new SystemException(soapFault.getMessage());
+        } catch (Exception e) {
             throw new SystemException();
         }
     }
 
-    public void cancel ()
-        throws FaultedException, UnknownTransactionException, SystemException
-    {
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
+    public void cancel() throws FaultedException, UnknownTransactionException, SystemException {
+        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId());
 
-        try
-        {
-            TerminationCoordinatorRPCClient.getClient().sendCancel(_terminationCoordinator, map, new InstanceIdentifier(_id)) ;
-        }
-        catch (SoapFault11 soapFault)
-        {
-            if (ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
-                throw new FaultedException(soapFault.getMessage()) ;
-            }
-            else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
-                throw new UnknownTransactionException(soapFault.getMessage()) ;
+        try {
+            TerminationCoordinatorRPCClient.getClient().sendCancel(_terminationCoordinator, map,
+                    new InstanceIdentifier(_id));
+        } catch (SoapFault11 soapFault) {
+            if (ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
+                throw new FaultedException(soapFault.getMessage());
+            } else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
+                throw new UnknownTransactionException(soapFault.getMessage());
             }
 
-            throw new SystemException(soapFault.getMessage()) ;
-        }
-        catch (Exception e)
-        {
+            throw new SystemException(soapFault.getMessage());
+        } catch (Exception e) {
             throw new SystemException(e.getMessage());
-        }
-        catch (final Throwable th)
-        {
-            th.printStackTrace() ;
-            throw new SystemException(th.getMessage()) ;
+        } catch (final Throwable th) {
+            th.printStackTrace();
+            throw new SystemException(th.getMessage());
         }
     }
 
-    public void complete ()
-        throws FaultedException, UnknownTransactionException, SystemException
-    {
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
+    public void complete() throws FaultedException, UnknownTransactionException, SystemException {
+        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId());
 
-        try
-        {
-            TerminationCoordinatorRPCClient.getClient().sendComplete(_terminationCoordinator, map, new InstanceIdentifier(_id)) ;
-        }
-        catch (SoapFault11 soapFault)
-        {
-            if (ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
-                throw new FaultedException(soapFault.getMessage()) ;
-            }
-            else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode()))
-            {
-                throw new UnknownTransactionException(soapFault.getMessage()) ;
+        try {
+            TerminationCoordinatorRPCClient.getClient().sendComplete(_terminationCoordinator, map,
+                    new InstanceIdentifier(_id));
+        } catch (SoapFault11 soapFault) {
+            if (ArjunaTXConstants.FAULTED_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
+                throw new FaultedException(soapFault.getMessage());
+            } else if (ArjunaTXConstants.UNKNOWNTRANSACTION_ERROR_CODE_QNAME.equals(soapFault.getSubcode())) {
+                throw new UnknownTransactionException(soapFault.getMessage());
             }
 
-            throw new SystemException(soapFault.getMessage()) ;
-        }
-        catch (Exception e)
-        {
+            throw new SystemException(soapFault.getMessage());
+        } catch (Exception e) {
             throw new SystemException(e.getMessage());
-        }
-        catch (final Throwable th)
-        {
-            th.printStackTrace() ;
-            throw new SystemException(th.getMessage()) ;
+        } catch (final Throwable th) {
+            th.printStackTrace();
+            throw new SystemException(th.getMessage());
         }
     }
 
-    public W3CEndpointReference getEndpoint()
-    {
+    public W3CEndpointReference getEndpoint() {
         return _terminationCoordinator;
     }
     /*
      * this never gets called
      */
-    public void unknown ()
-        throws SystemException
-    {
-        error() ;
+    public void unknown() throws SystemException {
+        error();
     }
 
     /*
      * this never gets called
      */
-    public void error ()
-        throws SystemException
-    {
-/*
- * Since it is never used this has been decommissioned due to problems with using the soap fault service to
-  * send a fault via a W3C endpoint. the latter is broken now that CXF helpfully puts metadata into the endpoint.
-        final MAP map = AddressingHelper.createNotificationContext(MessageId.getMessageId()) ;
-        final SoapFault soapFault = new SoapFault11(SoapFaultType.FAULT_SENDER, ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME,
-                WSTLogger.i18NLogger.get_wst11_stub_BusinessActivityTerminatorStub_1()) ;
-        try
-        {
-            TerminationCoordinatorClient.getClient().sendSoapFault(_terminationCoordinator, map, soapFault, new InstanceIdentifier(_id)) ;
-        }
-        catch (final Throwable th)
-        {
-            throw new SystemException() ;
-        }
-*/
+    public void error() throws SystemException {
+        /*
+         * Since it is never used this has been decommissioned due to problems
+         * with using the soap fault service to send a fault via a W3C endpoint.
+         * the latter is broken now that CXF helpfully puts metadata into the
+         * endpoint. final MAP map =
+         * AddressingHelper.createNotificationContext(MessageId.getMessageId())
+         * ; final SoapFault soapFault = new
+         * SoapFault11(SoapFaultType.FAULT_SENDER,
+         * ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME,
+         * WSTLogger.i18NLogger.get_wst11_stub_BusinessActivityTerminatorStub_1(
+         * )) ; try { TerminationCoordinatorClient.getClient().sendSoapFault(
+         * _terminationCoordinator, map, soapFault, new InstanceIdentifier(_id))
+         * ; } catch (final Throwable th) { throw new SystemException() ; }
+         */
     }
 
 }

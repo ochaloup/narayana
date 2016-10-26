@@ -108,8 +108,8 @@ public final class ParticipantResourceTestCase {
     public void testGetStatus() throws Exception {
         registerParticipant(participantId, new LoggingParticipant(new ReadOnly()));
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
         Response response = getParticipantStatus(participantId);
@@ -129,13 +129,14 @@ public final class ParticipantResourceTestCase {
 
         Response stringResponse = prepareParticipant(participantId);
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Assert.assertEquals(200, stringResponse.getStatus());
-        Assert.assertEquals(TxStatus.TransactionPrepared.name(), TxSupport.getStatus(stringResponse.readEntity(String.class)));
+        Assert.assertEquals(TxStatus.TransactionPrepared.name(),
+                TxSupport.getStatus(stringResponse.readEntity(String.class)));
         Assert.assertEquals(TxStatus.TransactionPrepared.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "prepare" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"prepare"}), participant.getInvocations());
     }
 
     @Test
@@ -143,15 +144,16 @@ public final class ParticipantResourceTestCase {
         final LoggingParticipant participant = new LoggingParticipant(new Aborted());
         registerParticipant(participantId, participant);
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Response stringResponse = prepareParticipant(participantId);
 
         Assert.assertEquals(409, stringResponse.getStatus());
-        Assert.assertEquals(TxStatus.TransactionRolledBack.name(), TxSupport.getStatus(stringResponse.readEntity(String.class)));
+        Assert.assertEquals(TxStatus.TransactionRolledBack.name(),
+                TxSupport.getStatus(stringResponse.readEntity(String.class)));
         Assert.assertEquals(TxStatus.TransactionRolledBack.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "prepare", "rollback" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"prepare", "rollback"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -160,15 +162,16 @@ public final class ParticipantResourceTestCase {
         final LoggingParticipant participant = new LoggingParticipant(new ReadOnly());
         registerParticipant(participantId, participant);
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Response stringResponse = prepareParticipant(participantId);
 
         Assert.assertEquals(200, stringResponse.getStatus());
-        Assert.assertEquals(TxStatus.TransactionReadOnly.name(), TxSupport.getStatus(stringResponse.readEntity(String.class)));
+        Assert.assertEquals(TxStatus.TransactionReadOnly.name(),
+                TxSupport.getStatus(stringResponse.readEntity(String.class)));
         Assert.assertEquals(TxStatus.TransactionReadOnly.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "prepare" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"prepare"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -177,8 +180,8 @@ public final class ParticipantResourceTestCase {
         final LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
         Response stringResponse = prepareParticipant(participantId);
@@ -190,8 +193,8 @@ public final class ParticipantResourceTestCase {
     public void testCommit() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
@@ -199,7 +202,7 @@ public final class ParticipantResourceTestCase {
 
         Assert.assertEquals(200, stringResponse.getStatus());
         Assert.assertEquals(TxStatus.TransactionCommitted.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "commit" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"commit"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -207,8 +210,8 @@ public final class ParticipantResourceTestCase {
     public void testCommitWithoutPrepare() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Response stringResponse = commitParticipant(participantInformation.getId());
 
@@ -219,14 +222,14 @@ public final class ParticipantResourceTestCase {
     public void testCommitOnePhase() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Response stringResponse = commitParticipantInOnePhase(participantInformation.getId());
 
         Assert.assertEquals(200, stringResponse.getStatus());
         Assert.assertEquals(TxStatus.TransactionCommittedOnePhase.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "commitOnePhase" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"commitOnePhase"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -234,8 +237,8 @@ public final class ParticipantResourceTestCase {
     public void testCommitOnePhaseAfterPrepare() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
@@ -248,14 +251,14 @@ public final class ParticipantResourceTestCase {
     public void testRollback() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Response stringResponse = rollbackParticipant(participantInformation.getId());
 
         Assert.assertEquals(200, stringResponse.getStatus());
         Assert.assertEquals(TxStatus.TransactionRolledBack.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "rollback" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"rollback"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -263,8 +266,8 @@ public final class ParticipantResourceTestCase {
     public void testRollbackAfterPrepare() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         participantInformation.setStatus(TxStatus.TransactionPrepared.name());
 
@@ -272,7 +275,7 @@ public final class ParticipantResourceTestCase {
 
         Assert.assertEquals(200, stringResponse.getStatus());
         Assert.assertEquals(TxStatus.TransactionRolledBack.name(), participantInformation.getStatus());
-        Assert.assertEquals(Arrays.asList(new String[] { "rollback" }), participant.getInvocations());
+        Assert.assertEquals(Arrays.asList(new String[]{"rollback"}), participant.getInvocations());
         Assert.assertNull(ParticipantsContainer.getInstance().getParticipantInformation(participantId));
     }
 
@@ -281,8 +284,8 @@ public final class ParticipantResourceTestCase {
     public void testForgetHeuristic() throws Exception {
         LoggingParticipant participant = new LoggingParticipant(new Prepared());
         registerParticipant(participantId, participant);
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         participantInformation.setStatus(TxStatus.TransactionHeuristicRollback.name());
 
@@ -300,8 +303,8 @@ public final class ParticipantResourceTestCase {
 
         Response simpleResponse = forgetParticipantHeuristic(participantId);
 
-        ParticipantInformation participantInformation = ParticipantsContainer.getInstance().getParticipantInformation(
-                participantId);
+        ParticipantInformation participantInformation = ParticipantsContainer.getInstance()
+                .getParticipantInformation(participantId);
 
         Assert.assertEquals(412, simpleResponse.getStatus());
         Assert.assertEquals(TxStatus.TransactionActive.name(), participantInformation.getStatus());
@@ -326,29 +329,24 @@ public final class ParticipantResourceTestCase {
     }
 
     private Response prepareParticipant(final String participantId) throws Exception {
-        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(
-                Entity.entity(TxSupport.toStatusContent(TxStatus.TransactionPrepared.name()), TxMediaType.TX_STATUS_MEDIA_TYPE));
+        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(Entity.entity(
+                TxSupport.toStatusContent(TxStatus.TransactionPrepared.name()), TxMediaType.TX_STATUS_MEDIA_TYPE));
     }
 
     private Response commitParticipant(final String participantId) throws Exception {
-        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(
-                Entity.entity(
-                TxSupport.toStatusContent(TxStatus.TransactionCommitted.name()),
-                        TxMediaType.TX_STATUS_MEDIA_TYPE));
+        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(Entity.entity(
+                TxSupport.toStatusContent(TxStatus.TransactionCommitted.name()), TxMediaType.TX_STATUS_MEDIA_TYPE));
     }
 
     private Response commitParticipantInOnePhase(final String participantId) throws Exception {
-        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(
-                Entity.entity(
-                TxSupport.toStatusContent(TxStatus.TransactionCommittedOnePhase.name()),
+        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request()
+                .put(Entity.entity(TxSupport.toStatusContent(TxStatus.TransactionCommittedOnePhase.name()),
                         TxMediaType.TX_STATUS_MEDIA_TYPE));
     }
 
     private Response rollbackParticipant(final String participantId) throws Exception {
-        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(
-                Entity.entity(
-                TxSupport.toStatusContent(TxStatus.TransactionRolledBack.name()),
-                        TxMediaType.TX_STATUS_MEDIA_TYPE));
+        return ClientBuilder.newClient().target(PARTICIPANT_URL + "/" + participantId).request().put(Entity.entity(
+                TxSupport.toStatusContent(TxStatus.TransactionRolledBack.name()), TxMediaType.TX_STATUS_MEDIA_TYPE));
     }
 
     @SuppressWarnings("rawtypes")

@@ -35,8 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(BMUnitRunner.class)
-public class TestCommitMarkableResourceMBeansFailAfterPrepare extends
-        FailAfterPrepareBase {
+public class TestCommitMarkableResourceMBeansFailAfterPrepare extends FailAfterPrepareBase {
     @Test
     @BMScript("commitMarkableResourceFailAfterPrepare")
     public void testObjStoreBrowser() throws Exception {

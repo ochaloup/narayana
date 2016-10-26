@@ -45,13 +45,15 @@ public class CompensationInterceptorRequiresNew extends CompensationInterceptorB
     /**
      * Request must be invoked in a newly created transaction.
      *
-     * If there is an active transaction available, it must be suspended and new transaction created.
+     * If there is an active transaction available, it must be suspended and new
+     * transaction created.
      *
      * After request processing, the suspended transaction must be resumed.
      *
      * @param ic
      * @return
-     * @throws Exception if request has failed.
+     * @throws Exception
+     *             if request has failed.
      */
     @AroundInvoke
     public Object intercept(final InvocationContext ic) throws Exception {

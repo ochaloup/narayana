@@ -17,7 +17,6 @@
  */
 package org.jboss.narayana.blacktie.jatmibroker.xatmi;
 
-
 /**
  * The X_OCTET buffer is used to send byte arrays in an XATMI application
  */
@@ -26,7 +25,8 @@ public interface X_OCTET extends Buffer {
     /**
      * Set the data of the buffer.
      * 
-     * @param bytes The data to set.
+     * @param bytes
+     *            The data to set.
      */
     public void setByteArray(byte[] bytes);
 

@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.PerfProfile01Clients;
  * $Id: Client_ImplicitObject_NoTran_TranCommitReadLock.java,v 1.2 2003/06/26 11:44:19 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.PerfProfile01.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
@@ -65,12 +64,9 @@ import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
 import java.util.Date;
 
-public class Client_ImplicitObject_NoTran_TranCommitReadLock
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client_ImplicitObject_NoTran_TranCommitReadLock {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -78,14 +74,14 @@ public class Client_ImplicitObject_NoTran_TranCommitReadLock
             int numberOfCalls = Integer.parseInt(args[args.length - 2]);
             String implicitObjectIOR = ServerIORStore.loadIOR(args[args.length - 1]);
 
-            ImplicitObject implicitObject = ImplicitObjectHelper.narrow(ORBInterface.orb().string_to_object(implicitObjectIOR));
+            ImplicitObject implicitObject = ImplicitObjectHelper
+                    .narrow(ORBInterface.orb().string_to_object(implicitObjectIOR));
 
             boolean correct = true;
 
             Date start = new Date();
 
-            for (int index = 0; index < numberOfCalls; index++)
-            {
+            for (int index = 0; index < numberOfCalls; index++) {
                 implicitObject.tran_commit_readlock();
             }
 
@@ -96,31 +92,24 @@ public class Client_ImplicitObject_NoTran_TranCommitReadLock
             System.err.println("Operation duration       : " + operationDuration + "ms");
             System.err.println("Test duration            : " + (end.getTime() - start.getTime()) + "ms");
 
-            correct = PerformanceProfileStore.checkPerformance(prefix + "_ImplicitObject_NoTran_TranCommitReadLock", operationDuration);
+            correct = PerformanceProfileStore.checkPerformance(prefix + "_ImplicitObject_NoTran_TranCommitReadLock",
+                    operationDuration);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client_ImplicitObject_NoTran_TranCommitReadLock.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client_ImplicitObject_NoTran_TranCommitReadLock.main: " + exception);
             exception.printStackTrace(System.err);
         }

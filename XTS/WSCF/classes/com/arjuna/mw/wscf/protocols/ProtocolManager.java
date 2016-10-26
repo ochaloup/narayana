@@ -49,11 +49,11 @@ import java.util.*;
  * @since 1.0.
  */
 
-public class ProtocolManager
-{
+public class ProtocolManager {
 
     /**
-     * @param     protocolName The name of the protocol.
+     * @param protocolName
+     *            The name of the protocol.
      *
      * @exception com.arjuna.mw.wscf.exceptions.ProtocolNotRegisteredException
      *                Thrown if the requested coordination protocol has not been
@@ -65,33 +65,29 @@ public class ProtocolManager
      *
      */
 
-    public Object getProtocolImplementation (String protocolName)
-            throws ProtocolNotRegisteredException, IllegalArgumentException
-    {
-        synchronized (this)
-        {
-            if (protocolName == null)
-            {
+    public Object getProtocolImplementation(String protocolName)
+            throws ProtocolNotRegisteredException, IllegalArgumentException {
+        synchronized (this) {
+            if (protocolName == null) {
                 throw new IllegalArgumentException();
             }
 
             Object object = _protocols.get(protocolName);
 
             if (object == null) {
-                throw new ProtocolNotRegisteredException(wscfLogger.i18NLogger.get_mw_wscf11_protocols_ProtocolManager_1()
-                        + protocolName);
+                throw new ProtocolNotRegisteredException(
+                        wscfLogger.i18NLogger.get_mw_wscf11_protocols_ProtocolManager_1() + protocolName);
             }
             return object;
         }
     }
 
     /*
-     * install all registered protocol implementations which should be either context factories
-     * or high level services
+     * install all registered protocol implementations which should be either
+     * context factories or high level services
      */
 
-    public synchronized final void initialise ()
-    {
+    public synchronized final void initialise() {
         if (_initialised)
             return;
         else
@@ -104,24 +100,23 @@ public class ProtocolManager
             return;
         }
         ListIterator<String> iterator = protocolImplementations.listIterator();
-        List<Class<?>> contextProviderClasses =  new ArrayList<Class<?>>();
-        List<Class<?>> hlsProviderClasses =  new ArrayList<Class<?>>();
+        List<Class<?>> contextProviderClasses = new ArrayList<Class<?>>();
+        List<Class<?>> hlsProviderClasses = new ArrayList<Class<?>>();
 
         // look for protocol implementations
-        
-        while (iterator.hasNext())
-        {
+
+        while (iterator.hasNext()) {
             String className = (String) iterator.next();
             Class<?> clazz = null;
 
             try {
                 clazz = this.getClass().getClassLoader().loadClass(className);
                 ContextProvider contextProvider = clazz.getAnnotation(ContextProvider.class);
-                if (contextProvider !=  null) {
+                if (contextProvider != null) {
                     contextProviderClasses.add(clazz);
                 } else {
                     HLSProvider hlsProvider = clazz.getAnnotation(HLSProvider.class);
-                    if (hlsProvider !=  null) {
+                    if (hlsProvider != null) {
                         hlsProviderClasses.add(clazz);
                     } else {
                         wscfLogger.i18NLogger.error_protocols_ProtocolManager_2(className);
@@ -132,13 +127,13 @@ public class ProtocolManager
             }
         }
 
-        // we need to create the high level services before context factories since the latter need to
+        // we need to create the high level services before context factories
+        // since the latter need to
         // cross-reference the former
-        
+
         for (Class<?> clazz : hlsProviderClasses) {
             String className = clazz.getName();
-            try
-            {
+            try {
                 HLSProvider hlsProvider = clazz.getAnnotation(HLSProvider.class);
                 String serviceType = hlsProvider.serviceType();
                 wscfLogger.i18NLogger.info_protocols_ProtocolManager_4(className, serviceType);
@@ -153,10 +148,9 @@ public class ProtocolManager
 
         for (Class<?> clazz : contextProviderClasses) {
             String className = clazz.getName();
-            try
-            {
+            try {
                 ContextProvider contextProvider = clazz.getAnnotation(ContextProvider.class);
-                if (contextProvider !=  null) {
+                if (contextProvider != null) {
                     String coordinationType = contextProvider.coordinationType();
                     wscfLogger.i18NLogger.info_protocols_ProtocolManager_4(className, coordinationType);
                     Object object = clazz.newInstance();
@@ -164,10 +158,12 @@ public class ProtocolManager
                 }
             } catch (InstantiationException ie) {
                 wscfLogger.i18NLogger.error_protocols_ProtocolManager_5(className, ie);
-                ie.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                ie.printStackTrace(); // To change body of catch statement use
+                                        // File | Settings | File Templates.
             } catch (IllegalAccessException iae) {
                 wscfLogger.i18NLogger.error_protocols_ProtocolManager_5(className, iae);
-                iae.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                iae.printStackTrace(); // To change body of catch statement use
+                                        // File | Settings | File Templates.
             }
         }
     }

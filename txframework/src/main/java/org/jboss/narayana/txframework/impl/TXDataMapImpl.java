@@ -54,7 +54,6 @@ public class TXDataMapImpl<K, V> implements TXDataMap<K, V> {
         return (Map<K, V>) mapThreadLocal.get();
     }
 
-
     @Override
     public int size() {
 

@@ -43,12 +43,14 @@ public class CompensationInterceptorBase {
     @Inject
     private BeanManager beanManager;
 
-    private CompensationContextStateManager compensationContextStateManager = CompensationContextStateManager.getInstance();
+    private CompensationContextStateManager compensationContextStateManager = CompensationContextStateManager
+            .getInstance();
 
     /**
      * Request should be invoked in a newly created compensating transaction.
      * 
-     * If {@code Compensatable.distributed} is true - remote transaction is created, otherwise local transaction is created.
+     * If {@code Compensatable.distributed} is true - remote transaction is
+     * created, otherwise local transaction is created.
      * 
      * @param ic
      * @return
@@ -83,9 +85,10 @@ public class CompensationInterceptorBase {
     /**
      * Request should be executed in already existing transaction.
      * 
-     * If the transaction is local, compensation context will be active already and we will be able to reuse it. However, if the
-     * incoming transaction is distributed, we need to active compensation context ourselves and to make sure to close it after
-     * the request processing.
+     * If the transaction is local, compensation context will be active already
+     * and we will be able to reuse it. However, if the incoming transaction is
+     * distributed, we need to active compensation context ourselves and to make
+     * sure to close it after the request processing.
      * 
      * @param ic
      * @return
@@ -127,16 +130,22 @@ public class CompensationInterceptorBase {
     }
 
     /**
-     * Based on the settings of the annotation, certain exceptions might cause transaction to fail, while others are allowed.
+     * Based on the settings of the annotation, certain exceptions might cause
+     * transaction to fail, while others are allowed.
      *
      * By default {@link RuntimeException} causes transaction to compensate.
      *
-     * @param ic invocation context.
-     * @param exception exception that was caught.
-     * @param started if the transaction was stared by this interceptor.
-     * @throws Exception always rethrows the same exception.
+     * @param ic
+     *            invocation context.
+     * @param exception
+     *            exception that was caught.
+     * @param started
+     *            if the transaction was stared by this interceptor.
+     * @throws Exception
+     *             always rethrows the same exception.
      */
-    private void handleException(final InvocationContext ic, final Exception exception, final boolean started) throws Exception {
+    private void handleException(final InvocationContext ic, final Exception exception, final boolean started)
+            throws Exception {
 
         final Compensatable compensatable = getCompensatable(ic);
 

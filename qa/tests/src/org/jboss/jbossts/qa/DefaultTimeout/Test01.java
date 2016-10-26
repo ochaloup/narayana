@@ -30,20 +30,17 @@ import javax.transaction.TransactionManager;
 import javax.transaction.RollbackException;
 
 /**
- * Test default timeout causes rollback by the reaper.
- * Commit attempt after timeout should fail with RollbackException.
+ * Test default timeout causes rollback by the reaper. Commit attempt after
+ * timeout should fail with RollbackException.
  *
- * Note: build time unit tests jta|jtax SimpleTest|RollbackTest are similar
- * but use custom (short) timeout value so as not to delay the build.
+ * Note: build time unit tests jta|jtax SimpleTest|RollbackTest are similar but
+ * use custom (short) timeout value so as not to delay the build.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com), 2011-03
  */
-public class Test01
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Test01 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -53,44 +50,35 @@ public class Test01
 
             transactionManager.begin();
 
-            try
-            {
-                Thread.sleep( (1000*arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout()) + 1000 );
+            try {
+                Thread.sleep((1000 * arjPropertyManager.getCoordinatorEnvironmentBean().getDefaultTimeout()) + 1000);
 
-//                correct = (transactionManager.getStatus() == Status.STATUS_ROLLEDBACK);
+                // correct = (transactionManager.getStatus() ==
+                // Status.STATUS_ROLLEDBACK);
 
                 transactionManager.commit();
                 correct = false;
-            }
-            catch (RollbackException rollbackException)
-            {
-                // Commit attempt after timeout should fail with RollbackException
+            } catch (RollbackException rollbackException) {
+                // Commit attempt after timeout should fail with
+                // RollbackException
                 correct = true;
             }
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Test01.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Test01.main: " + exception);
             exception.printStackTrace(System.err);
         }

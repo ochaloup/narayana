@@ -40,8 +40,8 @@ import java.util.Set;
 import java.util.Vector;
 
 /**
- * Implementation of XAResourceRecoveryHelper for use in txbridge recovery tests.
- * Provides persistence for TestXAResource via a file in the ObjectStore.
+ * Implementation of XAResourceRecoveryHelper for use in txbridge recovery
+ * tests. Provides persistence for TestXAResource via a file in the ObjectStore.
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com) 2010-01
  */
@@ -60,16 +60,21 @@ public class TestXAResourceRecoveryHelper implements XAResourceRecoveryHelper {
     }
 
     /**
-     * This is required to be public (not protected) because of 
-     * Caused by: org.jboss.as.server.deployment.DeploymentUnitProcessingException: JBAS014227: EJB TestXAResourceRecoveryHelper of type org.jboss.jbossts.txbridge.tests.inbound.utility.TestXAResourceRecoveryHelper must have public default constructor
-     * Clearly two instances will be created, one by the container for postConstruct/preDestroy and one by ourselves but as they both use getInstance() the code should work fine. 
+     * This is required to be public (not protected) because of Caused by:
+     * org.jboss.as.server.deployment.DeploymentUnitProcessingException:
+     * JBAS014227: EJB TestXAResourceRecoveryHelper of type
+     * org.jboss.jbossts.txbridge.tests.inbound.utility.TestXAResourceRecoveryHelper
+     * must have public default constructor Clearly two instances will be
+     * created, one by the container for postConstruct/preDestroy and one by
+     * ourselves but as they both use getInstance() the code should work fine.
      * This is not a new way of working it would have been like that before.
      */
     public TestXAResourceRecoveryHelper() {
     }
 
     /**
-     * MC lifecycle callback, used to register the recovery module with the transaction manager.
+     * MC lifecycle callback, used to register the recovery module with the
+     * transaction manager.
      */
     @PostConstruct
     public void postConstruct() {
@@ -81,7 +86,8 @@ public class TestXAResourceRecoveryHelper implements XAResourceRecoveryHelper {
     }
 
     /**
-     * MC lifecycle callback, used to unregister the recovery module from the transaction manager.
+     * MC lifecycle callback, used to unregister the recovery module from the
+     * transaction manager.
      */
     @PreDestroy
     public void preDestroy() {
@@ -147,7 +153,6 @@ public class TestXAResourceRecoveryHelper implements XAResourceRecoveryHelper {
 
         return preparedXids.toArray(new Xid[preparedXids.size()]);
     }
-
 
     private void writeToDisk() {
         File logFile = getLogFile();

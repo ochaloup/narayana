@@ -43,8 +43,8 @@ public class RecoveringTransaction extends Transaction {
                 if (recordBeingHandled.typeIs() == RecordType.RESTAT_RECORD) {
                     participants.add((RESTRecord) recordBeingHandled);
                 } else {
-                    log.warnf("Could not reactivate participant %s of transaction %s",
-                            recordBeingHandled.get_uid(), get_uid());
+                    log.warnf("Could not reactivate participant %s of transaction %s", recordBeingHandled.get_uid(),
+                            get_uid());
                 }
 
             }

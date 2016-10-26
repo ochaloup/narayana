@@ -58,7 +58,6 @@ package org.jboss.jbossts.qa.EnlistDelistEnlist01Impls;
  * $Id: EnlistDelistEnlistImpl01.java,v 1.4 2004/02/24 11:06:08 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.EnlistDelistEnlist01.*;
 
 import javax.naming.InitialContext;
@@ -70,8 +69,7 @@ import javax.transaction.xa.XAResource;
 import java.sql.Connection;
 import java.util.Hashtable;
 
-public class EnlistDelistEnlistImpl01 implements ServiceOperations
-{
+public class EnlistDelistEnlistImpl01 implements ServiceOperations {
     private boolean _isCorrect = true;
     private XADataSource _xaDataSource = null;
 
@@ -79,60 +77,45 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
     private String _databasePassword;
 
     public EnlistDelistEnlistImpl01(String binding, String databaseUser, String databasePassword)
-            throws InvocationException
-    {
+            throws InvocationException {
         _databaseUser = databaseUser;
         _databasePassword = databasePassword;
 
-        try
-        {
+        try {
             Hashtable env = new Hashtable();
             String initialCtx = System.getProperty("Context.INITIAL_CONTEXT_FACTORY");
             String bindingsLocation = System.getProperty("Context.PROVIDER_URL");
 
-            if (bindingsLocation != null)
-            {
+            if (bindingsLocation != null) {
                 env.put(javax.naming.Context.PROVIDER_URL, bindingsLocation);
             }
 
             env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, initialCtx);
             javax.naming.Context ctx = new InitialContext(env);
             _xaDataSource = (XADataSource) ctx.lookup(binding);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("EnlistDelistEnlist01.constructor: " + exception);
             throw new InvocationException();
         }
     }
 
-    public void finalize()
-            throws Throwable
-    {
-        try
-        {
+    public void finalize() throws Throwable {
+        try {
             // close XADataSource ?
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("EnlistDelistEnlist01.finalize: " + exception);
             throw exception;
         }
     }
 
-    public boolean isCorrect()
-            throws InvocationException
-    {
+    public boolean isCorrect() throws InvocationException {
         return _isCorrect;
     }
 
-    public void begin_begin()
-            throws InvocationException
-    {
+    public void begin_begin() throws InvocationException {
         boolean correct = true;
 
-        try
-        {
+        try {
             XAConnection xaConnection = _xaDataSource.getXAConnection(_databaseUser, _databasePassword);
 
             XAResource xaResource = xaConnection.getXAResource();
@@ -145,23 +128,17 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
 
             correct = correct && transaction.enlistResource(xaResource);
 
-            if (correct)
-            {
-                try
-                {
+            if (correct) {
+                try {
                     tm.begin();
                     correct = false;
-                }
-                catch (NotSupportedException notSupportedException)
-                {
+                } catch (NotSupportedException notSupportedException) {
                     // correct behaviour for nested XA transaction
                 }
             }
 
             tm.rollback();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             correct = false;
         }
@@ -170,13 +147,10 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
         return;
     }
 
-    public void begin_enlist_delist_enlist_commit()
-            throws InvocationException
-    {
+    public void begin_enlist_delist_enlist_commit() throws InvocationException {
         boolean correct = true;
 
-        try
-        {
+        try {
             XAConnection xaConnection = _xaDataSource.getXAConnection(_databaseUser, _databasePassword);
 
             XAResource xaResource = xaConnection.getXAResource();
@@ -189,27 +163,20 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
 
             correct = correct && transaction.enlistResource(xaResource);
 
-            if (correct)
-            {
+            if (correct) {
                 correct = correct && transaction.delistResource(xaResource, XAResource.TMSUCCESS);
             }
 
-            if (correct)
-            {
+            if (correct) {
                 correct = correct && transaction.enlistResource(xaResource);
             }
 
-            if (correct)
-            {
+            if (correct) {
                 tm.commit();
-            }
-            else
-            {
+            } else {
                 tm.rollback();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             correct = false;
         }
@@ -218,13 +185,10 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
         return;
     }
 
-    public void begin_enlist_delist_close_commit()
-            throws InvocationException
-    {
+    public void begin_enlist_delist_close_commit() throws InvocationException {
         boolean correct = true;
 
-        try
-        {
+        try {
             XAConnection xaConnection = _xaDataSource.getXAConnection(_databaseUser, _databasePassword);
 
             XAResource xaResource = xaConnection.getXAResource();
@@ -238,27 +202,20 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
 
             correct = correct && transaction.enlistResource(xaResource);
 
-            if (correct)
-            {
+            if (correct) {
                 correct = correct && transaction.delistResource(xaResource, XAResource.TMSUCCESS);
             }
 
-            if (correct)
-            {
+            if (correct) {
                 conn.close();
             }
 
-            if (correct)
-            {
+            if (correct) {
                 tm.commit();
-            }
-            else
-            {
+            } else {
                 tm.rollback();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             correct = false;
         }
@@ -267,13 +224,10 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
         return;
     }
 
-    public void begin_enlist_enlist_delist_commit()
-            throws InvocationException
-    {
+    public void begin_enlist_enlist_delist_commit() throws InvocationException {
         boolean correct = true;
 
-        try
-        {
+        try {
             XAConnection xaConnection = _xaDataSource.getXAConnection(_databaseUser, _databasePassword);
 
             XAResource xaResource = xaConnection.getXAResource();
@@ -287,27 +241,20 @@ public class EnlistDelistEnlistImpl01 implements ServiceOperations
 
             correct = correct && transaction.enlistResource(xaResource);
 
-            if (correct)
-            {
+            if (correct) {
                 correct = correct && transaction.enlistResource(xaResource);
             }
 
-            if (correct)
-            {
+            if (correct) {
                 correct = correct && transaction.delistResource(xaResource, XAResource.TMSUCCESS);
             }
 
-            if (correct)
-            {
+            if (correct) {
                 tm.commit();
-            }
-            else
-            {
+            } else {
                 tm.rollback();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             correct = false;
         }

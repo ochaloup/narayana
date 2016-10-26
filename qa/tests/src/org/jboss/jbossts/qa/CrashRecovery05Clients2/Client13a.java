@@ -56,26 +56,24 @@ package org.jboss.jbossts.qa.CrashRecovery05Clients2;
  * $Id: Client13a.java,v 1.2 2003/06/26 11:43:32 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery05.*;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 import org.jboss.jbossts.qa.Utils.CrashRecoveryDelays;
 
-public class Client13a extends ClientBase
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Client13a extends ClientBase {
+    public static void main(String[] args) {
+        try {
             init(args, null);
 
             String serviceIOR1 = ServerIORStore.loadIOR(args[args.length - 2]);
-            AfterCrashService service1 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR1));
+            AfterCrashService service1 = AfterCrashServiceHelper
+                    .narrow(ORBInterface.orb().string_to_object(serviceIOR1));
 
             String serviceIOR2 = ServerIORStore.loadIOR(args[args.length - 1]);
-            AfterCrashService service2 = AfterCrashServiceHelper.narrow(ORBInterface.orb().string_to_object(serviceIOR2));
+            AfterCrashService service2 = AfterCrashServiceHelper
+                    .narrow(ORBInterface.orb().string_to_object(serviceIOR2));
 
             CheckBehavior[] checkBehaviors1 = new CheckBehavior[1];
             checkBehaviors1[0] = new CheckBehavior();
@@ -105,7 +103,9 @@ public class Client13a extends ClientBase
             correct = correct && service1.is_correct();
             correct = correct && service2.is_correct();
 
-            CrashRecoveryDelays.awaitReplayCompletionCR05(5); // scale factor could maybe be reduced
+            CrashRecoveryDelays.awaitReplayCompletionCR05(5); // scale factor
+                                                                // could maybe
+                                                                // be reduced
 
             ResourceTrace resourceTrace1 = service1.get_resource_trace(0);
             ResourceTrace resourceTrace2 = service2.get_resource_trace(0);
@@ -113,28 +113,20 @@ public class Client13a extends ClientBase
             correct = correct && (resourceTrace1 == ResourceTrace.ResourceTraceRollback);
             correct = correct && (resourceTrace2 == ResourceTrace.ResourceTraceRollback);
 
-            if (correct)
-            {
+            if (correct) {
                 System.out.println("Passed");
-            }
-            else
-            {
+            } else {
                 System.out.println("Failed");
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.out.println("Failed");
             System.err.println("Client13a.main: " + exception);
             exception.printStackTrace(System.err);
         }
 
-        try
-        {
+        try {
             fini();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Client13a.main: " + exception);
             exception.printStackTrace(System.err);
         }

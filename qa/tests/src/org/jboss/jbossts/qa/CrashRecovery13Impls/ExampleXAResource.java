@@ -43,67 +43,66 @@ import javax.transaction.xa.Xid;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class ExampleXAResource
-        implements XAResource, Referenceable, Serializable
-{
+public class ExampleXAResource implements XAResource, Referenceable, Serializable {
     private final static long _sleepTime = 20000;
     private Xid _currentXid;
     private Reference _reference;
 
-    public ExampleXAResource()
-    {
+    public ExampleXAResource() {
         myLog("ExampleXAResource (Constructor)");
 
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void start(Xid xid, int flags) throws XAException
-    {
+    public void start(Xid xid, int flags) throws XAException {
         myLog("start");
         _currentXid = xid;
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void end(Xid xid, int flags) throws XAException
-    {
+    public void end(Xid xid, int flags) throws XAException {
         myLog("end");
         _currentXid = null;
     }
 
     /**
-     * @param param1 <description>
-     * @param param2 <description>
+     * @param param1
+     *            <description>
+     * @param param2
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void commit(Xid xid, boolean onePhase) throws XAException
-    {
+    public void commit(Xid xid, boolean onePhase) throws XAException {
         myLog("commit,xid=" + xid + ",onePhase=" + onePhase);
         mySleep(_sleepTime);
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public int prepare(Xid xid) throws XAException
-    {
+    public int prepare(Xid xid) throws XAException {
         myLog("prepare");
         int i = 2;
-        if (i == 1)
-        {
+        if (i == 1) {
             throw (new XAException(XAException.XA_RBROLLBACK));
         }
 
@@ -111,14 +110,13 @@ public class ExampleXAResource
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void rollback(Xid xid) throws XAException
-    {
-        if (xid.equals(toRecover))
-        {
+    public void rollback(Xid xid) throws XAException {
+        if (xid.equals(toRecover)) {
             passed = true;
         }
 
@@ -126,29 +124,28 @@ public class ExampleXAResource
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public void forget(Xid xid) throws XAException
-    {
+    public void forget(Xid xid) throws XAException {
         myLog("forget");
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public Xid[] recover(int flag) throws XAException
-    {
+    public Xid[] recover(int flag) throws XAException {
         myLog("recover");
 
         Xid[] xids = new Xid[2];
 
-        if (ExampleXAResource.toRecover == null)
-        {
+        if (ExampleXAResource.toRecover == null) {
             AtomicAction a = new AtomicAction();
 
             ExampleXAResource.toRecover = new XidImple(new AtomicAction());
@@ -161,13 +158,13 @@ public class ExampleXAResource
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public boolean isSameRM(XAResource other) throws XAException
-    {
+    public boolean isSameRM(XAResource other) throws XAException {
         myLog("isSameRM");
         return (false);
     }
@@ -175,81 +172,60 @@ public class ExampleXAResource
     /**
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public int getTransactionTimeout() throws XAException
-    {
+    public int getTransactionTimeout() throws XAException {
         myLog("getTransactionTimeout");
         return 10;
     }
 
     /**
-     * @param param1 <description>
+     * @param param1
+     *            <description>
      * @return <description>
      * @throws javax.transaction.xa.XAException
-     *          <description>
+     *             <description>
      */
-    public boolean setTransactionTimeout(int seconds) throws XAException
-    {
+    public boolean setTransactionTimeout(int seconds) throws XAException {
         myLog("setTransactionTimeout");
         return true;
     }
 
-    private void myLog(String msg)
-    {
+    private void myLog(String msg) {
         /*
-            try
-            {
-              String fileName = "ExampleXAResource.log";
-              FileWriter fw = new FileWriter(fileName, true);
-              PrintWriter pw = new PrintWriter(fw);
-              pw.println(msg);
-              pw.flush();
-              pw.close();
-              fw.close();
-                System.out.println("ExampleResource: "+msg);
-            }
-            catch (Throwable ex)
-            {
-              System.out.println("Caught an exception");
-              ex.printStackTrace();
-            }
-              */
+         * try { String fileName = "ExampleXAResource.log"; FileWriter fw = new
+         * FileWriter(fileName, true); PrintWriter pw = new PrintWriter(fw);
+         * pw.println(msg); pw.flush(); pw.close(); fw.close();
+         * System.out.println("ExampleResource: "+msg); } catch (Throwable ex) {
+         * System.out.println("Caught an exception"); ex.printStackTrace(); }
+         */
 
     }
 
-    private void mySleep(long millis)
-    {
+    private void mySleep(long millis) {
         myLog("Sleeping " + millis + " milliseconds");
-        try
-        {
+        try {
             Thread.sleep(millis);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
         }
         myLog("Sleep complete");
     }
 
-    public void setReference(Reference _reference)
-    {
+    public void setReference(Reference _reference) {
         myLog("setReference, _reference=" + _reference);
         this._reference = _reference;
     }
 
-    public Reference getReference() throws NamingException
-    {
+    public Reference getReference() throws NamingException {
         myLog("getReference");
         return _reference;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException
-    {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         myLog("writeObject (Serialized)");
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-    {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         myLog("readObject (Deserialized");
     }
 

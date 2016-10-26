@@ -29,53 +29,43 @@ import javax.transaction.SystemException;
 /**
  * TODO
  */
-public class JBossTSTxWrapper implements TxWrapper
-{
+public class JBossTSTxWrapper implements TxWrapper {
     AtomicAction tx;
 
-    public JBossTSTxWrapper()
-    {
+    public JBossTSTxWrapper() {
     }
 
-    public TxWrapper createWrapper()
-    {
+    public TxWrapper createWrapper() {
         return new JBossTSTxWrapper();
     }
 
-    public Transaction getTransaction() throws SystemException
-    {
+    public Transaction getTransaction() throws SystemException {
         return com.arjuna.ats.jta.TransactionManager.transactionManager().getTransaction();
     }
 
-    public int begin()
-    {
+    public int begin() {
         this.tx = new AtomicAction();
-        
+
         return tx.begin();
     }
 
-    public int commit()
-    {
+    public int commit() {
         return tx.commit();
     }
 
-    public int abort()
-    {
+    public int abort() {
         return tx.abort();
     }
 
-    public int add(AbstractRecord record)
-    {
+    public int add(AbstractRecord record) {
         return tx.add(record);
     }
 
-    public boolean supportsNestedTx()
-    {
+    public boolean supportsNestedTx() {
         return true;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return "JBossTS";
     }
 }

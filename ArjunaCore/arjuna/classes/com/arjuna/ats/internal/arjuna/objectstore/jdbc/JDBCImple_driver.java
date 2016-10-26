@@ -63,8 +63,7 @@ public abstract class JDBCImple_driver {
     protected String tableName;
     private JDBCAccess jdbcAccess;
 
-    public boolean commit_state(Uid objUid, String typeName)
-            throws ObjectStoreException {
+    public boolean commit_state(Uid objUid, String typeName) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -76,26 +75,20 @@ public abstract class JDBCImple_driver {
         try {
             connection = jdbcAccess.getConnection();
             // Delete any previously committed state
-            pstmt = connection
-                    .prepareStatement("DELETE FROM "
-                            + tableName
-                            + " WHERE TypeName = ? AND UidString = ? AND StateType = " + StateStatus.OS_COMMITTED);
+            pstmt = connection.prepareStatement("DELETE FROM " + tableName
+                    + " WHERE TypeName = ? AND UidString = ? AND StateType = " + StateStatus.OS_COMMITTED);
 
             pstmt.setString(1, typeName);
             pstmt.setString(2, objUid.stringForm());
 
             int rowcount = pstmt.executeUpdate();
             if (rowcount > 0) {
-                tsLogger.i18NLogger
-                        .trace_JDBCImple_previouslycommitteddeleted(rowcount);
+                tsLogger.i18NLogger.trace_JDBCImple_previouslycommitteddeleted(rowcount);
             }
 
             // now do the commit itself:
-            pstmt2 = connection
-                    .prepareStatement("UPDATE "
-                            + tableName
-                            + " SET StateType = " + StateStatus.OS_COMMITTED + " WHERE TypeName = ? AND UidString = ? AND StateType = "
-                            + StateStatus.OS_UNCOMMITTED);
+            pstmt2 = connection.prepareStatement("UPDATE " + tableName + " SET StateType = " + StateStatus.OS_COMMITTED
+                    + " WHERE TypeName = ? AND UidString = ? AND StateType = " + StateStatus.OS_UNCOMMITTED);
 
             pstmt2.setString(1, typeName);
             pstmt2.setString(2, objUid.stringForm());
@@ -138,8 +131,7 @@ public abstract class JDBCImple_driver {
         return result;
     }
 
-    public boolean hide_state(Uid objUid, String typeName)
-            throws ObjectStoreException {
+    public boolean hide_state(Uid objUid, String typeName) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -150,9 +142,7 @@ public abstract class JDBCImple_driver {
         try {
             connection = jdbcAccess.getConnection();
             pstmt = connection
-                    .prepareStatement("UPDATE "
-                            + tableName
-                            + " SET Hidden = 1 WHERE TypeName = ? AND UidString = ?");
+                    .prepareStatement("UPDATE " + tableName + " SET Hidden = 1 WHERE TypeName = ? AND UidString = ?");
 
             pstmt.setString(1, typeName);
             pstmt.setString(2, objUid.stringForm());
@@ -184,8 +174,7 @@ public abstract class JDBCImple_driver {
         return result;
     }
 
-    public boolean reveal_state(Uid objUid, String typeName)
-            throws ObjectStoreException {
+    public boolean reveal_state(Uid objUid, String typeName) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -196,9 +185,7 @@ public abstract class JDBCImple_driver {
         try {
             connection = jdbcAccess.getConnection();
             pstmt = connection
-                    .prepareStatement("UPDATE "
-                            + tableName
-                            + " SET Hidden = 0 WHERE TypeName = ? AND UidString = ?");
+                    .prepareStatement("UPDATE " + tableName + " SET Hidden = 0 WHERE TypeName = ? AND UidString = ?");
 
             pstmt.setString(1, typeName);
             pstmt.setString(2, objUid.stringForm());
@@ -235,10 +222,10 @@ public abstract class JDBCImple_driver {
      * ordered OS_UNCOMMITTED, OS_UNCOMMITTED_HIDDEN, OS_COMMITTED,
      * OS_COMMITTED_HIDDEN
      * 
-     * @throws ObjectStoreException - in case the JDBC store cannot be contacted
+     * @throws ObjectStoreException
+     *             - in case the JDBC store cannot be contacted
      */
-    public int currentState(Uid objUid, String typeName)
-            throws ObjectStoreException {
+    public int currentState(Uid objUid, String typeName) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -249,10 +236,8 @@ public abstract class JDBCImple_driver {
         PreparedStatement pstmt = null;
         try {
             connection = jdbcAccess.getConnection();
-            pstmt = connection
-                    .prepareStatement("SELECT StateType, Hidden FROM "
-                            + tableName
-                            + " WHERE TypeName = ? AND UidString = ?");
+            pstmt = connection.prepareStatement(
+                    "SELECT StateType, Hidden FROM " + tableName + " WHERE TypeName = ? AND UidString = ?");
 
             pstmt.setString(1, typeName);
             pstmt.setString(2, objUid.stringForm());
@@ -274,18 +259,18 @@ public abstract class JDBCImple_driver {
                 int hidden = rs.getInt(2);
 
                 switch (stateStatus) {
-                case StateStatus.OS_UNCOMMITTED:
-                    if (hidden == 0)
-                        have_OS_UNCOMMITTED = true;
-                    else
-                        have_OS_UNCOMMITTED_HIDDEN = true;
-                    break;
-                case StateStatus.OS_COMMITTED:
-                    if (hidden == 0)
-                        have_OS_COMMITTED = true;
-                    else
-                        have_OS_COMMITTED_HIDDEN = true;
-                    break;
+                    case StateStatus.OS_UNCOMMITTED :
+                        if (hidden == 0)
+                            have_OS_UNCOMMITTED = true;
+                        else
+                            have_OS_UNCOMMITTED_HIDDEN = true;
+                        break;
+                    case StateStatus.OS_COMMITTED :
+                        if (hidden == 0)
+                            have_OS_COMMITTED = true;
+                        else
+                            have_OS_COMMITTED_HIDDEN = true;
+                        break;
                 }
             }
             connection.commit();
@@ -337,8 +322,7 @@ public abstract class JDBCImple_driver {
      * allObjUids - Given a type name, return an ObjectState that contains all
      * of the uids of objects of that type.
      */
-    public boolean allObjUids(String typeName, InputObjectState state, int match)
-            throws ObjectStoreException {
+    public boolean allObjUids(String typeName, InputObjectState state, int match) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -353,8 +337,8 @@ public abstract class JDBCImple_driver {
                 /*
                  * Not used enough to warrant a PreparedStatement.
                  */
-                rs = stmt.executeQuery("SELECT DISTINCT UidString FROM "
-                        + tableName + " WHERE TypeName = '" + typeName + "'");
+                rs = stmt.executeQuery(
+                        "SELECT DISTINCT UidString FROM " + tableName + " WHERE TypeName = '" + typeName + "'");
 
                 boolean finished = false;
 
@@ -408,8 +392,7 @@ public abstract class JDBCImple_driver {
         }
     }
 
-    public boolean allTypes(InputObjectState foundTypes)
-            throws ObjectStoreException {
+    public boolean allTypes(InputObjectState foundTypes) throws ObjectStoreException {
 
         try {
             OutputObjectState store = new OutputObjectState();
@@ -422,8 +405,7 @@ public abstract class JDBCImple_driver {
                 /*
                  * Not used enough to warrant a PreparedStatement.
                  */
-                rs = stmt.executeQuery("SELECT DISTINCT TypeName FROM "
-                        + tableName);
+                rs = stmt.executeQuery("SELECT DISTINCT TypeName FROM " + tableName);
 
                 boolean finished = false;
 
@@ -473,25 +455,21 @@ public abstract class JDBCImple_driver {
         }
     }
 
-    public boolean remove_state(Uid objUid, String typeName, int stateType)
-            throws ObjectStoreException {
+    public boolean remove_state(Uid objUid, String typeName, int stateType) throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
         boolean result = false;
 
         if (typeName != null) {
-            if ((stateType == StateStatus.OS_COMMITTED)
-                    || (stateType == StateStatus.OS_UNCOMMITTED)) {
+            if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
 
                 Connection connection = null;
                 PreparedStatement pstmt = null;
                 try {
                     connection = jdbcAccess.getConnection();
-                    pstmt = connection
-                            .prepareStatement("DELETE FROM "
-                                    + tableName
-                                    + " WHERE TypeName = ? AND UidString = ? AND StateType = ?");
+                    pstmt = connection.prepareStatement(
+                            "DELETE FROM " + tableName + " WHERE TypeName = ? AND UidString = ? AND StateType = ?");
 
                     pstmt.setString(1, typeName);
                     pstmt.setString(2, objUid.stringForm());
@@ -523,8 +501,7 @@ public abstract class JDBCImple_driver {
                 }
             } else {
                 // can only remove (UN)COMMITTED objs
-                tsLogger.i18NLogger.warn_objectstore_JDBCImple_9(
-                        Integer.toString(stateType), objUid);
+                tsLogger.i18NLogger.warn_objectstore_JDBCImple_9(Integer.toString(stateType), objUid);
             }
         } else {
             tsLogger.i18NLogger.warn_objectstore_JDBCImple_10(objUid);
@@ -533,25 +510,21 @@ public abstract class JDBCImple_driver {
         return result;
     }
 
-    public InputObjectState read_state(Uid objUid, String typeName,
-            int stateType) throws ObjectStoreException {
+    public InputObjectState read_state(Uid objUid, String typeName, int stateType) throws ObjectStoreException {
         InputObjectState result = null;
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
 
-        if ((stateType == StateStatus.OS_COMMITTED)
-                || (stateType == StateStatus.OS_UNCOMMITTED)) {
+        if ((stateType == StateStatus.OS_COMMITTED) || (stateType == StateStatus.OS_UNCOMMITTED)) {
             ResultSet rs = null;
 
             Connection connection = null;
             PreparedStatement pstmt = null;
             try {
                 connection = jdbcAccess.getConnection();
-                pstmt = connection
-                        .prepareStatement("SELECT ObjectState FROM "
-                                + tableName
-                                + " WHERE TypeName = ? AND UidString = ? AND StateType = ?");
+                pstmt = connection.prepareStatement("SELECT ObjectState FROM " + tableName
+                        + " WHERE TypeName = ? AND UidString = ? AND StateType = ?");
                 pstmt.setString(1, typeName);
                 pstmt.setString(2, objUid.stringForm());
                 pstmt.setInt(3, stateType);
@@ -564,9 +537,9 @@ public abstract class JDBCImple_driver {
                     if (buffer != null) {
                         result = new InputObjectState(objUid, typeName, buffer);
                     } else {
-                        tsLogger.i18NLogger
-                                .warn_objectstore_JDBCImple_readfailed();
-                        throw new ObjectStoreException(tsLogger.i18NLogger.warn_objectstore_JDBCImple_readfailed_message());
+                        tsLogger.i18NLogger.warn_objectstore_JDBCImple_readfailed();
+                        throw new ObjectStoreException(
+                                tsLogger.i18NLogger.warn_objectstore_JDBCImple_readfailed_message());
                     }
                 }
 
@@ -604,8 +577,8 @@ public abstract class JDBCImple_driver {
         return result;
     }
 
-    public boolean write_state(Uid objUid, String typeName,
-            OutputObjectState state, int stateType) throws ObjectStoreException {
+    public boolean write_state(Uid objUid, String typeName, OutputObjectState state, int stateType)
+            throws ObjectStoreException {
         // Taken this requirement from ObjStoreBrowser
         if (typeName.startsWith("/"))
             typeName = typeName.substring(1);
@@ -614,8 +587,7 @@ public abstract class JDBCImple_driver {
         int imageSize = (int) state.length();
 
         if (imageSize > getMaxStateSize()) {
-            tsLogger.i18NLogger.warn_objectstore_JDBCImple_over_max_image_size(
-                    imageSize, getMaxStateSize());
+            tsLogger.i18NLogger.warn_objectstore_JDBCImple_over_max_image_size(imageSize, getMaxStateSize());
         } else if (imageSize > 0) {
             byte[] b = state.buffer();
             ResultSet rs = null;
@@ -624,13 +596,10 @@ public abstract class JDBCImple_driver {
             PreparedStatement pstmt = null;
             try {
                 connection = jdbcAccess.getConnection();
-                pstmt = connection
-                        .prepareStatement(
-                                "SELECT ObjectState, UidString, StateType, TypeName FROM "
-                                        + tableName
-                                        + " WHERE TypeName = ? AND UidString = ? AND StateType = ?",
-                                ResultSet.TYPE_FORWARD_ONLY,
-                                ResultSet.CONCUR_UPDATABLE);
+                pstmt = connection.prepareStatement(
+                        "SELECT ObjectState, UidString, StateType, TypeName FROM " + tableName
+                                + " WHERE TypeName = ? AND UidString = ? AND StateType = ?",
+                        ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
 
                 pstmt.setString(1, typeName);
                 pstmt.setString(2, objUid.stringForm());
@@ -639,10 +608,8 @@ public abstract class JDBCImple_driver {
                 rs = pstmt.executeQuery();
 
                 if (rs.next()) {
-                    PreparedStatement pstmt2 = connection
-                        .prepareStatement("UPDATE " + tableName +
-                            " SET ObjectState = ?" +
-                           " WHERE TypeName=? AND UidString=? AND StateType=?");
+                    PreparedStatement pstmt2 = connection.prepareStatement("UPDATE " + tableName
+                            + " SET ObjectState = ?" + " WHERE TypeName=? AND UidString=? AND StateType=?");
                     try {
                         pstmt2.setBytes(1, b);
                         pstmt2.setString(2, typeName);
@@ -659,16 +626,14 @@ public abstract class JDBCImple_driver {
                     }
                 } else {
                     // not in database, do insert:
-                    PreparedStatement pstmt2 = connection
-                            .prepareStatement("INSERT INTO "
-                                    + tableName
-                                    + " (TypeName,UidString,StateType,Hidden,ObjectState) VALUES (?,?,?,0,?)");
+                    PreparedStatement pstmt2 = connection.prepareStatement("INSERT INTO " + tableName
+                            + " (TypeName,UidString,StateType,Hidden,ObjectState) VALUES (?,?,?,0,?)");
                     try {
                         pstmt2.setString(1, typeName);
                         pstmt2.setString(2, objUid.stringForm());
                         pstmt2.setInt(3, stateType);
                         pstmt2.setBytes(4, b);
-    
+
                         int executeUpdate = pstmt2.executeUpdate();
                         if (executeUpdate != 0) {
                             result = true;
@@ -716,11 +681,11 @@ public abstract class JDBCImple_driver {
      * Set up the store for use.
      * 
      * @throws NamingException
-     * @throws SQLException In case the configured store cannot be connected to
+     * @throws SQLException
+     *             In case the configured store cannot be connected to
      */
     public void initialise(final JDBCAccess jdbcAccess, String tableName,
-            ObjectStoreEnvironmentBean jdbcStoreEnvironmentBean)
-            throws SQLException, NamingException {
+            ObjectStoreEnvironmentBean jdbcStoreEnvironmentBean) throws SQLException, NamingException {
         this.jdbcAccess = jdbcAccess;
 
         // connection = new ThreadLocal<Connection>() {
@@ -738,9 +703,9 @@ public abstract class JDBCImple_driver {
         try (Connection connection = jdbcAccess.getConnection()) {
 
             try (Statement stmt = connection.createStatement()) {
-    
+
                 // table [type, object UID, format, blob]
-        
+
                 if (jdbcStoreEnvironmentBean.getDropTable()) {
                     try {
                         stmt.executeUpdate("DROP TABLE " + tableName);
@@ -748,7 +713,7 @@ public abstract class JDBCImple_driver {
                         checkDropTableException(connection, ex);
                     }
                 }
-        
+
                 if (jdbcStoreEnvironmentBean.getCreateTable()) {
                     try {
                         createTable(stmt, tableName);
@@ -756,7 +721,7 @@ public abstract class JDBCImple_driver {
                         checkCreateTableError(ex);
                     }
                 }
-        
+
                 // This can be the case when triggering via EmptyObjectStore
                 if (!connection.getAutoCommit()) {
                     connection.commit();
@@ -771,14 +736,10 @@ public abstract class JDBCImple_driver {
      * Can be overridden by implementation-specific code to create the store
      * table. Called from initialise() and addTable(), above.
      */
-    protected void createTable(Statement stmt, String tableName)
-            throws SQLException {
-        String statement = "CREATE TABLE "
-                + tableName
-                + " (StateType INTEGER NOT NULL, Hidden INTEGER NOT NULL, "
+    protected void createTable(Statement stmt, String tableName) throws SQLException {
+        String statement = "CREATE TABLE " + tableName + " (StateType INTEGER NOT NULL, Hidden INTEGER NOT NULL, "
                 + "TypeName VARCHAR(255) NOT NULL, UidString VARCHAR(255) NOT NULL, ObjectState "
-                + getObjectStateSQLType()
-                + ", PRIMARY KEY(UidString, TypeName, StateType))";
+                + getObjectStateSQLType() + ", PRIMARY KEY(UidString, TypeName, StateType))";
         stmt.executeUpdate(statement);
     }
 
@@ -786,11 +747,9 @@ public abstract class JDBCImple_driver {
         return "bytea";
     }
 
-    protected abstract void checkCreateTableError(SQLException ex)
-            throws SQLException;
+    protected abstract void checkCreateTableError(SQLException ex) throws SQLException;
 
-    protected abstract void checkDropTableException(Connection connection, SQLException ex)
-            throws SQLException;
+    protected abstract void checkDropTableException(Connection connection, SQLException ex) throws SQLException;
 
     public int getMaxStateSize() {
         return 65535;

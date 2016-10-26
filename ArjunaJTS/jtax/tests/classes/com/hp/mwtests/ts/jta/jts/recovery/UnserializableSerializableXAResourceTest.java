@@ -72,30 +72,38 @@ public class UnserializableSerializableXAResourceTest {
 
     @Before
     public void setup() throws InvalidName, SystemException {
-        System.setProperty("OrbPortabilityEnvironmentBean.orbImpleClassName", System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName", "com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"));
-        System.setProperty("OrbPortabilityEnvironmentBean.poaImpleClassName", System.getProperty("OrbPortabilityEnvironmentBean.poaImpleClassName", "com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4"));
-        System.setProperty("OrbPortabilityEnvironmentBean.orbDataClassName", System.getProperty("OrbPortabilityEnvironmentBean.orbDataClassName", "com.arjuna.orbportability.internal.orbspecific.versions.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.orbImpleClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.javaidl.orb.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.poaImpleClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.javaidl.oa.implementations.javaidl_1_4"));
+        System.setProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
+                System.getProperty("OrbPortabilityEnvironmentBean.orbDataClassName",
+                        "com.arjuna.orbportability.internal.orbspecific.versions.javaidl_1_4"));
 
         final Map<String, String> orbInitializationProperties = new HashMap<String, String>();
         orbInitializationProperties.put("com.arjuna.orbportability.orb.PreInit1",
-            "com.arjuna.ats.internal.jts.recovery.RecoveryInit");
+                "com.arjuna.ats.internal.jts.recovery.RecoveryInit");
         opPropertyManager.getOrbPortabilityEnvironmentBean()
-            .setOrbInitializationProperties(orbInitializationProperties);
+                .setOrbInitializationProperties(orbInitializationProperties);
 
         final Properties initORBProperties = new Properties();
         initORBProperties.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
-        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", ""
-            + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
+        initORBProperties.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort",
+                "" + jtsPropertyManager.getJTSEnvironmentBean().getRecoveryManagerPort());
 
         myORB = ORB.getInstance("test");
         myOA = OA.getRootOA(myORB);
-        myORB.initORB(new String[] {}, initORBProperties);
+        myORB.initORB(new String[]{}, initORBProperties);
         myOA.initOA();
 
         ORBManager.setORB(myORB);
         ORBManager.setPOA(myOA);
-        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
-        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setTransactionManagerClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.TransactionManagerImple.class.getName());
+        jtaPropertyManager.getJTAEnvironmentBean().setUserTransactionClassName(
+                com.arjuna.ats.internal.jta.transaction.jts.UserTransactionImple.class.getName());
 
         final List<String> recoveryExtensions = new ArrayList<String>();
         recoveryExtensions.add(XARecoveryModule.class.getName());
@@ -107,7 +115,7 @@ public class UnserializableSerializableXAResourceTest {
         final List<String> recoveryActivatorClassNames = new ArrayList<String>();
         recoveryActivatorClassNames.add(RecoveryEnablement.class.getName());
         recoveryPropertyManager.getRecoveryEnvironmentBean()
-            .setRecoveryActivatorClassNames(recoveryActivatorClassNames);
+                .setRecoveryActivatorClassNames(recoveryActivatorClassNames);
 
         recoveryManager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
         recoveryManager.initialize();
@@ -122,8 +130,7 @@ public class UnserializableSerializableXAResourceTest {
     }
 
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         XAResource res1 = new XAResource() {
 
             @Override
@@ -190,8 +197,7 @@ public class UnserializableSerializableXAResourceTest {
 
         UnserializableSerializableXAResource res2 = new UnserializableSerializableXAResource(true);
 
-        final javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager
-            .transactionManager();
+        final javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
         tm.getStatus();
         tm.begin();
         javax.transaction.Transaction theTransaction = tm.getTransaction();
@@ -218,7 +224,7 @@ public class UnserializableSerializableXAResourceTest {
 
             @Override
             public XAResource[] getXAResources() throws Exception {
-                return new XAResource[] { new XAResource() {
+                return new XAResource[]{new XAResource() {
 
                     @Override
                     public void start(Xid xid, int flags) throws XAException {
@@ -282,13 +288,12 @@ public class UnserializableSerializableXAResourceTest {
                         return false;
                     }
 
-                } };
+                }};
             }
         });
 
-
         recoveryManager.scan();
-        
+
         assertTrue(committed);
 
     }

@@ -29,24 +29,21 @@ import org.jboss.jbossts.qa.performance.PerfTestInterface;
 import org.jboss.jbossts.qa.performance.PerfTestInterfaceHelper;
 import org.jboss.jbossts.qa.performance.implementations.perftestwork.DummyPerfTestImplementation;
 
-public class DummyImplServer
-{
+public class DummyImplServer {
     /**
      * The main test method which must assert either a pass or a fail.
      */
-    public void run(String[] args)
-    {
-        try
-        {
-            String serviceName = args[ args.length - 2 ];
-            String serviceName2 = args[ args.length - 1 ];
+    public void run(String[] args) {
+        try {
+            String serviceName = args[args.length - 2];
+            String serviceName2 = args[args.length - 1];
 
             /**
-             * Retrieve ORB and OA references, intialise them
-             * and then set the OTSManager ORB and OA properties
+             * Retrieve ORB and OA references, intialise them and then set the
+             * OTSManager ORB and OA properties
              */
-            ORB orb = ORB.getInstance( PerformanceFramework.ORB_INSTANCE_NAME );
-            OA oa = OA.getRootOA( orb );
+            ORB orb = ORB.getInstance(PerformanceFramework.ORB_INSTANCE_NAME);
+            OA oa = OA.getRootOA(orb);
 
             orb.initORB(args, null);
             oa.initOA(args);
@@ -69,9 +66,7 @@ public class DummyImplServer
             System.out.println("Ready");
 
             orb.orb().run();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace(System.err);
             System.out.println("Failed");
         }

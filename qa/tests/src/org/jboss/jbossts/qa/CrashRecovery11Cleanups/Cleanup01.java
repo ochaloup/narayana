@@ -58,7 +58,6 @@ package org.jboss.jbossts.qa.CrashRecovery11Cleanups;
  * $Id: Cleanup01.java,v 1.2 2003/06/26 11:43:49 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery11.*;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
 import org.jboss.jbossts.qa.Utils.OAInterface;
@@ -69,20 +68,16 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class Cleanup01
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Cleanup01 {
+    public static void main(String[] args) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 1];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -94,8 +89,7 @@ public class Cleanup01
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
             Connection connection;
-            if (databaseDynamicClass != null)
-            {
+            if (databaseDynamicClass != null) {
                 Properties databaseProperties = new Properties();
 
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.userName, databaseUser);
@@ -103,9 +97,7 @@ public class Cleanup01
                 databaseProperties.put(com.arjuna.ats.jdbc.TransactionalDriver.dynamicClass, databaseDynamicClass);
 
                 connection = DriverManager.getConnection(databaseURL, databaseProperties);
-            }
-            else
-            {
+            } else {
                 connection = DriverManager.getConnection(databaseURL, databaseUser, databasePassword);
             }
 
@@ -117,27 +109,16 @@ public class Cleanup01
 
             statement.close();
             connection.close();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Cleanup01.main: " + exception);
         }
 
-        try
-        {
+        try {
             OAInterface.shutdownOA();
             ORBInterface.shutdownORB();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Cleanup01.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
-
-
-
-
-
-

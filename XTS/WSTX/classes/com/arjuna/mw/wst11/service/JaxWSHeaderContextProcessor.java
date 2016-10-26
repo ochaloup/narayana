@@ -32,50 +32,51 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The class is used to perform WS-Transaction context insertion
- * and extraction for application level SOAP messages using JaxWS.
- * This is the server side version.
+ * The class is used to perform WS-Transaction context insertion and extraction
+ * for application level SOAP messages using JaxWS. This is the server side
+ * version.
  */
-public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor implements SOAPHandler<SOAPMessageContext>
-{
+public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor
+        implements
+            SOAPHandler<SOAPMessageContext> {
     /**
-     * Process a message. Determines if it is inbound or outbound and dispatches accordingly.
+     * Process a message. Determines if it is inbound or outbound and dispatches
+     * accordingly.
      *
      * @param msgContext
      * @return true
      */
-    public boolean handleMessage(SOAPMessageContext msgContext)
-    {
-        Boolean outbound = (Boolean)msgContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+    public boolean handleMessage(SOAPMessageContext msgContext) {
+        Boolean outbound = (Boolean) msgContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
         if (outbound == null)
-            throw new IllegalStateException("Cannot obtain required property: " + MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            throw new IllegalStateException(
+                    "Cannot obtain required property: " + MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
         return outbound ? handleOutbound(msgContext) : handleInbound(msgContext);
     }
 
     /**
-     * Tidy up the Transaction/Thread association before faults are thrown back to the client.
+     * Tidy up the Transaction/Thread association before faults are thrown back
+     * to the client.
      *
      * @param messageContext
      * @return true
      */
-    public boolean handleFault(SOAPMessageContext messageContext)
-    {
-        suspendTransaction() ;
+    public boolean handleFault(SOAPMessageContext messageContext) {
+        suspendTransaction();
         return true;
     }
 
-    public void close(MessageContext messageContext)
-    {
+    public void close(MessageContext messageContext) {
     }
 
     /**
      * Gets the header blocks that can be processed by this Handler instance.
      */
-    public Set<QName> getHeaders()
-    {
+    public Set<QName> getHeaders() {
         Set<QName> headerSet = new HashSet<QName>();
-        headerSet.add(new QName(CoordinationConstants.WSCOOR_NAMESPACE, CoordinationConstants.WSCOOR_ELEMENT_COORDINATION_CONTEXT));
+        headerSet.add(new QName(CoordinationConstants.WSCOOR_NAMESPACE,
+                CoordinationConstants.WSCOOR_ELEMENT_COORDINATION_CONTEXT));
 
         return headerSet;
     }
@@ -84,10 +85,8 @@ public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor i
      * Sets the header blocks that can be processed by this Handler instance.
      * Note: this impl ignores this function's args as the values are hardcoded.
      */
-    public void setHeaders(Set headers)
-    {
+    public void setHeaders(Set headers) {
     }
-
 
     /**
      * Process the tx context header that is attached to the received message.
@@ -95,23 +94,23 @@ public class JaxWSHeaderContextProcessor extends JaxBaseHeaderContextProcessor i
      * @param msgContext
      * @return true
      */
-    protected boolean handleInbound(SOAPMessageContext msgContext)
-    {
-        final SOAPMessageContext soapMessageContext = (SOAPMessageContext)msgContext ;
-        final SOAPMessage soapMessage = soapMessageContext.getMessage() ;
+    protected boolean handleInbound(SOAPMessageContext msgContext) {
+        final SOAPMessageContext soapMessageContext = (SOAPMessageContext) msgContext;
+        final SOAPMessage soapMessage = soapMessageContext.getMessage();
 
         return handleInboundMessage(soapMessage);
     }
 
     /**
-     * Tidy up the Transaction/Thread association before response is returned to the client.
+     * Tidy up the Transaction/Thread association before response is returned to
+     * the client.
      *
-     * @param messageContext The current message context.
+     * @param messageContext
+     *            The current message context.
      * @return true
      */
-    protected boolean handleOutbound(SOAPMessageContext messageContext)
-    {
-        suspendTransaction() ;
+    protected boolean handleOutbound(SOAPMessageContext messageContext) {
+        suspendTransaction();
         return true;
     }
 }

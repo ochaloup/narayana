@@ -226,15 +226,15 @@ public class ProtocolConverter {
         sendToStomp(sc);
     }
 
-    protected void onStompDisconnect(StompFrame command) throws JMSException, InterruptedException, IOException,
-    URISyntaxException {
+    protected void onStompDisconnect(StompFrame command)
+            throws JMSException, InterruptedException, IOException, URISyntaxException {
         checkConnected();
         close();
         sendResponse(command);
     }
 
-    protected void onStompSend(StompFrame command) throws IllegalStateException, SystemException, JMSException,
-    NamingException, IOException {
+    protected void onStompSend(StompFrame command)
+            throws IllegalStateException, SystemException, JMSException, NamingException, IOException {
         checkConnected();
 
         Map<String, Object> headers = command.getHeaders();
@@ -247,7 +247,8 @@ public class ProtocolConverter {
                 log.trace("RTS Transaction was propagated: " + xid);
 
                 String enlistmentUrl = xid;
-                final InboundBridge inboundBridge = InboundBridgeManager.getInstance().createInboundBridge(enlistmentUrl);
+                final InboundBridge inboundBridge = InboundBridgeManager.getInstance()
+                        .createInboundBridge(enlistmentUrl);
                 log.trace("Start inboundBridge");
                 inboundBridge.start();
                 StompSession session = getXASession(inboundBridge.getXid());
@@ -267,8 +268,8 @@ public class ProtocolConverter {
         log.trace("Sent Response");
     }
 
-    protected void onStompReceive(StompFrame command) throws IllegalStateException, SystemException, JMSException,
-    NamingException, IOException {
+    protected void onStompReceive(StompFrame command)
+            throws IllegalStateException, SystemException, JMSException, NamingException, IOException {
         checkConnected();
 
         Map<String, Object> headers = command.getHeaders();
@@ -277,13 +278,14 @@ public class ProtocolConverter {
         Message msg = null;
         StompSession session = null;
         if (xid != null) {
-            if (xid.startsWith("IOR")){
+            if (xid.startsWith("IOR")) {
                 log.error("OTS Transaction Not Supported");
-            } else if (xid.startsWith("http")){
+            } else if (xid.startsWith("http")) {
                 log.trace("RTS Transaction was propagated: " + xid);
 
                 String enlistmentUrl = xid;
-                final InboundBridge inboundBridge = InboundBridgeManager.getInstance().createInboundBridge(enlistmentUrl);
+                final InboundBridge inboundBridge = InboundBridgeManager.getInstance()
+                        .createInboundBridge(enlistmentUrl);
                 log.trace("Start inboundBridge");
                 inboundBridge.start();
                 session = getXASession(inboundBridge.getXid());
@@ -314,8 +316,10 @@ public class ProtocolConverter {
 
             sf = new StompFrame(Stomp.Responses.ERROR, eheaders, baos.toByteArray());
         } else {
-            // Don't use sendResponse since it uses Stomp.Responses.RECEIPT as the action
-            // which only allows zero length message bodies, Stomp.Responses.MESSAGE is correct:
+            // Don't use sendResponse since it uses Stomp.Responses.RECEIPT as
+            // the action
+            // which only allows zero length message bodies,
+            // Stomp.Responses.MESSAGE is correct:
             sf = session.convertMessage(msg);
         }
 
@@ -335,7 +339,8 @@ public class ProtocolConverter {
             subscriptionId = createSubscriptionId(headers);
         }
 
-        // We know this is going to be none-XA as the XA receive is handled in onStompReceive
+        // We know this is going to be none-XA as the XA receive is handled in
+        // onStompReceive
         noneXaSession.subscribe(subscriptionId, command);
         sendResponse(command);
     }
@@ -349,7 +354,8 @@ public class ProtocolConverter {
 
         if (subscriptionId == null) {
             if (destinationName == null) {
-                throw new ProtocolException("Must specify the subscriptionId or the destination you are unsubscribing from");
+                throw new ProtocolException(
+                        "Must specify the subscriptionId or the destination you are unsubscribing from");
             }
             subscriptionId = createSubscriptionId(headers);
         }
@@ -368,7 +374,8 @@ public class ProtocolConverter {
         }
 
         log.debug("Locking session to restart it");
-        // Dont allow the session to deliver any more messages until after we have acked the clients ack
+        // Dont allow the session to deliver any more messages until after we
+        // have acked the clients ack
         synchronized (session) {
             // Allow another message to be consumed
             session.resume();

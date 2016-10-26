@@ -56,7 +56,6 @@ package org.jboss.jbossts.qa.CrashRecovery11Servers;
  * $Id: JDBCServer02.java,v 1.2 2003/06/26 11:43:50 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.CrashRecovery11.*;
 import org.jboss.jbossts.qa.CrashRecovery11Impls.JDBCServiceImpl02;
 import org.jboss.jbossts.qa.Utils.JDBCProfileStore;
@@ -64,20 +63,16 @@ import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class JDBCServer02
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class JDBCServer02 {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
             String profileName = args[args.length - 3];
 
             int numberOfDrivers = JDBCProfileStore.numberOfDrivers(profileName);
-            for (int index = 0; index < numberOfDrivers; index++)
-            {
+            for (int index = 0; index < numberOfDrivers; index++) {
                 String driver = JDBCProfileStore.driver(profileName, index);
 
                 Class.forName(driver);
@@ -88,7 +83,8 @@ public class JDBCServer02
             String databasePassword = JDBCProfileStore.databasePassword(profileName);
             String databaseDynamicClass = JDBCProfileStore.databaseDynamicClass(profileName);
 
-            JDBCServiceImpl02 jdbcServiceImpl = new JDBCServiceImpl02(args[args.length - 2], databaseURL, databaseUser, databasePassword, databaseDynamicClass);
+            JDBCServiceImpl02 jdbcServiceImpl = new JDBCServiceImpl02(args[args.length - 2], databaseURL, databaseUser,
+                    databasePassword, databaseDynamicClass);
             AfterCrashServicePOATie servant = new AfterCrashServicePOATie(jdbcServiceImpl);
 
             OAInterface.objectIsReady(servant);
@@ -99,12 +95,9 @@ public class JDBCServer02
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("JDBCServer02.main: " + exception);
             exception.printStackTrace(System.err);
         }
     }
 }
-

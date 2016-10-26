@@ -31,7 +31,8 @@ public class CommandFailedException extends Exception {
     /**
      * Create the exception with an exit code
      * 
-     * @param exitCode The exit code
+     * @param exitCode
+     *            The exit code
      */
     public CommandFailedException(int exitCode) {
         this.exitCode = exitCode;

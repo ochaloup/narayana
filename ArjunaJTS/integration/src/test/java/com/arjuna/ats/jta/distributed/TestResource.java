@@ -87,7 +87,7 @@ public class TestResource implements XAResource {
             public byte[] getBranchQualifier() {
                 return bqual;
             }
-            
+
             public String toString() {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("< formatId=");
@@ -103,16 +103,13 @@ public class TestResource implements XAResource {
                 stringBuilder.append(", branch_uid=");
                 stringBuilder.append(new Uid(bqual));;
                 stringBuilder.append(", subordinatenodename=");
-                
+
                 int offset = Uid.UID_SIZE + 4;
-                int length = (bqual[offset++] << 24)
-                        + ((bqual[offset++] & 0xFF) << 16)
-                        + ((bqual[offset++] & 0xFF) << 8)
-                        + (bqual[offset++] & 0xFF);
-                if (length > 0) 
-                    stringBuilder.append(new String(Arrays.copyOfRange(bqual, offset, offset+length)));
-                    
-                
+                int length = (bqual[offset++] << 24) + ((bqual[offset++] & 0xFF) << 16)
+                        + ((bqual[offset++] & 0xFF) << 8) + (bqual[offset++] & 0xFF);
+                if (length > 0)
+                    stringBuilder.append(new String(Arrays.copyOfRange(bqual, offset, offset + length)));
+
                 stringBuilder.append(", eis_name=unknown");
                 stringBuilder.append(" >");
 
@@ -123,8 +120,8 @@ public class TestResource implements XAResource {
     }
 
     public TestResource(String nodeName, boolean b, boolean fatalCommit) {
-       this(nodeName, b);
-       this.fatalCommit = fatalCommit;
+        this(nodeName, b);
+        this.fatalCommit = fatalCommit;
     }
 
     /**
@@ -134,12 +131,14 @@ public class TestResource implements XAResource {
      * https://issues.jboss.org/browse/BYTEMAN-175
      */
     public synchronized int prepare(Xid xid) throws XAException, Error {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_PREPARE [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                + ")      XA_PREPARE [" + xid + "]");
 
         if (readonly)
             return XA_RDONLY;
         else {
-            File dir = new File(System.getProperty("user.dir") + "/distributedjta-tests/TestResource/" + serverId + "/");
+            File dir = new File(
+                    System.getProperty("user.dir") + "/distributedjta-tests/TestResource/" + serverId + "/");
             dir.mkdirs();
             file = new File(dir, new Uid().fileStringForm() + "_");
             try {
@@ -166,7 +165,8 @@ public class TestResource implements XAResource {
     }
 
     public synchronized void commit(Xid id, boolean onePhase) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_COMMIT  [" + id + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                + ")      XA_COMMIT  [" + id + "]");
         completionCounter.incrementCommit(serverId);
         if (file != null) {
             if (!file.delete()) {
@@ -174,14 +174,15 @@ public class TestResource implements XAResource {
             }
         }
         this.xid = null;
-        
+
         if (fatalCommit) {
             throw new Error();
         }
     }
 
     public synchronized void rollback(Xid xid) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_ROLLBACK[" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                + ")      XA_ROLLBACK[" + xid + "]");
         completionCounter.incrementRollback(serverId);
         if (file != null) {
             if (!file.delete()) {
@@ -192,15 +193,18 @@ public class TestResource implements XAResource {
     }
 
     public void start(Xid xid, int flags) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_START   [" + xid + "] Flags=" + flags);
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                + ")      XA_START   [" + xid + "] Flags=" + flags);
     }
 
     public void end(Xid xid, int flags) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_END     [" + xid + "] Flags=" + flags);
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                + ")      XA_END     [" + xid + "] Flags=" + flags);
     }
 
     public void forget(Xid xid) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_FORGET[" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      XA_FORGET["
+                + xid + "]");
     }
 
     public int getTransactionTimeout() throws XAException {
@@ -227,7 +231,7 @@ public class TestResource implements XAResource {
         Xid toReturn = null;
         if ((flag & XAResource.TMSTARTRSCAN) == XAResource.TMSTARTRSCAN) {
 
-            synchronized(this) {
+            synchronized (this) {
                 if (scanning) {
                     try {
                         this.wait();
@@ -238,16 +242,19 @@ public class TestResource implements XAResource {
                     scanning = true;
                 }
             }
-            
-            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      RECOVER[XAResource.TMSTARTRSCAN]: " + serverId);
+
+            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                    + ")      RECOVER[XAResource.TMSTARTRSCAN]: " + serverId);
             if (xid != null) {
                 toReturn = xid;
-                System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      RECOVERED: " + toReturn);
+                System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                        + ")      RECOVERED: " + toReturn);
             }
         }
         if ((flag & XAResource.TMENDRSCAN) == XAResource.TMENDRSCAN) {
-            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      RECOVER[XAResource.TMENDRSCAN]: " + serverId);
-            synchronized(this) {
+            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                    + ")      RECOVER[XAResource.TMENDRSCAN]: " + serverId);
+            synchronized (this) {
                 if (scanning) {
                     scanning = false;
                     this.notify();
@@ -255,9 +262,10 @@ public class TestResource implements XAResource {
             }
         }
         if (flag == XAResource.TMNOFLAGS) {
-            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId + ")      RECOVER[XAResource.TMENDRSCAN]: " + serverId);
+            System.out.println("[" + Thread.currentThread().getName() + "] TestResource (" + serverId
+                    + ")      RECOVER[XAResource.TMENDRSCAN]: " + serverId);
         }
-        return new Xid[] { toReturn };
+        return new Xid[]{toReturn};
     }
 
     public boolean setTransactionTimeout(int seconds) throws XAException {

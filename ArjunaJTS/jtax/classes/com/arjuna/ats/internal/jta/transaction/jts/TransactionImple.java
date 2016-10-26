@@ -83,26 +83,21 @@ import com.arjuna.ats.jta.xa.XAModifier;
  * An implementation of javax.transaction.Transaction.
  *
  * @author Mark Little (mark_little@hp.com)
- * @version $Id: TransactionImple.java 2342 2006-03-30 13:06:17Z  $
+ * @version $Id: TransactionImple.java 2342 2006-03-30 13:06:17Z $
  * @since JTS 1.2.4.
  */
 
-public class TransactionImple implements javax.transaction.Transaction,
-        com.arjuna.ats.jta.transaction.Transaction
-{
+public class TransactionImple implements javax.transaction.Transaction, com.arjuna.ats.jta.transaction.Transaction {
 
-    public TransactionImple () throws SubtransactionsUnavailable
-    {
+    public TransactionImple() throws SubtransactionsUnavailable {
         this(new AtomicTransaction());
 
         _theTransaction.begin();
 
-        try
-        {
+        try {
             TwoPhaseCoordinator theTx = null;
 
-            try
-            {
+            try {
                 /*
                  * If this is an imported transaction and we have just performed
                  * interposition, then register a purely local Synchronization.
@@ -111,22 +106,18 @@ public class TransactionImple implements javax.transaction.Transaction,
 
                 theTx = (TwoPhaseCoordinator) BasicAction.Current();
 
-                if (theTx != null)  // TM is local
+                if (theTx != null) // TM is local
                     theTx.addSynchronization(new LocalCleanupSynchronization(this));
                 else
                     registerSynchronization(new CleanupSynchronization(this));
-            }
-            catch (ClassCastException ex)
-            {
+            } catch (ClassCastException ex) {
                 /*
                  * Not a local/interposed transaction.
                  */
 
                 registerSynchronization(new CleanupSynchronization(this));
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             /*
              * Could set rollback only, but let's take the memory leak hit for
              * now.
@@ -140,8 +131,7 @@ public class TransactionImple implements javax.transaction.Transaction,
      * Overloads Object.equals()
      */
 
-    public boolean equals (Object obj)
-    {
+    public boolean equals(Object obj) {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.equals");
         }
@@ -152,10 +142,8 @@ public class TransactionImple implements javax.transaction.Transaction,
         if (obj == this)
             return true;
 
-        if (obj instanceof TransactionImple)
-        {
-            if (_theTransaction != null)
-            {
+        if (obj instanceof TransactionImple) {
+            if (_theTransaction != null) {
                 return _theTransaction.equals(((TransactionImple) obj)._theTransaction);
             }
         }
@@ -164,27 +152,23 @@ public class TransactionImple implements javax.transaction.Transaction,
     }
 
     /**
-   * TransactionImple (which could be a proxy to the remote transaction) will
-   * return up to two different hashCodes. It will return a valid hashcode if
-   * the remote transaction is active and it will return -1 if the transaction
-   * is no longer active.
-   * The hashcode is the uid of the transaction, when the transaction completes
-   * it no longer has a uid in theory hence the -1. With raw JTA as we don't
-   * reset the uid when the transaction completes it will still get a hashcode
-   * based off the uid.
-     * Return -1 if we fail.
+     * TransactionImple (which could be a proxy to the remote transaction) will
+     * return up to two different hashCodes. It will return a valid hashcode if
+     * the remote transaction is active and it will return -1 if the transaction
+     * is no longer active. The hashcode is the uid of the transaction, when the
+     * transaction completes it no longer has a uid in theory hence the -1. With
+     * raw JTA as we don't reset the uid when the transaction completes it will
+     * still get a hashcode based off the uid. Return -1 if we fail.
      */
 
-    public int hashCode ()
-    {
+    public int hashCode() {
         if (_theTransaction != null)
             return _theTransaction.hashCode();
         else
             return -1;
     }
 
-    public ControlWrapper getControlWrapper ()
-    {
+    public ControlWrapper getControlWrapper() {
         if (_theTransaction != null)
             return _theTransaction.getControlWrapper();
         else
@@ -206,236 +190,181 @@ public class TransactionImple implements javax.transaction.Transaction,
      * a differentiation.
      */
 
-    public void commit () throws javax.transaction.RollbackException,
-            javax.transaction.HeuristicMixedException,
-            javax.transaction.HeuristicRollbackException,
-            java.lang.SecurityException, javax.transaction.SystemException,
-            java.lang.IllegalStateException
-    {
+    public void commit() throws javax.transaction.RollbackException, javax.transaction.HeuristicMixedException,
+            javax.transaction.HeuristicRollbackException, java.lang.SecurityException,
+            javax.transaction.SystemException, java.lang.IllegalStateException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.commit");
         }
 
-        if (_theTransaction != null)
-        {   
+        if (_theTransaction != null) {
             /*
              * Call end on any suspended resources. If this fails, then the
              * transaction will be rolled back.
              */
 
-            try
-            {
+            try {
                 if ((getStatus() != Status.STATUS_ACTIVE) && (getStatus() != Status.STATUS_MARKED_ROLLBACK))
-                                throw new NoTransaction();
-                     
+                    throw new NoTransaction();
+
                 if (!endSuspendedRMs())
                     _theTransaction.rollbackOnly();
 
                 _theTransaction.end(true);
-            }
-            catch (WrongTransaction wt)
-            {
+            } catch (WrongTransaction wt) {
                 InactiveTransactionException inactiveTransactionException = new InactiveTransactionException(
                         jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx());
                 inactiveTransactionException.initCause(wt);
                 throw inactiveTransactionException;
-            }
-            catch (org.omg.CosTransactions.NoTransaction e1)
-            {
-                IllegalStateException illegalStateException = new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx());
+            } catch (org.omg.CosTransactions.NoTransaction e1) {
+                IllegalStateException illegalStateException = new IllegalStateException(
+                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx());
                 illegalStateException.initCause(e1);
                 throw illegalStateException;
-            }
-            catch (org.omg.CosTransactions.HeuristicMixed e2)
-            {
+            } catch (org.omg.CosTransactions.HeuristicMixed e2) {
                 HeuristicMixedException heuristicMixedException = new javax.transaction.HeuristicMixedException();
                 heuristicMixedException.initCause(e2);
                 throw heuristicMixedException;
-            }
-            catch (org.omg.CosTransactions.HeuristicHazard e3)
-            {
+            } catch (org.omg.CosTransactions.HeuristicHazard e3) {
                 HeuristicMixedException heuristicMixedException = new javax.transaction.HeuristicMixedException();
                 heuristicMixedException.initCause(e3);
                 throw heuristicMixedException;
-            }
-            catch (TRANSACTION_ROLLEDBACK e4)
-            {
+            } catch (TRANSACTION_ROLLEDBACK e4) {
                 RollbackException rollbackException = new RollbackException(e4.toString());
                 rollbackException.initCause(e4);
                 throw rollbackException;
-            }
-            catch (org.omg.CORBA.NO_PERMISSION e5)
-            {
+            } catch (org.omg.CORBA.NO_PERMISSION e5) {
                 throw new SecurityException(e5);
-            }
-            catch (INVALID_TRANSACTION e6)
-            {
+            } catch (INVALID_TRANSACTION e6) {
                 InactiveTransactionException inactiveTransactionException = new InactiveTransactionException(
                         jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2());
                 inactiveTransactionException.initCause(e6);
                 throw inactiveTransactionException;
-            }
-            catch (org.omg.CORBA.SystemException e7)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e7.toString());
+            } catch (org.omg.CORBA.SystemException e7) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e7.toString());
                 systemException.initCause(e7);
                 throw systemException;
-            }
-            finally
-            {
+            } finally {
                 TransactionImple.removeTransaction(this);
             }
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
-    public void rollback () throws java.lang.IllegalStateException,
-            java.lang.SecurityException, javax.transaction.SystemException
-    {
+    public void rollback()
+            throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.rollback");
         }
 
         boolean endSuspendedFailed = false;
-        
-        if (_theTransaction != null)
-        {
-            try
-            {
-                     if ((getStatus() != Status.STATUS_ACTIVE) && (getStatus() != Status.STATUS_MARKED_ROLLBACK))
-                                throw new NoTransaction();
-                     
-                         /*
-                             * Call end on any suspended resources. If this fails, then there's
-                             * not a lot else we can do because the transaction is about to roll
-                             * back anyway!
-                             */
-                     
-                      endSuspendedFailed = !endSuspendedRMs();
 
-                            if (endSuspendedFailed)
-                            {
-                                jtaxLogger.i18NLogger.warn_jtax_transaction_jts_endsuspendfailed1();
-                            }
-                            
+        if (_theTransaction != null) {
+            try {
+                if ((getStatus() != Status.STATUS_ACTIVE) && (getStatus() != Status.STATUS_MARKED_ROLLBACK))
+                    throw new NoTransaction();
+
+                /*
+                 * Call end on any suspended resources. If this fails, then
+                 * there's not a lot else we can do because the transaction is
+                 * about to roll back anyway!
+                 */
+
+                endSuspendedFailed = !endSuspendedRMs();
+
+                if (endSuspendedFailed) {
+                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_endsuspendfailed1();
+                }
+
                 _theTransaction.abort();
-            }
-            catch (WrongTransaction e1)
-            {
-                InactiveTransactionException inactiveTransactionException =new InactiveTransactionException(
+            } catch (WrongTransaction e1) {
+                InactiveTransactionException inactiveTransactionException = new InactiveTransactionException(
                         jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx());
                 inactiveTransactionException.initCause(e1);
                 throw inactiveTransactionException;
-            }
-            catch (org.omg.CORBA.NO_PERMISSION e2)
-            {
+            } catch (org.omg.CORBA.NO_PERMISSION e2) {
                 throw new SecurityException(e2);
-            }
-            catch (INVALID_TRANSACTION e3)
-            {
+            } catch (INVALID_TRANSACTION e3) {
                 InactiveTransactionException inactiveTransactionException = new InactiveTransactionException(
                         jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2());
                 inactiveTransactionException.initCause(e3);
                 throw inactiveTransactionException;
-            }
-            catch (NoTransaction e4)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e4);
-            }
-            catch (org.omg.CORBA.SystemException e5)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e5.toString());
+            } catch (NoTransaction e4) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e4);
+            } catch (org.omg.CORBA.SystemException e5) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e5.toString());
                 systemException.initCause(e5);
                 throw systemException;
-            }
-            finally
-            {
+            } finally {
                 TransactionImple.removeTransaction(this);
             }
 
             if (endSuspendedFailed)
                 throw new InvalidTerminationStateException(
                         jtaxLogger.i18NLogger.get_jtax_transaction_jts_endsuspendfailed2());
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
-    public void setRollbackOnly () throws java.lang.IllegalStateException,
-            javax.transaction.SystemException
-    {
+    public void setRollbackOnly() throws java.lang.IllegalStateException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.setRollbackOnly");
         }
 
-        if (_theTransaction != null)
-        {
-            try
-            {
+        if (_theTransaction != null) {
+            try {
                 _theTransaction.rollbackOnly();
-                // keep a record of why we are rolling back i.e. who called us first, it's a useful debug aid.
-                if (_rollbackOnlyCallerStacktrace == null)
-                {
-                    _rollbackOnlyCallerStacktrace = new Throwable(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx());
+                // keep a record of why we are rolling back i.e. who called us
+                // first, it's a useful debug aid.
+                if (_rollbackOnlyCallerStacktrace == null) {
+                    _rollbackOnlyCallerStacktrace = new Throwable(
+                            jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx());
                 }
-            }
-            catch (org.omg.CosTransactions.NoTransaction e3)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e3);
-            }
-            catch (final INVALID_TRANSACTION ex)
-            {
-                switch (getStatus())
-                    {
-                case Status.STATUS_ROLLEDBACK:
-                case Status.STATUS_ROLLING_BACK:
+            } catch (org.omg.CosTransactions.NoTransaction e3) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e3);
+            } catch (final INVALID_TRANSACTION ex) {
+                switch (getStatus()) {
+                    case Status.STATUS_ROLLEDBACK :
+                    case Status.STATUS_ROLLING_BACK :
                         break;
-                case Status.STATUS_PREPARING:
-                case Status.STATUS_PREPARED:
-                        throw new InvalidTerminationStateException( jtaLogger.i18NLogger.get_transaction_arjunacore_invalidstate() );
-                    default:
-                        throw new InactiveTransactionException( jtaLogger.i18NLogger.get_transaction_arjunacore_inactive() );
-                    }
-            }
-            catch (org.omg.CORBA.SystemException e4)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e4.toString());
+                    case Status.STATUS_PREPARING :
+                    case Status.STATUS_PREPARED :
+                        throw new InvalidTerminationStateException(
+                                jtaLogger.i18NLogger.get_transaction_arjunacore_invalidstate());
+                    default :
+                        throw new InactiveTransactionException(
+                                jtaLogger.i18NLogger.get_transaction_arjunacore_inactive());
+                }
+            } catch (org.omg.CORBA.SystemException e4) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e4.toString());
                 systemException.initCause(e4);
                 throw systemException;
             }
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
-    public int getStatus () throws javax.transaction.SystemException
-    {
+    public int getStatus() throws javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.getStatus");
         }
 
         int status = javax.transaction.Status.STATUS_NO_TRANSACTION;
 
-        if (_theTransaction != null)
-        {
-            try
-            {
+        if (_theTransaction != null) {
+            try {
                 status = StatusConverter.convert(_theTransaction.get_status());
-            }
-            catch (org.omg.CORBA.SystemException e2)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e2.toString());
+            } catch (org.omg.CORBA.SystemException e2) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e2.toString());
                 systemException.initCause(e2);
                 throw systemException;
             }
         }
-        
+
         if (jtaLogger.logger.isTraceEnabled()) {
             jtaLogger.logger.trace("TransactionImple.getStatus: " + JTAHelper.stringForm(status));
         }
@@ -443,18 +372,17 @@ public class TransactionImple implements javax.transaction.Transaction,
         return status;
     }
 
-    public void registerSynchronization (javax.transaction.Synchronization sync)
-            throws javax.transaction.RollbackException,
-            java.lang.IllegalStateException, javax.transaction.SystemException
-    {
+    public void registerSynchronization(javax.transaction.Synchronization sync)
+            throws javax.transaction.RollbackException, java.lang.IllegalStateException,
+            javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("TransactionImple.registerSynchronization - Class: " + sync.getClass() + " HashCode: " + sync.hashCode() + " toString: " + sync);
+            jtaxLogger.logger.trace("TransactionImple.registerSynchronization - Class: " + sync.getClass()
+                    + " HashCode: " + sync.hashCode() + " toString: " + sync);
         }
 
         if (sync == null)
-            throw new javax.transaction.SystemException(
-                    "TransactionImple.registerSynchronization - "
-                            + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
+            throw new javax.transaction.SystemException("TransactionImple.registerSynchronization - "
+                    + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
 
         registerSynchronizationImple(new ManagedSynchronizationImple(sync));
     }
@@ -463,98 +391,69 @@ public class TransactionImple implements javax.transaction.Transaction,
     // TransactionSynchronizationRegistryImple
 
     void registerSynchronizationImple(SynchronizationImple synchronizationImple)
-            throws javax.transaction.RollbackException,
-            java.lang.IllegalStateException, javax.transaction.SystemException
-    {
-        if (_theTransaction != null)
-        {
-            try
-            {
+            throws javax.transaction.RollbackException, java.lang.IllegalStateException,
+            javax.transaction.SystemException {
+        if (_theTransaction != null) {
+            try {
                 _theTransaction.registerSynchronization(synchronizationImple.getSynchronization());
-            }
-            catch (TRANSACTION_ROLLEDBACK e2)
-            {
+            } catch (TRANSACTION_ROLLEDBACK e2) {
                 RollbackException rollbackException = new javax.transaction.RollbackException(e2.toString());
                 rollbackException.initCause(e2);
                 throw rollbackException;
-            }
-            catch (org.omg.CosTransactions.Inactive e3)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx(), e3);
-            }
-            catch (org.omg.CosTransactions.SynchronizationUnavailable e4)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_syncerror(), e4);
-            }
-            catch (INVALID_TRANSACTION e5)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2(), e5);
-            }
-            catch (org.omg.CORBA.SystemException e6)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e6.toString());
+            } catch (org.omg.CosTransactions.Inactive e3) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx(), e3);
+            } catch (org.omg.CosTransactions.SynchronizationUnavailable e4) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_syncerror(), e4);
+            } catch (INVALID_TRANSACTION e5) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2(), e5);
+            } catch (org.omg.CORBA.SystemException e6) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e6.toString());
                 systemException.initCause(e6);
                 throw systemException;
             }
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
-
-    public boolean enlistResource (XAResource xaRes) throws RollbackException,
-            IllegalStateException, javax.transaction.SystemException
-    {
+    public boolean enlistResource(XAResource xaRes)
+            throws RollbackException, IllegalStateException, javax.transaction.SystemException {
         return enlistResource(xaRes, null);
     }
 
-    public boolean enlistResource (XAResource xaRes, Object[] params)
-            throws RollbackException, IllegalStateException,
-            javax.transaction.SystemException
-    {
+    public boolean enlistResource(XAResource xaRes, Object[] params)
+            throws RollbackException, IllegalStateException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("TransactionImple.enlistResource ( "
-                    + xaRes + " )");
+            jtaxLogger.logger.trace("TransactionImple.enlistResource ( " + xaRes + " )");
         }
 
         if (xaRes == null)
             throw new javax.transaction.SystemException(
-                    "TransactionImple.enlistResource - "
-                            + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
+                    "TransactionImple.enlistResource - " + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
 
         int status = getStatus();
 
-        switch (status)
-        {
-        case javax.transaction.Status.STATUS_MARKED_ROLLBACK:
-            throw new RollbackException("TransactionImple.enlistResource - "
-                    + jtaxLogger.i18NLogger.get_jtax_transaction_jts_markedrollback());
-        case javax.transaction.Status.STATUS_ACTIVE:
-            break;
-        default:
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        switch (status) {
+            case javax.transaction.Status.STATUS_MARKED_ROLLBACK :
+                throw new RollbackException("TransactionImple.enlistResource - "
+                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_markedrollback());
+            case javax.transaction.Status.STATUS_ACTIVE :
+                break;
+            default :
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
         }
 
         XAModifier theModifier = null;
 
-        if (params != null)
-        {
-            if (params.length >= XAMODIFIER + 1)
-            {
-                if (params[XAMODIFIER] instanceof XAModifier)
-                {
+        if (params != null) {
+            if (params.length >= XAMODIFIER + 1) {
+                if (params[XAMODIFIER] instanceof XAModifier) {
                     theModifier = (XAModifier) params[XAMODIFIER];
                 }
             }
         }
 
-        try
-        {
+        try {
             /*
              * For each transaction we maintain a list of resources registered
              * with it. Each element on this list also contains a list of
@@ -569,14 +468,11 @@ public class TransactionImple implements javax.transaction.Transaction,
              * trawl first before checking the RM instance later. Saves time.
              */
 
-            try
-            {
-                synchronized (this)
-                {
+            try {
+                synchronized (this) {
                     info = (TxInfo) _resources.get(xaRes);
 
-                    if (info == null)
-                    {
+                    if (info == null) {
                         /*
                          * Null info means it's not in the main resources list,
                          * but may be in the duplicates.
@@ -586,78 +482,67 @@ public class TransactionImple implements javax.transaction.Transaction,
                     }
                 }
 
-                if (info != null)
-                {
-                    switch (info.getState())
-                    {
-                    case TxInfo.ASSOCIATION_SUSPENDED:
-                    {
-                        /*
-                         * Have seen resource before, so do a resume. The
-                         * Resource instance will still be registered with the
-                         * transaction though.
-                         */
+                if (info != null) {
+                    switch (info.getState()) {
+                        case TxInfo.ASSOCIATION_SUSPENDED : {
+                            /*
+                             * Have seen resource before, so do a resume. The
+                             * Resource instance will still be registered with
+                             * the transaction though.
+                             */
 
-                        xaRes.start(info.xid(), XAResource.TMRESUME);
+                            xaRes.start(info.xid(), XAResource.TMRESUME);
 
-                        info.setState(TxInfo.ASSOCIATED);
+                            info.setState(TxInfo.ASSOCIATED);
 
-                        synchronized (this)
-                        {
-                            _suspendCount--;
+                            synchronized (this) {
+                                _suspendCount--;
+                            }
+
+                            return true; // already registered resource with
+                                            // this
+                            // transaction!
                         }
+                        case TxInfo.ASSOCIATED : {
+                            /*
+                             * Already active on this transaction.
+                             */
 
-                        return true; // already registered resource with this
-                        // transaction!
-                    }
-                    case TxInfo.ASSOCIATED:
-                    {
-                        /*
-                         * Already active on this transaction.
-                         */
+                            return true;
+                        }
+                        case TxInfo.NOT_ASSOCIATED : {
+                            /*
+                             * Resource was associated, but was presumably
+                             * delisted.
+                             */
+                            xaRes.start(info.xid(), XAResource.TMJOIN);
 
-                        return true;
-                    }
-                    case TxInfo.NOT_ASSOCIATED:
-                    {
-                        /*
-                         * Resource was associated, but was presumably delisted.
-                         */
-                        xaRes.start(info.xid(), XAResource.TMJOIN);
+                            info.setState(TxInfo.ASSOCIATED);
 
-                        info.setState(TxInfo.ASSOCIATED);
-
-                        return true;
-                    }
-                    default:
-                    {
-                        // Note: this exception will be caught by our catch
-                        // block
-                        throw new IllegalStateException(
-                                "TransactionImple.enlistResource - "
-                                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_illegalstate()
-                                        + info.getState());
-                    }
+                            return true;
+                        }
+                        default : {
+                            // Note: this exception will be caught by our catch
+                            // block
+                            throw new IllegalStateException("TransactionImple.enlistResource - "
+                                    + jtaxLogger.i18NLogger.get_jtax_transaction_jts_illegalstate() + info.getState());
+                        }
                     }
                 }
-            }
-            catch (IllegalStateException ex)
-            {
+            } catch (IllegalStateException ex) {
                 throw ex; // we threw it in the first place
-            }
-            catch (XAException exp)
-            {
+            } catch (XAException exp) {
                 if (info != null)
                     info.setState(TxInfo.FAILED);
 
-                jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror( "TransactionImple.enlistResource",
+                jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.enlistResource",
                         XAHelper.printXAErrorCode(exp), exp);
 
                 return false;
             }
 
-            //        if (threadIsActive(xaRes))
-            //        return true; // this thread has already registered a resource for
+            // if (threadIsActive(xaRes))
+            // return true; // this thread has already registered a resource for
             // this db
 
             /*
@@ -669,20 +554,18 @@ public class TransactionImple implements javax.transaction.Transaction,
             Xid xid = null;
             TxInfo existingRM = isNewRM(xaRes);
 
-            if (existingRM == null)
-            {
+            if (existingRM == null) {
                 /*
                  * New RM, so create xid with new branch.
                  */
 
                 boolean branchRequired = true;
 
-                synchronized (this)
-                {
+                synchronized (this) {
                     if (_resources.size() == 0)// first ever, so no need for
                     // branch
                     {
-                        //branchRequired = false;
+                        // branchRequired = false;
                         branchRequired = true;
                     }
                 }
@@ -705,105 +588,106 @@ public class TransactionImple implements javax.transaction.Transaction,
                  * Is there a benefit to a zero branch?
                  */
 
-                while (!associatedWork)
-                {
-                    try
-                    {
-                        if (_xaTransactionTimeoutEnabled)
-                        {
+                while (!associatedWork) {
+                    try {
+                        if (_xaTransactionTimeoutEnabled) {
                             int timeout = _theTransaction.getTimeout();
 
-                            if (timeout > 0)
-                            {
-                                try
-                                {
+                            if (timeout > 0) {
+                                try {
                                     xaRes.setTransactionTimeout(timeout);
-                                }
-                                catch (XAException te)
-                                {
-                                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_timeouterror("TransactionImple.enlistResource",
-                                            XAHelper.printXAErrorCode(te), XAHelper.xidToString(xid), te);
+                                } catch (XAException te) {
+                                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_timeouterror(
+                                            "TransactionImple.enlistResource", XAHelper.printXAErrorCode(te),
+                                            XAHelper.xidToString(xid), te);
                                 }
                             }
                         }
 
-                        // Pay attention now, this bit is hairy. We need to add a new XAResourceRecord
-                        // to the transaction, which will thereafter drive its completion. However, the transaction
-                        // core is not directly XA aware, so it's our job to start the XAResource. Problem is, if
-                        // adding the record fails, the tx will never end the resource via the XAResourceRecord,
-                        // so we must do so directly.  start may fail due to dupl xid or other reason, and transactions
-                        // may rollback async, for which reasons we can't call add before start.
-                        // The xid will change on each pass of the loop, so we need to create a new record on each pass.
-                        // The registerResource will fail in the case of multiple last resources being disallowed.
+                        // Pay attention now, this bit is hairy. We need to add
+                        // a new XAResourceRecord
+                        // to the transaction, which will thereafter drive its
+                        // completion. However, the transaction
+                        // core is not directly XA aware, so it's our job to
+                        // start the XAResource. Problem is, if
+                        // adding the record fails, the tx will never end the
+                        // resource via the XAResourceRecord,
+                        // so we must do so directly. start may fail due to dupl
+                        // xid or other reason, and transactions
+                        // may rollback async, for which reasons we can't call
+                        // add before start.
+                        // The xid will change on each pass of the loop, so we
+                        // need to create a new record on each pass.
+                        // The registerResource will fail in the case of
+                        // multiple last resources being disallowed.
                         // see JBTM-362 and JBTM-363
                         XAResourceRecord xaResourceRecord = createRecord(xaRes, params, xid);
-                        if(xaResourceRecord != null) {
+                        if (xaResourceRecord != null) {
                             xaRes.start(xid, XAResource.TMNOFLAGS);
                             try {
-                                RecoveryCoordinator recCoord = _theTransaction.registerResource(xaResourceRecord.getResource());
+                                RecoveryCoordinator recCoord = _theTransaction
+                                        .registerResource(xaResourceRecord.getResource());
                                 xaResourceRecord.setRecoveryCoordinator(recCoord);
                                 if (jtaxLogger.logger.isTraceEnabled()) {
-                                    jtaxLogger.logger.tracef("TransactionImple.enlistResource: "
-                                        + "resource_trace: txn uid=%s XAReource=%s resource uid=%s\n",
-                                        get_uid(), xaRes, xaResourceRecord.get_uid());
+                                    jtaxLogger.logger.tracef(
+                                            "TransactionImple.enlistResource: "
+                                                    + "resource_trace: txn uid=%s XAReource=%s resource uid=%s\n",
+                                            get_uid(), xaRes, xaResourceRecord.get_uid());
                                 }
 
-                            } catch(Exception e) {
-                                // we called start on the resource, but _theTransaction did not accept it.
-                                // we therefore have a mess which we must now clean up by ensuring the start is undone:
+                            } catch (Exception e) {
+                                // we called start on the resource, but
+                                // _theTransaction did not accept it.
+                                // we therefore have a mess which we must now
+                                // clean up by ensuring the start is undone:
                                 xaResourceRecord.rollback();
                                 markRollbackOnly();
                                 return false;
                             }
                             _resources.put(xaRes, new TxInfo(xid));
-                            return true; // dive out, no need to set associatedWork = true;
+                            return true; // dive out, no need to set
+                                            // associatedWork = true;
                         }
 
-                        // if we get to here, something other than a failure of xaRes.start probably went wrong.
+                        // if we get to here, something other than a failure of
+                        // xaRes.start probably went wrong.
                         // so we don't loop and retry, we just give up.
                         markRollbackOnly();
                         return false;
-                    }
-                    catch (XAException e)
-                    {
+                    } catch (XAException e) {
                         // transaction already created by another server
 
                         /* We get this from Oracle instead of DUPID. */
-                        if (e.errorCode == XAException.XAER_RMERR)
-                        {
+                        if (e.errorCode == XAException.XAER_RMERR) {
 
                             if (retry > 0)
                                 xid = createXid(true, theModifier);
 
                             retry--;
+                        } else if (e.errorCode == XAException.XAER_DUPID) {
+                            if (retry > 0)
+                                xid = createXid(true, theModifier);
+
+                            retry--;
+                        } else {
+                            /*
+                             * Can't do start, so set transaction to rollback
+                             * only.
+                             */
+
+                            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_starterror(
+                                    "TransactionImple.enlistResource - XAResource.start", XAHelper.printXAErrorCode(e),
+                                    XAHelper.xidToString(xid), e);
+
+                            markRollbackOnly();
+
+                            throw e;
                         }
-                        else
-                            if (e.errorCode == XAException.XAER_DUPID)
-                            {
-                                if (retry > 0)
-                                    xid = createXid(true, theModifier);
 
-                                retry--;
-                            }
-                            else
-                            {
-                                /*
-                                 * Can't do start, so set transaction to
-                                 * rollback only.
-                                 */
-
-                                jtaxLogger.i18NLogger.warn_jtax_transaction_jts_starterror("TransactionImple.enlistResource - XAResource.start",
-                                        XAHelper.printXAErrorCode(e), XAHelper.xidToString(xid), e);
-
-                                markRollbackOnly();
-
-                                throw e;
-                            }
-
-                        if (retry < 0)
-                        {
-                            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_starterror("TransactionImple.enlistResource - XAResource.start",
-                                    XAHelper.printXAErrorCode(e), XAHelper.xidToString(xid), e);
+                        if (retry < 0) {
+                            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_starterror(
+                                    "TransactionImple.enlistResource - XAResource.start", XAHelper.printXAErrorCode(e),
+                                    XAHelper.xidToString(xid), e);
 
                             markRollbackOnly();
 
@@ -811,9 +695,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                         }
                     }
                 }
-            }
-            else
-            {
+            } else {
                 /*
                  * Have seen this RM before, so ignore this instance. The first
                  * registered RM instance will be used to drive the transaction
@@ -827,13 +709,11 @@ public class TransactionImple implements javax.transaction.Transaction,
 
                 xid = existingRM.xid();
 
-                try
-                {
+                try {
                     xaRes.start(xid, XAResource.TMJOIN);
-                }
-                catch (XAException ex)
-                {
-                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.enlistResource - xa_start: ", XAHelper.printXAErrorCode(ex), ex);
+                } catch (XAException ex) {
+                    jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror(
+                            "TransactionImple.enlistResource - xa_start: ", XAHelper.printXAErrorCode(ex), ex);
 
                     markRollbackOnly();
 
@@ -851,9 +731,7 @@ public class TransactionImple implements javax.transaction.Transaction,
             }
 
             return false;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             /*
              * Some exceptional condition arose and we probably could not enlist
              * the resouce. So, for safety mark the transaction as rollback
@@ -867,25 +745,21 @@ public class TransactionImple implements javax.transaction.Transaction,
     }
 
     /**
-     * Attempt to create an XAResourceRecord wrapping the given XAResource. Return null if this fails, or
-     * is diallowed by the current configuration of multiple last resource behaviour.
+     * Attempt to create an XAResourceRecord wrapping the given XAResource.
+     * Return null if this fails, or is diallowed by the current configuration
+     * of multiple last resource behaviour.
      *
      * @param xaRes
      * @param params
      * @param xid
      * @return
      */
-    private XAResourceRecord createRecord(XAResource xaRes, Object[] params, Xid xid)
-    {
+    private XAResourceRecord createRecord(XAResource xaRes, Object[] params, Xid xid) {
         final XAResourceRecord record;
-        if ((xaRes instanceof LastResourceCommitOptimisation)
-                || ((LAST_RESOURCE_OPTIMISATION_INTERFACE != null) && LAST_RESOURCE_OPTIMISATION_INTERFACE
-                .isInstance(xaRes)))
-        {
-                record = new LastResourceRecord(this, xaRes, xid, params);
-        }
-        else
-        {
+        if ((xaRes instanceof LastResourceCommitOptimisation) || ((LAST_RESOURCE_OPTIMISATION_INTERFACE != null)
+                && LAST_RESOURCE_OPTIMISATION_INTERFACE.isInstance(xaRes))) {
+            record = new LastResourceRecord(this, xaRes, xid, params);
+        } else {
             record = new XAResourceRecord(this, xaRes, xid, params);
         }
 
@@ -897,65 +771,52 @@ public class TransactionImple implements javax.transaction.Transaction,
      * sense otherwise!
      */
 
-    public boolean delistResource (XAResource xaRes, int flags)
-            throws IllegalStateException, javax.transaction.SystemException
-    {
+    public boolean delistResource(XAResource xaRes, int flags)
+            throws IllegalStateException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("TransactionImple.delistResource ( "
-                    + xaRes + ", " + flags + " )");
+            jtaxLogger.logger.trace("TransactionImple.delistResource ( " + xaRes + ", " + flags + " )");
         }
 
         if (xaRes == null)
             throw new javax.transaction.SystemException(
-                    "TransactionImple.delistResource - "
-                            + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
+                    "TransactionImple.delistResource - " + jtaxLogger.i18NLogger.get_jtax_transaction_jts_nullparam());
 
         int status = getStatus();
 
-        switch (status)
-        {
-        case javax.transaction.Status.STATUS_ACTIVE:
-            break;
-        case javax.transaction.Status.STATUS_MARKED_ROLLBACK:
-            break;
-        default:
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        switch (status) {
+            case javax.transaction.Status.STATUS_ACTIVE :
+                break;
+            case javax.transaction.Status.STATUS_MARKED_ROLLBACK :
+                break;
+            default :
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
         }
 
         TxInfo info = null;
 
-        try
-        {
-            synchronized (this)
-            {
+        try {
+            synchronized (this) {
                 info = (TxInfo) _resources.get(xaRes);
 
                 if (info == null)
                     info = (TxInfo) _duplicateResources.get(xaRes);
             }
 
-            if (info == null)
-            {
+            if (info == null) {
                 jtaxLogger.i18NLogger.warn_jtax_transaction_jts_unknownres("TransactionImple.delistResource");
 
                 return false;
-            }
-            else
-            {
+            } else {
                 boolean optimizedRollback = false;
 
-                try
-                {
+                try {
                     /*
                      * If we know the transaction is going to rollback, then we
                      * can try to rollback the RM now. Just an optimisation.
                      */
 
-                    if (status == javax.transaction.Status.STATUS_MARKED_ROLLBACK)
-                    {
-                        if (XAUtils.canOptimizeDelist(xaRes))
-                        {
+                    if (status == javax.transaction.Status.STATUS_MARKED_ROLLBACK) {
+                        if (XAUtils.canOptimizeDelist(xaRes)) {
                             xaRes.end(info.xid(), XAResource.TMFAIL);
                             xaRes.rollback(info.xid());
 
@@ -964,102 +825,77 @@ public class TransactionImple implements javax.transaction.Transaction,
                             optimizedRollback = true;
                         }
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     // failed, so try again when transaction does rollback
                 }
 
-                switch (info.getState())
-                {
-                case TxInfo.ASSOCIATED:
-                {
-                    if ((flags & XAResource.TMSUCCESS) != 0)
-                    {
-                        xaRes.end(info.xid(), XAResource.TMSUCCESS);
-                        info.setState(TxInfo.NOT_ASSOCIATED);
-                    }
-                    else
-                    {
-                        if ((flags & XAResource.TMSUSPEND) != 0)
-                        {
-                            xaRes.end(info.xid(), XAResource.TMSUSPEND);
-                            info.setState(TxInfo.ASSOCIATION_SUSPENDED);
+                switch (info.getState()) {
+                    case TxInfo.ASSOCIATED : {
+                        if ((flags & XAResource.TMSUCCESS) != 0) {
+                            xaRes.end(info.xid(), XAResource.TMSUCCESS);
+                            info.setState(TxInfo.NOT_ASSOCIATED);
+                        } else {
+                            if ((flags & XAResource.TMSUSPEND) != 0) {
+                                xaRes.end(info.xid(), XAResource.TMSUSPEND);
+                                info.setState(TxInfo.ASSOCIATION_SUSPENDED);
 
-                            synchronized (this)
-                            {
-                                _suspendCount++;
+                                synchronized (this) {
+                                    _suspendCount++;
+                                }
+                            } else {
+                                xaRes.end(info.xid(), XAResource.TMFAIL);
+                                info.setState(TxInfo.FAILED);
                             }
                         }
-                        else
-                        {
-                            xaRes.end(info.xid(), XAResource.TMFAIL);
-                            info.setState(TxInfo.FAILED);
-                        }
                     }
-                }
-                    break;
-                case TxInfo.ASSOCIATION_SUSPENDED:
-                {
-                    if ((flags & XAResource.TMSUCCESS) != 0)
-                    {
-                        // Oracle barfs if we don't resume first, despite what
-                        // XA says!
+                        break;
+                    case TxInfo.ASSOCIATION_SUSPENDED : {
+                        if ((flags & XAResource.TMSUCCESS) != 0) {
+                            // Oracle barfs if we don't resume first, despite
+                            // what
+                            // XA says!
 
-                        if (XAUtils.mustEndSuspendedRMs(xaRes))
-                            xaRes.start(info.xid(), XAResource.TMRESUME);
+                            if (XAUtils.mustEndSuspendedRMs(xaRes))
+                                xaRes.start(info.xid(), XAResource.TMRESUME);
 
-                        xaRes.end(info.xid(), XAResource.TMSUCCESS);
-                        info.setState(TxInfo.NOT_ASSOCIATED);
+                            xaRes.end(info.xid(), XAResource.TMSUCCESS);
+                            info.setState(TxInfo.NOT_ASSOCIATED);
 
-                        synchronized (this)
-                        {
-                            _suspendCount--;
-                        }
-                    }
-                    else
-                    {
-                        if ((flags & XAResource.TMSUSPEND) != 0)
-                        {
-                            // Note: this exception will be caught by our catch
-                            // block
-
-                            throw new IllegalStateException(
-                                    "TransactionImple.delistResource - "
-                                            + jtaxLogger.i18NLogger.get_jtax_transaction_jts_ressusp());
-                        }
-                        else
-                        {
-                            xaRes.end(info.xid(), XAResource.TMFAIL);
-                            info.setState(TxInfo.FAILED);
-
-                            synchronized (this)
-                            {
+                            synchronized (this) {
                                 _suspendCount--;
                             }
+                        } else {
+                            if ((flags & XAResource.TMSUSPEND) != 0) {
+                                // Note: this exception will be caught by our
+                                // catch
+                                // block
+
+                                throw new IllegalStateException("TransactionImple.delistResource - "
+                                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_ressusp());
+                            } else {
+                                xaRes.end(info.xid(), XAResource.TMFAIL);
+                                info.setState(TxInfo.FAILED);
+
+                                synchronized (this) {
+                                    _suspendCount--;
+                                }
+                            }
                         }
                     }
-                }
-                    break;
-                default:
-                    if (!optimizedRollback)
-                        throw new IllegalStateException(
-                                "TransactionImple.delistResource - "
-                                        + jtaxLogger.i18NLogger.get_jtax_transaction_jts_illegalstate()
-                                        + info.getState());
+                        break;
+                    default :
+                        if (!optimizedRollback)
+                            throw new IllegalStateException("TransactionImple.delistResource - "
+                                    + jtaxLogger.i18NLogger.get_jtax_transaction_jts_illegalstate() + info.getState());
                 }
 
                 info = null;
 
                 return true;
             }
-        }
-        catch (IllegalStateException ex)
-        {
+        } catch (IllegalStateException ex) {
             throw ex;
-        }
-        catch (XAException exp)
-        {
+        } catch (XAException exp) {
             if (info != null)
                 info.setState(TxInfo.FAILED);
 
@@ -1069,12 +905,11 @@ public class TransactionImple implements javax.transaction.Transaction,
 
             markRollbackOnly();
 
-            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.delistResource", XAHelper.printXAErrorCode(exp), exp);
+            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.delistResource",
+                    XAHelper.printXAErrorCode(exp), exp);
 
             return false;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jtaxLogger.i18NLogger.warn_jtax_transaction_jts_delistfailed(e);
 
             /*
@@ -1088,42 +923,34 @@ public class TransactionImple implements javax.transaction.Transaction,
         }
     }
 
-    public final Uid get_uid ()
-    {
+    public final Uid get_uid() {
         return _theTransaction.get_uid();
     }
-    
-    public final Xid getTxId ()
-    {
+
+    public final Xid getTxId() {
         Xid res = baseXid();
-        
+
         if (res == null)
             return _theTransaction.get_xid(false);
-        
+
         return res;
     }
 
-    public String toString ()
-    {
+    public String toString() {
         if (_theTransaction == null)
             return "TransactionImple < jts, NoTransaction >";
-        else
-        {
-            return "TransactionImple < jts, " + _theTransaction.get_uid()
-                    + " >";
+        else {
+            return "TransactionImple < jts, " + _theTransaction.get_uid() + " >";
         }
     }
 
-    public int getXAResourceState (XAResource xaRes)
-    {
+    public int getXAResourceState(XAResource xaRes) {
         int state = TxInfo.UNKNOWN;
 
-        if (xaRes != null)
-        {
+        if (xaRes != null) {
             TxInfo info = (TxInfo) _resources.get(xaRes);
 
-            if (info == null)
-            {
+            if (info == null) {
                 info = (TxInfo) _duplicateResources.get(xaRes);
             }
 
@@ -1134,13 +961,11 @@ public class TransactionImple implements javax.transaction.Transaction,
         return state;
     }
 
-    public void setXAResourceState (XAResource xaRes, int state) {
-        if (xaRes != null)
-        {
+    public void setXAResourceState(XAResource xaRes, int state) {
+        if (xaRes != null) {
             TxInfo info = (TxInfo) _resources.get(xaRes);
 
-            if (info == null)
-            {
+            if (info == null) {
                 info = (TxInfo) _duplicateResources.get(xaRes);
             }
 
@@ -1153,23 +978,18 @@ public class TransactionImple implements javax.transaction.Transaction,
      * Creates if does not exist and adds to our internal mapping table.
      */
 
-    static final TransactionImple getTransaction ()
-    {
+    static final TransactionImple getTransaction() {
         TransactionImple tx = null;
 
-//        try {
+        // try {
         ControlWrapper otx = OTSImpleManager.current().getControlWrapper();
 
-        if (otx != null)
-        {
-            synchronized (TransactionImple._transactions)
-            {
-                try
-                {
+        if (otx != null) {
+            synchronized (TransactionImple._transactions) {
+                try {
                     tx = (TransactionImple) TransactionImple._transactions.get(otx.get_uid());
 
-                    if (tx == null)
-                    {
+                    if (tx == null) {
                         /*
                          * If it isn't active then don't add it to the
                          * hashtable.
@@ -1177,102 +997,89 @@ public class TransactionImple implements javax.transaction.Transaction,
 
                         tx = new TransactionImple(new AtomicTransaction(otx));
 
-                        try
-                        {
-                            if (tx.getStatus() == javax.transaction.Status.STATUS_ACTIVE)
-                            {
+                        try {
+                            if (tx.getStatus() == javax.transaction.Status.STATUS_ACTIVE) {
                                 putTransaction(tx);
                             }
-                        }
-                        catch (Exception ex)
-                        {
+                        } catch (Exception ex) {
                             // shouldn't happen!
                         }
                     }
-                }
-                catch (ClassCastException ex)
-                {
+                } catch (ClassCastException ex) {
                     jtaxLogger.i18NLogger.warn_jtax_transaction_jts_nottximple();
                 }
             }
         }
-        // We used to catch the TRANSACTION_UNAVAILABLE exception here but it is not clear there is a good reason to do so.
-        // It is beneficial for TransactionManager::suspend to have knowledge that the transaction is in this state to know
-        // whether it is worth trying to locate a local instance of a transaction by Uid (potentially an expensive operation)
-//        } catch (TRANSACTION_UNAVAILABLE e) {
-//            if (e.minor != 1) {
-//                throw e;
-//            }
-//        }
-        
+        // We used to catch the TRANSACTION_UNAVAILABLE exception here but it is
+        // not clear there is a good reason to do so.
+        // It is beneficial for TransactionManager::suspend to have knowledge
+        // that the transaction is in this state to know
+        // whether it is worth trying to locate a local instance of a
+        // transaction by Uid (potentially an expensive operation)
+        // } catch (TRANSACTION_UNAVAILABLE e) {
+        // if (e.minor != 1) {
+        // throw e;
+        // }
+        // }
 
         return tx;
     }
 
-    public final void shutdown ()
-    {
+    public final void shutdown() {
         removeTransaction(this);
     }
 
     // get a key-value pair from a transaction specific Map
-    public Object getTxLocalResource(Object key)
-    {
+    public Object getTxLocalResource(Object key) {
         return _txLocalResources.get(key);
     }
 
     // store a key-value pair in the scope of the transaction.
-    public void putTxLocalResource(Object key, Object value)
-    {
+    public void putTxLocalResource(Object key, Object value) {
         _txLocalResources.put(key, value);
     }
 
-
     /*
-     * For JBossAS integration TransactionLocal implementation, we need to know if a tx has been
-     * resolved yet or not. We could use getStatus() and a case stmt, but since an instance is
-     * removed from _transactions on completion this is just as effective.
+     * For JBossAS integration TransactionLocal implementation, we need to know
+     * if a tx has been resolved yet or not. We could use getStatus() and a case
+     * stmt, but since an instance is removed from _transactions on completion
+     * this is just as effective.
+     * 
      * @param tx
+     * 
      * @return
      */
     public boolean isAlive() {
         try {
-            if(_theTransaction != null) {
+            if (_theTransaction != null) {
                 return _transactions.containsKey(this.get_uid());
             } else {
                 return false;
             }
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             return false; // there is no tx/action, therefore it's not alive.
         }
     }
 
-
-    protected TransactionImple (AtomicTransaction tx)
-    {
+    protected TransactionImple(AtomicTransaction tx) {
         _theTransaction = tx;
 
-        if (tx != null)
-        {
+        if (tx != null) {
             _resources = new Hashtable();
             _duplicateResources = new Hashtable();
             _txLocalResources = Collections.synchronizedMap(new HashMap());
-        }
-        else
-        {
+        } else {
             _resources = null;
             _duplicateResources = null;
         }
 
         _suspendCount = 0;
 
-        try
-        {
-            if (getStatus() == javax.transaction.Status.STATUS_ACTIVE)
-            {
+        try {
+            if (getStatus() == javax.transaction.Status.STATUS_ACTIVE) {
                 TwoPhaseCoordinator theTx = null;
 
-                try
-                {
+                try {
                     /*
                      * If this is an imported transaction and we have just
                      * performed interposition, then register a purely local
@@ -1283,13 +1090,10 @@ public class TransactionImple implements javax.transaction.Transaction,
                     theTx = (TwoPhaseCoordinator) BasicAction.Current();
 
                     if (theTx != null)
-                        theTx.addSynchronization(new LocalCleanupSynchronization(
-                                this));
+                        theTx.addSynchronization(new LocalCleanupSynchronization(this));
                     else
                         registerSynchronization(new CleanupSynchronization(this));
-                }
-                catch (ClassCastException ex)
-                {
+                } catch (ClassCastException ex) {
                     /*
                      * Not a local/interposed transaction.
                      */
@@ -1297,9 +1101,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                     registerSynchronization(new CleanupSynchronization(this));
                 }
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             /*
              * Could set rollback only, but let's take the possible memory leak
              * hit for now.
@@ -1307,150 +1109,103 @@ public class TransactionImple implements javax.transaction.Transaction,
 
             jtaxLogger.i18NLogger.warn_jtax_transaction_jts_syncproblem(ex);
         }
-        _xaTransactionTimeoutEnabled = getXATransactionTimeoutEnabled() ;
+        _xaTransactionTimeoutEnabled = getXATransactionTimeoutEnabled();
     }
 
-    protected void commitAndDisassociate ()
-            throws javax.transaction.RollbackException,
-            javax.transaction.HeuristicMixedException,
-            javax.transaction.HeuristicRollbackException,
-            java.lang.SecurityException, javax.transaction.SystemException,
-            java.lang.IllegalStateException
-    {
+    protected void commitAndDisassociate() throws javax.transaction.RollbackException,
+            javax.transaction.HeuristicMixedException, javax.transaction.HeuristicRollbackException,
+            java.lang.SecurityException, javax.transaction.SystemException, java.lang.IllegalStateException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.commitAndDisassociate");
         }
 
-        if (_theTransaction != null)
-        {
-            try
-            {
+        if (_theTransaction != null) {
+            try {
                 _theTransaction.commit(true);
-            }
-            catch (WrongTransaction wt)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx(), wt);
-            }
-            catch (org.omg.CosTransactions.NoTransaction e1)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e1);
-            }
-            catch (org.omg.CosTransactions.HeuristicMixed e2)
-            {
+            } catch (WrongTransaction wt) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx(), wt);
+            } catch (org.omg.CosTransactions.NoTransaction e1) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e1);
+            } catch (org.omg.CosTransactions.HeuristicMixed e2) {
                 HeuristicMixedException heuristicMixedException = new javax.transaction.HeuristicMixedException();
                 heuristicMixedException.initCause(e2);
                 throw heuristicMixedException;
-            }
-            catch (org.omg.CosTransactions.HeuristicHazard e3)
-            {
+            } catch (org.omg.CosTransactions.HeuristicHazard e3) {
                 HeuristicMixedException heuristicMixedException = new javax.transaction.HeuristicMixedException();
                 heuristicMixedException.initCause(e3);
                 throw heuristicMixedException;
-            }
-            catch (TRANSACTION_ROLLEDBACK e4)
-            {
+            } catch (TRANSACTION_ROLLEDBACK e4) {
                 e4.printStackTrace();
-                
+
                 RollbackException rollbackException = new RollbackException(e4.toString());
-                if(_rollbackOnlyCallerStacktrace != null) {
-                    // we rolled back beacuse the user explicitly told us not to commit. Attach the trace of who did that for debug:
+                if (_rollbackOnlyCallerStacktrace != null) {
+                    // we rolled back beacuse the user explicitly told us not to
+                    // commit. Attach the trace of who did that for debug:
                     rollbackException.initCause(_rollbackOnlyCallerStacktrace);
                 }
                 throw rollbackException;
-            }
-            catch (org.omg.CORBA.NO_PERMISSION e5)
-            {
+            } catch (org.omg.CORBA.NO_PERMISSION e5) {
                 throw new SecurityException(e5);
-            }
-            catch (INVALID_TRANSACTION e6)
-            {
+            } catch (INVALID_TRANSACTION e6) {
                 /*
-                 * In JTS/OTS we can indicate that something was terminated by another thread.
-                 * JTA doesn't really prevent this, but ...
+                 * In JTS/OTS we can indicate that something was terminated by
+                 * another thread. JTA doesn't really prevent this, but ...
                  */
 
-                //throw new IllegalStateException(
-                //        jtaxLogger.loggerI18N.getString("com.arjuna.ats.internal.jta.transaction.jts.invalidtx2"));
-                
+                // throw new IllegalStateException(
+                // jtaxLogger.loggerI18N.getString("com.arjuna.ats.internal.jta.transaction.jts.invalidtx2"));
+
                 throw new IllegalStateException();
-            }
-            catch (org.omg.CORBA.SystemException e7)
-            {
+            } catch (org.omg.CORBA.SystemException e7) {
                 InvalidTerminationStateException invalidTerminationStateException = new InvalidTerminationStateException();
                 invalidTerminationStateException.initCause(e7);
                 throw invalidTerminationStateException;
-            }
-            finally
-            {
+            } finally {
                 TransactionImple.removeTransaction(this);
             }
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
-    protected void rollbackAndDisassociate ()
-            throws java.lang.IllegalStateException,
-            java.lang.SecurityException, javax.transaction.SystemException
-    {
+    protected void rollbackAndDisassociate()
+            throws java.lang.IllegalStateException, java.lang.SecurityException, javax.transaction.SystemException {
         if (jtaxLogger.logger.isTraceEnabled()) {
             jtaxLogger.logger.trace("TransactionImple.rollbackAndDisassociate");
         }
 
-        if (_theTransaction != null)
-        {
-            try
-            {
+        if (_theTransaction != null) {
+            try {
                 _theTransaction.rollback();
-            }
-            catch (WrongTransaction e1)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx(), e1);
-            }
-            catch (org.omg.CORBA.NO_PERMISSION e2)
-            {
+            } catch (WrongTransaction e1) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_wrongstatetx(), e1);
+            } catch (org.omg.CORBA.NO_PERMISSION e2) {
                 throw new SecurityException(e2);
-            }
-            catch (INVALID_TRANSACTION e3)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2(), e3);
-            }
-            catch (NoTransaction e4)
-            {
-                throw new IllegalStateException(
-                        jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e4);
-            }
-            catch (org.omg.CORBA.SystemException e5)
-            {
-                javax.transaction.SystemException systemException = new javax.transaction.SystemException(e5.toString());
+            } catch (INVALID_TRANSACTION e3) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_invalidtx2(), e3);
+            } catch (NoTransaction e4) {
+                throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_notx(), e4);
+            } catch (org.omg.CORBA.SystemException e5) {
+                javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                        e5.toString());
                 systemException.initCause(e5);
                 throw systemException;
-            }
-            finally
-            {
+            } finally {
                 TransactionImple.removeTransaction(this);
             }
-        }
-        else
-            throw new IllegalStateException(
-                    jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
+        } else
+            throw new IllegalStateException(jtaxLogger.i18NLogger.get_jtax_transaction_jts_inactivetx());
     }
 
     /**
      * If this is an imported JCA transaction, then this method will return the
-     * Xid we should pretend to be. Otherwise it'll return null and we will generate
-     * our own Xid.
+     * Xid we should pretend to be. Otherwise it'll return null and we will
+     * generate our own Xid.
      *
-     * @return null for a pure ATS transaction, otherwise a valid JCA imported Xid.
+     * @return null for a pure ATS transaction, otherwise a valid JCA imported
+     *         Xid.
      */
 
-    protected Xid baseXid ()
-    {
+    protected Xid baseXid() {
         return null;
     }
 
@@ -1458,13 +1213,11 @@ public class TransactionImple implements javax.transaction.Transaction,
      * Add and remove transactions from list.
      */
 
-    protected static final void putTransaction (TransactionImple tx)
-    {
+    protected static final void putTransaction(TransactionImple tx) {
         TransactionImple._transactions.put(tx.get_uid(), tx);
     }
 
-    public static final void removeTransaction (TransactionImple tx)
-    {
+    public static final void removeTransaction(TransactionImple tx) {
         TransactionImple._transactions.remove(tx.get_uid());
     }
 
@@ -1473,12 +1226,10 @@ public class TransactionImple implements javax.transaction.Transaction,
      * transaction is terminated.
      */
 
-    protected boolean endSuspendedRMs ()
-    {
+    protected boolean endSuspendedRMs() {
         boolean result = true;
 
-        if (_suspendCount > 0)
-        {
+        if (_suspendCount > 0) {
             Enumeration el = _resources.keys();
 
             /*
@@ -1488,12 +1239,9 @@ public class TransactionImple implements javax.transaction.Transaction,
              * the list to try to end any other suspended resources.
              */
 
-            if (el != null)
-            {
-                try
-                {
-                    while (el.hasMoreElements())
-                    {
+            if (el != null) {
+                try {
+                    while (el.hasMoreElements()) {
                         /*
                          * Get the XAResource in case we have to call end on it.
                          */
@@ -1501,8 +1249,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                         XAResource xaRes = (XAResource) el.nextElement();
                         TxInfo info = (TxInfo) _resources.get(xaRes);
 
-                        if (info.getState() == TxInfo.ASSOCIATION_SUSPENDED)
-                        {
+                        if (info.getState() == TxInfo.ASSOCIATION_SUSPENDED) {
                             if (XAUtils.mustEndSuspendedRMs(xaRes))
                                 xaRes.start(info.xid(), XAResource.TMRESUME);
 
@@ -1510,9 +1257,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                             info.setState(TxInfo.NOT_ASSOCIATED);
                         }
                     }
-                }
-                catch (XAException ex)
-                {
+                } catch (XAException ex) {
                     jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaenderror();
 
                     result = false;
@@ -1525,12 +1270,9 @@ public class TransactionImple implements javax.transaction.Transaction,
 
             el = _duplicateResources.keys();
 
-            if (el != null)
-            {
-                try
-                {
-                    while (el.hasMoreElements())
-                    {
+            if (el != null) {
+                try {
+                    while (el.hasMoreElements()) {
                         /*
                          * Get the XAResource in case we have to call end on it.
                          */
@@ -1538,8 +1280,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                         XAResource xaRes = (XAResource) el.nextElement();
                         TxInfo info = (TxInfo) _duplicateResources.get(xaRes);
 
-                        if (info.getState() == TxInfo.ASSOCIATION_SUSPENDED)
-                        {
+                        if (info.getState() == TxInfo.ASSOCIATION_SUSPENDED) {
                             if (XAUtils.mustEndSuspendedRMs(xaRes))
                                 xaRes.start(info.xid(), XAResource.TMRESUME);
 
@@ -1547,9 +1288,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                             info.setState(TxInfo.NOT_ASSOCIATED);
                         }
                     }
-                }
-                catch (XAException ex)
-                {
+                } catch (XAException ex) {
                     jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaenderror();
 
                     result = false;
@@ -1569,22 +1308,17 @@ public class TransactionImple implements javax.transaction.Transaction,
      * Oracle 8.1.6 it causes their JDBC driver to crash!
      */
 
-    private final boolean threadIsActive (XAResource xaRes)
-    {
+    private final boolean threadIsActive(XAResource xaRes) {
         Thread t = Thread.currentThread();
 
-        try
-        {
+        try {
             Enumeration el = _resources.keys();
 
-            if (el != null)
-            {
-                while (el.hasMoreElements())
-                {
+            if (el != null) {
+                while (el.hasMoreElements()) {
                     XAResource x = (XAResource) el.nextElement();
 
-                    if (x.isSameRM(xaRes))
-                    {
+                    if (x.isSameRM(xaRes)) {
                         TxInfo info = (TxInfo) _resources.get(x);
 
                         if (info.thread() == t)
@@ -1595,14 +1329,11 @@ public class TransactionImple implements javax.transaction.Transaction,
 
             el = _duplicateResources.keys();
 
-            if (el != null)
-            {
-                while (el.hasMoreElements())
-                {
+            if (el != null) {
+                while (el.hasMoreElements()) {
                     XAResource x = (XAResource) el.nextElement();
 
-                    if (x.isSameRM(xaRes))
-                    {
+                    if (x.isSameRM(xaRes)) {
                         TxInfo info = (TxInfo) _resources.get(x);
 
                         if (info.thread() == t)
@@ -1610,9 +1341,7 @@ public class TransactionImple implements javax.transaction.Transaction,
                     }
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jtaxLogger.i18NLogger.warn_jtax_transaction_jts_threaderror(e);
 
             throw new com.arjuna.ats.arjuna.exceptions.FatalError(e.toString(), e);
@@ -1626,22 +1355,16 @@ public class TransactionImple implements javax.transaction.Transaction,
      * otherwise.
      */
 
-    private final TxInfo isNewRM (XAResource xaRes)
-    {
-        try
-        {
-            synchronized (this)
-            {
+    private final TxInfo isNewRM(XAResource xaRes) {
+        try {
+            synchronized (this) {
                 Enumeration el = _resources.keys();
 
-                if (el != null)
-                {
-                    while (el.hasMoreElements())
-                    {
+                if (el != null) {
+                    while (el.hasMoreElements()) {
                         XAResource x = (XAResource) el.nextElement();
 
-                        if (x.isSameRM(xaRes))
-                        {
+                        if (x.isSameRM(xaRes)) {
                             return (TxInfo) _resources.get(x);
                         }
                     }
@@ -1649,28 +1372,22 @@ public class TransactionImple implements javax.transaction.Transaction,
 
                 el = _duplicateResources.keys();
 
-                if (el != null)
-                {
-                    while (el.hasMoreElements())
-                    {
+                if (el != null) {
+                    while (el.hasMoreElements()) {
                         XAResource x = (XAResource) el.nextElement();
 
-                        if (x.isSameRM(xaRes))
-                        {
+                        if (x.isSameRM(xaRes)) {
                             return (TxInfo) _duplicateResources.get(x);
                         }
                     }
                 }
             }
-        }
-        catch (XAException ex)
-        {
-            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.isNewRM", XAHelper.printXAErrorCode(ex), ex);
+        } catch (XAException ex) {
+            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_xaerror("TransactionImple.isNewRM",
+                    XAHelper.printXAErrorCode(ex), ex);
 
             throw new com.arjuna.ats.arjuna.exceptions.FatalError(ex.toString(), ex);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             jtaxLogger.i18NLogger.warn_jtax_transaction_jts_rmerror(e);
 
             throw new com.arjuna.ats.arjuna.exceptions.FatalError(e.toString(), e);
@@ -1679,33 +1396,25 @@ public class TransactionImple implements javax.transaction.Transaction,
         return null;
     }
 
-    private final Xid createXid (boolean branch, XAModifier theModifier)
-    {
+    private final Xid createXid(boolean branch, XAModifier theModifier) {
         Xid jtaXid = baseXid();
 
         if (jtaXid != null)
             return jtaXid;
 
-        try
-        {
+        try {
             jtaXid = _theTransaction.get_xid(branch);
 
-            if (theModifier != null)
-            {
-                try
-                {
+            if (theModifier != null) {
+                try {
                     jtaXid = theModifier.createXid(jtaXid);
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
             return jtaXid;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1719,51 +1428,38 @@ public class TransactionImple implements javax.transaction.Transaction,
      * the application, so a failure here will only be masked.
      */
 
-    private final void markRollbackOnly ()
-    {
-        try
-        {
-            if (_theTransaction != null)
-            {
-                try
-                {
+    private final void markRollbackOnly() {
+        try {
+            if (_theTransaction != null) {
+                try {
                     _theTransaction.rollbackOnly();
-                }
-                catch (org.omg.CosTransactions.NoTransaction e3)
-                {
+                } catch (org.omg.CosTransactions.NoTransaction e3) {
                     // ok
-                }
-                catch (org.omg.CORBA.SystemException e3)
-                {
-                    javax.transaction.SystemException systemException = new javax.transaction.SystemException(e3.toString());
+                } catch (org.omg.CORBA.SystemException e3) {
+                    javax.transaction.SystemException systemException = new javax.transaction.SystemException(
+                            e3.toString());
                     systemException.initCause(e3);
                     throw systemException;
                 }
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             jtaxLogger.i18NLogger.warn_jtax_transaction_jts_rollbackerror("TransactionImple.markRollbackOnly -", ex);
         }
     }
 
-    private static boolean getXATransactionTimeoutEnabled()
-    {
-        return XA_TRANSACTION_TIMEOUT_ENABLED ;
+    private static boolean getXATransactionTimeoutEnabled() {
+        return XA_TRANSACTION_TIMEOUT_ENABLED;
     }
 
-    public static Map<Uid, javax.transaction.Transaction> getTransactions()
-    {
+    public static Map<Uid, javax.transaction.Transaction> getTransactions() {
         return Collections.unmodifiableMap(_transactions);
     }
 
-    public Map<XAResource, TxInfo> getResources()
-    {
+    public Map<XAResource, TxInfo> getResources() {
         return Collections.unmodifiableMap(_resources);
     }
 
-    public int getTimeout()
-    {
+    public int getTimeout() {
         return _theTransaction.getTimeout();
     }
 
@@ -1771,8 +1467,7 @@ public class TransactionImple implements javax.transaction.Transaction,
         return TransactionReaper.transactionReaper().getRemainingTimeoutMills(_theTransaction.getControlWrapper());
     }
 
-    public java.util.Map<Uid, String> getSynchronizations()
-    {
+    public java.util.Map<Uid, String> getSynchronizations() {
         if (_theTransaction != null)
             return _theTransaction.getControlWrapper().getSynchronizations();
 
@@ -1784,7 +1479,7 @@ public class TransactionImple implements javax.transaction.Transaction,
     private Hashtable _resources;
     private Hashtable _duplicateResources;
     private int _suspendCount;
-    private final boolean _xaTransactionTimeoutEnabled ;
+    private final boolean _xaTransactionTimeoutEnabled;
     private Map _txLocalResources;
 
     private Throwable _rollbackOnlyCallerStacktrace;
@@ -1795,13 +1490,15 @@ public class TransactionImple implements javax.transaction.Transaction,
             .getLastResourceOptimisationInterface();
 
     /**
-     * Static block writes warning message to the log if last resource optimisation interface was not provided.
+     * Static block writes warning message to the log if last resource
+     * optimisation interface was not provided.
      */
-    static
-    {
-        if(LAST_RESOURCE_OPTIMISATION_INTERFACE == null) {
-            jtaLogger.i18NLogger.warn_transaction_arjunacore_lastResourceOptimisationInterface(jtaPropertyManager.getJTAEnvironmentBean().getLastResourceOptimisationInterfaceClassName());
-            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_lastResourceOptimisationInterface(jtaPropertyManager.getJTAEnvironmentBean().getLastResourceOptimisationInterfaceClassName());
+    static {
+        if (LAST_RESOURCE_OPTIMISATION_INTERFACE == null) {
+            jtaLogger.i18NLogger.warn_transaction_arjunacore_lastResourceOptimisationInterface(
+                    jtaPropertyManager.getJTAEnvironmentBean().getLastResourceOptimisationInterfaceClassName());
+            jtaxLogger.i18NLogger.warn_jtax_transaction_jts_lastResourceOptimisationInterface(
+                    jtaPropertyManager.getJTAEnvironmentBean().getLastResourceOptimisationInterfaceClassName());
         }
     }
 

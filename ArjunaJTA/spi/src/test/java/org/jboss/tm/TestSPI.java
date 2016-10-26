@@ -44,8 +44,7 @@ public class TestSPI {
     @Deployment
     public static WebArchive createTestArchive() {
 
-        return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addPackage("org.jboss.tm")
+        return ShrinkWrap.create(WebArchive.class, "test.war").addPackage("org.jboss.tm")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -82,7 +81,8 @@ public class TestSPI {
                 }
             });
 
-            Thread.sleep(SLEEP * 1000); // sleep for longer than the transaction timeout period
+            Thread.sleep(SLEEP * 1000); // sleep for longer than the transaction
+                                        // timeout period
             int status = transactionManager.getStatus();
 
             Assert.assertTrue("ERROR transaction should have timed out but its state is " + status,

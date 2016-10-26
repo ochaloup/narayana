@@ -57,30 +57,25 @@ public class TwoPCParticipantTest extends BaseWSTTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        return WarDeployment.getDeployment(
-                TestCoordinatorProcessor.class,
-                CoordinatorDetails.class);
+        return WarDeployment.getDeployment(TestCoordinatorProcessor.class, CoordinatorDetails.class);
     }
 
-    private CoordinatorProcessor origCoordinatorProcessor ;
+    private CoordinatorProcessor origCoordinatorProcessor;
     private TestCoordinatorProcessor testCoordinatorProcessor = new TestCoordinatorProcessor();
 
     @Before
-    public void setUp()
-            throws Exception
-            {
+    public void setUp() throws Exception {
         origCoordinatorProcessor = CoordinatorProcessor.getProcessor();
         CoordinatorProcessor.setProcessor(testCoordinatorProcessor);
-            }
+    }
 
     @Test
-    public void testSendPrepared()
-            throws Exception
-            {
-        final String messageId = "testSendPrepared" ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1") ;
-        W3CEndpointReference coordinatorEndpoint = TestUtil.getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId) ;
+    public void testSendPrepared() throws Exception {
+        final String messageId = "testSendPrepared";
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("1");
+        W3CEndpointReference coordinatorEndpoint = TestUtil
+                .getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId);
 
         CoordinatorClient.getClient().sendPrepared(coordinatorEndpoint, map, new InstanceIdentifier("sender"));
 
@@ -88,16 +83,15 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         assertTrue(details.hasPrepared());
 
         checkDetails(details, true, true, messageId, instanceIdentifier);
-            }
+    }
 
     @Test
-    public void testSendAborted()
-            throws Exception
-            {
-        final String messageId = "testSendAborted" ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2") ;
-        W3CEndpointReference coordinatorEndpoint = TestUtil.getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId) ;
+    public void testSendAborted() throws Exception {
+        final String messageId = "testSendAborted";
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("2");
+        W3CEndpointReference coordinatorEndpoint = TestUtil
+                .getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId);
 
         CoordinatorClient.getClient().sendAborted(coordinatorEndpoint, map, new InstanceIdentifier("sender"));
 
@@ -105,16 +99,15 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         assertTrue(details.hasAborted());
 
         checkDetails(details, false, true, messageId, instanceIdentifier);
-            }
+    }
 
     @Test
-    public void testSendReadOnly()
-            throws Exception
-            {
-        final String messageId = "testSendReadOnly" ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("3") ;
-        W3CEndpointReference coordinatorEndpoint = TestUtil.getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId) ;
+    public void testSendReadOnly() throws Exception {
+        final String messageId = "testSendReadOnly";
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("3");
+        W3CEndpointReference coordinatorEndpoint = TestUtil
+                .getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId);
 
         CoordinatorClient.getClient().sendReadOnly(coordinatorEndpoint, map, new InstanceIdentifier("sender"));
 
@@ -122,16 +115,15 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         assertTrue(details.hasReadOnly());
 
         checkDetails(details, false, true, messageId, instanceIdentifier);
-            }
+    }
 
     @Test
-    public void testSendCommitted()
-            throws Exception
-            {
-        final String messageId = "testSendCommitted" ;
-        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("4") ;
-        W3CEndpointReference coordinatorEndpoint = TestUtil.getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
-        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId) ;
+    public void testSendCommitted() throws Exception {
+        final String messageId = "testSendCommitted";
+        final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("4");
+        W3CEndpointReference coordinatorEndpoint = TestUtil
+                .getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+        final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId);
 
         CoordinatorClient.getClient().sendCommitted(coordinatorEndpoint, map, new InstanceIdentifier("sender"));
 
@@ -139,22 +131,22 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         assertTrue(details.hasCommitted());
 
         checkDetails(details, false, true, messageId, instanceIdentifier);
-            }
+    }
 
     @Test
-    public void testSendError()
-            throws Exception
-            {
-        final String messageId = "testSendError" ;
+    public void testSendError() throws Exception {
+        final String messageId = "testSendError";
         final InstanceIdentifier instanceIdentifier = new InstanceIdentifier("5");
-        W3CEndpointReference coordinatorEndpoint = TestUtil.getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
+        W3CEndpointReference coordinatorEndpoint = TestUtil
+                .getCoordinatorEndpoint(instanceIdentifier.getInstanceIdentifier());
         final MAP map = AddressingHelper.createRequestContext(TestUtil.coordinatorServiceURI, messageId);
-        final String reason = "testSendErrorReason" ;
-        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER ;
-        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME ;
-        final SoapFault11 soapFault = new SoapFault11(soapFaultType, subcode, reason) ;
+        final String reason = "testSendErrorReason";
+        final SoapFaultType soapFaultType = SoapFaultType.FAULT_SENDER;
+        final QName subcode = ArjunaTXConstants.UNKNOWNERROR_ERROR_CODE_QNAME;
+        final SoapFault11 soapFault = new SoapFault11(soapFaultType, subcode, reason);
 
-        CoordinatorClient.getClient().sendSoapFault(coordinatorEndpoint, map, soapFault, new InstanceIdentifier("sender"));
+        CoordinatorClient.getClient().sendSoapFault(coordinatorEndpoint, map, soapFault,
+                new InstanceIdentifier("sender"));
 
         CoordinatorDetails details = testCoordinatorProcessor.getCoordinatorDetails(messageId, 10000);
         assertNotNull(details.hasSoapFault());
@@ -163,18 +155,18 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         assertEquals(details.hasSoapFault().getSubcode(), soapFault.getSubcode());
 
         checkDetails(details, false, false, messageId, instanceIdentifier);
-            }
+    }
 
     @After
-    public void tearDown()
-            throws Exception
-            {
+    public void tearDown() throws Exception {
         CoordinatorProcessor.setProcessor(origCoordinatorProcessor);
-            }
+    }
 
     /**
-     * check the message details to see that they have the correct to, from and faultto address and message id, a
-     * none reply to address and an arjuna context containing the correct instannce identifier
+     * check the message details to see that they have the correct to, from and
+     * faultto address and message id, a none reply to address and an arjuna
+     * context containing the correct instannce identifier
+     * 
      * @param details
      * @param hasFrom
      * @param hasFaultTo
@@ -182,8 +174,8 @@ public class TwoPCParticipantTest extends BaseWSTTest {
      * @param instanceIdentifier
      */
 
-    private void checkDetails(CoordinatorDetails details, boolean hasFrom, boolean hasFaultTo, String messageId, InstanceIdentifier instanceIdentifier)
-    {
+    private void checkDetails(CoordinatorDetails details, boolean hasFrom, boolean hasFaultTo, String messageId,
+            InstanceIdentifier instanceIdentifier) {
         MAP inMAP = details.getMAP();
         ArjunaContext inArjunaContext = details.getArjunaContext();
 
@@ -208,8 +200,9 @@ public class TwoPCParticipantTest extends BaseWSTTest {
         if (instanceIdentifier == null) {
             assertNull(inArjunaContext);
         } else {
-            assertNotNull(inArjunaContext) ;
-            assertEquals(instanceIdentifier.getInstanceIdentifier(), inArjunaContext.getInstanceIdentifier().getInstanceIdentifier()) ;
+            assertNotNull(inArjunaContext);
+            assertEquals(instanceIdentifier.getInstanceIdentifier(),
+                    inArjunaContext.getInstanceIdentifier().getInstanceIdentifier());
         }
     }
 }

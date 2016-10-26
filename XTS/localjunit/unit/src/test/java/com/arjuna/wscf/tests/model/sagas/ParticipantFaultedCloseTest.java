@@ -24,15 +24,12 @@ public class ParticipantFaultedCloseTest {
     }
 
     @Test
-    public void testParticipantFaultedClose()
-            throws Exception
-            {
+    public void testParticipantFaultedClose() throws Exception {
         System.out.println("Running test : " + this.getClass().getName());
 
         CoordinatorManager cm = CoordinatorManagerFactory.coordinatorManager();
 
-        try
-        {
+        try {
             String id = "1236";
 
             cm.begin("Sagas11HLS");
@@ -43,20 +40,16 @@ public class ParticipantFaultedCloseTest {
 
             cm.participantFaulted(id);
 
-            System.out.println("Started: "+cm.identifier()+"\n");
+            System.out.println("Started: " + cm.identifier() + "\n");
 
             cm.close();
 
             fail("Close succeeded after participantFaulted");
-        }
-        catch (CoordinatorCancelledException ex)
-        {
+        } catch (CoordinatorCancelledException ex) {
             WSCF11TestUtils.cleanup(cm);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             WSCF11TestUtils.cleanup(cm);
             throw ex;
         }
-            }
+    }
 }

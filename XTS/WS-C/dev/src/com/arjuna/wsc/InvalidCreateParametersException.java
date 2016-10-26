@@ -26,14 +26,11 @@
 
 package com.arjuna.wsc;
 
-public class InvalidCreateParametersException extends Exception
-{
-    public InvalidCreateParametersException()
-    {
+public class InvalidCreateParametersException extends Exception {
+    public InvalidCreateParametersException() {
     }
 
-    public InvalidCreateParametersException(String message)
-    {
+    public InvalidCreateParametersException(String message) {
         super(message);
     }
 }

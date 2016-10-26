@@ -32,7 +32,8 @@ public class JtsTransactionImple extends TransactionImple {
     /**
      * Construct a transaction based on an OTS control
      * 
-     * @param wrapper the wrapped OTS control
+     * @param wrapper
+     *            the wrapped OTS control
      */
     public JtsTransactionImple(ControlWrapper wrapper) {
         super(new AtomicTransaction(wrapper));
@@ -67,14 +68,15 @@ public class JtsTransactionImple extends TransactionImple {
     /**
      * Associated a transaction with the callers thread
      * 
-     * @param ior IOR for the corresponding OTS transaction, must not be null
+     * @param ior
+     *            IOR for the corresponding OTS transaction, must not be null
      * @param control
      * 
      * @throws SystemException
      * @throws IllegalStateException
      * @throws InvalidTransactionException
      * @throws ConfigurationException
-     * @throws TransactionException 
+     * @throws TransactionException
      */
     public static void resume(String ior) throws InvalidTransactionException, IllegalStateException, SystemException,
             ConfigurationException, TransactionException {
@@ -89,7 +91,8 @@ public class JtsTransactionImple extends TransactionImple {
     }
 
     /**
-     * Dissassociate the transaction currently associated with the callers thread
+     * Dissassociate the transaction currently associated with the callers
+     * thread
      * 
      * @throws SystemException
      */
@@ -108,7 +111,8 @@ public class JtsTransactionImple extends TransactionImple {
      * 
      * @param orb
      * 
-     * @param ior the CORBA reference for the OTS transaction
+     * @param ior
+     *            the CORBA reference for the OTS transaction
      * @return a JTA transaction that wraps the OTS transaction
      */
     private static Transaction controlToTx(String ior) {
@@ -142,9 +146,11 @@ public class JtsTransactionImple extends TransactionImple {
     }
 
     /**
-     * If the current transaction represents an OTS transaction then return it IOR
+     * If the current transaction represents an OTS transaction then return it
+     * IOR
      * 
-     * @return the IOR or null if the current transaction is not an OTS transaction
+     * @return the IOR or null if the current transaction is not an OTS
+     *         transaction
      * @throws NamingException
      * @throws org.omg.CORBA.SystemException
      * @throws SystemException

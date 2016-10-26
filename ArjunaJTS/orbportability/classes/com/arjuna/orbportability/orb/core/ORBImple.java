@@ -56,52 +56,51 @@ import org.omg.CORBA.SystemException;
  * @since JTS 2.1.
  */
 
-public interface ORBImple
-{
+public interface ORBImple {
     /**
      * Is the ORB initialised?
      */
 
-    public boolean initialised ();
+    public boolean initialised();
 
     /**
      * Initialise the ORB.
      */
 
-    public void init () throws SystemException;
+    public void init() throws SystemException;
 
-    public void init (Applet a, Properties p) throws SystemException;
+    public void init(Applet a, Properties p) throws SystemException;
 
-    public void init (String[] s, Properties p) throws SystemException;
+    public void init(String[] s, Properties p) throws SystemException;
 
     /**
      * Shutdown the ORB. Do not wait for explicit completion ack from the ORB.
      */
 
-    public void shutdown () throws SystemException;
+    public void shutdown() throws SystemException;
 
     /**
      * Shutdown the ORB and signal whether to do this synchronously.
      */
 
-    public void shutdown (boolean waitForCompletion) throws SystemException;
+    public void shutdown(boolean waitForCompletion) throws SystemException;
 
     /**
      * Destroy the ORB.
      */
 
-    public void destroy () throws SystemException;
+    public void destroy() throws SystemException;
 
     /**
      * Return a reference to the ORB.
      */
 
-    public org.omg.CORBA.ORB orb () throws SystemException;
+    public org.omg.CORBA.ORB orb() throws SystemException;
 
     /**
      * Provide a reference to the ORB. Used if the application must initialise
      * the ORB separately.
      */
 
-    public void orb (org.omg.CORBA.ORB o) throws SystemException;
+    public void orb(org.omg.CORBA.ORB o) throws SystemException;
 }

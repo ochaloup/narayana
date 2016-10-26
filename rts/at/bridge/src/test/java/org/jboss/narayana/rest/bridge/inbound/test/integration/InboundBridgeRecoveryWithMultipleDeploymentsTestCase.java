@@ -63,8 +63,7 @@ public class InboundBridgeRecoveryWithMultipleDeploymentsTestCase extends Abstra
             + " -Dcom.arjuna.ats.arjuna.recovery.periodicRecoveryPeriod=" + RECOVERY_PERIOD;
 
     private static final String BYTEMAN_ARGUMENTS = "-Dorg.jboss.byteman.verbose"
-            + " -Djboss.modules.system.pkgs=org.jboss.byteman"
-            + " -Dorg.jboss.byteman.transform.all"
+            + " -Djboss.modules.system.pkgs=org.jboss.byteman" + " -Dorg.jboss.byteman.transform.all"
             + " -javaagent:../lib/byteman.jar=script:scripts/@BMScript@.btm,boot:../lib/byteman.jar,listener:true";
 
     @Deployment(name = FIRST_DEPLOYMENT_NAME, testable = false, managed = false)
@@ -72,7 +71,8 @@ public class InboundBridgeRecoveryWithMultipleDeploymentsTestCase extends Abstra
         return ShrinkWrap.create(WebArchive.class, FIRST_DEPLOYMENT_NAME + ".war")
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addClasses(RestATManagementResource.class, LoggingXAResource.class, SimpleInboundBridgeResource.class,
-                        LoggingRestATResource.class).addAsWebInfResource("web.xml", "web.xml");
+                        LoggingRestATResource.class)
+                .addAsWebInfResource("web.xml", "web.xml");
     }
 
     @Deployment(name = SECOND_DEPLOYMENT_NAME, testable = false, managed = false)
@@ -80,7 +80,8 @@ public class InboundBridgeRecoveryWithMultipleDeploymentsTestCase extends Abstra
         return ShrinkWrap.create(WebArchive.class, SECOND_DEPLOYMENT_NAME + ".war")
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addClasses(RestATManagementResource.class, LoggingXAResource.class, SimpleInboundBridgeResource.class,
-                        LoggingRestATResource.class).addAsWebInfResource("web.xml", "web.xml");
+                        LoggingRestATResource.class)
+                .addAsWebInfResource("web.xml", "web.xml");
     }
 
     @After
@@ -102,7 +103,8 @@ public class InboundBridgeRecoveryWithMultipleDeploymentsTestCase extends Abstra
             txSupport.commitTx();
             Assert.fail("Container was not killed.");
         } catch (HttpResponseException e) {
-            // After crash participant won't return any response and exception will be thrown.
+            // After crash participant won't return any response and exception
+            // will be thrown.
         }
 
         restartContainer(VM_ARGUMENTS);
@@ -116,7 +118,8 @@ public class InboundBridgeRecoveryWithMultipleDeploymentsTestCase extends Abstra
             try {
                 // Updates coordinator's active transactions list
                 txSupport.getTransactions();
-                // After successful recovery transaction is removed and 404 is returned.
+                // After successful recovery transaction is removed and 404 is
+                // returned.
                 status = txSupport.getTransactionInfo().getStatus();
             } catch (HttpResponseException e) {
             }

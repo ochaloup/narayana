@@ -32,18 +32,17 @@ import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule;
 import com.hp.mwtests.ts.arjuna.abstractrecords.OrderedOnePhaseAbstractRecord;
 
-public class OrderedOnePhaseResourcesUnitTest
-{
+public class OrderedOnePhaseResourcesUnitTest {
     @Test
-    public void testOrderedOnePhase() throws Exception
-    {
+    public void testOrderedOnePhase() throws Exception {
         System.setProperty("com.arjuna.ats.arjuna.common.propertiesFile", "jbossts-properties.xml");
 
         Uid firstToCommit = new Uid();
         Uid secondToCommit = new Uid();
         AtomicAction A = new AtomicAction();
 
-        // These user defined records could wrap anything such as 1PC JDBC or messages
+        // These user defined records could wrap anything such as 1PC JDBC or
+        // messages
         OrderedOnePhaseAbstractRecord rec1 = new OrderedOnePhaseAbstractRecord(secondToCommit);
         OrderedOnePhaseAbstractRecord rec2 = new OrderedOnePhaseAbstractRecord(firstToCommit);
 
@@ -53,7 +52,8 @@ public class OrderedOnePhaseResourcesUnitTest
         A.add(rec1);
         A.add(rec2);
 
-        // Do some work you could save some concept of the work in the abstract record save_state
+        // Do some work you could save some concept of the work in the abstract
+        // record save_state
         // rec1.sendMessage
         // rec2.doSQL
 
@@ -63,7 +63,8 @@ public class OrderedOnePhaseResourcesUnitTest
         // Commit, this would make sure the database (rec2) was committed first
         A.commit();
 
-        // This shows recovery working, we should see Uid2 called again, if you had encoded some information in rec2 you could
+        // This shows recovery working, we should see Uid2 called again, if you
+        // had encoded some information in rec2 you could
         // maybe
         // retry the sending of a message or similar
         RecordTypeManager.manager().add(new RecordTypeMap() {

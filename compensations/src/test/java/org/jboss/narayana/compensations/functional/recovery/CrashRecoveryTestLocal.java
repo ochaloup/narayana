@@ -55,14 +55,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
- * All test cases in this class follow the same pattern:
- * 1. An application server is started.
- * 2. Transaction log is cleared.
- * 3. Test options are passed to the test executor.
- * 4. Executor triggers a specific Byteman rule required for the specific test.
- * 5. Executor triggers a specific functionality defined in the options.
- * 6. The Byteman rule crashes the server.
- * 7. After restart crash recovery is executed and expected outcome is validated.
+ * All test cases in this class follow the same pattern: 1. An application
+ * server is started. 2. Transaction log is cleared. 3. Test options are passed
+ * to the test executor. 4. Executor triggers a specific Byteman rule required
+ * for the specific test. 5. Executor triggers a specific functionality defined
+ * in the options. 6. The Byteman rule crashes the server. 7. After restart
+ * crash recovery is executed and expected outcome is validated.
  *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
@@ -82,7 +80,8 @@ public class CrashRecoveryTestLocal {
 
     private static final String TEST_ENTRY = "test-entry";
 
-    private static final String EXECUTOR_URL = "http://localhost:8080/" + DEPLOYMENT_NAME + "/" + ExecutionResource.PATH;
+    private static final String EXECUTOR_URL = "http://localhost:8080/" + DEPLOYMENT_NAME + "/"
+            + ExecutionResource.PATH;
 
     private static final String CRASH_RECOVERY_RULES = "crash-recovery-rules.btm";
 
@@ -100,16 +99,15 @@ public class CrashRecoveryTestLocal {
 
     @Deployment(name = DEPLOYMENT_NAME, managed = false, testable = false)
     public static WebArchive createTestArchive() {
-        return ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME + ".war")
-                .addPackage(Executor.class.getPackage())
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsWebInfResource("web.xml", "web.xml");
+        return ShrinkWrap.create(WebArchive.class, DEPLOYMENT_NAME + ".war").addPackage(Executor.class.getPackage())
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml").addAsWebInfResource("web.xml", "web.xml");
     }
 
     @Before
     public void before() {
         client = ClientBuilder.newClient();
-        testUtils = new ArquillianRecoveryTestUtils(containerController, deployer, CONTAINER_NAME, DEPLOYMENT_NAME, JBOSS_HOME);
+        testUtils = new ArquillianRecoveryTestUtils(containerController, deployer, CONTAINER_NAME, DEPLOYMENT_NAME,
+                JBOSS_HOME);
     }
 
     @After
@@ -119,22 +117,17 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed after all participants` confirmCompleted operation is invoked. All participant records are
-     * persisted, but transaction record is not available.
-     * Expected outcome: two compensated entry.
+     * Application server is crashed after all participants` confirmCompleted
+     * operation is invoked. All participant records are persisted, but
+     * transaction record is not available. Expected outcome: two compensated
+     * entry.
      */
     @Test
     public void testCrashAfterConfirmCompleted() {
-        Options options = Options.builder()
-                .testName("CRASH_AFTER_CONFIRM_COMPLETED")
-                .isCompensate(false)
-                .isTxConfirm(true)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(true)
-                .isCompensatableActionCompensation(true)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_AFTER_CONFIRM_COMPLETED").isCompensate(false)
+                .isTxConfirm(true).isTxCompensate(true).isCompensatableActionConfirmation(true)
+                .isCompensatableActionCompensation(true).compensatableActionData(TEST_ENTRY)
+                .compensationScopedData(TEST_ENTRY).isDistributed(isDistributed()).build();
 
         Result expectedResult = Result.builder().compensatedDate(Arrays.asList(TEST_ENTRY, TEST_ENTRY))
                 .confirmedData(Collections.emptyList()).build();
@@ -143,23 +136,18 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed after all participants` confirmCompleted operation is invoked. All participant records are
-     * persisted, but transaction record is not available. In this scenario only @TxCompensate hadler is enlisted, thus one
-     * phase commit optimisation would be used.
+     * Application server is crashed after all participants` confirmCompleted
+     * operation is invoked. All participant records are persisted, but
+     * transaction record is not available. In this scenario only @TxCompensate
+     * hadler is enlisted, thus one phase commit optimisation would be used.
      * Expected outcome: one compensated entry.
      */
     @Test
     public void testCrashAfterConfirmCompletedOnePhase() {
-        Options options = Options.builder()
-                .testName("CRASH_AFTER_CONFIRM_COMPLETED")
-                .isCompensate(false)
-                .isTxConfirm(false)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(false)
-                .isCompensatableActionCompensation(false)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_AFTER_CONFIRM_COMPLETED").isCompensate(false)
+                .isTxConfirm(false).isTxCompensate(true).isCompensatableActionConfirmation(false)
+                .isCompensatableActionCompensation(false).compensatableActionData(TEST_ENTRY)
+                .compensationScopedData(TEST_ENTRY).isDistributed(isDistributed()).build();
 
         Result expectedResult = Result.builder().compensatedDate(Collections.singletonList(TEST_ENTRY))
                 .confirmedData(Collections.emptyList()).build();
@@ -168,22 +156,16 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed before the first participant`s complete operation is invoked. All participant and
-     * transaction records are persisted.
-     * Expected outcome: two confirmed entry.
+     * Application server is crashed before the first participant`s complete
+     * operation is invoked. All participant and transaction records are
+     * persisted. Expected outcome: two confirmed entry.
      */
     @Test
     public void testCrashBeforeClose() {
-        Options options = Options.builder()
-                .testName("CRASH_BEFORE_CLOSE")
-                .isCompensate(false)
-                .isTxConfirm(true)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(true)
-                .isCompensatableActionCompensation(true)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_BEFORE_CLOSE").isCompensate(false).isTxConfirm(true)
+                .isTxCompensate(true).isCompensatableActionConfirmation(true).isCompensatableActionCompensation(true)
+                .compensatableActionData(TEST_ENTRY).compensationScopedData(TEST_ENTRY).isDistributed(isDistributed())
+                .build();
 
         Result expectedResult = Result.builder().compensatedDate(Collections.emptyList())
                 .confirmedData(Arrays.asList(TEST_ENTRY, TEST_ENTRY)).build();
@@ -192,22 +174,17 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed before the participant`s complete operation is invoked. In this scenario only @TxCompensate
-     * handler is enlisted, thus one phase commit optimisation would be used. As a result only participant record is persisted.
-     * Expected outcome: one compensated entry.
+     * Application server is crashed before the participant`s complete operation
+     * is invoked. In this scenario only @TxCompensate handler is enlisted, thus
+     * one phase commit optimisation would be used. As a result only participant
+     * record is persisted. Expected outcome: one compensated entry.
      */
     @Test
     public void testCrashBeforeCloseOnePhase() {
-        Options options = Options.builder()
-                .testName("CRASH_BEFORE_CLOSE")
-                .isCompensate(false)
-                .isTxConfirm(false)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(false)
-                .isCompensatableActionCompensation(false)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_BEFORE_CLOSE").isCompensate(false).isTxConfirm(false)
+                .isTxCompensate(true).isCompensatableActionConfirmation(false).isCompensatableActionCompensation(false)
+                .compensatableActionData(TEST_ENTRY).compensationScopedData(TEST_ENTRY).isDistributed(isDistributed())
+                .build();
 
         Result expectedResult = Result.builder().compensatedDate(Collections.singletonList(TEST_ENTRY))
                 .confirmedData(Collections.emptyList()).build();
@@ -217,16 +194,10 @@ public class CrashRecoveryTestLocal {
 
     @Test
     public void testCrashBeforeCloseWithDelayedDeserializerRegistration() {
-        Options options = Options.builder()
-                .testName("CRASH_BEFORE_CLOSE")
-                .isCompensate(false)
-                .isTxConfirm(true)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(true)
-                .isCompensatableActionCompensation(true)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_BEFORE_CLOSE").isCompensate(false).isTxConfirm(true)
+                .isTxCompensate(true).isCompensatableActionConfirmation(true).isCompensatableActionCompensation(true)
+                .compensatableActionData(TEST_ENTRY).compensationScopedData(TEST_ENTRY).isDistributed(isDistributed())
+                .build();
 
         Result expectedResult = Result.builder().compensatedDate(Collections.emptyList())
                 .confirmedData(Arrays.asList(TEST_ENTRY, TEST_ENTRY)).build();
@@ -236,22 +207,17 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed before the first participant`s compensate operation is invoked. All participant records are
-     * persisted, but no transaction record is available because of the presumed abort optimisation.
-     * Expected outcome: two compensated entry.
+     * Application server is crashed before the first participant`s compensate
+     * operation is invoked. All participant records are persisted, but no
+     * transaction record is available because of the presumed abort
+     * optimisation. Expected outcome: two compensated entry.
      */
     @Test
     public void testCrashBeforeCompensate() {
-        Options options = Options.builder()
-                .testName("CRASH_BEFORE_COMPENSATE")
-                .isCompensate(true)
-                .isTxConfirm(true)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(true)
-                .isCompensatableActionCompensation(true)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_BEFORE_COMPENSATE").isCompensate(true).isTxConfirm(true)
+                .isTxCompensate(true).isCompensatableActionConfirmation(true).isCompensatableActionCompensation(true)
+                .compensatableActionData(TEST_ENTRY).compensationScopedData(TEST_ENTRY).isDistributed(isDistributed())
+                .build();
 
         Result expectedResult = Result.builder().compensatedDate(Arrays.asList(TEST_ENTRY, TEST_ENTRY))
                 .confirmedData(Collections.emptyList()).build();
@@ -260,23 +226,20 @@ public class CrashRecoveryTestLocal {
     }
 
     /**
-     * Application server is crashed before the participant`s compensate operation is invoked. Participant records are
-     * persisted, but no transaction record is available because of the presumed abort optimisation. In this scenario only
-     * @TxCompensate handler is enlisted, thus one phase commit optimisation would be used.
-     * Expected outcome: one compensated entry.
+     * Application server is crashed before the participant`s compensate
+     * operation is invoked. Participant records are persisted, but no
+     * transaction record is available because of the presumed abort
+     * optimisation. In this scenario only
+     * 
+     * @TxCompensate handler is enlisted, thus one phase commit optimisation
+     *               would be used. Expected outcome: one compensated entry.
      */
     @Test
     public void testCrashBeforeCompensateOnePhase() {
-        Options options = Options.builder()
-                .testName("CRASH_BEFORE_COMPENSATE")
-                .isCompensate(true)
-                .isTxConfirm(false)
-                .isTxCompensate(true)
-                .isCompensatableActionConfirmation(false)
-                .isCompensatableActionCompensation(false)
-                .compensatableActionData(TEST_ENTRY)
-                .compensationScopedData(TEST_ENTRY)
-                .isDistributed(isDistributed()).build();
+        Options options = Options.builder().testName("CRASH_BEFORE_COMPENSATE").isCompensate(true).isTxConfirm(false)
+                .isTxCompensate(true).isCompensatableActionConfirmation(false).isCompensatableActionCompensation(false)
+                .compensatableActionData(TEST_ENTRY).compensationScopedData(TEST_ENTRY).isDistributed(isDistributed())
+                .build();
 
         Result expectedResult = Result.builder().compensatedDate(Collections.singletonList(TEST_ENTRY))
                 .confirmedData(Collections.emptyList()).build();

@@ -66,8 +66,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlXADataSource;
 
 import org.junit.Assert;
 
-public class PerformanceTestCommitMarkableResource extends
-        TestCommitMarkableResourceBase {
+public class PerformanceTestCommitMarkableResource extends TestCommitMarkableResourceBase {
 
     private final Object waitLock = new Object();
     private AtomicInteger totalExecuted = new AtomicInteger();
@@ -77,7 +76,7 @@ public class PerformanceTestCommitMarkableResource extends
     public void doTest(final Handler xaHandler, String testName) throws Exception {
         String fullTestName = getClass().getName() + testName;
 
-        Worker<Void> worker = new Worker<Void> () {
+        Worker<Void> worker = new Worker<Void>() {
             javax.transaction.TransactionManager tm = null;
             @Override
             public void init() {
@@ -86,7 +85,7 @@ public class PerformanceTestCommitMarkableResource extends
 
             @Override
             public void fini() {
-//                    totalExecuted.addAndGet(success);
+                // totalExecuted.addAndGet(success);
             }
 
             @Override
@@ -101,7 +100,7 @@ public class PerformanceTestCommitMarkableResource extends
 
             @Override
             public Void doWork(Void context, int batchSize, Measurement<Void> measurement) {
-                for (int i =0; i < batchSize; i++) {
+                for (int i = 0; i < batchSize; i++) {
                     try {
                         tm.begin();
                         tm.getTransaction().enlistResource(new DummyXAResource());
@@ -123,8 +122,7 @@ public class PerformanceTestCommitMarkableResource extends
                             SQLException nextException = e.getNextException();
                             while (nextException != null) {
                                 nextException.printStackTrace();
-                                nextException = nextException
-                                        .getNextException();
+                                nextException = nextException.getNextException();
                             }
                             Throwable[] suppressed = e.getSuppressed();
                             for (int j = 0; j < suppressed.length; j++) {
@@ -132,16 +130,13 @@ public class PerformanceTestCommitMarkableResource extends
                             }
                             try {
                                 tm.rollback();
-                            } catch (IllegalStateException | SecurityException
-                                    | SystemException e1) {
+                            } catch (IllegalStateException | SecurityException | SystemException e1) {
                                 e1.printStackTrace();
                                 fail("Problem with transaction");
                             }
                         }
-                    } catch (NotSupportedException | SystemException
-                            | IllegalStateException | RollbackException
-                            | SecurityException | HeuristicMixedException
-                            | HeuristicRollbackException e) {
+                    } catch (NotSupportedException | SystemException | IllegalStateException | RollbackException
+                            | SecurityException | HeuristicMixedException | HeuristicRollbackException e) {
                         measurement.incrementErrorCount();
 
                         e.printStackTrace();
@@ -153,19 +148,18 @@ public class PerformanceTestCommitMarkableResource extends
             }
         };
 
-        int warmUpCount = 0; // TODO if non zero then make sure the db is reset after the warm up loop
+        int warmUpCount = 0; // TODO if non zero then make sure the db is reset
+                                // after the warm up loop
         int batchSize = 50;
         int threadCount = 20;
 
-        Measurement measurement = new Measurement.Builder(fullTestName)
-                .maxTestTime(0L).numberOfCalls(batchSize * threadCount)
-                .numberOfThreads(threadCount).batchSize(batchSize)
+        Measurement measurement = new Measurement.Builder(fullTestName).maxTestTime(0L)
+                .numberOfCalls(batchSize * threadCount).numberOfThreads(threadCount).batchSize(batchSize)
                 .numberOfWarmupCalls(warmUpCount).build().measure(worker, worker);
 
         System.out.printf("%s%n", measurement.getInfo());
 
-
-        System.out.println(new Date() + "  Number of transactions: "+ totalExecuted.intValue());
+        System.out.println(new Date() + "  Number of transactions: " + totalExecuted.intValue());
 
         long additionalCleanuptime = xaHandler.postRunCleanup(measurement.getNumberOfMeasurements(),
                 measurement.getNumberOfCalls(), measurement.getNumberOfThreads());
@@ -178,17 +172,16 @@ public class PerformanceTestCommitMarkableResource extends
         System.out.println("  Average transaction time: " + timeInMillis / totalExecuted.intValue());
         System.out.println("  Transactions per second: " + throughput);
 
-        xaHandler.checkFooSize(measurement.getNumberOfMeasurements(), measurement.getBatchSize(), measurement.getNumberOfThreads());
+        xaHandler.checkFooSize(measurement.getNumberOfMeasurements(), measurement.getBatchSize(),
+                measurement.getNumberOfThreads());
 
         Assert.assertEquals(0, measurement.getNumberOfErrors());
         Assert.assertFalse(measurement.getInfo(), measurement.shouldFail());
 
     }
 
-    private void checkSize(String string, Statement statement, int expected)
-            throws SQLException {
-        ResultSet result = statement.executeQuery("select count(*) from "
-                + string);
+    private void checkSize(String string, Statement statement, int expected) throws SQLException {
+        ResultSet result = statement.executeQuery("select count(*) from " + string);
         result.next();
         int actual = result.getInt(1);
         result.close();
@@ -214,57 +207,41 @@ public class PerformanceTestCommitMarkableResource extends
             // ORA-01795: maximum number of expressions in a list is 1000
             BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
                     .setCommitMarkableResourceRecordDeleteBatchSize(1000);
-            Class clazz = Class
-                    .forName("oracle.jdbc.pool.OracleConnectionPoolDataSource");
+            Class clazz = Class.forName("oracle.jdbc.pool.OracleConnectionPoolDataSource");
             dataSource = (ConnectionPoolDataSource) clazz.newInstance();
-            clazz.getMethod("setDriverType", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "thin" });
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "tywin.eng.hst.ams2.redhat.com" });
-            clazz.getMethod("setNetworkProtocol", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "tcp" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "orcl" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "dtf11" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "dtf11" });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 1521 });
+            clazz.getMethod("setDriverType", new Class[]{String.class}).invoke(dataSource, new Object[]{"thin"});
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"tywin.eng.hst.ams2.redhat.com"});
+            clazz.getMethod("setNetworkProtocol", new Class[]{String.class}).invoke(dataSource, new Object[]{"tcp"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"orcl"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"dtf11"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"dtf11"});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{1521});
             recoveryDataSource = (DataSource) dataSource;
         } else if (dbType.equals("sybase")) {
 
             // wide table support?
             BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
                     .setCommitMarkableResourceRecordDeleteBatchSize(2000);
-            Class clazz = Class
-                    .forName("com.sybase.jdbc3.jdbc.SybConnectionPoolDataSource");
+            Class clazz = Class.forName("com.sybase.jdbc3.jdbc.SybConnectionPoolDataSource");
             dataSource = (ConnectionPoolDataSource) clazz.newInstance();
 
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "192.168.1.5" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "LOCALHOST" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "sa" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "sybase" });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 5000 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource, new Object[]{"192.168.1.5"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"LOCALHOST"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"sa"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"sybase"});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{5000});
 
             Class clazz2 = Class.forName("com.sybase.jdbc3.jdbc.SybDataSource");
             recoveryDataSource = (DataSource) clazz2.newInstance();
-            clazz2.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(recoveryDataSource, new Object[] { "192.168.1.5" });
-            clazz2.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(recoveryDataSource, new Object[] { "LOCALHOST" });
-            clazz2.getMethod("setUser", new Class[] { String.class }).invoke(
-                    recoveryDataSource, new Object[] { "sa" });
-            clazz2.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(recoveryDataSource, new Object[] { "sybase" });
-            clazz2.getMethod("setPortNumber", new Class[] { int.class })
-                    .invoke(recoveryDataSource, new Object[] { 5000 });
+            clazz2.getMethod("setServerName", new Class[]{String.class}).invoke(recoveryDataSource,
+                    new Object[]{"192.168.1.5"});
+            clazz2.getMethod("setDatabaseName", new Class[]{String.class}).invoke(recoveryDataSource,
+                    new Object[]{"LOCALHOST"});
+            clazz2.getMethod("setUser", new Class[]{String.class}).invoke(recoveryDataSource, new Object[]{"sa"});
+            clazz2.getMethod("setPassword", new Class[]{String.class}).invoke(recoveryDataSource,
+                    new Object[]{"sybase"});
+            clazz2.getMethod("setPortNumber", new Class[]{int.class}).invoke(recoveryDataSource, new Object[]{5000});
         } else if (dbType.equals("h2")) {
 
             // Smaller batch size as H2 uses a hashtable in the delete which is
@@ -272,8 +249,7 @@ public class PerformanceTestCommitMarkableResource extends
             BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
                     .setCommitMarkableResourceRecordDeleteBatchSize(100);
             dataSource = new JdbcDataSource();
-            ((JdbcDataSource) dataSource)
-                    .setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+            ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB;MVCC=TRUE;DB_CLOSE_DELAY=-1");
             recoveryDataSource = ((JdbcDataSource) dataSource);
         } else if (dbType.equals("postgres")) {
 
@@ -281,18 +257,14 @@ public class PerformanceTestCommitMarkableResource extends
             ((PGConnectionPoolDataSource) dataSource).setPortNumber(5432);
             ((PGConnectionPoolDataSource) dataSource).setUser("dtf11");
             ((PGConnectionPoolDataSource) dataSource).setPassword("dtf11");
-            ((PGConnectionPoolDataSource) dataSource)
-                    .setServerName("tywin.eng.hst.ams2.redhat.com");
-            ((PGConnectionPoolDataSource) dataSource)
-                    .setDatabaseName("jbossts");
+            ((PGConnectionPoolDataSource) dataSource).setServerName("tywin.eng.hst.ams2.redhat.com");
+            ((PGConnectionPoolDataSource) dataSource).setDatabaseName("jbossts");
             recoveryDataSource = new PGSimpleDataSource();
             ((PGSimpleDataSource) recoveryDataSource).setPortNumber(5432);
             ((PGSimpleDataSource) recoveryDataSource).setUser("dtf11");
             ((PGSimpleDataSource) recoveryDataSource).setPassword("dtf11");
-            ((PGSimpleDataSource) recoveryDataSource)
-                    .setServerName("tywin.eng.hst.ams2.redhat.com");
-            ((PGSimpleDataSource) recoveryDataSource)
-                    .setDatabaseName("jbossts");
+            ((PGSimpleDataSource) recoveryDataSource).setServerName("tywin.eng.hst.ams2.redhat.com");
+            ((PGSimpleDataSource) recoveryDataSource).setDatabaseName("jbossts");
         } else if (dbType.equals("mysql")) {
             // com.mysql.jdbc.PacketTooBigException: Packet for query is too
             // large (1318148 > 1048576). You can change this value on the
@@ -302,61 +274,42 @@ public class PerformanceTestCommitMarkableResource extends
 
             dataSource = new MysqlConnectionPoolDataSource();
             // need paranoid as otherwise it sends a connection change user
-            ((MysqlConnectionPoolDataSource) dataSource)
-                    .setUrl("jdbc:mysql://tywin.eng.hst.ams2.redhat.com:3306/jbossts?user=dtf11&password=dtf11&paranoid=true");
+            ((MysqlConnectionPoolDataSource) dataSource).setUrl(
+                    "jdbc:mysql://tywin.eng.hst.ams2.redhat.com:3306/jbossts?user=dtf11&password=dtf11&paranoid=true");
             recoveryDataSource = (DataSource) dataSource;
         } else if (dbType.equals("db2")) {
-            Class clazz = Class
-                    .forName("com.ibm.db2.jcc.DB2ConnectionPoolDataSource");
+            Class clazz = Class.forName("com.ibm.db2.jcc.DB2ConnectionPoolDataSource");
             dataSource = (ConnectionPoolDataSource) clazz.newInstance();
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "tywin.eng.hst.ams2.redhat.com" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "BTDB1" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "db2" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "db2" });
-            clazz.getMethod("setDriverType", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 4 });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 50001 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"tywin.eng.hst.ams2.redhat.com"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"BTDB1"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"db2"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"db2"});
+            clazz.getMethod("setDriverType", new Class[]{int.class}).invoke(dataSource, new Object[]{4});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{50001});
 
             Class clazz2 = Class.forName("com.ibm.db2.jcc.DB2DataSource");
             recoveryDataSource = (DataSource) clazz2.newInstance();
-            clazz2.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(recoveryDataSource,
-                            new Object[] { "tywin.eng.hst.ams2.redhat.com" });
-            clazz2.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(recoveryDataSource, new Object[] { "BTDB1" });
-            clazz2.getMethod("setUser", new Class[] { String.class }).invoke(
-                    recoveryDataSource, new Object[] { "db2" });
-            clazz2.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(recoveryDataSource, new Object[] { "db2" });
-            clazz2.getMethod("setDriverType", new Class[] { int.class })
-                    .invoke(recoveryDataSource, new Object[] { 4 });
-            clazz2.getMethod("setPortNumber", new Class[] { int.class })
-                    .invoke(recoveryDataSource, new Object[] { 50001 });
+            clazz2.getMethod("setServerName", new Class[]{String.class}).invoke(recoveryDataSource,
+                    new Object[]{"tywin.eng.hst.ams2.redhat.com"});
+            clazz2.getMethod("setDatabaseName", new Class[]{String.class}).invoke(recoveryDataSource,
+                    new Object[]{"BTDB1"});
+            clazz2.getMethod("setUser", new Class[]{String.class}).invoke(recoveryDataSource, new Object[]{"db2"});
+            clazz2.getMethod("setPassword", new Class[]{String.class}).invoke(recoveryDataSource, new Object[]{"db2"});
+            clazz2.getMethod("setDriverType", new Class[]{int.class}).invoke(recoveryDataSource, new Object[]{4});
+            clazz2.getMethod("setPortNumber", new Class[]{int.class}).invoke(recoveryDataSource, new Object[]{50001});
         } else if (dbType.equals("sqlserver")) {
-            Class clazz = Class
-                    .forName("com.microsoft.sqlserver.jdbc.SQLServerConnectionPoolDataSource");
+            Class clazz = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerConnectionPoolDataSource");
             dataSource = (ConnectionPoolDataSource) clazz.newInstance();
 
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "dev30.mw.lab.eng.bos.redhat.com" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "dballo01" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "dballo01" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "dballo01" });
-            clazz.getMethod("setSendStringParametersAsUnicode",
-                    new Class[] { Boolean.class }).invoke(dataSource,
-                    new Object[] { false });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 3918 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"dev30.mw.lab.eng.bos.redhat.com"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"dballo01"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"dballo01"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"dballo01"});
+            clazz.getMethod("setSendStringParametersAsUnicode", new Class[]{Boolean.class}).invoke(dataSource,
+                    new Object[]{false});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{3918});
             recoveryDataSource = (DataSource) dataSource;
         }
         PooledConnection pooledConnection = dataSource.getPooledConnection();
@@ -373,57 +326,40 @@ public class PerformanceTestCommitMarkableResource extends
         XADataSource dataSource = null;
 
         if (dbType.equals("oracle")) {
-            Class clazz = Class
-                    .forName("oracle.jdbc.xa.client.OracleXADataSource");
+            Class clazz = Class.forName("oracle.jdbc.xa.client.OracleXADataSource");
             dataSource = (XADataSource) clazz.newInstance();
-            clazz.getMethod("setDriverType", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "thin" });
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "tywin.eng.hst.ams2.redhat.com" });
-            clazz.getMethod("setNetworkProtocol", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "tcp" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "orcl" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "dtf11" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "dtf11" });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 1521 });
+            clazz.getMethod("setDriverType", new Class[]{String.class}).invoke(dataSource, new Object[]{"thin"});
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"tywin.eng.hst.ams2.redhat.com"});
+            clazz.getMethod("setNetworkProtocol", new Class[]{String.class}).invoke(dataSource, new Object[]{"tcp"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"orcl"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"dtf11"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"dtf11"});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{1521});
         } else if (dbType.equals("sybase")) {
-            Class clazz = Class
-                    .forName("com.sybase.jdbc3.jdbc.SybXADataSource");
+            Class clazz = Class.forName("com.sybase.jdbc3.jdbc.SybXADataSource");
             dataSource = (XADataSource) clazz.newInstance();
 
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "192.168.1.5" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "LOCALHOST" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "sa" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "sybase" });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 5000 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource, new Object[]{"192.168.1.5"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"LOCALHOST"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"sa"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"sybase"});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{5000});
         } else if (dbType.equals("h2")) {
             dataSource = new org.h2.jdbcx.JdbcDataSource();
-            ((JdbcDataSource) dataSource)
-                    .setURL("jdbc:h2:mem:JBTMDB2;MVCC=TRUE;DB_CLOSE_DELAY=-1");
+            ((JdbcDataSource) dataSource).setURL("jdbc:h2:mem:JBTMDB2;MVCC=TRUE;DB_CLOSE_DELAY=-1");
         } else if (dbType.equals("postgres")) {
 
             dataSource = new PGXADataSource();
             ((PGXADataSource) dataSource).setPortNumber(5432);
             ((PGXADataSource) dataSource).setUser("dtf11");
             ((PGXADataSource) dataSource).setPassword("dtf11");
-            ((PGXADataSource) dataSource)
-                    .setServerName("tywin.eng.hst.ams2.redhat.com");
+            ((PGXADataSource) dataSource).setServerName("tywin.eng.hst.ams2.redhat.com");
             ((PGXADataSource) dataSource).setDatabaseName("jbossts");
         } else if (dbType.equals("mysql")) {
 
             dataSource = new MysqlXADataSource();
-            ((MysqlXADataSource) dataSource)
-                    .setServerName("tywin.eng.hst.ams2.redhat.com");
+            ((MysqlXADataSource) dataSource).setServerName("tywin.eng.hst.ams2.redhat.com");
             ((MysqlXADataSource) dataSource).setPortNumber(3306);
             ((MysqlXADataSource) dataSource).setDatabaseName("jbossts");
             ((MysqlXADataSource) dataSource).setUser("dtf11");
@@ -431,38 +367,25 @@ public class PerformanceTestCommitMarkableResource extends
         } else if (dbType.equals("db2")) {
             Class clazz = Class.forName("com.ibm.db2.jcc.DB2XADataSource");
             dataSource = (XADataSource) clazz.newInstance();
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "tywin.eng.hst.ams2.redhat.com" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "BTDB1" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "db2" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "db2" });
-            clazz.getMethod("setDriverType", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 4 });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 50001 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"tywin.eng.hst.ams2.redhat.com"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"BTDB1"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"db2"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"db2"});
+            clazz.getMethod("setDriverType", new Class[]{int.class}).invoke(dataSource, new Object[]{4});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{50001});
         } else if (dbType.equals("sqlserver")) {
-            Class clazz = Class
-                    .forName("com.microsoft.sqlserver.jdbc.SQLServerXADataSource");
+            Class clazz = Class.forName("com.microsoft.sqlserver.jdbc.SQLServerXADataSource");
             dataSource = (XADataSource) clazz.newInstance();
 
-            clazz.getMethod("setServerName", new Class[] { String.class })
-                    .invoke(dataSource,
-                            new Object[] { "dev30.mw.lab.eng.bos.redhat.com" });
-            clazz.getMethod("setDatabaseName", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "crashrec" });
-            clazz.getMethod("setUser", new Class[] { String.class }).invoke(
-                    dataSource, new Object[] { "crashrec" });
-            clazz.getMethod("setPassword", new Class[] { String.class })
-                    .invoke(dataSource, new Object[] { "crashrec" });
-            clazz.getMethod("setSendStringParametersAsUnicode",
-                    new Class[] { Boolean.class }).invoke(dataSource,
-                    new Object[] { false });
-            clazz.getMethod("setPortNumber", new Class[] { int.class }).invoke(
-                    dataSource, new Object[] { 3918 });
+            clazz.getMethod("setServerName", new Class[]{String.class}).invoke(dataSource,
+                    new Object[]{"dev30.mw.lab.eng.bos.redhat.com"});
+            clazz.getMethod("setDatabaseName", new Class[]{String.class}).invoke(dataSource, new Object[]{"crashrec"});
+            clazz.getMethod("setUser", new Class[]{String.class}).invoke(dataSource, new Object[]{"crashrec"});
+            clazz.getMethod("setPassword", new Class[]{String.class}).invoke(dataSource, new Object[]{"crashrec"});
+            clazz.getMethod("setSendStringParametersAsUnicode", new Class[]{Boolean.class}).invoke(dataSource,
+                    new Object[]{false});
+            clazz.getMethod("setPortNumber", new Class[]{int.class}).invoke(dataSource, new Object[]{3918});
         }
 
         Utils.createTables(dataSource);
@@ -483,15 +406,13 @@ public class PerformanceTestCommitMarkableResource extends
             this.xaDataSource = xaDataSource;
         }
 
-        public Handler(ConnectionPoolDataSource dataSource,
-                DataSource recoveryDataSource) {
+        public Handler(ConnectionPoolDataSource dataSource, DataSource recoveryDataSource) {
             this.dataSource = dataSource;
             this.recoveryDataSource = recoveryDataSource;
         }
 
         private void enlistResource(Transaction transaction)
-                throws SQLException, IllegalStateException, RollbackException,
-                SystemException {
+                throws SQLException, IllegalStateException, RollbackException, SystemException {
             if (xaDataSource != null) {
                 if (this.xaConnection.get() == null) {
                     this.xaConnection.set(xaDataSource.getXAConnection());
@@ -501,19 +422,16 @@ public class PerformanceTestCommitMarkableResource extends
                 transaction.enlistResource(xaResource);
 
                 Statement createStatement = connection.get().createStatement();
-                createStatement.execute("INSERT INTO "
-                        + Utils.getXAFooTableName() + " (bar) VALUES (1)");
+                createStatement.execute("INSERT INTO " + Utils.getXAFooTableName() + " (bar) VALUES (1)");
                 createStatement.close();
             } else {
                 if (this.pooledConnection.get() == null) {
                     this.pooledConnection.set(dataSource.getPooledConnection());
                 }
-                Connection connection = this.pooledConnection.get()
-                        .getConnection();
+                Connection connection = this.pooledConnection.get().getConnection();
                 connection.setAutoCommit(false);
 
-                XAResource nonXAResource = new JDBCConnectableResource(
-                        connection);
+                XAResource nonXAResource = new JDBCConnectableResource(connection);
                 transaction.enlistResource(nonXAResource);
 
                 Statement createStatement = connection.createStatement();
@@ -534,9 +452,8 @@ public class PerformanceTestCommitMarkableResource extends
             }
         }
 
-        public long postRunCleanup(int numberOfMeasurements,
-            int numberOfCalls, int numberOfThreads) throws NamingException, SQLException,
-                ObjectStoreException {
+        public long postRunCleanup(int numberOfMeasurements, int numberOfCalls, int numberOfThreads)
+                throws NamingException, SQLException, ObjectStoreException {
             if (dataSource != null) {
                 PooledConnection pooledConnection = null;
                 Connection connection = null;
@@ -551,8 +468,7 @@ public class PerformanceTestCommitMarkableResource extends
                         Enumeration modules = recoveryModules.elements();
 
                         while (modules.hasMoreElements()) {
-                            RecoveryModule m = (RecoveryModule) modules
-                                    .nextElement();
+                            RecoveryModule m = (RecoveryModule) modules.nextElement();
 
                             if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
                                 crrrm = (CommitMarkableResourceRecordRecoveryModule) m;
@@ -560,15 +476,14 @@ public class PerformanceTestCommitMarkableResource extends
                             }
                         }
                     }
-                    int expectedReapableRecords = BeanPopulator
-                            .getDefaultInstance(JTAEnvironmentBean.class)
-                            .isPerformImmediateCleanupOfCommitMarkableResourceBranches() ? 0
-                            : numberOfMeasurements * numberOfCalls;
+                    int expectedReapableRecords = BeanPopulator.getDefaultInstance(JTAEnvironmentBean.class)
+                            .isPerformImmediateCleanupOfCommitMarkableResourceBranches()
+                                    ? 0
+                                    : numberOfMeasurements * numberOfCalls;
                     checkSize("xids", statement, expectedReapableRecords);
                     if (expectedReapableRecords > 0) {
                         // The recovery module has to perform lookups
-                        new InitialContext().rebind("commitmarkableresource",
-                                recoveryDataSource);
+                        new InitialContext().rebind("commitmarkableresource", recoveryDataSource);
                         long startTime = System.currentTimeMillis();
                         crrrm.periodicWorkFirstPass();
                         crrrm.periodicWorkSecondPass();
@@ -577,11 +492,8 @@ public class PerformanceTestCommitMarkableResource extends
                         checkSize("xids", statement, 0);
                         statement.close();
 
-                        System.out.println("  Total cleanup time: "
-                                + (endTime - startTime)
-                                + " Average cleanup time: "
-                                + (endTime - startTime)
-                                / expectedReapableRecords);
+                        System.out.println("  Total cleanup time: " + (endTime - startTime) + " Average cleanup time: "
+                                + (endTime - startTime) / expectedReapableRecords);
 
                         return endTime - startTime;
                     } else {

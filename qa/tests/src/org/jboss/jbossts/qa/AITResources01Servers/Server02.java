@@ -56,19 +56,15 @@ package org.jboss.jbossts.qa.AITResources01Servers;
  * $Id: Server02.java,v 1.2 2003/06/26 11:43:09 rbegg Exp $
  */
 
-
 import org.jboss.jbossts.qa.AITResources01.*;
 import org.jboss.jbossts.qa.AITResources01Impls.AITCounterImpl01;
 import org.jboss.jbossts.qa.Utils.OAInterface;
 import org.jboss.jbossts.qa.Utils.ORBInterface;
 import org.jboss.jbossts.qa.Utils.ServerIORStore;
 
-public class Server02
-{
-    public static void main(String args[])
-    {
-        try
-        {
+public class Server02 {
+    public static void main(String args[]) {
+        try {
             ORBInterface.initORB(args, null);
             OAInterface.initOA();
 
@@ -99,9 +95,7 @@ public class Server02
             System.out.println("Ready");
 
             ORBInterface.run();
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             System.err.println("Server02.main: " + exception);
             exception.printStackTrace(System.err);
         }

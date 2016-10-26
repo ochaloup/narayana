@@ -26,14 +26,11 @@
 
 package com.arjuna.wsc;
 
-public class InvalidProtocolException extends Exception
-{
-    public InvalidProtocolException()
-    {
+public class InvalidProtocolException extends Exception {
+    public InvalidProtocolException() {
     }
 
-    public InvalidProtocolException(String message)
-    {
+    public InvalidProtocolException(String message) {
         super(message);
     }
 }

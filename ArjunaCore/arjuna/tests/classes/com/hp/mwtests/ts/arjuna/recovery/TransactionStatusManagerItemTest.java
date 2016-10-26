@@ -41,24 +41,24 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.utils.Utility;
 import com.arjuna.ats.internal.arjuna.recovery.TransactionStatusManagerItem;
 
-public class TransactionStatusManagerItemTest
-{
+public class TransactionStatusManagerItemTest {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         int _test_port = 4321;
         String _test_host = InetAddress.getLocalHost().getHostAddress();
 
-        // Check that a transaction status manager item can be created correctly.
+        // Check that a transaction status manager item can be created
+        // correctly.
 
-        assertTrue( TransactionStatusManagerItem.createAndSave(_test_port) );
+        assertTrue(TransactionStatusManagerItem.createAndSave(_test_port));
 
         TransactionStatusManagerItem _tsmi = TransactionStatusManagerItem.get();
 
         assertEquals(_test_port, _tsmi.port());
         assertEquals(_test_host, _tsmi.host());
 
-        // Check that a transaction status manager item can be re-created correctly.
+        // Check that a transaction status manager item can be re-created
+        // correctly.
 
         _tsmi = null;
         _tsmi = TransactionStatusManagerItem.recreate(Utility.getProcessUid());

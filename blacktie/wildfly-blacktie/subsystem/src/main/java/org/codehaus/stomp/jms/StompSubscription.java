@@ -38,16 +38,14 @@ import org.codehaus.stomp.StompFrame;
 public class StompSubscription implements MessageListener {
     public static final String AUTO_ACK = Stomp.Headers.Subscribe.AckModeValues.AUTO;
     public static final String CLIENT_ACK = Stomp.Headers.Subscribe.AckModeValues.CLIENT;
-    private static final transient Log log = LogFactory
-            .getLog(StompSubscription.class);
+    private static final transient Log log = LogFactory.getLog(StompSubscription.class);
     private final StompSession session;
     private final String subscriptionId;
     private MessageConsumer consumer;
     private Map<String, Object> headers;
 
-    public StompSubscription(StompSession session, String subscriptionId,
-            StompFrame frame) throws JMSException, ProtocolException,
-            NamingException {
+    public StompSubscription(StompSession session, String subscriptionId, StompFrame frame)
+            throws JMSException, ProtocolException, NamingException {
         this.subscriptionId = subscriptionId;
         this.session = session;
         this.headers = frame.getHeaders();
@@ -56,15 +54,13 @@ public class StompSubscription implements MessageListener {
     }
 
     public void close() throws JMSException {
-        log.debug("Closing: "
-                + (String) headers.get(Stomp.Headers.Subscribe.DESTINATION));
+        log.debug("Closing: " + (String) headers.get(Stomp.Headers.Subscribe.DESTINATION));
         consumer.close();
         resume();
     }
 
     public void resume() {
-        log.debug("Resuming: "
-                + (String) headers.get(Stomp.Headers.Subscribe.DESTINATION));
+        log.debug("Resuming: " + (String) headers.get(Stomp.Headers.Subscribe.DESTINATION));
         synchronized (session) {
             session.notify();
         }
@@ -72,15 +68,12 @@ public class StompSubscription implements MessageListener {
 
     public void onMessage(Message message) {
 
-        String destinationName = (String) headers
-                .get(Stomp.Headers.Subscribe.DESTINATION);
+        String destinationName = (String) headers.get(Stomp.Headers.Subscribe.DESTINATION);
         try {
             log.debug("Received from HQ: " + message.getJMSMessageID());
-            log.debug("received: " + destinationName + " for: "
-                    + message.getObjectProperty("messagereplyto"));
+            log.debug("received: " + destinationName + " for: " + message.getObjectProperty("messagereplyto"));
         } catch (JMSException e) {
-            log.warn("received: " + destinationName
-                    + " with trouble getting the message properties");
+            log.warn("received: " + destinationName + " with trouble getting the message properties");
         }
         if (message != null) {
             log.debug("Locking session to send a message");
@@ -99,8 +92,7 @@ public class StompSubscription implements MessageListener {
                     // Acknowledge the message for this connection as we know
                     // the server has received it now
                     try {
-                        log.debug("Acking message: "
-                                + message.getJMSMessageID());
+                        log.debug("Acking message: " + message.getJMSMessageID());
                         message.acknowledge();
                         log.debug("Acked message: " + message.getJMSMessageID());
                     } catch (JMSException e) {
@@ -111,20 +103,14 @@ public class StompSubscription implements MessageListener {
                     try {
                         session.recover();
                     } catch (JMSException e1) {
-                        log.fatal(
-                                "Could not recover the session, possible lost message: "
-                                        + e, e);
+                        log.fatal("Could not recover the session, possible lost message: " + e, e);
                     }
                 } catch (JMSException e) {
-                    log.warn(
-                            "Could not convert message to send to stomp: " + e,
-                            e);
+                    log.warn("Could not convert message to send to stomp: " + e, e);
                     try {
                         session.recover();
                     } catch (JMSException e1) {
-                        log.fatal(
-                                "Could not recover the session, possible lost message: "
-                                        + e, e);
+                        log.fatal("Could not recover the session, possible lost message: " + e, e);
                     }
                 }
             }

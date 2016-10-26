@@ -84,7 +84,8 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
      */
     @Override
     public void start(Xid xid, int flags) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_START   [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_START   [" + xid + "]");
     }
 
     /**
@@ -92,7 +93,8 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
      */
     @Override
     public void end(Xid xid, int flags) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_END     [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_END     [" + xid + "]");
     }
 
     /**
@@ -102,21 +104,24 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
      */
     @Override
     public int prepare(Xid xid) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_PREPARE [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_PREPARE [" + xid + "]");
 
         Xid toPropagate = migratedXid != null ? migratedXid : xid;
-        int propagatePrepare = LookupProvider.getInstance().lookup(remoteServerName).prepare(toPropagate, !nonerecovered);
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_PREPARED");
+        int propagatePrepare = LookupProvider.getInstance().lookup(remoteServerName).prepare(toPropagate,
+                !nonerecovered);
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_PREPARED");
         return propagatePrepare;
     }
 
     @Override
     public void commit(Xid xid, boolean onePhase) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_COMMIT  [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_COMMIT  [" + xid + "]");
 
         Xid toPropagate = migratedXid != null ? migratedXid : xid;
 
-        
         try {
             LookupProvider.getInstance().lookup(remoteServerName).commit(toPropagate, onePhase, !nonerecovered);
         } catch (Error e) {
@@ -126,7 +131,8 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
                 throw e;
             }
         }
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_COMMITED");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_COMMITED");
 
         CompletionCounter.getInstance().incrementCommit(localServerName);
 
@@ -134,12 +140,14 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
 
     @Override
     public void rollback(Xid xid) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_ROLLBACK[" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_ROLLBACK[" + xid + "]");
 
         Xid toPropagate = migratedXid != null ? migratedXid : xid;
         try {
             LookupProvider.getInstance().lookup(remoteServerName).rollback(toPropagate, !nonerecovered);
-            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_ROLLBACKED");
+            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                    + remoteServerName + ") XA_ROLLBACKED");
         } catch (XAException e) {
             // We know the remote side must have done a JBTM-927
             if (e.errorCode == XAException.XAER_INVAL) {
@@ -165,17 +173,20 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
     @Override
     public Xid[] recover(int flag) throws XAException {
         if ((flag & XAResource.TMSTARTRSCAN) == XAResource.TMSTARTRSCAN) {
-            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_RECOVER [XAResource.TMSTARTRSCAN]");
+            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                    + remoteServerName + ") XA_RECOVER [XAResource.TMSTARTRSCAN]");
         }
         if ((flag & XAResource.TMENDRSCAN) == XAResource.TMENDRSCAN) {
-            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_RECOVER [XAResource.TMENDRSCAN]");
+            System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                    + remoteServerName + ") XA_RECOVER [XAResource.TMENDRSCAN]");
         }
 
         Xid[] toReturn = LookupProvider.getInstance().lookup(remoteServerName).recoverFor(localServerName);
 
         if (toReturn != null) {
             for (int i = 0; i < toReturn.length; i++) {
-                System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_RECOVERD: " + toReturn[i]);
+                System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName
+                        + ":" + remoteServerName + ") XA_RECOVERD: " + toReturn[i]);
             }
         }
         return toReturn;
@@ -183,11 +194,13 @@ public class ProxyXAResource implements XAResource, XAResourceWrapper, Serializa
 
     @Override
     public void forget(Xid xid) throws XAException {
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_FORGET  [" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_FORGET  [" + xid + "]");
 
         Xid toPropagate = migratedXid != null ? migratedXid : xid;
         LookupProvider.getInstance().lookup(remoteServerName).forget(toPropagate, !nonerecovered);
-        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":" + remoteServerName + ") XA_FORGETED[" + xid + "]");
+        System.out.println("[" + Thread.currentThread().getName() + "] ProxyXAResource (" + localServerName + ":"
+                + remoteServerName + ") XA_FORGETED[" + xid + "]");
     }
 
     @Override

@@ -24,7 +24,8 @@ package com.hp.mwtests.ts.jts.utils;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Class for threads to report forward progress (@see TaskMonitor.monitorProgress)
+ * Class for threads to report forward progress (@see
+ * TaskMonitor.monitorProgress)
  */
 public class TaskProgress extends AtomicInteger {
     private boolean finished = false;

@@ -36,10 +36,12 @@ import java.io.IOException;
  * @author Mike Musgrove
  */
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
- * provide a better separation between public and internal classes.
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages
+ *             names in order to provide a better separation between public and
+ *             internal classes.
  */
-@Deprecated // in order to provide a better separation between public and internal classes.
+@Deprecated // in order to provide a better separation between public and
+            // internal classes.
 public class JTSXAResourceRecordWrapper extends OSEntryBean implements JTSXAResourceRecordWrapperMBean {
     private final XARecoveryResourceWrapper record;
     int heuristic;
@@ -50,7 +52,8 @@ public class JTSXAResourceRecordWrapper extends OSEntryBean implements JTSXAReso
     private class XARecoveryResourceWrapper extends XARecoveryResourceImple {
 
         public XARecoveryResourceWrapper(UidWrapper wrapper) {
-            super(wrapper.getUid()); // calls loadState which in turn calls restoreState
+            super(wrapper.getUid()); // calls loadState which in turn calls
+                                        // restoreState
         }
 
         public boolean restoreState(InputObjectState os) {
@@ -74,7 +77,7 @@ public class JTSXAResourceRecordWrapper extends OSEntryBean implements JTSXAReso
 
     public JTSXAResourceRecordWrapper(UidWrapper wrapper) {
         super(wrapper);
-        // initialise heuristic and  xidImple
+        // initialise heuristic and xidImple
         record = new XARecoveryResourceWrapper(wrapper);
     }
 
@@ -103,7 +106,7 @@ public class JTSXAResourceRecordWrapper extends OSEntryBean implements JTSXAReso
         record.updateHeuristic(heuristic);
     }
 
-/*    public boolean isCommitted() {
-        return committed;
-    }*/
+    /*
+     * public boolean isCommitted() { return committed; }
+     */
 }

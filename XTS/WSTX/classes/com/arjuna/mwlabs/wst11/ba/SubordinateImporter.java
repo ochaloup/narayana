@@ -12,20 +12,19 @@ import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 import java.util.HashMap;
 
 /**
- * class to manage association of incoming BA transactions with subordinate BA transactions
- * coordinated by the local coordination service
+ * class to manage association of incoming BA transactions with subordinate BA
+ * transactions coordinated by the local coordination service
  */
-public class SubordinateImporter
-{
+public class SubordinateImporter {
     private static HashMap<String, TxContext> subordinateContextMap = new HashMap<String, TxContext>();
 
     /**
      * handle on the local 1.1 context factory implementation
      */
-    private static ContextFactoryImple baContextFactory = (ContextFactoryImple) ContextFactoryMapper.getMapper().getContextFactory(BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME);
+    private static ContextFactoryImple baContextFactory = (ContextFactoryImple) ContextFactoryMapper.getMapper()
+            .getContextFactory(BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME);
 
-    public static TxContext importContext(CoordinationContextType cc)
-    {
+    public static TxContext importContext(CoordinationContextType cc) {
         // get the subordinate transaction manager to install any existing
         // subordinate tx for this one or create and install a new one.
         final String identifier = cc.getIdentifier().getValue();
@@ -34,21 +33,24 @@ public class SubordinateImporter
             // create a context for a local coordinator
             CoordinationContext context = null;
             try {
-                context = baContextFactory.create(BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME, 0L, cc, false);
+                context = baContextFactory.create(BusinessActivityConstants.WSBA_PROTOCOL_ATOMIC_OUTCOME, 0L, cc,
+                        false);
             } catch (InvalidCreateParametersException e) {
                 // should not happen
             }
             subordinateTxContext = new TxContextImple(context);
             subordinateContextMap.put(identifier, subordinateTxContext);
 
-            // register a cleanup callback with the subordinate transactionso that the entry gets removed
+            // register a cleanup callback with the subordinate transactionso
+            // that the entry gets removed
             // when the transcation commits or rolls back
 
-            String subordinateId = context.getIdentifier().getValue().substring(4); // remove "urn:" prefix
+            String subordinateId = context.getIdentifier().getValue().substring(4); // remove
+                                                                                    // "urn:"
+                                                                                    // prefix
             SubordinateBACoordinator.SubordinateCallback callback = new SubordinateBACoordinator.SubordinateCallback() {
                 public String parentId = identifier;
-                public void run()
-                {
+                public void run() {
                     subordinateContextMap.remove(parentId);
                 }
             };

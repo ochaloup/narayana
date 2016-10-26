@@ -25,8 +25,7 @@ import org.jboss.narayana.blacktie.jatmibroker.RunServer;
 import org.jboss.narayana.blacktie.jatmibroker.core.conf.ConfigurationException;
 
 public class TestTPConversation extends TestCase {
-    private static final Logger log = LogManager
-            .getLogger(TestTPConversation.class);
+    private static final Logger log = LogManager.getLogger(TestTPConversation.class);
     private RunServer server = new RunServer();
 
     private Connection connection;
@@ -37,8 +36,7 @@ public class TestTPConversation extends TestCase {
     public void setUp() throws ConnectionException, ConfigurationException {
         server.serverinit();
 
-        ConnectionFactory connectionFactory = ConnectionFactory
-                .getConnectionFactory();
+        ConnectionFactory connectionFactory = ConnectionFactory.getConnectionFactory();
         connection = connectionFactory.getConnection();
         sendlen = 11;
         sendbuf = (X_OCTET) connection.tpalloc("X_OCTET", null);
@@ -51,14 +49,12 @@ public class TestTPConversation extends TestCase {
         log.info("Called teardown");
     }
 
-    public void test_conversation() throws ConnectionException,
-            ConfigurationException {
+    public void test_conversation() throws ConnectionException, ConfigurationException {
         log.info("test_conversation");
         server.tpadvertiseTestTPConversation();
 
         sendbuf.setByteArray("conversate".getBytes());
-        cd = connection.tpconnect(RunServer.getServiceNameTestTPConversation(),
-                sendbuf, Connection.TPRECVONLY);
+        cd = connection.tpconnect(RunServer.getServiceNameTestTPConversation(), sendbuf, Connection.TPRECVONLY);
         long revent = 0;
         log.info("Started conversation");
         for (int i = 10; i < 100; i++) {
@@ -86,19 +82,16 @@ public class TestTPConversation extends TestCase {
             assertTrue(e.getTperrno() == Connection.TPEEVENT);
             Buffer rcvbuf = e.getReceived();
             String expectedResult = ("hi" + 100);
-            log.info("Expected: " + expectedResult + " Received: "
-                    + new String(((X_OCTET) rcvbuf).getByteArray()));
+            log.info("Expected: " + expectedResult + " Received: " + new String(((X_OCTET) rcvbuf).getByteArray()));
             assertTrue(strncmp(expectedResult, rcvbuf, 5) == 0);
         }
     }
 
-    public void test_short_conversation() throws ConnectionException,
-            ConfigurationException {
+    public void test_short_conversation() throws ConnectionException, ConfigurationException {
         server.tpadvertiseTestTPConversa2();
 
         log.info("test_short_conversation");
-        cd = connection.tpconnect(RunServer.getServiceNameTestTPConversa2(),
-                null, Connection.TPRECVONLY);
+        cd = connection.tpconnect(RunServer.getServiceNameTestTPConversa2(), null, Connection.TPRECVONLY);
         assertTrue(cd != null);
 
         Buffer rcvbuf = cd.tprecv(0);

@@ -126,7 +126,7 @@ public class TransportImpl implements Transport {
         Sender sender;
         String callback_ior = (String) destination;
         log.debug("Creating a sender for: " + callback_ior);
-        if(callback_ior.contains("IOR:")) {
+        if (callback_ior.contains("IOR:")) {
             log.debug(callback_ior + " is for corba");
             throw new ConnectionException(org.jboss.narayana.blacktie.jatmibroker.xatmi.Connection.TPESYSTEM,
                     "Could not create a Corba sender");
@@ -137,9 +137,9 @@ public class TransportImpl implements Transport {
         log.debug("Created sender");
         return sender;
     }
-    
+
     public Sender createSender(Receiver receiver) throws ConnectionException {
-        return new SocketSenderImpl((Socket)receiver.getEndpoint(), (String)receiver.getReplyTo());
+        return new SocketSenderImpl((Socket) receiver.getEndpoint(), (String) receiver.getReplyTo());
     }
 
     public Receiver getReceiver(String serviceName, boolean conversational) throws ConnectionException {
@@ -170,7 +170,8 @@ public class TransportImpl implements Transport {
         return toReturn;
     }
 
-    public Receiver createReceiver(int cd, ResponseMonitor responseMonitor, EventListener eventListener) throws ConnectionException {
+    public Receiver createReceiver(int cd, ResponseMonitor responseMonitor, EventListener eventListener)
+            throws ConnectionException {
         if (closed) {
             log.error("Already closed");
             throw new ConnectionException(Connection.TPEPROTO, "Already closed");
@@ -184,14 +185,14 @@ public class TransportImpl implements Transport {
             log.error("Already closed");
             throw new ConnectionException(Connection.TPEPROTO, "Already closed");
         }
-    return null;
+        return null;
     }
-    
+
     public Receiver createReceiver(Sender sender) throws ConnectionException {
-        if(sender == null) {
+        if (sender == null) {
             log.debug("no need to create on empty sender");
             return null;
-        } 
-        return new SocketReceiverImpl((Socket)sender.getEndpoint(), (String)sender.getSendTo(), properties);
+        }
+        return new SocketReceiverImpl((Socket) sender.getEndpoint(), (String) sender.getSendTo(), properties);
     }
 }

@@ -15,8 +15,9 @@ public class BAControllerFactory {
     /**
      * Get an instance of {@link BAController}.
      * 
-     * @return an instance of a remote {@link BAController} implementation is returned if remote compensating transaction is
-     *         active. Otherwise local instance of a {@link BAController} is returned.
+     * @return an instance of a remote {@link BAController} implementation is
+     *         returned if remote compensating transaction is active. Otherwise
+     *         local instance of a {@link BAController} is returned.
      */
     public static BAController getInstance() {
 
@@ -32,7 +33,8 @@ public class BAControllerFactory {
     }
 
     /**
-     * Get {@link BAController} capable to control remote compensating transactions.
+     * Get {@link BAController} capable to control remote compensating
+     * transactions.
      *
      * @return an instance of a remote {@link BAController}.
      */
@@ -42,7 +44,8 @@ public class BAControllerFactory {
     }
 
     /**
-     * Get {@link BAController} capable to control only local compensating transactions.
+     * Get {@link BAController} capable to control only local compensating
+     * transactions.
      *
      * @return an instance of a local {@link BAController}.
      */
@@ -53,9 +56,11 @@ public class BAControllerFactory {
     }
 
     /**
-     * Check if there is an active local compensating transaction associated with the thread.
+     * Check if there is an active local compensating transaction associated
+     * with the thread.
      *
-     * @return {@code true} if local compensation transaction is running and {@code false} otherwise.
+     * @return {@code true} if local compensation transaction is running and
+     *         {@code false} otherwise.
      */
     public static boolean isLocalTransactionRunning() {
 
@@ -67,9 +72,11 @@ public class BAControllerFactory {
     }
 
     /**
-     * Check if there is an active remote compensating transaction associated with the thread.
+     * Check if there is an active remote compensating transaction associated
+     * with the thread.
      *
-     * @return {@code true} if remote compensation transaction is running and {@code false} otherwise.
+     * @return {@code true} if remote compensation transaction is running and
+     *         {@code false} otherwise.
      */
     public static boolean isRemoteTransactionRunning() {
 

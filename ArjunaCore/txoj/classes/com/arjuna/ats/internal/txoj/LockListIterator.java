@@ -33,32 +33,25 @@ package com.arjuna.ats.internal.txoj;
 
 import com.arjuna.ats.txoj.Lock;
 
+public class LockListIterator {
 
-public class LockListIterator
-{
-
-    public LockListIterator(LockList L)
-    {
+    public LockListIterator(LockList L) {
         currentList = L;
         next = currentList.head;
     }
 
-    public final synchronized Lock iterate ()
-    {
+    public final synchronized Lock iterate() {
         Lock current = next;
 
-        if (current == null)
-        {
+        if (current == null) {
             return null;
-        }
-        else
+        } else
             next = LockFriend.getLink(current);
 
         return current;
     }
 
-    public final synchronized void reset ()
-    {
+    public final synchronized void reset() {
         next = null;
     }
 
