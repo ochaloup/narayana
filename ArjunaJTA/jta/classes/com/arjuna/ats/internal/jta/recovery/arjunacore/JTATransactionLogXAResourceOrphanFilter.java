@@ -74,7 +74,7 @@ public class JTATransactionLogXAResourceOrphanFilter implements XAResourceOrphan
             RecoverConnectableAtomicAction rcaa = new RecoverConnectableAtomicAction(
                     RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE, u, state);
 
-            return (rcaa.containsIncompleteCommitMarkableResourceRecord());
+            return (rcaa.containsIncompleteCommitMarkableResourceRecord() || rcaa.wasConfirmedCommitted());
         }
 
         return false;
