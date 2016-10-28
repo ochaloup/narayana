@@ -149,7 +149,22 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
 
                 theOrb = null;
 
-                _resourceHandle = com.arjuna.ArjunaOTS.ArjunaSubtranAwareResourceHelper.unchecked_narrow(optr);
+                _resourceHandle = com.arjuna.ArjunaOTS.ArjunaSubtranAwareResourceHelper.narrow(optr); // This
+                                                                                                        // is
+                                                                                                        // needed
+                                                                                                        // because
+                                                                                                        // for
+                                                                                                        // JDK
+                                                                                                        // ORB
+                                                                                                        // it
+                                                                                                        // could
+                                                                                                        // narrow
+                                                                                                        // and
+                                                                                                        // won't
+                                                                                                        // allow
+                                                                                                        // shutdown
+                                                                                                        // of
+                                                                                                        // OA
 
                 if (jtsLogger.logger.isTraceEnabled()) {
                     jtsLogger.logger.trace("ExtendedResourceRecord: Successfully narrowed");
@@ -980,7 +995,7 @@ public class ExtendedResourceRecord extends com.arjuna.ats.arjuna.coordinator.Ab
 
     private final OTSAbstractRecord otsRecord() {
         try {
-            if (_otsARHandle == null) {
+            if (_otsARHandle == null && _resourceHandle != null) {
                 _otsARHandle = com.arjuna.ArjunaOTS.OTSAbstractRecordHelper.unchecked_narrow(_resourceHandle);
                 lastRecord = RecordType.LASTRESOURCE == _otsARHandle.type_id();
             }

@@ -102,17 +102,8 @@ public class JTSOSBTestBase extends TestBase {
         ORBManager.reset();
     }
 
-    public void setUp() {
-        emptyObjectStore();
-    }
-
     @Before
     public void beforeTest() {
-        emptyObjectStore();
-    }
-
-    @After
-    public void tearDown() {
         emptyObjectStore();
     }
 

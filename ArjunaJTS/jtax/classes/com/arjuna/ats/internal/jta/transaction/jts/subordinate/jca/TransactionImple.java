@@ -36,6 +36,7 @@ import javax.transaction.xa.Xid;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.internal.jta.utils.jtaxLogger;
+import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
 
 public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jts.subordinate.TransactionImple
         implements
@@ -123,7 +124,10 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
     }
 
     public void recover() {
-        getControlWrapper().getImple().getImplHandle().activate();
+        ArjunaTransactionImple implHandle = getControlWrapper().getImple().getImplHandle();
+        if (implHandle != null) {
+            implHandle.activate();
+        }
     }
 
     public boolean activated() {
