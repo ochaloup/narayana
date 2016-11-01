@@ -68,6 +68,16 @@ public class RecoveryManagerService implements XAResourceRecoveryRegistry {
         _recoveryManager.terminate();
     }
 
+    public void suspend() {
+        jbossatxLogger.i18NLogger.info_jta_RecoveryManagerService_suspend();
+        _recoveryManager.suspend(false);
+    }
+
+    public void resume() {
+        jbossatxLogger.i18NLogger.info_jta_RecoveryManagerService_resume();
+        _recoveryManager.resume();
+    }
+
     //////////////////////////////
 
     public void addXAResourceRecovery(XAResourceRecovery xaResourceRecovery) {
