@@ -41,4 +41,7 @@ public class TestException extends Exception {
         super(s);
     }
 
+    public TestException(Exception e) {
+        super(e);
+    }
 }

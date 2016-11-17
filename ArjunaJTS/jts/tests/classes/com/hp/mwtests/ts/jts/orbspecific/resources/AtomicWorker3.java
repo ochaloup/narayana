@@ -35,8 +35,10 @@ import com.arjuna.ats.internal.jts.OTSImpleManager;
 import com.arjuna.ats.internal.jts.orbspecific.CurrentImple;
 import com.hp.mwtests.ts.jts.exceptions.TestException;
 import com.hp.mwtests.ts.jts.utils.Util;
+import org.jboss.logging.Logger;
 
 public class AtomicWorker3 {
+    public static final Logger logger = Logger.getLogger("AtomicWorker3");
 
     public static void randomOperation(int thr, int level) {
         switch (Util.rand.nextInt() % 23) {
@@ -69,18 +71,18 @@ public class AtomicWorker3 {
                 try {
                     current.begin();
 
-                    Util.indent(thr, level);
-                    System.out.println("begin");
+                    logger.info("" + level);
+                    logger.info("begin");
 
                     randomOperation(thr, level + 1);
                     randomOperation(thr, level + 1);
 
                     current.commit(false);
 
-                    Util.indent(thr, level);
-                    System.out.println("end");
+                    logger.info("" + level);
+                    logger.info("end");
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.warn(e, e);
                 }
             }
                 break;
@@ -89,18 +91,18 @@ public class AtomicWorker3 {
                 try {
                     current.begin();
 
-                    Util.indent(thr, level);
-                    System.out.println("begin");
+                    logger.info("" + level);
+                    logger.info("begin");
 
                     randomOperation(thr, level + 1);
                     randomOperation(thr, level + 1);
 
                     current.rollback();
 
-                    Util.indent(thr, level);
-                    System.out.print("abort");
+                    logger.info("" + level);
+                    logger.info("abort");
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.warn(e, e);
                 }
             }
                 break;
@@ -108,8 +110,8 @@ public class AtomicWorker3 {
                 Thread thr1 = null;
                 Thread thr2 = null;
 
-                Util.indent(thr, level);
-                System.out.println("fork");
+                logger.info("" + level);
+                logger.info("fork");
 
                 thr1 = new ThreadObject3a(false);
                 thr2 = new ThreadObject3a(false);
@@ -121,19 +123,19 @@ public class AtomicWorker3 {
                     thr1.join();
                     thr2.join();
                 } catch (InterruptedException e) {
-                    System.err.println(e);
+                    logger.warn(e, e);
                 }
 
-                Util.indent(thr, level);
-                System.out.println("join");
+                logger.info("" + level);
+                logger.info("join");
             }
                 break;
             case 21 : {
                 Thread thr1 = null;
                 Thread thr2 = null;
 
-                Util.indent(thr, level);
-                System.out.println("fork");
+                logger.info("" + level);
+                logger.info("fork");
 
                 thr1 = new ThreadObject3a(true);
                 thr2 = new ThreadObject3a(false);
@@ -145,19 +147,19 @@ public class AtomicWorker3 {
                     thr1.join();
                     thr2.join();
                 } catch (InterruptedException e) {
-                    System.err.println(e);
+                    logger.warn(e, e);
                 }
 
-                Util.indent(thr, level);
-                System.out.println("join");
+                logger.info("" + level);
+                logger.info("join");
             }
                 break;
             case 22 : {
                 Thread thr1 = null;
                 Thread thr2 = null;
 
-                Util.indent(thr, level);
-                System.out.println("fork");
+                logger.info("" + level);
+                logger.info("fork");
 
                 thr1 = new ThreadObject3a(true);
                 thr2 = new ThreadObject3a(true);
@@ -169,11 +171,11 @@ public class AtomicWorker3 {
                     thr1.join();
                     thr2.join();
                 } catch (InterruptedException e) {
-                    System.err.println(e);
+                    logger.warn(e, e);
                 }
 
-                Util.indent(thr, level);
-                System.out.println("join");
+                logger.info("" + level);
+                logger.info("join");
             }
                 break;
         }
@@ -189,16 +191,16 @@ public class AtomicWorker3 {
         try {
             current.begin();
 
-            Util.indent(thr, level);
-            System.out.println("begin   incr12");
+            logger.info("" + level);
+            logger.info("begin   incr12");
 
             ran = Util.rand.nextInt() % 16;
 
             res1 = atomicObject_1.incr(ran);
             res = res1;
 
-            Util.indent(thr, level);
-            System.out.println("part1   incr12 : " + res1);
+            logger.info("" + level);
+            logger.info("part1   incr12 : " + res1);
 
             Util.lowProbYield();
 
@@ -206,24 +208,24 @@ public class AtomicWorker3 {
                 res2 = atomicObject_2.incr(-ran);
                 res = res2;
 
-                Util.indent(thr, level);
-                System.out.println("part2   incr12 : " + res2);
+                logger.info("" + level);
+                logger.info("part2   incr12 : " + res2);
             }
 
             Util.lowProbYield();
 
-            Util.indent(thr, level);
+            logger.info("" + level);
             if (res) {
-                System.out.print("end ");
+                logger.info("end ");
                 current.commit(false);
             } else {
-                System.out.print("abort  ");
+                logger.info("abort  ");
                 current.rollback();
             }
 
-            System.out.println(" incr12 : " + res1 + " : " + res2 + " : " + res + " : " + ran);
+            logger.info(" incr12 : " + res1 + " : " + res2 + " : " + res + " : " + ran);
         } catch (Exception e) {
-            System.err.println(e);
+            logger.warn(e, e);
         }
     }
 
@@ -237,16 +239,16 @@ public class AtomicWorker3 {
         try {
             current.begin();
 
-            Util.indent(thr, level);
-            System.out.print("begin   incr21");
+            logger.info("" + level);
+            logger.info("begin   incr21");
 
             ran = Util.rand.nextInt() % 16;
 
             res1 = atomicObject_2.incr(ran);
             res = res1;
 
-            Util.indent(thr, level);
-            System.out.print("part1   incr21 : " + res1);
+            logger.info("" + level);
+            logger.info("part1   incr21 : " + res1);
 
             Util.lowProbYield();
 
@@ -254,24 +256,24 @@ public class AtomicWorker3 {
                 res2 = atomicObject_1.incr(-ran);
                 res = res2;
 
-                Util.indent(thr, level);
-                System.out.println("part2   incr21 : " + res2);
+                logger.info("" + level);
+                logger.info("part2   incr21 : " + res2);
             }
 
             Util.lowProbYield();
 
-            Util.indent(thr, level);
+            logger.info("" + level);
             if (res) {
-                System.out.print("end ");
+                logger.info("end ");
                 current.commit(false);
             } else {
-                System.out.print("abort  ");
+                logger.info("abort  ");
                 current.rollback();
             }
 
-            System.out.println(" incr21 : " + res1 + " : " + res2 + " : " + res + " : " + ran);
+            logger.info(" incr21 : " + res1 + " : " + res2 + " : " + res + " : " + ran);
         } catch (Exception e) {
-            System.err.println(e);
+            logger.warn(e, e);
         }
     }
 
@@ -286,8 +288,8 @@ public class AtomicWorker3 {
         try {
             current.begin();
 
-            Util.indent(thr, level);
-            System.out.println("begin   get12");
+            logger.info("" + level);
+            logger.info("begin   get12");
 
             res1 = true;
 
@@ -299,8 +301,8 @@ public class AtomicWorker3 {
 
             res = res1;
 
-            Util.indent(thr, level);
-            System.out.println("part1   get12  : " + res1);
+            logger.info("" + level);
+            logger.info("part1   get12  : " + res1);
 
             Util.lowProbYield();
 
@@ -315,24 +317,24 @@ public class AtomicWorker3 {
 
                 res = res2;
 
-                Util.indent(thr, level);
-                System.out.println("part2   get12  : " + res2);
+                logger.info("" + level);
+                logger.info("part2   get12  : " + res2);
             }
 
             Util.lowProbYield();
 
-            Util.indent(thr, level);
+            logger.info("" + level);
             if (res) {
-                System.out.print("end ");
+                logger.info("end ");
                 current.commit(false);
             } else {
-                System.out.print("abort  ");
+                logger.info("abort  ");
                 current.rollback();
             }
 
-            System.out.println(" get12  : " + res1 + " : " + res2 + " : " + res + " : " + value1 + " : " + value2);
+            logger.info(" get12  : " + res1 + " : " + res2 + " : " + res + " : " + value1 + " : " + value2);
         } catch (Exception e) {
-            System.err.println(e);
+            logger.warn(e, e);
         }
     }
 
@@ -347,8 +349,8 @@ public class AtomicWorker3 {
         try {
             current.begin();
 
-            Util.indent(thr, level);
-            System.out.print("begin   get21");
+            logger.info("" + level);
+            logger.info("begin   get21");
 
             res1 = true;
 
@@ -360,8 +362,8 @@ public class AtomicWorker3 {
 
             res = res1;
 
-            Util.indent(thr, level);
-            System.out.print("part1   get21  : " + res1);
+            logger.info("" + level);
+            logger.info("part1   get21  : " + res1);
 
             Util.lowProbYield();
 
@@ -376,24 +378,24 @@ public class AtomicWorker3 {
 
                 res = res2;
 
-                Util.indent(thr, level);
-                System.out.println("part2   get21  : " + res2);
+                logger.info("" + level);
+                logger.info("part2   get21  : " + res2);
             }
 
             Util.lowProbYield();
 
-            Util.indent(thr, level);
+            logger.info("" + level);
             if (res) {
-                System.out.print("end ");
+                logger.info("end ");
                 current.commit(false);
             } else {
-                System.out.print("abort  ");
+                logger.info("abort  ");
                 current.rollback();
             }
 
-            System.out.println(" get21  : " + res1 + " : " + res2 + " : " + res + " : " + value1 + " : " + value2);
+            logger.info(" get21  : " + res1 + " : " + res2 + " : " + res + " : " + value1 + " : " + value2);
         } catch (Exception e) {
-            System.err.println(e);
+            logger.warn(e, e);
         }
     }
 
@@ -403,24 +405,17 @@ public class AtomicWorker3 {
 
         try {
             current.begin();
-
-            try {
-                returnValue = atomicObject_1.get();
-                res = true;
-            } catch (TestException e) {
-            }
-
+            returnValue = atomicObject_1.get();
+            res = true;
+        } catch (Exception e) {
+            logger.warn(e, e);
+            throw e;
+        } finally {
             if (res)
                 current.commit(false);
             else
                 current.rollback();
-        } catch (Exception e) {
-            System.err.println(e);
-            throw e;
         }
-
-        if (!res)
-            throw new Exception("Get1: Failed to retrieve value");
 
         return (returnValue);
     }
@@ -431,24 +426,17 @@ public class AtomicWorker3 {
 
         try {
             current.begin();
-
-            try {
-                returnValue = atomicObject_2.get();
-                res = true;
-            } catch (TestException e) {
-            }
-
+            returnValue = atomicObject_2.get();
+            res = true;
+        } catch (Exception e) {
+            logger.warn(e, e);
+            throw e;
+        } finally {
             if (res)
                 current.commit(false);
             else
                 current.rollback();
-        } catch (Exception e) {
-            System.err.println(e);
-            throw e;
         }
-
-        if (!res)
-            throw new Exception("Get2: Failed to retrieve value");
 
         return (returnValue);
     }
