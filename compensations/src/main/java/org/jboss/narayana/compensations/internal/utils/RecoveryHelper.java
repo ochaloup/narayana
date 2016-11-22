@@ -38,6 +38,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
+ * An utility class to help when working with recovery store.
+ *
+ * New instance should be created for each required recovery store and record
+ * type.
+ *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 public class RecoveryHelper {
@@ -46,11 +51,26 @@ public class RecoveryHelper {
 
     private final String recordType;
 
+    /**
+     * @param recoveryStore
+     *            An instance of the recovery store to work with.
+     * @param recordType
+     *            A record type to work with.
+     */
     public RecoveryHelper(RecoveryStore recoveryStore, String recordType) {
         this.recoveryStore = recoveryStore;
         this.recordType = recordType;
     }
 
+    /**
+     * Get all {@code recordType} states persisted to the {@code recoveryStore}.
+     *
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     *
+     * @return {@link InputObjectState} with all Uids, or an empty
+     *         {@link InputObjectState} if failure has occurred.
+     */
     public InputObjectState getStates(Consumer<Throwable> exceptionConsumer) {
         InputObjectState states = new InputObjectState();
         try {
@@ -62,6 +82,16 @@ public class RecoveryHelper {
         return states;
     }
 
+    /**
+     * Get all {@code recordType} states persisted to the {@code recoveryStore}.
+     *
+     * @param exceptionFunction
+     *            function to create an expected exception in case of a failure.
+     * @return {@link InputObjectState} with all Uids, or an empty
+     *         {@link InputObjectState} if failure has occurred.
+     * @throws X
+     *             if failure has occurred when getting states.
+     */
     public <X extends Throwable> InputObjectState getStatesWithException(Function<Throwable, X> exceptionFunction)
             throws X {
         InputObjectState states = new InputObjectState();
@@ -73,6 +103,13 @@ public class RecoveryHelper {
         return states;
     }
 
+    /**
+     * Get all {@code recordType} Uids persisted to the {@code recoveryStore}.
+     *
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     * @return a set of Uids.
+     */
     public Set<Uid> getAllUids(Consumer<Throwable> exceptionConsumer) {
         InputObjectState states = getStates(exceptionConsumer);
         Set<Uid> uids = new HashSet<>();
@@ -87,6 +124,15 @@ public class RecoveryHelper {
         return uids;
     }
 
+    /**
+     * Get all {@code recordType} Uids persisted to the {@code recoveryStore}.
+     *
+     * @param exceptionFunction
+     *            function to create an expected exception in case of a failure.
+     * @return a set of Uids.
+     * @throws X
+     *             if failure has occurred when getting Uids.
+     */
     public <X extends Throwable> Set<Uid> getAllUidsWithException(Function<Throwable, X> exceptionFunction) throws X {
         InputObjectState states = getStatesWithException(exceptionFunction);
         Set<Uid> uids = new HashSet<>();
@@ -101,6 +147,14 @@ public class RecoveryHelper {
         return uids;
     }
 
+    /**
+     * Get all {@code recordType} records persisted to the
+     * {@code recoveryStore}.
+     *
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     * @return a set of all records.
+     */
     public Set<InputObjectState> getAllRecords(Consumer<Throwable> exceptionConsumer) {
         InputObjectState states = getStates(exceptionConsumer);
         Set<InputObjectState> records = new HashSet<>();
@@ -118,6 +172,17 @@ public class RecoveryHelper {
         return records;
     }
 
+    /**
+     * Get a specific record of {@code recordType} persisted to the
+     * {@code recoveryStore};
+     *
+     * @param id
+     *            Uid of the record.
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     * @return {@link Optional} with the requested record if it was read, or
+     *         empty if failure occurred.
+     */
     public Optional<InputObjectState> getRecord(Uid id, Consumer<Throwable> exceptionConsumer) {
         try {
             return Optional.of(recoveryStore.read_committed(id, recordType));
@@ -127,6 +192,16 @@ public class RecoveryHelper {
         }
     }
 
+    /**
+     * Write record of {@code recordType} to the {@code recoveryStore}.
+     *
+     * @param state
+     *            record state to be persisted.
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     * @return {@code true} if record was written successfully, or {@code false}
+     *         if failure occurred.
+     */
     public boolean writeRecord(OutputObjectState state, Consumer<Throwable> exceptionConsumer) {
         try {
             return recoveryStore.write_committed(state.stateUid(), recordType, state);
@@ -136,6 +211,16 @@ public class RecoveryHelper {
         }
     }
 
+    /**
+     * Remove record of {@code recordType} from the {@code recoveryStore}.
+     *
+     * @param id
+     *            record to be removed.
+     * @param exceptionConsumer
+     *            exception consumer to be called in case of the failure.
+     * @return {@code true} if record was removed successfully, or {@code false}
+     *         if failure occurred.
+     */
     public boolean removeRecord(Uid id, Consumer<Throwable> exceptionConsumer) {
         try {
             return recoveryStore.remove_committed(id, recordType);
@@ -145,6 +230,18 @@ public class RecoveryHelper {
         }
     }
 
+    /**
+     * Remove record of {@code recordType} from the {@code recoveryStore}.
+     *
+     * @param id
+     *            record to be removed.
+     * @param exceptionFunction
+     *            function to create an expected exception in case of a failure.
+     * @return {@code true} if record was removed successfully, or {@code false}
+     *         if failure occurred.
+     * @throws X
+     *             if failure has occurred when removing a record.
+     */
     public <X extends Throwable> boolean removeRecordWithException(Uid id, Function<Throwable, X> exceptionFunction)
             throws X {
         try {

@@ -78,6 +78,12 @@ public class LocalParticipant implements BAParticipant, Participant {
         participant.confirmCompleted(confirmed);
     }
 
+    /**
+     * Tell participant implementation to close and once that's done remove
+     * recovery record.
+     *
+     * @throws InvalidParticipantException
+     */
     @Override
     public void close() throws InvalidParticipantException {
         try {
@@ -88,6 +94,11 @@ public class LocalParticipant implements BAParticipant, Participant {
         }
     }
 
+    /**
+     * Tell participant implementation to cancel.
+     *
+     * @throws InvalidParticipantException
+     */
     @Override
     public void cancel() throws InvalidParticipantException {
         try {
@@ -97,6 +108,12 @@ public class LocalParticipant implements BAParticipant, Participant {
         }
     }
 
+    /**
+     * Tell participant implementation to compesate and once that's done remove
+     * recovery record.
+     *
+     * @throws CompensateFailedException
+     */
     @Override
     public void compensate() throws CompensateFailedException {
         try {
@@ -121,6 +138,14 @@ public class LocalParticipant implements BAParticipant, Participant {
         return coordinatorId;
     }
 
+    /**
+     * Persist participant and coordinator ids and delegate further persistence
+     * to the participant implementation.
+     *
+     * @param state
+     *            state to persist participant to.
+     * @return if persistence was successful or not.
+     */
     @Override
     public boolean save_state(OutputObjectState state) {
         LOGGER.tracef("Persisting state: '%s'", this);
@@ -135,6 +160,14 @@ public class LocalParticipant implements BAParticipant, Participant {
         return participant.saveState(state);
     }
 
+    /**
+     * Restore participant and coordinator ids first and then recreate
+     * particiapnt implementation.
+     *
+     * @param state
+     *            state to deserialize participant from.
+     * @return if deserialization was successful or not.
+     */
     @Override
     public boolean restore_state(InputObjectState state) {
         try {
