@@ -479,8 +479,7 @@ public class Interposition {
 
         if (action != null) {
             if (action.get_uid().notEquals(ctxHierarchy[depth])) {
-                jtsLogger.i18NLogger.warn_interposition_resources_arjuna_iptl(action.get_uid(),
-                        ctxHierarchy[depth - 1]);
+                jtsLogger.i18NLogger.warn_interposition_resources_arjuna_iptl(action.get_uid(), ctxHierarchy[depth]);
 
                 printHierarchies = true;
             } else {
