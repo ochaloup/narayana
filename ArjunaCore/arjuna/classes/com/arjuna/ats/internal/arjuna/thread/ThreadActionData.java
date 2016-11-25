@@ -202,7 +202,7 @@ public class ThreadActionData {
                     BasicAction act = txs.pop();
 
                     if (act != null) {
-                        act.removeChildThread(ThreadUtil.removeThreadId(t));
+                        act.removeChildThread(ThreadUtil.getThreadId(t));
                     }
                 }
             }
