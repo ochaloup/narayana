@@ -48,6 +48,7 @@ public class LogRecordWrapper extends OSEntryBean implements LogRecordWrapperMBe
     protected boolean activated;
     protected ParticipantStatus listType;
     protected boolean removed;
+    protected boolean forgetRec;
 
     public LogRecordWrapper(Uid uid) {
         super(null);
@@ -238,7 +239,7 @@ public class LogRecordWrapper extends OSEntryBean implements LogRecordWrapperMBe
 
     public boolean removeFromList(RecordList rl) {
         if (rl != null && rl.size() > 0 && rec != null) {
-            boolean forgotten = rec.forgetHeuristic();
+            boolean forgotten = forgetRec || rec.forgetHeuristic();
             boolean removeAllowed = arjPropertyManager.getObjectStoreEnvironmentBean().isIgnoreMBeanHeuristics();
 
             if (forgotten || removeAllowed) {
