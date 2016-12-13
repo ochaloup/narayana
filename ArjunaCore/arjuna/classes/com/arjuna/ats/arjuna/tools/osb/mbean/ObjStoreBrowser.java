@@ -68,7 +68,9 @@ public class ObjStoreBrowser implements ObjStoreBrowserMBean {
                     "StateManager/BasicAction/TwoPhaseCoordinator/AtomicAction", null),};
 
     private static OSBTypeHandler[] defaultJTSOsbTypes = {
-            new OSBTypeHandler(true, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper",
+            new OSBTypeHandler(true, false, // by default do not probe for this
+                                            // type
+                    "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper",
                     "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JTSXAResourceRecordWrapper",
                     "CosTransactions/XAResourceRecord", null),
             new OSBTypeHandler(false, "com.arjuna.ats.internal.jta.tools.osb.mbean.jts.JCAServerTransactionWrapper",
