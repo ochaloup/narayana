@@ -22,59 +22,44 @@
 
 package org.jboss.narayana.compensations.internal.remote;
 
-import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.wst.BusinessAgreementWithParticipantCompletionParticipant;
 import com.arjuna.wst.FaultedException;
 import com.arjuna.wst.SystemException;
 import com.arjuna.wst.WrongStateException;
 import com.arjuna.wst11.ConfirmCompletedParticipant;
-import org.jboss.jbossts.xts.recovery.participant.ba.PersistableBAParticipant;
-import org.jboss.logging.Logger;
 import org.jboss.narayana.compensations.api.CompensationHandler;
 import org.jboss.narayana.compensations.api.ConfirmationHandler;
 import org.jboss.narayana.compensations.api.TransactionLoggedHandler;
 import org.jboss.narayana.compensations.internal.BAParticipant;
-import org.jboss.narayana.compensations.internal.CurrentTransaction;
 import org.jboss.narayana.compensations.internal.ParticipantImpl;
-import org.jboss.narayana.compensations.internal.context.CompensationContextStateManager;
-import org.jboss.narayana.compensations.internal.recovery.DeserializerHelper;
 
 /**
- * @author paul.robinson@redhat.com
- * @author gytis@redhat.com
+ * @author paul.robinson@redhat.com 22/03/2013
  */
 public class RemoteParticipant
         implements
             BAParticipant,
             BusinessAgreementWithParticipantCompletionParticipant,
-            ConfirmCompletedParticipant,
-            PersistableBAParticipant {
-
-    private static final Logger LOGGER = Logger.getLogger(RemoteParticipant.class);
+            ConfirmCompletedParticipant {
 
     private ParticipantImpl participant;
 
-    // Needed for recovery
-    public RemoteParticipant(ParticipantImpl participant) {
-        this.participant = participant;
-    }
-
     public RemoteParticipant(CompensationHandler compensationHandler, ConfirmationHandler confirmationHandler,
-            TransactionLoggedHandler transactionLoggedHandler, CurrentTransaction currentTransaction,
-            String participantId, CompensationContextStateManager compensationContextStateManager,
-            DeserializerHelper deserializerHelper) {
+            TransactionLoggedHandler transactionLoggedHandler, Object currentTX) {
 
         participant = new ParticipantImpl(compensationHandler, confirmationHandler, transactionLoggedHandler,
-                currentTransaction.getId(), participantId, compensationContextStateManager, deserializerHelper);
+                currentTX);
     }
 
     @Override
     public void confirmCompleted(boolean confirmed) {
+
         participant.confirmCompleted(confirmed);
     }
 
     @Override
     public void close() throws WrongStateException, SystemException {
+
         participant.close();
     }
 
@@ -85,6 +70,7 @@ public class RemoteParticipant
 
     @Override
     public void compensate() throws FaultedException, WrongStateException, SystemException {
+
         participant.compensate();
     }
 
@@ -94,7 +80,6 @@ public class RemoteParticipant
         return null;
     }
 
-    @Deprecated
     @Override
     public void unknown() throws SystemException {
 
@@ -103,19 +88,5 @@ public class RemoteParticipant
     @Override
     public void error() throws SystemException {
 
-    }
-
-    @Override
-    public byte[] getRecoveryState() throws Exception {
-        LOGGER.tracef("Persisting state: '%s'", this);
-
-        OutputObjectState state = new OutputObjectState();
-        state.packString(getClass().getSimpleName());
-
-        if (!participant.saveState(state)) {
-            throw new Exception("Failed to persist state");
-        }
-
-        return state.buffer();
     }
 }

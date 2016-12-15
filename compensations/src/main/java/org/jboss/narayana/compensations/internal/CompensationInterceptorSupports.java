@@ -19,20 +19,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.jboss.narayana.compensations.internal;
 
+import org.jboss.narayana.compensations.api.Compensatable;
+import org.jboss.narayana.compensations.api.CompensationTransactionType;
+
+import javax.annotation.Priority;
+import javax.interceptor.AroundInvoke;
+import javax.interceptor.Interceptor;
+import javax.interceptor.InvocationContext;
+
 /**
- * @author paul.robinson@redhat.com 22/03/2013
+ * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
-public interface BAParticipant {
+@Compensatable(CompensationTransactionType.SUPPORTS)
+@Interceptor
+@Priority(Interceptor.Priority.PLATFORM_BEFORE + 197)
+public class CompensationInterceptorSupports extends CompensationInterceptorBase {
 
-    public void confirmCompleted(boolean confirmed);
+    @AroundInvoke
+    public Object intercept(final InvocationContext ic) throws Exception {
 
-    public void close() throws Exception;
-
-    public void cancel() throws Exception;
-
-    public void compensate() throws Exception;
+        BAController baController = BAControllerFactory.getInstance();
+        if (!baController.isBARunning()) {
+            return invokeInNoTx(ic);
+        } else {
+            return invokeInCallerTx(ic);
+        }
+    }
 
 }

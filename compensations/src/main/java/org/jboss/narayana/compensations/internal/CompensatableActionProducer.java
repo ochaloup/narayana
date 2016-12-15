@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2013, Red Hat, Inc., and individual contributors
+ * Copyright 2016, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -22,17 +22,19 @@
 
 package org.jboss.narayana.compensations.internal;
 
+import org.jboss.narayana.compensations.api.CompensatableAction;
+
+import javax.enterprise.inject.New;
+import javax.enterprise.inject.Produces;
+
 /**
- * @author paul.robinson@redhat.com 22/03/2013
+ * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
-public interface BAParticipant {
+public class CompensatableActionProducer {
 
-    public void confirmCompleted(boolean confirmed);
-
-    public void close() throws Exception;
-
-    public void cancel() throws Exception;
-
-    public void compensate() throws Exception;
+    @Produces
+    public CompensatableAction getCompensatableAction(@New CompensatableActionImpl compensatableAction) {
+        return compensatableAction;
+    }
 
 }

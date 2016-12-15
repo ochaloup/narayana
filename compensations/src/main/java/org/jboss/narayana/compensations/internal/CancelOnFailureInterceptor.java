@@ -22,17 +22,34 @@
 
 package org.jboss.narayana.compensations.internal;
 
+import org.jboss.narayana.compensations.api.CancelOnFailure;
+import org.jboss.narayana.compensations.api.CompensationManager;
+
+import javax.annotation.Priority;
+import javax.inject.Inject;
+import javax.interceptor.AroundInvoke;
+import javax.interceptor.Interceptor;
+import javax.interceptor.InvocationContext;
+
 /**
- * @author paul.robinson@redhat.com 22/03/2013
+ * @author paul.robinson@redhat.com 25/04/2013
  */
-public interface BAParticipant {
+@CancelOnFailure
+@Interceptor
+@Priority(Interceptor.Priority.PLATFORM_BEFORE + 199)
+public class CancelOnFailureInterceptor {
 
-    public void confirmCompleted(boolean confirmed);
+    @Inject
+    CompensationManager compensationManager;
 
-    public void close() throws Exception;
+    @AroundInvoke
+    public Object intercept(InvocationContext ic) throws Exception {
 
-    public void cancel() throws Exception;
-
-    public void compensate() throws Exception;
-
+        try {
+            return ic.proceed();
+        } catch (RuntimeException e) {
+            compensationManager.setCompensateOnly();
+            throw e;
+        }
+    }
 }

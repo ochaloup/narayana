@@ -22,17 +22,15 @@
 
 package org.jboss.narayana.compensations.internal;
 
-/**
- * @author paul.robinson@redhat.com 22/03/2013
- */
-public interface BAParticipant {
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
 
-    public void confirmCompleted(boolean confirmed);
+public class CompensationScopedExtension implements Extension {
 
-    public void close() throws Exception;
+    public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
 
-    public void cancel() throws Exception;
-
-    public void compensate() throws Exception;
-
+        event.addContext(new CompensationContext());
+    }
 }
