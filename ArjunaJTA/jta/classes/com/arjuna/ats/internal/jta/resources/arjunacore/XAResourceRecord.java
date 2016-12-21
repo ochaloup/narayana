@@ -377,10 +377,13 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                                 if (!_prepared)
                                     break; // just do the finally block
                             case XAException.XA_HEURHAZ :
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                                 return TwoPhaseOutcome.HEURISTIC_HAZARD;
                             case XAException.XA_HEURCOM :
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_COMMIT;
                                 return TwoPhaseOutcome.HEURISTIC_COMMIT;
                             case XAException.XA_HEURMIX :
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_MIXED;
                                 return TwoPhaseOutcome.HEURISTIC_MIXED;
                             case XAException.XAER_NOTA :
                                 if (_recovered)
@@ -468,6 +471,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
 
                         switch (e1.errorCode) {
                             case XAException.XA_HEURHAZ :
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                                 return TwoPhaseOutcome.HEURISTIC_HAZARD;
                             case XAException.XA_HEURCOM : // what about forget?
                                                             // OTS doesn't
@@ -492,6 +496,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                             case XAException.XAER_RMERR :
                             case XAException.XAER_PROTO : // XA spec implies
                                                             // rollback
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_ROLLBACK;
                                 return TwoPhaseOutcome.HEURISTIC_ROLLBACK;
                             case XAException.XA_HEURMIX :
                                 return TwoPhaseOutcome.HEURISTIC_MIXED;
@@ -499,11 +504,13 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                                 if (_recovered)
                                     break; // committed previously and recovery
                                             // completed
-                                else
+                                else {
+                                    _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                                     return TwoPhaseOutcome.HEURISTIC_HAZARD; // something
                                                                                 // terminated
                                                                                 // the
                                                                                 // transaction!
+                                }
                             case XAException.XA_RETRY :
                             case XAException.XAER_RMFAIL :
                                 _committed = true; // will cause log to be
@@ -522,6 +529,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                                                             // failed, did it
                                                             // rollback?
                             default :
+                                _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                                 return TwoPhaseOutcome.HEURISTIC_HAZARD;
                         }
                     }
@@ -702,6 +710,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                     switch (e1.errorCode) {
                         case XAException.XA_HEURHAZ :
                         case XAException.XA_HEURMIX :
+                            _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                             return TwoPhaseOutcome.HEURISTIC_HAZARD;
                         case XAException.XA_HEURCOM :
                             forget();
@@ -720,6 +729,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                         case XAException.XAER_RMERR :
                             return TwoPhaseOutcome.ONE_PHASE_ERROR;
                         case XAException.XAER_NOTA :
+                            _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                             return TwoPhaseOutcome.HEURISTIC_HAZARD; // something
                                                                         // committed
                                                                         // or
@@ -743,6 +753,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                         case XAException.XAER_INVAL : // resource manager
                                                         // failed, did it
                                                         // rollback?
+                            _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                             return TwoPhaseOutcome.HEURISTIC_HAZARD;
                         case XAException.XA_RETRY : // XA does not allow this to
                                                     // be thrown for 1PC!
@@ -756,6 +767,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                                                         // rollback/commit we
                                                         // are flagging this to
                                                         // the user
+                            _heuristic = TwoPhaseOutcome.HEURISTIC_HAZARD;
                             return TwoPhaseOutcome.HEURISTIC_HAZARD;
                         default :
                             _committed = true; // will cause log to be rewritten
@@ -1261,6 +1273,10 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
         }
 
         return false;
+    }
+
+    public int getHeuristic() {
+        return _heuristic;
     }
 
     public boolean isForgotten() {
