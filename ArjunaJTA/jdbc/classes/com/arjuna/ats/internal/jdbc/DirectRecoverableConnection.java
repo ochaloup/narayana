@@ -290,6 +290,10 @@ public class DirectRecoverableConnection
             _dbName = _theModifier.initialise(_dbName);
     }
 
+    public XADataSource xaDataSource() {
+        return _theDataSource;
+    }
+
     private final void createConnection() throws SQLException {
         if (jdbcLogger.logger.isTraceEnabled()) {
             jdbcLogger.logger.trace("DirectRecoverableConnection.createConnection");
