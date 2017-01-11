@@ -2761,6 +2761,8 @@ public class BasicAction extends StateManager
                     * appear on multiple lists at the same time.
                     */
 
+                    addDeferredThrowables(record, deferredThrowables);
+
                     record = insertRecord(heuristicList, record);
 
                     /*
