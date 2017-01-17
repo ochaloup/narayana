@@ -821,13 +821,23 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
             jtaxLogger.logger.trace("XAResourceRecord.forget for " + _tranID + " _forgotten=" + _forgotten);
         }
 
-        if (!_forgotten) {
-            handleForget();
+        // if we have not yet seen a successful forget call then tell the
+        // resource to forget
+        if (!_forgotten)
+            handleForget(); // this call can fail silently which will leave
+                            // _forgotten as false
 
+        // if it is known that the resource has forgotten the heuristic then
+        // delete our record of it
+        if (_forgotten) {
             destroyState();
 
             removeConnection();
         }
+    }
+
+    public boolean isForgotten() {
+        return _forgotten;
     }
 
     private void handleForget() throws org.omg.CORBA.SystemException {
