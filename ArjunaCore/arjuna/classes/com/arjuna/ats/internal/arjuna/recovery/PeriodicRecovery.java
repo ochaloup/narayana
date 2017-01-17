@@ -158,7 +158,7 @@ public class PeriodicRecovery extends Thread
      * initiate termination of the periodic recovery thread and stop any subsequent scan requests from proceeding.
      *
      * this switches the recovery operation mode to TERMINATED. if a scan is in progress when this method is called
-     * and has not yet started phase 2 of its scan it will be forced to return before completing phase 2.
+     * and has not yet started phase 2 of its scan it will still complete phase 2.
      *
      * @param async false if the calling thread should wait for any in-progress scan to complete before returning
      */
@@ -355,7 +355,7 @@ public class PeriodicRecovery extends Thread
            }
 
            // its ok to start work if requested -- we cannot be stopped now by a mode change to SUSPEND
-           // or TERMINATE until we get through phase 1 and maybe phase 2 if we are lucky
+           // or TERMINATE until we get through phase 1 and phase 2
 
            if (workToDo) {
                // ok it is now this thread's turn to run a scan. before starting we check if there is a
@@ -481,7 +481,7 @@ public class PeriodicRecovery extends Thread
 
 
             // ok to start work -- we cannot be stopped now by a mode change to SUSPEND or TERMINATE
-            // until we get through phase 1 and maybe phase 2 if we are lucky
+            // until we get through phase 1 and phase 2
             if (tsLogger.logger.isDebugEnabled()) {
                 tsLogger.logger.debug("PeriodicRecovery: ad hoc thread scanning");
             }
@@ -777,21 +777,21 @@ public class PeriodicRecovery extends Thread
         synchronized (_stateLock) {
             // we have to wait for a bit to avoid catching (too many)
             // transactions etc. that are really progressing quite happily
+            // unless the scan has been TERMINATED in which case skip the back off
+            // in order to complete earlier
+            if (getMode() != Mode.TERMINATED) {
+                if (tsLogger.logger.isDebugEnabled()) {
+                    tsLogger.logger.debug("PeriodicRecovery: scan TERMINATED at phase 1 skipping backoff");
+                }
 
-            doBackoffWait();
+                doBackoffWait();
+            }
 
             // we carry on scanning even if scanning is SUSPENDED because the suspending thread
             // might be waiting on us to complete and we don't want to risk deadlocking it by waiting
             // here for a resume.
-            // if we have been TERMINATED we bail out now
-            // n.b. if we give up here the caller is responsible for clearing the active scan
-
-            if (getMode() == Mode.TERMINATED) {
-                if (tsLogger.logger.isDebugEnabled()) {
-                    tsLogger.logger.debug("PeriodicRecovery: scan TERMINATED at phase 1");
-                }
-                return;
-            }
+            // if we have been TERMINATED we still run phase 2 since some modules (XARecoveryModule for example)
+            // require phase 2 if phase 1 has ran
         }
 
         // move on to phase 2
