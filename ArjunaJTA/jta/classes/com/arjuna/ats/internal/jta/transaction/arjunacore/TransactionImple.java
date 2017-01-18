@@ -242,7 +242,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 	 * @param e an exception that will be thrown out of here
 	 * @return the given exception with suppressed exceptions added 
 	 */
-	<T extends Exception> T addSuppressedThrowables(T e) {
+	protected <T extends Exception> T addSuppressedThrowables(T e) {
         for (Throwable t : _theTransaction.getDeferredThrowables())
         {
             e.addSuppressed(t);
@@ -293,8 +293,8 @@ public class TransactionImple implements javax.transaction.Transaction,
 			case ActionStatus.ABORTING: // in case of async rollback
 				break;
 			default:
-				throw new IllegalStateException( jtaLogger.i18NLogger.get_transaction_arjunacore_rollbackstatus()
-								+ ActionStatus.stringForm(outcome));
+				throw addSuppressedThrowables(new IllegalStateException( jtaLogger.i18NLogger.get_transaction_arjunacore_rollbackstatus()
+								+ ActionStatus.stringForm(outcome)));
 			}
 
 			if (endSuspendedFailed)

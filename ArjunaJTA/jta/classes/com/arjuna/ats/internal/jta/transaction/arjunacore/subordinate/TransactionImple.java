@@ -176,18 +176,18 @@ public class TransactionImple extends
                 return false;
 			case ActionStatus.ABORTED:
 			case ActionStatus.ABORTING:
-				throw new HeuristicRollbackException();
+				throw addSuppressedThrowables(new HeuristicRollbackException());
 			case ActionStatus.H_ROLLBACK:
-				throw new HeuristicRollbackException();
+				throw addSuppressedThrowables(new HeuristicRollbackException());
 			case ActionStatus.H_HAZARD:
 			case ActionStatus.H_MIXED:
-				throw new HeuristicMixedException();
+			    throw addSuppressedThrowables(new javax.transaction.HeuristicMixedException());
 			case ActionStatus.INVALID:
 				TransactionImple.removeTransaction(this);
 
-				throw new IllegalStateException();
+				throw addSuppressedThrowables(new IllegalStateException());
 			default:
-				throw new HeuristicMixedException(); // not sure what
+				throw addSuppressedThrowables(new HeuristicMixedException()); // not sure what
 			// happened,
 			// so err on the safe side!
 			}
@@ -226,14 +226,14 @@ public class TransactionImple extends
 
 	                                break;
 			case ActionStatus.H_ROLLBACK:
-				throw new HeuristicRollbackException();
+				throw addSuppressedThrowables(new HeuristicRollbackException());
 			case ActionStatus.H_COMMIT:
-				throw new HeuristicCommitException();
+				throw addSuppressedThrowables(new HeuristicCommitException());
 			case ActionStatus.H_HAZARD:
 			case ActionStatus.H_MIXED:
-				throw new HeuristicMixedException();
+				throw addSuppressedThrowables(new HeuristicMixedException());
 			default:
-				throw new HeuristicMixedException();
+				throw addSuppressedThrowables(new HeuristicMixedException());
 			}
 		}
 		catch (ClassCastException ex)
@@ -295,13 +295,13 @@ public class TransactionImple extends
                 TransactionImple.removeTransaction(this);
                 // JBTM-428. Note also this may be because the tx was set rollback only,
                 // in which case IllegalState may be a better option?
-                throw new RollbackException();
+                throw addSuppressedThrowables(new RollbackException());
 	                case ActionStatus.INVALID:
-	                                throw new InvalidTerminationStateException();
+	                                throw addSuppressedThrowables(new InvalidTerminationStateException());
 			case ActionStatus.H_HAZARD:
 			case ActionStatus.H_MIXED:
 			default:
-				throw new javax.transaction.HeuristicMixedException();
+				throw addSuppressedThrowables(new javax.transaction.HeuristicMixedException());
 			}
 		}
 		catch (ClassCastException ex)
