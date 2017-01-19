@@ -138,6 +138,10 @@ public class XARecoveryModule implements RecoveryModule {
     }
 
     public synchronized void periodicWorkFirstPass() {
+        periodicWorkFirstPass(ScanStates.BETWEEN_PASSES);
+    }
+
+    private synchronized void periodicWorkFirstPass(ScanStates endState) {
         // JBTM-1354 JCA needs to be able to recover XAResources associated with
         // a subordinate transaction so we have to do at least
         // the start scan to make sure that we have loaded all the XAResources
@@ -193,7 +197,17 @@ public class XARecoveryModule implements RecoveryModule {
             }
         }
 
-        setScanState(ScanStates.BETWEEN_PASSES);
+        if (endState != ScanStates.BETWEEN_PASSES) {
+            for (XAResource xaResource : resources) {
+                try {
+                    xaResource.recover(XAResource.TMENDRSCAN);
+                } catch (Exception ex) {
+                    jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+                }
+            }
+        }
+
+        setScanState(endState);
     }
 
     public synchronized void periodicWorkSecondPass() {
@@ -262,8 +276,15 @@ public class XARecoveryModule implements RecoveryModule {
         XAResource toReturn = getTheKey(xid);
 
         if (toReturn == null) {
-            periodicWorkFirstPass();
-            toReturn = getTheKey(xid);
+            synchronized (this) {
+                /*
+                 * run an xid scan with the lock held to avoid _xidScans being
+                 * changed after the call to periodicWorkFirstPass but before
+                 * the call to getTheKey
+                 */
+                periodicWorkFirstPass(ScanStates.IDLE);
+                toReturn = getTheKey(xid);
+            }
         }
 
         return toReturn;
