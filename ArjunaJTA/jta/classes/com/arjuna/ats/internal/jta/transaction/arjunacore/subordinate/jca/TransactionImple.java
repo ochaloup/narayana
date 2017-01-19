@@ -31,6 +31,8 @@
 
 package com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca;
 
+import java.util.List;
+
 import javax.transaction.xa.Xid;
 
 import com.arjuna.ats.arjuna.common.Uid;
@@ -153,5 +155,9 @@ public class TransactionImple
 	public boolean activated()
 	{
 		return ((SubordinateAtomicAction) _theTransaction).activated();
+	}
+
+	public List<Throwable> getDeferredThrowables() {
+	    return _theTransaction.getDeferredThrowables();
 	}
 }
