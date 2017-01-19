@@ -271,6 +271,7 @@ public class XARecoveryModule implements RecoveryModule
 		if (toReturn == null) {
 			periodicWorkFirstPass();
 			toReturn = getTheKey(xid);
+			setScanState(ScanStates.IDLE);
 		}
 
 		return toReturn;
