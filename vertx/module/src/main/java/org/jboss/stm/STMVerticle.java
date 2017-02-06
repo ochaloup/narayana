@@ -65,7 +65,7 @@ public class STMVerticle extends AbstractVerticle {
     }
 
     @Transactional
-    public class SampleLockable implements Sample {
+    public static class SampleLockable implements Sample {
         public SampleLockable(int init) {
             _isState = init;
         }
