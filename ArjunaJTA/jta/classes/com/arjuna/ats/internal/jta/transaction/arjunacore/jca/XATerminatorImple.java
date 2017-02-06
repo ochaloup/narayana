@@ -532,7 +532,12 @@ public class XATerminatorImple
     }
 
     public Object getCurrentTransactionId() {
-        return TransactionImple.getTransaction().get_uid();
+        com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple transaction = TransactionImple
+                .getTransaction();
+        if (transaction == null)
+            return null;
+
+        return transaction.get_uid();
     }
 
     public void removeImportedTransaction(Xid xid) throws XAException {
