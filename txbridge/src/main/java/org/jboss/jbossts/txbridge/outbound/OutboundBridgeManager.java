@@ -28,6 +28,8 @@ import com.arjuna.ats.jta.transaction.Transaction;
 import com.arjuna.ats.arjuna.common.Uid;
 
 import javax.transaction.SystemException;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.RollbackException;
 import javax.transaction.Synchronization;
 import javax.transaction.xa.XAResource;
@@ -66,7 +68,7 @@ public class OutboundBridgeManager
 
         try
         {
-            Transaction transaction = (Transaction)TransactionManager.transactionManager().getTransaction();
+            Transaction transaction = (Transaction)TransactionManager.transactionManager(new InitialContext()).getTransaction();
 
             Uid externalTxId = transaction.get_uid();
 
@@ -77,7 +79,7 @@ public class OutboundBridgeManager
             return outboundBridgeMappings.get(externalTxId);
 
         }
-        catch(SystemException e)
+        catch(SystemException | NamingException e)
         {
             txbridgeLogger.logger.error(e);
         }

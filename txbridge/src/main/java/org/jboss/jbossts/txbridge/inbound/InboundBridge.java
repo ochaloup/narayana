@@ -31,6 +31,8 @@ import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.InvalidTransactionException;
 import javax.transaction.Transaction;
 
@@ -70,14 +72,16 @@ public class InboundBridge
      * @throws XAException
      * @throws SystemException
      * @throws InvalidTransactionException
+     * @throws NamingException
+     * @throws IllegalStateException
      */
-    public void start() throws XAException, SystemException, InvalidTransactionException
+    public void start() throws XAException, SystemException, InvalidTransactionException, IllegalStateException, NamingException
     {
         txbridgeLogger.logger.trace("InboundBridge.start(Xid="+xid+")");
 
         Transaction tx = getTransaction();
 
-        TransactionManager.transactionManager().resume(tx);
+        TransactionManager.transactionManager(new InitialContext()).resume(tx);
     }
 
     /**
@@ -87,12 +91,13 @@ public class InboundBridge
      * @throws XAException
      * @throws SystemException
      * @throws InvalidTransactionException
+     * @throws NamingException
      */
-    public void stop() throws XAException, SystemException, InvalidTransactionException
+    public void stop() throws XAException, SystemException, InvalidTransactionException, NamingException
     {
         txbridgeLogger.logger.trace("InboundBridge.stop("+xid+")");
 
-        TransactionManager.transactionManager().suspend();
+        TransactionManager.transactionManager(new InitialContext()).suspend();
     }
 
     public void setRollbackOnly() throws XAException, SystemException
