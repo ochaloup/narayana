@@ -23,18 +23,25 @@
  */
 package org.jboss.jbossts.txbridge.inbound;
 
-import com.arjuna.ats.jta.TransactionManager;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
-import org.jboss.jbossts.txbridge.utils.txbridgeLogger;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.transaction.xa.Xid;
-import javax.transaction.xa.XAException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
+import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.transaction.InvalidTransactionException;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
+
+import org.jboss.jbossts.txbridge.utils.txbridgeLogger;
+
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
+import com.arjuna.ats.jta.TransactionManager;
 
 /**
  * Manages Thread association of the interposed coordinator.
@@ -78,10 +85,38 @@ public class InboundBridge
     public void start() throws XAException, SystemException, InvalidTransactionException, IllegalStateException, NamingException
     {
         txbridgeLogger.logger.trace("InboundBridge.start(Xid="+xid+")");
+        txbridgeLogger.logger.warn("context: " + toMap(new InitialContext()));
 
         Transaction tx = getTransaction();
 
         TransactionManager.transactionManager(new InitialContext()).resume(tx);
+    }
+
+    public static Map toMap(Context ctx) throws NamingException {
+        String namespace = ctx instanceof InitialContext ? ctx.getNameInNamespace() : "";
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        txbridgeLogger.logger.info("> Listing namespace: " + namespace);
+        NamingEnumeration<NameClassPair> list = ctx.list(namespace);
+        while (list.hasMoreElements()) {
+            NameClassPair next = list.next();
+            String name = next.getName();
+            String jndiPath = namespace + name;
+            Object lookup;
+            try {
+                txbridgeLogger.logger.info("> Looking up name: " + jndiPath);
+                Object tmp = ctx.lookup(jndiPath);
+                if (tmp instanceof Context) {
+                    lookup = toMap((Context) tmp);
+                } else {
+                    lookup = tmp.toString();
+                }
+            } catch (Throwable t) {
+                lookup = t.getMessage();
+            }
+            map.put(name, lookup);
+
+        }
+        return map;
     }
 
     /**
