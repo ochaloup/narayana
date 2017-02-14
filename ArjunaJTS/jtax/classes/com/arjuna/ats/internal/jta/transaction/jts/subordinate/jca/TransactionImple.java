@@ -35,7 +35,6 @@ import javax.transaction.xa.Xid;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
-import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
 
 public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jts.subordinate.TransactionImple
@@ -74,28 +73,6 @@ public class TransactionImple extends com.arjuna.ats.internal.jta.transaction.jt
 
     public final void recordTransaction() {
         TransactionImple.putTransaction(this);
-    }
-
-    /**
-     * Overloads Object.equals()
-     */
-
-    public boolean equals(Object obj) {
-        if (jtaxLogger.logger.isTraceEnabled()) {
-            jtaxLogger.logger.trace("TransactionImple.equals");
-        }
-
-        if (obj == null)
-            return false;
-
-        if (obj == this)
-            return true;
-
-        if (obj instanceof TransactionImple) {
-            return super.equals(obj);
-        }
-
-        return false;
     }
 
     public String toString() {
