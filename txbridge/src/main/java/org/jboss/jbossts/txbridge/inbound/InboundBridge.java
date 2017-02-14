@@ -39,6 +39,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 
 import org.jboss.jbossts.txbridge.utils.txbridgeLogger;
+import org.wildfly.transaction.client.LocalTransactionContext;
 
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.jta.TransactionManager;
@@ -152,7 +153,8 @@ public class InboundBridge
     private Transaction getTransaction()
             throws XAException, SystemException
     {
-        Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
+        // Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
+        Transaction tx = LocalTransactionContext.getCurrent().findOrImportTransaction(xid, 0).getTransaction();
 
         switch (tx.getStatus())
         {

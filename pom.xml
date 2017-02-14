@@ -396,7 +396,7 @@
     
     <!-- External dependencies versions -->
     <version.org.codehaus.mojo.findbugs-maven-plugin>3.0.1</version.org.codehaus.mojo.findbugs-maven-plugin>
-    <version.org.wildfly.arquillian>1.0.2.Final</version.org.wildfly.arquillian>
+    <version.org.wildfly.arquillian>2.1.0.Alpha1</version.org.wildfly.arquillian>
     <version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>1.0.1.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_1.1_spec>
     <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.0.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
     <version.org.jboss.jandex>1.1.0.Final</version.org.jboss.jandex>

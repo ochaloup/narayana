@@ -287,6 +287,42 @@
             <version>${version.org.jboss.jboss-transaction-spi}</version>
         </dependency>
 
+        <!--<dependency>
+            <groupId>org.jboss.remoting3</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>3.3.9.Final</version>
+        </dependency>
+        org.wildfly wildfly-client-all -->
+
+        <dependency>
+            <groupId>org.wildfly.transaction</groupId>
+            <artifactId>wildfly-transaction-client</artifactId>
+            <version>1.0.0.Beta10</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.remoting</groupId>
+                    <artifactId>jboss-remoting</artifactId>
+                </exclusion>
+                <!--<exclusion>
+                    <groupId>org.wildfly.common</groupId>
+                    <artifactId>wildfly-common</artifactId>
+                </exclusion>-->
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.xnio</groupId>
+                    <artifactId>xnio-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-naming-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 	<profiles>
 		<profile>
