@@ -24,12 +24,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
+import javax.transaction.xa.XAException;
 
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecordWrappingPlugin;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
 import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import com.arjuna.ats.jta.resources.XAResourceMap;
@@ -109,6 +114,14 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 	private Map<String, Boolean> performImmediateCleanupOfCommitMarkableResourceBranchesMap = new HashMap<String, Boolean>();
 
 	private Map<String, Integer> commitMarkableResourceRecordDeleteBatchSizeMap = new HashMap<String, Integer>();
+
+	@FunctionalInterface
+	public interface XAExceptionFunction<T, R> {
+	   R apply(T t) throws XAException;
+	}
+
+	private XAExceptionFunction<javax.transaction.xa.Xid,javax.transaction.Transaction> importedTransaction = 
+	        xid -> SubordinationManager.getTransactionImporter().importTransaction(xid);
 
 	/**
      * Returns true if subtransactions are allowed.
@@ -1224,5 +1237,12 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 	public void setNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches(
 			boolean notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches) {
 		this.notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches = notifyCommitMarkableResourceRecoveryModuleOfCompleteBranches;
+	}
+
+	/**
+	 * Importing subordinate transaction.
+	 */
+	public Transaction importSubordinateTransaction(javax.transaction.xa.Xid xid) throws XAException {
+	    return importedTransaction.apply(xid);
 	}
 }

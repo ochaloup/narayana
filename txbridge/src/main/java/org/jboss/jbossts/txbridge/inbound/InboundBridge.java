@@ -43,6 +43,7 @@ import org.wildfly.transaction.client.LocalTransactionContext;
 
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.jta.TransactionManager;
+import com.arjuna.ats.jta.common.jtaPropertyManager;
 
 /**
  * Manages Thread association of the interposed coordinator.
@@ -153,8 +154,7 @@ public class InboundBridge
     private Transaction getTransaction()
             throws XAException, SystemException
     {
-        // Transaction tx = SubordinationManager.getTransactionImporter().importTransaction(xid);
-        Transaction tx = LocalTransactionContext.getCurrent().findOrImportTransaction(xid, 0).getTransaction();
+        Transaction tx = jtaPropertyManager.getJTAEnvironmentBean().importSubordinateTransaction(xid);
 
         switch (tx.getStatus())
         {
