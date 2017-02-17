@@ -24,20 +24,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
-import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
 
 import com.arjuna.ats.internal.jta.resources.arjunacore.XAResourceRecordWrappingPlugin;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
 import com.arjuna.ats.jta.recovery.XAResourceRecovery;
 import com.arjuna.ats.jta.resources.XAResourceMap;
+import com.arjuna.ats.jta.transaction.TransactionImporter;
 import com.arjuna.common.internal.util.ClassloadingUtility;
 import com.arjuna.common.internal.util.propertyservice.ConcatenationPrefix;
 import com.arjuna.common.internal.util.propertyservice.FullPropertyName;
@@ -115,13 +111,8 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 
 	private Map<String, Integer> commitMarkableResourceRecordDeleteBatchSizeMap = new HashMap<String, Integer>();
 
-	@FunctionalInterface
-	public interface XAExceptionFunction<T, R> {
-	   R apply(T t) throws XAException;
-	}
-
-	private XAExceptionFunction<javax.transaction.xa.Xid,javax.transaction.Transaction> importedTransaction = 
-	        xid -> SubordinationManager.getTransactionImporter().importTransaction(xid);
+	private volatile String subordinateTransactionImporterClassName = "com.arjuna.ats.jta.transaction.TransactionImporterSubordinate";
+	private volatile TransactionImporter subordinateTransactionImporter;
 
 	/**
      * Returns true if subtransactions are allowed.
@@ -1240,9 +1231,27 @@ public class JTAEnvironmentBean implements JTAEnvironmentBeanMBean
 	}
 
 	/**
+     * Setting name of class which is taken to be used as transaction importer
+     * when a {@link Xid} needs to be imported as a transaction to currently running TM.<br>
+     * The classname which is set here has to implement {@link TransactionImporter} interface.
+     */
+    public void setSubordinateTransactionImporterClassName(String importerClassName){
+        this.subordinateTransactionImporterClassName = importerClassName;
+    }
+
+	/**
 	 * Importing subordinate transaction.
 	 */
-	public Transaction importSubordinateTransaction(javax.transaction.xa.Xid xid) throws XAException {
-	    return importedTransaction.apply(xid);
+	public TransactionImporter getSubordinateTransactionImporter() {
+        if(subordinateTransactionImporter == null && subordinateTransactionImporterClassName != null) {
+            synchronized(this) {
+                if(subordinateTransactionImporter == null && subordinateTransactionImporterClassName != null) {
+                    Class<?> importerClass = ClassloadingUtility.loadClass(subordinateTransactionImporterClassName);
+                    subordinateTransactionImporter = TransactionImporter.class.cast(importerClass);
+                }
+            }
+        }
+
+        return subordinateTransactionImporter;
 	}
 }
