@@ -245,8 +245,10 @@ public class BasicAction extends StateManager {
              * so check status.
              */
 
-            if (actionStatus == ActionStatus.RUNNING)
-                actionStatus = ActionStatus.ABORT_ONLY;
+            synchronized (this) {
+                if (actionStatus == ActionStatus.RUNNING)
+                    actionStatus = ActionStatus.ABORT_ONLY;
+            }
 
             /*
              * Since the reason to call this method is to make sure the
@@ -3380,7 +3382,7 @@ public class BasicAction extends StateManager {
 
     /* Atomic action status variables */
 
-    private int actionStatus;
+    private volatile int actionStatus;
     private int actionType;
     private BasicAction parentAction;
     private AbstractRecord recordBeingHandled;
