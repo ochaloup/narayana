@@ -209,25 +209,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
              * notices that there is no log entry for it.
              */
 
-            if (endAssociation()) {
-                try {
-                    _theXAResource.end(_tranID, XAResource.TMSUCCESS);
-                    _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                } catch (XAException e1) {
-                    switch (e1.errorCode) {
-                        case XAException.XA_RBROLLBACK :
-                        case XAException.XA_RBCOMMFAIL :
-                        case XAException.XA_RBDEADLOCK :
-                        case XAException.XA_RBINTEGRITY :
-                        case XAException.XA_RBOTHER :
-                        case XAException.XA_RBPROTO :
-                        case XAException.XA_RBTIMEOUT :
-                        case XAException.XA_RBTRANSIENT :
-                            _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                    }
-                    throw e1;
-                }
-            }
+            endAssociation(XAResource.TMSUCCESS, TxInfo.NOT_ASSOCIATED);
 
             if (_theXAResource.prepare(_tranID) == XAResource.XA_RDONLY) {
                 removeConnection();
@@ -319,25 +301,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
 
                 try {
                     if (!_prepared) {
-                        if (endAssociation()) {
-                            try {
-                                _theXAResource.end(_tranID, XAResource.TMFAIL);
-                                _theTransaction.setXAResourceState(_theXAResource, TxInfo.FAILED);
-                            } catch (XAException e1) {
-                                switch (e1.errorCode) {
-                                    case XAException.XA_RBROLLBACK :
-                                    case XAException.XA_RBCOMMFAIL :
-                                    case XAException.XA_RBDEADLOCK :
-                                    case XAException.XA_RBINTEGRITY :
-                                    case XAException.XA_RBOTHER :
-                                    case XAException.XA_RBPROTO :
-                                    case XAException.XA_RBTIMEOUT :
-                                    case XAException.XA_RBTRANSIENT :
-                                        _theTransaction.setXAResourceState(_theXAResource, TxInfo.FAILED);
-                                }
-                                throw e1;
-                            }
-                        }
+                        endAssociation(XAResource.TMFAIL, TxInfo.FAILED);
                     }
                 } catch (XAException e1) {
                     if ((e1.errorCode >= XAException.XA_RBBASE) && (e1.errorCode < XAException.XA_RBEND)) {
@@ -664,25 +628,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
                     XAException endRBOnly = null;
 
                     try {
-                        if (endAssociation()) {
-                            try {
-                                _theXAResource.end(_tranID, XAResource.TMSUCCESS);
-                                _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                            } catch (XAException e1) {
-                                switch (e1.errorCode) {
-                                    case XAException.XA_RBROLLBACK :
-                                    case XAException.XA_RBCOMMFAIL :
-                                    case XAException.XA_RBDEADLOCK :
-                                    case XAException.XA_RBINTEGRITY :
-                                    case XAException.XA_RBOTHER :
-                                    case XAException.XA_RBPROTO :
-                                    case XAException.XA_RBTIMEOUT :
-                                    case XAException.XA_RBTRANSIENT :
-                                        _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                                }
-                                throw e1;
-                            }
-                        }
+                        endAssociation(XAResource.TMSUCCESS, TxInfo.NOT_ASSOCIATED);
                     } catch (XAException e1) {
                         /*
                          * Now it's not legal to return a heuristic from end,
@@ -1324,19 +1270,10 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
      * with the thread, i.e., has end already been called on it?
      */
 
-    private final boolean endAssociation() {
-        if (_doEnd && _theTransaction != null) {
-            if (_theTransaction.getXAResourceState(_theXAResource) == TxInfo.ASSOCIATED) {
-                // end has been called so we don't need to do it next time
-
-                _doEnd = false;
-                return true;
-            }
+    private final void endAssociation(int xaState, int txInfoState) throws XAException {
+        if (_theTransaction != null) {
+            _theTransaction.endAssociation(_tranID, _theXAResource, xaState, txInfoState);
         }
-        // else if (_theTransaction == null)
-        // _doEnd = false; // recovery mode
-
-        return false;
     }
 
     private List<SerializableXAResourceDeserializer> getXAResourceDeserializers() {
@@ -1374,7 +1311,6 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA 
     private org.omg.CosTransactions.Resource _theReference;
     private org.omg.CosTransactions.RecoveryCoordinator _recoveryCoordinator;
     private TransactionImple _theTransaction;
-    boolean _doEnd = true;
     private boolean _forgotten;
 
     // cached variables

@@ -46,7 +46,6 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 import com.arjuna.ats.internal.jta.resources.XAResourceErrorHandler;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple;
 import com.arjuna.ats.internal.jta.xa.TxInfo;
-import com.arjuna.ats.jta.common.JTAEnvironmentBean;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.recovery.SerializableXAResourceDeserializer;
@@ -192,25 +191,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
         }
 
         try {
-            if (endAssociation()) {
-                try {
-                    _theXAResource.end(_tranID, XAResource.TMSUCCESS);
-                    _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                } catch (XAException e1) {
-                    switch (e1.errorCode) {
-                        case XAException.XA_RBROLLBACK :
-                        case XAException.XA_RBCOMMFAIL :
-                        case XAException.XA_RBDEADLOCK :
-                        case XAException.XA_RBINTEGRITY :
-                        case XAException.XA_RBOTHER :
-                        case XAException.XA_RBPROTO :
-                        case XAException.XA_RBTIMEOUT :
-                        case XAException.XA_RBTRANSIENT :
-                            _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                    }
-                    throw e1;
-                }
-            }
+            endAssociation(XAResource.TMSUCCESS, TxInfo.NOT_ASSOCIATED);
 
             _prepared = true;
 
@@ -304,25 +285,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
 
                 try {
                     if (!_prepared) {
-                        if (endAssociation()) {
-                            try {
-                                _theXAResource.end(_tranID, XAResource.TMFAIL);
-                                _theTransaction.setXAResourceState(_theXAResource, TxInfo.FAILED);
-                            } catch (XAException e1) {
-                                switch (e1.errorCode) {
-                                    case XAException.XA_RBROLLBACK :
-                                    case XAException.XA_RBCOMMFAIL :
-                                    case XAException.XA_RBDEADLOCK :
-                                    case XAException.XA_RBINTEGRITY :
-                                    case XAException.XA_RBOTHER :
-                                    case XAException.XA_RBPROTO :
-                                    case XAException.XA_RBTIMEOUT :
-                                    case XAException.XA_RBTRANSIENT :
-                                        _theTransaction.setXAResourceState(_theXAResource, TxInfo.FAILED);
-                                }
-                                throw e1;
-                            }
-                        }
+                        endAssociation(XAResource.TMFAIL, TxInfo.FAILED);
                     }
                 } catch (XAException e1) {
                     addDeferredThrowable(e1);
@@ -604,25 +567,7 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
                      * across other RMs?
                      */
 
-                    if (endAssociation()) {
-                        try {
-                            _theXAResource.end(_tranID, XAResource.TMSUCCESS);
-                            _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                        } catch (XAException e1) {
-                            switch (e1.errorCode) {
-                                case XAException.XA_RBROLLBACK :
-                                case XAException.XA_RBCOMMFAIL :
-                                case XAException.XA_RBDEADLOCK :
-                                case XAException.XA_RBINTEGRITY :
-                                case XAException.XA_RBOTHER :
-                                case XAException.XA_RBPROTO :
-                                case XAException.XA_RBTIMEOUT :
-                                case XAException.XA_RBTRANSIENT :
-                                    _theTransaction.setXAResourceState(_theXAResource, TxInfo.NOT_ASSOCIATED);
-                            }
-                            throw e1;
-                        }
-                    }
+                    endAssociation(XAResource.TMSUCCESS, TxInfo.NOT_ASSOCIATED);
                 } catch (XAException e1) {
                     /*
                      * Now it's not legal to return a heuristic from end, but
@@ -1247,20 +1192,10 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
      * with the thread, i.e., has end already been called on it?
      */
 
-    private final boolean endAssociation() {
-        boolean doEnd = true;
-
+    private void endAssociation(int xaState, int txInfoState) throws XAException {
         if (_theTransaction != null) {
-            int txInfo = _theTransaction.getXAResourceState(_theXAResource);
-            if ((txInfo == TxInfo.NOT_ASSOCIATED) || (txInfo == TxInfo.FAILED)) {
-                // end has been called so we don't need to do it again!
-
-                doEnd = false;
-            }
-        } else
-            doEnd = false; // Recovery mode
-
-        return doEnd;
+            _theTransaction.endAssociation(_tranID, _theXAResource, xaState, txInfoState);
+        }
     }
 
     private boolean wasResourceContactedByRecoveryModule(final String jndiName) {
