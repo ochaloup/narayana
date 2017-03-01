@@ -61,6 +61,7 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManag
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporter;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
+import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 import com.arjuna.ats.jta.exceptions.UnexpectedConditionException;
 import com.arjuna.ats.jta.xa.XidImple;
 import org.jboss.tm.ExtendedJBossXATerminator;
@@ -367,8 +368,12 @@ public class XATerminatorImple
 
     public Transaction getTransaction(Xid xid) throws XAException {
         // first see if the xid is a root coordinator
-        return com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple
-                .getTransaction(new XidImple(xid).getTransactionUid());
+        Transaction transaction = TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
+        // second see if the xid is a subordinate txn
+        if (transaction == null) {
+            transaction = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        }
+        return transaction;
     }
 
     public TransactionImportResult importTransaction(Xid xid, int timeoutIfNew) throws XAException {
@@ -381,12 +386,11 @@ public class XATerminatorImple
     }
 
     public Transaction getTransactionById(Object id) {
-        return com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple.getTransaction((Uid) id);
+        return TransactionImple.getTransaction((Uid) id);
     }
 
     public Object getCurrentTransactionId() {
-        com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple transaction = com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionImple
-                .getTransaction();
+        com.arjuna.ats.internal.jta.transaction.jts.TransactionImple transaction = TransactionImple.getTransaction();
         if (transaction == null)
             return null;
 
@@ -402,21 +406,13 @@ public class XATerminatorImple
         final Set<Xid> xidsToRecover = new HashSet<Xid>();
         if (recoverInFlight) {
             final TransactionImporter transactionImporter = SubordinationManager.getTransactionImporter();
-            if (transactionImporter instanceof com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple) {
-                final Set<Xid> inFlightXids = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.TransactionImporterImple) transactionImporter)
-                        .getInflightXids(parentNodeName);
-                if (inFlightXids != null) {
-                    xidsToRecover.addAll(inFlightXids);
-                }
+            if (transactionImporter instanceof TransactionImporterImple) {
+                throw new UnsupportedOperationException(jtaxLogger.i18NLogger.get_not_supported());
             }
         }
         final javax.resource.spi.XATerminator xaTerminator = SubordinationManager.getXATerminator();
-        if (xaTerminator instanceof com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple) {
-            final Xid[] inDoubtTransactions = ((com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple) xaTerminator)
-                    .doRecover(null, parentNodeName);
-            if (inDoubtTransactions != null) {
-                xidsToRecover.addAll(Arrays.asList(inDoubtTransactions));
-            }
+        if (xaTerminator instanceof XATerminatorImple) {
+            throw new UnsupportedOperationException(jtaxLogger.i18NLogger.get_not_supported());
         } else {
             final Xid[] inDoubtTransactions = xaTerminator.recover(recoveryFlags);
             if (inDoubtTransactions != null) {
