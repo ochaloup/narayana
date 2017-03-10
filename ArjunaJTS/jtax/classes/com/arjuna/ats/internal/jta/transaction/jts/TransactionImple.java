@@ -954,11 +954,7 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
             try {
                 doEnd(_tranID, _theXAResource, xaState, txInfoState);
             } catch (XAException e) {
-                if (toThrow == null) {
-                    toThrow = e;
-                }
-                // Could add suppressed but this is not sent back via IDL so not
-                // doing
+                toThrow = e;
             }
         }
         for (Object resource : _duplicateResources.keySet()) {
@@ -967,11 +963,15 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
                 try {
                     doEnd(_tranID, dupXar, xaState, txInfoState);
                 } catch (XAException e) {
-                    if (toThrow == null) {
-                        toThrow = e;
+                    // Some resource managers (e.g. Artemis) will not allow
+                    // xa_end on duplicate xa resources as per JTA 1.2
+                    if (e.errorCode != XAException.XAER_PROTO || STRICTJTA12DUPLICATEXAENDPROTOERR) {
+                        if (toThrow == null) {
+                            toThrow = e;
+                        }
+                        // Could add suppressed but this is not sent back via
+                        // IDL so not doing
                     }
-                    // Could add suppressed but this is not sent back via IDL so
-                    // not doing
                 }
             }
         }
@@ -1571,5 +1571,8 @@ public class TransactionImple implements javax.transaction.Transaction, com.arju
     }
 
     private static ConcurrentHashMap _transactions = new ConcurrentHashMap();
+
+    private static final boolean STRICTJTA12DUPLICATEXAENDPROTOERR = jtaPropertyManager.getJTAEnvironmentBean()
+            .isStrictJTA12DuplicateXAENDPROTOErr();
 
 }
