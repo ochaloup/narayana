@@ -47,7 +47,7 @@ public class CoordinationContextHelper {
      *             for errors during parsing.
      */
     public static CoordinationContextType deserialise(final Element headerElement) throws JAXBException {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = getContextClassLoader();
         try {
             // use the XTS module loader so that JAXB can find its factory
             setContextClassLoader(CoordinationContextHelper.class.getClassLoader());
@@ -87,7 +87,7 @@ public class CoordinationContextHelper {
         // coordinationContextType into a header created by the caller, moving
         // all its children into the
         // header element and then deleting it.
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = getContextClassLoader();
         try {
             // use the XTS module loader so that JAXB can find its factory
             setContextClassLoader(CoordinationContextHelper.class.getClassLoader());
@@ -142,6 +142,18 @@ public class CoordinationContextHelper {
                 }
             });
         }
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        if (System.getSecurityManager() == null) {
+            return Thread.currentThread().getContextClassLoader();
+        }
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
+        });
     }
 
     private static JAXBContext getJaxbContext() throws Exception {
