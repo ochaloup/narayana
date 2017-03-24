@@ -57,7 +57,7 @@ public class BaseCrashTest {
     @Before
     public void setUp() {
         javaVmArguments = System.getProperty("server.jvm.args").replaceAll("=listen",
-                "=script:target/test-classes/scripts/@BMScript@.btm,boot:target/lib/byteman.jar,listen");
+                "=script:target/test-classes/scripts/@BMScript@.btm,listen");
 
         javaVmArguments = javaVmArguments.replace("@BMScript@", scriptName);
 
