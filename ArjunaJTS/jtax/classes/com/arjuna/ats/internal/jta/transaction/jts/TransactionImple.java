@@ -1767,7 +1767,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					jtaxLogger.i18NLogger.warn_cantCreateXidForTransaction(jtaXid, theModifier, this, e);
 				}
 			}
 
@@ -1775,7 +1775,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			jtaxLogger.i18NLogger.warn_cantGetXidOfAtomicTransaction(_theTransaction, this, e);
 		}
 
 		return null;

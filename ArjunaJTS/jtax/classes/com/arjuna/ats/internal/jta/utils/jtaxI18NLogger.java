@@ -29,8 +29,17 @@ import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
+import com.arjuna.ats.arjuna.coordinator.BasicAction;
+import com.arjuna.ats.arjuna.state.InputObjectState;
+import com.arjuna.ats.arjuna.state.OutputObjectState;
+import com.arjuna.ats.internal.jta.resources.jts.orbspecific.XAResourceRecord;
+import com.arjuna.ats.jta.xa.XAModifier;
+import com.arjuna.ats.jts.extensions.AtomicTransaction;
+
+import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 /**
  * i18n log messages for the jtax module.
@@ -269,6 +278,30 @@ public interface jtaxI18NLogger {
 	@Message(id = 24060, value = "Could not end XA resource {0}", format = MESSAGE_FORMAT)
 	@LogMessage(level = WARN)
 	void warn_could_not_end_xar(XAResource xar, @Cause() XAException e1);
+
+	@Message(id = 24061, value = "JCAServerTransactionRecoveryModule: fail in processing first pass ", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_recovery_jcaServerTransactionRecovery(@Cause() Throwable exceptionCause);
+
+	@Message(id = 24062, value = "XAResourceRecord: {0} can't save state: {1}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_xaResourceRecordSaveStateFailure(XAResourceRecord record, OutputObjectState state, @Cause() Throwable e);
+
+	@Message(id = 24063, value = "Can't save state: {1} of transaction: {0}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_transactionSaveStateFailure(BasicAction txn, OutputObjectState state, @Cause() Throwable e);
+
+	@Message(id = 24064, value = "Can't restore state: {1} of transaction: {0}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_transactionRestoreStateFailure(BasicAction txn, InputObjectState state, @Cause() Throwable e);
+
+	@Message(id = 24065, value = "Can't create modified Xid from {0} by modifier {1} for transaction: {2}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cantCreateXidForTransaction(Xid xid, XAModifier modifier, Transaction txn, @Cause() Throwable e);
+
+	@Message(id = 24066, value = "Can't get xid from atomic transaction: {0} of transaction {1}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cantGetXidOfAtomicTransaction(AtomicTransaction atxn, Transaction txn, @Cause() Throwable e);
 
     /*
         Allocate new messages directly above this notice.

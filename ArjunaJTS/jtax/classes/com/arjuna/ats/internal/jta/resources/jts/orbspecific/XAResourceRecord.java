@@ -973,7 +973,7 @@ public class XAResourceRecord extends com.arjuna.ArjunaOTS.OTSAbstractRecordPOA
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			jtaxLogger.i18NLogger.warn_xaResourceRecordSaveStateFailure(this, os, e);
 
 			res = false;
 		}

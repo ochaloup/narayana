@@ -29,6 +29,7 @@ import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
+import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 
 import javax.transaction.xa.XAException;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class JCAServerTransactionRecoveryModule implements RecoveryModule {
                 while (!finished);
             }
         } catch (ObjectStoreException | XAException | IOException e) {
-            e.printStackTrace();
+            jtaxLogger.i18NLogger.warn_recovery_jcaServerTransactionRecovery(e);
         }
     }
 
