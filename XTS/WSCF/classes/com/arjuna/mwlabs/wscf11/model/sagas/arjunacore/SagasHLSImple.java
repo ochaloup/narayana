@@ -58,6 +58,7 @@ import com.arjuna.mw.wsas.exceptions.ProtocolViolationException;
 import com.arjuna.mw.wsas.exceptions.HLSError;
 
 import com.arjuna.mw.wscf.exceptions.*;
+import com.arjuna.mw.wscf.logging.wscfLogger;
 import com.arjuna.mwlabs.wscf.model.sagas.arjunacore.CoordinatorServiceImple;
 import com.arjuna.mwlabs.wscf.model.sagas.arjunacore.CoordinatorControl;
 import com.arjuna.mwlabs.wscf.utils.ContextProvider;
@@ -201,7 +202,7 @@ public class SagasHLSImple implements SagasHLS, UserCoordinatorService
 
                 return ctx;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                wscfLogger.i18NLogger.error_unabletoInitialiseSoapContext11(CONTEXT_IMPLE_CLASS, ex);
                 throw new SystemException(ex.toString());
             }
         } else {

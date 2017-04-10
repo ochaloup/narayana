@@ -140,8 +140,6 @@ public class ParticipantRecord extends
 		catch (Exception ex6) {
             wscfLogger.i18NLogger.warn_model_sagas_coordinator_arjunacore_ParticipantRecord_3(order(), ex6);
 
-            ex6.printStackTrace();
-
             return TwoPhaseOutcome.FINISH_ERROR;
         }
 	}

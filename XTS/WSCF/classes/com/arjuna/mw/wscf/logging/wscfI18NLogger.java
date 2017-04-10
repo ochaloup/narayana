@@ -288,6 +288,22 @@ public interface wscfI18NLogger {
 	@Message(id = 44067, value = "SynchronizationRecord.beforeCompletion caught exception", format = MESSAGE_FORMAT)
 	@LogMessage(level = WARN)
 	public void warn_model_twophase_arjunacore_SynchronizationRecord_2(@Cause() Throwable arg1);
+	
+	@Message(id = 44068, value = "Unable to initialise SOAPContext for SAGAS 1.1 service of class {0}", format = MESSAGE_FORMAT)
+	@LogMessage(level = ERROR)
+	public void error_unabletoInitialiseSoapContext11(Class<?> contextImpleClass, @Cause() Throwable t);
+	
+	@Message(id = 44069, value = "Cannot obtain current activity handle", format = MESSAGE_FORMAT)
+	@LogMessage(level = ERROR)
+	public void error_cannotObtainActivityHandle(@Cause() Throwable t);
+	
+	@Message(id = 44070, value = "Cannot obtain parent activity coordinator", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cannotObtainParentCoordinator(@Cause() Throwable t);
+	
+	@Message(id = 44071, value = "Cannot get document builder", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cannotGetDocumentBuilder(@Cause() Throwable t);
 
     /*
         Allocate new messages directly above this notice.

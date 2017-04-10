@@ -492,7 +492,7 @@ public class CoordinatorControl
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wscfLogger.i18NLogger.error_cannotObtainActivityHandle(ex);
 
 			throw new SystemException(ex.toString());
 		}
@@ -517,7 +517,7 @@ public class CoordinatorControl
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wscfLogger.i18NLogger.warn_cannotObtainParentCoordinator(ex);
 
 			return null;
 		}

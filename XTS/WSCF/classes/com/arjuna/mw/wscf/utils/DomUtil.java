@@ -33,6 +33,8 @@ package com.arjuna.mw.wscf.utils;
 
 import javax.xml.parsers.*;
 
+import com.arjuna.mw.wscf.logging.wscfLogger;
+
 // TODO put back
 
 //import org.apache.xml.serialize.DOMWriterImpl;
@@ -111,7 +113,7 @@ public class DomUtil
 	}
 	catch (Exception ex)
 	{
-	    ex.printStackTrace();
+	    wscfLogger.i18NLogger.warn_cannotGetDocumentBuilder(ex);
 	}
 	
 	return null;
