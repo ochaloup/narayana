@@ -21,9 +21,24 @@
 package com.arjuna.mw.wstx.logging;
 
 
-import org.jboss.logging.annotations.*;
-import static org.jboss.logging.Logger.Level.*;
-import static org.jboss.logging.annotations.Message.Format.*;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.annotations.Message.Format.MESSAGE_FORMAT;
+
+import javax.xml.ws.wsaddressing.W3CEndpointReference;
+
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
+import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
+
+import com.arjuna.mw.wsas.activity.ActivityHierarchy;
+import com.arjuna.mw.wst.TxContext;
+import com.arjuna.mwlabs.wscf.model.twophase.arjunacore.ATCoordinator;
+import com.arjuna.mwlabs.wst.at.remote.ContextManager;
+import com.arjuna.wsc11.ContextFactory;
+import com.arjuna.wst.Volatile2PCParticipant;
 
 /**
  * i18n log messages for the wstx module.
@@ -264,6 +279,63 @@ public interface wstxI18NLogger {
     @Message(id = 45062, value = "Coordinator cancelled the activity", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
    	public void warn_mwlabs_wst11_ba_coordinator_cancelled_activity();
+
+    @Message(id = 45063, value = "Fail to register sub completion coordinator at {0} for activity hierarchy {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_failToRegisterSubCompletionCoordinator(String url, ActivityHierarchy activityHierarchy, @Cause() Throwable ex);
+    
+    @Message(id = 45064, value = "Fail to register sub completion coordinator for RPC at {0} for activity hierarchy {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_failToRegisterSubCompletionRpcCoordinator(String url, ActivityHierarchy activityHierarchy, @Cause() Throwable ex);
+    
+    @Message(id = 45065, value = "Cannot get user activity for AT coordinator {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cannotGetATUserActivity(ATCoordinator coordinator, @Cause() Throwable ex);
+    
+    @Message(id = 45066, value = "Cannot register volatile participant {0} to identifier {1}. Cause could actually be no activity or"
+        + " activity already registered", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_cannotEnlistVolatileParticipant(Volatile2PCParticipant tpp, String id, @Cause() Throwable ex);
+    
+    @Message(id = 45067, value = "Cannot resume transaction {0} by transaction manager {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cannotResumeTransaction(TxContext txContext, ContextManager manager, @Cause() Throwable ex);
+    
+    @Message(id = 45068, value = "Cannot establish activation coordinator service", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cannotEstablishActivationCoordinatorService(@Cause() Throwable ex);
+    
+    @Message(id = 45069, value = "Cannot enlist completion participant {0} to tx id {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_cannotEnlistCompletionParticipants(W3CEndpointReference completionParticipant, String id, @Cause() Throwable ex);
+    
+    @Message(id = 45070, value = "Fail to commit txn {0} with id {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_failCommittingTransaction(TxContext txn, String id, @Cause() Throwable ex);
+    
+    @Message(id = 45071, value = "Transaction manager {0} cannot suspend", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cannotSuspendTransaction(ContextManager manager, @Cause() Throwable ex);
+    
+    @Message(id = 45072, value = "Cannot enlist completion standalone participant for tx id {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_cannotEnlistCompletionStandaloneParticipants(String id, @Cause() Throwable ex);
+    
+    @Message(id = 45073, value = "Cannot dissacociate cleanup id {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_cannotDissasociateId(String id, @Cause() Throwable ex);
+
+    @Message(id = 45074, value = "Issue during initialisation context factory {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_issueOnContextFactoryInitialisation(ContextFactory cf, @Cause() Throwable ex);
+
+    @Message(id = 45075, value = "Failure during creation coordination context of uri {0} and context type {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    public void error_failureOnCoordinationContextCreation(String uri, CoordinationContextType contextType, @Cause() Throwable ex);
+
+    @Message(id = 45076, value = "Failure during creation coordination context of uri {0} and context type {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_failureOnCoordinationContextCreation(String uri, CoordinationContextType contextType, @Cause() Throwable ex);
 
     /*
         Allocate new messages directly above this notice.

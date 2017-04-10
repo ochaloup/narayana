@@ -60,7 +60,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
 		{
 			// TODO
 
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.warn_cannotEstablishActivationCoordinatorService(ex);
 		}
         // this implementation cannot provide support for subordinate transactions
         _userSubordinateTransaction = null;
@@ -199,7 +199,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
         }
         catch (InvalidProtocolException ex)
         {
-            ex.printStackTrace();
+            wstxLogger.i18NLogger.error_cannotEnlistCompletionStandaloneParticipants(id, ex);
 
             throw new SystemException(ex.toString());
         }
@@ -339,7 +339,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
         }
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.error_failCommittingTransaction(ctx, id, ex);
 
 			throw new SystemException(ex.toString());
 		}
@@ -352,7 +352,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_cannotResumeTransaction(ctx, _ctxManager, ex);
 			}
 
 			if (id != null)
@@ -423,7 +423,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_cannotResumeTransaction(ctx, _ctxManager, ex);
 			}
 
 			if (id != null)
@@ -439,7 +439,7 @@ public class UserTransactionStandaloneImple extends UserTransaction
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.warn_cannotSuspendTransaction(_ctxManager, ex);
 		}
 	}
 

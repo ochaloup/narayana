@@ -56,7 +56,7 @@ public class UserTransactionImple extends UserTransaction
 		{
 			// TODO
 
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.warn_cannotEstablishActivationCoordinatorService(ex);
 		}
         _userSubordinateTransaction = new UserSubordinateTransactionImple();
 	}
@@ -226,7 +226,7 @@ public class UserTransactionImple extends UserTransaction
         }
         catch (com.arjuna.wsc.InvalidProtocolException ex)
         {
-            ex.printStackTrace();
+            wstxLogger.i18NLogger.error_cannotEnlistCompletionParticipants(completionParticipant, id, ex);
 
             throw new SystemException(ex.toString());
         }
@@ -366,7 +366,7 @@ public class UserTransactionImple extends UserTransaction
         }
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.error_failCommittingTransaction(ctx, id, ex);
 
 			throw new SystemException(ex.toString());
 		}
@@ -379,7 +379,7 @@ public class UserTransactionImple extends UserTransaction
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_cannotResumeTransaction(ctx, _ctxManager, ex);
 			}
 
 			if (id != null)
@@ -450,7 +450,7 @@ public class UserTransactionImple extends UserTransaction
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_cannotResumeTransaction(ctx, _ctxManager, ex);
 			}
 
 			if (id != null)
@@ -486,7 +486,7 @@ public class UserTransactionImple extends UserTransaction
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.warn_cannotSuspendTransaction(_ctxManager, ex);
 		}
 	}
 

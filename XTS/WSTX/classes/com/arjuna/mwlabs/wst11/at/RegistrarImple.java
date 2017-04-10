@@ -172,7 +172,7 @@ public class RegistrarImple implements Registrar
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.error_failToRegisterSubCompletionCoordinator(protocolIdentifier, hier, ex);
 
 				throw new InvalidStateException(ex.toString());
 			}
@@ -190,7 +190,7 @@ public class RegistrarImple implements Registrar
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                wstxLogger.i18NLogger.error_failToRegisterSubCompletionRpcCoordinator(protocolIdentifier, hier, ex);
 
                 throw new InvalidStateException(ex.toString());
             }

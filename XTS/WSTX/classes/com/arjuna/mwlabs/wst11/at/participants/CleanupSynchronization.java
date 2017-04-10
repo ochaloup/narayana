@@ -34,7 +34,7 @@ package com.arjuna.mwlabs.wst11.at.participants;
 import com.arjuna.mwlabs.wst11.at.RegistrarImple;
 
 import com.arjuna.mw.wscf.model.twophase.participants.*;
-
+import com.arjuna.mw.wstx.logging.wstxLogger;
 import com.arjuna.mw.wsas.exceptions.SystemException;
 
 /**
@@ -65,7 +65,7 @@ public class CleanupSynchronization implements Synchronization
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.error_cannotDissasociateId(_cleanupId, ex);
 
 			throw new SystemException(ex.toString());
 		}

@@ -88,7 +88,7 @@ public class ContextFactoryImple implements ContextFactory, LocalFactory
         }
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+		    wstxLogger.i18NLogger.warn_issueOnContextFactoryInitialisation(this, ex);
 		}
 	}
 
@@ -235,17 +235,17 @@ public class ContextFactoryImple implements ContextFactory, LocalFactory
 			}
 			catch (NoActivityException ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.error_failureOnCoordinationContextCreation(coordinationTypeURI, currentContext, ex);
 
 				throw new InvalidCreateParametersException();
 			}
 			catch (SystemException ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_failureOnCoordinationContextCreation(coordinationTypeURI, currentContext, ex);
             }
 			catch (com.arjuna.mw.wsas.exceptions.WrongStateException ex)
 			{
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.error_failureOnCoordinationContextCreation(coordinationTypeURI, currentContext, ex);
 
 				throw new InvalidCreateParametersException();
 			}
@@ -253,7 +253,7 @@ public class ContextFactoryImple implements ContextFactory, LocalFactory
 			{
 				// TODO handle properly
 
-				ex.printStackTrace();
+			    wstxLogger.i18NLogger.warn_failureOnCoordinationContextCreation(coordinationTypeURI, currentContext, ex);
 			}
 		}
 		else {
