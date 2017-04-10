@@ -35,6 +35,7 @@ import com.arjuna.mwlabs.wsas.activity.ActivityImple;
 import java.nio.charset.StandardCharsets;
 
 import com.arjuna.mw.wsas.activity.ActivityHandle;
+import com.arjuna.mw.wsas.logging.wsasLogger;
 
 /**
  * ActivityHandle is used as a representation of a single activity
@@ -115,7 +116,7 @@ public class ActivityHandleImple implements ActivityHandle
 	}
 	catch (Exception ex)
 	{
-	    ex.printStackTrace();
+	    wsasLogger.i18NLogger.warn_cantResumeActivity(_theActivity, ex);
 	    
 	    return -1;
 	}

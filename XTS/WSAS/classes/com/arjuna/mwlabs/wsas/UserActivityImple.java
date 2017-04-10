@@ -495,7 +495,7 @@ public class UserActivityImple implements UserActivity
                 }
                 catch (Exception ex)
                 {
-                    ex.printStackTrace();
+                    wsasLogger.i18NLogger.warn_cantResumeActivity(tx, ex);
 		    
                     purge();
                 }

@@ -20,9 +20,16 @@
  */
 package com.arjuna.mw.wsas.logging;
 
-import org.jboss.logging.annotations.*;
-import static org.jboss.logging.Logger.Level.*;
-import static org.jboss.logging.annotations.Message.Format.*;
+import static org.jboss.logging.Logger.Level.WARN;
+import static org.jboss.logging.annotations.Message.Format.MESSAGE_FORMAT;
+
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
+
+import com.arjuna.mw.wsas.activity.ActivityHierarchy;
+import com.arjuna.mwlabs.wsas.activity.ActivityImple;
 
 /**
  * i18n log messages for the wsas module.
@@ -113,6 +120,14 @@ public interface wsasI18NLogger {
 
 	@Message(id = 41022, value = "HLS not found!", format = MESSAGE_FORMAT)
 	public String get_activity_HLSManager_1();
+
+    @Message(id = 41023, value = "Cannot resume activity {0}.", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cantResumeActivity(ActivityHierarchy tx, @Cause() Throwable ex);
+    
+    @Message(id = 41024, value = "Cannot obtain timeout for activity {0}.", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cantResumeActivity(ActivityImple tx, @Cause() Throwable ex);
 
     /*
         Allocate new messages directly above this notice.
