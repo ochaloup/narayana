@@ -93,7 +93,7 @@ public class UserBusinessActivityImple extends UserBusinessActivity
         {
             // TODO
 
-            ex.printStackTrace();
+            wstxLogger.i18NLogger.warn_issueOnUserBusinessActivityInitialisation(this, ex);
         }
         _userSubordinateBusinessActivity = new UserSubordinateBusinessActivityImple();
     }
@@ -174,7 +174,7 @@ public class UserBusinessActivityImple extends UserBusinessActivity
     	}
     	catch (Exception ex)
     	{
-    	    ex.printStackTrace();
+    	    wstxLogger.i18NLogger.warn_failureOnClosingUserBusinessActivity(this, ex);
 
     	    throw new SystemException(ex.toString());
     	}
@@ -216,7 +216,7 @@ public class UserBusinessActivityImple extends UserBusinessActivity
     	}
     	catch (Exception ex)
     	{
-    	    ex.printStackTrace();
+    	    wstxLogger.i18NLogger.warn_failureOnCancelingUserBusinessActivity(this, ex);
 
     	    throw new SystemException(ex.toString());
     	}
@@ -415,7 +415,7 @@ public class UserBusinessActivityImple extends UserBusinessActivity
     	}
     	catch (Exception ex)
     	{
-    	    ex.printStackTrace();
+    	    wstxLogger.i18NLogger.warn_cannotSuspendBaTransactionManager(_ctxManager, ex);
     	}
     }
 

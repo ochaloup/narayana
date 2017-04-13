@@ -33,9 +33,10 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.oasis_open.docs.ws_tx.wscoor._2006._06.CoordinationContextType;
 
+import com.arjuna.ats.arjuna.coordinator.TwoPhaseCoordinator;
 import com.arjuna.mw.wsas.activity.ActivityHierarchy;
 import com.arjuna.mw.wst.TxContext;
-import com.arjuna.mwlabs.wscf.model.twophase.arjunacore.ATCoordinator;
+import com.arjuna.mw.wst11.UserBusinessActivity;
 import com.arjuna.mwlabs.wst.at.remote.ContextManager;
 import com.arjuna.wsc11.ContextFactory;
 import com.arjuna.wst.Volatile2PCParticipant;
@@ -288,9 +289,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = ERROR)
     public void error_failToRegisterSubCompletionRpcCoordinator(String url, ActivityHierarchy activityHierarchy, @Cause() Throwable ex);
     
-    @Message(id = 45065, value = "Cannot get user activity for AT coordinator {0}", format = MESSAGE_FORMAT)
+    @Message(id = 45065, value = "Cannot get user activity for coordinator {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_cannotGetATUserActivity(ATCoordinator coordinator, @Cause() Throwable ex);
+    public void warn_cannotGetUserActivity(TwoPhaseCoordinator coordinator, @Cause() Throwable ex);
     
     @Message(id = 45066, value = "Cannot register volatile participant {0} to identifier {1}. Cause could actually be no activity or"
         + " activity already registered", format = MESSAGE_FORMAT)
@@ -313,9 +314,9 @@ public interface wstxI18NLogger {
     @LogMessage(level = ERROR)
     public void error_failCommittingTransaction(TxContext txn, String id, @Cause() Throwable ex);
     
-    @Message(id = 45071, value = "Transaction manager {0} cannot suspend", format = MESSAGE_FORMAT)
+    @Message(id = 45071, value = "Atomic remote transaction manager {0} cannot suspend", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
-    public void warn_cannotSuspendTransaction(ContextManager manager, @Cause() Throwable ex);
+    public void warn_cannotSuspendAtTransactionManager(ContextManager manager, @Cause() Throwable ex);
     
     @Message(id = 45072, value = "Cannot enlist completion standalone participant for tx id {0}", format = MESSAGE_FORMAT)
     @LogMessage(level = ERROR)
@@ -336,6 +337,22 @@ public interface wstxI18NLogger {
     @Message(id = 45076, value = "Failure during creation coordination context of uri {0} and context type {1}", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_failureOnCoordinationContextCreation(String uri, CoordinationContextType contextType, @Cause() Throwable ex);
+
+    @Message(id = 45077, value = "Issue during user business activity initialisation", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_issueOnUserBusinessActivityInitialisation(UserBusinessActivity ua, @Cause() Throwable ex);
+    
+    @Message(id = 45078, value = "Failure on closing user business activity", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_failureOnClosingUserBusinessActivity(UserBusinessActivity ua, @Cause() Throwable ex);
+    
+    @Message(id = 45079, value = "Failure on canceling user business activity", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_failureOnCancelingUserBusinessActivity(UserBusinessActivity ua, @Cause() Throwable ex);
+
+    @Message(id = 45080, value = "Business activity transaction manager {0} cannot suspend", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cannotSuspendBaTransactionManager(com.arjuna.mwlabs.wst.ba.remote.ContextManager manager, @Cause() Throwable ex);
 
     /*
         Allocate new messages directly above this notice.

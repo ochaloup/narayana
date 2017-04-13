@@ -98,7 +98,7 @@ public class ArjunaContextImple implements SOAPContext
 			}
 			catch (SystemException ex)
 			{
-			    wstxLogger.i18NLogger.warn_cannotGetATUserActivity(currentCoordinator, ex);
+			    wstxLogger.i18NLogger.warn_cannotGetUserActivity(currentCoordinator, ex);
 			}
 
 			if ((currentCoordinator != null) && (hier != null))

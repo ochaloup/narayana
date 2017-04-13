@@ -486,7 +486,7 @@ public class UserTransactionImple extends UserTransaction
 		}
 		catch (Exception ex)
 		{
-		    wstxLogger.i18NLogger.warn_cannotSuspendTransaction(_ctxManager, ex);
+		    wstxLogger.i18NLogger.warn_cannotSuspendAtTransactionManager(_ctxManager, ex);
 		}
 	}
 
