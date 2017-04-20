@@ -581,6 +581,7 @@ public class XARecoveryModule implements RecoveryModule {
             } catch (Exception e1) {
             }
 
+            _xidScans.remove(xares);
             return;
         }
 
