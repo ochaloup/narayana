@@ -125,7 +125,7 @@ public class AtomicActionRecoveryModule implements RecoveryModule
 
     }
 
-   private void doRecoverTransaction( Uid recoverUid )
+   protected void doRecoverTransaction( Uid recoverUid )
    {
       boolean commitThisTransaction = true ;
 
@@ -146,8 +146,7 @@ public class AtomicActionRecoveryModule implements RecoveryModule
       {
          try
          {
-            RecoverAtomicAction rcvAtomicAction =
-               new RecoverAtomicAction( recoverUid, theStatus ) ;
+            RecoverAtomicAction rcvAtomicAction = getRecoverAtomicAction(recoverUid, theStatus);
 
             rcvAtomicAction.replayPhase2() ;
          }
@@ -259,6 +258,10 @@ public class AtomicActionRecoveryModule implements RecoveryModule
                 }
             }
         }
+   }
+
+   protected RecoverAtomicAction getRecoverAtomicAction(Uid recoverUid, int status) {
+       return new RecoverAtomicAction(recoverUid, status) ;
    }
 
    // 'type' within the Object Store for AtomicActions.
