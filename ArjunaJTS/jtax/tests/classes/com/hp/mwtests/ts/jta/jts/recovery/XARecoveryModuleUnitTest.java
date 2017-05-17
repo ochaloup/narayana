@@ -51,6 +51,7 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.internal.jta.recovery.jts.JTSNodeNameXAResourceOrphanFilter;
+import com.arjuna.ats.internal.jta.recovery.jts.JTSTransactionLogXAResourceOrphanFilter;
 import com.arjuna.ats.internal.jta.recovery.jts.XARecoveryModule;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
@@ -124,6 +125,7 @@ public class XARecoveryModuleUnitTest
             arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
 
         XARecoveryModule xarm = new XARecoveryModule();
+        xarm.addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
         xarm.addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
         xarm.addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1));
 
@@ -142,6 +144,7 @@ public class XARecoveryModuleUnitTest
     public void testRecoverPassFailure () throws Exception
     {
         XARecoveryModule xarm = new XARecoveryModule();
+        xarm.addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
         xarm.addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
 
         final String jndiName = "java:/test";

@@ -38,6 +38,7 @@ import com.arjuna.ats.jts.extensions.AtomicTransaction;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
+import javax.transaction.xa.Xid;
 
 /**
  * i18n log messages for the jtax module.
@@ -295,6 +296,10 @@ public interface jtaxI18NLogger {
 	@Message(id = 24065, value = "Can't restore state of input object state {0} of object type {1}", format = MESSAGE_FORMAT)
 	@LogMessage(level = WARN)
 	public void warn_cant_restore_state(InputObjectState os, int ot, @Cause() IOException ex);
+
+    @Message(id = 24066, value = "Could not access object store to check for log for xid {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_could_not_access_object_store(Xid xid, @Cause() Exception e);
 
     /*
         Allocate new messages directly above this notice.

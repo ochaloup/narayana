@@ -141,7 +141,7 @@ public class XATxConverter
 
     public static Uid getUid(XID xid)
     {
-        if (xid == null || xid.formatID != FORMAT_ID) {
+        if (xid == null || !isNarayanaFormatId(xid.formatID)) {
             return Uid.nullUid();
         }
 
@@ -152,7 +152,7 @@ public class XATxConverter
     }
 
 	public static String getNodeName(XID xid) {
-		if (!isNodeNameFormatId(xid.formatID)) {
+		if (!isNarayanaFormatId(xid.formatID)) {
 			return null;
 		}
 
@@ -167,7 +167,7 @@ public class XATxConverter
 	}
 
 	public static void setSubordinateNodeName(XID theXid, String xaNodeName) {
-		if (theXid == null || !isNodeNameFormatId(theXid.formatID)) {
+		if (theXid == null || !isNarayanaFormatId(theXid.formatID)) {
 			return;
 		}
 		int length = 0;
@@ -186,7 +186,7 @@ public class XATxConverter
 		theXid.bqual_length = Uid.UID_SIZE+4+4+length;
 	}
 	public static String getSubordinateNodeName(XID xid) {
-		if (!isNodeNameFormatId(xid.formatID)) {
+		if (!isNarayanaFormatId(xid.formatID)) {
 			return null;
 		}
 
@@ -294,7 +294,7 @@ public class XATxConverter
         return stringBuilder.toString();
     }
 
-    public static boolean isNodeNameFormatId(int xidFormatId) {
+    public static boolean isNarayanaFormatId(int xidFormatId) {
         return xidFormatId == FORMAT_ID || xidFormatId == JTS_FORMAT_ID;
     }
 }
