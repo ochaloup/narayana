@@ -141,7 +141,7 @@ public class ImportedTransactionRecoveryUnitTest {
                     wasThrown = true;
                     throw new XAException(XAException.XAER_RMFAIL);
                 } else {
-                    super.commit(xid, onePhase);
+                    // super.commit(xid, onePhase);
                 }
             }
         };
@@ -154,7 +154,7 @@ public class ImportedTransactionRecoveryUnitTest {
                     wasThrown = true;
                     throw new XAException(XAException.XAER_RMFAIL);
                 } else {
-                    super.commit(xid, onePhase);
+                    // super.commit(xid, onePhase);
                 }
             }
         };
