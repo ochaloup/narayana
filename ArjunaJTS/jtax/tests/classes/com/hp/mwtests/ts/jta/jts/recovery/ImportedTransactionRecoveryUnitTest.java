@@ -28,6 +28,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +44,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
+import com.arjuna.ats.internal.jta.recovery.jts.JTSNodeNameXAResourceOrphanFilter;
+import com.arjuna.ats.internal.jta.recovery.jts.JTSTransactionLogXAResourceOrphanFilter;
 import com.arjuna.ats.internal.jta.recovery.jts.XARecoveryModule;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
@@ -67,7 +72,7 @@ public class ImportedTransactionRecoveryUnitTest {
     private ORB myORB = null;
     private RootOA myOA = null;
     int orphanSafetyIntervalOrigin;
-    List<String> xaRecoveryNodesOrigin = null;
+    List<String> xaRecoveryNodesOrigin = null, xaResourceOrphanFiltersOrigin = null;
     RecoveryManager recoveryManager = null;
 
     @Before
@@ -99,18 +104,20 @@ public class ImportedTransactionRecoveryUnitTest {
         recoveryPropertyManager.getRecoveryEnvironmentBean()
                 .setRecoveryActivatorClassNames(recoveryActivatorClassNames);
 
-        recoveryManager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
-        recoveryManager.initialize();
-
         orphanSafetyIntervalOrigin = jtaPropertyManager.getJTAEnvironmentBean().getOrphanSafetyInterval();
         jtaPropertyManager.getJTAEnvironmentBean().setOrphanSafetyInterval(0);
+        xaResourceOrphanFiltersOrigin = jtaPropertyManager.getJTAEnvironmentBean().getXaResourceOrphanFilterClassNames();
         xaRecoveryNodesOrigin = jtaPropertyManager.getJTAEnvironmentBean().getXaRecoveryNodes();
+
+        recoveryManager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
+        recoveryManager.initialize();
     }
 
     @After
     public void tearDown () throws Exception {
         jtaPropertyManager.getJTAEnvironmentBean().setOrphanSafetyInterval(orphanSafetyIntervalOrigin);
         jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(xaRecoveryNodesOrigin);
+        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceOrphanFilterClassNames(xaResourceOrphanFiltersOrigin);
 
         recoveryManager.terminate();
         myOA.destroy();
@@ -141,7 +148,7 @@ public class ImportedTransactionRecoveryUnitTest {
                     wasThrown = true;
                     throw new XAException(XAException.XAER_RMFAIL);
                 } else {
-                    // super.commit(xid, onePhase);
+                    super.commit(xid, onePhase);
                 }
             }
         };
@@ -154,7 +161,7 @@ public class ImportedTransactionRecoveryUnitTest {
                     wasThrown = true;
                     throw new XAException(XAException.XAER_RMFAIL);
                 } else {
-                    // super.commit(xid, onePhase);
+                    super.commit(xid, onePhase);
                 }
             }
         };
@@ -173,6 +180,53 @@ public class ImportedTransactionRecoveryUnitTest {
 
         recoveryManager.scan();
 
+        assertEquals("XAResource1 can't be rolled-back", 0, xar1.rollbackCount());
+        assertEquals("XAResource2 can't be rolled-back", 0, xar2.rollbackCount());
+        assertEquals("XAResource1 has to be committed", 1, xar1.commitCount());
+        assertEquals("XAResource2 has to be committed", 1, xar2.commitCount());
+    }
+
+    @Test
+    public void testJTSOrphanFilterNodeName() throws Exception {
+        final Xid xid = XidUtils.getXid(new Uid(), true);
+        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
+        
+        TestXAResourceWrapper xar1 = new TestXAResourceWrapper("narayana", "narayana", "java:/test1");
+        TestXAResourceWrapper xar2 = new TestXAResourceWrapper("narayana", "narayana", "java:/test2")
+        {
+            Xid[] xids = null;
+            @Override
+            public int prepare(Xid xid) throws XAException {
+                this.xids = new Xid[] {xid};
+                return super.prepare(xid);
+            }
+            @Override
+            public Xid[] recover(int flag) throws XAException {
+                return xids;
+            }
+            @Override
+            public void rollback(Xid xid) throws XAException {
+                xids = null;
+                super.rollback(xid);
+            }
+        };
+        
+        assertTrue("Fail to enlist first test XAResource", subordinateTransaction.enlistResource(xar1));
+        assertTrue("Fail to enlist second XAResource", subordinateTransaction.enlistResource(xar2));
+        
+        assertEquals("transaction should be prepared", TwoPhaseOutcome.PREPARE_OK, subordinateTransaction.doPrepare());
+        assertTrue("simulating transaction was fully committed but there is a fail", subordinateTransaction.doCommit());
+
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Collections.singletonList(
+            arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
+            // .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
+        
+        recoveryManager.scan();
+        
         assertEquals("XAResource1 can't be rolled-back", 0, xar1.rollbackCount());
         assertEquals("XAResource2 can't be rolled-back", 0, xar2.rollbackCount());
         assertEquals("XAResource1 has to be committed", 1, xar1.commitCount());
