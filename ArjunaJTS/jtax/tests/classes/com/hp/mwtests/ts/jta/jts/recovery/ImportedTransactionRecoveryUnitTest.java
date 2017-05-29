@@ -186,6 +186,16 @@ public class ImportedTransactionRecoveryUnitTest {
         assertEquals("XAResource2 has to be committed", 1, xar2.commitCount());
     }
 
+    /**
+     * <p>
+     * Test simulates the state where transaction manager does not know what happened after XAResource.prepare.
+     * The situation can occurs when jvm is crashed during prepare phase and some resources were prepared and some weren't.
+     * After jvm restart you can find the state that a resource was prepared at side of resource but this information
+     * hadn't hit the transaction manager before jvm crashed.
+     * <p>
+     * After jvm is restarted the orphan filter should see that object log store does not contain information about
+     * the transaction but there is some orphan on the resource side. Expecting XAResource rollback to be called.
+     */
     @Test
     public void testJTSOrphanFilterNodeName() throws Exception {
         final Xid xid = XidUtils.getXid(new Uid(), true);
@@ -194,7 +204,7 @@ public class ImportedTransactionRecoveryUnitTest {
         TestXAResourceWrapper xar1 = new TestXAResourceWrapper("narayana", "narayana", "java:/test1");
         TestXAResourceWrapper xar2 = new TestXAResourceWrapper("narayana", "narayana", "java:/test2")
         {
-            Xid[] xids = null;
+            Xid[] xids = new Xid[] {};
             @Override
             public int prepare(Xid xid) throws XAException {
                 this.xids = new Xid[] {xid};
@@ -206,7 +216,7 @@ public class ImportedTransactionRecoveryUnitTest {
             }
             @Override
             public void rollback(Xid xid) throws XAException {
-                xids = null;
+                xids = new Xid[] {};
                 super.rollback(xid);
             }
         };
@@ -215,7 +225,7 @@ public class ImportedTransactionRecoveryUnitTest {
         assertTrue("Fail to enlist second XAResource", subordinateTransaction.enlistResource(xar2));
         
         assertEquals("transaction should be prepared", TwoPhaseOutcome.PREPARE_OK, subordinateTransaction.doPrepare());
-        assertTrue("simulating transaction was fully committed but there is a fail", subordinateTransaction.doCommit());
+        assertTrue("simulating transaction was fully committed", subordinateTransaction.doCommit());
 
         jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Collections.singletonList(
             arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
@@ -223,13 +233,72 @@ public class ImportedTransactionRecoveryUnitTest {
             .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
         ((XARecoveryModule) recoveryManager.getModules().get(0))
             .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
-            // .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
         
         recoveryManager.scan();
         
-        assertEquals("XAResource1 can't be rolled-back", 0, xar1.rollbackCount());
-        assertEquals("XAResource2 can't be rolled-back", 0, xar2.rollbackCount());
-        assertEquals("XAResource1 has to be committed", 1, xar1.commitCount());
-        assertEquals("XAResource2 has to be committed", 1, xar2.commitCount());
+        assertEquals("XAResource1 should not be rolled-back as it should be committed by two-phase commit",
+            0, xar1.rollbackCount());
+        assertEquals("XAResource2 should be rolled-back", 1, xar2.rollbackCount());
+        assertEquals("XAResource1 should be committed", 1, xar1.commitCount());
+        assertEquals("XAResource2 can't be committed", 0, xar2.commitCount());
+    }
+
+    /**
+     * <p>
+     * Orphan filter should not take into account transaction on resource created by different node id
+     * than the current transaction manager owns.
+     * <p>
+     * This is a variant to {@link #testJTSOrphanFilterNodeName()} but the orphan filter should not be activated
+     * for the different node name.
+     */
+    @Test
+    public void testJTSOrphanFilterWithDifferntNodeName() throws Exception {
+        final Xid xid = XidUtils.getXid(new Uid(), true);
+        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
+
+        TestXAResourceWrapper xar1 = new TestXAResourceWrapper("narayana", "narayana", "java:/test1");
+        TestXAResourceWrapper xar2 = new TestXAResourceWrapper("narayana", "narayana", "java:/test2")
+        {
+            Xid[] xids = new Xid[] {};
+            @Override
+            public int prepare(Xid xid) throws XAException {
+                this.xids = new Xid[] {xid};
+                return super.prepare(xid);
+            }
+            @Override
+            public Xid[] recover(int flag) throws XAException {
+                return xids;
+            }
+            @Override
+            public void rollback(Xid xid) throws XAException {
+                xids = new Xid[] {};
+                super.rollback(xid);
+            }
+        };
+
+        assertTrue("Fail to enlist first test XAResource", subordinateTransaction.enlistResource(xar1));
+        assertTrue("Fail to enlist second XAResource", subordinateTransaction.enlistResource(xar2));
+
+        assertEquals("transaction should be prepared", TwoPhaseOutcome.PREPARE_OK, subordinateTransaction.doPrepare());
+        assertTrue("simulating transaction was fully committed", subordinateTransaction.doCommit());
+
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Collections.singletonList(
+            arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier() + "franta"));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
+
+        recoveryManager.scan();
+
+        assertEquals("XAResource1 should not be rolled-back", 0, xar1.rollbackCount());
+        assertEquals("XAResource2 should not be rolled-back as working with different node name", 1, xar2.rollbackCount());
+        assertEquals("XAResource1 should be committed", 1, xar1.commitCount());
+        assertEquals("XAResource2 should not be committed as there is no record in transaction log after 2pc finished",
+            0, xar2.commitCount());
     }
 }

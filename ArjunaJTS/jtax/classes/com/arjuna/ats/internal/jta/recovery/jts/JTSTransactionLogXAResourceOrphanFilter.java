@@ -76,7 +76,7 @@ public class JTSTransactionLogXAResourceOrphanFilter implements XAResourceOrphan
         List<String> transactionTypesToCheck = Arrays.asList(new String[] {
             new AtomicAction().type(),
             com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple.typeName(),
-            com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction.typeName(),
+            com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction.getType(),
             com.arjuna.ats.internal.jts.orbspecific.interposition.coordinator.ServerTransaction.typeName()
         });
 
