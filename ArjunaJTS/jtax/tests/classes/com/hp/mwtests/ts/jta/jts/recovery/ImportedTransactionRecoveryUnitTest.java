@@ -204,20 +204,9 @@ public class ImportedTransactionRecoveryUnitTest {
         TestXAResourceWrapper xar1 = new TestXAResourceWrapper("narayana", "narayana", "java:/test1");
         TestXAResourceWrapper xar2 = new TestXAResourceWrapper("narayana", "narayana", "java:/test2")
         {
-            Xid[] xids = new Xid[] {};
             @Override
-            public int prepare(Xid xid) throws XAException {
-                this.xids = new Xid[] {xid};
-                return super.prepare(xid);
-            }
-            @Override
-            public Xid[] recover(int flag) throws XAException {
-                return xids;
-            }
-            @Override
-            public void rollback(Xid xid) throws XAException {
-                xids = new Xid[] {};
-                super.rollback(xid);
+            public void commit(javax.transaction.xa.Xid id, boolean onePhase) throws XAException {
+                // simulating that commit was not processed
             }
         };
         
@@ -254,7 +243,7 @@ public class ImportedTransactionRecoveryUnitTest {
      * for the different node name.
      */
     @Test
-    public void testJTSOrphanFilterWithDifferntNodeName() throws Exception {
+    public void testJTSOrphanFilterWithDifferentNodeName() throws Exception {
         final Xid xid = XidUtils.getXid(new Uid(), true);
         SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
 
@@ -285,7 +274,7 @@ public class ImportedTransactionRecoveryUnitTest {
         assertTrue("simulating transaction was fully committed", subordinateTransaction.doCommit());
 
         jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Collections.singletonList(
-            arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier() + "franta"));
+            arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier() + "-unknown"));
         ((XARecoveryModule) recoveryManager.getModules().get(0))
             .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
         ((XARecoveryModule) recoveryManager.getModules().get(0))
@@ -295,10 +284,57 @@ public class ImportedTransactionRecoveryUnitTest {
 
         recoveryManager.scan();
 
-        assertEquals("XAResource1 should not be rolled-back", 0, xar1.rollbackCount());
-        assertEquals("XAResource2 should not be rolled-back as working with different node name", 1, xar2.rollbackCount());
-        assertEquals("XAResource1 should be committed", 1, xar1.commitCount());
-        assertEquals("XAResource2 should not be committed as there is no record in transaction log after 2pc finished",
-            0, xar2.commitCount());
+        assertEquals("XAResource2 should not be rolled-back as working with different node name", 0, xar2.rollbackCount());
+        assertEquals("XAResource2 called is set only to one as called from two-phase but not expected to be called from recovery",
+            1, xar2.commitCount());
+    }
+
+    @Test
+    public void testNotLaunchingRollbackByJTSOrphanFilterNodeNameWhenTxRecordExists() throws Exception {
+        final Xid xid = XidUtils.getXid(new Uid(), true);
+        SubordinateTransaction subordinateTransaction = SubordinationManager.getTransactionImporter().importTransaction(xid);
+        
+        TestXAResourceWrapper xar1 = new TestXAResourceWrapper("narayana", "narayana", "java:/test1");
+        TestXAResourceWrapper xar2 = new TestXAResourceWrapper("narayana", "narayana", "java:/test2")
+        {
+            private boolean commitCalled = false;
+            @Override
+            public void commit(javax.transaction.xa.Xid id, boolean onePhase) throws XAException {
+                if(!commitCalled) {
+                    commitCalled = true;
+                    throw new XAException(XAException.XAER_RMFAIL);
+                } else {
+                    if(true) throw new XAException(XAException.XAER_RMFAIL);
+                    super.commit(id, onePhase);
+                }
+            }
+
+            /*@Override
+            public Xid getXid() {
+                return null;
+            }*/
+        };
+        
+        assertTrue("Fail to enlist first test XAResource", subordinateTransaction.enlistResource(xar1));
+        assertTrue("Fail to enlist second XAResource", subordinateTransaction.enlistResource(xar2));
+        
+        assertEquals("transaction should be prepared", TwoPhaseOutcome.PREPARE_OK, subordinateTransaction.doPrepare());
+        subordinateTransaction.doCommit();
+
+        jtaPropertyManager.getJTAEnvironmentBean().setXaRecoveryNodes(Collections.singletonList(
+            arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier()));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+            .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
+        // ((XARecoveryModule) recoveryManager.getModules().get(0))
+        //    .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
+        
+        recoveryManager.scan();
+        recoveryManager.scan();
+        
+        assertEquals("XAResource1 should ? rollback", 0, xar1.rollbackCount());
+        assertEquals("XAResource2 should ? rollback", 0, xar2.rollbackCount());
+        assertEquals("XAResource1 should ? commit", 1, xar1.commitCount());
     }
 }
