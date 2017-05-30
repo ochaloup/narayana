@@ -279,12 +279,11 @@ public class ImportedTransactionRecoveryUnitTest {
             .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
         ((XARecoveryModule) recoveryManager.getModules().get(0))
             .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
-        ((XARecoveryModule) recoveryManager.getModules().get(0))
-            .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
 
         recoveryManager.scan();
 
         assertEquals("XAResource2 should not be rolled-back as working with different node name", 0, xar2.rollbackCount());
+        // we check here that commitCount is 1, if commit is called during recovery then commitCount will be 2
         assertEquals("XAResource2 called is set only to one as called from two-phase but not expected to be called from recovery",
             1, xar2.commitCount());
     }
@@ -304,15 +303,10 @@ public class ImportedTransactionRecoveryUnitTest {
                     commitCalled = true;
                     throw new XAException(XAException.XAER_RMFAIL);
                 } else {
-                    if(true) throw new XAException(XAException.XAER_RMFAIL);
+                    // if(true) throw new XAException(XAException.XAER_RMFAIL);
                     super.commit(id, onePhase);
                 }
             }
-
-            /*@Override
-            public Xid getXid() {
-                return null;
-            }*/
         };
         
         assertTrue("Fail to enlist first test XAResource", subordinateTransaction.enlistResource(xar1));
@@ -327,8 +321,8 @@ public class ImportedTransactionRecoveryUnitTest {
             .addXAResourceRecoveryHelper(new TestXARecoveryHelper(xar1, xar2));
         ((XARecoveryModule) recoveryManager.getModules().get(0))
             .addXAResourceOrphanFilter(new JTSNodeNameXAResourceOrphanFilter());
-        // ((XARecoveryModule) recoveryManager.getModules().get(0))
-        //    .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
+        ((XARecoveryModule) recoveryManager.getModules().get(0))
+           .addXAResourceOrphanFilter(new JTSTransactionLogXAResourceOrphanFilter());
         
         recoveryManager.scan();
         recoveryManager.scan();
