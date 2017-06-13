@@ -1,0 +1,180 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2017, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package org.jboss.narayana.rts.lra.coordinator.api;
+
+import javax.ws.rs.WebApplicationException;
+import java.util.List;
+
+public interface LRAClientAPI {
+
+    /**
+     * Start a new LRA
+     *
+     * The LRA model uses a presumed nothing protocol: the coordinator must communicate with Compensators
+     * in order to inform them of the LRA activity. Every time a Compensator is enrolled with a LRA, the
+     * coordinator must make information about it durable so that the Compensator can be contacted when
+     * the LRA terminates, even in the event of subsequent failures. Compensators, clients and coordinators
+     * cannot make any presumption about the state of the global transaction without consulting the
+     * coordinator and all compensators, respectively.
+     *
+     * @param clientID Each client is expected to have a unique identity (which can be a URL). (optional)
+     * @param timeout Specifies the maximum time in seconds that the LRA will exist for. If the LRA is
+     *                terminated because of a timeout, the LRA URL is deleted. All further invocations
+     *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
+     *                operation. (optional, default to 0)
+     * @throws WebApplicationException Comms error
+     */
+    String startLRA(String clientID, Integer timeout) throws WebApplicationException;
+
+    /**
+     * Attempt to cancel an LRA
+     *
+     * Trigger the compensation of the LRA. All compensators will be triggered by the coordinator
+     * (ie the compensate message will be sent to each compensators). Upon termination, the URL is
+     * implicitly deleted. The invoker cannot know for sure whether the lra completed or compensated
+     * without enlisting a participant.
+     *
+     * @param lraId The unique identifier of the LRA (required)
+     * @throws WebApplicationException Comms error
+     */
+    void cancelLRA(String lraId) throws WebApplicationException;
+
+    /**
+     * Attempt to close an LRA
+     *
+     * Trigger the successful completion of the LRA. All compensators will be dropped by the coordinator.
+     * The complete message will be sent to the compensators. Upon termination, the URL is implicitly
+     * deleted. The invoker cannot know for sure whether the lra completed or compensated without enlisting
+     * a participant.
+     *
+     * @param lraId The unique identifier of the LRA (required)
+     * @throws WebApplicationException Comms error
+     */
+    void closeLRA(String lraId) throws WebApplicationException;
+
+    /**
+     * Lookup active LRAs
+     * 
+     * @throws WebApplicationException Comms error
+     */
+    List<LRAStatus> getActiveLRAs() throws WebApplicationException;
+
+    /**
+     * Returns all LRAs
+     *
+     * Gets both active and recovering LRAs
+     *
+     * @return List<LRA>
+     * @throws WebApplicationException Comms error
+     */
+    List<LRAStatus> getAllLRAs() throws WebApplicationException;
+
+    /**
+     * List recovering Long Running Actions
+     *
+     * Returns LRAs that are recovering (ie some compensators still need to be ran)
+     *
+     * @throws WebApplicationException Comms error
+     */
+    List<LRAStatus> getRecoveringLRAs() throws WebApplicationException;
+
+    /**
+     * Indicates whether an LRA is active
+     * 
+     * @param lraId The unique identifier of the LRA (required)
+     * @throws WebApplicationException Comms error
+     */
+    Boolean isActiveLRA(String lraId) throws WebApplicationException;
+
+    /**
+     * Indicates whether an LRA was compensated
+     * 
+     * @param lraId The unique identifier of the LRA (required)
+     * @throws WebApplicationException Comms error
+     */
+    Boolean isCompensatedLRA(String lraId) throws WebApplicationException;
+
+    /**
+     * Indicates whether an LRA is complete
+     * 
+     * @param lraId The unique identifier of the LRA (required)
+     * @throws WebApplicationException Comms error
+     */
+    Boolean isCompletedLRA(String lraId) throws WebApplicationException;
+
+    /**
+     * A Compensator can join with the LRA at any time prior to the completion of an activity
+     * 
+     * @param lraId   The unique identifier of the LRA (required)
+     * @param timelimit The time limit (in seconds) that the Compensator can guarantee that it
+     *                can compensate the work performed by the service. After this time period has elapsed,
+     *                it may no longer be possible to undo the work within the scope of this (or any enclosing)
+     *                LRA. It may therefore be necessary for the application or service to start other
+     *                activities to explicitly try to compensate this work. The application or coordinator may
+     *                use this information to control the lifecycle of a LRA. (required)
+     * @param body    The resource path that the LRA coordinator will use to drive the compensator.
+     *                Performing a GET on the compensator URL will return the current status of the compensator,
+     *                or 404 if the compensator is no longer present.  The following types must be returned by
+     *                Compensators to indicate their current status:
+     *                -  Compensating: the Compensator is currently compensating for the LRA;
+     *                -  Compensated: the Compensator has successfully compensated for
+     *                the LRA.
+     *                -  FailedToCompensate: the Compensator was not able to compensate for the LRA.
+     *                   It must maintain information about the work it was to compensate until the
+     *                   coordinator sends it a forget message.
+     *                -  Completing: the Compensator is tidying up after being told to complete.
+     *                -  Completed: the coordinator/participant has confirmed.
+     *                -  FailedToComplete: the Compensator was unable to tidy-up.
+     *                     Performing a POST on URL/compensate will cause the compensator to compensate
+     *                     the work that was done within the scope of the LRA.
+     *                     Performing a POST on URL/complete will cause the compensator to tidy up and
+     *                  it can forget this LRA.  (optional)
+     * @throws WebApplicationException Comms error
+     */
+    void joinLRA(String lraId, Integer timelimit, String body) throws WebApplicationException;
+
+    /**
+     * Similar to {@link LRAClientAPI#joinLRA(String, Integer, String)} but the various compensator urls
+     * are passed in explicitly
+     *
+     * @param lraId The unique identifier of the LRA (required)
+     * @param timelimit The time limit (in seconds) that the Compensator can guarantee that it
+     *                can compensate the work performed by the service
+     * @param completeUrl Performing a POST on this URL  will cause the participant to tidy up and it can forget this transaction.
+     * @param compensateUrl Performing a POST onthis URL will cause the participant to compensate the work that
+     *                      was done within the scope of the LRA.
+     * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
+     * @param leaveUrl Performing a PUT on this URL with cause the compensator to leave the LRA
+     * @throws WebApplicationException
+     */
+    void joinLRA(String lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
+
+    /**
+     * A Compensator can resign from the LRA at any time prior to the completion of an activity
+     * 
+     * @param lraId The unique identifier of the LRA (required)
+     * @param body  (optional)
+     * @throws WebApplicationException Comms error
+     */
+    void leaveLRA(String lraId, String body) throws WebApplicationException;
+}
