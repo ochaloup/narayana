@@ -40,6 +40,7 @@ public class TransactionImple
 		extends
 		com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple implements SubordinateTransaction
 {
+    private int subordinateTransactionTimeout = Integer.MIN_VALUE;
 
 	/**
 	 * Create a new transaction with the specified timeout.
@@ -57,6 +58,7 @@ public class TransactionImple
 		super(new SubordinateAtomicAction(timeout, importedXid));
 
 		TransactionImple.putTransaction(this);
+		subordinateTransactionTimeout = timeout;
 	}
 
 	/**
@@ -128,5 +130,12 @@ public class TransactionImple
 	public boolean activated()
 	{
 		return ((SubordinateAtomicAction) _theTransaction).activated();
+	}
+
+	@Override
+	public int getTimeout() {
+	    if(subordinateTransactionTimeout == Integer.MIN_VALUE)
+	        return super.getTimeout();
+	    return subordinateTransactionTimeout;
 	}
 }
