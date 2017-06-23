@@ -1,4 +1,4 @@
-package participant.filter;
+package org.jboss.narayana.rts.lra.filter;
 
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -8,13 +8,14 @@ import java.io.IOException;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
 @Provider
-public class ClientLRARequestFilter implements ClientRequestFilter {
+public class ClientLRARequestFilter extends FilterBase implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext context) throws IOException {
-        LRAState txId = LRAState.getCurrentLRA();
+        String lraId = currentLRA();
 
-        if (txId != null) {
-            context.getHeaders().putSingle(LRA_HTTP_HEADER, txId.id);
-        }
+        if (lraId != null)
+            context.getHeaders().putSingle(LRA_HTTP_HEADER, lraId);
+        else
+            context.getHeaders().remove(LRA_HTTP_HEADER);
     }
 }

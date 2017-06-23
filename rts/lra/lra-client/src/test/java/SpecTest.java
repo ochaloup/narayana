@@ -19,6 +19,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 public class SpecTest {
     private static URL MICRSERVICE_BASE_URL;
@@ -220,6 +221,25 @@ public class SpecTest {
         assertEquals(cnt1, cnt2);
     }
 
+    @Test
+    public void dependentLRA() throws WebApplicationException {
+        // call a method annotated with NOT_SUPPORTED but one which programatically starts an LRA and returns it via a header
+        Response response = msTarget.path("activities").path("startviaapi").request().put(Entity.text(""));
+        // check that the method started an LRA
+        String id = response.readEntity(String.class);
+        Object lraHeader = response.getHeaders().getFirst(LRAClient.LRA_HTTP_HEADER);
+
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+
+        // the value returned via the header and body should be equal
+
+        assertNotNull(lraHeader);
+
+        assertEquals(id, lraHeader.toString());
+
+        lraClient.closeLRA((String) lraHeader);
+    }
+
     private void checkStatusAndClose(Response response, int expected) {
         try {
             if (response.getStatus() != expected)
@@ -233,7 +253,7 @@ public class SpecTest {
         Response response = null;
 
         try {
-            response = msTarget.path("activities").path("stats").path("completed").request().get();
+            response = msTarget.path("activities").path("completedactivitycount").request().get();
 
             assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
 

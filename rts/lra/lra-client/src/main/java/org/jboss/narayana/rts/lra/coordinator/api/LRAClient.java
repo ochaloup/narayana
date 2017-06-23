@@ -1,5 +1,7 @@
 package org.jboss.narayana.rts.lra.coordinator.api;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 
 import javax.json.Json;
@@ -8,6 +10,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.StringReader;
 
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -26,10 +29,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 @ApplicationScoped
 public class LRAClient implements LRAClientAPI {
     public static final String LRA_HTTP_HEADER = "X-lra";
+    public static final String LRA_HTTP_HEADER2 = "X-lra2";
     public static final String LRA_HTTP_RECOVERY_HEADER = "X-lra-recovery";
 
     public static final String COORDINATOR_PATH_NAME = "lra-coordinator";
@@ -59,6 +64,14 @@ public class LRAClient implements LRAClientAPI {
     private WebTarget target;
     private URI base;
     private Client client;
+    private Stack<String> lraStack;
+    private boolean isUseable;
+
+     @Produces
+     @ApplicationScoped
+     public LRAClient createLRAClient() throws URISyntaxException {
+         return new LRAClient();
+     }
 
     public LRAClient() throws URISyntaxException {
         this("http", "localhost", 8080);
@@ -69,30 +82,64 @@ public class LRAClient implements LRAClientAPI {
     }
 
     public LRAClient(String scheme, String host, int port) throws URISyntaxException {
-        client = ClientBuilder.newClient();
+        init(scheme, host, port);
+    }
+
+    public LRAClient(String coordinatorUrl) throws MalformedURLException, URISyntaxException {
+        init(coordinatorUrl);
+    }
+
+    private void init(String coordinatorUrl) throws MalformedURLException, URISyntaxException {
+        URL url = new URL(coordinatorUrl);
+
+        init(url.getProtocol(), url.getHost(), url.getPort());
+    }
+
+    private void init(String scheme, String host, int port) throws URISyntaxException {
+        if (client == null)
+            client = ClientBuilder.newClient();
+
         base = new URI(scheme, null, host, port, "/" + COORDINATOR_PATH_NAME, null, null);
         target = client.target(base);
+
+        if (lraStack == null)
+            lraStack = new Stack<>();
+
+        isUseable = true;
     }
 
-    public void setCoordinator(String coordinatorUrl) {
+    /**
+     * Update the clients notion of the current coordinator. Warning all further operations will be performed
+     * on the LRA manager that created the passed in coordinator.
+     *
+     * @param coordinatorUrl the full url of an LRA
+     */
+    public void setCurrentLRA(String coordinatorUrl) {
         try {
-            URL url = new URL(coordinatorUrl);
+            init(coordinatorUrl);
 
-            base = url.toURI();
+            lraStack.add(coordinatorUrl);
         } catch (MalformedURLException | URISyntaxException e) {
-            ;throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build());
         }
-
-        target = client.target(base);
     }
 
-    //@PostConstruct
-    public void initialize() {
+    public boolean isUseable() {
+        return isUseable;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
         // an opportunity to consult any config
+
     }
 
+    @PreDestroy
+    public void preDestroy() {
+        isUseable = false;
+    }
     public static String getLRAId(String lraId) {
-        return lraId == null || lraId.endsWith("/") ? null : lraId.substring(lraId.lastIndexOf('/') + 1);
+        return lraId == null ? null : lraId.replaceFirst(".*/([^/?]+).*", "$1");
     }
 
     public String startLRA(String clientID) throws WebApplicationException {
@@ -128,6 +175,8 @@ public class LRAClient implements LRAClientAPI {
             assertNotNull(lraObject, "LRA is null");
 
             lra = lraObject.toString();
+
+            lraStack.add(lra);
         } finally {
             if (response != null)
                 response.close();
@@ -141,12 +190,12 @@ public class LRAClient implements LRAClientAPI {
 
     @Override
     public void cancelLRA(String lraId) throws WebApplicationException {
-        endLRA(getLRAId(lraId), false);
+        endLRA(lraId, false);
     }
 
     @Override
     public void closeLRA(String lraId) throws WebApplicationException {
-        endLRA(getLRAId(lraId), true);
+        endLRA(lraId, true);
     }
 
     @Override
@@ -159,8 +208,9 @@ public class LRAClient implements LRAClientAPI {
     }
 
     @Override
-    public void joinLRA(String lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException {
-        enlistCompensator(lraId, timelimit, "", compensateUrl, completeUrl, leaveUrl, statusUrl);
+    public String joinLRA(String lraId, Integer timelimit,
+                          String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException {
+        return enlistCompensator(lraId, timelimit, "", compensateUrl, completeUrl, leaveUrl, statusUrl);
     }
 
     @Override
@@ -169,7 +219,9 @@ public class LRAClient implements LRAClientAPI {
 
         try {
             response = target.path(String.format(leaveFormat, getLRAId(lraId)))
-                    .request().put(Entity.entity(compensatorUrl, MediaType.TEXT_PLAIN));
+                    .request()
+                    .header(LRA_HTTP_HEADER, lraId)
+                    .put(Entity.entity(compensatorUrl, MediaType.TEXT_PLAIN));
 
             if (Response.Status.OK.getStatusCode() != response.getStatus())
                 throw new WebApplicationException(response);
@@ -276,7 +328,7 @@ public class LRAClient implements LRAClientAPI {
         return b.append(link);
     }
 
-    private void enlistCompensator(String lraUrl, int timelimit, String uriPrefix,
+    private String enlistCompensator(String lraUrl, int timelimit, String uriPrefix,
                                    String compensateUrl, String completeUrl, String leaveUrl, String statusUrl ) {
         validateURL(completeUrl, false, "Invalid complete URL: %s");
         validateURL(compensateUrl, false, "Invalid compensate URL: %s");
@@ -309,18 +361,7 @@ public class LRAClient implements LRAClientAPI {
             if (response.getStatus() != Response.Status.OK.getStatusCode())
                 throw new WebApplicationException(Response.status(response.getStatus()).entity("unable to register compensator: ").build());
 
-
-            LRAState lraState = new LRAState(lraUrl);
-            lraState.registrationStatus = response.getStatusInfo().toString();
-            lraState.statusUrl = statusUrl;
-
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                lraState.registered = true;
-                lraState.rcvUrl = response.readEntity(String.class);
-            } else {
-                lraState.registered = false;
-            }
-
+            return response.readEntity(String.class);
         } finally {
             if (response != null)
                 response.close();
@@ -328,13 +369,25 @@ public class LRAClient implements LRAClientAPI {
     }
 
     private void endLRA(String lra, boolean confirm) throws WebApplicationException {
-        String confirmUrl = String.format(confirm ? confirmFormat : compensateFormat, lra);
+        String confirmUrl = String.format(confirm ? confirmFormat : compensateFormat, getLRAId(lra));
         Response response = null;
 
         try {
             response = target.path(confirmUrl).request().put(Entity.text(""));
 
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus(), "LRA finished with an unexpected status code");
+
+            // TODO store the hierarchy of LRAs somewhere
+            lraStack.remove(lra);
+
+            String nextLRA = getCurrent();
+
+            if (nextLRA != null)
+                try {
+                    init(nextLRA);
+                } catch (MalformedURLException | URISyntaxException ignore) {
+                    // the validity of the url was checked when we added it to lraStack
+                }
         } finally {
             if (response != null)
                 response.close();
@@ -366,5 +419,9 @@ public class LRAClient implements LRAClientAPI {
 
     public String getUrl() {
         return base.toString();
+    }
+
+    public String getCurrent() {
+        return lraStack.empty() ? null : lraStack.peek();
     }
 }

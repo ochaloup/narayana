@@ -160,14 +160,14 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @param timelimit The time limit (in seconds) that the Compensator can guarantee that it
      *                can compensate the work performed by the service
-     * @param completeUrl Performing a POST on this URL  will cause the participant to tidy up and it can forget this transaction.
      * @param compensateUrl Performing a POST onthis URL will cause the participant to compensate the work that
      *                      was done within the scope of the LRA.
-     * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
+     * @param completeUrl Performing a POST on this URL  will cause the participant to tidy up and it can forget this transaction.
      * @param leaveUrl Performing a PUT on this URL with cause the compensator to leave the LRA
+     * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
      * @throws WebApplicationException
      */
-    void joinLRA(String lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
+    String joinLRA(String lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
 
     /**
      * A Compensator can resign from the LRA at any time prior to the completion of an activity
@@ -177,4 +177,10 @@ public interface LRAClientAPI {
      * @throws WebApplicationException Comms error
      */
     void leaveLRA(String lraId, String body) throws WebApplicationException;
+
+    /**
+     * checks whether there is an LRA associated with the calling thread
+     * @return
+     */
+    String getCurrent();
 }

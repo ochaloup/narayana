@@ -22,6 +22,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,7 +41,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECO
 public class ActivityController {
 
     @Inject
-    private LRAClientAPI lraClient;
+    private LRAClient lraClient;
 
     private static final AtomicInteger completedCount = new AtomicInteger(0);
     private static final AtomicInteger compensatedCount = new AtomicInteger(0);
@@ -143,19 +146,57 @@ public class ActivityController {
     }
 
     @PUT
+    @Path("/supports")
+    @LRA(LRA.LRAType.SUPPORTS)
+    public Response supportsLRACall(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        return Response.ok(lraId == null ? "" : lraId).build();
+    }
+
+    @PUT
+    @Path("/startviaapi")
+    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    public Response subActivity(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        if (lraId != null)
+            throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
+
+        lraId = lraClient.startLRA("subActivity", 0);
+
+        String id = null;
+        Response response = ClientBuilder.newClient().target(context.getBaseUri()).path("activities").path("supports").request().put(Entity.text(""));
+        if (response.hasEntity())
+            id = response.readEntity(String.class);
+
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+
+        if (lraId == null || id == null || !lraId.equals(id))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text("Unequal LRA ids")).build();
+
+        return Response.ok(id).build();
+    }
+
+    @PUT
     @Path("/work")
     @LRA(LRA.LRAType.REQUIRED)
     public Response activityWithLRA(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
                                     @HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        Activity activity = addWork(lraId, rcvId);
+
+        if (activity == null)
+            return Response.status(Response.Status.EXPECTATION_FAILED).entity("Missing lra data").build();
+
+        return Response.ok(lraId).build();
+    }
+
+    private Activity addWork(String lraId, String rcvId) {
         String txId = LRAClient.getLRAId(lraId);
 
         System.out.printf("ActivityController: work id %s and rcvId %s %n", txId, rcvId);
 
         if (txId == null)
-            return Response.status(Response.Status.EXPECTATION_FAILED).entity("Missing transaction data").build();
+            return null;
 
         try {
-            activityService.getActivity(txId);
+            return activityService.getActivity(txId);
         } catch (NotFoundException e) {
             Activity activity = new Activity(txId);
 
@@ -163,9 +204,9 @@ public class ActivityController {
             activity.status = null;
 
             activityService.add(activity);
-        }
 
-        return Response.ok(lraId).build();
+            return activity;
+        }
     }
 
     @GET
@@ -178,14 +219,14 @@ public class ActivityController {
     }
 
     @GET
-    @Path("/stats/completed")
+    @Path("/completedactivitycount")
     @Produces(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.NOT_SUPPORTED)
     public Response getCompleteCount() {
         return Response.ok(completedCount.get()).build();
     }
     @GET
-    @Path("/stats/compensated")
+    @Path("/compensatedactivitycount")
     @Produces(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.NOT_SUPPORTED)
     public Response getCompensatedCount() {
@@ -254,5 +295,14 @@ public class ActivityController {
     @Produces(MediaType.APPLICATION_JSON)
     public String compensatedStatus(@PathParam("TxId")String txId) {
         return CompensatorStatus.Compensated.name();
+    }
+
+    private void checkStatusAndClose(Response response, int expected) {
+        try {
+            if (response.getStatus() != expected)
+                throw new WebApplicationException(response);
+        } finally {
+            response.close();
+        }
     }
 }

@@ -37,6 +37,7 @@ import io.swagger.annotations.ApiOperation;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_PATH_NAME;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER2;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMEOUT_PARAM_NAME;
 
@@ -162,10 +163,11 @@ public class Coordinator {
             try {
                 transactionService.addTransaction(tx);
 
-                return Response.status(Response.Status.CREATED).
-                        entity(tx.getId()).
-                        header(LRA_HTTP_HEADER, tx.getId()).
-                        build();
+                return Response.status(Response.Status.CREATED)
+                        .entity(tx.getId())
+                        .header(LRA_HTTP_HEADER, tx.getId())
+                        .header(LRA_HTTP_HEADER2, tx.getId())
+                        .build();
             } finally {
                 AtomicAction.suspend();
             }
