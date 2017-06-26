@@ -138,6 +138,7 @@ public class LRAClient implements LRAClientAPI {
     public void preDestroy() {
         isUseable = false;
     }
+
     public static String getLRAId(String lraId) {
         return lraId == null ? null : lraId.replaceFirst(".*/([^/?]+).*", "$1");
     }

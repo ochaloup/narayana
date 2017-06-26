@@ -7,6 +7,7 @@ import org.jboss.narayana.rts.lra.compensator.api.Leave;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 
+import javax.inject.Inject;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -223,9 +224,9 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
     }
 
     private String startLRA(String clientId, int timeout) {
-        getLRAClient(true);
+//        getLRAClient(true);
 
-        return lraClient.startLRA(clientId, timeout);
+        return getLRAClient(true).startLRA(clientId, timeout);
     }
 
     private void resumeTransaction(String lraId) {

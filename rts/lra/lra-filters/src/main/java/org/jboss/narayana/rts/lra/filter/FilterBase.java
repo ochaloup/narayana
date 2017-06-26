@@ -20,7 +20,7 @@ class FilterBase {
     private LRAClient lraClient;
 
     private boolean hasClient() {
-        return false;//lraClient != null && lraClient.isUseable();
+        return lraClient != null && lraClient.isUseable();
     }
 
     LRAClient getLRAClient(boolean create) {

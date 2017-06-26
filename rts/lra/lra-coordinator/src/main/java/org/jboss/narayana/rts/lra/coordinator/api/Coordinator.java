@@ -1,7 +1,5 @@
 package org.jboss.narayana.rts.lra.coordinator.api;
 
-import com.arjuna.ats.arjuna.AtomicAction;
-import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -19,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -27,11 +24,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.function.BiFunction;
+
 import io.swagger.annotations.ApiOperation;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_PATH_NAME;
@@ -64,7 +64,7 @@ public class Coordinator {
     @ApiOperation(value = "Returns all LRAs",
             notes = "Gets both active and recovering LRAs",
             response = LRAStatus.class, responseContainer = "List")
-    public List<LRAStatus> getAllTransactions() {
+    public List<LRAStatus> getAllLRAs() {
         return transactionService.getAll();
     }
 
@@ -78,7 +78,7 @@ public class Coordinator {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 200, message = "If the LRA exists" )
     } )
-    public Boolean isActiveTransaction(
+    public Boolean isActiveLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
         return transactionService.getTransaction(toLRAId(lraId)).isActive();
@@ -94,7 +94,7 @@ public class Coordinator {
     @ApiResponses( {
             @ApiResponse( code = 200, message = "The request was successful" )
     } )
-    public List<LRAStatus> getRecoveringTransactions() {
+    public List<LRAStatus> getRecoveringLRAs() {
         return transactionService.getAllRecovering();
     }
 
@@ -107,10 +107,9 @@ public class Coordinator {
     @ApiResponses( {
             @ApiResponse( code = 200, message = "The request was successful" )
     } )
-    public List<LRAStatus> getActiveTransactions() {
+    public List<LRAStatus> getActiveLRAs() {
         return transactionService.getAllActive();
     }
-
 
     // Performing a POST on /lra-org.jboss.narayana.rts.lra.coordinator/start?ClientID=<ClientID> will start a new lra with a default timeout and
     // return a lra URL of the form <machine>/lra-org.jboss.narayana.rts.lra.coordinator/<LraId>.
@@ -133,7 +132,8 @@ public class Coordinator {
             @ApiResponse(code = 200, message = "The request was successful and the response body contains the id of the new LRA"),
             @ApiResponse(code = 500, message = "A new LRA could not be started")
     } )
-    public Response startTransaction(
+
+    public Response startLRA(
             @ApiParam( value = "Each client is expected to have a unique identity (which can be a URL).", required = false)
             @QueryParam("ClientID")
             @DefaultValue("") String clientId,
@@ -141,37 +141,15 @@ public class Coordinator {
                     + "If the LRA is terminated because of a timeout, the LRA URL is deleted.\n"
                     + "All further invocations on the URL will return 404.\n"
                     + "The invoker can assume this was equivalent to a compensate operation.")
-            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") int timelimit) {
+            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") Integer timelimit) throws WebApplicationException {
 
-        Transaction tx = new Transaction(String.format("%s%s", context.getBaseUri(), COORDINATOR_PATH_NAME), clientId);
+        String lraId = transactionService.startLRA(String.format("%s%s", context.getBaseUri(), COORDINATOR_PATH_NAME), clientId, timelimit);
 
-//        logger.info(() -> String.format("org.jboss.narayana.rts.lra.coordinator: timeout=%d", timeout);
-
-        // round up the timeout from milliseconds to seconds
-        if (timelimit != 0) {
-            if (timelimit < 0)
-                timelimit = 0;
-        }
-
-        int status = tx.begin(timelimit);
-
-        if (status != ActionStatus.RUNNING) {
-            tx.abort();
-
-            throw new InternalServerErrorException(ActionStatus.stringForm(status));
-        } else {
-            try {
-                transactionService.addTransaction(tx);
-
-                return Response.status(Response.Status.CREATED)
-                        .entity(tx.getId())
-                        .header(LRA_HTTP_HEADER, tx.getId())
-                        .header(LRA_HTTP_HEADER2, tx.getId())
-                        .build();
-            } finally {
-                AtomicAction.suspend();
-            }
-        }
+        return Response.status(Response.Status.CREATED)
+                .entity(lraId)
+                .header(LRA_HTTP_HEADER, lraId)
+                .header(LRA_HTTP_HEADER2, lraId)
+                .build();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/completed/<LraId> returns 200 if the lra completed successfully
@@ -185,7 +163,7 @@ public class Coordinator {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 200, message = "If the LRA exists and its' status is known" )
     } )
-    public Response isCompletedTransaction(
+    public Response isCompletedLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
         return Response.ok(Boolean.toString(transactionService.getTransaction(toLRAId(lraId)).isComplete())).build();
@@ -201,7 +179,7 @@ public class Coordinator {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 200, message = "If the LRA exists and its' status is known" )
     } )
-    public Response isCompensatedTransaction(
+    public Response isCompensatedLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
         return Response.ok(Boolean.toString(transactionService.getTransaction(toLRAId(lraId)).isCompensated())).build();
@@ -227,10 +205,10 @@ public class Coordinator {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 200, message = "The complete message was sent to all coordinators" )
     } )
-    public Response closeTransaction(
+    public Response closeLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId) throws NotFoundException {
-        return endTransaction(toLRAId(txId), false);
+        return endLRA(toLRAId(txId), false);
     }
 
     @PUT
@@ -246,33 +224,16 @@ public class Coordinator {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 200, message = "The compensate message was sent to all coordinators" )
     } )
-    public Response cancelTransaction(
+    public Response cancelLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId) throws NotFoundException {
-        return endTransaction(toLRAId(txId), true);
+        return endLRA(toLRAId(txId), true);
     }
 
-    private Response endTransaction(String txId, boolean compensate) throws NotFoundException {
-        Transaction transaction = transactionService.getTransaction(txId);
+    private Response endLRA(String txId, boolean compensate) throws NotFoundException {
+        int status = transactionService.endLRA(txId, compensate);
 
-        if (!transaction.isRunning())
-            return Response.status(Response.Status.PRECONDITION_FAILED).build();
-
-        AtomicAction.resume(transaction);
-
-        int status = transaction.end(compensate);
-        int sc = 500;
-
-        if (compensate) {
-            if (status == ActionStatus.COMMITTED)
-                sc = 200;
-        } else if (status == ActionStatus.ABORTED) {
-            sc = 200;
-        }
-
-        transactionService.finished(transaction, sc != 200);
-
-        return Response.status(sc).entity(ActionStatus.stringForm(status)).build();
+        return Response.status(status).build();
     }
 
     @PUT
@@ -282,9 +243,9 @@ public class Coordinator {
             response = String.class)
     @ResponseHeader(name = LRA_HTTP_RECOVERY_HEADER, response = String.class,
             description = "If the compensator is successfully registered with the LRA then this header\n"
-            + " will contain a unique resource reference for that compensator:\n"
-            + " - HTTP GET on the reference returns the original compensator URL;\n"
-            + " - HTTP PUT on the reference will overwrite the old compensator URL with the new one supplied.")
+                    + " will contain a unique resource reference for that compensator:\n"
+                    + " - HTTP GET on the reference returns the original compensator URL;\n"
+                    + " - HTTP PUT on the reference will overwrite the old compensator URL with the new one supplied.")
     @ApiResponses( {
             @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
             @ApiResponse( code = 412, message = "The LRA is not longer active (ie in the complete or compensate messages have been sent" ),
@@ -294,7 +255,7 @@ public class Coordinator {
                     + " - HTTP PUT on the reference will overwrite the old compensator URL with the new one supplied."
             )
     } )
-    public Response joinTransactionViaHeader(
+    public Response joinLRAViaHeader(
             @ApiParam( value = "The identifier of the LRA that the compensator wishes to join", required = true )
             @HeaderParam(LRA_HTTP_HEADER) String lraId,
             @ApiParam( value = "The resource paths that the coordinator will use to complete or compensate and to request"
@@ -309,7 +270,7 @@ public class Coordinator {
                     required = true )
             @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") int timeLimit,
             String compensatorUrl) throws NotFoundException {
-        return joinTransaction(lraId, timeLimit, compensatorUrl, linkHeader);
+        return joinLRA(lraId, timeLimit, compensatorUrl, linkHeader);
     }
 
     @PUT
@@ -331,7 +292,7 @@ public class Coordinator {
                     + " - HTTP PUT on the reference will overwrite the old compensator URL with the new one supplied."
             )
     } )
-    public Response joinTransactionViaBody(
+    public Response joinLRAViaBody(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId,
             @ApiParam( value = "The time limit (in seconds) that the Compensator can guarantee that it can compensate the work performed by the service."
@@ -359,51 +320,18 @@ public class Coordinator {
                     + "Performing a POST on <URL>/complete will cause the compensator to tidy up and\n"
                     + "   it can forget this LRA.\n")
                     String compensatorUrl) throws NotFoundException {
-        return joinTransaction(toLRAId(lraId), timeLimit, compensatorUrl, null);
+        return joinLRA(toLRAId(lraId), timeLimit, compensatorUrl, null);
     }
 
-    private Response joinTransaction(String txId, int timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
-        // return a recovery cooridinator:  http://<machine>/lra-recovery-org.jboss.narayana.rts.lra.coordinator/<RecCoordId>
-        Transaction transaction = transactionService.getTransaction(txId);
-        final String host = context.getRequestUri().getHost();
-
+    private Response joinLRA(String txId, int timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
         final String recoveryUrlBase = String.format("http://%s/%s/",
                 context.getRequestUri().getAuthority(), LRAClient.RECOVERY_COORDINATOR_PATH_NAME);
 
-        // round up the timeout from milliseconds to seconds
-        if (timeLimit != 0) {
-            if (timeLimit < 0)
-                timeLimit = 0;
-            else
-                timeLimit /= 1000;
-        }
+        StringBuilder recoveryUrl = new StringBuilder();
 
-        /*
-         * TODO update the spec with:
-         *   If the transaction is not TransactionActive then the implementation MUST return a 412 status code
-         */
-        if (!transaction.isRunning())
-            return Response.status(Response.Status.PRECONDITION_FAILED).build();
+        int status = transactionService.joinLRA(recoveryUrl, txId, timeLimit, compensatorUrl, linkHeader, recoveryUrlBase);
 
-        String coordinatorId;
-
-//        if (coordinatorUrl.endsWith("/"))
-//            coordinatorUrl = coordinatorUrl.substring(0, coordinatorUrl.length() - 1);
-
-        if (linkHeader != null) {
-            coordinatorId = transaction.enlistParticipants(txId, linkHeader, recoveryUrlBase);
-        } else {
-            coordinatorId = transaction.enlistParticipant( txId, compensatorUrl, recoveryUrlBase);
-        }
-
-        String recoveryUrl = transaction.getRecoveryUrl();
-
-        if (coordinatorId == null)
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(transaction.getStatus()).build();
-
-        transactionService.addCompensator(transaction, coordinatorId, compensatorUrl);
-
-        return Response.ok(recoveryUrl).header(LRA_HTTP_RECOVERY_HEADER, recoveryUrl).build();
+        return Response.status(status).entity(recoveryUrl).header(LRA_HTTP_RECOVERY_HEADER, recoveryUrl).build();
     }
 
     // A compensator can resign from a lra at any time prior to the completion of an activity by performing a
@@ -418,23 +346,17 @@ public class Coordinator {
             @ApiResponse( code = 412, message = "The LRA is not longer active (ie in the complete or compensate messages have been sent" ),
             @ApiResponse( code = 200, message = "If the compensator was successfully removed from the LRA" )
     } )
-    public Response leaveTransaction(
+    public Response leaveLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId,
             String compensatorUrl) throws NotFoundException {
-        Transaction transaction = transactionService.getTransaction(toLRAId(txId));
+        String reqUri = context.getRequestUri().toString();
 
-        if (!transaction.isRunning())
-            return Response.status(Response.Status.PRECONDITION_FAILED).build();
+        reqUri =  reqUri.substring(0, reqUri.lastIndexOf('/'));
 
-        try {
-            if (!transaction.forgetParticipant(compensatorUrl))
-                return Response.status(Response.Status.OK).entity("WARNING could not determine wether or not the request succeeded").build();
-        } catch (Exception e) {
-            new NotFoundException(Response.status(Response.Status.BAD_REQUEST).entity("no such compensator").build());
-        }
+        int status = transactionService.leave(reqUri, compensatorUrl);
 
-        return Response.ok().build();
+        return Response.status(status).build();
     }
 
     private String toLRAId(String lraId) {
