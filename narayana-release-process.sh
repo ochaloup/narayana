@@ -30,6 +30,20 @@ if [[ $? != 0 ]]
 then
   set -e
   git checkout 5.5
+  set +e
+  git status | grep "nothing to commit, working directory is clean"
+  if [[ $? != 0 ]]
+  then
+    git status
+    exit
+  fi
+  git status | grep "ahead"
+  if [[ $? != 0 ]]
+  then
+    git status
+    exit
+  fi
+  set -e
   git log -n 10
   echo Mark version as released in Jira and create next version: https://issues.jboss.org/plugins/servlet/project-config/JBTM/versions
   echo Make sure you have the credentials in your .m2/settings.xml and ignore an error in the final module about missing javadocs
