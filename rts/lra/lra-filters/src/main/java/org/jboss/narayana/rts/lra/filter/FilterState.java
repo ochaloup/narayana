@@ -1,24 +1,28 @@
 package org.jboss.narayana.rts.lra.filter;
 
+import java.net.URL;
+
 class FilterState {
     private static final ThreadLocal<FilterState> lraContext = new ThreadLocal<>();
 
-    String id;
-    String newLRA;
-    String suspendedLRA;
+    URL id;
+    URL newLRA;
+    URL suspendedLRA;
+    String recoveryUrl;
 
-    FilterState(String lraId, String newLRA, String suspendedLRA) {
+    FilterState(URL lraId, URL newLRA, URL suspendedLRA, String recoveryUrl) {
         this.id = lraId;
         this.newLRA = newLRA;
         this.suspendedLRA = suspendedLRA;
+        this.recoveryUrl = recoveryUrl;
     }
 
     static FilterState getCurrentLRA() {
         return lraContext.get();
     }
 
-    static void setCurrentLRA(String lra) {
-        lraContext.set(new FilterState(lra, null, null));
+    static void setCurrentLRA(URL lra) {
+        lraContext.set(new FilterState(lra, null, null, null));
     }
 
     static void setCurrentLRA(FilterState filterState) {

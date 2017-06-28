@@ -1,5 +1,7 @@
 package org.jboss.narayana.rts.lra.coordinator.api;
 
+import java.net.URL;
+
 //@Data
 //@AllArgsConstructor
 //@ApiModel( value = "LRA", description = "A Long Running Action" )
@@ -16,18 +18,24 @@ public class LRAStatus {
     private boolean isRecovering;
 //    @ApiModelProperty( value = "Indicates whether or not this LRA has been asked to complete or compensate yet", required = false )
     private boolean isActive;
+//    @ApiModelProperty( value = "Indicates whether or not this LRA is top level", required = false )
+    private boolean isTopLevel;
 
     public LRAStatus(String lraId) {
         this.lraId = lraId;
     }
+    public LRAStatus(URL lraId) {
+        this.lraId = lraId.toString();
+    }
 
-    public LRAStatus(String lraId, String clientId, boolean isComplete, boolean isCompensated, boolean isRecovering, boolean isActive) {
+    public LRAStatus(String lraId, String clientId, boolean isComplete, boolean isCompensated, boolean isRecovering, boolean isActive, boolean isTopLevel) {
         this.lraId = lraId;
         this.clientId = clientId;
         this.isComplete = isComplete;
         this.isCompensated = isCompensated;
         this.isRecovering = isRecovering;
         this.isActive = isActive;
+        this.isTopLevel = isTopLevel;
     }
 
     public String getLraId() {
@@ -52,6 +60,10 @@ public class LRAStatus {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public boolean isTopLevel() {
+        return isTopLevel;
     }
 
     @Override

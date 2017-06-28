@@ -5,6 +5,7 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.net.URL;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
@@ -12,13 +13,19 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEAD
 public class ClientLRAResponseFilter extends FilterBase implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
-        Object lraId = responseContext.getHeaders().getFirst(LRA_HTTP_HEADER);
-
+        Object outgoingLRA = requestContext.getHeaders().getFirst(LRA_HTTP_HEADER);
+        Object incomingLRA = responseContext.getHeaders().getFirst(LRA_HTTP_HEADER);
         // if the response does not contain a transaction put back the one that was on the outgoing request
-        if (lraId == null)
-            lraId = requestContext.getHeaders().getFirst(LRA_HTTP_HEADER);
+        Object lraId = incomingLRA == null ? outgoingLRA : incomingLRA;
 
-        if (lraId != null)
-            associateLRA(lraId.toString());
+        // if there is an LRA then associate
+        if (lraId != null) {
+            associateLRA(new URL(lraId.toString()));
+        }
+
+       System.out.printf("ClientLRAResponseFilter: response from %s request to %s: %s%n\tContext changed from %s to %s%n",
+               requestContext.getMethod(), requestContext.getUri(), responseContext.getStatusInfo(),
+               outgoingLRA == null ? "null" : outgoingLRA,
+               incomingLRA == null ? "null" : incomingLRA);
     }
 }

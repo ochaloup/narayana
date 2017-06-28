@@ -33,49 +33,65 @@ import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 @Path("/trip")
 @LRA(LRA.LRAType.SUPPORTS)
 public class TripController {
-    private static URL THEATRE_SERVICE_BASE_URL;
-    private static URL TAXI_SERVICE_BASE_URL;
+    private static URL HOTEL_SERVICE_BASE_URL;
+    private static URL FLIGHT_SERVICE_BASE_URL;
 
-    private Client theatreClient;
-    private Client taxiClient;
+    private Client hotelClient;
+    private Client flightClient;
 
-    private WebTarget theatreTarget;
-    private WebTarget taxiTarget;
+    private WebTarget hotelTarget;
+    private WebTarget flightTarget;
 
     @PostConstruct
     private void initController() {
         try {
-            THEATRE_SERVICE_BASE_URL = new URL("http://localhost:8081");
-            TAXI_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            HOTEL_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:8081");
 
-            theatreClient = ClientBuilder.newClient();
-            taxiClient = ClientBuilder.newClient();
+            hotelClient = ClientBuilder.newClient();
+            flightClient = ClientBuilder.newClient();
 
-            theatreTarget = theatreClient.target(URI.create(new URL(THEATRE_SERVICE_BASE_URL, "/theatre").toExternalForm()));
-            taxiTarget = taxiClient.target(URI.create(new URL(TAXI_SERVICE_BASE_URL, "/taxi").toExternalForm()));
+            hotelTarget = hotelClient.target(URI.create(new URL(HOTEL_SERVICE_BASE_URL, "/hotel").toExternalForm()));
+            flightTarget = flightClient.target(URI.create(new URL(FLIGHT_SERVICE_BASE_URL, "/flight").toExternalForm()));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * The quickstart scenario is:
+     *
+     * start LRA 1
+     *   Book hotel
+     *   start LRA 2
+     *     start LRA 3
+     *       Book flight option 1
+     *     start LRA 4
+     *       Book flight option 2
+     *
+     * @param asyncResponse
+     * @param hotel hotel name
+     * @param hotelGuests number of beds required
+     * @param flightSeats number of people flying
+     */
     @GET
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
     public void bookTrip(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam("show") @DefaultValue("") String show,
-                         @QueryParam("theatreSeats") @DefaultValue("1") Integer theatreSeats,
-                         @QueryParam("taxiSeats") @DefaultValue("0") Integer taxiSeats) {
+                         @QueryParam("hotel") @DefaultValue("") String hotel,
+                         @QueryParam("hotelGuests") @DefaultValue("1") Integer hotelGuests,
+                         @QueryParam("flightSeats") @DefaultValue("0") Integer flightSeats) {
 
         long timeout = -1;
 
-        CompletableFuture<Booking> theatreBooking = show.isEmpty() ? null : bookTheatre();
-        CompletableFuture<Booking> taxiBooking = taxiSeats <= 0 ? null : bookTaxi();
+        CompletableFuture<Booking> hotelBooking = hotelGuests <= 0 ? null : bookHotel();
+        CompletableFuture<Booking> flightBooking = flightSeats <= 0 ? null : bookFlight();
 
-        if (theatreBooking != null) {
+        if (hotelBooking != null) {
             timeout = 500;
 
-            if (taxiBooking != null) {
-                CompletableFuture<Booking> trip = theatreBooking.thenCombineAsync(taxiBooking, Booking::new);
+            if (flightBooking != null) {
+                CompletableFuture<Booking> trip = hotelBooking.thenCombineAsync(flightBooking, Booking::new);
 
                 trip
                         .thenApply(
@@ -83,15 +99,15 @@ public class TripController {
                         .exceptionally(
                                 e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
             } else {
-                theatreBooking
+                hotelBooking
                         .thenApply(asyncResponse::resume)
                         .exceptionally(e ->
                                 asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
             }
-        } else if (taxiBooking != null) {
+        } else if (flightBooking != null) {
             timeout = 500;
 
-            taxiBooking
+            flightBooking
                     .thenApply(asyncResponse::resume)
                     .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
         }
@@ -104,17 +120,17 @@ public class TripController {
         }
     }
 
-    private CompletableFuture<Booking> bookTheatre() {
-        WebTarget webTarget = theatreTarget
+    private CompletableFuture<Booking> bookHotel() {
+        WebTarget webTarget = hotelTarget
                 .path("book")
-                .queryParam("show", "Cats").queryParam("seats", 2);
+                .queryParam("hotel", "The Grand").queryParam("hotelGuests", 2);
 
         return invokeWebTarget(webTarget);
     }
-    private CompletableFuture<Booking> bookTaxi() {
-        WebTarget webTarget = taxiTarget
+    private CompletableFuture<Booking> bookFlight() {
+        WebTarget webTarget = flightTarget
                 .path("book")
-                .queryParam("seats", 2);
+                .queryParam("flightSeats", 2);
 
         return invokeWebTarget(webTarget);
     }

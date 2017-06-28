@@ -63,14 +63,14 @@ public class LRAIT {
 
     @Test
     public void testStartLRA() throws MalformedURLException, URISyntaxException {
-        String lra = lraClient.startLRA("testStartLRA", 0);
+        URL lra = lraClient.startLRA("testStartLRA", 0);
         JsonArray lras = lraWrapper.getLRAs();
 
         assertNotNull(lras); // there should be at least one
         assertNotEquals(0, lras.size());
 
         // the new lra should be present in the current list of lras
-        String lraId = LRAClient.getLRAId(lra);
+        String lraId = LRAClient.getLRAId(lra.toString());
 
         assertTrue(StreamSupport.stream(lras.spliterator(), false).
                 anyMatch(jv -> ((JsonObject) jv).getString("lraId").equals(lraId)));

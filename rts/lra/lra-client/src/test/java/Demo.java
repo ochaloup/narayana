@@ -60,7 +60,7 @@ public class Demo {
 
     @Test
     public void testClientManagedLRA() throws MalformedURLException {
-        String lraUrl = lraClient.startLRA("ClientDemo1", 500); // start an LRA
+        URL lraUrl = lraClient.startLRA("ClientDemo1", 500); // start an LRA
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(URI.create(new URL(MICRSERVICE_BASE_URL, "/").toExternalForm()));
 
@@ -85,18 +85,18 @@ public class Demo {
         validateParticipantStatus(client, lraUrl, null, Response.Status.BAD_REQUEST.getStatusCode());
 
         // end the LRA started by this client
-        lraClient.cancelLRA(lraId);
+        lraClient.cancelLRA(new URL(lraId));
 
         // validate that the participant completed
         validateParticipantStatus(ClientBuilder.newClient(), lraUrl,
                 CompensatorStatus.Compensated, Response.Status.OK.getStatusCode());
     }
 
-    private void validateParticipantStatus(Client client, String lraUrl, CompensatorStatus expectedStatus, int expectedHttpCode) throws MalformedURLException {
+    private void validateParticipantStatus(Client client, URL lraUrl, CompensatorStatus expectedStatus, int expectedHttpCode) throws MalformedURLException {
         WebTarget target = client.target(URI.create(new URL(MICRSERVICE_BASE_URL, "/").toExternalForm()));
 
         // NB if lra has terminated lraUrl will no longer exists so make sure to mark the target method as NOT_SUPPORTED
-        Response response = target.path("activities").path("status").request().header(LRAClient.LRA_HTTP_HEADER, lraUrl).get();
+        Response response = target.path("activities").path("status").request().header(LRAClient.LRA_HTTP_HEADER, lraUrl.toString()).get();
 
         assertEquals(expectedHttpCode, response.getStatus());
 

@@ -23,6 +23,7 @@ public class TransactionService {
     private static Map<String, String> participants = new ConcurrentHashMap<>();
 
     public Transaction getTransaction(String lraId) throws NotFoundException {
+        lraTrace(lraId, "request for LRA");
 
         if (!transactions.containsKey(lraId)) {
             throw new NotFoundException(Response.status(404).entity("Invalid transaction id: " + lraId).build());
@@ -47,15 +48,24 @@ public class TransactionService {
         return recoveringTransactions.values().stream().map(LRAStatus::new).collect(toList());
     }
 
-    public void addTransaction(Transaction transaction) {
-        transactions.put(transaction.getId(), transaction);
+    public void addTransaction(Transaction lra) {
+        transactions.put(lra.getId(), lra);
     }
 
-    public void finished(Transaction transaction, boolean needsRecovery) {
-        transactions.remove(transaction.getId());
+    public void finished(Transaction transaction, boolean fromHierarchy, boolean needsRecovery) {
+        if (fromHierarchy || transaction.isTopLevel()) {
+            remove(ActionStatus.stringForm(transaction.status()), transaction.getId());
+        }
 
         if (needsRecovery)
-           recoveringTransactions.put(transaction.getId(), transaction);
+            recoveringTransactions.put(transaction.getId(), transaction);
+    }
+
+    public void remove(String state, String lraId) {
+        lraTrace(lraId, "remove LRA");
+
+        transactions.remove(lraId);
+        recoveringTransactions.remove(lraId);
     }
 
     public void addCompensator(Transaction transaction, String coordinatorId, String compensatorUrl) {
@@ -66,53 +76,73 @@ public class TransactionService {
         return participants.get(rcvCoordId);
     }
 
-    public String startLRA(String baseUri, String clientId, Integer timelimit) {
-        Transaction tx = new Transaction(baseUri, clientId);
+    public synchronized String startLRA(String baseUri, String parentLRA, String clientId, Integer timelimit) {
+        Transaction lra = new Transaction(baseUri, parentLRA, clientId);
 
         if (timelimit < 0)
             timelimit = 0;
 
-        int status = tx.begin(timelimit);
+        if (lra.currentLRA() != null)
+            System.out.printf("WARNING LRA %s is already associated");
+
+        int status = lra.begin(timelimit);
 
         if (status != ActionStatus.RUNNING) {
-            tx.abort();
+            lraTrace(lra.getId(), "failed to start LRA");
 
-            throw new InternalServerErrorException(ActionStatus.stringForm(status));
+            lra.abort();
+
+            throw new InternalServerErrorException("Could not start LRA: " + ActionStatus.stringForm(status));
         } else {
             try {
-                addTransaction(tx);
+                addTransaction(lra);
 
-                return tx.getId();
+                lraTrace(lra.getId(), "started LRA");
+
+                return lra.getId();
             } finally {
                 AtomicAction.suspend();
             }
         }
     }
 
-    public int endLRA(String lraId, boolean compensate) {
+    public int endLRA(String lraId, boolean compensate, boolean fromHierarchy) {
+        lraTrace(lraId, "end LRA");
+
         Transaction transaction = getTransaction(lraId);
 
-        if (!transaction.isRunning())
+        if (!transaction.isRunning() && transaction.isTopLevel())
             return Response.Status.PRECONDITION_FAILED.getStatusCode();
 
-        AtomicAction.resume(transaction);
+//        AtomicAction.resume(transaction);
 
         int status = transaction.end(compensate);
         int sc = 500;
 
-        if (compensate) {
+        if (!compensate) {
             if (status == ActionStatus.COMMITTED)
                 sc = 200;
         } else if (status == ActionStatus.ABORTED) {
             sc = 200;
         }
 
-        finished(transaction, sc != 200);
+
+        if (transaction.currentLRA() != null)
+            System.out.printf("WARNING LRA %s ended but is still associated");
+
+        finished(transaction, fromHierarchy, sc != 200);
+
+        if (transaction.isTopLevel()) {
+            // forget any nested LRAs
+            transaction.forgetAllParticipants();
+        }
 
         return sc;
     }
 
     public int leave(String lraId, String compensatorUrl) {
+        lraTrace(lraId, "leave LRA");
+
         Transaction transaction = getTransaction(lraId);
 
         if (!transaction.isRunning())
@@ -130,8 +160,13 @@ public class TransactionService {
 
     }
 
-    public int joinLRA(StringBuilder recoveryUrl, String txId, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
-        Transaction transaction = getTransaction(txId);
+    public synchronized int joinLRA(StringBuilder recoveryUrl, String lra, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
+        if (lra ==  null)
+            lraTrace("null", "Error missing LRA header in join request");
+
+        lraTrace(lra, "join LRA");
+
+        Transaction transaction = getTransaction(lra);
 
         if (timeLimit < 0)
             timeLimit = 0;
@@ -149,9 +184,9 @@ public class TransactionService {
 //            coordinatorUrl = coordinatorUrl.substring(0, coordinatorUrl.length() - 1);
 
         if (linkHeader != null)
-            coordinatorId = transaction.enlistParticipants(txId, linkHeader, recoveryUrlBase);
+            coordinatorId = transaction.enlistParticipants(lra, linkHeader, recoveryUrlBase);
         else
-            coordinatorId = transaction.enlistParticipant( txId, compensatorUrl, recoveryUrlBase);
+            coordinatorId = transaction.enlistParticipant( lra, compensatorUrl, recoveryUrlBase);
 
         if (coordinatorId == null)
             return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
@@ -161,5 +196,19 @@ public class TransactionService {
         recoveryUrl.append(transaction.getRecoveryUrl());
 
         return Response.Status.OK.getStatusCode();
+    }
+
+    public boolean hasTransaction(String id) {
+        return transactions.containsKey(id);
+    }
+
+    private void lraTrace(String lraId, String reason) {
+        if (transactions.containsKey(lraId)) {
+            Transaction lra = transactions.get(lraId);
+            System.out.printf("%s (%s) in state %s: %s%n",
+                    reason, lra.getClientId(), ActionStatus.stringForm(lra.status()), lra.getId());
+        } else {
+            System.out.printf("%s not found: %s%n", reason, lraId);
+        }
     }
 }

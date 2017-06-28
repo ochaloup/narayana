@@ -1,10 +1,8 @@
 package participant.api;
 
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
-
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-
-import participant.filter.service.TheatreService;
+import participant.filter.service.FlightService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -17,31 +15,29 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @ApplicationScoped
-@Path("/theatre")
+@Path("/flight")
 @LRA(LRA.LRAType.SUPPORTS)
-public class TheatreController {
+public class FlightController {
 
     @Inject
     private LRAClient lraClient;
 
     @Inject
-    private TheatreService theatreService;
+    private FlightService flightService;
 
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
-    public void bookShow(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam("show") @DefaultValue("") String show,
+    public void bookFlight(@Suspended final AsyncResponse asyncResponse,
                          @QueryParam("seats") @DefaultValue("") Integer seats) {
 
-        theatreService.bookAsync(show, seats)
+        flightService.bookAsync(seats)
                 .thenApply(asyncResponse::resume)
                 .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
 

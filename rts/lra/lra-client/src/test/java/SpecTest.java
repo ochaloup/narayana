@@ -1,8 +1,12 @@
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAStatus;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -14,7 +18,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,7 +36,10 @@ public class SpecTest {
 
     private WebTarget msTarget;
 
-    private String lra = null;
+    private static List<LRAStatus> oldLRAs;
+
+    @Rule
+    public TestName testName = new TestName();
 
     @BeforeClass
     public static void setupClass() throws MalformedURLException, URISyntaxException {
@@ -37,67 +47,90 @@ public class SpecTest {
 
         lraClient = new LRAClient("localhost", 8080);
         msClient = ClientBuilder.newClient();
+
+        oldLRAs = new ArrayList<>();
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        oldLRAs.clear();
+        lraClient.close();
+        msClient.close();
     }
 
     @Before
     public void setupTest() throws MalformedURLException, URISyntaxException {
-        if (lra != null) {
-            try {
-                lraClient.cancelLRA(lra);
-            } catch (Throwable ignore) {
-            }
-
-            lra = null;
-        }
-
         msTarget = msClient.target(URI.create(new URL(MICRSERVICE_BASE_URL, "/").toExternalForm()));
+    }
+
+    @After
+    public void finishTest() {
+        List<LRAStatus> activeLRAs = lraClient.getActiveLRAs();
+
+        System.out.printf("TEST %s finished%n", testName.getMethodName());
+
+        if (activeLRAs.size() != 0) {
+            activeLRAs.forEach(lra -> {
+                try {
+                    if (!oldLRAs.contains(lra)) {
+                        System.out.printf("%s: WARNING: test did not close %s%n", testName.getMethodName(), lra.getLraId());
+                        oldLRAs.add(lra);
+                        lraClient.closeLRA(new URL(lra.getLraId()));
+                    }
+                } catch (WebApplicationException | MalformedURLException e) {
+                    System.out.printf("After Test: exception %s closing %s%n", e.getMessage(), lra.getLraId());
+                }
+            });
+        }
     }
 
     @Test
     public void startLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("startLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#startLRA", 500);
+
+        lraClient.closeLRA(lra);
     }
 
     @Test
     public void cancelLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("cancelLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#cancelLRA", 500);
 
         lraClient.cancelLRA(lra);
 
         List<LRAStatus> lras = lraClient.getAllLRAs();
 
-        assertFalse(lras.contains(new LRAStatus(lra)));
-
-        lra = null;
+        assertFalse(lras.contains(lra));
     }
 
     @Test
     public void closeLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("closelLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#closelLRA", 500);
 
         lraClient.closeLRA(lra);
 
         List<LRAStatus> lras = lraClient.getAllLRAs();
 
         assertFalse(lras.contains(new LRAStatus(lra)));
-
-        lra = null;
     }
 
     @Test
     public void getActiveLRAs() throws WebApplicationException {
-        lra = lraClient.startLRA("getActiveLRAs", 500);
+        URL lra = lraClient.startLRA("SpecTest#getActiveLRAs", 500);
         List<LRAStatus> lras = lraClient.getActiveLRAs();
 
         assertTrue(lras.contains(new LRAStatus(lra)));
+
+        lraClient.closeLRA(lra);
     }
 
     @Test
     public void getAllLRAs() throws WebApplicationException {
-        lra = lraClient.startLRA("getAllLRAs", 500);
+        URL lra = lraClient.startLRA("SpecTest#getAllLRAs", 500);
         List<LRAStatus> lras = lraClient.getAllLRAs();
 
         assertTrue(lras.contains(new LRAStatus(lra)));
+
+        lraClient.closeLRA(lra);
     }
 
     @Test
@@ -107,7 +140,7 @@ public class SpecTest {
 
     @Test
     public void isActiveLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("isActiveLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isActiveLRA", 500);
 
         assertTrue(lraClient.isActiveLRA(lra));
 
@@ -117,16 +150,20 @@ public class SpecTest {
 //    @Test
     // the coordinator cleans up when canceled
     public void isCompensatedLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("isCompensatedLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isCompensatedLRA", 500);
+
         lraClient.cancelLRA(lra);
+
         assertTrue(lraClient.isCompensatedLRA(lra));
     }
 
 //    @Test
 // the coordinator cleans up when completed
     public void isCompletedLRA() throws WebApplicationException {
-        lra = lraClient.startLRA("isCompletedLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isCompletedLRA", 500);
+
         lraClient.closeLRA(lra);
+
         assertTrue(lraClient.isCompletedLRA(lra));
     }
 
@@ -134,22 +171,128 @@ public class SpecTest {
     public void joinLRAViaBody() throws WebApplicationException {
         Response response = msTarget.path("activities").path("work").request().put(Entity.text(""));
 
+        String lra = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
+
         // validate that the LRA coordinator no longer knows about lraId
         List<LRAStatus> lras = lraClient.getActiveLRAs();
 
         // the resource /activities/work is annotated with LRAType.REQUIRED so the container should have ended it
-        assertFalse(lras.contains(new LRAStatus(response.readEntity(String.class))));
+        assertFalse(lras.contains(new LRAStatus(lra)));
+    }
+
+    @Test
+    public void nestedActivity() throws WebApplicationException {
+        URL lra = lraClient.startLRA("SpecTest#nestedActivity", 500);
+
+        Response response = msTarget
+                .path("activities").path("nestedActivity")
+                .request()
+                .header(LRAClient.LRA_HTTP_HEADER, lra)
+                .put(Entity.text(""));
+
+        String nestedLraId = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
+
+        List<LRAStatus> lras = lraClient.getActiveLRAs();
+
+        // close the LRA
+        lraClient.closeLRA(lra);
+
+        // validate that the nested LRA was closed
+        lras = lraClient.getActiveLRAs();
+
+        // the resource /activities/work is annotated with LRAType.REQUIRED so the container should have ended it
+        assertFalse(lras.contains(new LRAStatus(nestedLraId)));
+    }
+
+    @Test
+    public void completeMultiLevelNestedActivity() throws WebApplicationException {
+        multiLevelNestedActivity(true);
+    }
+
+    @Test
+    public void compensateMultiLevelNestedActivity() throws WebApplicationException {
+        multiLevelNestedActivity(false);
+    }
+
+    private void multiLevelNestedActivity(boolean complete) throws WebApplicationException {
+        int nestedCnt = 1;
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+
+        URL lra = lraClient.startLRA("SpecTest#multiLevelNestedActivity", 500);
+        String lraId = lra.toString();
+
+        Response response = msTarget
+                .path("activities").path("multiLevelNestedActivity")
+                .queryParam("nestedCnt", nestedCnt)
+                .request()
+                .header(LRAClient.LRA_HTTP_HEADER, lra)
+                .put(Entity.text(""));
+
+        String lraStr = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
+        String[] lraArray = lraStr.split(",");
+        final List<LRAStatus> lras = lraClient.getActiveLRAs();
+
+        // check that the multiLevelNestedActivity method returned the mandatory LRA followed by two nested LRAs
+        assertEquals(nestedCnt + 1, lraArray.length);
+        assertEquals(lraId, lraArray[0]); // first element should be the mandatory LRA
+
+        // check that the coordinator knows about the two nested LRAs started by the multiLevelNestedActivity method
+        // NB even though they should have completed they are held in memory pending the enclosing LRA finishing
+        IntStream.rangeClosed(1, nestedCnt).forEach(i -> assertTrue(lras.contains(new LRAStatus(lraArray[i]))));
+
+        // and the mandatory lra seen by the multiLevelNestedActivity method
+        assertTrue(lras.contains(new LRAStatus(lraArray[0])));
+
+        int[] cnt2 = {completedCount(true), completedCount(false)};
+
+        // check that both nested activities were told to complete
+        assertEquals(cnt1[0] + nestedCnt, cnt2[0]);
+        // and that neither were told to compensate
+        assertEquals(cnt1[1], cnt2[1]);
+
+        // close the LRA
+        if (complete)
+            lraClient.closeLRA(lra);
+        else
+            lraClient.cancelLRA(lra);
+
+        // validate that the top level and nested LRAs are gone
+        final List<LRAStatus> lras2 = lraClient.getActiveLRAs();
+
+        IntStream.rangeClosed(0, nestedCnt).forEach(i -> assertFalse(lras2.contains(new LRAStatus(lraArray[i]))));
+
+        int[] cnt3 = {completedCount(true), completedCount(false)};
+
+        if (complete) {
+            // make sure that both nested activities weren't told to complete or cancel a second time
+            assertEquals(cnt2[0] + 1, cnt3[0]);
+            // and that neither were still not told to compensate
+            assertEquals(cnt1[1], cnt3[1]);
+
+        } else {
+            /*
+             * the test starts LRA1 calls a @Mandatory method multiLevelNestedActivity which enlists in LRA1
+             * multiLevelNestedActivity then calls an @Nested method which starts L2 and enlists another compensator
+             *   when the method returns the nested compensator is completed (ie completed count is incremented)
+             * Canceling L1 should then compensate the L1 enlistement (ie compensate count is incrememted)
+             * which will then tell L2 to compenstate (ie the compensate count is incrememted again)
+             */
+            // each nested compensator should have completed (the +nestedCnt)
+            assertEquals(cnt1[0] + nestedCnt, cnt3[0]);
+            // each nested compensator should have compensated. The top level enlistement should have compensated (the +1)
+            assertEquals(cnt2[1] + 1 + nestedCnt, cnt3[1]);
+        }
     }
 
     @Test
     public void joinLRAViaHeader () throws WebApplicationException {
-        int cnt1 = completedCount();
+        int cnt1 = completedCount(true);
 
-        lra = lraClient.startLRA("joinLRAViaBody", 500);
+        URL lra = lraClient.startLRA("SpecTest#joinLRAViaBody", 500);
 
         Response response = msTarget.path("activities").path("work")
                 .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // validate that the LRA coordinator still knows about lraId
         List<LRAStatus> lras = lraClient.getActiveLRAs();
@@ -163,73 +306,86 @@ public class SpecTest {
         assertFalse(lras.contains(new LRAStatus(lra)));
 
         // check that participant was told to complete
-        int cnt2 = completedCount();
+        int cnt2 = completedCount(true);
         assertEquals(cnt1 + 1, cnt2);
     }
 
     @Test
-    public void leaveLRA() throws WebApplicationException {
-        int cnt1 = completedCount();
+    public void join () throws WebApplicationException {
+        List<LRAStatus> lras = lraClient.getActiveLRAs();
+        int count = lras.size();
+        URL lra = lraClient.startLRA("SpecTest#join", 500);
 
-        lra = lraClient.startLRA("leaveLRA", 500);
+        Response response = msTarget.path("activities").path("work")
+                .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+        lraClient.closeLRA(lra);
+
+        lras = lraClient.getActiveLRAs();
+        System.out.printf("join ok %d versus %d lras%n", count, lras.size());
+        assertEquals(count, lras.size());
+    }
+
+    @Test
+    public void leaveLRA() throws WebApplicationException {
+        int cnt1 = completedCount(true);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", 500);
 
         Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
         response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // call a method annotated with @Leave (should remove the compensator from the LRA)
         response = msTarget.path("activities").path("leave").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
 //        lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
 
         lraClient.closeLRA(lra);
 
         // check that participant was not told to complete
-        int cnt2 = completedCount();
+        int cnt2 = completedCount(true);
 
         assertEquals(cnt1, cnt2);
     }
 
     @Test
     public void leaveLRAViaAPI() throws WebApplicationException {
-        int cnt1 = completedCount();
-
-        lra = lraClient.startLRA("leaveLRA", 500);
+        int cnt1 = completedCount(true);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", 500);
 
         Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
         response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // call a method annotated with @Leave (should remove the compensator from the LRA)
-        response = msTarget.path("activities").path("leave").path(LRAClient.getLRAId(lra)).request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        response = msTarget.path("activities").path("leave").path(URLEncoder.encode(lra.toString())).request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
 //        lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
 
         lraClient.closeLRA(lra);
 
         // check that participant was not told to complete
-        int cnt2 = completedCount();
+        int cnt2 = completedCount(true);
 
         assertEquals(cnt1, cnt2);
     }
 
     @Test
-    public void dependentLRA() throws WebApplicationException {
+    public void dependentLRA() throws WebApplicationException, MalformedURLException {
         // call a method annotated with NOT_SUPPORTED but one which programatically starts an LRA and returns it via a header
         Response response = msTarget.path("activities").path("startviaapi").request().put(Entity.text(""));
         // check that the method started an LRA
-        String id = response.readEntity(String.class);
         Object lraHeader = response.getHeaders().getFirst(LRAClient.LRA_HTTP_HEADER);
 
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        String id = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
 
         // the value returned via the header and body should be equal
 
@@ -237,23 +393,29 @@ public class SpecTest {
 
         assertEquals(id, lraHeader.toString());
 
-        lraClient.closeLRA((String) lraHeader);
+        lraClient.closeLRA(new URL(lraHeader.toString()));
     }
 
-    private void checkStatusAndClose(Response response, int expected) {
+    private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
         try {
             if (response.getStatus() != expected)
                 throw new WebApplicationException(response);
+
+            if (readEntity)
+                return response.readEntity(String.class);
         } finally {
             response.close();
         }
+
+        return null;
     }
 
-    private int completedCount() {
+    private int completedCount(boolean completed) {
         Response response = null;
+        String path = completed ? "completedactivitycount" : "compensatedactivitycount";
 
         try {
-            response = msTarget.path("activities").path("completedactivitycount").request().get();
+            response = msTarget.path("activities").path(path).request().get();
 
             assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
 

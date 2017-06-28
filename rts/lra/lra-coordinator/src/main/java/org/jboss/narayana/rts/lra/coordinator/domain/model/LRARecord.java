@@ -30,6 +30,7 @@ public class LRARecord extends RESTRecord {
     private String compensateURI;
     private String statusURI;
     private String leaveURI;
+    private String forgetURI;
 
     private boolean isCompelete;
     private boolean isCompensated;
@@ -47,6 +48,7 @@ public class LRARecord extends RESTRecord {
             this.completeURI = String.format("%s/complete", linkURI);
             this.leaveURI = String.format("%s/leave", linkURI);
             this.statusURI = String.format("%s/status", linkURI);
+            this.forgetURI = String.format("%s/forget", linkURI);
         }
 
         this.participantPath = linkURI;
@@ -80,15 +82,18 @@ public class LRARecord extends RESTRecord {
     private void parseLink(String linkStr) {
         Link link = Link.valueOf(linkStr);
         String rel = link.getRel();
+        String uri = link.getUri().toString();
 
         if ("compensate".equals(rel))
-            compensateURI = link.getUri().toString();
+            compensateURI = uri;
         else if ("complete".equals(rel))
-            completeURI = link.getUri().toString();
+            completeURI = uri;
         else if ("status".equals(rel))
-            statusURI = link.getUri().toString();
+            statusURI = uri;
         else if ("leave".equals(rel))
-            leaveURI = link.getUri().toString();
+            leaveURI = uri;
+        else if ("forget".equals(rel))
+            forgetURI = uri;
     }
 
     @Override
@@ -97,7 +102,8 @@ public class LRARecord extends RESTRecord {
     }
 
     @Override
-    // complete actions are mapped onto abort since complete is best effort. If a compensator needs to know
+    // (? should complete actions be mapped onto abort since complete is best effort - ie it is compensate that recovery
+    // needs to retry). If a compensator needs to know
     // if the lra completed then it can ask the org.jboss.narayana.rts.lra.coordinator. A 404 status implies:
     // - all compensators completed ok, or
     // - all compensators compensated ok
@@ -106,7 +112,7 @@ public class LRARecord extends RESTRecord {
         // TODO if this wa due to a timeout then we need to return doEnd(true);
 
         // put to compensateURI
-        return doEnd(false);
+        return doEnd(true);
     }
 
     @Override
@@ -116,17 +122,32 @@ public class LRARecord extends RESTRecord {
     }
 
     @Override
-    // compensate actions are mapped onto commit since we need recovery to kick in if any compensation failes
+    // ? what about mapping compensate actions commit (since we need recovery to kick in if any compensation fails)
     public int topLevelCommit() {
-        return doEnd(true);
+        return doEnd(false);
     }
 
     private int doEnd(boolean compensate) {
         // put to completeURI
-        String endPath = compensate ? compensateURI : completeURI;
+        String endPath;
+        Client client = null;
+
+        if (compensate) {
+            if (isCompensated())
+                return TwoPhaseOutcome.FINISH_OK;
+            // run the compensator
+            endPath = compensateURI;
+        } else {
+            if (isCompelete())
+                return TwoPhaseOutcome.FINISH_OK;
+            // run complete
+            endPath = completeURI;
+        }
+
+        // NB trying to compensate when already completed is allowed
 
         try {
-            Client client = ClientBuilder.newClient();
+            client = ClientBuilder.newClient();
             WebTarget target = client.target(URI.create(new URL(endPath).toExternalForm()));
 
             Response response = target.request()
@@ -147,6 +168,32 @@ public class LRARecord extends RESTRecord {
         } catch (MalformedURLException error) {
             isFailed = true;
             return TwoPhaseOutcome.FINISH_ERROR;
+        } finally {
+            if (client != null)
+                client.close();
+        }
+    }
+
+    public boolean forget() {
+        if (forgetURI == null)
+            return false; // warning
+
+        Client client = ClientBuilder.newClient();
+        WebTarget target = null;
+
+        try {
+            target = client.target(URI.create(new URL(forgetURI).toExternalForm()));
+
+            Response response = target.request()
+                    .header(LRA_HTTP_HEADER, coordinatorURI)
+                    .post(Entity.entity("", MediaType.APPLICATION_JSON));
+
+            return response.getStatus() == Response.Status.OK.getStatusCode();
+        } catch (MalformedURLException e) {
+            return false;
+        } finally {
+            if (client != null)
+                client.close();
         }
     }
 

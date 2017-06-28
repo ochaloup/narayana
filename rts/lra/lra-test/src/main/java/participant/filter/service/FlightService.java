@@ -7,11 +7,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @ApplicationScoped
-public class TaxiService {
+public class FlightService {
     private AtomicInteger id = new AtomicInteger(0);
 
     private Booking book(Integer seats) {
-        return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), "ABC Taxis", seats);
+        return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), "Delag", seats);
     }
 
     public CompletableFuture<Booking> bookAsync(Integer seats) {

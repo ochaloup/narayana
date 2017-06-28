@@ -23,6 +23,7 @@
 package org.jboss.narayana.rts.lra.coordinator.api;
 
 import javax.ws.rs.WebApplicationException;
+import java.net.URL;
 import java.util.List;
 
 public interface LRAClientAPI {
@@ -44,7 +45,20 @@ public interface LRAClientAPI {
      *                operation. (optional, default to 0)
      * @throws WebApplicationException Comms error
      */
-    String startLRA(String clientID, Integer timeout) throws WebApplicationException;
+    URL startLRA(String clientID, Integer timeout) throws WebApplicationException;
+
+    /**
+     *
+     * @param parentLRA the parent LRA if this new LRA is nested
+     * @param clientID Each client is expected to have a unique identity (which can be a URL). (optional)
+     * @param timeout Specifies the maximum time in seconds that the LRA will exist for. If the LRA is
+     *                terminated because of a timeout, the LRA URL is deleted. All further invocations
+     *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
+     *                operation. (optional, default to 0)
+     * @return
+     * @throws WebApplicationException
+     */
+    URL startLRA(URL parentLRA, String clientID, Integer timeout) throws WebApplicationException;
 
     /**
      * Attempt to cancel an LRA
@@ -57,7 +71,7 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @throws WebApplicationException Comms error
      */
-    void cancelLRA(String lraId) throws WebApplicationException;
+    void cancelLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Attempt to close an LRA
@@ -70,7 +84,7 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @throws WebApplicationException Comms error
      */
-    void closeLRA(String lraId) throws WebApplicationException;
+    void closeLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Lookup active LRAs
@@ -104,7 +118,7 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @throws WebApplicationException Comms error
      */
-    Boolean isActiveLRA(String lraId) throws WebApplicationException;
+    Boolean isActiveLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Indicates whether an LRA was compensated
@@ -112,7 +126,7 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @throws WebApplicationException Comms error
      */
-    Boolean isCompensatedLRA(String lraId) throws WebApplicationException;
+    Boolean isCompensatedLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Indicates whether an LRA is complete
@@ -120,7 +134,7 @@ public interface LRAClientAPI {
      * @param lraId The unique identifier of the LRA (required)
      * @throws WebApplicationException Comms error
      */
-    Boolean isCompletedLRA(String lraId) throws WebApplicationException;
+    Boolean isCompletedLRA(URL lraId) throws WebApplicationException;
 
     /**
      * A Compensator can join with the LRA at any time prior to the completion of an activity
@@ -151,10 +165,10 @@ public interface LRAClientAPI {
      *                  it can forget this LRA.  (optional)
      * @throws WebApplicationException Comms error
      */
-    void joinLRA(String lraId, Integer timelimit, String body) throws WebApplicationException;
+    void joinLRA(URL lraId, Integer timelimit, String body) throws WebApplicationException;
 
     /**
-     * Similar to {@link LRAClientAPI#joinLRA(String, Integer, String)} but the various compensator urls
+     * Similar to {@link LRAClientAPI#joinLRA(URL, Integer, String)} but the various compensator urls
      * are passed in explicitly
      *
      * @param lraId The unique identifier of the LRA (required)
@@ -167,7 +181,7 @@ public interface LRAClientAPI {
      * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
      * @throws WebApplicationException
      */
-    String joinLRA(String lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
+    String joinLRA(URL lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
 
     /**
      * A Compensator can resign from the LRA at any time prior to the completion of an activity
@@ -176,11 +190,11 @@ public interface LRAClientAPI {
      * @param body  (optional)
      * @throws WebApplicationException Comms error
      */
-    void leaveLRA(String lraId, String body) throws WebApplicationException;
+    void leaveLRA(URL lraId, String body) throws WebApplicationException;
 
     /**
      * checks whether there is an LRA associated with the calling thread
      * @return
      */
-    String getCurrent();
+    URL getCurrent();
 }

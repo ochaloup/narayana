@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ResponseHeader;
 import org.jboss.logging.Logger;
 
+import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
 import org.jboss.narayana.rts.lra.coordinator.domain.service.TransactionService;
@@ -25,6 +26,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,11 +39,13 @@ import java.util.function.BiFunction;
 
 import io.swagger.annotations.ApiOperation;
 
+import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.CLIENT_ID_PARAM_NAME;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_PATH_NAME;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER2;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
+import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.PARENT_LRA_PARAM_NAME;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMEOUT_PARAM_NAME;
 
 @ApplicationScoped
@@ -70,7 +77,7 @@ public class Coordinator {
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/<LraId> returns 200 if the lra is still active.
     @GET
-    @Path("{LraId}")
+    @Path("/status/{LraId}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Indicates whether an LRA is active",
             response = Boolean.class)
@@ -135,21 +142,71 @@ public class Coordinator {
 
     public Response startLRA(
             @ApiParam( value = "Each client is expected to have a unique identity (which can be a URL).", required = false)
-            @QueryParam("ClientID")
-            @DefaultValue("") String clientId,
+            @QueryParam(CLIENT_ID_PARAM_NAME) @DefaultValue("") String clientId,
             @ApiParam( value = "Specifies the maximum time in seconds that the LRA will exist for.\n"
                     + "If the LRA is terminated because of a timeout, the LRA URL is deleted.\n"
                     + "All further invocations on the URL will return 404.\n"
                     + "The invoker can assume this was equivalent to a compensate operation.")
-            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") Integer timelimit) throws WebApplicationException {
+            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") Integer timelimit,
+            @ApiParam( value = "The enclosing LRA if this new LRA is nested", required = false)
+            @QueryParam(PARENT_LRA_PARAM_NAME) @DefaultValue("") String parentLRA) throws WebApplicationException {
 
-        String lraId = transactionService.startLRA(String.format("%s%s", context.getBaseUri(), COORDINATOR_PATH_NAME), clientId, timelimit);
+        String coordinatorUrl = String.format("%s%s", context.getBaseUri(), COORDINATOR_PATH_NAME);
+        String lraId = transactionService.startLRA(coordinatorUrl, parentLRA, clientId, timelimit);
+
+        if (!parentLRA.isEmpty()) {
+            // register with the parent as a participant
+            Client client = ClientBuilder.newClient();
+            String compensatorUrl = String.format("%s/%s", coordinatorUrl, LRAClient.getLRAId(lraId));
+
+            Response response = client.target(parentLRA).request().put(Entity.text(compensatorUrl));
+
+            if (response.getStatus() != Response.Status.OK.getStatusCode())
+                return response;
+        }
 
         return Response.status(Response.Status.CREATED)
                 .entity(lraId)
                 .header(LRA_HTTP_HEADER, lraId)
                 .header(LRA_HTTP_HEADER2, lraId)
                 .build();
+    }
+
+    @GET
+    @Path("{NestedLraId}/status")
+    public Response getNestedLRAStatus(@PathParam("NestedLraId")String nestedLraId) {
+        if (!transactionService.hasTransaction(nestedLraId)) {
+            // it must have compensated TODO maybe it's better to keep nested LRAs in separate collection
+            return Response.ok(CompensatorStatus.Compensated.name()).build();
+        }
+
+        Transaction lra = transactionService.getTransaction(nestedLraId);
+        CompensatorStatus status = lra.getLRAStatus();
+
+        if (status.equals(CompensatorStatus.Active))
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+
+        return Response.ok(lra.getLRAStatus().name()).build();
+    }
+
+    @POST
+    @Path("{NestedLraId}/complete")
+    public Response completeNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
+        return endLRA(toLRAId(nestedLraId), false, true);
+    }
+
+    @POST
+    @Path("{NestedLraId}/compensate")
+    public Response compensateNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
+        return endLRA(toLRAId(nestedLraId), true, true);
+    }
+
+    @POST
+    @Path("{NestedLraId}/forget")
+    public Response forgetNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
+        transactionService.remove(null, toLRAId(nestedLraId));
+
+        return Response.ok().build();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/completed/<LraId> returns 200 if the lra completed successfully
@@ -208,7 +265,7 @@ public class Coordinator {
     public Response closeLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId) throws NotFoundException {
-        return endLRA(toLRAId(txId), false);
+        return endLRA(toLRAId(txId), false, false);
     }
 
     @PUT
@@ -227,11 +284,11 @@ public class Coordinator {
     public Response cancelLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId) throws NotFoundException {
-        return endLRA(toLRAId(txId), true);
+        return endLRA(toLRAId(txId), true, false);
     }
 
-    private Response endLRA(String txId, boolean compensate) throws NotFoundException {
-        int status = transactionService.endLRA(txId, compensate);
+    private Response endLRA(String txId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
+        int status = transactionService.endLRA(txId, compensate, fromHierarchy);
 
         return Response.status(status).build();
     }

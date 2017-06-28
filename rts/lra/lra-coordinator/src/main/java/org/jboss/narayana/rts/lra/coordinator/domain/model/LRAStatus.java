@@ -16,6 +16,8 @@ public class LRAStatus {
     private boolean isRecovering;
 //    @ApiModelProperty( value = "Indicates whether or not this LRA has been asked to complete or compensate yet", required = false )
     private boolean isActive;
+//    @ApiModelProperty( value = "Indicates whether or not this LRA is top level", required = false )
+    private boolean isTopLevel;
 
     public LRAStatus(Transaction lra) {
         this.lraId = lra.getId();
@@ -24,6 +26,7 @@ public class LRAStatus {
         this. isCompensated = lra.isCompensated();
         this. isRecovering = lra.isRecovering();
         this. isActive = lra.isActive();
+        this. isTopLevel = lra.isTopLevel();
     }
 
     public String getLraId() {
@@ -48,5 +51,9 @@ public class LRAStatus {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public boolean isTopLevel() {
+        return isTopLevel;
     }
 }

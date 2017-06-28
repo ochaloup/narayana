@@ -4,6 +4,7 @@ import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Compensate;
 import org.jboss.narayana.rts.lra.compensator.api.Complete;
 import org.jboss.narayana.rts.lra.compensator.api.Leave;
+import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
@@ -13,6 +14,7 @@ import participant.filter.service.ActivityService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
@@ -21,6 +23,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -28,8 +31,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
@@ -71,17 +77,19 @@ public class ActivityController {
 
     /**
      * Test that participants can leave an LRA using the {@link LRAClientAPI} programatic API
-     * @param lraId
+     * @param lraUrl
      * @return
      * @throws NotFoundException
      */
     @PUT
-    @Path("/leave/{LraId}")
+    @Path("/leave/{LraUrl}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response leaveWorkViaAPI(@PathParam("LraId")String lraId) throws NotFoundException {
+    public Response leaveWorkViaAPI(@PathParam("LraUrl")String lraUrl) throws NotFoundException, MalformedURLException {
 
-        if (lraId != null) {
-            lraClient.leaveLRA(lraId, Testing.getCompensatorUrl(context.getBaseUri(), this.getClass()));
+        if (lraUrl != null) {
+            String lraId = LRAClient.getLRAId(lraUrl);
+
+            lraClient.leaveLRA(new URL(lraUrl), Testing.getCompensatorUrl(context.getBaseUri(), this.getClass()));
             activityService.getActivity(lraId);
 
             activityService.remove(lraId);
@@ -148,6 +156,8 @@ public class ActivityController {
     @Path("/supports")
     @LRA(LRA.LRAType.SUPPORTS)
     public Response supportsLRACall(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        addWork(lraId, null);
+
         return Response.ok(lraId == null ? "" : lraId).build();
     }
 
@@ -158,15 +168,19 @@ public class ActivityController {
         if (lraId != null)
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
 
-        lraId = lraClient.startLRA("subActivity", 0);
+        // manually start an LRA via the injection LRAClient api
+        URL lra = lraClient.startLRA("subActivity", 0);
 
-        String id = null;
-        Response response = ClientBuilder.newClient().target(context.getBaseUri()).path("activities").path("supports").request().put(Entity.text(""));
-        if (response.hasEntity())
-            id = response.readEntity(String.class);
+        lraId = lra.toString();
 
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+        addWork(lraId, null);
 
+        // invoke a method that SUPPORTS LRAs. The filters should detect the LRA we just started via the injected client
+        // and add it as a header before calling the method at path /supports (ie supportsLRACall()).
+        // The supportsLRACall method will return LRA id in the body if it is present.
+        String id = restPutInvocation("supports", "");
+
+        // check that the invoked method saw the LRA
         if (lraId == null || id == null || !lraId.equals(id))
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text("Unequal LRA ids")).build();
 
@@ -184,6 +198,53 @@ public class ActivityController {
             return Response.status(Response.Status.EXPECTATION_FAILED).entity("Missing lra data").build();
 
         return Response.ok(lraId).build();
+    }
+
+    private String restPutInvocation(String path, String bodyText) {
+        String id = null;
+        Response response = ClientBuilder.newClient().target(context.getBaseUri())
+                .path("activities").path(path).request().put(Entity.text(bodyText));
+
+        if (response.hasEntity())
+            id = response.readEntity(String.class);
+
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode());
+
+        return id;
+    }
+
+    @PUT
+    @Path("/nestedActivity")
+    @LRA(LRA.LRAType.MANDATORY)
+    @NestedLRA
+    public Response nestedActivity(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
+                                    @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId) {
+        Activity activity = addWork(nestedLRAId, rcvId);
+
+        if (activity == null)
+            return Response.status(Response.Status.EXPECTATION_FAILED).entity("Missing lra data").build();
+
+        return Response.ok(nestedLRAId).build();
+    }
+
+    @PUT
+    @Path("/multiLevelNestedActivity")
+    @LRA(LRA.LRAType.MANDATORY)
+    public Response multiLevelNestedActivity(
+            @HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
+            @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId,
+            @QueryParam("nestedCnt") @DefaultValue("1") Integer nestedCnt) {
+        Activity activity = addWork(nestedLRAId, rcvId);
+
+        if (activity == null)
+            return Response.status(Response.Status.EXPECTATION_FAILED).entity("Missing lra data").build();
+
+        // invoke resources that enlist nested LRAs
+        String[] lras = new String[nestedCnt + 1];
+        lras[0] = nestedLRAId;
+        IntStream.range(1, lras.length).forEach(i -> lras[i] = restPutInvocation("nestedActivity", ""));
+
+        return Response.ok(String.join(",", lras)).build();
     }
 
     private Activity addWork(String lraId, String rcvId) {
