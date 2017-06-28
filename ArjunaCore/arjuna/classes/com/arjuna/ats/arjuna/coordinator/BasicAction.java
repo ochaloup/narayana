@@ -2832,6 +2832,7 @@ public class BasicAction extends StateManager
                            */
 
                         pastFirstParticipant = true;
+                        rl.insert(rec);
                         break;
                     case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
                     {
