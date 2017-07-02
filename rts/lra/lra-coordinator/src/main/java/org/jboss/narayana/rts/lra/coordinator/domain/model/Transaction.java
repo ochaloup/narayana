@@ -65,7 +65,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         if ((res != ActionStatus.RUNNING) && (res != ActionStatus.ABORT_ONLY)) {
             if (nested && compensate) {
                 /*
-                 * TODO this is wrong - we should be hooking into ActionType.NESTED
+                 * TODO this is wrong - we should be hooking into ActionType.NESTED ... but
                  * Unfortunatly that means that after a nested txn is committed its participants are merged
                  * with the parent and they can then only be aborted if the parent aborts whereas in
                  * the LRA model nested LRAs can be compensated whilst the enclosing LRA is completed
@@ -77,6 +77,8 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
                 pending.forEach(r -> pendingList.putRear(r));
 
                 super.phase2Abort(true);
+
+                res = status();
 
                 status = toLRAStatus(status());
             }

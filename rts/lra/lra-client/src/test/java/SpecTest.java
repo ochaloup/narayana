@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class SpecTest {
     private static URL MICRSERVICE_BASE_URL;
@@ -206,17 +207,29 @@ public class SpecTest {
 
     @Test
     public void completeMultiLevelNestedActivity() throws WebApplicationException {
-        multiLevelNestedActivity(true);
+        multiLevelNestedActivity(CompletionType.complete, 1);
     }
 
     @Test
     public void compensateMultiLevelNestedActivity() throws WebApplicationException {
-        multiLevelNestedActivity(false);
+        multiLevelNestedActivity(CompletionType.compensate, 1);
     }
 
-    private void multiLevelNestedActivity(boolean complete) throws WebApplicationException {
-        int nestedCnt = 1;
+    @Test
+    public void mixedMultiLevelNestedActivity() throws WebApplicationException {
+        multiLevelNestedActivity(CompletionType.mixed, 2);
+    }
+
+    private enum CompletionType {
+        complete, compensate, mixed
+    }
+
+    private void multiLevelNestedActivity(CompletionType how, int nestedCnt) throws WebApplicationException {
+
         int[] cnt1 = {completedCount(true), completedCount(false)};
+
+        if (how == CompletionType.mixed && nestedCnt <= 1)
+            how = CompletionType.complete;
 
         URL lra = lraClient.startLRA("SpecTest#multiLevelNestedActivity", 500);
         String lraId = lra.toString();
@@ -231,7 +244,15 @@ public class SpecTest {
         String lraStr = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
         String[] lraArray = lraStr.split(",");
         final List<LRAStatus> lras = lraClient.getActiveLRAs();
+        URL[] urls = new URL[lraArray.length];
 
+        IntStream.range(0, urls.length).forEach(i -> {
+            try {
+                urls[i] = new URL(lraArray[i]);
+            } catch (MalformedURLException e) {
+                fail("the test resource multiLevelNestedActivity return an invalid URL: " + e.getMessage());
+            }
+        });
         // check that the multiLevelNestedActivity method returned the mandatory LRA followed by two nested LRAs
         assertEquals(nestedCnt + 1, lraArray.length);
         assertEquals(lraId, lraArray[0]); // first element should be the mandatory LRA
@@ -251,10 +272,28 @@ public class SpecTest {
         assertEquals(cnt1[1], cnt2[1]);
 
         // close the LRA
-        if (complete)
-            lraClient.closeLRA(lra);
-        else
+        if (how == CompletionType.compensate) {
             lraClient.cancelLRA(lra);
+        } else if (how == CompletionType.complete) {
+            lraClient.closeLRA(lra);
+        } else {
+            /*
+             * The test is calling for a mixed uutcome (a top level LRA L! and nestedCnt nested LRAs (L2, L3, ...)::
+             * L1 the mandatory call (PUT "activities/multiLevelNestedActivity") registers compensator C1
+             *   the resource makes nestedCnt calls to "activities/nestedActivity" each of which create nested LRAs
+             * L2, L3, ... each of which enlists a compensator (C2, C3, ...) which are completed when the call returns
+             * L2 is canceled  which causes C2 to compensate
+             * L1 is closed which triggers the completion of C1
+             *
+             * To summarise:
+             *
+             * - C1 is completed
+             * - C2 is completed and then compensated
+             * - C3, ... are completed
+             */
+            lraClient.cancelLRA(urls[1]); // compensate the first nested LRA
+            lraClient.closeLRA(lra); // should not complete any nested LRAs (since they have already completed via the interceptor)
+        }
 
         // validate that the top level and nested LRAs are gone
         final List<LRAStatus> lras2 = lraClient.getActiveLRAs();
@@ -263,13 +302,13 @@ public class SpecTest {
 
         int[] cnt3 = {completedCount(true), completedCount(false)};
 
-        if (complete) {
-            // make sure that both nested activities weren't told to complete or cancel a second time
-            assertEquals(cnt2[0] + 1, cnt3[0]);
+        if (how == CompletionType.complete) {
+            // make sure that all nested activities were not told to complete or cancel a second time
+            assertEquals(cnt2[0] + nestedCnt, cnt3[0]);
             // and that neither were still not told to compensate
             assertEquals(cnt1[1], cnt3[1]);
 
-        } else {
+        } else if (how == CompletionType.compensate) {
             /*
              * the test starts LRA1 calls a @Mandatory method multiLevelNestedActivity which enlists in LRA1
              * multiLevelNestedActivity then calls an @Nested method which starts L2 and enlists another compensator
@@ -281,6 +320,19 @@ public class SpecTest {
             assertEquals(cnt1[0] + nestedCnt, cnt3[0]);
             // each nested compensator should have compensated. The top level enlistement should have compensated (the +1)
             assertEquals(cnt2[1] + 1 + nestedCnt, cnt3[1]);
+        } else {
+            /*
+             * The test is calling for a mixed uutcome:
+             * - the top level LRA was closed
+             * - one of the nested LRAs was compensated the rest should have been completed
+             */
+            assertEquals(1, cnt3[1] - cnt1[1]); // there should be just 1 compensation (the first nested LRA)
+            /*
+             * Expect nestedCnt + 1 completions, 1 for the top level and one for each nested LRA
+             * (NB the first nested LRA is completed and compensated)
+             * Note that the top level complete should not call complete again on the nested LRA
+             */
+            assertEquals(nestedCnt + 1, cnt3[0] - cnt1[0]); //
         }
     }
 
