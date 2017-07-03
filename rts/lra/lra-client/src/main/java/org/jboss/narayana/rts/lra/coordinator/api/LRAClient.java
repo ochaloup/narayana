@@ -42,7 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-@RequestScoped
+//@RequestScoped // TODO RESTEASY-682
+@ApplicationScoped
 public class LRAClient implements LRAClientAPI {
     public static final String LRA_HTTP_HEADER = "X-lra";
     public static final String LRA_HTTP_HEADER2 = "X-lra2";
@@ -72,18 +73,21 @@ public class LRAClient implements LRAClientAPI {
     private static final String confirmFormat = "/%s/close";
     private static final String compensateFormat = "/%s/cancel";
     private static final String leaveFormat = "/%s/remove";
+    private static final String MISSING_ANNOTATION_FORMAT =
+            "Cannot enlist resource class %s: annotated with LRA but is missing one or more of {@Complete. @Compensate, @Status}";
 
     private WebTarget target;
     private URI base;
     private Client client;
     private Stack<URL> lraStack;
     private boolean isUseable;
+    private boolean connectionInUse;
 
-     @Produces
-     @ApplicationScoped
-     public LRAClient createLRAClient() throws URISyntaxException {
-         return new LRAClient();
-     }
+    @Produces
+    @ApplicationScoped
+    public LRAClient createLRAClient() throws URISyntaxException {
+        return new LRAClient();
+    }
 
     public LRAClient() throws URISyntaxException {
         this("http", "localhost", 8080);
@@ -180,6 +184,8 @@ public class LRAClient implements LRAClientAPI {
         try {
             String encodedParentLRA = parentLRA == null ? "" : URLEncoder.encode(parentLRA.toString(), "UTF-8");
 
+            aquireConnection();
+
             response = target.path(startLRAUrl)
                     .queryParam(TIMEOUT_PARAM_NAME, timeout)
                     .queryParam(CLIENT_ID_PARAM_NAME, clientID)
@@ -204,8 +210,7 @@ public class LRAClient implements LRAClientAPI {
             throw new WebApplicationException(
                     Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
         } finally {
-            if (response != null)
-                response.close();
+            releaseConnection(response);
         }
 
         // check that the lra is active
@@ -222,6 +227,21 @@ public class LRAClient implements LRAClientAPI {
     @Override
     public void closeLRA(URL lraId) throws WebApplicationException {
         endLRA(lraId, true);
+    }
+
+    /**
+     *
+     * @param lraUrl the URL of the LRA to join
+     * @param timelimit how long the participant is prepared to wait for LRA completion
+     * @param linkHeader participant protocol URLs in link header format (RFC 5988)
+     *
+     * @return a recovery URL for this enlistment
+     *
+     * @throws WebApplicationException if the LRA coordinator failed to enlist the participant
+     */
+    public String joinLRAWithLinkHeader(URL lraUrl, Integer timelimit, String linkHeader) throws WebApplicationException {
+        lraTrace(String.format("joining LRA with compensator link: %s", linkHeader), lraUrl);
+        return enlistCompensator(lraUrl, timelimit, linkHeader);
     }
 
     @Override
@@ -248,6 +268,8 @@ public class LRAClient implements LRAClientAPI {
         lraTrace("leaving LRA", lraId);
 
         try {
+            aquireConnection();
+
             response = target.path(String.format(leaveFormat, getLRAId(lraId.toString())))
                     .request()
                     .header(LRA_HTTP_HEADER, lraId)
@@ -256,8 +278,7 @@ public class LRAClient implements LRAClientAPI {
             if (Response.Status.OK.getStatusCode() != response.getStatus())
                 throw new WebApplicationException(response);
         } finally {
-            if (response != null)
-                response.close();
+            releaseConnection(response);
         }
     }
 
@@ -280,6 +301,8 @@ public class LRAClient implements LRAClientAPI {
         Response response = null;
 
         try {
+            aquireConnection();
+
             response = target.path(getUrl).request().get();
 
             if (!response.hasEntity())
@@ -298,8 +321,7 @@ public class LRAClient implements LRAClientAPI {
 
             return actions;
         } finally {
-            if (response != null)
-                response.close();
+            releaseConnection(response);
         }
     }
 
@@ -335,7 +357,7 @@ public class LRAClient implements LRAClientAPI {
         return getStatus(lraId, isCompletedUrlFormat);
     }
 
-    public Map<String, String> getTerminationUris(Class<?> compensatorClass, URI baseUri) {
+    public Map<String, String> getTerminationUris(Class<?> compensatorClass, URI baseUri, boolean validate) {
         Map<String, String> paths = new HashMap<>();
 
         Annotation resourcePathAnnotation = compensatorClass.getAnnotation(Path.class);
@@ -344,23 +366,39 @@ public class LRAClient implements LRAClientAPI {
         String uriPrefix = String.format("%s:%s%s",
                 baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1));
 
+        final int[] validCnt = {0};
+
         Arrays.stream(compensatorClass.getMethods()).forEach(method -> {
             Annotation pathAnnotation = method.getAnnotation(Path.class);
 
             if (pathAnnotation != null) {
-                checkMethod(paths, COMPLETE, (Path) pathAnnotation, method.getAnnotation(Complete.class), uriPrefix);
-                checkMethod(paths, COMPENSATE, (Path) pathAnnotation, method.getAnnotation(Compensate.class), uriPrefix);
-                checkMethod(paths, STATUS, (Path) pathAnnotation, method.getAnnotation(Status.class), uriPrefix);
+                if (checkMethod(paths, COMPLETE, (Path) pathAnnotation, method.getAnnotation(Complete.class), uriPrefix))
+                    validCnt[0] += 1;
+                if (checkMethod(paths, COMPENSATE, (Path) pathAnnotation, method.getAnnotation(Compensate.class), uriPrefix))
+                    validCnt[0] += 1;
+                if (checkMethod(paths, STATUS, (Path) pathAnnotation, method.getAnnotation(Status.class), uriPrefix))
+                    validCnt[0] += 1;
                 checkMethod(paths, LEAVE, (Path) pathAnnotation, method.getAnnotation(Leave.class), uriPrefix);
             }
         });
+
+        if (validate && validCnt[0] < 3)
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Entity.text(String.format(MISSING_ANNOTATION_FORMAT, compensatorClass.getName())))
+                    .build());
+
+        StringBuilder linkHeaderValue = new StringBuilder();
+
+        paths.forEach((k, v) -> makeLink(linkHeaderValue, null, k, v));
+
+        paths.put("Link", linkHeaderValue.toString());
 
         return paths;
     }
 
     private String getCompensatorUrl(URI baseUri, Class<?> resourceClass) {
 
-        Map<String, String> terminateURIs = getTerminationUris(resourceClass, baseUri);
+        Map<String, String> terminateURIs = getTerminationUris(resourceClass, baseUri, true);
 
         if (terminateURIs.size() < 3)
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
@@ -384,30 +422,36 @@ public class LRAClient implements LRAClientAPI {
         return b.append(link);
     }
 
-    private void checkMethod(Map<String, String> paths, String rel,
-                                    Path pathAnnotation,
-                                    Annotation annotationClass,
-                                    String uriPrefix) {
-        if (annotationClass != null)
-            paths.put(rel, uriPrefix + pathAnnotation.value());
+    private boolean checkMethod(Map<String, String> paths,
+                                String rel,
+                                Path pathAnnotation,
+                                Annotation annotationClass,
+                                String uriPrefix) {
+        if (annotationClass == null)
+            return false;
+
+        paths.put(rel, uriPrefix + pathAnnotation.value());
+
+        return true;
     }
 
     private Boolean getStatus(URL lraId, String statusFormat) {
         Response response = null;
 
         try {
+            aquireConnection();
+
             response = target.path("status").path(String.format(statusFormat, getLRAId(lraId.toString()))).request().get();
 
             return Boolean.valueOf(response.readEntity(String.class));
         } finally {
-            if (response != null)
-                response.close();
+            releaseConnection(response);
         }
     }
 
     private StringBuilder makeLink(StringBuilder b, String uriPrefix, String key, String value) {
 
-        String terminationUri = String.format("%s%s", uriPrefix, value);
+        String terminationUri = uriPrefix == null ? value : String.format("%s%s", uriPrefix, value);
         Link link =  Link.fromUri(terminationUri).title(key + " URI").rel(key).type(MediaType.TEXT_PLAIN).build();
 
         if (b.length() != 0)
@@ -436,13 +480,19 @@ public class LRAClient implements LRAClientAPI {
 
         terminateURIs.forEach((k, v) -> makeLink(linkHeaderValue, uriPrefix, k, v));
 
+        return enlistCompensator(lraUrl, timelimit, linkHeaderValue.toString());
+    }
+
+    private String enlistCompensator(URL lraUrl, int timelimit, String linkHeader) {
+        // register with the coordinator
+        // put the lra id in an http header
         Response response = null;
 
         try {
             response = target
                     .queryParam(TIMEOUT_PARAM_NAME, timelimit)
                     .request()
-                    .header("Link", linkHeaderValue)
+                    .header("Link", linkHeader)
                     .header(LRA_HTTP_HEADER, lraUrl)
                     .put(Entity.entity("", MediaType.TEXT_PLAIN));
 
@@ -454,8 +504,7 @@ public class LRAClient implements LRAClientAPI {
 
             return response.readEntity(String.class);
         } finally {
-            if (response != null)
-                response.close();
+            releaseConnection(response);
         }
     }
 
@@ -471,20 +520,21 @@ public class LRAClient implements LRAClientAPI {
             assertEquals(response, Response.Status.OK.getStatusCode(), response.getStatus(), "LRA finished with an unexpected status code");
 
         } finally {
+
+            releaseConnection(response);
+
             // TODO store the hierarchy of LRAs somewhere
             lraStack.remove(lra);
 
             URL nextLRA = getCurrent();
 
-            if (nextLRA != null)
+            if (nextLRA != null) {
                 try {
                     init(nextLRA);
                 } catch (URISyntaxException ignore) {
                     // the validity of the url was checked when we added it to lraStack
                 }
-
-            if (response != null)
-                response.close();
+            }
         }
     }
 
@@ -525,5 +575,23 @@ public class LRAClient implements LRAClientAPI {
 
     public void close() {
         client.close();
+    }
+
+    private void aquireConnection() {
+        if (connectionInUse) {
+            System.out.printf("LRAClient: trying to aquire an in use connection");
+
+            throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Entity.text("LRAClient: trying to aquire an in use connection")).build());
+        }
+
+        connectionInUse = true;
+    }
+
+    private void releaseConnection(Response response) {
+        if (response != null)
+            response.close();
+
+        connectionInUse = false;
     }
 }

@@ -2,8 +2,6 @@ package participant.api;
 
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-
 import participant.filter.service.HotelService;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -24,12 +22,12 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @ApplicationScoped
-@Path("/hotel")
+@Path(HotelController.HOTEL_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
-public class HotelController {
-
-    @Inject
-    private LRAClient lraClient;
+public class HotelController extends Participant {
+    static final String HOTEL_PATH = "/hotel";
+    static final String HOTEL_NAME_PARAM = "hotelName";
+    static final String HOTEL_BEDS_PARAM = "beds";
 
     @Inject
     private HotelService hotelService;
@@ -37,15 +35,17 @@ public class HotelController {
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
-    public void bookShow(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam("show") @DefaultValue("") String show,
-                         @QueryParam("seats") @DefaultValue("") Integer seats) {
+    @LRA(LRA.LRAType.REQUIRED)
+    public void bookRoom(@Suspended final AsyncResponse asyncResponse,
+                         @QueryParam(HOTEL_NAME_PARAM) @DefaultValue("Default") String hotelName,
+                         @QueryParam(HOTEL_BEDS_PARAM) @DefaultValue("1") Integer beds,
+                         @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
 
-        hotelService.bookAsync(show, seats)
+        hotelService.bookAsync(hotelName, beds)
                 .thenApply(asyncResponse::resume)
                 .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
 
-        asyncResponse.setTimeout(500, TimeUnit.MILLISECONDS);
+        asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
     }
 }

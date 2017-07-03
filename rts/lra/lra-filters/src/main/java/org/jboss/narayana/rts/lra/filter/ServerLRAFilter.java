@@ -216,22 +216,31 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
 
         // TODO make sure it is possible to do compensations inside a new LRA
         if (!endAnnotation && enlist) { // don't enlist for methods marked with Compensate, Complete or Leave
-            Map<String, String> terminateURIs = getTerminationUris(resourceInfo.getResourceClass());
-
-            Annotation resourcePathAnnotation = resourceInfo.getResourceClass().getAnnotation(Path.class);
-            String resourcePath = resourcePathAnnotation == null ? "/" : ((Path) resourcePathAnnotation).value();
-
             URI baseUri = containerRequestContext.getUriInfo().getBaseUri();
-            String uriPrefix = String.format("%s:%s%s",
-                    baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1));
+            boolean refactored = true;
 
-            lraTrace(containerRequestContext, lraId,
-                    "ServerLRAFilter before: joining LRA with compensator " + terminateURIs.get(COMPENSATE));
-            recoveryUrl = lraClient.joinLRA(lraId, 0,
-                    String.format("%s%s", uriPrefix, terminateURIs.get(COMPENSATE)),
-                    String.format("%s%s", uriPrefix, terminateURIs.get(COMPLETE)),
-                    String.format("%s%s", uriPrefix, terminateURIs.get(LEAVE)),
-                    String.format("%s%s", uriPrefix, terminateURIs.get(STATUS)));
+            if (refactored) {
+                Map<String, String> terminateURIs = lraClient.getTerminationUris(resourceInfo.getResourceClass(), baseUri, true);
+                recoveryUrl = lraClient.joinLRAWithLinkHeader(lraId, 0, terminateURIs.get("Link"));
+            } else {
+
+
+                Map<String, String> terminateURIs = getTerminationUris(resourceInfo.getResourceClass());
+
+                Annotation resourcePathAnnotation = resourceInfo.getResourceClass().getAnnotation(Path.class);
+                String resourcePath = resourcePathAnnotation == null ? "/" : ((Path) resourcePathAnnotation).value();
+
+                String uriPrefix = String.format("%s:%s%s",
+                        baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1));
+
+                lraTrace(containerRequestContext, lraId,
+                        "ServerLRAFilter before: joining LRA with compensator " + terminateURIs.get(COMPENSATE));
+                recoveryUrl = lraClient.joinLRA(lraId, 0,
+                        String.format("%s%s", uriPrefix, terminateURIs.get(COMPENSATE)),
+                        String.format("%s%s", uriPrefix, terminateURIs.get(COMPLETE)),
+                        String.format("%s%s", uriPrefix, terminateURIs.get(LEAVE)),
+                        String.format("%s%s", uriPrefix, terminateURIs.get(STATUS)));
+            }
 
             headers.putSingle(LRA_HTTP_RECOVERY_HEADER, recoveryUrl);
         }

@@ -1,7 +1,7 @@
 package participant.api;
 
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
 import participant.filter.service.FlightService;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,12 +21,12 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @ApplicationScoped
-@Path("/flight")
+@Path(FlightController.FLIGHT_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
-public class FlightController {
-
-    @Inject
-    private LRAClient lraClient;
+public class FlightController extends Participant {
+    static final String FLIGHT_PATH = "/flight";
+    static final String FLIGHT_NUMBER_PARAM = "flightNumber";
+    static final String FLIGHT_SEATS_PARAM = "flightSeats";
 
     @Inject
     private FlightService flightService;
@@ -34,14 +34,18 @@ public class FlightController {
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
+    @LRA(LRA.LRAType.REQUIRED)
+    @NestedLRA
     public void bookFlight(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam("seats") @DefaultValue("") Integer seats) {
+                           @QueryParam(FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
+                           @QueryParam(FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer seats,
+                           @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
 
-        flightService.bookAsync(seats)
+        flightService.bookAsync(flightNumber, seats)
                 .thenApply(asyncResponse::resume)
                 .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
 
-        asyncResponse.setTimeout(500, TimeUnit.MILLISECONDS);
+        asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
     }
 }

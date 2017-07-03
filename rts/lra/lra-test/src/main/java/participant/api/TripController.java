@@ -4,9 +4,10 @@ import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import participant.filter.model.Booking;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -30,12 +31,10 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @ApplicationScoped
-@Path("/trip")
+@Path(TripController.TRIP_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
-public class TripController {
-    private static URL HOTEL_SERVICE_BASE_URL;
-    private static URL FLIGHT_SERVICE_BASE_URL;
-
+public class TripController extends Participant {
+    static final String TRIP_PATH = "/trip";
     private Client hotelClient;
     private Client flightClient;
 
@@ -45,17 +44,23 @@ public class TripController {
     @PostConstruct
     private void initController() {
         try {
-            HOTEL_SERVICE_BASE_URL = new URL("http://localhost:8081");
-            FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:8081");
 
             hotelClient = ClientBuilder.newClient();
             flightClient = ClientBuilder.newClient();
 
-            hotelTarget = hotelClient.target(URI.create(new URL(HOTEL_SERVICE_BASE_URL, "/hotel").toExternalForm()));
-            flightTarget = flightClient.target(URI.create(new URL(FLIGHT_SERVICE_BASE_URL, "/flight").toExternalForm()));
+            hotelTarget = hotelClient.target(URI.create(new URL(HOTEL_SERVICE_BASE_URL, HotelController.HOTEL_PATH).toExternalForm()));
+            flightTarget = flightClient.target(URI.create(new URL(FLIGHT_SERVICE_BASE_URL, FlightController.FLIGHT_PATH).toExternalForm()));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @PreDestroy
+    private void finiController() {
+        hotelClient.close();
+        flightClient.close();
     }
 
     /**
@@ -69,80 +74,84 @@ public class TripController {
      *     start LRA 4
      *       Book flight option 2
      *
-     * @param asyncResponse
-     * @param hotel hotel name
+     * @param asyncResponse the response object that will be asynchronously returned back to the caller
+     * @param hotelName hotel name
      * @param hotelGuests number of beds required
      * @param flightSeats number of people flying
      */
-    @GET
+    @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
+    @LRA(LRA.LRAType.REQUIRED)
     public void bookTrip(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam("hotel") @DefaultValue("") String hotel,
-                         @QueryParam("hotelGuests") @DefaultValue("1") Integer hotelGuests,
-                         @QueryParam("flightSeats") @DefaultValue("0") Integer flightSeats) {
+                         @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("The Grand") String hotelName,
+                         @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
+                         @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("123") String flightNumber,
+                         @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("0") Integer flightSeats,
+                         @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
 
-        long timeout = -1;
-
-        CompletableFuture<Booking> hotelBooking = hotelGuests <= 0 ? null : bookHotel();
-        CompletableFuture<Booking> flightBooking = flightSeats <= 0 ? null : bookFlight();
+        CompletableFuture<Booking> hotelBooking = bookHotel(hotelName, hotelGuests);
+        CompletableFuture<Booking> flightBooking1 = bookFlight(flightNumber, flightSeats);
+        CompletableFuture<Booking> flightBooking2 =
+                flightBooking1 == null ? null : bookFlight(flightNumber + "B", flightSeats);
+        CompletableFuture<Booking> asyncResult;
 
         if (hotelBooking != null) {
-            timeout = 500;
-
-            if (flightBooking != null) {
-                CompletableFuture<Booking> trip = hotelBooking.thenCombineAsync(flightBooking, Booking::new);
-
-                trip
-                        .thenApply(
-                                asyncResponse::resume)
-                        .exceptionally(
-                                e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
+            if (flightBooking1 != null) {
+                asyncResult = hotelBooking
+//                        .thenCombineAsync(flightBooking1, Booking::new)
+                        .thenCombineAsync(flightBooking2, Booking::new);
             } else {
-                hotelBooking
-                        .thenApply(asyncResponse::resume)
-                        .exceptionally(e ->
-                                asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
+                asyncResult = hotelBooking;
             }
-        } else if (flightBooking != null) {
-            timeout = 500;
-
-            flightBooking
-                    .thenApply(asyncResponse::resume)
-                    .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
-        }
-
-        if (timeout >= 0) {
-            asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
-            asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
+        } else if (flightBooking1 != null) {
+            asyncResult = flightBooking1;
         } else {
-            asyncResponse.resume("Invalid booking request");
+            asyncResponse.resume("Invalid booking request: no flight or hotel information");
+            return;
         }
+
+        asyncResult
+                .thenApply(asyncResponse::resume)
+                .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
+
+        asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
+        asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
     }
 
-    private CompletableFuture<Booking> bookHotel() {
+    private CompletableFuture<Booking> bookHotel(String name, int beds) {
+        if (name == null || name.length() == 0 || beds <= 0)
+            return null;
+
         WebTarget webTarget = hotelTarget
                 .path("book")
-                .queryParam("hotel", "The Grand").queryParam("hotelGuests", 2);
+                .queryParam(HotelController.HOTEL_NAME_PARAM, name).queryParam(HotelController.HOTEL_BEDS_PARAM, beds);
 
         return invokeWebTarget(webTarget);
     }
-    private CompletableFuture<Booking> bookFlight() {
+
+    private CompletableFuture<Booking> bookFlight(String flightNumber, int seats) {
+        if (flightNumber == null || flightNumber.length() == 0 || seats <= 0)
+            return null;
+
         WebTarget webTarget = flightTarget
                 .path("book")
-                .queryParam("flightSeats", 2);
+                .queryParam(FlightController.FLIGHT_NUMBER_PARAM, flightNumber)
+                .queryParam(FlightController.FLIGHT_SEATS_PARAM, seats);
 
         return invokeWebTarget(webTarget);
     }
 
-    private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget) {
+    private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget, Integer ... acceptableStatusCodes) {
+        if (acceptableStatusCodes.length == 0)
+            acceptableStatusCodes = new Integer[] {Response.Status.OK.getStatusCode()};
+
         AsyncInvoker asyncInvoker = webTarget.request().async();
-        BookingCallback<Booking> adapter = new BookingCallback<>(Booking.class);
+        RequestCallback<Booking> callback = new RequestCallback<>(Booking.class, acceptableStatusCodes);
 
-        asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), adapter);
+        asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
 
-        return adapter.getCompletableFuture();
+        return callback.getCompletableFuture();
     }
-
 }
 

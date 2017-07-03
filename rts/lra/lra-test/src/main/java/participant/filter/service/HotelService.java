@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HotelService {
     private AtomicInteger id = new AtomicInteger(0);
 
-    public Booking book(String hotel, Integer seats) {;
-        return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), hotel, seats);
+    public Booking book(String hotel, Integer beds) {;
+        return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), hotel, beds);
     }
 
-    public CompletableFuture<Booking> bookAsync(String hotel, Integer seats) {
-        return CompletableFuture.supplyAsync(() -> book(hotel, seats));
+    public CompletableFuture<Booking> bookAsync(String hotel, Integer beds) {
+        return CompletableFuture.supplyAsync(() -> book(hotel, beds));
     }
 }

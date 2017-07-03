@@ -19,7 +19,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 
-@RequestScoped
+//@RequestScoped TODO RESTEASY-682 so try
+@ApplicationScoped
 class FilterBase {
     @Context
     protected ResourceInfo resourceInfo;
@@ -35,7 +36,7 @@ class FilterBase {
         Method method = resourceInfo.getResourceMethod();
         System.out.printf("%s: container request for method %s: lra: %s%n",
                 reason, method.getDeclaringClass().getName() +"#" + method.getName(),
-                lraId == null ? "null" : lraId);
+                lraId == null ? "context" : lraId);
     }
 
     LRAClient getLRAClient(boolean create) {
