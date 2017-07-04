@@ -2,9 +2,11 @@ package participant.api;
 
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 
+import participant.filter.model.Booking;
 import participant.filter.service.HotelService;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
@@ -21,7 +23,8 @@ import java.util.concurrent.TimeUnit;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
-@ApplicationScoped
+//@ApplicationScoped
+@RequestScoped
 @Path(HotelController.HOTEL_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
 public class HotelController extends Participant {
@@ -33,10 +36,10 @@ public class HotelController extends Participant {
     private HotelService hotelService;
 
     @POST
-    @Path("/book")
+    @Path("/bookasync")
     @Produces(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.REQUIRED)
-    public void bookRoom(@Suspended final AsyncResponse asyncResponse,
+    public void bookRoomAsync(@Suspended final AsyncResponse asyncResponse,
                          @QueryParam(HOTEL_NAME_PARAM) @DefaultValue("Default") String hotelName,
                          @QueryParam(HOTEL_BEDS_PARAM) @DefaultValue("1") Integer beds,
                          @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
@@ -47,5 +50,16 @@ public class HotelController extends Participant {
 
         asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
+    }
+
+    @POST
+    @Path("/book")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LRA(LRA.LRAType.REQUIRED)
+    public Booking bookRoom(@QueryParam(HOTEL_NAME_PARAM) @DefaultValue("Default") String hotelName,
+                            @QueryParam(HOTEL_BEDS_PARAM) @DefaultValue("1") Integer beds,
+                            @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
+
+        return hotelService.book(hotelName, beds);
     }
 }

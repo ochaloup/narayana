@@ -61,7 +61,10 @@ mvn -f lra-test/pom.xml clean wildfly-swarm:run -Dswarm.debug.port=5007 -DskipTe
 ### Book a trip
 
 ```bash
-curl -X GET http://localhost:8081/trip/book?hotelName=Rex&flightSeats=1"
+curl -X POST  "http://localhost:8081/trip/book?hotelName=Rex&flightNumber=BA123"
+curl -X POST  "http://localhost:8081/trip/book?hotelName=Rex"
+curl -X POST  "http://localhost:8081/trip/book?flightNumber=BA123"
+
 ```
 
 

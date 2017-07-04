@@ -2,9 +2,11 @@ package participant.api;
 
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
+import participant.filter.model.Booking;
 import participant.filter.service.FlightService;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
@@ -20,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
-@ApplicationScoped
+//@ApplicationScoped
+@RequestScoped
 @Path(FlightController.FLIGHT_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
 public class FlightController extends Participant {
@@ -32,11 +35,11 @@ public class FlightController extends Participant {
     private FlightService flightService;
 
     @POST
-    @Path("/book")
+    @Path("/bookasync")
     @Produces(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.REQUIRED)
     @NestedLRA
-    public void bookFlight(@Suspended final AsyncResponse asyncResponse,
+    public void bookFlightAsync(@Suspended final AsyncResponse asyncResponse,
                            @QueryParam(FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
                            @QueryParam(FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer seats,
                            @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
@@ -47,5 +50,17 @@ public class FlightController extends Participant {
 
         asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
+    }
+
+    @POST
+    @Path("/book")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LRA(LRA.LRAType.REQUIRED)
+    @NestedLRA
+    public Booking bookFlight(@QueryParam(FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
+                              @QueryParam(FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer seats,
+                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
+
+        return flightService.book(flightNumber, seats);
     }
 }

@@ -37,6 +37,8 @@ public class RequestCallback<T> implements InvocationCallback<Response> {
             }
         } catch (Throwable t) {
             failed(t);
+//        } finally {
+//            response.close();
         }
     }
 

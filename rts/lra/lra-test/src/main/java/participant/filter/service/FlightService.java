@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FlightService {
     private AtomicInteger id = new AtomicInteger(0);
 
-    private Booking book(String flightNumber, Integer seats) {
+    public Booking book(String flightNumber, Integer seats) {
         return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), flightNumber, seats);
     }
 

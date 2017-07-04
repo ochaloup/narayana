@@ -6,11 +6,13 @@ import participant.filter.model.Booking;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -25,12 +27,14 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
-@ApplicationScoped
+//@ApplicationScoped
+@RequestScoped
 @Path(TripController.TRIP_PATH)
 @LRA(LRA.LRAType.SUPPORTS)
 public class TripController extends Participant {
@@ -80,15 +84,15 @@ public class TripController extends Participant {
      * @param flightSeats number of people flying
      */
     @POST
-    @Path("/book")
+    @Path("/bookasync")
     @Produces(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.REQUIRED)
-    public void bookTrip(@Suspended final AsyncResponse asyncResponse,
-                         @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("The Grand") String hotelName,
-                         @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
-                         @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("123") String flightNumber,
-                         @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("0") Integer flightSeats,
-                         @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
+    public void bookTripAsync(@Suspended final AsyncResponse asyncResponse,
+                              @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
+                              @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
+                              @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
+                              @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer flightSeats,
+                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
 
         CompletableFuture<Booking> hotelBooking = bookHotel(hotelName, hotelGuests);
         CompletableFuture<Booking> flightBooking1 = bookFlight(flightNumber, flightSeats);
@@ -99,8 +103,8 @@ public class TripController extends Participant {
         if (hotelBooking != null) {
             if (flightBooking1 != null) {
                 asyncResult = hotelBooking
-//                        .thenCombineAsync(flightBooking1, Booking::new)
-                        .thenCombineAsync(flightBooking2, Booking::new);
+                        .thenCombineAsync(flightBooking2, Booking::new)
+                        .thenCombineAsync(flightBooking1, Booking::new);
             } else {
                 asyncResult = hotelBooking;
             }
@@ -117,6 +121,36 @@ public class TripController extends Participant {
 
         asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
+    }
+
+    @POST
+    @Path("/book")
+    @Produces(MediaType.APPLICATION_JSON)
+    @LRA(LRA.LRAType.REQUIRED)
+    public Booking bookTrip(  @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
+                              @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
+                              @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
+                              @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer flightSeats,
+                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
+
+        CompletableFuture<Booking> hotelBooking = bookHotel(hotelName, hotelGuests);
+        CompletableFuture<Booking> flightBooking1 = bookFlight(flightNumber, flightSeats);
+        CompletableFuture<Booking> flightBooking2 = bookFlight(flightNumber, flightSeats);
+
+        try {
+            if (hotelBooking != null) {
+                if (flightBooking1 != null)
+                    return new Booking(hotelBooking.get(), flightBooking1.get());
+                else
+                    return hotelBooking.get();
+            } else if (flightBooking1 != null) {
+                return flightBooking1.get();
+            } else {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(Entity.text("Missing booking information")).build());
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new WebApplicationException(Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(Entity.text(e.getMessage())).build());
+        }
     }
 
     private CompletableFuture<Booking> bookHotel(String name, int beds) {
@@ -142,12 +176,22 @@ public class TripController extends Participant {
         return invokeWebTarget(webTarget);
     }
 
+    private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget) {
+        AsyncInvoker asyncInvoker = webTarget.request().async();
+        BookingCallback callback = new BookingCallback();
+
+        asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
+
+        return callback.getCompletableFuture();
+    }
+
     private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget, Integer ... acceptableStatusCodes) {
         if (acceptableStatusCodes.length == 0)
             acceptableStatusCodes = new Integer[] {Response.Status.OK.getStatusCode()};
 
         AsyncInvoker asyncInvoker = webTarget.request().async();
-        RequestCallback<Booking> callback = new RequestCallback<>(Booking.class, acceptableStatusCodes);
+//        RequestCallback<Booking> callback = new RequestCallback<>(Booking.class, acceptableStatusCodes);
+        BookingCallback callback = new BookingCallback();
 
         asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
 

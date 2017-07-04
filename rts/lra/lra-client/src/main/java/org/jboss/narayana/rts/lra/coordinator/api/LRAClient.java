@@ -83,11 +83,11 @@ public class LRAClient implements LRAClientAPI {
     private boolean isUseable;
     private boolean connectionInUse;
 
-    @Produces
+/*    @Produces
     @ApplicationScoped
     public LRAClient createLRAClient() throws URISyntaxException {
         return new LRAClient();
-    }
+    }*/
 
     public LRAClient() throws URISyntaxException {
         this("http", "localhost", 8080);
@@ -122,6 +122,12 @@ public class LRAClient implements LRAClientAPI {
         isUseable = true;
     }
 
+    private WebTarget getTarget() {
+//        return target; // TODO can't share the target if a service makes multiple JAX-RS requests
+        client.close(); // hacking
+        client = ClientBuilder.newClient();
+        return client.target(base);
+    }
     /**
      * Update the clients notion of the current coordinator. Warning all further operations will be performed
      * on the LRA manager that created the passed in coordinator.
@@ -186,7 +192,7 @@ public class LRAClient implements LRAClientAPI {
 
             aquireConnection();
 
-            response = target.path(startLRAUrl)
+            response = getTarget().path(startLRAUrl)
                     .queryParam(TIMEOUT_PARAM_NAME, timeout)
                     .queryParam(CLIENT_ID_PARAM_NAME, clientID)
                     .queryParam(PARENT_LRA_PARAM_NAME, encodedParentLRA)
@@ -270,7 +276,7 @@ public class LRAClient implements LRAClientAPI {
         try {
             aquireConnection();
 
-            response = target.path(String.format(leaveFormat, getLRAId(lraId.toString())))
+            response = getTarget().path(String.format(leaveFormat, getLRAId(lraId.toString())))
                     .request()
                     .header(LRA_HTTP_HEADER, lraId)
                     .put(Entity.entity(compensatorUrl, MediaType.TEXT_PLAIN));
@@ -303,7 +309,7 @@ public class LRAClient implements LRAClientAPI {
         try {
             aquireConnection();
 
-            response = target.path(getUrl).request().get();
+            response = getTarget().path(getUrl).request().get();
 
             if (!response.hasEntity())
                 throw new WebApplicationException(response);
@@ -441,7 +447,7 @@ public class LRAClient implements LRAClientAPI {
         try {
             aquireConnection();
 
-            response = target.path("status").path(String.format(statusFormat, getLRAId(lraId.toString()))).request().get();
+            response = getTarget().path("status").path(String.format(statusFormat, getLRAId(lraId.toString()))).request().get();
 
             return Boolean.valueOf(response.readEntity(String.class));
         } finally {
@@ -489,7 +495,7 @@ public class LRAClient implements LRAClientAPI {
         Response response = null;
 
         try {
-            response = target
+            response = getTarget()
                     .queryParam(TIMEOUT_PARAM_NAME, timelimit)
                     .request()
                     .header("Link", linkHeader)
@@ -515,7 +521,7 @@ public class LRAClient implements LRAClientAPI {
         lraTrace(String.format("%s LRA", confirm ? "close" : "compensate"), lra);
 
         try {
-            response = target.path(confirmUrl).request().put(Entity.text(""));
+            response = getTarget().path(confirmUrl).request().put(Entity.text(""));
 
             assertEquals(response, Response.Status.OK.getStatusCode(), response.getStatus(), "LRA finished with an unexpected status code");
 
