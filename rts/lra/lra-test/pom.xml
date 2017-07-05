@@ -85,7 +85,6 @@
 </dependency>
 org.jboss.resteasy.plugins.providers.jackson.ResteasyJacksonProvider
 -->
-
         <!-- JAXRS 2 Client API implementation -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>

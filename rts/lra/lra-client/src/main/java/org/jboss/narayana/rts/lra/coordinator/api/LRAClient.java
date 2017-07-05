@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -120,6 +121,17 @@ public class LRAClient implements LRAClientAPI {
             lraStack = new Stack<>();
 
         isUseable = true;
+    }
+
+    public static URL lraToURL(String lraId, String message) {
+        try {
+            return new URL(lraId);
+        } catch (MalformedURLException e) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity(Entity.text(String.format("%s: %s", message, lraId)))
+                            .build());
+        }
     }
 
     private WebTarget getTarget() {
@@ -215,6 +227,15 @@ public class LRAClient implements LRAClientAPI {
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             throw new WebApplicationException(
                     Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
+        } catch (Exception e) {
+            if (ConnectException.class.equals(e.getCause().getClass()))
+                throw new WebApplicationException(
+                        Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                                .entity(Entity.text("Cannont connect to an LRA coordinator: " + e.getCause().getMessage()))
+                                .build());
+
+            throw new WebApplicationException(
+                    Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(Entity.text(e.getMessage())).build());
         } finally {
             releaseConnection(response);
         }

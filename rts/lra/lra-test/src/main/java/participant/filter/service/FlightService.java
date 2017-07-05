@@ -4,16 +4,17 @@ import participant.filter.model.Booking;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @ApplicationScoped
-public class FlightService {
-    private AtomicInteger id = new AtomicInteger(0);
+public class FlightService extends BookingStore {
+    public Booking book(String bid, String flightNumber, Integer seats) {
+        Booking booking = new Booking(bid, flightNumber, seats, "Flight");
 
-    public Booking book(String flightNumber, Integer seats) {
-        return new Booking(Integer.valueOf(id.incrementAndGet()).toString(), flightNumber, seats);
+        add(booking);
+
+        return booking;
     }
 
-    public CompletableFuture<Booking> bookAsync(String flightNumber, Integer seats) {
-        return CompletableFuture.supplyAsync(() -> book(flightNumber, seats));}
+    public CompletableFuture<Booking> bookAsync(String bid, String flightNumber, Integer seats) {
+        return CompletableFuture.supplyAsync(() -> book(bid, flightNumber, seats));}
 }

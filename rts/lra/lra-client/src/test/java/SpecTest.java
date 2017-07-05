@@ -14,6 +14,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -417,7 +418,13 @@ public class SpecTest {
         checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
         // call a method annotated with @Leave (should remove the compensator from the LRA)
-        response = msTarget.path("activities").path("leave").path(URLEncoder.encode(lra.toString())).request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        try {
+            response = msTarget.path("activities").path("leave").path(URLEncoder.encode(lra.toString(), "UTF-8"))
+                    .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        } catch (UnsupportedEncodingException e) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
+        }
         checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
 
 //        lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient

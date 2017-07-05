@@ -64,8 +64,16 @@ public class TransactionService {
     public void remove(String state, String lraId) {
         lraTrace(lraId, "remove LRA");
 
-        transactions.remove(lraId);
-        recoveringTransactions.remove(lraId);
+        if (transactions.containsKey(lraId)) {
+            Transaction lra = transactions.get(lraId);
+
+//            if (lra.isTopLevel()) {
+                transactions.remove(lraId);
+                recoveringTransactions.remove(lraId);
+//            }
+
+            // TODO make sure we clean up nested LRAs when the top level LRA closes
+        }
     }
 
     public void addCompensator(Transaction transaction, String coordinatorId, String compensatorUrl) {

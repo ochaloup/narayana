@@ -85,6 +85,15 @@ public @interface LRA {
     }
 
     /**
+     * Some annotations (such as REQUIRES_NEW) will start an LRA on entry to a method and
+     * end it on exit. For some business activities it is desirable for the action to survive
+     * method execution and be completed elsewhere.
+     *
+     * @return whether or not newly created LRAs will survive after the method has executed
+     */
+    boolean longRunning() default false;
+
+    /**
      * The rollbackOn element can be set to indicate exceptions that must cause
      *  the interceptor to mark the transaction for rollback. Conversely, the dontRollbackOn
      *  element can be set to indicate exceptions that must not cause the interceptor to mark

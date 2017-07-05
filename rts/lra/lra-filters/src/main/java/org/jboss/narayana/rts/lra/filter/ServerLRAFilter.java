@@ -75,14 +75,18 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         URL incommingLRA = null;
         String recoveryUrl = null;
         boolean nested;
+        boolean isLongRunning = false;
 
         if (transactional == null) {
             transactional = method.getDeclaringClass().getDeclaredAnnotation(LRA.class);
 
-            if (transactional != null)
+            if (transactional != null) {
                 type = ((LRA) transactional).value();
+                isLongRunning = ((LRA) transactional).longRunning();
+            }
         } else {
             type = ((LRA) transactional).value();
+            isLongRunning = ((LRA) transactional).longRunning();
         }
 
         if (type == null)
@@ -203,6 +207,9 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
             lraTrace(containerRequestContext, lraId, "ServerLRAFilter before: adding header");
             headers.putSingle(LRA_HTTP_HEADER, lraId.toString());
         }
+
+        if (isLongRunning)
+            newLRA = null;
 
         lraClient = getLRAClient(true);
 

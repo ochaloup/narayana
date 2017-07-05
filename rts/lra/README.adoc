@@ -67,4 +67,16 @@ curl -X POST  "http://localhost:8081/trip/book?flightNumber=BA123"
 
 ```
 
+### Uodate a trip booking
+
+Make a provisional booking and then amend it before confirming the booking. Apart from using
+Jackson for parsing Json the client only uses Java SE APIs.
+
+
+```bash
+mvn package -f lra-test/pom.xml
+
+java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -cp lra-test/target/classes:lra-test/target/lra-test/WEB-INF/lib/jackson-jaxrs-json-provider-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/javax.json-1.0.3.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-databind-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-core-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-annotations-2.7.4.jar HttpClient
+```
+
 
