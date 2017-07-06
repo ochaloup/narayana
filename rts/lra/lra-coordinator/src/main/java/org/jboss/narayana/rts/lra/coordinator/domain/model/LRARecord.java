@@ -4,6 +4,8 @@ import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import org.jboss.jbossts.star.resource.RESTRecord;
+import org.jboss.narayana.rts.lra.coordinator.api.Current;
+import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,14 +25,14 @@ import java.util.TreeMap;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
 public class LRARecord extends RESTRecord {
-    private String coordinatorURI;
+    private URL coordinatorURI;
     private String participantPath;
 
-    private String completeURI;
-    private String compensateURI;
-    private String statusURI;
-    private String leaveURI;
-    private String forgetURI;
+    private URL completeURI;
+    private URL compensateURI;
+    private URL statusURI;
+    private URL leaveURI;
+    private URL forgetURI;
 
     private boolean isCompelete;
     private boolean isCompensated;
@@ -39,20 +41,34 @@ public class LRARecord extends RESTRecord {
     LRARecord(String lraId, String coordinatorURI, String linkURI) {
         super(lraId, coordinatorURI, linkURI, null);
 
-        // if compensateURI is a link parse it into compensate,complete and status urls
-        if (linkURI.indexOf(',') != -1) {
-            linkURI = cannonicalForm(linkURI);
-            Arrays.stream(linkURI.split(",")).forEach(this::parseLink);
-        } else {
-            this.compensateURI = String.format("%s/compensate", linkURI);
-            this.completeURI = String.format("%s/complete", linkURI);
-            this.leaveURI = String.format("%s/leave", linkURI);
-            this.statusURI = String.format("%s/status", linkURI);
-            this.forgetURI = String.format("%s/forget", linkURI);
-        }
+        try {
+            // if compensateURI is a link parse it into compensate,complete and status urls
+            if (linkURI.indexOf(',') != -1) {
+                linkURI = cannonicalForm(linkURI);
+                Exception parseException[] = {null};
 
-        this.participantPath = linkURI;
-        this.coordinatorURI = coordinatorURI;
+                Arrays.stream(linkURI.split(",")).forEach((linkStr) -> {
+                    Exception e = parseLink(linkStr);
+                    if (e != null)
+                        parseException[0] = e;
+                });
+
+                if (parseException[0] != null)
+                    throw new InvalidLRAId(coordinatorURI, "Invalid link URL", parseException[0]);
+            } else {
+                this.compensateURI = new URL(String.format("%s/compensate", linkURI));
+                this.completeURI = new URL(String.format("%s/complete", linkURI));
+                this.leaveURI = new URL(String.format("%s/leave", linkURI));
+                this.statusURI = new URL(String.format("%s/status", linkURI));
+                this.forgetURI = new URL(String.format("%s/forget", linkURI));
+            }
+
+            this.participantPath = linkURI;
+
+            this.coordinatorURI = new URL(coordinatorURI);
+        } catch (MalformedURLException e) {
+            throw new InvalidLRAId(coordinatorURI, "Invalid LRA id", e);
+        }
     }
 
     public String getParticipantPath() {
@@ -79,21 +95,27 @@ public class LRARecord extends RESTRecord {
         return b.append(value);
     }
 
-    private void parseLink(String linkStr) {
+    private MalformedURLException parseLink(String linkStr) {
         Link link = Link.valueOf(linkStr);
         String rel = link.getRel();
         String uri = link.getUri().toString();
 
-        if ("compensate".equals(rel))
-            compensateURI = uri;
-        else if ("complete".equals(rel))
-            completeURI = uri;
-        else if ("status".equals(rel))
-            statusURI = uri;
-        else if ("leave".equals(rel))
-            leaveURI = uri;
-        else if ("forget".equals(rel))
-            forgetURI = uri;
+        try {
+            if ("compensate".equals(rel))
+                compensateURI = new URL(uri);
+            else if ("complete".equals(rel))
+                completeURI = new URL(uri);
+            else if ("status".equals(rel))
+                statusURI = new URL(uri);
+            else if ("leave".equals(rel))
+                leaveURI = new URL(uri);
+            else if ("forget".equals(rel))
+                forgetURI = new URL(uri);
+
+            return null;
+        } catch (MalformedURLException e) {
+            return e;
+        }
     }
 
     @Override
@@ -129,7 +151,7 @@ public class LRARecord extends RESTRecord {
 
     private int doEnd(boolean compensate) {
         // put to completeURI
-        String endPath;
+        URL endPath;
         Client client = null;
 
         if (compensate) {
@@ -148,10 +170,12 @@ public class LRARecord extends RESTRecord {
 
         try {
             client = ClientBuilder.newClient();
-            WebTarget target = client.target(URI.create(new URL(endPath).toExternalForm()));
+            WebTarget target = client.target(URI.create(endPath.toExternalForm()));
+
+            Current.push(coordinatorURI);
 
             Response response = target.request()
-                    .header(LRA_HTTP_HEADER, coordinatorURI)
+                    .header(LRA_HTTP_HEADER, coordinatorURI.toString())
                     .post(Entity.entity("", MediaType.APPLICATION_JSON));
 
             if (response.getStatus() != Response.Status.OK.getStatusCode()) {
@@ -165,9 +189,6 @@ public class LRARecord extends RESTRecord {
                 isCompelete = true;
 
             return TwoPhaseOutcome.FINISH_OK;
-        } catch (MalformedURLException error) {
-            isFailed = true;
-            return TwoPhaseOutcome.FINISH_ERROR;
         } finally {
             if (client != null)
                 client.close();
@@ -182,15 +203,13 @@ public class LRARecord extends RESTRecord {
         WebTarget target = null;
 
         try {
-            target = client.target(URI.create(new URL(forgetURI).toExternalForm()));
+            target = client.target(URI.create(forgetURI.toExternalForm()));
 
             Response response = target.request()
                     .header(LRA_HTTP_HEADER, coordinatorURI)
                     .post(Entity.entity("", MediaType.APPLICATION_JSON));
 
             return response.getStatus() == Response.Status.OK.getStatusCode();
-        } catch (MalformedURLException e) {
-            return false;
         } finally {
             if (client != null)
                 client.close();
@@ -213,12 +232,12 @@ public class LRARecord extends RESTRecord {
     public boolean save_state(OutputObjectState os, int t) {
         if (super.save_state(os, t)) {
             try {
-                os.packString(coordinatorURI);
+                os.packString(coordinatorURI.toString());
                 os.packString(participantPath);
-                os.packString(completeURI);
-                os.packString(compensateURI);
-                os.packString(statusURI);
-                os.packString(leaveURI);
+                os.packString(completeURI.toString());
+                os.packString(compensateURI.toString());
+                os.packString(statusURI.toString());
+                os.packString(leaveURI.toString());
 
                 os.packBoolean(isCompelete);
                 os.packBoolean(isCompensated);
@@ -237,12 +256,12 @@ public class LRARecord extends RESTRecord {
             participantPath = getParticipantURI();
 
             try {
-                coordinatorURI = os.unpackString();
+                coordinatorURI = new URL(os.unpackString());
                 participantPath = os.unpackString();
-                completeURI = os.unpackString();
-                compensateURI = os.unpackString();
-                statusURI = os.unpackString();
-                leaveURI = os.unpackString();
+                completeURI = new URL(os.unpackString());
+                compensateURI = new URL(os.unpackString());
+                statusURI = new URL(os.unpackString());
+                leaveURI = new URL(os.unpackString());
 
                 isCompelete = os.unpackBoolean();
                 isCompensated = os.unpackBoolean();

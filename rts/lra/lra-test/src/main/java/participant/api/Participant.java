@@ -6,8 +6,13 @@ import org.jboss.narayana.rts.lra.compensator.api.Complete;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Leave;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
+import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -18,12 +23,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
+@RequestScoped
 public abstract class Participant {
     @Context
     private UriInfo context;
@@ -31,7 +41,7 @@ public abstract class Participant {
     @Context
     private HttpServletRequest httpRequest;
 
-    private CompensatorStatus status = CompensatorStatus.Active;
+    private Map<String, CompensatorStatus> compensatorStatusMap;
 
     /**
      * Tell the compensator to move to the requested state.
@@ -43,7 +53,9 @@ public abstract class Participant {
     protected abstract CompensatorStatus updateCompensator(CompensatorStatus status, String activityId);
 
     /**
-     * Get the LRA context of the currently running method
+     * Get the LRA context of the currently running method.
+     * Note that @HeaderParam(LRA_HTTP_HEADER) does not match the header (done't know why) so we the httpRequest
+     *
      * @return the LRA context of the currently running method
      */
     protected String getCurrentActivityId() {
@@ -54,16 +66,16 @@ public abstract class Participant {
     @Path("/complete")
     @Produces(MediaType.APPLICATION_JSON)
     @Complete
-    public Response completeWork(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
-        return updateState(CompensatorStatus.Completing, lraId);
+    public Response completeWork() throws NotFoundException {
+        return updateState(CompensatorStatus.Completed, getCurrentActivityId());
     }
 
     @POST
     @Path("/compensate")
     @Produces(MediaType.APPLICATION_JSON)
     @Compensate
-    public Response compensateWork(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
-        return updateState(CompensatorStatus.Compensating, lraId);
+    public Response compensateWork() throws NotFoundException {
+        return updateState(CompensatorStatus.Compensated, getCurrentActivityId());
     }
 
     @GET
@@ -71,10 +83,16 @@ public abstract class Participant {
     @Produces(MediaType.APPLICATION_JSON)
     @Status
     @LRA(LRA.LRAType.NOT_SUPPORTED)
-    public Response status(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
-        System.out.printf("%s: Participant status request%n", getClass().getName());
+    public Response status() throws NotFoundException {
+        String lraId = getCurrentActivityId();
 
-        return Response.ok(status).build();
+        if (lraId == null)
+            throw new InvalidLRAId("null", "not present on Compensator#status request", null);
+
+        if (!compensatorStatusMap.containsKey(lraId))
+            throw new InvalidLRAId(lraId, "Compensator#status request: unknown lra id", null);
+
+        return Response.ok(compensatorStatusMap.get(getCurrentActivityId())).build();
     }
 
     @PUT
@@ -85,13 +103,20 @@ public abstract class Participant {
         return Response.ok().build();
     }
 
+    @PostConstruct
+    public void postConstruct() {
+        compensatorStatusMap = new HashMap<>();
+    }
+
     private Response updateState(CompensatorStatus status, String activityId) {
-        this.status = updateCompensator(CompensatorStatus.Completed, activityId);
+        CompensatorStatus newStatus = updateCompensator(status, activityId);
+
+        compensatorStatusMap.put(activityId, newStatus); // NB in the demo we never remove completed activities
 
         return Response.ok(getStatusUrl(activityId)).build();
     }
 
     private String getStatusUrl(String lraId) {
-        return String.format("%s/%s/activity/compensated", context.getBaseUri(), LRAClient.getLRAId(lraId));
+        return String.format("%s/%s/activity/status", context.getBaseUri(), LRAClient.getLRAId(lraId));
     }
 }

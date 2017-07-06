@@ -72,25 +72,4 @@ class FilterBase {
 
         return (T) bm.getReference(bean, clazz, ctx);
     }
-
-
-    void associateLRA(URL lraId) {
-        FilterState.setCurrentLRA(lraId);
-
-        if (getLRAClient(false) != null)
-            lraClient.setCurrentLRA(lraId);
-    }
-
-    URL currentLRA() {
-        FilterState lraId = FilterState.getCurrentLRA();
-
-        if (lraId != null)
-            return lraId.id;
-
-        // see if the resource started an LRA
-        if (getLRAClient(false) == null)
-            return null;
-
-        return lraClient.getCurrent();
-    }
 }

@@ -9,6 +9,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +86,7 @@ public class TransactionService {
         return participants.get(rcvCoordId);
     }
 
-    public synchronized String startLRA(String baseUri, String parentLRA, String clientId, Integer timelimit) {
+    public synchronized URL startLRA(String baseUri, URL parentLRA, String clientId, Integer timelimit) {
         Transaction lra = new Transaction(baseUri, parentLRA, clientId);
 
         if (timelimit < 0)
@@ -107,7 +109,9 @@ public class TransactionService {
 
                 lraTrace(lra.getId(), "started LRA");
 
-                return lra.getId();
+                return new URL(lra.getId());
+            } catch (MalformedURLException e) {
+                 throw new InternalServerErrorException("LRA service generated an invalid lra id: " + lra.getId());
             } finally {
                 AtomicAction.suspend();
             }

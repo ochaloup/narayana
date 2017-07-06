@@ -1,18 +1,19 @@
 package participant.filter.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 public class Booking {
-    private final char RECORD_SEPARATOR = 0x1E;
     private AtomicLong nextBid = new AtomicLong(0);
 
     @JsonProperty("id") private String id;
@@ -21,7 +22,6 @@ public class Booking {
     @JsonProperty("status") private BookingStatus status;
     @JsonProperty("type") private String type;
     @JsonProperty("details") private Booking[] details;
-//    private String json;
 
     public Booking(String id, String name, Integer quantity, String type) {
         this(id, name, quantity, type, BookingStatus.PROVISIONAL, null);
@@ -145,5 +145,14 @@ public class Booking {
         status = booking.getStatus();
 
         return true;
+    }
+
+    @JsonIgnore
+    public String getEncodedId() {
+        try {
+            return URLEncoder.encode(id, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return id; // TODD do it in the constructor
+        }
     }
 }

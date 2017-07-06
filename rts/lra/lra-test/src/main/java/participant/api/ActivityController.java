@@ -125,6 +125,7 @@ public class ActivityController {
     public Response completeWork(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
         completedCount.incrementAndGet();
 
+        assert lraId != null;
         String txId = LRAClient.getLRAId(lraId);
         Activity activity = activityService.getActivity(txId);
 
@@ -142,6 +143,7 @@ public class ActivityController {
     public Response compensateWork(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
         compensatedCount.incrementAndGet();
 
+        assert lraId != null;
         String txId = LRAClient.getLRAId(lraId);
         Activity activity = activityService.getActivity(txId);
 
@@ -156,6 +158,7 @@ public class ActivityController {
     @Path("/supports")
     @LRA(LRA.LRAType.SUPPORTS)
     public Response supportsLRACall(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        assert lraId != null;
         addWork(lraId, null);
 
         return Response.ok(lraId == null ? "" : lraId).build();
@@ -192,6 +195,7 @@ public class ActivityController {
     @LRA(LRA.LRAType.REQUIRED)
     public Response activityWithLRA(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
                                     @HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        assert lraId != null;
         Activity activity = addWork(lraId, rcvId);
 
         if (activity == null)
@@ -219,6 +223,7 @@ public class ActivityController {
     @NestedLRA
     public Response nestedActivity(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
                                     @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId) {
+        assert nestedLRAId != null;
         Activity activity = addWork(nestedLRAId, rcvId);
 
         if (activity == null)
@@ -234,6 +239,7 @@ public class ActivityController {
             @HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
             @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId,
             @QueryParam("nestedCnt") @DefaultValue("1") Integer nestedCnt) {
+        assert nestedLRAId != null;
         Activity activity = addWork(nestedLRAId, rcvId);
 
         if (activity == null)
@@ -248,6 +254,7 @@ public class ActivityController {
     }
 
     private Activity addWork(String lraId, String rcvId) {
+        assert lraId != null;
         String txId = LRAClient.getLRAId(lraId);
 
         System.out.printf("ActivityController: work id %s and rcvId %s %n", txId, rcvId);

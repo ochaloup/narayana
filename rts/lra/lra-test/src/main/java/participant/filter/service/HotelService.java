@@ -10,8 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
 public class HotelService extends BookingStore {
-    private Map<String, Booking> bookings = new HashMap<>();
-
     public Booking book(String bid, String hotel, Integer beds) {;
         Booking booking = new Booking(bid, hotel, beds, "Hotel");
 

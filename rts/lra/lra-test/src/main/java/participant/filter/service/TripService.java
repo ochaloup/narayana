@@ -46,7 +46,7 @@ public class TripService extends BookingStore{
 
         booking.confirmirming();
 
-        lraClient.closeLRA(LRAClient.lraToURL(booking.getId(), "Invalid trip booking id format"));
+        lraClient.closeLRA(booking.getId());
 
         booking.confirm();
 

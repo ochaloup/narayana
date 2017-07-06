@@ -6,6 +6,7 @@ import org.jboss.narayana.rts.lra.compensator.api.Complete;
 import org.jboss.narayana.rts.lra.compensator.api.Leave;
 import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
+import org.jboss.narayana.rts.lra.coordinator.api.Current;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 
 import javax.ws.rs.Path;
@@ -14,8 +15,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -34,7 +33,6 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COMPENSATE;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COMPLETE;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LEAVE;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER2;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.STATUS;
 
@@ -69,9 +67,9 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         LRA.LRAType type = null;
         Annotation transactional = method.getDeclaredAnnotation(LRA.class);
         URL lraId;
+        URL newLRA = null;
 
         URL suspendedLRA = null;
-        URL newLRA = null;
         URL incommingLRA = null;
         String recoveryUrl = null;
         boolean nested;
@@ -89,8 +87,11 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
             isLongRunning = ((LRA) transactional).longRunning();
         }
 
-        if (type == null)
+        if (type == null) {
+            Current.clearContext(headers);
+
             return; // not transactional
+        }
 
         boolean enlist = true;
         boolean endAnnotation = method.isAnnotationPresent(Complete.class)
@@ -100,8 +101,11 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         if (headers.containsKey(LRA_HTTP_HEADER))
             incommingLRA = new URL(headers.getFirst(LRA_HTTP_HEADER)); // TODO filters for asynchronous JAX-RS motheods should not throw exceptions
 
-        if (endAnnotation && incommingLRA == null)
+        if (endAnnotation && incommingLRA == null) {
+//            Current.clearContext(headers); // or don't provide the header to participants and force them to provide something unique
+
             return;
+        }
 
         nested = resourceInfo.getResourceMethod().isAnnotationPresent(NestedLRA.class);
 
@@ -167,7 +171,7 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
 
                 } else {
                     lraTrace(containerRequestContext, null, "ServerLRAFilter before: REQUIRED start new LRA");
-                    newLRA = lraId = startLRA(incommingLRA, method, 500);
+                    newLRA = lraId = startLRA(null, method, 500);
                 }
 
                 break;
@@ -200,23 +204,22 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         if (lraId == null) {
             lraTrace(containerRequestContext, lraId, "ServerLRAFilter before: removing header");
             // the method call needs to run without a transaction
-            headers.remove(LRA_HTTP_HEADER);
-            FilterState.clearCurrentLRA();
+            Current.clearContext(headers);
             return; // non transactional
         } else {
             lraTrace(containerRequestContext, lraId, "ServerLRAFilter before: adding header");
-            headers.putSingle(LRA_HTTP_HEADER, lraId.toString());
+//            headers.putSingle(LRA_HTTP_HEADER, lraId.toString());
         }
 
         if (isLongRunning)
             newLRA = null;
 
+        Current.updateLRAContext(lraId, headers); // make the current LRA available to the called method
+
+        if (newLRA != null)
+            Current.putState("newLRA", newLRA);
+
         lraClient = getLRAClient(true);
-
-//        lraState = new FilterState(incommingLRA, false, lraClient.getUrl());
-
-//        if (suspendedLRA != null)
-//            lraClient.setCurrentLRA(suspendedLRA);
 
         lraTrace(containerRequestContext, lraId, "ServerLRAFilter before: making LRA available to injected LRAClient");
         lraClient.setCurrentLRA(lraId); // make the current LRA available to the called method
@@ -224,30 +227,9 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         // TODO make sure it is possible to do compensations inside a new LRA
         if (!endAnnotation && enlist) { // don't enlist for methods marked with Compensate, Complete or Leave
             URI baseUri = containerRequestContext.getUriInfo().getBaseUri();
-            boolean refactored = true;
 
-            if (refactored) {
-                Map<String, String> terminateURIs = lraClient.getTerminationUris(resourceInfo.getResourceClass(), baseUri, true);
-                recoveryUrl = lraClient.joinLRAWithLinkHeader(lraId, 0, terminateURIs.get("Link"));
-            } else {
-
-
-                Map<String, String> terminateURIs = getTerminationUris(resourceInfo.getResourceClass());
-
-                Annotation resourcePathAnnotation = resourceInfo.getResourceClass().getAnnotation(Path.class);
-                String resourcePath = resourcePathAnnotation == null ? "/" : ((Path) resourcePathAnnotation).value();
-
-                String uriPrefix = String.format("%s:%s%s",
-                        baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1));
-
-                lraTrace(containerRequestContext, lraId,
-                        "ServerLRAFilter before: joining LRA with compensator " + terminateURIs.get(COMPENSATE));
-                recoveryUrl = lraClient.joinLRA(lraId, 0,
-                        String.format("%s%s", uriPrefix, terminateURIs.get(COMPENSATE)),
-                        String.format("%s%s", uriPrefix, terminateURIs.get(COMPLETE)),
-                        String.format("%s%s", uriPrefix, terminateURIs.get(LEAVE)),
-                        String.format("%s%s", uriPrefix, terminateURIs.get(STATUS)));
-            }
+            Map<String, String> terminateURIs = lraClient.getTerminationUris(resourceInfo.getResourceClass(), baseUri, true);
+            recoveryUrl = lraClient.joinLRAWithLinkHeader(lraId, 0, terminateURIs.get("Link"));
 
             headers.putSingle(LRA_HTTP_RECOVERY_HEADER, recoveryUrl);
         }
@@ -266,45 +248,22 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         FilterState.setCurrentLRA(new FilterState(lraId, newLRA, suspendedLRA, recoveryUrl));
     }
 
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        FilterState state = FilterState.getCurrentLRA();
+        // a request is leaving the container so clear any context on the thread and fix up the LRA response header
 
-        if (state == null)
-            return;
+        try {
+            Object lra = Current.getState("newLRA");
+            if (lra != null) {
+                lraTrace(requestContext, (URL) lra, "ServerLRAFilter after: closing LRA");
+                lraClient.closeLRA((URL) lra);
+            }
+        } finally {
+            Current.updateLRAContext(responseContext.getHeaders());
 
-        if (state.newLRA != null) {
-            lraTrace(requestContext, state.newLRA, "ServerLRAFilter after: closing LRA");
-            lraClient.closeLRA(state.newLRA);
+            Current.popAll();
         }
-
-        // TODO the filters should not trigger for the coordinator but they are pulled in via the dependency on LRAClient which
-        // the coordinator needs for the constants
-        if (responseContext.getHeaders().containsKey(LRA_HTTP_HEADER2)) {
-            URL url = new URL(responseContext.getHeaders().getFirst(LRA_HTTP_HEADER2).toString());
-            FilterState.setCurrentLRA(url);
-        }
-
-        URL current = currentLRA();
-
-        if (current != null) {
-            System.out.printf("ServerLRAFilter after: setting header: %s%n", current);
-            lraTrace(requestContext, current, "ServerLRAFilter after: adding header");
-
-            responseContext.getHeaders().putSingle(LRA_HTTP_HEADER, current);
-        } else {
-            lraTrace(requestContext, null, "ServerLRAFilter after: removing header and thread local");
-            responseContext.getHeaders().remove(LRA_HTTP_HEADER);
-            FilterState.clearCurrentLRA();
-        }
-
-        if (state.suspendedLRA != null) {
-            lraTrace(requestContext, state.suspendedLRA, "ServerLRAFilter after: resetting header to suspended LRA");
-            responseContext.getHeaders().putSingle(LRA_HTTP_HEADER, state.suspendedLRA);
-        }
-
-//        if (previous != null)
-//            AtomicAction.resume(previous);
     }
 
     private URL startLRA(URL parentLRA, Method method, int timeout) {

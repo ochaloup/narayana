@@ -10,17 +10,18 @@ import org.jboss.jbossts.star.resource.RESTRecord;
 import org.jboss.jbossts.star.util.TxStatus;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     private final String id;
-    private final String parentId; // TODO save_state and restore_state
+    private final URL parentId; // TODO save_state and restore_state
     private final String clientId;
     private List<LRARecord> pending;
     private CompensatorStatus status; // reuse commpensator states for the LRA
 
-    public Transaction(String baseUrl, String parentId, String clientId) {
+    public Transaction(String baseUrl, URL parentId, String clientId) {
         super();
 
         this.id = String.format("%s/%s", baseUrl, get_uid().fileStringForm());
@@ -142,16 +143,23 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     }
 
     public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase) {
+        RESTRecord participant = findParticipant(participantUrl);
+
+        if (participant != null)
+            return participant.get_uid().fileStringForm(); // must have already been enlisted
+
+        // TODO remove dependency on REST-AT since it deosn't add much
         String coordinatorId = super.enlistParticipant(coordinatorUrl, participantUrl, recoveryUrlBase, null);
 
-        if (coordinatorId != null) { // null means the enlist was rejected - probably because the end protocol has started
-            RESTRecord participant = findParticipant(participantUrl);
+        if (coordinatorId != null) { // null means the enlist was rejected - probably because  it is already enlisted or the end protocol has started
+            participant = findParticipant(participantUrl);
 
             // need to remember that there is a new participant
             deactivate(); // if it fails the superclass will have logged a warning
+            return coordinatorId;
         }
 
-        return coordinatorId;
+        return null;
     }
 
     public String enlistParticipants(String coordinatorUrl, String compensateURI, String recoveryUrlBase) {
@@ -226,7 +234,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     }
 
     public boolean isTopLevel() {
-        return parentId == null || parentId.isEmpty();
+        return parentId == null;
     }
 
     public BasicAction currentLRA() {

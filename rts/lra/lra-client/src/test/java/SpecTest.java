@@ -69,7 +69,7 @@ public class SpecTest {
     public void finishTest() {
         List<LRAStatus> activeLRAs = lraClient.getActiveLRAs();
 
-        System.out.printf("TEST %s finished%n", testName.getMethodName());
+        System.out.printf("TEST %s finished with %d active LRAs%n", testName.getMethodName(), activeLRAs.size());
 
         if (activeLRAs.size() != 0) {
             activeLRAs.forEach(lra -> {

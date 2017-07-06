@@ -4,6 +4,7 @@ import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 import participant.filter.service.TripService;
@@ -34,6 +35,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.awt.print.Book;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -172,12 +174,12 @@ public class TripController extends Participant {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.SUPPORTS) // the confirmation could be part of an enclosing LRA
-    public Response confirmTrip(Booking booking) {
+    public Booking confirmTrip(Booking booking) throws BookingException {
         tripService.confirmBooking(booking);
 
-        checkBooking(booking); // there may have been independent updates to the dependent bookings
+        booking = validateBooking(booking, BookingStatus.CONFIRMED);
 
-        return Response.ok(booking).build();
+        return booking;
     }
 
     @PUT
@@ -185,10 +187,10 @@ public class TripController extends Participant {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @LRA(LRA.LRAType.SUPPORTS) // the confirmation could be part of an enclosing LRA
-    public Response cancelTrip(Booking booking) {
+    public Booking cancelTrip(Booking booking) throws BookingException {
         tripService.cancelBooking(booking);
 
-        return Response.ok(booking).build();
+        return validateBooking(booking, BookingStatus.CANCELLED);
     }
 
     @GET
@@ -197,54 +199,56 @@ public class TripController extends Participant {
     @Status
     @LRA(LRA.LRAType.NOT_SUPPORTED)
     public Response status(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
-        // TODO lookup booking id lraId
         Booking booking = tripService.get(lraId);
 
         return Response.ok(booking.getStatus().name()).build(); // TODO convert to a CompensatorStatus if we we're enlisted in an LRA
     }
 
-    private void checkBooking(Booking booking) {
+    private Booking validateBooking(Booking booking, BookingStatus status) throws BookingException {
+        checkBooking(booking); // there may have been independent updates to the dependent bookings
+        booking.setStatus(status);
+
+        return booking;
+//        return Response.ok(booking).build();
+    }
+
+    private void checkBooking(Booking booking) throws BookingException {
+        final BookingException[] bookingException = {null};
+
         // NB parallel() results in IllegalStateException: WFLYWELD0039 because
         // ... trying to access a weld deployment with a Thread Context ClassLoader that is not associated with the deployment
-        Arrays.stream(booking.getDetails()).forEach(this::checkDependentBooking);
+        Arrays.stream(booking.getDetails()).forEach(b -> {
+            try {
+                checkDependentBooking(b);
+            } catch (BookingException e) {
+                bookingException[0] = e;
+            }
+        });
+
+        if (bookingException[0] != null)
+            throw bookingException[0];
     }
 
-    private void checkDependentBooking(Booking booking) {
-        Response response = null;
-        String id;// LRAClient.getLRAId(booking.getId());
-        Booking b = null;
-
-        response = ClientBuilder.newClient().target("http://localhost:8081/flight/info/xyz").request().get();
-
-        try {
-            id = URLEncoder.encode(booking.getId(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
-        }
-
+    private void checkDependentBooking(Booking booking) throws BookingException {
         if ("Hotel".equals(booking.getType()))
-            response = hotelTarget.path("info").path(id).request(MediaType.APPLICATION_JSON).get();
+            checkDependentBooking(hotelTarget, booking);
         else if ("Flight".equals(booking.getType()))
-            response = flightTarget.path("info").path(id).request(MediaType.APPLICATION_JSON).get();
-        else
-            return;
-
-        if (response.getStatus() == 200) {
-            b = response.readEntity(Booking.class);
-
-            booking.merge(b);
-        }
+            checkDependentBooking(flightTarget, booking);
     }
 
-    private void xcheckDependentBooking(Booking booking) {
-        Booking b;
+    private void checkDependentBooking(WebTarget target, Booking booking) throws BookingException {
+        Response response = target.path("info").path(booking.getEncodedId()).request().get();
 
-        if ("Hotel".equals(booking.getType()))
-            booking.merge(hotelTarget.path(booking.getId()).request().get().readEntity(Booking.class));
-        else if ("Flight".equals(booking.getType()))
-            booking.merge(flightTarget.path(booking.getId()).request().get().readEntity(Booking.class));
+        checkResponse(response, Response.Status.OK, "Could not lookup hotel booking status");
+
+        booking.merge(response.readEntity(Booking.class));
     }
+
+    private void checkResponse(Response response, Response.Status expect, String message) throws BookingException {
+        if (response.getStatus() != expect.getStatusCode())
+            throw new BookingException(response.getStatus(), message);
+    }
+
     private Booking bookHotel(String name, int beds) {
         if (name == null || name.length() == 0 || beds <= 0)
             return null;

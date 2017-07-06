@@ -47,8 +47,8 @@ public class TripClient {
 
         Booking confirmation = tripClient.confirm(booking);
 
-        System.out.printf("%nBooking confirmation:%n\t%s%n", booking);
-        Arrays.stream(booking.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
+        System.out.printf("%nBooking confirmation:%n\t%s%n", confirmation);
+        Arrays.stream(confirmation.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
     }
 
     private static void initClient() {
