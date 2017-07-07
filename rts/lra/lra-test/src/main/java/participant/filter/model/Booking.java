@@ -1,3 +1,24 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2013, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package participant.filter.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -107,21 +128,6 @@ public class Booking {
     public String toString() {
         return String.format("{\"id\":\"%s\",\"name\":\"%s\",\"quantity\":\"%d\",\"type\":\"%s\",\"status\":\"%s\"}",
                     id, name, quantity, type, status);
-
-        // js.append('[').append(Arrays.stream(details).map(Booking::toString).collect(Collectors.joining(","))).append(']');
-
-/*        if (json == null) {
-            StringBuilder js = new StringBuilder(String.format("{\"id\":\"%s\",\"name\":\"%s\",\"quantity\":\"%d\",\"type\":\"%s\",\"status\":\"%s\"}",
-                    id, name, quantity, type, status));
-
-            // append the array of bookings as ,[{...},{...}]
-
-            js.append('[').append(Arrays.stream(details).map(Booking::toString).collect(Collectors.joining(","))).append(']');
-
-            json = js.toString();
-        }
-
-        return json;*/
     }
 
     public void canceled() {

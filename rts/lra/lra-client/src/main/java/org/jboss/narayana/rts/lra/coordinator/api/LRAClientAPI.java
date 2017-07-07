@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.jboss.narayana.rts.lra.coordinator.api;
 
 import javax.ws.rs.WebApplicationException;
@@ -55,7 +54,7 @@ public interface LRAClientAPI {
      *                terminated because of a timeout, the LRA URL is deleted. All further invocations
      *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
      *                operation. (optional, default to 0)
-     * @return
+     * @return the id of the new LRA
      * @throws WebApplicationException
      */
     URL startLRA(URL parentLRA, String clientID, Integer timeout) throws WebApplicationException;

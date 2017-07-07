@@ -1,16 +1,34 @@
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2013, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import participant.api.FlightController;
 import participant.api.HotelController;
 import participant.api.TripController;
 import participant.filter.model.Booking;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -58,7 +76,8 @@ public class TripClient {
         FLIGHT_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, FlightController.FLIGHT_PATH);
     }
 
-    public Booking bookTrip(String hotelName, Integer hotelGuests, String flightNumber, String altFlightNumber, Integer flightSeats) throws Exception {
+    public Booking bookTrip(String hotelName, Integer hotelGuests,
+                            String flightNumber, String altFlightNumber, Integer flightSeats) throws Exception {
         StringBuilder tripRequest =
                 new StringBuilder(TRIP_SERVICE_BASE_URL)
                         .append("/book?")
@@ -69,15 +88,12 @@ public class TripClient {
                         .append(FlightController.FLIGHT_SEATS_PARAM).append('=').append(flightSeats);
 
         URL url = new URL(tripRequest.toString());
-        String json = postRequestAsJson(url, "");
+        String json = updateResource(url, "POST", "");
 
         if (json == null)
             return null;
 
         return objectMapper.readValue(json, Booking.class);
-
-//        booking.setJson(objectMapper.writeValueAsString(json));
-//        booking.setPrettyJson(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
     }
 
 
@@ -89,42 +105,10 @@ public class TripClient {
         return objectMapper.readValue(confirmation, Booking.class);
     }
 
-    private String postRequestAsJson(URL resource, String jsonBody) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) resource.openConnection();
-
-        try (AutoCloseable conc = connection::disconnect) {
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            try (DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
-                dos.writeBytes(jsonBody);
-            }
-
-            int responseCode = connection.getResponseCode();
-
-            try (InputStream ins = responseCode >= 400 ? connection.getErrorStream() : connection.getInputStream()) {
-                // BufferedReader in = new BufferedReader(new InputStreamReader(ins))) {
-                // receive response
-                Scanner responseScanner = new java.util.Scanner(ins).useDelimiter("\\A");
-                String res = responseScanner.hasNext()? responseScanner.next() : null;
-
-                if (res != null && responseCode >= 400) {
-                    System.out.println(res);
-
-                    return null;
-                }
-
-                return res;
-            }
-        }
-    }
-
     private String updateResource(URL resource, String method, String jsonBody) throws Exception {
         HttpURLConnection connection = (HttpURLConnection) resource.openConnection();
 
-        try (AutoCloseable conc = connection::disconnect) {
+        try (AutoCloseable ac = connection::disconnect) {
 
             connection.setDoOutput(true);
             connection.setRequestMethod(method);
@@ -137,8 +121,6 @@ public class TripClient {
             int responseCode = connection.getResponseCode();
 
             try (InputStream ins = responseCode >= 400 ? connection.getErrorStream() : connection.getInputStream()) {
-                // BufferedReader in = new BufferedReader(new InputStreamReader(ins))) {
-                // receive response
                 Scanner responseScanner = new java.util.Scanner(ins).useDelimiter("\\A");
                 String res = responseScanner.hasNext()? responseScanner.next() : null;
 
@@ -150,28 +132,6 @@ public class TripClient {
 
                 return res;
             }
-        }
-    }
-
-    void bookit2(URL resource) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) resource.openConnection();
-
-        try (AutoCloseable conc = connection::disconnect) {
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_CREATED)
-                throw new RuntimeException("Failed : HTTP error code : " + connection.getResponseCode());
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (connection.getInputStream())));
-
-            String output;
-
-            while ((output = br.readLine()) != null)
-                System.out.println(output);
         }
     }
 }
