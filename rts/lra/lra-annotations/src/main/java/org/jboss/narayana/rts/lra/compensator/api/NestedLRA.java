@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  * When a nested LRA is confirmed its' compensators are propagated to the enclosing LRA (in contrast to
  * top level LRAs where compensators are informed that the activity has terminated).
  *
- * Compatability with the @LRA annotation. If @LRA is not present @Nested is ignored, otherwise the behaviour depends upon the value of the LRAType attribute:
+ * Compatability with the @LRA annotation. If @LRA is not present @Nested is ignored, otherwise the behaviour depends upon the value of the Type attribute:
  *
  * REQUIRED
  *  if there is an LRA present a new LRA is nested under it

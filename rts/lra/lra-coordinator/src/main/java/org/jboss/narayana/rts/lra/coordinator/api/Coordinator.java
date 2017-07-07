@@ -10,11 +10,10 @@ import org.jboss.logging.Logger;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
-import org.jboss.narayana.rts.lra.coordinator.domain.service.TransactionService;
+import org.jboss.narayana.rts.lra.coordinator.domain.service.LRAService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -29,19 +28,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -65,7 +58,7 @@ public class Coordinator {
     private UriInfo context;
 
     @Inject
-    private TransactionService transactionService;
+    private LRAService lraService;
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator returns a list of all transactions.
     @GET
@@ -75,7 +68,7 @@ public class Coordinator {
             notes = "Gets both active and recovering LRAs",
             response = LRAStatus.class, responseContainer = "List")
     public List<LRAStatus> getAllLRAs() {
-        return transactionService.getAll();
+        return lraService.getAll();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/<LraId> returns 200 if the lra is still active.
@@ -91,7 +84,7 @@ public class Coordinator {
     public Boolean isActiveLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
-        return transactionService.getTransaction(toLRAId(lraId)).isActive();
+        return lraService.getTransaction(toURL(lraId)).isActive();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/recovery returns a list of recovering transactions.
@@ -105,7 +98,7 @@ public class Coordinator {
             @ApiResponse( code = 200, message = "The request was successful" )
     } )
     public List<LRAStatus> getRecoveringLRAs() {
-        return transactionService.getAllRecovering();
+        return lraService.getAllRecovering();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/active returns a list of inflight transactions.
@@ -118,7 +111,7 @@ public class Coordinator {
             @ApiResponse( code = 200, message = "The request was successful" )
     } )
     public List<LRAStatus> getActiveLRAs() {
-        return transactionService.getAllActive();
+        return lraService.getAllActive();
     }
 
     // Performing a POST on /lra-org.jboss.narayana.rts.lra.coordinator/start?ClientID=<ClientID> will start a new lra with a default timeout and
@@ -160,7 +153,7 @@ public class Coordinator {
             parent = LRAClient.lraToURL(parentLRA, "Invalid parent LRA id");
 
         String coordinatorUrl = String.format("%s%s", context.getBaseUri(), COORDINATOR_PATH_NAME);
-        URL lraId = transactionService.startLRA(coordinatorUrl, parent, clientId, timelimit);
+        URL lraId = lraService.startLRA(coordinatorUrl, parent, clientId, timelimit);
 
         if (parent != null) {
             // register with the parent as a participant
@@ -186,12 +179,12 @@ public class Coordinator {
     @GET
     @Path("{NestedLraId}/status")
     public Response getNestedLRAStatus(@PathParam("NestedLraId")String nestedLraId) {
-        if (!transactionService.hasTransaction(nestedLraId)) {
+        if (!lraService.hasTransaction(nestedLraId)) {
             // it must have compensated TODO maybe it's better to keep nested LRAs in separate collection
             return Response.ok(CompensatorStatus.Compensated.name()).build();
         }
 
-        Transaction lra = transactionService.getTransaction(toLRAId(nestedLraId));
+        Transaction lra = lraService.getTransaction(toURL(nestedLraId));
         CompensatorStatus status = lra.getLRAStatus();
 
         if (status.equals(CompensatorStatus.Active))
@@ -203,19 +196,19 @@ public class Coordinator {
     @POST
     @Path("{NestedLraId}/complete")
     public Response completeNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
-        return endLRA(toLRAId(nestedLraId), false, true);
+        return endLRA(toURL(nestedLraId), false, true);
     }
 
     @POST
     @Path("{NestedLraId}/compensate")
     public Response compensateNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
-        return endLRA(toLRAId(nestedLraId), true, true);
+        return endLRA(toURL(nestedLraId), true, true);
     }
 
     @POST
     @Path("{NestedLraId}/forget")
     public Response forgetNestedLRA(@PathParam("NestedLraId") String nestedLraId) {
-        transactionService.remove(null, toLRAId(nestedLraId));
+        lraService.remove(null, toURL(nestedLraId));
 
         return Response.ok().build();
     }
@@ -234,7 +227,7 @@ public class Coordinator {
     public Response isCompletedLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
-        return Response.ok(Boolean.toString(transactionService.getTransaction(toLRAId(lraId)).isComplete())).build();
+        return Response.ok(Boolean.toString(lraService.getTransaction(toURL(lraId)).isComplete())).build();
     }
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator/compensated/<LraId> returns 200 if the lra compensated (a 404 response means it is not present).
@@ -250,7 +243,7 @@ public class Coordinator {
     public Response isCompensatedLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
-        return Response.ok(Boolean.toString(transactionService.getTransaction(toLRAId(lraId)).isCompensated())).build();
+        return Response.ok(Boolean.toString(lraService.getTransaction(toURL(lraId)).isCompensated())).build();
     }
 
     // Performing a PUT on lra-coordinator/<LraId>/close will trigger the successful completion of the lra and all
@@ -276,7 +269,7 @@ public class Coordinator {
     public Response closeLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String txId) throws NotFoundException {
-        return endLRA(toLRAId(txId), false, false);
+        return endLRA(toURL(txId), false, false);
     }
 
     @PUT
@@ -295,11 +288,11 @@ public class Coordinator {
     public Response cancelLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId) throws NotFoundException {
-        return endLRA(toLRAId(lraId), true, false);
+        return endLRA(toURL(lraId), true, false);
     }
 
-    private Response endLRA(String txId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
-        int status = transactionService.endLRA(txId, compensate, fromHierarchy);
+    private Response endLRA(URL lraId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
+        int status = lraService.endLRA(lraId, compensate, fromHierarchy);
 
         return Response.status(status).build();
     }
@@ -339,7 +332,7 @@ public class Coordinator {
                     required = true )
             @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") int timeLimit,
             String compensatorUrl) throws NotFoundException {
-        return joinLRA(lraId, timeLimit, compensatorUrl, linkHeader);
+        return joinLRA(toURL(lraId), timeLimit, compensatorUrl, linkHeader);
     }
 
     @PUT
@@ -389,16 +382,16 @@ public class Coordinator {
                     + "Performing a POST on <URL>/complete will cause the compensator to tidy up and\n"
                     + "   it can forget this LRA.\n")
                     String compensatorUrl) throws NotFoundException {
-        return joinLRA(toLRAId(lraId), timeLimit, compensatorUrl, null);
+        return joinLRA(toURL(lraId), timeLimit, compensatorUrl, null);
     }
 
-    private Response joinLRA(String txId, int timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
+    private Response joinLRA(URL lraId, int timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
         final String recoveryUrlBase = String.format("http://%s/%s/",
                 context.getRequestUri().getAuthority(), LRAClient.RECOVERY_COORDINATOR_PATH_NAME);
 
         StringBuilder recoveryUrl = new StringBuilder();
 
-        int status = transactionService.joinLRA(recoveryUrl, txId, timeLimit, compensatorUrl, linkHeader, recoveryUrlBase);
+        int status = lraService.joinLRA(recoveryUrl, lraId, timeLimit, compensatorUrl, linkHeader, recoveryUrlBase);
 
         return Response.status(status).entity(recoveryUrl).header(LRA_HTTP_RECOVERY_HEADER, recoveryUrl).build();
     }
@@ -418,14 +411,34 @@ public class Coordinator {
     public Response leaveLRA(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId") String lraId,
-            String compensatorUrl) throws NotFoundException {
+            String compensatorUrl) throws NotFoundException, MalformedURLException {
         String reqUri = context.getRequestUri().toString();
 
         reqUri =  reqUri.substring(0, reqUri.lastIndexOf('/'));
 
-        int status = transactionService.leave(reqUri, compensatorUrl);
+        int status = lraService.leave(new URL(reqUri), compensatorUrl);
 
         return Response.status(status).build();
+    }
+
+
+    private URL toURL(String lraId) {
+        URL url;
+
+        try {
+            // see if it already in the correct format
+            url = new URL(lraId);
+            url.toURI();
+
+        } catch (Exception e) {
+            try {
+                url = new URL(String.format("%s%s/%s", context.getBaseUri(), COORDINATOR_PATH_NAME, lraId));
+            } catch (MalformedURLException e1) {
+                throw new InvalidLRAId(lraId, "Invalid LRA id format", e1);
+            }
+        }
+
+        return url;
     }
 
     private String toLRAId(String lraId) {

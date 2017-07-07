@@ -7,7 +7,6 @@ import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 import participant.filter.service.FlightService;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -31,7 +30,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEAD
 //@ApplicationScoped
 @RequestScoped
 @Path(FlightController.FLIGHT_PATH)
-@LRA(LRA.LRAType.SUPPORTS)
+@LRA(LRA.Type.SUPPORTS)
 public class FlightController extends Participant {
     public static final String FLIGHT_PATH = "/flight";
     public static final String FLIGHT_NUMBER_PARAM = "flightNumber";
@@ -44,7 +43,7 @@ public class FlightController extends Participant {
     @POST
     @Path("/bookasync")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.REQUIRED)
+    @LRA(LRA.Type.REQUIRED)
     @NestedLRA
     public void bookFlightAsync(@Suspended final AsyncResponse asyncResponse,
                                 @HeaderParam(LRA_HTTP_HEADER) String lraId,
@@ -63,7 +62,7 @@ public class FlightController extends Participant {
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.REQUIRED)
+    @LRA(LRA.Type.REQUIRED)
     @NestedLRA
     public Booking bookFlight(@HeaderParam(LRA_HTTP_HEADER) String lraId,
                               @QueryParam(FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
@@ -76,7 +75,7 @@ public class FlightController extends Participant {
     @GET
     @Path("/info/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.SUPPORTS)
+    @LRA(LRA.Type.SUPPORTS)
     public Booking getBooking(@PathParam("bookingId") String bookingId) {
         return flightService.get(bookingId);
     }

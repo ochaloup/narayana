@@ -2,6 +2,7 @@ package org.jboss.narayana.rts.lra.coordinator.domain.service;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
+import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
 
@@ -18,18 +19,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
-public class TransactionService {
-    private Map<String, Transaction> transactions = new ConcurrentHashMap<>();
-    private Map<String, Transaction> recoveringTransactions = new ConcurrentHashMap<>();
+public class LRAService {
+    private Map<URL, Transaction> transactions = new ConcurrentHashMap<>();
+    private Map<URL, Transaction> recoveringTransactions = new ConcurrentHashMap<>();
 
     private static Map<String, String> participants = new ConcurrentHashMap<>();
 
-    public Transaction getTransaction(String lraId) throws NotFoundException {
-        lraTrace(lraId, "request for LRA");
-
-        if (!transactions.containsKey(lraId)) {
+    public Transaction getTransaction(URL lraId) throws NotFoundException {
+        if (!transactions.containsKey(lraId))
             throw new NotFoundException(Response.status(404).entity("Invalid transaction id: " + lraId).build());
-        }
 
         return transactions.get(lraId);
     }
@@ -63,7 +61,7 @@ public class TransactionService {
             recoveringTransactions.put(transaction.getId(), transaction);
     }
 
-    public void remove(String state, String lraId) {
+    public void remove(String state, URL lraId) {
         lraTrace(lraId, "remove LRA");
 
         if (transactions.containsKey(lraId)) {
@@ -87,7 +85,12 @@ public class TransactionService {
     }
 
     public synchronized URL startLRA(String baseUri, URL parentLRA, String clientId, Integer timelimit) {
-        Transaction lra = new Transaction(baseUri, parentLRA, clientId);
+        Transaction lra = null;
+        try {
+            lra = new Transaction(baseUri, parentLRA, clientId);
+        } catch (MalformedURLException e) {
+            throw new InvalidLRAId(baseUri, "Invalid base uri", e);
+        }
 
         if (timelimit < 0)
             timelimit = 0;
@@ -109,16 +112,14 @@ public class TransactionService {
 
                 lraTrace(lra.getId(), "started LRA");
 
-                return new URL(lra.getId());
-            } catch (MalformedURLException e) {
-                 throw new InternalServerErrorException("LRA service generated an invalid lra id: " + lra.getId());
+                return lra.getId();
             } finally {
                 AtomicAction.suspend();
             }
         }
     }
 
-    public int endLRA(String lraId, boolean compensate, boolean fromHierarchy) {
+    public int endLRA(URL lraId, boolean compensate, boolean fromHierarchy) {
         lraTrace(lraId, "end LRA");
 
         Transaction transaction = getTransaction(lraId);
@@ -146,13 +147,13 @@ public class TransactionService {
 
         if (transaction.isTopLevel()) {
             // forget any nested LRAs
-            transaction.forgetAllParticipants();
+            transaction.forgetAllParticipants(); // instruct compensators to clean up
         }
 
         return sc;
     }
 
-    public int leave(String lraId, String compensatorUrl) {
+    public int leave(URL lraId, String compensatorUrl) {
         lraTrace(lraId, "leave LRA");
 
         Transaction transaction = getTransaction(lraId);
@@ -172,9 +173,9 @@ public class TransactionService {
 
     }
 
-    public synchronized int joinLRA(StringBuilder recoveryUrl, String lra, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
+    public synchronized int joinLRA(StringBuilder recoveryUrl, URL lra, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
         if (lra ==  null)
-            lraTrace("null", "Error missing LRA header in join request");
+            lraTrace(null, "Error missing LRA header in join request");
 
         lraTrace(lra, "join LRA");
 
@@ -214,7 +215,7 @@ public class TransactionService {
         return transactions.containsKey(id);
     }
 
-    private void lraTrace(String lraId, String reason) {
+    private void lraTrace(URL lraId, String reason) {
         if (transactions.containsKey(lraId)) {
             Transaction lra = transactions.get(lraId);
             System.out.printf("%s (%s) in state %s: %s%n",

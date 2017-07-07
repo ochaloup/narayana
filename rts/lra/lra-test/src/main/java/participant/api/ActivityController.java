@@ -42,7 +42,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECO
 
 @ApplicationScoped
 @Path("/activities")
-@LRA(LRA.LRAType.SUPPORTS)
+@LRA(LRA.Type.SUPPORTS)
 public class ActivityController {
 
     @Inject
@@ -64,7 +64,7 @@ public class ActivityController {
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
     @Status
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response status(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
         String txId = LRAClient.getLRAId(lraId);
         Activity activity = activityService.getActivity(txId);
@@ -156,7 +156,7 @@ public class ActivityController {
 
     @PUT
     @Path("/supports")
-    @LRA(LRA.LRAType.SUPPORTS)
+    @LRA(LRA.Type.SUPPORTS)
     public Response supportsLRACall(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
         assert lraId != null;
         addWork(lraId, null);
@@ -166,7 +166,7 @@ public class ActivityController {
 
     @PUT
     @Path("/startviaapi")
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response subActivity(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
         if (lraId != null)
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
@@ -192,7 +192,7 @@ public class ActivityController {
 
     @PUT
     @Path("/work")
-    @LRA(LRA.LRAType.REQUIRED)
+    @LRA(LRA.Type.REQUIRED)
     public Response activityWithLRA(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
                                     @HeaderParam(LRA_HTTP_HEADER) String lraId) {
         assert lraId != null;
@@ -219,7 +219,7 @@ public class ActivityController {
 
     @PUT
     @Path("/nestedActivity")
-    @LRA(LRA.LRAType.MANDATORY)
+    @LRA(LRA.Type.MANDATORY)
     @NestedLRA
     public Response nestedActivity(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
                                     @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId) {
@@ -234,7 +234,7 @@ public class ActivityController {
 
     @PUT
     @Path("/multiLevelNestedActivity")
-    @LRA(LRA.LRAType.MANDATORY)
+    @LRA(LRA.Type.MANDATORY)
     public Response multiLevelNestedActivity(
             @HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
             @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId,
@@ -278,7 +278,7 @@ public class ActivityController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response findAll() {
         List<Activity> results = activityService.findAll();
 
@@ -288,14 +288,14 @@ public class ActivityController {
     @GET
     @Path("/completedactivitycount")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response getCompleteCount() {
         return Response.ok(completedCount.get()).build();
     }
     @GET
     @Path("/compensatedactivitycount")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response getCompensatedCount() {
         return Response.ok(compensatedCount.get()).build();
     }

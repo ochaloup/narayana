@@ -4,7 +4,6 @@ import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 import participant.filter.service.TripService;
@@ -24,7 +23,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -35,12 +33,9 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.awt.print.Book;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +47,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEAD
 //@ApplicationScoped
 @RequestScoped
 @Path(TripController.TRIP_PATH)
-@LRA(LRA.LRAType.SUPPORTS)
+@LRA(LRA.Type.SUPPORTS)
 public class TripController extends Participant {
     public static final String TRIP_PATH = "/trip";
 
@@ -109,7 +104,7 @@ public class TripController extends Participant {
     @POST
     @Path("/bookasync")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.REQUIRED)
+    @LRA(LRA.Type.REQUIRED)
     public void bookTripAsync(@Suspended final AsyncResponse asyncResponse,
                               @HeaderParam(LRA_HTTP_HEADER) String lraId,
                               @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
@@ -151,7 +146,7 @@ public class TripController extends Participant {
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
     // longRunning because we want the LRA to be associated with a booking until the user confirms the booking
-    @LRA(value = LRA.LRAType.REQUIRED, longRunning = true)
+    @LRA(value = LRA.Type.REQUIRED, longRunning = true)
     public Response bookTrip( @HeaderParam(LRA_HTTP_HEADER) String lraId,
                               @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
                               @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
@@ -173,7 +168,7 @@ public class TripController extends Participant {
     @Path("/complete")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.SUPPORTS) // the confirmation could be part of an enclosing LRA
+    @LRA(LRA.Type.SUPPORTS) // the confirmation could be part of an enclosing LRA
     public Booking confirmTrip(Booking booking) throws BookingException {
         tripService.confirmBooking(booking);
 
@@ -186,7 +181,7 @@ public class TripController extends Participant {
     @Path("/compensate")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.SUPPORTS) // the confirmation could be part of an enclosing LRA
+    @LRA(LRA.Type.SUPPORTS) // the confirmation could be part of an enclosing LRA
     public Booking cancelTrip(Booking booking) throws BookingException {
         tripService.cancelBooking(booking);
 
@@ -197,7 +192,7 @@ public class TripController extends Participant {
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
     @Status
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response status(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
         Booking booking = tripService.get(lraId);
 
@@ -320,7 +315,7 @@ public class TripController extends Participant {
     @GET
     @Path("/{bookingId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.LRAType.SUPPORTS)
+    @LRA(LRA.Type.SUPPORTS)
     public Booking getBooking(@PathParam("bookingId") String bookingId) {
         return tripService.get(bookingId);
     }

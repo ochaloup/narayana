@@ -43,7 +43,7 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
 
 //    private AtomicAction previous = null;
 
-    private void checkForTx(LRA.LRAType type, URL txId, boolean shouldNotBeNull) {
+    private void checkForTx(LRA.Type type, URL txId, boolean shouldNotBeNull) {
         if (txId == null && shouldNotBeNull) {
             Response resonse = Response.status(Response.Status.PRECONDITION_FAILED).entity(type.name() + " but no tx").build();
 
@@ -64,7 +64,7 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
         Method method = resourceInfo.getResourceMethod();
         MultivaluedMap<String, String> headers = containerRequestContext.getHeaders();
-        LRA.LRAType type = null;
+        LRA.Type type = null;
         Annotation transactional = method.getDeclaredAnnotation(LRA.class);
         URL lraId;
         URL newLRA = null;

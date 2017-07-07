@@ -13,6 +13,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import java.io.Closeable;
 import java.io.StringReader;
 
 import javax.ws.rs.Path;
@@ -43,7 +44,7 @@ import java.util.Map;
 
 //@RequestScoped // TODO RESTEASY-682
 @ApplicationScoped // TODO it must be RequestScoped
-public class LRAClient implements LRAClientAPI {
+public class LRAClient implements LRAClientAPI, Closeable {
     public static final String LRA_HTTP_HEADER = "X-lra";
     public static final String LRA_HTTP_HEADER2 = "X-lra2";
     public static final String LRA_HTTP_RECOVERY_HEADER = "X-lra-recovery";

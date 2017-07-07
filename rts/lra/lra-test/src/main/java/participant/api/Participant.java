@@ -10,9 +10,7 @@ import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -21,9 +19,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -82,7 +78,7 @@ public abstract class Participant {
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
     @Status
-    @LRA(LRA.LRAType.NOT_SUPPORTED)
+    @LRA(LRA.Type.NOT_SUPPORTED)
     public Response status() throws NotFoundException {
         String lraId = getCurrentActivityId();
 

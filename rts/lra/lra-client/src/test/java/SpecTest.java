@@ -178,7 +178,7 @@ public class SpecTest {
         // validate that the LRA coordinator no longer knows about lraId
         List<LRAStatus> lras = lraClient.getActiveLRAs();
 
-        // the resource /activities/work is annotated with LRAType.REQUIRED so the container should have ended it
+        // the resource /activities/work is annotated with Type.REQUIRED so the container should have ended it
         assertFalse(lras.contains(new LRAStatus(lra)));
     }
 
@@ -202,7 +202,7 @@ public class SpecTest {
         // validate that the nested LRA was closed
         lras = lraClient.getActiveLRAs();
 
-        // the resource /activities/work is annotated with LRAType.REQUIRED so the container should have ended it
+        // the resource /activities/work is annotated with Type.REQUIRED so the container should have ended it
         assertFalse(lras.contains(new LRAStatus(nestedLraId)));
     }
 

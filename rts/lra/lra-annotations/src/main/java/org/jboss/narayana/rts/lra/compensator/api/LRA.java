@@ -15,17 +15,17 @@ import java.lang.annotation.Target;
 public @interface LRA {
 
     /**
-     * The LRAType element of the LRA annotation indicates whether a bean method
+     * The Type element of the LRA annotation indicates whether a bean method
      * is to be executed within a compensatable transaction context.
      */
-    LRAType value() default LRAType.REQUIRED;
+    Type value() default Type.REQUIRED;
 
     /**
-     * The LRAType element of the annotation indicates whether a bean method is to be
+     * The Type element of the annotation indicates whether a bean method is to be
      * executed within a compensatable transaction context where the values provide the following
      * corresponding behavior.
      */
-    enum LRAType {
+    enum Type {
         /**
          *  <p>If called outside a compensatable transaction context, the interceptor must begin a new
          *  JTA transaction, the managed bean method execution must then continue

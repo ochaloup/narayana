@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.jboss.logging.Logger;
-import org.jboss.narayana.rts.lra.coordinator.domain.service.TransactionService;
+import org.jboss.narayana.rts.lra.coordinator.domain.service.LRAService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -28,7 +28,7 @@ public class RecoveryCoordinator {
     private final Logger logger = Logger.getLogger(RecoveryCoordinator.class.getName());
 
     @Inject
-    private TransactionService transactionService;
+    private LRAService lraService;
 
     // Performing a GET on the recovery URL (return from a join request) will return the original <compensator URL>
     @GET
@@ -45,7 +45,7 @@ public class RecoveryCoordinator {
             @ApiParam( value = "An identifier that was returned by the coordinator when a compensator joined the LRA", required = true )
             @PathParam("RecCoordId") String rcvCoordId) throws NotFoundException {
 
-        String compensatorUrl = transactionService.getParticipant(rcvCoordId);
+        String compensatorUrl = lraService.getParticipant(rcvCoordId);
 
         if (compensatorUrl == null)
             throw new NotFoundException(rcvCoordId);
@@ -69,10 +69,10 @@ public class RecoveryCoordinator {
     public String replaceCompensator(
             @ApiParam( value = "An identifier that was returned by the coordinator when a compensator joined the LRA", required = true )
             @PathParam("RecCoordId")String rcvCoordId, String newCompensatorUrl) throws NotFoundException {
-        String compensatorUrl = transactionService.getParticipant(rcvCoordId);
+        String compensatorUrl = lraService.getParticipant(rcvCoordId);
 
         if (compensatorUrl != null) {
-            transactionService.addCompensator(null, rcvCoordId, newCompensatorUrl);
+            lraService.addCompensator(null, rcvCoordId, newCompensatorUrl);
 
             return compensatorUrl;
         }

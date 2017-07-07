@@ -10,28 +10,29 @@ import org.jboss.jbossts.star.resource.RESTRecord;
 import org.jboss.jbossts.star.util.TxStatus;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
-    private final String id;
+    private final URL id;
     private final URL parentId; // TODO save_state and restore_state
     private final String clientId;
     private List<LRARecord> pending;
     private CompensatorStatus status; // reuse commpensator states for the LRA
 
-    public Transaction(String baseUrl, URL parentId, String clientId) {
+    public Transaction(String baseUrl, URL parentId, String clientId) throws MalformedURLException {
         super();
 
-        this.id = String.format("%s/%s", baseUrl, get_uid().fileStringForm());
+        this.id = new URL(String.format("%s/%s", baseUrl, get_uid().fileStringForm()));
         this.parentId = parentId;
         this.clientId = clientId;
 
         status = CompensatorStatus.Active;
     }
 
-    public String getId() {
+    public URL getId() {
         return id;
     }
 
@@ -142,14 +143,14 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         return new LRARecord(txId, coordinatorUrl, participantUrl);
     }
 
-    public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase) {
+    public String enlistParticipant(URL coordinatorUrl, String participantUrl, String recoveryUrlBase) {
         RESTRecord participant = findParticipant(participantUrl);
 
         if (participant != null)
             return participant.get_uid().fileStringForm(); // must have already been enlisted
 
         // TODO remove dependency on REST-AT since it deosn't add much
-        String coordinatorId = super.enlistParticipant(coordinatorUrl, participantUrl, recoveryUrlBase, null);
+        String coordinatorId = super.enlistParticipant(coordinatorUrl.toString(), participantUrl, recoveryUrlBase, null);
 
         if (coordinatorId != null) { // null means the enlist was rejected - probably because  it is already enlisted or the end protocol has started
             participant = findParticipant(participantUrl);
@@ -162,8 +163,10 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         return null;
     }
 
-    public String enlistParticipants(String coordinatorUrl, String compensateURI, String recoveryUrlBase) {
-        String coordinatorId = super.enlistParticipant(coordinatorUrl, compensateURI, recoveryUrlBase, null);
+    public String enlistParticipants(URL coordinatorUrl, String compensateURI, String recoveryUrlBase) {
+        return enlistParticipant(coordinatorUrl, compensateURI, recoveryUrlBase);
+
+/*        String coordinatorId = super.enlistParticipant(coordinatorUrl, compensateURI, recoveryUrlBase, null);
 
         if (coordinatorId == null) {
             // null means either the compenstaor is already regitered or the enlist was rejected (probably because the end protocol has started)
@@ -178,7 +181,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         // need to remember that there is a new participant
         deactivate(); // if it fails the superclass will have logged a warning
 
-        return coordinatorId;
+        return coordinatorId;*/
     }
 
     public Boolean isActive() {

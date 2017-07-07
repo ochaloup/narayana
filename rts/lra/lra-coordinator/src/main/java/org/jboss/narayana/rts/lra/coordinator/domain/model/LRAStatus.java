@@ -20,7 +20,7 @@ public class LRAStatus {
     private boolean isTopLevel;
 
     public LRAStatus(Transaction lra) {
-        this.lraId = lra.getId();
+        this.lraId = lra.getId().toString();
         this. clientId = lra.getClientId();
         this. isComplete = lra.isComplete();
         this. isCompensated = lra.isCompensated();
