@@ -25,6 +25,7 @@ import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
 import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 import participant.filter.service.TripService;
@@ -79,7 +80,7 @@ public class TripController extends Participant {
     private WebTarget flightTarget;
 
     @Inject
-    private LRAClient lraClient;
+    private LRAClientAPI lraClient;
 
     @Inject
     private TripService tripService;

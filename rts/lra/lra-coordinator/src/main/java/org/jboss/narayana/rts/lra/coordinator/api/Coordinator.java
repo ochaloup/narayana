@@ -63,7 +63,6 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.CLIENT_ID_PAR
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_PATH_NAME;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER2;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.PARENT_LRA_PARAM_NAME;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMEOUT_PARAM_NAME;
@@ -193,7 +192,6 @@ public class Coordinator {
         return Response.status(Response.Status.CREATED)
                 .entity(lraId)
                 .header(LRA_HTTP_HEADER, lraId)
-                .header(LRA_HTTP_HEADER2, lraId)
                 .build();
     }
 

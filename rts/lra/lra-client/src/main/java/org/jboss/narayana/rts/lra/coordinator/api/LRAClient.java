@@ -30,6 +30,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 
+import javax.enterprise.context.RequestScoped;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -63,11 +64,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@RequestScoped // TODO RESTEASY-682
-@ApplicationScoped // TODO it must be RequestScoped
+@RequestScoped // TODO RESTEASY-682
+//@ApplicationScoped // TODO it must be RequestScoped
 public class LRAClient implements LRAClientAPI, Closeable {
     public static final String LRA_HTTP_HEADER = "X-lra";
-    public static final String LRA_HTTP_HEADER2 = "X-lra2";
     public static final String LRA_HTTP_RECOVERY_HEADER = "X-lra-recovery";
 
     public static final String COORDINATOR_PATH_NAME = "lra-coordinator";
