@@ -23,11 +23,14 @@ package org.jboss.narayana.rts.lra.coordinator.domain.service;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
+import org.jboss.narayana.rts.lra.coordinator.api.IllegalLRAStateException;
 import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
+import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
@@ -45,6 +48,9 @@ public class LRAService {
     private Map<URL, Transaction> recoveringTransactions = new ConcurrentHashMap<>();
 
     private static Map<String, String> participants = new ConcurrentHashMap<>();
+
+    @Inject
+    LRAClient lraClient;
 
     public Transaction getTransaction(URL lraId) throws NotFoundException {
         if (!transactions.containsKey(lraId))
@@ -140,38 +146,28 @@ public class LRAService {
         }
     }
 
-    public int endLRA(URL lraId, boolean compensate, boolean fromHierarchy) {
+    public LRAStatus endLRA(URL lraId, boolean compensate, boolean fromHierarchy) {
         lraTrace(lraId, "end LRA");
 
         Transaction transaction = getTransaction(lraId);
 
         if (!transaction.isRunning() && transaction.isTopLevel())
-            return Response.Status.PRECONDITION_FAILED.getStatusCode();
-
-//        AtomicAction.resume(transaction);
+            throw new IllegalLRAStateException(lraId.toString(), "LRA is closing or closed", null);
 
         int status = transaction.end(compensate);
-        int sc = 500;
-
-        if (!compensate) {
-            if (status == ActionStatus.COMMITTED)
-                sc = 200;
-        } else if (status == ActionStatus.ABORTED) {
-            sc = 200;
-        }
-
 
         if (transaction.currentLRA() != null)
-            System.out.printf("WARNING LRA %s ended but is still associated");
+            System.out.printf("WARNING LRA %s ended but is still associated with %s%n",
+                    lraId, transaction.currentLRA().get_uid().fileStringForm());
 
-        finished(transaction, fromHierarchy, sc != 200);
+        finished(transaction, fromHierarchy, false); // TODO implement recovery
 
         if (transaction.isTopLevel()) {
             // forget any nested LRAs
             transaction.forgetAllParticipants(); // instruct compensators to clean up
         }
 
-        return sc;
+        return new LRAStatus(transaction);
     }
 
     public int leave(URL lraId, String compensatorUrl) {

@@ -1,6 +1,12 @@
 * changes to the protocol *
-when starting a new LRA tell the coordinator if it is nested using a query param: ?ParentLRA=<id>
-
+1) when starting a new LRA tell the coordinator if it is nested using a query param: ?ParentLRA=<id>
+   (or just check if there a pre existing LRA when a new one is started)
+2) if POST to the compensator url is successful it will optionally return application specific
+   data about the outcome. Closing or cancellng an LRA will produce multiple data items, the
+   implementation can return these as a list or as a map keyed by either the LRA url or by the
+   compensator url (the later is preferable).
+3) (WARN clashes with "GET on /jfdi-coordinator/active  and /jfdi-coordinator/recovery ..."
+ so change spec to /jfdi-coordinator/status/<TxId> instead
 
 
 The JFDI transaction protocol is a forward-compensation based approach. It does not assume that resources are locked for the duration of the transaction. (Much of this model was subsequently incorporated into WS-LRA or WS-BP.

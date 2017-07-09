@@ -28,14 +28,16 @@ import org.jboss.narayana.rts.lra.compensator.api.Status;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
 
 import javax.enterprise.context.RequestScoped;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.StringReader;
 
 import javax.ws.rs.Path;
@@ -64,8 +66,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequestScoped // TODO RESTEASY-682
-//@ApplicationScoped // TODO it must be RequestScoped
+@RequestScoped
 public class LRAClient implements LRAClientAPI, Closeable {
     public static final String LRA_HTTP_HEADER = "X-lra";
     public static final String LRA_HTTP_RECOVERY_HEADER = "X-lra-recovery";
@@ -102,12 +103,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
     private Client client;
     private boolean isUseable;
     private boolean connectionInUse;
-
-/*    @Produces
-    @ApplicationScoped
-    public LRAClient createLRAClient() throws URISyntaxException {
-        return new LRAClient();
-    }*/
+    private Map<URL, List<String>> responseDataMap;
 
     public LRAClient() throws URISyntaxException {
         this("http", "localhost", 8080);
@@ -137,6 +133,31 @@ public class LRAClient implements LRAClientAPI, Closeable {
         target = client.target(base);
 
         isUseable = true;
+
+        if (responseDataMap == null)
+            postConstruct();
+        else
+            responseDataMap.clear();
+    }
+
+
+    public boolean isUseable() {
+        return isUseable;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        // an opportunity to consult any config - NB this will only get called if we are in a CDI enabled container
+        responseDataMap = new HashMap<>();
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        isUseable = false;
+    }
+
+    public static URL lraToURL(String lraId) {
+        return lraToURL(lraId, "Invalid LRA id");
     }
 
     public static URL lraToURL(String lraId, String message) {
@@ -192,20 +213,6 @@ public class LRAClient implements LRAClientAPI, Closeable {
         } catch (URISyntaxException e) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build());
         }
-    }
-
-    public boolean isUseable() {
-        return isUseable;
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-        // an opportunity to consult any config
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        isUseable = false;
     }
 
     public URL startLRA(String clientID) throws WebApplicationException {
@@ -281,16 +288,13 @@ public class LRAClient implements LRAClientAPI, Closeable {
     }
 
     @Override
-    public void cancelLRA(URL lraId) throws WebApplicationException {
-        endLRA(lraId, false);
+    public String cancelLRA(URL lraId) throws WebApplicationException {
+        return endLRA(lraId, false);
     }
 
     @Override
-    public void closeLRA(URL lraId) throws WebApplicationException {
-        endLRA(lraId, true);
-    }
-    public void closeLRA(String lraId) throws InvalidLRAId {
-        endLRA(toURL(lraId), true);
+    public String closeLRA(URL lraId) throws WebApplicationException {
+        return endLRA(lraId, true);
     }
 
     /**
@@ -381,7 +385,6 @@ public class LRAClient implements LRAClientAPI, Closeable {
 
             ja.forEach(jsonValue ->
                     actions.add(toLRAStatus(((JsonObject) jsonValue))));
-//            ja.forEach(jsonValue -> actions.add(new LRAStatus(jsonValue.asJsonObject().getString("lraId"))));
 
             return actions;
         } finally {
@@ -460,32 +463,6 @@ public class LRAClient implements LRAClientAPI, Closeable {
         return paths;
     }
 
-    private String getCompensatorUrl(URI baseUri, Class<?> resourceClass) {
-
-        Map<String, String> terminateURIs = getTerminationUris(resourceClass, baseUri, true);
-
-        if (terminateURIs.size() < 3)
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Missing complete, compensate or status annotations").build());
-
-        // register with the coordinator
-        StringBuilder linkHeaderValue = new StringBuilder();
-
-        terminateURIs.forEach((k, v) -> getParticipantLink(linkHeaderValue, k, v));
-
-        return linkHeaderValue.toString();
-    }
-
-    private StringBuilder getParticipantLink(StringBuilder b, String key, String value) {
-
-        Link link =  Link.fromUri(value).title(key + " URI").rel(key).type(MediaType.TEXT_PLAIN).build();
-
-        if (b.length() != 0)
-            b.append(',');
-
-        return b.append(link);
-    }
-
     private boolean checkMethod(Map<String, String> paths,
                                 String rel,
                                 Path pathAnnotation,
@@ -542,7 +519,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
         // put the lra id in an http header
         StringBuilder linkHeaderValue = new StringBuilder();
 
-        terminateURIs.forEach((k, v) -> makeLink(linkHeaderValue, uriPrefix, k, v));
+        terminateURIs.forEach((k, v) -> makeLink(linkHeaderValue, uriPrefix, k, v)); // or use Collectors.joining(",")
 
         return enlistCompensator(lraUrl, timelimit, linkHeaderValue.toString());
     }
@@ -573,7 +550,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
         }
     }
 
-    private void endLRA(URL lra, boolean confirm) throws WebApplicationException {
+    private String endLRA(URL lra, boolean confirm) throws WebApplicationException {
         String confirmUrl = String.format(confirm ? confirmFormat : compensateFormat, getLRAId(lra.toString()));
         Response response = null;
 
@@ -584,6 +561,11 @@ public class LRAClient implements LRAClientAPI, Closeable {
 
             assertEquals(response, Response.Status.OK.getStatusCode(), response.getStatus(), "LRA finished with an unexpected status code");
 
+            String responseData = response.readEntity(String.class);
+
+            setResponseData(lra, responseData);
+
+            return responseData;
         } finally {
 
             releaseConnection(response);
@@ -639,6 +621,8 @@ public class LRAClient implements LRAClientAPI, Closeable {
 
     public void close() {
         client.close();
+        if (responseDataMap != null)
+            responseDataMap.clear();
     }
 
     private void aquireConnection() {
@@ -657,5 +641,25 @@ public class LRAClient implements LRAClientAPI, Closeable {
             response.close();
 
         connectionInUse = false;
+    }
+
+    private void setResponseData(URL lraId, String responseData) {
+        // responseData will be a json encoded list of strings
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            List<String> compensatorData = Arrays.asList(mapper.readValue(responseData, String[].class));
+
+            if (responseDataMap.containsKey(lraId))
+                responseDataMap.get(lraId).addAll(compensatorData);
+            else
+                responseDataMap.put(lraId, compensatorData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> getResponseData(URL lraId) {
+        return responseDataMap.get(lraId);
     }
 }

@@ -68,9 +68,13 @@ public interface LRAClientAPI {
      * without enlisting a participant.
      *
      * @param lraId The unique identifier of the LRA (required)
+     * @return compensator sepcific data provided by the application
+     *         for nested LRA the API implementation will combine compensator data into a
+     *         JSON encoded array. This means that compensators MUST not return any data
+     *         that starts with the JSON array start token (ie a '[' character)
      * @throws WebApplicationException Comms error
      */
-    void cancelLRA(URL lraId) throws WebApplicationException;
+    String cancelLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Attempt to close an LRA
@@ -81,9 +85,13 @@ public interface LRAClientAPI {
      * a participant.
      *
      * @param lraId The unique identifier of the LRA (required)
+     * @return compensator sepcific data provided by the application
+     *         for nested LRA the API implementation will combine compensator data into a
+     *         JSON encoded array. This means that compensators MUST not return any data
+     *         that starts with the JSON array start token (ie a '[' character)
      * @throws WebApplicationException Comms error
      */
-    void closeLRA(URL lraId) throws WebApplicationException;
+    String closeLRA(URL lraId) throws WebApplicationException;
 
     /**
      * Lookup active LRAs
@@ -196,4 +204,6 @@ public interface LRAClientAPI {
      * @return
      */
     URL getCurrent();
+
+    List<String> getResponseData(URL lraId);
 }

@@ -19,33 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.api;
+package participant.demo;
 
-import participant.filter.model.Booking;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class BookingCallback implements InvocationCallback<Booking> {
-
-    private final CompletableFuture<Booking> future = new CompletableFuture<>();
-
-    CompletableFuture<Booking> getCompletableFuture() {
-        return future;
-    }
-
+@Provider
+public class BookingExceptionMapper implements ExceptionMapper<BookingException> {
     @Override
-    public void completed(Booking booking) {
-        future.complete(booking);
-    }
+    public Response toResponse(BookingException exception) {
 
-    @Override
-    public void failed(Throwable t) {
-        future.completeExceptionally(t);
+        return Response.status(exception.getReason())
+                .entity(exception.getMessage()).build();
     }
 }
-

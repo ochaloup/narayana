@@ -55,6 +55,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -110,7 +111,9 @@ public class ActivityController {
         if (lraUrl != null) {
             String lraId = LRAClient.getLRAId(lraUrl);
 
-            lraClient.leaveLRA(new URL(lraUrl), Testing.getCompensatorUrl(context.getBaseUri(), this.getClass()));
+            Map<String, String> terminateURIs = lraClient.getTerminationUris(this.getClass(), context.getBaseUri(), true);
+            lraClient.leaveLRA(new URL(lraUrl), terminateURIs.get("Link"));
+
             activityService.getActivity(lraId);
 
             activityService.remove(lraId);

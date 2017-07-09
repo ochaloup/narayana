@@ -21,24 +21,34 @@
  */
 package org.jboss.narayana.rts.lra.coordinator.domain.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.util.List;
+
 //@Data
 //@AllArgsConstructor
 //@ApiModel( value = "LRA", description = "A Long Running Action" )
 public class LRAStatus {
-//    @ApiModelProperty( value = "The unique id of the LRA", required = true )
+    //    @ApiModelProperty( value = "The unique id of the LRA", required = true )
     private String lraId;
-//    @ApiModelProperty( value = "The client id associated with this LRA", required = false )
+    //    @ApiModelProperty( value = "The client id associated with this LRA", required = false )
     private String clientId ;
-//    @ApiModelProperty( value = "Indicates whether or not this LRA has completed", required = false )
+    //    @ApiModelProperty( value = "Indicates whether or not this LRA has completed", required = false )
     private boolean isComplete;
-//    @ApiModelProperty( value = "Indicates whether or not this LRA has compensated", required = false )
+    //    @ApiModelProperty( value = "Indicates whether or not this LRA has compensated", required = false )
     private boolean isCompensated;
-//    @ApiModelProperty( value = "Indicates whether or not this LRA is recovering", required = false )
+    //    @ApiModelProperty( value = "Indicates whether or not this LRA is recovering", required = false )
     private boolean isRecovering;
-//    @ApiModelProperty( value = "Indicates whether or not this LRA has been asked to complete or compensate yet", required = false )
+    //    @ApiModelProperty( value = "Indicates whether or not this LRA has been asked to complete or compensate yet", required = false )
     private boolean isActive;
-//    @ApiModelProperty( value = "Indicates whether or not this LRA is top level", required = false )
+    //    @ApiModelProperty( value = "Indicates whether or not this LRA is top level", required = false )
     private boolean isTopLevel;
+    private int httpStatus;
+    private List<String> responseData;
 
     public LRAStatus(Transaction lra) {
         this.lraId = lra.getId().toString();
@@ -48,6 +58,8 @@ public class LRAStatus {
         this. isRecovering = lra.isRecovering();
         this. isActive = lra.isActive();
         this. isTopLevel = lra.isTopLevel();
+        this.httpStatus = lra.getHttpStatus();
+        this.responseData = lra.getResponseData();
     }
 
     public String getLraId() {
@@ -76,5 +88,25 @@ public class LRAStatus {
 
     public boolean isTopLevel() {
         return isTopLevel;
+    }
+
+    public int getHttpStatus() {
+        return httpStatus;
+    }
+
+    public List<String> getResponseData() {
+        return responseData;
+    }
+
+    public String getEncodedResponseData() throws IOException {
+        if (responseData == null || responseData.size() == 0)
+            return null;
+
+        final StringWriter sw = new StringWriter();
+        final ObjectMapper mapper = new ObjectMapper();
+
+        mapper.writeValue(sw, responseData);
+
+        return sw.toString();
     }
 }

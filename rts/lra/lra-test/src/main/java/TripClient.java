@@ -21,9 +21,9 @@
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import participant.api.FlightController;
-import participant.api.HotelController;
-import participant.api.TripController;
+import participant.demo.FlightController;
+import participant.demo.HotelController;
+import participant.demo.TripController;
 import participant.filter.model.Booking;
 
 import java.io.DataOutputStream;
@@ -63,7 +63,9 @@ public class TripClient {
 
         Arrays.stream(booking.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
 
-        Booking confirmation = tripClient.confirm(booking);
+        Booking confirmation = (args.length > 0 && args[0].equals("cancel"))
+                    ? tripClient.completeBooking(booking, "compensate")
+                    : tripClient.completeBooking(booking, "complete");
 
         System.out.printf("%nBooking confirmation:%n\t%s%n", confirmation);
         Arrays.stream(confirmation.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
@@ -96,9 +98,24 @@ public class TripClient {
         return objectMapper.readValue(json, Booking.class);
     }
 
-
     private Booking confirm(Booking booking) throws Exception {
         URL confirmURL = new URL(TRIP_SERVICE_BASE_URL +"/complete");
+        String jsonBody = objectMapper.writeValueAsString(booking);
+        String confirmation = updateResource(confirmURL, "PUT", jsonBody);
+
+        return objectMapper.readValue(confirmation, Booking.class);
+    }
+
+    private Booking cancel(Booking booking) throws Exception {
+        URL confirmURL = new URL(TRIP_SERVICE_BASE_URL +"/compensate");
+        String jsonBody = objectMapper.writeValueAsString(booking);
+        String confirmation = updateResource(confirmURL, "PUT", jsonBody);
+
+        return objectMapper.readValue(confirmation, Booking.class);
+    }
+
+    private Booking completeBooking(Booking booking, String how) throws Exception {
+        URL confirmURL = new URL(TRIP_SERVICE_BASE_URL +"/" + how);
         String jsonBody = objectMapper.writeValueAsString(booking);
         String confirmation = updateResource(confirmURL, "PUT", jsonBody);
 

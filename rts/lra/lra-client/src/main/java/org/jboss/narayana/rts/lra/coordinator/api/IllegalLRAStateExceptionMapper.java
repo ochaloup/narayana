@@ -19,19 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.api;
+package org.jboss.narayana.rts.lra.coordinator.api;
 
-public class BookingException extends Exception {
-    int reason;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-    public int getReason() {
-        return reason;
-    }
-
-    public BookingException(int reason, String message) {
-        super(message);
-
-        this.reason = reason;
-
+@Provider
+public class IllegalLRAStateExceptionMapper implements ExceptionMapper<IllegalLRAStateException> {
+    @Override
+    public Response toResponse(IllegalLRAStateException exception) {
+        return Response.status(Response.Status.PRECONDITION_FAILED)
+                .entity(String.format("LRA is in the wrong state for this operation: %s", exception.getMessage())).build();
     }
 }

@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.api;
+package participant.demo;
 
 import org.jboss.narayana.rts.lra.compensator.api.Compensate;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
@@ -40,6 +40,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -51,7 +52,7 @@ import java.util.Map;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
 @RequestScoped
-public abstract class Participant {
+public abstract class Compensator {
     @Context
     private UriInfo context;
 
@@ -69,6 +70,9 @@ public abstract class Participant {
      */
     protected abstract CompensatorStatus updateCompensator(CompensatorStatus status, String activityId);
 
+    protected String getCompensatorData(String activityId) {
+        return null;
+    }
     /**
      * Get the LRA context of the currently running method.
      * Note that @HeaderParam(LRA_HTTP_HEADER) does not match the header (done't know why) so we the httpRequest
@@ -109,7 +113,22 @@ public abstract class Participant {
         if (!compensatorStatusMap.containsKey(lraId))
             throw new InvalidLRAId(lraId, "Compensator#status request: unknown lra id", null);
 
-        return Response.ok(compensatorStatusMap.get(getCurrentActivityId())).build();
+        // return status ok together with optional completion data or one of the other codes with a url that
+        // returns
+
+        /*
+         * the compensator will either return a 200 OK code (together with optional completion data) or a URL which
+         * indicates the outcome. That URL can be probed (via GET) and will simply return the same (implicit) information:
+         *
+         * <URL>/cannot-compensate
+         * <URL>/cannot-complete
+         *
+         * TODO I am returning the status url instead. And if the status is compensated or completed then performing
+         * GET on it will return 200 OK together with a compensator specific string that the business operation can
+         * reason about, otherwise some other suitable status code is returned together with one of he valid
+         * compensator states.
+         */
+        return updateState(compensatorStatusMap.get(lraId), lraId);
     }
 
     @PUT
@@ -125,12 +144,33 @@ public abstract class Participant {
         compensatorStatusMap = new HashMap<>();
     }
 
+    /**
+     * If the compensator was successful return a 200 status code and optionally an application specific string
+     * that can be used by whoever closed the LRA (that triggered this compensator).
+     * <p>
+     * Otherwise return a status url that can be probed to obtain the final outcome when it is ready
+     *
+     * @param status
+     * @param activityId
+     * @return
+     */
     private Response updateState(CompensatorStatus status, String activityId) {
+
         CompensatorStatus newStatus = updateCompensator(status, activityId);
 
         compensatorStatusMap.put(activityId, newStatus); // NB in the demo we never remove completed activities
 
-        return Response.ok(getStatusUrl(activityId)).build();
+        switch (newStatus) {
+            case Completed:
+            case Compensated:
+                String data = getCompensatorData(activityId);
+
+                return data == null ? Response.ok().build() : Response.ok(data).build();
+            default:
+                String statusUrl = getStatusUrl(activityId);
+
+                return Response.status(Response.Status.ACCEPTED).entity(Entity.text(statusUrl)).build();
+        }
     }
 
     private String getStatusUrl(String lraId) {

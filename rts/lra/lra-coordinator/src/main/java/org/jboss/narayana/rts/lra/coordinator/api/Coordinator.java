@@ -53,6 +53,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -310,10 +311,19 @@ public class Coordinator {
         return endLRA(toURL(lraId), true, false);
     }
 
-    private Response endLRA(URL lraId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
-        int status = lraService.endLRA(lraId, compensate, fromHierarchy);
 
-        return Response.status(status).build();
+    private Response endLRA(URL lraId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
+        LRAStatus status = lraService.endLRA(lraId, compensate, fromHierarchy);
+        String compensatorData = null;
+        try {
+            compensatorData = status.getEncodedResponseData();
+        } catch (IOException e) {
+            compensatorData = "Unable to encode as JSON";
+        }
+
+        return compensatorData == null
+                ? Response.ok().status(status.getHttpStatus()).build()
+                : Response.ok(compensatorData).status(status.getHttpStatus()).build();
     }
 
     //    @PUT

@@ -24,7 +24,10 @@ package participant.filter.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
@@ -33,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.IntStream;
 
 public class Booking {
     private AtomicLong nextBid = new AtomicLong(0);
@@ -43,6 +47,8 @@ public class Booking {
     @JsonProperty("status") private BookingStatus status;
     @JsonProperty("type") private String type;
     @JsonProperty("details") private Booking[] details;
+
+    private IOException decodingException;
 
     public Booking(String id, String name, Integer quantity, String type) {
         this(id, name, quantity, type, BookingStatus.PROVISIONAL, null);
@@ -61,6 +67,18 @@ public class Booking {
                    @JsonProperty("details") Booking[] details) {
 
         init(id, name, quantity, type, status, details);
+    }
+
+    public Booking(IOException decodingException) {
+        this.decodingException = decodingException;
+    }
+
+    public Booking(Booking booking) {
+        this.init(booking.getId(), booking.getName(), booking.getQuantity(), booking.getType(), booking.getStatus(), null);
+
+        details = new Booking[booking.getDetails().length];
+
+        IntStream.range(0, details.length).forEach(i -> details[i] = new Booking(booking.getDetails()[i]));
     }
 
 /*    public Booking(String id, String type, Booking... bookings) {
@@ -130,12 +148,17 @@ public class Booking {
                     id, name, quantity, type, status);
     }
 
-    public void canceled() {
+    public void setCanceled() {
         status = BookingStatus.CANCELLED;
     }
 
     public void confirmirming() {
         status = BookingStatus.CONFIRMING;
+    }
+
+    @JsonIgnore
+    public boolean isCancelPending() {
+        return status == BookingStatus.CANCEL_REQUESTED;
     }
 
     public void setStatus(BookingStatus status) {
@@ -161,4 +184,89 @@ public class Booking {
             return id; // TODD do it in the constructor
         }
     }
+
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        return objectMapper.writeValueAsString(this);
+    }
+
+    public static Booking fromJson(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+/*            if (json.startsWith("[")) {
+                *//*
+                 * it's an encoded array so it is either
+                 * - from a nested compensator (so the array holds data for multiple compensators
+                 * - from a single compensator that has encoded array data
+                 * For now we tell compensators not to encode data as an array (though they can produce
+                 * a JSON object that itself contains arrays) {@link
+                 *//*
+
+
+                String[] ja = mapper.readValue(json, String[].class);
+
+                if (ja.length == 0)
+                    throw new IOException("Invalid json array: " + json);
+                return mapper.readValue(ja[0], Booking.class);
+            }*/
+            return mapper.readValue(json, Booking.class);
+        } catch (IOException e) {
+            return new Booking(e);
+        }
+    }
+
+    public static List<Booking> listFromJson(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        return Arrays.asList(mapper.readValue(json, Booking[].class));
+    }
+
+    @JsonIgnore
+    public IOException getDecodingException() {
+        return decodingException;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Booking booking = (Booking) o;
+
+        if (!getId().equals(booking.getId())) return false;
+        if (!getName().equals(booking.getName())) return false;
+        if (!getQuantity().equals(booking.getQuantity())) return false;
+        if (getStatus() != booking.getStatus()) return false;
+        if (!getType().equals(booking.getType())) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        return Arrays.equals(getDetails(), booking.getDetails());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getQuantity().hashCode();
+        result = 31 * result + getStatus().hashCode();
+        result = 31 * result + getType().hashCode();
+        result = 31 * result + Arrays.hashCode(getDetails());
+        return result;
+    }
+
+/*    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Booking)) return false;
+
+        Booking booking = (Booking) o;
+
+        return getId().equals(booking.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }*/
 }

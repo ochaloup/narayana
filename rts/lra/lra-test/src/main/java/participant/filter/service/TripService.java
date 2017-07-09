@@ -22,6 +22,7 @@
 package participant.filter.service;
 
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
 import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 
@@ -29,44 +30,46 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TripService extends BookingStore{
     @Inject
-    private LRAClient lraClient;
+    private LRAClientAPI lraClient;
 
-    public Booking confirmBooking(Booking booking) {
-        System.out.printf("Confirming booking id %s (%s) status: %s%n",
-                booking.getId(), booking.getName(), booking.getStatus());
+    public Booking confirmBooking(Booking tripBooking) {
+        System.out.printf("Confirming tripBooking id %s (%s) status: %s%n",
+                tripBooking.getId(), tripBooking.getName(), tripBooking.getStatus());
 
-        if (booking.getStatus() == BookingStatus.CANCEL_REQUESTED)
+        if (tripBooking.getStatus() == BookingStatus.CANCEL_REQUESTED)
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Trying to confirm a booking which needs to be cancelled")
+                    .entity("Trying to confirm a tripBooking which needs to be cancelled")
                     .build());
 
-        Booking prev = add(booking);
+        Booking prev = add(tripBooking);
 
         if (prev != null)
-            System.out.printf("Seen this booking before%n");
+            System.out.printf("Seen this tripBooking before%n");
 
-        Arrays.stream(booking.getDetails()).forEach(b -> {
-            System.out.printf("\tid %s (%s) status: %s%n",
-                    b.getId(), b.getName(), b.getStatus());
-
-            if (b.getStatus().equals(BookingStatus.CANCEL_REQUESTED)) {
-                lraClient.cancelLRA(LRAClient.lraToURL(b.getId(), "Invalid " + b.getType() + " booking id format"));
-                b.canceled();
-            }
+        // check the booking to see if the client wants to cancel any dependent bookings
+        Arrays.stream(tripBooking.getDetails()).filter(Booking::isCancelPending).forEach(b -> {
+            lraClient.cancelLRA(LRAClient.lraToURL(b.getId(), "Invalid " + b.getType() + " tripBooking id format"));
+            b.setCanceled();
         });
 
-        booking.confirmirming();
+        tripBooking.confirmirming();
 
-        lraClient.closeLRA(booking.getId());
+        lraClient.closeLRA(LRAClient.lraToURL(tripBooking.getId()));
 
-        booking.confirm();
+        tripBooking.confirm();
 
-        return booking;
+        return mergeBookingResponse(tripBooking);
     }
 
     public Booking cancelBooking(Booking booking) {
@@ -85,8 +88,27 @@ public class TripService extends BookingStore{
 
         lraClient.cancelLRA(LRAClient.lraToURL(booking.getId(), "Invalid trip booking id format"));
 
-        booking.canceled();
+        booking.setCanceled();
 
-        return booking;
+        return mergeBookingResponse(booking);
+    }
+
+    private Booking mergeBookingResponse(Booking tripBooking) {
+        URL bookingId = LRAClient.lraToURL(tripBooking.getId());
+        List<String> bookingDetails = lraClient.getResponseData(bookingId); // each string is a json encoded tripBooking
+
+//        List<Booking> bookings = bookingDetails.stream().map(Booking::fromJson).collect(Collectors.toList());
+
+        // convert the list of bookings into a map keyed by Booking::getId()
+        Map<String, Booking> bookings = bookingDetails.stream()
+                .map(Booking::fromJson)
+                .collect(Collectors.toMap(Booking::getId, Function.identity()));
+
+        // update tripBooking with bookings returned in the data returned from the trip confirm request
+        Arrays.stream(tripBooking.getDetails()) // the array of bookings in this trip booking
+                .filter(b -> bookings.containsKey(b.getId())) // pick out bookings for which we have updated data
+                .forEach(b -> b.merge(bookings.get(b.getId()))); // merge in the changes (returned from the confirm request)
+
+        return tripBooking;
     }
 }

@@ -59,6 +59,8 @@ public class LRARecord extends RESTRecord {
     private boolean isCompensated;
     private boolean isFailed;
 
+    private String responseData;
+
     LRARecord(String lraId, String coordinatorURI, String linkURI) {
         super(lraId, coordinatorURI, linkURI, null);
 
@@ -204,10 +206,15 @@ public class LRARecord extends RESTRecord {
                 return TwoPhaseOutcome.FINISH_ERROR;
             }
 
-            if (compensate)
+            if (compensate) {
                 isCompensated = true;
-            else
+                isCompelete = false;
+            } else {
                 isCompelete = true;
+                isCompensated = false;
+            }
+
+            responseData = response.readEntity(String.class);
 
             return TwoPhaseOutcome.FINISH_OK;
         } finally {
@@ -247,6 +254,10 @@ public class LRARecord extends RESTRecord {
 
     public boolean isFailed() {
         return isFailed;
+    }
+
+    public String getResponseData() {
+        return responseData;
     }
 
     @Override

@@ -27,14 +27,18 @@ import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.arjuna.ats.arjuna.coordinator.RecordList;
 import com.arjuna.ats.arjuna.coordinator.RecordListIterator;
 import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jboss.jbossts.star.resource.RESTRecord;
 import org.jboss.jbossts.star.util.TxStatus;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     private final URL id;
@@ -42,6 +46,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     private final String clientId;
     private List<LRARecord> pending;
     private CompensatorStatus status; // reuse commpensator states for the LRA
+    private List<String> responseData;
 
     public Transaction(String baseUrl, URL parentId, String clientId) throws MalformedURLException {
         super();
@@ -82,8 +87,10 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         int res = status();
         boolean nested = !isTopLevel();
 
-        if (nested)
-            savePendingList();
+        // nested compensators need to be remembered in case the enclosing LRA decides to compensate
+        // also save the list so that we can retrieve any response data after committing compensators
+//        if (nested)
+        savePendingList();
 
         if ((res != ActionStatus.RUNNING) && (res != ActionStatus.ABORT_ONLY)) {
             if (nested && compensate) {
@@ -105,34 +112,69 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
 
                 status = toLRAStatus(status());
             }
-
-            return res;
-        }
+        } else {
 
 //        if (!status.equals(CompensatorStatus.Active))
 //            return status();
 
 
+            if (compensate || status() == ActionStatus.ABORT_ONLY) {
+                status = CompensatorStatus.Compensating;
 
-        if (compensate || status() == ActionStatus.ABORT_ONLY) {
-            status = CompensatorStatus.Compensating;
+                // compensators must be called in reverse order so reverse the pending list
+                int sz = pendingList == null ? 0 : pendingList.size();
 
-            // compensators must be called in reverse order so reverse the pending list
-            int sz = pendingList == null ? 0 : pendingList.size();
-
-            if (sz > 0) {
-                for (int i = sz - 1; i > 0; i--) {
-                    pendingList.putRear(pendingList.getFront());
+                if (sz > 0) {
+                    for (int i = sz - 1; i > 0; i--) {
+                        pendingList.putRear(pendingList.getFront());
+                    }
                 }
+
+                // tell each compensator that the lra canceled - use commit since we need recovery for compensation actions
+                res = super.abort();
+            } else {
+                status = CompensatorStatus.Completing;
+
+                // tell each compensator that the lra completed ok
+                res = super.commit(false);
+            }
+        }
+
+        // gather up any response data
+        if (pending != null && pending.size() != 0) {
+            responseData = pending.stream()
+                    .map(LRARecord::getResponseData)
+                    .collect(Collectors.toList());
+
+            // some compensators may be for nested LRAs so their response data will be an encoded array
+            // - let the client handle this case (since a busisness logic compensator can legitimately encode
+            // an array as his business data)
+            // TODO use a flat map to do it all in one go
+            List<String> flattenedData = new ArrayList<>();
+            ObjectMapper mapper = new ObjectMapper();
+
+            responseData.forEach(s -> {
+                if (s.startsWith("[")) {
+                    try {
+                        String[] ja = mapper.readValue(s, String[].class);
+                        // TODO should reccurse here since the encoded strings may themselves contain compensator output
+                        // TODO fixit
+                        flattenedData.addAll(Arrays.asList(ja));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    flattenedData.add(s);
+                }
+            });
+
+            if (flattenedData.size() != 0) {
+                responseData.clear();
+                responseData.addAll(flattenedData);
             }
 
-            // tell each compensator that the lra canceled - use commit since we need recovery for compensation actions
-            res = super.abort();
-        } else {
-            status = CompensatorStatus.Completing;
-
-            // tell each compensator that the lra completed ok
-            res = super.commit(false);
+            if (!nested)
+                pending.clear(); // TODO we will loose this data if we need recovery
         }
 
         status = toLRAStatus(res);
@@ -140,14 +182,14 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         return res;
     }
 
-    private CompensatorStatus toLRAStatus(int atomicActionStatues) {
-        switch (atomicActionStatues) {
+    private CompensatorStatus toLRAStatus(int atomicActionStatus) {
+        switch (atomicActionStatus) {
             case ActionStatus.ABORTING:
                 return CompensatorStatus.Compensating;
             case ActionStatus.ABORT_ONLY:
                 return CompensatorStatus.Compensating;
             case ActionStatus.ABORTED:
-                return CompensatorStatus.Compensating;
+                return CompensatorStatus.Compensated;
             case ActionStatus.COMMITTING:
                 return CompensatorStatus.Completing;
             case ActionStatus.COMMITTED:
@@ -261,7 +303,21 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         return parentId == null;
     }
 
+    public List<String> getResponseData() {
+        return responseData;
+    }
+
     public BasicAction currentLRA() {
         return ThreadActionData.currentAction();
+    }
+
+    public int getHttpStatus() {
+        switch (status()) {
+            case ActionStatus.COMMITTED:
+            case ActionStatus.ABORTED:
+                return 200;
+            default: // TODO return a more comprehensive mapping between states
+                return 500;
+        }
     }
 }

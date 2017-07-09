@@ -19,13 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.api;
+package participant.demo;
 
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
 import participant.filter.model.Booking;
 import participant.filter.model.BookingStatus;
 import participant.filter.service.TripService;
@@ -50,27 +48,21 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
-//@ApplicationScoped
 @RequestScoped
 @Path(TripController.TRIP_PATH)
 @LRA(LRA.Type.SUPPORTS)
-public class TripController extends Participant {
+public class TripController extends Compensator {
     public static final String TRIP_PATH = "/trip";
 
     private Client hotelClient;
@@ -78,9 +70,6 @@ public class TripController extends Participant {
 
     private WebTarget hotelTarget;
     private WebTarget flightTarget;
-
-    @Inject
-    private LRAClientAPI lraClient;
 
     @Inject
     private TripService tripService;
@@ -118,52 +107,10 @@ public class TripController extends Participant {
      *     start LRA 4
      *       Book flight option 2
      *
-     * @param asyncResponse the response object that will be asynchronously returned back to the caller
      * @param hotelName hotel name
      * @param hotelGuests number of beds required
      * @param flightSeats number of people flying
      */
-    @POST
-    @Path("/bookasync")
-    @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.Type.REQUIRED)
-    public void bookTripAsync(@Suspended final AsyncResponse asyncResponse,
-                              @HeaderParam(LRA_HTTP_HEADER) String lraId,
-                              @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
-                              @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
-                              @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
-                              @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer flightSeats,
-                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
-
-        CompletableFuture<Booking> hotelBooking = bookHotelAsync(hotelName, hotelGuests);
-        CompletableFuture<Booking> flightBooking1 = bookFlightAsync(flightNumber, flightSeats);
-        CompletableFuture<Booking> flightBooking2 =
-                flightBooking1 == null ? null : bookFlightAsync(flightNumber + "B", flightSeats);
-        CompletableFuture<Booking> asyncResult;
-
-        if (hotelBooking != null) {
-            if (flightBooking1 != null) {
-                asyncResult = hotelBooking
-                        .thenCombineAsync(flightBooking2, (bookings, bookings2) -> new Booking(null, null, bookings, bookings2))
-                        .thenCombineAsync(flightBooking1, (bookings1, bookings12) -> new Booking(null, null, bookings1, bookings12));
-            } else {
-                asyncResult = hotelBooking;
-            }
-        } else if (flightBooking1 != null) {
-            asyncResult = flightBooking1;
-        } else {
-            asyncResponse.resume("Invalid booking request: no flight or hotel information");
-            return;
-        }
-
-        asyncResult
-                .thenApply(asyncResponse::resume)
-                .exceptionally(e -> asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).entity(e).build()));
-
-        asyncResponse.setTimeout(timeout, TimeUnit.MILLISECONDS);
-        asyncResponse.setTimeoutHandler(ar -> ar.resume(Response.status(SERVICE_UNAVAILABLE).entity("Operation timed out").build()));
-    }
-
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
@@ -194,7 +141,10 @@ public class TripController extends Participant {
     public Booking confirmTrip(Booking booking) throws BookingException {
         tripService.confirmBooking(booking);
 
-        booking = validateBooking(booking, BookingStatus.CONFIRMED);
+        if (!TripCheck.validateBooking(booking, hotelTarget, flightTarget))
+            throw new BookingException(INTERNAL_SERVER_ERROR.getStatusCode(), "LRA response data does not match booking data");
+
+        booking.setStatus(BookingStatus.CONFIRMED);
 
         return booking;
     }
@@ -207,7 +157,12 @@ public class TripController extends Participant {
     public Booking cancelTrip(Booking booking) throws BookingException {
         tripService.cancelBooking(booking);
 
-        return validateBooking(booking, BookingStatus.CANCELLED);
+        if (!TripCheck.validateBooking(booking, hotelTarget, flightTarget))
+            throw new BookingException(INTERNAL_SERVER_ERROR.getStatusCode(), "LRA response data does not match booking data");
+
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        return booking;
     }
 
     @GET
@@ -219,50 +174,6 @@ public class TripController extends Participant {
         Booking booking = tripService.get(lraId);
 
         return Response.ok(booking.getStatus().name()).build(); // TODO convert to a CompensatorStatus if we we're enlisted in an LRA
-    }
-
-    private Booking validateBooking(Booking booking, BookingStatus status) throws BookingException {
-        checkBooking(booking); // there may have been independent updates to the dependent bookings
-        booking.setStatus(status);
-
-        return booking;
-    }
-
-    private void checkBooking(Booking booking) throws BookingException {
-        final BookingException[] bookingException = {null};
-
-        // NB parallel() results in IllegalStateException: WFLYWELD0039 because
-        // ... trying to access a weld deployment with a Thread Context ClassLoader that is not associated with the deployment
-        Arrays.stream(booking.getDetails()).forEach(b -> {
-            try {
-                checkDependentBooking(b);
-            } catch (BookingException e) {
-                bookingException[0] = e;
-            }
-        });
-
-        if (bookingException[0] != null)
-            throw bookingException[0];
-    }
-
-    private void checkDependentBooking(Booking booking) throws BookingException {
-        if ("Hotel".equals(booking.getType()))
-            checkDependentBooking(hotelTarget, booking);
-        else if ("Flight".equals(booking.getType()))
-            checkDependentBooking(flightTarget, booking);
-    }
-
-    private void checkDependentBooking(WebTarget target, Booking booking) throws BookingException {
-        Response response = target.path("info").path(booking.getEncodedId()).request().get();
-
-        checkResponse(response, Response.Status.OK, "Could not lookup hotel booking status");
-
-        booking.merge(response.readEntity(Booking.class));
-    }
-
-    private void checkResponse(Response response, Response.Status expect, String message) throws BookingException {
-        if (response.getStatus() != expect.getStatusCode())
-            throw new BookingException(response.getStatus(), message);
     }
 
     private Booking bookHotel(String name, int beds) {
@@ -299,33 +210,8 @@ public class TripController extends Participant {
         return invokeWebTarget(webTarget);
     }
 
-    private CompletableFuture<Booking> bookFlightAsync(String flightNumber, int seats) {
-        if (flightNumber == null || flightNumber.length() == 0 || seats <= 0)
-            return null;
-
-        WebTarget webTarget = flightTarget
-                .path("book")
-                .queryParam(FlightController.FLIGHT_NUMBER_PARAM, flightNumber)
-                .queryParam(FlightController.FLIGHT_SEATS_PARAM, seats);
-
-        return invokeWebTarget(webTarget);
-    }
-
     private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget) {
         AsyncInvoker asyncInvoker = webTarget.request().async();
-        BookingCallback callback = new BookingCallback();
-
-        asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
-
-        return callback.getCompletableFuture();
-    }
-
-    private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget, Integer ... acceptableStatusCodes) {
-        if (acceptableStatusCodes.length == 0)
-            acceptableStatusCodes = new Integer[] {Response.Status.OK.getStatusCode()};
-
-        AsyncInvoker asyncInvoker = webTarget.request().async();
-//        RequestCallback<Booking> callback = new RequestCallback<>(Booking.class, acceptableStatusCodes);
         BookingCallback callback = new BookingCallback();
 
         asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
