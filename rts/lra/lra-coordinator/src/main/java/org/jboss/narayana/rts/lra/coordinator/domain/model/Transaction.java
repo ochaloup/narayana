@@ -37,8 +37,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     private final URL id;
@@ -141,37 +144,14 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         }
 
         // gather up any response data
+        ObjectMapper mapper = new ObjectMapper();
+
         if (pending != null && pending.size() != 0) {
             responseData = pending.stream()
                     .map(LRARecord::getResponseData)
+                    .map(s -> getCompensatorResponse(mapper, s)) // some compensators may be for nested LRAs so their response data will be an encoded array
+                    .flatMap(Collection::stream)
                     .collect(Collectors.toList());
-
-            // some compensators may be for nested LRAs so their response data will be an encoded array
-            // - let the client handle this case (since a busisness logic compensator can legitimately encode
-            // an array as his business data)
-            // TODO use a flat map to do it all in one go
-            List<String> flattenedData = new ArrayList<>();
-            ObjectMapper mapper = new ObjectMapper();
-
-            responseData.forEach(s -> {
-                if (s.startsWith("[")) {
-                    try {
-                        String[] ja = mapper.readValue(s, String[].class);
-                        // TODO should reccurse here since the encoded strings may themselves contain compensator output
-                        // TODO fixit
-                        flattenedData.addAll(Arrays.asList(ja));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    flattenedData.add(s);
-                }
-            });
-
-            if (flattenedData.size() != 0) {
-                responseData.clear();
-                responseData.addAll(flattenedData);
-            }
 
             if (!nested)
                 pending.clear(); // TODO we will loose this data if we need recovery
@@ -180,6 +160,23 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         status = toLRAStatus(res);
 
         return res;
+    }
+
+    // TODO should reccurse here since the encoded strings may themselves contain compensator output
+    private Collection<String> getCompensatorResponse(ObjectMapper mapper, String data) {
+        if (data.startsWith("[")) {
+            try {
+                String[] ja = mapper.readValue(data, String[].class);
+                // TODO should reccurse here since the encoded strings may themselves contain compensator output
+                return Arrays.asList(ja);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return Collections.emptyList();
+            }
+        } else {
+            return Collections.singletonList(data);
+        }
+
     }
 
     private CompensatorStatus toLRAStatus(int atomicActionStatus) {

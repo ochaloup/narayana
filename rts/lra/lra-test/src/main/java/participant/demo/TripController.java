@@ -43,7 +43,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -54,7 +53,6 @@ import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.CompletableFuture;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
@@ -197,26 +195,6 @@ public class TripController extends Compensator {
                 .queryParam(FlightController.FLIGHT_SEATS_PARAM, seats);
 
         return webTarget.request().post(Entity.text("")).readEntity(Booking.class);
-    }
-
-    private CompletableFuture<Booking> bookHotelAsync(String name, int beds) {
-        if (name == null || name.length() == 0 || beds <= 0)
-            return null;
-
-        WebTarget webTarget = hotelTarget
-                .path("book")
-                .queryParam(HotelController.HOTEL_NAME_PARAM, name).queryParam(HotelController.HOTEL_BEDS_PARAM, beds);
-
-        return invokeWebTarget(webTarget);
-    }
-
-    private CompletableFuture<Booking> invokeWebTarget(WebTarget webTarget) {
-        AsyncInvoker asyncInvoker = webTarget.request().async();
-        BookingCallback callback = new BookingCallback();
-
-        asyncInvoker.post(Entity.entity("", MediaType.APPLICATION_JSON_TYPE), callback);
-
-        return callback.getCompletableFuture();
     }
 
     @GET
