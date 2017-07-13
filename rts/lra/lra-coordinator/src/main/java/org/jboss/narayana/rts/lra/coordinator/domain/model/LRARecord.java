@@ -21,10 +21,12 @@
  */
 package org.jboss.narayana.rts.lra.coordinator.domain.model;
 
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
+import com.arjuna.ats.arjuna.coordinator.RecordType;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
-import org.jboss.jbossts.star.resource.RESTRecord;
 import org.jboss.narayana.rts.lra.coordinator.api.Current;
 import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
 
@@ -45,7 +47,7 @@ import java.util.TreeMap;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
-public class LRARecord extends RESTRecord {
+public class LRARecord extends AbstractRecord implements Comparable {
     private URL coordinatorURI;
     private String participantPath;
 
@@ -62,7 +64,7 @@ public class LRARecord extends RESTRecord {
     private String responseData;
 
     LRARecord(String lraId, String coordinatorURI, String linkURI) {
-        super(lraId, coordinatorURI, linkURI, null);
+        super(new Uid());
 
         try {
             // if compensateURI is a link parse it into compensate,complete and status urls
@@ -94,11 +96,11 @@ public class LRARecord extends RESTRecord {
         }
     }
 
-    public String getParticipantPath() {
+    String getParticipantPath() {
         return participantPath;
     }
 
-    public static String cannonicalForm(String linkStr) {
+    static String cannonicalForm(String linkStr) {
         if (linkStr.indexOf(',') == -1)
             return linkStr;
 
@@ -285,8 +287,6 @@ public class LRARecord extends RESTRecord {
     @Override
     public boolean restore_state(InputObjectState os, int t) {
         if (super.restore_state(os, t)) {
-            participantPath = getParticipantURI();
-
             try {
                 coordinatorURI = new URL(os.unpackString());
                 participantPath = os.unpackString();
@@ -305,4 +305,92 @@ public class LRARecord extends RESTRecord {
 
         return true;
     }
+
+    public int typeIs() {
+        return 166; // RecordType.LRA_RECORD; TODO we dependend on swarm for narayana which is using an earlier version
+    }
+
+    public int nestedAbort()
+    {
+        return TwoPhaseOutcome.FINISH_OK;
+    }
+
+    public int nestedCommit()
+    {
+        return TwoPhaseOutcome.FINISH_OK;
+    }
+
+    public int nestedPrepare()
+    {
+        return TwoPhaseOutcome.PREPARE_OK; // do nothing
+    }
+
+    public int nestedOnePhaseCommit()
+    {
+        return TwoPhaseOutcome.FINISH_ERROR;
+    }
+
+    public String type()
+    {
+        return LRARecord.typeName();
+    }
+
+    public static String typeName()
+    {
+        return "/StateManager/AbstractRecord/LRARecord";
+    }
+
+    public boolean doSave()
+    {
+        return true;
+    }
+
+    public void merge(AbstractRecord a) {
+    }
+
+    public void alter(AbstractRecord a) {
+    }
+
+    public boolean shouldAdd(AbstractRecord a)
+    {
+        return (a.typeIs() == typeIs());
+    }
+
+    public boolean shouldAlter(AbstractRecord a)
+    {
+        return false;
+    }
+
+    public boolean shouldMerge(AbstractRecord a)
+    {
+        return false;
+    }
+
+    public boolean shouldReplace(AbstractRecord a)
+    {
+        return false;
+    }
+
+    @Override
+    public Object value() {
+        return null; // LRA does not support heuristics
+    }
+
+    @Override
+    public void setValue(Object o) {
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        AbstractRecord other = (AbstractRecord) o;
+
+        if (lessThan(other))
+            return -1;
+
+        if (greaterThan(other))
+            return 1;
+
+        return 0;
+    }
+
 }

@@ -151,7 +151,7 @@ public class LRAService {
 
         Transaction transaction = getTransaction(lraId);
 
-        if (!transaction.isRunning() && transaction.isTopLevel())
+        if (!transaction.isActive() && transaction.isTopLevel())
             throw new IllegalLRAStateException(lraId.toString(), "LRA is closing or closed", null);
 
         int status = transaction.end(compensate);
@@ -175,19 +175,17 @@ public class LRAService {
 
         Transaction transaction = getTransaction(lraId);
 
-        if (!transaction.isRunning())
+        if (!transaction.isActive())
             return Response.Status.PRECONDITION_FAILED.getStatusCode();
 
         try {
             if (!transaction.forgetParticipant(compensatorUrl))
-                System.out.printf("WARNING could not determine wether or not the request succeeded%s");
+                System.out.printf("WARNING forget %s failed%n", lraId);
 
             return Response.Status.OK.getStatusCode();
         } catch (Exception e) {
             return Response.Status.BAD_REQUEST.getStatusCode();
         }
-
-
     }
 
     public synchronized int joinLRA(StringBuilder recoveryUrl, URL lra, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
@@ -199,31 +197,31 @@ public class LRAService {
         Transaction transaction = getTransaction(lra);
 
         if (timeLimit < 0)
-            timeLimit = 0;
+            timeLimit = 0; // TODO use it
 
         /*
          * TODO update the spec with:
          *   If the transaction is not TransactionActive then the implementation MUST return a 412 status code
          */
-        if (!transaction.isRunning())
+        if (!transaction.isActive())
             return Response.Status.PRECONDITION_FAILED.getStatusCode();
 
-        String coordinatorId;
+        String recoveryURL;
 
 //        if (coordinatorUrl.endsWith("/"))
 //            coordinatorUrl = coordinatorUrl.substring(0, coordinatorUrl.length() - 1);
 
         if (linkHeader != null)
-            coordinatorId = transaction.enlistParticipants(lra, linkHeader, recoveryUrlBase);
+            recoveryURL = transaction.enlistParticipant(lra, linkHeader, recoveryUrlBase);
         else
-            coordinatorId = transaction.enlistParticipant( lra, compensatorUrl, recoveryUrlBase);
+            recoveryURL = transaction.enlistParticipant( lra, compensatorUrl, recoveryUrlBase);
 
-        if (coordinatorId == null)
+        if (recoveryURL == null)
             return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
-        addCompensator(transaction, coordinatorId, compensatorUrl);
+        addCompensator(transaction, recoveryURL, compensatorUrl);
 
-        recoveryUrl.append(transaction.getRecoveryUrl());
+        recoveryUrl.append(recoveryURL);
 
         return Response.Status.OK.getStatusCode();
     }

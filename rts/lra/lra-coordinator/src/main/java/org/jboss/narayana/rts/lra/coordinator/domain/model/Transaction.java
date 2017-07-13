@@ -21,15 +21,17 @@
  */
 package org.jboss.narayana.rts.lra.coordinator.domain.model;
 
+import com.arjuna.ats.arjuna.AtomicAction;
+import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
+import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.arjuna.ats.arjuna.coordinator.RecordList;
 import com.arjuna.ats.arjuna.coordinator.RecordListIterator;
 import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.jbossts.star.resource.RESTRecord;
-import org.jboss.jbossts.star.util.TxStatus;
+
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 
 import java.io.IOException;
@@ -41,9 +43,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
+public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resource.Transaction {
     private final URL id;
     private final URL parentId; // TODO save_state and restore_state
     private final String clientId;
@@ -52,7 +53,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
     private List<String> responseData;
 
     public Transaction(String baseUrl, URL parentId, String clientId) throws MalformedURLException {
-        super();
+        super(new Uid());
 
         this.id = new URL(String.format("%s/%s", baseUrl, get_uid().fileStringForm()));
         this.parentId = parentId;
@@ -92,7 +93,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
 
         // nested compensators need to be remembered in case the enclosing LRA decides to compensate
         // also save the list so that we can retrieve any response data after committing compensators
-//        if (nested)
+        // if (nested)
         savePendingList();
 
         if ((res != ActionStatus.RUNNING) && (res != ActionStatus.ABORT_ONLY)) {
@@ -127,11 +128,8 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
                 // compensators must be called in reverse order so reverse the pending list
                 int sz = pendingList == null ? 0 : pendingList.size();
 
-                if (sz > 0) {
-                    for (int i = sz - 1; i > 0; i--) {
-                        pendingList.putRear(pendingList.getFront());
-                    }
-                }
+                for (int i = sz - 1; i > 0; i--)
+                    pendingList.putRear(pendingList.getFront());
 
                 // tell each compensator that the lra canceled - use commit since we need recovery for compensation actions
                 res = super.abort();
@@ -139,7 +137,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
                 status = CompensatorStatus.Completing;
 
                 // tell each compensator that the lra completed ok
-                res = super.commit(false);
+                res = super.commit(true);
             }
         }
 
@@ -162,9 +160,8 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         return res;
     }
 
-    // TODO should reccurse here since the encoded strings may themselves contain compensator output
     private Collection<String> getCompensatorResponse(ObjectMapper mapper, String data) {
-        if (data.startsWith("[")) {
+        if (data !=null && data.startsWith("[")) {
             try {
                 String[] ja = mapper.readValue(data, String[].class);
                 // TODO should reccurse here since the encoded strings may themselves contain compensator output
@@ -198,59 +195,51 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         }
     }
 
-    @Override
-    protected RESTRecord getParticipantRecord(String txId, String coordinatorUrl, String participantUrl, String terminateUrl, String recoveryUrlBase) {
-        return new LRARecord(txId, coordinatorUrl, participantUrl);
-    }
-
     public String enlistParticipant(URL coordinatorUrl, String participantUrl, String recoveryUrlBase) {
-        RESTRecord participant = findParticipant(participantUrl);
+        LRARecord participant = findLRAParticipant(participantUrl);
 
         if (participant != null)
             return participant.get_uid().fileStringForm(); // must have already been enlisted
 
-        // TODO remove dependency on REST-AT since it deosn't add much
-        String coordinatorId = super.enlistParticipant(coordinatorUrl.toString(), participantUrl, recoveryUrlBase, null);
+        String coordinatorId = enlistParticipant(coordinatorUrl.toString(), participantUrl, recoveryUrlBase, null);
 
-        if (coordinatorId != null) { // null means the enlist was rejected - probably because  it is already enlisted or the end protocol has started
-            participant = findParticipant(participantUrl);
-
+        if (coordinatorId != null && findLRAParticipant(participantUrl) != null) {
             // need to remember that there is a new participant
             deactivate(); // if it fails the superclass will have logged a warning
-            return coordinatorId;
         }
+
+        return coordinatorId;
+    }
+
+    public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase,
+                                    String terminateUrl) {
+        if (findLRAParticipant(participantUrl) != null)
+            return null;    // already enlisted
+
+        String txId = get_uid().fileStringForm();
+        LRARecord p = new LRARecord(txId, coordinatorUrl, participantUrl);
+        String coordinatorId = p.get_uid().fileStringForm();
+
+        String recoveryUrl = recoveryUrlBase + txId + '/' + coordinatorId;
+
+        if (add(p) != AddOutcome.AR_REJECTED)
+            return recoveryUrl;
 
         return null;
     }
 
-    public String enlistParticipants(URL coordinatorUrl, String compensateURI, String recoveryUrlBase) {
-        return enlistParticipant(coordinatorUrl, compensateURI, recoveryUrlBase);
-
-/*        String coordinatorId = super.enlistParticipant(coordinatorUrl, compensateURI, recoveryUrlBase, null);
-
-        if (coordinatorId == null) {
-            // null means either the compenstaor is already regitered or the enlist was rejected (probably because the end protocol has started)
-            RESTRecord rr = findParticipant(compensateURI);
-
-            if (rr != null)
-                return rr.get_uid().fileStringForm();
-        }
-
-        RESTRecord participant = findParticipant(compensateURI);
-
-        // need to remember that there is a new participant
-        deactivate(); // if it fails the superclass will have logged a warning
-
-        return coordinatorId;*/
-    }
-
     public Boolean isActive() {
-        return TxStatus.fromActionStatus(status()).isActive();
+        return status == CompensatorStatus.Active;
     }
 
     public boolean forgetParticipant(String participantUrl) {
-        return pendingList == null || pendingList.size() == 0 || super.forgetParticipant(participantUrl);
+        return pendingList == null || pendingList.size() == 0 || doForgetParticipant(participantUrl);
+    }
 
+    private boolean doForgetParticipant(String participantLinkUrl) {
+        LRARecord pUrl = findLRAParticipant(participantLinkUrl);
+
+        return pUrl == null || pendingList.remove(pUrl);
     }
 
     public void forgetAllParticipants() {
@@ -274,7 +263,7 @@ public class Transaction extends org.jboss.jbossts.star.resource.Transaction {
         }
     }
 
-    protected RESTRecord findParticipant(String participantUrl) {
+    private LRARecord findLRAParticipant(String participantUrl) {
         if (pendingList != null) {
 
             RecordListIterator i = new RecordListIterator(pendingList);

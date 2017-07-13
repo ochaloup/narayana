@@ -4,6 +4,14 @@
 mvn clean install
 ```
 
+## View the swagger documentation for the LRA coordinator
+
+By pointing your browser at http://localhost:8080/swagger.json you should see a json representation
+of the API. A pretty version is available via the swagger ui:
+
+- copy the output from http://localhost:8080/swagger.json into a local file
+- go to http://editor.swagger.io/#/ and use the file menu to import this file into the UI
+
 ## Run an integration test
 
 ### Start the org.jboss.narayana.rts.lra.coordinator on port 8080
