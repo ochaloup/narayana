@@ -469,14 +469,4 @@ public class Coordinator {
 
         return url;
     }
-
-    private String toLRAId(String lraId) {
-        // see if it already in the correct format#
-        try {
-            new URL(lraId).toURI();
-            return lraId;
-        } catch (Exception e) {
-            return String.format("%s%s/%s", context.getBaseUri(), COORDINATOR_PATH_NAME, lraId);
-        }
-    }
 }

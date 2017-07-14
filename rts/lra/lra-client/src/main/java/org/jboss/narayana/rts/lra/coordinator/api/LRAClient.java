@@ -98,6 +98,8 @@ public class LRAClient implements LRAClientAPI, Closeable {
     private static final String MISSING_ANNOTATION_FORMAT =
             "Cannot enlist resource class %s: annotated with LRA but is missing one or more of {@Complete. @Compensate, @Status}";
 
+    private static Boolean isTrace = Boolean.getBoolean("trace");
+
     private WebTarget target;
     private URI base;
     private Client client;
@@ -616,7 +618,8 @@ public class LRAClient implements LRAClientAPI, Closeable {
     }
 
     private void lraTrace(String reason, URL lra) {
-        System.out.printf("LRAClient: %s: lra: %s%n", reason, lra == null ? "null" : lra);
+        if (isTrace)
+            System.out.printf("LRAClient: %s: lra: %s%n", reason, lra == null ? "null" : lra);
     }
 
     public void close() {

@@ -48,6 +48,7 @@ public class LRAService {
     private Map<URL, Transaction> recoveringTransactions = new ConcurrentHashMap<>();
 
     private static Map<String, String> participants = new ConcurrentHashMap<>();
+    private static Boolean isTrace = Boolean.getBoolean("trace");
 
     @Inject
     LRAClient lraClient;
@@ -231,12 +232,14 @@ public class LRAService {
     }
 
     private void lraTrace(URL lraId, String reason) {
-        if (transactions.containsKey(lraId)) {
-            Transaction lra = transactions.get(lraId);
-            System.out.printf("%s (%s) in state %s: %s%n",
-                    reason, lra.getClientId(), ActionStatus.stringForm(lra.status()), lra.getId());
-        } else {
-            System.out.printf("%s not found: %s%n", reason, lraId);
+        if (isTrace) {
+            if (transactions.containsKey(lraId)) {
+                Transaction lra = transactions.get(lraId);
+                System.out.printf("%s (%s) in state %s: %s%n",
+                        reason, lra.getClientId(), ActionStatus.stringForm(lra.status()), lra.getId());
+            } else {
+                System.out.printf("%s not found: %s%n", reason, lraId);
+            }
         }
     }
 }

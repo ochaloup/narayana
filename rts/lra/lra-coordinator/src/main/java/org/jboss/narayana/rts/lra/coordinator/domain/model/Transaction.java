@@ -62,6 +62,24 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
         status = CompensatorStatus.Active;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Transaction)) return false;
+        if (!super.equals(o)) return false;
+
+        Transaction that = (Transaction) o;
+
+        return getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + getId().hashCode();
+        return result;
+    }
+
     public URL getId() {
         return id;
     }

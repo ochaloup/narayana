@@ -235,6 +235,7 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         if (isLongRunning)
             newLRA = null;
 
+        // store state with the current thread. TODO for the async version use containerRequestContext.setProperty("lra", Current.peek());
         Current.updateLRAContext(lraId, headers); // make the current LRA available to the called method
 
         if (newLRA != null)

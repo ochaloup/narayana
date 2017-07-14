@@ -48,15 +48,19 @@ class FilterBase {
     @Inject
     private LRAClient lraClient;
 
+    private static Boolean isTrace = Boolean.getBoolean("trace");
+
     private boolean hasClient() {
         return lraClient != null && lraClient.isUseable();
     }
 
     protected void lraTrace(ContainerRequestContext context, URL lraId, String reason) {
-        Method method = resourceInfo.getResourceMethod();
-        System.out.printf("%s: container request for method %s: lra: %s%n",
-                reason, method.getDeclaringClass().getName() +"#" + method.getName(),
-                lraId == null ? "context" : lraId);
+        if (isTrace) {
+            Method method = resourceInfo.getResourceMethod();
+            System.out.printf("%s: container request for method %s: lra: %s%n",
+                    reason, method.getDeclaringClass().getName() + "#" + method.getName(),
+                    lraId == null ? "context" : lraId);
+        }
     }
 
     LRAClient getLRAClient(boolean create) {
