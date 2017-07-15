@@ -23,6 +23,7 @@ package org.jboss.narayana.rts.lra.compensator.api;
 
 import javax.enterprise.util.Nonbinding;
 import javax.interceptor.InterceptorBinding;
+import javax.ws.rs.core.Response;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -115,29 +116,17 @@ public @interface LRA {
     boolean longRunning() default false;
 
     /**
-     * The rollbackOn element can be set to indicate exceptions that must cause
-     *  the interceptor to mark the transaction for rollback. Conversely, the dontRollbackOn
-     *  element can be set to indicate exceptions that must not cause the interceptor to mark
-     *  the transaction for rollback. When a class is specified for either of these elements,
-     *  the designated behavior applies to subclasses of that class as well. If both elements
-     *  are specified, dontRollbackOn takes precedence.
-     * @return Class[] of Exceptions
+     * The cancelOnFamily element can be set to indicate which families of HTTP response codes will cause
+     * the LRA to cancel.
+     * @return the {@link Response.Status.Family} families that will cause cancellation of the LRA
      */
-    // TODO array type or annotation type require JEE dependencies
     @Nonbinding
-    Class[] cancelOn() default {};
+    Response.Status.Family[] cancelOnFamily() default {};
 
     /**
-     * The dontRollbackOn element can be set to indicate exceptions that must not cause
-     *  the interceptor to mark the transaction for rollback. Conversely, the rollbackOn element
-     *  can be set to indicate exceptions that must cause the interceptor to mark the transaction
-     *  for rollback. When a class is specified for either of these elements,
-     *  the designated behavior applies to subclasses of that class as well. If both elements
-     *  are specified, dontRollbackOn takes precedence.
-     * @return Class[] of Exceptions
+     * The cancelOn element can be set to indicate which  HTTP response codes will cause the LRA to cancel
+     * @return the {@link Response.Status} HTTP status codes that will cause cancellation of the LRA
      */
-    // TODO array type or annotation type require JEE dependencies
     @Nonbinding
-    Class[] dontCancelOn() default {};
-
+    Response.Status [] cancelOn() default {};
 }

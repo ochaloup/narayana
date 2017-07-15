@@ -476,6 +476,44 @@ public class SpecTest {
         lraClient.closeLRA(new URL(lraHeader.toString()));
     }
 
+    @Test
+    public void cancelOn() {
+        cancelCheck("cancelOn");
+    }
+
+    @Test
+    public void cancelOnFamily() {
+        cancelCheck("cancelOnFamily");
+    }
+
+    private void cancelCheck(String path) {
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+        URL lra = lraClient.startLRA("SpecTest#" + path, 500);
+        Response response = null;
+
+        try {
+            response = msTarget.path("activities")
+                    .path(path)
+                    .request()
+                    .header(LRAClient.LRA_HTTP_HEADER, lra)
+                    .get();
+
+            checkStatusAndClose(response, Response.Status.BAD_REQUEST.getStatusCode(), true);
+
+            // check that compensator was invoked
+            int[] cnt2 = {completedCount(true), completedCount(false)};
+
+            // check that complete was not called and that compensate was
+            assertEquals("complete was called instead of compensate", cnt1[0], cnt2[0]);
+            assertEquals("compensate should have been called", cnt1[1] + 1, cnt2[1]);
+        } finally {
+            if (response != null)
+                response.close();
+
+            assertFalse(lraClient.isActiveLRA(lra));
+        }
+    }
+
     private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
         try {
             if (response.getStatus() != expected)

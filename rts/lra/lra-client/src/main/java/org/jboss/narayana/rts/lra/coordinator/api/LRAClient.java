@@ -561,7 +561,8 @@ public class LRAClient implements LRAClientAPI, Closeable {
         try {
             response = getTarget().path(confirmUrl).request().put(Entity.text(""));
 
-            assertEquals(response, Response.Status.OK.getStatusCode(), response.getStatus(), "LRA finished with an unexpected status code");
+            assertEquals(response, Response.Status.OK.getStatusCode(),
+                    response.getStatus(), "LRA finished with an unexpected status code: " + response.getStatus());
 
             String responseData = response.readEntity(String.class);
 

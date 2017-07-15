@@ -27,6 +27,7 @@ import org.jboss.narayana.rts.lra.compensator.api.Complete;
 import org.jboss.narayana.rts.lra.compensator.api.Leave;
 import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
+import org.jboss.narayana.rts.lra.compensator.api.TimeLimit;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
 import participant.filter.model.Activity;
@@ -56,6 +57,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -246,7 +248,7 @@ public class ActivityController {
     @LRA(LRA.Type.MANDATORY)
     @NestedLRA
     public Response nestedActivity(@HeaderParam(LRA_HTTP_RECOVERY_HEADER) String rcvId,
-                                    @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId) {
+                                   @HeaderParam(LRA_HTTP_HEADER) String nestedLRAId) {
         assert nestedLRAId != null;
         Activity activity = addWork(nestedLRAId, rcvId);
 
@@ -322,6 +324,28 @@ public class ActivityController {
     @LRA(LRA.Type.NOT_SUPPORTED)
     public Response getCompensatedCount() {
         return Response.ok(compensatedCount.get()).build();
+    }
+
+    @GET
+    @Path("/cancelOn")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TimeLimit(limit = 100, unit = TimeUnit.MICROSECONDS)
+    @LRA(value = LRA.Type.REQUIRED, cancelOn = {Response.Status.NOT_FOUND, Response.Status.BAD_REQUEST})
+    public Response cancelOn(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        activityService.add(new Activity(LRAClient.getLRAId(lraId)));
+
+        return Response.status(Response.Status.BAD_REQUEST).entity(Entity.text("Simulate buisiness logic failure")).build();
+    }
+
+    @GET
+    @Path("/cancelOnFamily")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TimeLimit(limit = 100, unit = TimeUnit.MICROSECONDS)
+    @LRA(value = LRA.Type.REQUIRED, cancelOnFamily = {Response.Status.Family.CLIENT_ERROR})
+    public Response cancelOnFamily(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        activityService.add(new Activity(LRAClient.getLRAId(lraId)));
+
+        return Response.status(Response.Status.BAD_REQUEST).entity(Entity.text("Simulate buisiness logic failure")).build();
     }
 
     /**

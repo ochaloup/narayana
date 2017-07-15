@@ -60,6 +60,9 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.STATUS;
 @Provider
 public class ServerLRAFilter extends FilterBase implements ContainerRequestFilter, ContainerResponseFilter {
 
+    private static final String CANCEL_ON_FAMILY_PROP = "CancelOnFamily";
+    private static final String CANCEL_ON_PROP = "CancelOn";
+
     private LRAClient lraClient;
 
 //    private AtomicAction previous = null;
@@ -96,16 +99,20 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
         boolean nested;
         boolean isLongRunning = false;
 
-        if (transactional == null) {
+        if (transactional == null)
             transactional = method.getDeclaringClass().getDeclaredAnnotation(LRA.class);
 
-            if (transactional != null) {
-                type = ((LRA) transactional).value();
-                isLongRunning = ((LRA) transactional).longRunning();
-            }
-        } else {
+        if (transactional != null) {
             type = ((LRA) transactional).value();
             isLongRunning = ((LRA) transactional).longRunning();
+            Response.Status.Family[] cancel0nFamily = ((LRA) transactional).cancelOnFamily();
+            Response.Status[] cancel0n = ((LRA) transactional).cancelOn();
+
+            if (cancel0nFamily.length != 0)
+                containerRequestContext.setProperty(CANCEL_ON_FAMILY_PROP, cancel0nFamily);
+
+            if (cancel0n.length != 0)
+                containerRequestContext.setProperty(CANCEL_ON_PROP, cancel0n);
         }
 
         if (type == null) {
@@ -275,11 +282,36 @@ public class ServerLRAFilter extends FilterBase implements ContainerRequestFilte
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         // a request is leaving the container so clear any context on the thread and fix up the LRA response header
 
+        Object newLRA = Current.getState("newLRA");
+        URL current = Current.peek();
+
         try {
-            Object lra = Current.getState("newLRA");
-            if (lra != null) {
-                lraTrace(requestContext, (URL) lra, "ServerLRAFilter after: closing LRA");
-                lraClient.closeLRA((URL) lra);
+            if (current != null) {
+                int status = responseContext.getStatus();
+                Response.Status.Family[] cancel0nFamily = (Response.Status.Family[]) requestContext.getProperty(CANCEL_ON_FAMILY_PROP);
+                Response.Status[] cancel0n = (Response.Status[]) requestContext.getProperty(CANCEL_ON_PROP);
+                boolean closeCurrent = false;
+
+                if (cancel0nFamily != null)
+                    if (Arrays.stream(cancel0nFamily).anyMatch(f -> Response.Status.Family.familyOf(status) == f))
+                        closeCurrent = true;
+
+                if (cancel0n != null && !closeCurrent)
+                    if (Arrays.stream(cancel0n).anyMatch(f -> status == f.getStatusCode()))
+                        closeCurrent = true;
+
+                if (closeCurrent) {
+                    lraTrace(requestContext, (URL) newLRA, "ServerLRAFilter after: closing LRA becasue http status is " + status);
+                    lraClient.cancelLRA(current);
+
+                    if (current.equals(newLRA))
+                        newLRA = null; // don't try to cancle newKRA twice
+                }
+            }
+
+            if (newLRA != null) {
+                lraTrace(requestContext, (URL) newLRA, "ServerLRAFilter after: closing LRA");
+                lraClient.closeLRA((URL) newLRA);
             }
         } finally {
             Current.updateLRAContext(responseContext.getHeaders());

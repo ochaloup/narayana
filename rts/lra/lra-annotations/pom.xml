@@ -24,11 +24,18 @@
             <groupId>org.jboss.spec.javax.interceptor</groupId>
             <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
             <version>${version.jboss-interceptors}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>${version.cdi-api}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${version.jaxrs-api}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
