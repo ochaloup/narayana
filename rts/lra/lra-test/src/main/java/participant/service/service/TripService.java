@@ -19,18 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.filter.service;
+package participant.service.service;
 
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
-import participant.filter.model.Booking;
-import participant.filter.model.BookingStatus;
+import participant.model.Booking;
+import participant.model.BookingStatus;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;

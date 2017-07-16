@@ -21,13 +21,9 @@
  */
 package participant.demo;
 
-import participant.filter.model.Booking;
+import participant.model.Booking;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class BookingCallback implements InvocationCallback<Booking> {

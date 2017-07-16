@@ -30,9 +30,9 @@ import org.jboss.narayana.rts.lra.compensator.api.Status;
 import org.jboss.narayana.rts.lra.compensator.api.TimeLimit;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
-import participant.filter.model.Activity;
+import participant.model.Activity;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
-import participant.filter.service.ActivityService;
+import participant.service.service.ActivityService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -191,14 +191,14 @@ public class ActivityController {
     }
 
     @PUT
-    @Path("/startviaapi")
+    @Path("/startViaApi")
     @LRA(LRA.Type.NOT_SUPPORTED)
     public Response subActivity(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
         if (lraId != null)
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
 
         // manually start an LRA via the injection LRAClient api
-        URL lra = lraClient.startLRA("subActivity", 0);
+        URL lra = lraClient.startLRA("subActivity", 0L);
 
         lraId = lra.toString();
 
@@ -329,7 +329,6 @@ public class ActivityController {
     @GET
     @Path("/cancelOn")
     @Produces(MediaType.APPLICATION_JSON)
-    @TimeLimit(limit = 100, unit = TimeUnit.MICROSECONDS)
     @LRA(value = LRA.Type.REQUIRED, cancelOn = {Response.Status.NOT_FOUND, Response.Status.BAD_REQUEST})
     public Response cancelOn(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
         activityService.add(new Activity(LRAClient.getLRAId(lraId)));
@@ -340,12 +339,27 @@ public class ActivityController {
     @GET
     @Path("/cancelOnFamily")
     @Produces(MediaType.APPLICATION_JSON)
-    @TimeLimit(limit = 100, unit = TimeUnit.MICROSECONDS)
     @LRA(value = LRA.Type.REQUIRED, cancelOnFamily = {Response.Status.Family.CLIENT_ERROR})
     public Response cancelOnFamily(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
         activityService.add(new Activity(LRAClient.getLRAId(lraId)));
 
         return Response.status(Response.Status.BAD_REQUEST).entity(Entity.text("Simulate buisiness logic failure")).build();
+    }
+
+    @GET
+    @Path("/timeLimit")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TimeLimit(limit = 100, unit = TimeUnit.MILLISECONDS)
+    @LRA(value = LRA.Type.REQUIRED)
+    public Response timeLimit(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        activityService.add(new Activity(LRAClient.getLRAId(lraId)));
+
+        try {
+            Thread.sleep(200); // sleep for 200000 micro seconds (should be longer than specified in the @TimeLimit annotation)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Response.status(Response.Status.OK).entity(Entity.text("Simulate buisiness logic timeoout")).build();
     }
 
     /**

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import participant.demo.FlightController;
 import participant.demo.HotelController;
 import participant.demo.TripController;
-import participant.filter.model.Booking;
+import participant.model.Booking;
 
 import java.io.DataOutputStream;
 import java.io.InputStream;

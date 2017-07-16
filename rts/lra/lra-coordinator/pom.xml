@@ -109,12 +109,6 @@
             <artifactId>swagger</artifactId>
             <version>${version.wildfly-swarm}</version>
         </dependency>
-<!--        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jaxrs</artifactId>
-            <version>1.5.13</version>
-        </dependency>-->
-
 
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>

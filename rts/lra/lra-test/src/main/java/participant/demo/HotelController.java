@@ -25,9 +25,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 
-import participant.filter.model.Booking;
-import participant.filter.model.BookingStatus;
-import participant.filter.service.HotelService;
+import participant.model.Booking;
+import participant.model.BookingStatus;
+import participant.service.service.HotelService;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

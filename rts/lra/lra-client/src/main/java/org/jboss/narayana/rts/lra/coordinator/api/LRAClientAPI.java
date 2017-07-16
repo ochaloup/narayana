@@ -44,7 +44,7 @@ public interface LRAClientAPI {
      *                operation. (optional, default to 0)
      * @throws WebApplicationException Comms error
      */
-    URL startLRA(String clientID, Integer timeout) throws WebApplicationException;
+    URL startLRA(String clientID, Long timeout) throws WebApplicationException;
 
     /**
      *
@@ -57,7 +57,7 @@ public interface LRAClientAPI {
      * @return the id of the new LRA
      * @throws WebApplicationException
      */
-    URL startLRA(URL parentLRA, String clientID, Integer timeout) throws WebApplicationException;
+    URL startLRA(URL parentLRA, String clientID, Long timeout) throws WebApplicationException;
 
     /**
      * Attempt to cancel an LRA
@@ -172,10 +172,10 @@ public interface LRAClientAPI {
      *                  it can forget this LRA.  (optional)
      * @throws WebApplicationException Comms error
      */
-    void joinLRA(URL lraId, Integer timelimit, String body) throws WebApplicationException;
+    void joinLRA(URL lraId, Long timelimit, String body) throws WebApplicationException;
 
     /**
-     * Similar to {@link LRAClientAPI#joinLRA(URL, Integer, String)} but the various compensator urls
+     * Similar to {@link LRAClientAPI#joinLRA(URL, Long, String)} but the various compensator urls
      * are passed in explicitly
      *
      * @param lraId The unique identifier of the LRA (required)
@@ -188,7 +188,7 @@ public interface LRAClientAPI {
      * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
      * @throws WebApplicationException
      */
-    String joinLRA(URL lraId, Integer timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
+    String joinLRA(URL lraId, Long timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
 
     /**
      * A Compensator can resign from the LRA at any time prior to the completion of an activity

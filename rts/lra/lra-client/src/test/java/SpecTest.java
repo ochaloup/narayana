@@ -19,6 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import org.jboss.narayana.rts.lra.coordinator.api.IllegalLRAStateException;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.api.LRAStatus;
 import org.junit.After;
@@ -52,6 +53,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class SpecTest {
+    private static final Long LRA_TIMEOUT_MILLIS = 50000L;
     private static URL MICRSERVICE_BASE_URL;
 
     private static LRAClient lraClient;
@@ -107,16 +109,18 @@ public class SpecTest {
         }
     }
 
+    // TODO add a test for a compensator annotated with @TimeLimit
+
     @Test
     public void startLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#startLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#startLRA", LRA_TIMEOUT_MILLIS);
 
         lraClient.closeLRA(lra);
     }
 
     @Test
     public void cancelLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#cancelLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#cancelLRA", LRA_TIMEOUT_MILLIS);
 
         lraClient.cancelLRA(lra);
 
@@ -127,7 +131,7 @@ public class SpecTest {
 
     @Test
     public void closeLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#closelLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#closelLRA", LRA_TIMEOUT_MILLIS);
 
         lraClient.closeLRA(lra);
 
@@ -138,7 +142,7 @@ public class SpecTest {
 
     @Test
     public void getActiveLRAs() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#getActiveLRAs", 500);
+        URL lra = lraClient.startLRA("SpecTest#getActiveLRAs", LRA_TIMEOUT_MILLIS);
         List<LRAStatus> lras = lraClient.getActiveLRAs();
 
         assertTrue(lras.contains(new LRAStatus(lra)));
@@ -148,7 +152,7 @@ public class SpecTest {
 
     @Test
     public void getAllLRAs() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#getAllLRAs", 500);
+        URL lra = lraClient.startLRA("SpecTest#getAllLRAs", LRA_TIMEOUT_MILLIS);
         List<LRAStatus> lras = lraClient.getAllLRAs();
 
         assertTrue(lras.contains(new LRAStatus(lra)));
@@ -163,7 +167,7 @@ public class SpecTest {
 
     @Test
     public void isActiveLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#isActiveLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isActiveLRA", LRA_TIMEOUT_MILLIS);
 
         assertTrue(lraClient.isActiveLRA(lra));
 
@@ -173,7 +177,7 @@ public class SpecTest {
 //    @Test
     // the coordinator cleans up when canceled
     public void isCompensatedLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#isCompensatedLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isCompensatedLRA", LRA_TIMEOUT_MILLIS);
 
         lraClient.cancelLRA(lra);
 
@@ -183,7 +187,7 @@ public class SpecTest {
 //    @Test
 // the coordinator cleans up when completed
     public void isCompletedLRA() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#isCompletedLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#isCompletedLRA", LRA_TIMEOUT_MILLIS);
 
         lraClient.closeLRA(lra);
 
@@ -205,7 +209,7 @@ public class SpecTest {
 
     @Test
     public void nestedActivity() throws WebApplicationException {
-        URL lra = lraClient.startLRA("SpecTest#nestedActivity", 500);
+        URL lra = lraClient.startLRA("SpecTest#nestedActivity", LRA_TIMEOUT_MILLIS);
 
         Response response = msTarget
                 .path("activities").path("nestedActivity")
@@ -253,7 +257,7 @@ public class SpecTest {
         if (how == CompletionType.mixed && nestedCnt <= 1)
             how = CompletionType.complete;
 
-        URL lra = lraClient.startLRA("SpecTest#multiLevelNestedActivity", 500);
+        URL lra = lraClient.startLRA("SpecTest#multiLevelNestedActivity", LRA_TIMEOUT_MILLIS);
         String lraId = lra.toString();
 
         Response response = msTarget
@@ -362,7 +366,7 @@ public class SpecTest {
     public void joinLRAViaHeader () throws WebApplicationException {
         int cnt1 = completedCount(true);
 
-        URL lra = lraClient.startLRA("SpecTest#joinLRAViaBody", 500);
+        URL lra = lraClient.startLRA("SpecTest#joinLRAViaBody", LRA_TIMEOUT_MILLIS);
 
         Response response = msTarget.path("activities").path("work")
                 .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
@@ -388,7 +392,7 @@ public class SpecTest {
     public void join () throws WebApplicationException {
         List<LRAStatus> lras = lraClient.getActiveLRAs();
         int count = lras.size();
-        URL lra = lraClient.startLRA("SpecTest#join", 500);
+        URL lra = lraClient.startLRA("SpecTest#join", LRA_TIMEOUT_MILLIS);
 
         Response response = msTarget.path("activities").path("work")
                 .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
@@ -403,7 +407,7 @@ public class SpecTest {
     @Test
     public void leaveLRA() throws WebApplicationException {
         int cnt1 = completedCount(true);
-        URL lra = lraClient.startLRA("SpecTest#leaveLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
 
         Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
         checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
@@ -429,7 +433,7 @@ public class SpecTest {
     @Test
     public void leaveLRAViaAPI() throws WebApplicationException {
         int cnt1 = completedCount(true);
-        URL lra = lraClient.startLRA("SpecTest#leaveLRA", 500);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
 
         Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
         checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
@@ -461,7 +465,7 @@ public class SpecTest {
     @Test
     public void dependentLRA() throws WebApplicationException, MalformedURLException {
         // call a method annotated with NOT_SUPPORTED but one which programatically starts an LRA and returns it via a header
-        Response response = msTarget.path("activities").path("startviaapi").request().put(Entity.text(""));
+        Response response = msTarget.path("activities").path("startViaApi").request().put(Entity.text(""));
         // check that the method started an LRA
         Object lraHeader = response.getHeaders().getFirst(LRAClient.LRA_HTTP_HEADER);
 
@@ -488,7 +492,7 @@ public class SpecTest {
 
     private void cancelCheck(String path) {
         int[] cnt1 = {completedCount(true), completedCount(false)};
-        URL lra = lraClient.startLRA("SpecTest#" + path, 500);
+        URL lra = lraClient.startLRA("SpecTest#" + path, LRA_TIMEOUT_MILLIS);
         Response response = null;
 
         try {
@@ -514,9 +518,38 @@ public class SpecTest {
         }
     }
 
+    @Test
+    public void timeLimit() {
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+        Response response = null;
+
+        try {
+            response = msTarget.path("activities")
+                    .path("timeLimit")
+                    .request()
+                    .get();
+
+            checkStatusAndClose(response, -1, true);
+
+            // check that compensator was invoked
+            int[] cnt2 = {completedCount(true), completedCount(false)};
+
+            /*
+             * The call to activities/timeLimit should have started an LRA whch should have timed out
+             * (because the called resource method sleeps for long than the @TimeLimit annotation specifies).
+             * Therefore the it should have compensated:
+             */
+            assertEquals("complete was called instead of compensate", cnt1[0], cnt2[0]);
+            assertEquals("compensate should have been called", cnt1[1] + 1, cnt2[1]);
+        } finally {
+            if (response != null)
+                response.close();
+        }
+    }
+
     private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
         try {
-            if (response.getStatus() != expected)
+            if (expected != -1 && response.getStatus() != expected)
                 throw new WebApplicationException(response);
 
             if (readEntity)

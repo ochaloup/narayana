@@ -5,7 +5,7 @@
    data about the outcome. Closing or cancellng an LRA will produce multiple data items, the
    implementation can return these as a list or as a map keyed by either the LRA url or by the
    compensator url (the later is preferable).
-3) (WARN clashes with "GET on /jfdi-coordinator/active  and /jfdi-coordinator/recovery ..."
+3) (WARN clashes with "GET on /lra-coordinator/active and /lra-coordinator/recovery ..."
  so change spec to /jfdi-coordinator/status/<TxId> instead
 
 

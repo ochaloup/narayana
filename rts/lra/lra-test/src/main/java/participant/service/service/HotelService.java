@@ -19,8 +19,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.filter.model;
+package participant.service.service;
 
-public enum BookingStatus {
-    CONFIRMED, CANCELLED, PROVISIONAL, CONFIRMING, CANCEL_REQUESTED
+import participant.model.Booking;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import java.util.concurrent.CompletableFuture;
+
+@ApplicationScoped
+public class HotelService extends BookingStore {
+    public Booking book(String bid, String hotel, Integer beds) {;
+        Booking booking = new Booking(bid, hotel, beds, "Hotel");
+
+        add(booking);
+
+        return booking;
+    }
+
+    public CompletableFuture<Booking> bookAsync(String bid, String hotel, Integer beds) {
+        return CompletableFuture.supplyAsync(() -> book(bid, hotel, beds));
+    }
 }

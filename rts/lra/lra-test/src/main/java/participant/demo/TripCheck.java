@@ -21,7 +21,7 @@
  */
 package participant.demo;
 
-import participant.filter.model.Booking;
+import participant.model.Booking;
 
 import javax.ws.rs.client.WebTarget;
 

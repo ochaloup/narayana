@@ -55,37 +55,6 @@
                     </execution>
                 </executions>
             </plugin>
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>org.jboss.narayana.rts</groupId>
-                            <artifactId>lra-coordinator</artifactId>
-                            <version>${project.version}</version>
-                            <type>war</type>
-                            <overWrite>false</overWrite>
-                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
-                        </artifactItem>
-                    </artifactItems>
-                    <outputDirectory>${project.build.directory}/wars</outputDirectory>
-                    <overWriteReleases>false</overWriteReleases>
-                    <overWriteSnapshots>true</overWriteSnapshots>
-                </configuration>
-            </plugin>
--->
         </plugins>
     </build>
 
@@ -105,40 +74,6 @@
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>lra-client</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.4</version>
-            <scope>test</scope>
-        </dependency>
-<!--
-        <dependency>
-            <groupId>org.jboss.narayana.rts</groupId>
-            <artifactId>lra-coordinator</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-            <scope>test</scope>
-        </dependency>
--->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly.swarm</groupId>
-            <artifactId>arquillian</artifactId>
-            <version>${version.wildfly-swarm}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>${version.resteasy-client}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

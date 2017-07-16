@@ -19,11 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.filter.service;
+package participant.service.service;
 
-import participant.filter.model.Activity;
+import participant.model.Booking;
+import participant.model.BookingStatus;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -31,26 +31,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
-public class ActivityService {
-    private Map<String, Activity> activities = new HashMap<>();
+public class BookingStore {
+    private Map<String, Booking> bookings = new HashMap<>();
 
-    public Activity getActivity(String txId) throws NotFoundException {
-        if (!activities.containsKey(txId))
-            throw new NotFoundException(Response.status(404).entity("Invalid activity id: " + txId).build());
+    public Booking get(String bookingId) throws NotFoundException {
+        if (!bookings.containsKey(bookingId))
+            throw new NotFoundException(Response.status(404).entity("Invalid bookingId id: " + bookingId).build());
 
-        return activities.get(txId);
+        return bookings.get(bookingId);
     }
 
-    public List<Activity> findAll() {
-        return activities.values().stream().collect(Collectors.toList());
+    public List<Booking> findAll() {
+        return bookings.values().stream().collect(Collectors.toList());
     }
 
-    public void add(Activity activity) {
-        activities.putIfAbsent(activity.id, activity);
+    public Booking add(Booking booking) {
+        return bookings.putIfAbsent(booking.getId(), booking);
     }
 
-    public void remove(String id) {
-        activities.remove(id);
+    public Booking remove(String id) {
+        return bookings.remove(id);
+    }
+
+    public void updateBookingStatus(String bookingId, BookingStatus status) {
+        get(bookingId).setStatus(status);
     }
 }

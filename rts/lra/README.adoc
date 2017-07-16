@@ -6,8 +6,14 @@ mvn clean install
 
 ## View the swagger documentation for the LRA coordinator
 
-By pointing your browser at http://localhost:8080/swagger.json you should see a json representation
-of the API. A pretty version is available via the swagger ui:
+Make sure the LRA coordinator is running:
+
+```bash
+mvn -f lra-coordinator/pom.xml wildfly-swarm:run -DskipTests -Dswarm.http.port=8080
+```
+
+Now point your browser at http://localhost:8080/swagger.json (or use a tool such as curl):
+you should see a json representation of the API. A pretty version is available via the swagger ui:
 
 - copy the output from http://localhost:8080/swagger.json into a local file
 - go to http://editor.swagger.io/#/ and use the file menu to import this file into the UI

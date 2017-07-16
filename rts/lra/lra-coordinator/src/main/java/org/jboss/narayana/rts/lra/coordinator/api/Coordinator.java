@@ -66,7 +66,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_P
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.PARENT_LRA_PARAM_NAME;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMEOUT_PARAM_NAME;
+import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMELIMIT_PARAM_NAME;
 
 @ApplicationScoped
 @Path(COORDINATOR_PATH_NAME)
@@ -78,7 +78,7 @@ public class Coordinator {
     @Context
     private UriInfo context;
 
-    @Inject
+    @Inject // Will not work in an async scenario: CDI-452
     private LRAService lraService;
 
     // Performing a GET on /lra-org.jboss.narayana.rts.lra.coordinator returns a list of all transactions.
@@ -164,9 +164,10 @@ public class Coordinator {
                     + "If the LRA is terminated because of a timeout, the LRA URL is deleted.\n"
                     + "All further invocations on the URL will return 404.\n"
                     + "The invoker can assume this was equivalent to a compensate operation.")
-            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") Integer timelimit,
+            @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") Long timelimit,
             @ApiParam( value = "The enclosing LRA if this new LRA is nested", required = false)
-            @QueryParam(PARENT_LRA_PARAM_NAME) @DefaultValue("") String parentLRA) throws WebApplicationException, InvalidLRAId {
+            @QueryParam(PARENT_LRA_PARAM_NAME) @DefaultValue("") String parentLRA,
+            @HeaderParam(LRA_HTTP_HEADER) String parentId) throws WebApplicationException, InvalidLRAId {
 
         URL parent = null;
 
@@ -359,7 +360,7 @@ public class Coordinator {
                     + " It may therefore be necessary for the application or service to start other activities to explicitly try to compensate this work."
                     + " The application or coordinator may use this information to control the lifecycle of a LRA.",
                     required = true )
-            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") int timeLimit,
+            @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") long timeLimit,
             String compensatorUrl) throws NotFoundException {
         return joinLRA(toURL(lraId), timeLimit, compensatorUrl, linkHeader);
     }
@@ -391,7 +392,7 @@ public class Coordinator {
                     + " It may therefore be necessary for the application or service to start other activities to explicitly try to compensate this work."
                     + " The application or coordinator may use this information to control the lifecycle of a LRA.",
                     required = true )
-            @QueryParam(TIMEOUT_PARAM_NAME) @DefaultValue("0") int timeLimit,
+            @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") int timeLimit,
             @ApiParam( value = "The resource path that the LRA coordinator will use to drive the compensator.\n"
                     + "Performing a GET on the compensator URL will return the current status of the compensator,\n"
                     + "or 404 if the compensator is no longer present.\n"
@@ -414,7 +415,7 @@ public class Coordinator {
         return joinLRA(toURL(lraId), timeLimit, compensatorUrl, null);
     }
 
-    private Response joinLRA(URL lraId, int timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
+    private Response joinLRA(URL lraId, long timeLimit, String compensatorUrl, String linkHeader) throws NotFoundException {
         final String recoveryUrlBase = String.format("http://%s/%s/",
                 context.getRequestUri().getAuthority(), LRAClient.RECOVERY_COORDINATOR_PATH_NAME);
 

@@ -19,25 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.filter.service;
+package participant.service.service;
 
-import participant.filter.model.Booking;
+import participant.model.Booking;
 
 import javax.enterprise.context.ApplicationScoped;
-
 import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
-public class HotelService extends BookingStore {
-    public Booking book(String bid, String hotel, Integer beds) {;
-        Booking booking = new Booking(bid, hotel, beds, "Hotel");
+public class FlightService extends BookingStore {
+    public Booking book(String bid, String flightNumber, Integer seats) {
+        Booking booking = new Booking(bid, flightNumber, seats, "Flight");
 
         add(booking);
 
         return booking;
     }
 
-    public CompletableFuture<Booking> bookAsync(String bid, String hotel, Integer beds) {
-        return CompletableFuture.supplyAsync(() -> book(bid, hotel, beds));
-    }
+    public CompletableFuture<Booking> bookAsync(String bid, String flightNumber, Integer seats) {
+        return CompletableFuture.supplyAsync(() -> book(bid, flightNumber, seats));}
 }

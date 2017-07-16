@@ -29,7 +29,7 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 @Provider
-public class ClientLRARequestFilter extends FilterBase implements ClientRequestFilter {
+public class ClientLRARequestFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext context) throws IOException {
         // NB the following overrides what the caller did with the LRA context header

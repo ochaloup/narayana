@@ -37,20 +37,26 @@ import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resource.Transaction {
+    private final ScheduledExecutorService scheduler;
     private final URL id;
     private final URL parentId; // TODO save_state and restore_state
     private final String clientId;
     private List<LRARecord> pending;
     private CompensatorStatus status; // reuse commpensator states for the LRA
     private List<String> responseData;
+    private LocalTime cancelOn; // TODO make sure this acted upon during restore_state()
 
     public Transaction(String baseUrl, URL parentId, String clientId) throws MalformedURLException {
         super(new Uid());
@@ -58,8 +64,12 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
         this.id = new URL(String.format("%s/%s", baseUrl, get_uid().fileStringForm()));
         this.parentId = parentId;
         this.clientId = clientId;
+        this.cancelOn = null;
 
         status = CompensatorStatus.Active;
+
+        // TODO tasks should return a future to avoid hogging the executor then we can use a pool size of 1
+        scheduler = Executors.newScheduledThreadPool(3);
     }
 
     @Override
@@ -213,7 +223,7 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
         }
     }
 
-    public String enlistParticipant(URL coordinatorUrl, String participantUrl, String recoveryUrlBase) {
+    public String enlistParticipant(URL coordinatorUrl, String participantUrl, String recoveryUrlBase, long timeLimit) {
         LRARecord participant = findLRAParticipant(participantUrl);
 
         if (participant != null)
@@ -226,11 +236,13 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
             deactivate(); // if it fails the superclass will have logged a warning
         }
 
+        if (timeLimit > 0 && coordinatorId != null)
+            scheduleCancelation(() -> {abortCompensator(participantUrl);}, timeLimit);
+
         return coordinatorId;
     }
 
-    public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase,
-                                    String terminateUrl) {
+    public String enlistParticipant(String coordinatorUrl, String participantUrl, String recoveryUrlBase, String terminateUrl) {
         if (findLRAParticipant(participantUrl) != null)
             return null;    // already enlisted
 
@@ -323,5 +335,41 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
             default: // TODO return a more comprehensive mapping between states
                 return 500;
         }
+    }
+
+    public int begin(Long timelimit) {
+        int res = super.begin(); // no timeout because the default timeunit (SECONDS) is too course
+
+        if (res == ActionStatus.RUNNING && timelimit > 0)
+            scheduleCancelation(this::abortLRA, timelimit);
+
+        return res;
+    }
+
+    private void scheduleCancelation(Runnable runnable, Long timelimit) {
+        cancelOn = LocalTime.now().plusNanos(timelimit * 1000000);
+
+        scheduler.schedule(runnable, timelimit, TimeUnit.MILLISECONDS);
+    }
+
+    public int abortLRA() {
+        int status = status();
+
+        // TODO should we return a future to avoid hogging the ScheduledExecutorService
+        if (status == ActionStatus.RUNNING || status == ActionStatus.ABORT_ONLY) {
+            System.out.printf("Cancelling LRA: %s%n", id);
+            return super.abort();
+        }
+
+        return status;
+    }
+
+
+    private void abortCompensator(String participantUrl) {
+        LRARecord p = findLRAParticipant(participantUrl);
+
+        // TODO should we return a future to avoid hogging the ScheduledExecutorService
+        if (p != null)
+            p.topLevelAbort();
     }
 }

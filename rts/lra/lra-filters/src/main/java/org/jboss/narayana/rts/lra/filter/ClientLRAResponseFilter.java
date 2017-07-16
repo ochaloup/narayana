@@ -33,7 +33,7 @@ import java.net.URL;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
 @Provider
-public class ClientLRAResponseFilter extends FilterBase implements ClientResponseFilter {
+public class ClientLRAResponseFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
         Object incomingLRA = responseContext.getHeaders().getFirst(LRA_HTTP_HEADER);

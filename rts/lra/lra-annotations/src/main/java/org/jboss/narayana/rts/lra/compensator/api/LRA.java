@@ -111,20 +111,31 @@ public @interface LRA {
      * end it on exit. For some business activities it is desirable for the action to survive
      * method execution and be completed elsewhere.
      *
-     * @return whether or not newly created LRAs will survive after the method has executed
+     * @return whether or not newly created LRAs will survive after the method has executed.
      */
     boolean longRunning() default false;
 
     /**
+     * Normally if an LRA is present when a bean method is invoked it will not be ended when the method returns.
+     * To override this behaviour use the terminal element to force its' termination
+     *
+     * @return true if pre existing LRAs will be terminated when the bean method finishes.
+     */
+    boolean terminal() default false;
+
+    /**
      * The cancelOnFamily element can be set to indicate which families of HTTP response codes will cause
-     * the LRA to cancel.
+     * the LRA to cancel. By default client errors (4xx codes) and server errors (5xx codes) will result in
+     * cancellation of the LRA.
+     *
      * @return the {@link Response.Status.Family} families that will cause cancellation of the LRA
      */
     @Nonbinding
-    Response.Status.Family[] cancelOnFamily() default {};
+    Response.Status.Family[] cancelOnFamily() default {Response.Status.Family.CLIENT_ERROR, Response.Status.Family.SERVER_ERROR};
 
     /**
      * The cancelOn element can be set to indicate which  HTTP response codes will cause the LRA to cancel
+     *
      * @return the {@link Response.Status} HTTP status codes that will cause cancellation of the LRA
      */
     @Nonbinding

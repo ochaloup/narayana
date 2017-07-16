@@ -24,9 +24,9 @@ package participant.demo;
 import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
 import org.jboss.narayana.rts.lra.compensator.api.LRA;
 import org.jboss.narayana.rts.lra.compensator.api.Status;
-import participant.filter.model.Booking;
-import participant.filter.model.BookingStatus;
-import participant.filter.service.TripService;
+import participant.model.Booking;
+import participant.model.BookingStatus;
+import participant.service.service.TripService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

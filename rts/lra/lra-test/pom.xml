@@ -56,35 +56,13 @@
             <artifactId>microprofile</artifactId>
         </dependency>
 
-        <!-- LRA annotations -->
-        <dependency>
-            <groupId>org.jboss.narayana.rts</groupId>
-            <artifactId>lra-annotations</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- LRA JAXRS filters -->
+         <!-- LRA JAXRS filters -->
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>lra-filters</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${version.junit}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!--
-<dependency>
-    <groupId>org.jboss.resteasy</groupId>
-    <artifactId>resteasy-jackson-provider</artifactId>
-    <version>${version.resteasy-client}</version>
-</dependency>
-org.jboss.resteasy.plugins.providers.jackson.ResteasyJacksonProvider
--->
         <!-- JAXRS 2 Client API implementation -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>

@@ -112,19 +112,36 @@ public class LRAService {
         return participants.get(rcvCoordId);
     }
 
-    public synchronized URL startLRA(String baseUri, URL parentLRA, String clientId, Integer timelimit) {
-        Transaction lra = null;
+    public synchronized URL startLRA(String baseUri, URL parentLRA, String clientId, Long timelimit) {
+        Transaction lra;
+//        long timeout;
+
         try {
             lra = new Transaction(baseUri, parentLRA, clientId);
         } catch (MalformedURLException e) {
             throw new InvalidLRAId(baseUri, "Invalid base uri", e);
         }
 
-        if (timelimit < 0)
-            timelimit = 0;
-
         if (lra.currentLRA() != null)
             System.out.printf("WARNING LRA %s is already associated");
+
+        // AtomicAction uses seconds for timeouts
+/*        if (timelimit <= 0)
+            timeout = 0; // no timeout
+        } else if (timelimit < 1000) {
+            timeout = 1; // 1 second
+        } else {
+            long ltl = timelimit / 1000; // round down millis to the nearest second
+
+
+            if (ltl > Integer.MAX_VALUE) {
+                System.out.printf("WARNING LRA %s requested timeout is bigger than Integer.MAX_VALUE seconds, rounding down");
+                ltl = Integer.MAX_VALUE;
+            }
+
+            timeout = (int) ltl;
+        }*/
+
 
         int status = lra.begin(timelimit);
 
@@ -189,7 +206,8 @@ public class LRAService {
         }
     }
 
-    public synchronized int joinLRA(StringBuilder recoveryUrl, URL lra, int timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
+    // TODO return a jax-rs Response
+    public synchronized int joinLRA(StringBuilder recoveryUrl, URL lra, long timeLimit, String compensatorUrl, String linkHeader, String recoveryUrlBase) {
         if (lra ==  null)
             lraTrace(null, "Error missing LRA header in join request");
 
@@ -207,18 +225,12 @@ public class LRAService {
         if (!transaction.isActive())
             return Response.Status.PRECONDITION_FAILED.getStatusCode();
 
-        String recoveryURL;
+        String recoveryURL = transaction.enlistParticipant(lra,
+                linkHeader != null ? linkHeader : compensatorUrl, recoveryUrlBase,
+                timeLimit);
 
-//        if (coordinatorUrl.endsWith("/"))
-//            coordinatorUrl = coordinatorUrl.substring(0, coordinatorUrl.length() - 1);
-
-        if (linkHeader != null)
-            recoveryURL = transaction.enlistParticipant(lra, linkHeader, recoveryUrlBase);
-        else
-            recoveryURL = transaction.enlistParticipant( lra, compensatorUrl, recoveryUrlBase);
-
-        if (recoveryURL == null)
-            return Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+        if (recoveryURL == null) // probably already closing or cancelling
+            return Response.Status.PRECONDITION_FAILED.getStatusCode();
 
         addCompensator(transaction, recoveryURL, compensatorUrl);
 

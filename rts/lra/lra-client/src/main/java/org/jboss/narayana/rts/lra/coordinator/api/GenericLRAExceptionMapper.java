@@ -19,23 +19,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.filter.service;
+package org.jboss.narayana.rts.lra.coordinator.api;
 
-import participant.filter.model.Booking;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-import javax.enterprise.context.ApplicationScoped;
-import java.util.concurrent.CompletableFuture;
-
-@ApplicationScoped
-public class FlightService extends BookingStore {
-    public Booking book(String bid, String flightNumber, Integer seats) {
-        Booking booking = new Booking(bid, flightNumber, seats, "Flight");
-
-        add(booking);
-
-        return booking;
+@Provider
+public class GenericLRAExceptionMapper implements ExceptionMapper<GenericLRAException> {
+    @Override
+    public Response toResponse(GenericLRAException exception) {
+        return Response.status(exception.getStatusCode())
+                .entity(String.format("%s: %s", exception.getLraId() != null
+                        ? exception.getLraId()
+                        : "not present", exception.getMessage())).build();
     }
-
-    public CompletableFuture<Booking> bookAsync(String bid, String flightNumber, Integer seats) {
-        return CompletableFuture.supplyAsync(() -> book(bid, flightNumber, seats));}
 }
