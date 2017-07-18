@@ -21,7 +21,6 @@
  */
 package org.jboss.narayana.rts.lra.coordinator.api;
 
-import javax.ws.rs.WebApplicationException;
 import java.net.URL;
 import java.util.List;
 
@@ -42,9 +41,9 @@ public interface LRAClientAPI {
      *                terminated because of a timeout, the LRA URL is deleted. All further invocations
      *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
      *                operation. (optional, default to 0)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    URL startLRA(String clientID, Long timeout) throws WebApplicationException;
+    URL startLRA(String clientID, Long timeout) throws GenericLRAException;
 
     /**
      *
@@ -55,9 +54,9 @@ public interface LRAClientAPI {
      *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
      *                operation. (optional, default to 0)
      * @return the id of the new LRA
-     * @throws WebApplicationException
+     * @throws GenericLRAException
      */
-    URL startLRA(URL parentLRA, String clientID, Long timeout) throws WebApplicationException;
+    URL startLRA(URL parentLRA, String clientID, Long timeout) throws GenericLRAException;
 
     /**
      * Attempt to cancel an LRA
@@ -72,9 +71,9 @@ public interface LRAClientAPI {
      *         for nested LRA the API implementation will combine compensator data into a
      *         JSON encoded array. This means that compensators MUST not return any data
      *         that starts with the JSON array start token (ie a '[' character)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    String cancelLRA(URL lraId) throws WebApplicationException;
+    String cancelLRA(URL lraId) throws GenericLRAException;
 
     /**
      * Attempt to close an LRA
@@ -89,16 +88,16 @@ public interface LRAClientAPI {
      *         for nested LRA the API implementation will combine compensator data into a
      *         JSON encoded array. This means that compensators MUST not return any data
      *         that starts with the JSON array start token (ie a '[' character)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    String closeLRA(URL lraId) throws WebApplicationException;
+    String closeLRA(URL lraId) throws GenericLRAException;
 
     /**
      * Lookup active LRAs
      * 
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    List<LRAStatus> getActiveLRAs() throws WebApplicationException;
+    List<LRAStatus> getActiveLRAs() throws GenericLRAException;
 
     /**
      * Returns all LRAs
@@ -106,42 +105,42 @@ public interface LRAClientAPI {
      * Gets both active and recovering LRAs
      *
      * @return List<LRA>
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    List<LRAStatus> getAllLRAs() throws WebApplicationException;
+    List<LRAStatus> getAllLRAs() throws GenericLRAException;
 
     /**
      * List recovering Long Running Actions
      *
      * Returns LRAs that are recovering (ie some compensators still need to be ran)
      *
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    List<LRAStatus> getRecoveringLRAs() throws WebApplicationException;
+    List<LRAStatus> getRecoveringLRAs() throws GenericLRAException;
 
     /**
      * Indicates whether an LRA is active
      * 
      * @param lraId The unique identifier of the LRA (required)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    Boolean isActiveLRA(URL lraId) throws WebApplicationException;
+    Boolean isActiveLRA(URL lraId) throws GenericLRAException;
 
     /**
      * Indicates whether an LRA was compensated
      * 
      * @param lraId The unique identifier of the LRA (required)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    Boolean isCompensatedLRA(URL lraId) throws WebApplicationException;
+    Boolean isCompensatedLRA(URL lraId) throws GenericLRAException;
 
     /**
      * Indicates whether an LRA is complete
      * 
      * @param lraId The unique identifier of the LRA (required)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    Boolean isCompletedLRA(URL lraId) throws WebApplicationException;
+    Boolean isCompletedLRA(URL lraId) throws GenericLRAException;
 
     /**
      * A Compensator can join with the LRA at any time prior to the completion of an activity
@@ -170,9 +169,9 @@ public interface LRAClientAPI {
      *                     the work that was done within the scope of the LRA.
      *                     Performing a POST on URL/complete will cause the compensator to tidy up and
      *                  it can forget this LRA.  (optional)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    void joinLRA(URL lraId, Long timelimit, String body) throws WebApplicationException;
+    void joinLRA(URL lraId, Long timelimit, String body) throws GenericLRAException;
 
     /**
      * Similar to {@link LRAClientAPI#joinLRA(URL, Long, String)} but the various compensator urls
@@ -186,18 +185,18 @@ public interface LRAClientAPI {
      * @param completeUrl Performing a POST on this URL  will cause the participant to tidy up and it can forget this transaction.
      * @param leaveUrl Performing a PUT on this URL with cause the compensator to leave the LRA
      * @param statusUrl Performing a GET on this URL will return the status of the compensator {@see joinLRA}
-     * @throws WebApplicationException
+     * @throws GenericLRAException
      */
-    String joinLRA(URL lraId, Long timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws WebApplicationException;
+    String joinLRA(URL lraId, Long timelimit, String compensateUrl, String completeUrl, String leaveUrl, String statusUrl) throws GenericLRAException;
 
     /**
      * A Compensator can resign from the LRA at any time prior to the completion of an activity
      * 
      * @param lraId The unique identifier of the LRA (required)
      * @param body  (optional)
-     * @throws WebApplicationException Comms error
+     * @throws GenericLRAException Comms error
      */
-    void leaveLRA(URL lraId, String body) throws WebApplicationException;
+    void leaveLRA(URL lraId, String body) throws GenericLRAException;
 
     /**
      * checks whether there is an LRA associated with the calling thread

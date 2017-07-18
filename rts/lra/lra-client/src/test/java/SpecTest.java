@@ -568,7 +568,7 @@ public class SpecTest {
         try {
             response = msTarget.path("activities").path(path).request().get();
 
-            assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             return Integer.parseInt(response.readEntity(String.class));
         } finally {
