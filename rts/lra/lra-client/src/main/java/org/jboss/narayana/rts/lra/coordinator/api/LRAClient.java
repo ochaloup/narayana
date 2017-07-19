@@ -62,6 +62,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -673,6 +674,6 @@ public class LRAClient implements LRAClientAPI, Closeable {
     }
 
     public List<String> getResponseData(URL lraId) {
-        return responseDataMap.get(lraId);
+        return responseDataMap.containsKey(lraId) ? responseDataMap.get(lraId) : Collections.emptyList();
     }
 }

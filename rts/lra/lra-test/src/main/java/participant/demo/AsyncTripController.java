@@ -64,7 +64,7 @@ import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEAD
 @Path(AsyncTripController.TRIP_PATH)
 @LRA(LRA.Type.SUPPORTS)
 public class AsyncTripController {
-    public static final String TRIP_PATH = "/trip";
+    public static final String TRIP_PATH = "/asynctrip";
 
     private Client hotelClient;
     private Client flightClient;
@@ -114,7 +114,7 @@ public class AsyncTripController {
      * @param flightSeats number of people flying
      */
     @POST
-    @Path("/bookasync")
+    @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
     // longRunning because we want the LRA to be associated with a booking until the user confirms the booking
     @LRA(value = LRA.Type.REQUIRED, longRunning = true)

@@ -68,6 +68,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
 
     private static final String CANCEL_ON_FAMILY_PROP = "CancelOnFamily";
     private static final String CANCEL_ON_PROP = "CancelOn";
+    private static final String TERMINAL_LRA_PROP = "terminateLRA";
 
     private static Boolean isTrace = Boolean.getBoolean("trace");
 
@@ -117,6 +118,9 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
             isLongRunning = ((LRA) transactional).longRunning();
             Response.Status.Family[] cancel0nFamily = ((LRA) transactional).cancelOnFamily();
             Response.Status[] cancel0n = ((LRA) transactional).cancelOn();
+
+            if (((LRA) transactional).terminal())
+                containerRequestContext.setProperty(TERMINAL_LRA_PROP, Boolean.TRUE);
 
             if (cancel0nFamily.length != 0)
                 containerRequestContext.setProperty(CANCEL_ON_FAMILY_PROP, cancel0nFamily);
@@ -301,7 +305,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
                 int status = responseContext.getStatus();
                 Response.Status.Family[] cancel0nFamily = (Response.Status.Family[]) requestContext.getProperty(CANCEL_ON_FAMILY_PROP);
                 Response.Status[] cancel0n = (Response.Status[]) requestContext.getProperty(CANCEL_ON_PROP);
-                boolean closeCurrent = false;
+                Boolean closeCurrent = (Boolean) requestContext.getProperty(TERMINAL_LRA_PROP);
 
                 if (cancel0nFamily != null)
                     if (Arrays.stream(cancel0nFamily).anyMatch(f -> Response.Status.Family.familyOf(status) == f))
@@ -311,7 +315,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
                     if (Arrays.stream(cancel0n).anyMatch(f -> status == f.getStatusCode()))
                         closeCurrent = true;
 
-                if (closeCurrent) {
+                if (closeCurrent != null && closeCurrent) {
                     lraTrace(requestContext, (URL) newLRA, "ServerLRAFilter after: closing LRA becasue http status is " + status);
                     lraClient.cancelLRA(current);
 

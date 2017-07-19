@@ -43,11 +43,17 @@ public class TripClient {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
+    private static void initClient() {
+        PRIMARY_SERVER = "http://localhost:8081";
+        TRIP_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, TripController.TRIP_PATH);
+        HOTEL_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, HotelController.HOTEL_PATH);
+        FLIGHT_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, FlightController.FLIGHT_PATH);
+    }
+
     public static void main(String[] args) throws Exception {
         initClient();
         TripClient tripClient = new TripClient();
 
-//        tripClient.postRequestAsJson(new URL("http://localhost:8081/trip/book?hotelName=Rex&flightNumber=BA123"), "");
         Booking booking = tripClient.bookTrip("TheGrand", 2, "BA123", "RH456", 2);
 
         if (booking == null)
@@ -64,21 +70,14 @@ public class TripClient {
         Arrays.stream(booking.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
 
         Booking confirmation = (args.length > 0 && args[0].equals("cancel"))
-                    ? tripClient.completeBooking(booking, "compensate")
-                    : tripClient.completeBooking(booking, "complete");
+                    ? tripClient.cancel(booking)
+                    : tripClient.confirm(booking);
 
         System.out.printf("%nBooking confirmation:%n\t%s%n", confirmation);
         Arrays.stream(confirmation.getDetails()).forEach(b -> System.out.printf("\t%s%n", b));
     }
 
-    private static void initClient() {
-        PRIMARY_SERVER = "http://localhost:8081";
-        TRIP_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, TripController.TRIP_PATH);
-        HOTEL_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, HotelController.HOTEL_PATH);
-        FLIGHT_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, FlightController.FLIGHT_PATH);
-    }
-
-    public Booking bookTrip(String hotelName, Integer hotelGuests,
+    private Booking bookTrip(String hotelName, Integer hotelGuests,
                             String flightNumber, String altFlightNumber, Integer flightSeats) throws Exception {
         StringBuilder tripRequest =
                 new StringBuilder(TRIP_SERVICE_BASE_URL)
@@ -99,19 +98,11 @@ public class TripClient {
     }
 
     private Booking confirm(Booking booking) throws Exception {
-        URL confirmURL = new URL(TRIP_SERVICE_BASE_URL +"/complete");
-        String jsonBody = objectMapper.writeValueAsString(booking);
-        String confirmation = updateResource(confirmURL, "PUT", jsonBody);
-
-        return objectMapper.readValue(confirmation, Booking.class);
+        return completeBooking(booking, "complete");
     }
 
     private Booking cancel(Booking booking) throws Exception {
-        URL confirmURL = new URL(TRIP_SERVICE_BASE_URL +"/compensate");
-        String jsonBody = objectMapper.writeValueAsString(booking);
-        String confirmation = updateResource(confirmURL, "PUT", jsonBody);
-
-        return objectMapper.readValue(confirmation, Booking.class);
+        return completeBooking(booking, "compensate");
     }
 
     private Booking completeBooking(Booking booking, String how) throws Exception {
@@ -142,7 +133,7 @@ public class TripClient {
                 String res = responseScanner.hasNext()? responseScanner.next() : null;
 
                 if (res != null && responseCode >= 400) {
-                    System.out.printf(res);
+                    System.out.println(res);
 
                     return null;
                 }
