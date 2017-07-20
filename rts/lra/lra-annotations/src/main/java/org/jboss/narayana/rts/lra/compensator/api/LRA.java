@@ -113,7 +113,7 @@ public @interface LRA {
      *
      * @return whether or not newly created LRAs will survive after the method has executed.
      */
-    boolean longRunning() default false;
+    boolean delayClose() default false;
 
     /**
      * Normally if an LRA is present when a bean method is invoked it will not be ended when the method returns.

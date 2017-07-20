@@ -48,7 +48,7 @@ public class TripService extends BookingStore{
 
         if (tripBooking.getStatus() == BookingStatus.CANCEL_REQUESTED)
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Trying to confirm a tripBooking which needs to be cancelled")
+                    .entity("Trying to setConfirmed a tripBooking which needs to be cancelled")
                     .build());
 
         Booking prev = add(tripBooking);
@@ -56,17 +56,17 @@ public class TripService extends BookingStore{
         if (prev != null)
             System.out.printf("Seen this tripBooking before%n");
 
-        // check the booking to see if the client wants to cancel any dependent bookings
+        // check the booking to see if the client wants to requestCancel any dependent bookings
         Arrays.stream(tripBooking.getDetails()).filter(Booking::isCancelPending).forEach(b -> {
             lraClient.cancelLRA(LRAClient.lraToURL(b.getId(), "Invalid " + b.getType() + " tripBooking id format"));
             b.setCanceled();
         });
 
-        tripBooking.confirmirming();
+        tripBooking.setConfirming();
 
         lraClient.closeLRA(LRAClient.lraToURL(tripBooking.getId()));
 
-        tripBooking.confirm();
+        tripBooking.setConfirmed();
 
         return mergeBookingResponse(tripBooking);
     }
@@ -76,14 +76,14 @@ public class TripService extends BookingStore{
                 booking.getId(), booking.getName(), booking.getStatus());
 
         if (booking.getStatus() != BookingStatus.CANCEL_REQUESTED && booking.getStatus() != BookingStatus.PROVISIONAL)
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("To late to cancel booking").build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("To late to requestCancel booking").build());
 
         Booking prev = add(booking);
 
         if (prev != null)
             System.out.printf("Seen this booking before%n");
 
-        booking.cancel();
+        booking.requestCancel();
 
         lraClient.cancelLRA(LRAClient.lraToURL(booking.getId(), "Invalid trip booking id format"));
 
@@ -103,10 +103,10 @@ public class TripService extends BookingStore{
                 .map(Booking::fromJson)
                 .collect(Collectors.toMap(Booking::getId, Function.identity()));
 
-        // update tripBooking with bookings returned in the data returned from the trip confirm request
+        // update tripBooking with bookings returned in the data returned from the trip setConfirmed request
         Arrays.stream(tripBooking.getDetails()) // the array of bookings in this trip booking
                 .filter(b -> bookings.containsKey(b.getId())) // pick out bookings for which we have updated data
-                .forEach(b -> b.merge(bookings.get(b.getId()))); // merge in the changes (returned from the confirm request)
+                .forEach(b -> b.merge(bookings.get(b.getId()))); // merge in the changes (returned from the setConfirmed request)
 
         return tripBooking;
     }

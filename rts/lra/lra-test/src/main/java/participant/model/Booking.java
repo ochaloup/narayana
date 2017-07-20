@@ -35,12 +35,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 public class Booking {
-    private AtomicLong nextBid = new AtomicLong(0);
-
     @JsonProperty("id") private String id;
     @JsonProperty("name") private String name;
     @JsonProperty("quantity") private Integer quantity;
@@ -81,22 +78,8 @@ public class Booking {
         IntStream.range(0, details.length).forEach(i -> details[i] = new Booking(booking.getDetails()[i]));
     }
 
-/*    public Booking(String id, String type, Booking... bookings) {
-        detailSb.append(bookings.length).append(RECORD_SEPARATOR);
-
-        // TOTO use a json string instead
-        Arrays.stream(bookings).forEach(b -> {
-            if (b != null)
-                detailSb
-                        .append(b.getId()).append(RECORD_SEPARATOR)
-                        .append(b.getName()).append(RECORD_SEPARATOR)
-                        .append(b.getQuantity()).append(RECORD_SEPARATOR);
-        });*/
-
-
-
     private void init(String id, String name, Integer quantity, String type, BookingStatus status, Booking[] details) {
-        this.id = id == null ? Long.valueOf(nextBid.incrementAndGet()).toString() : id;
+        this.id = id;
         this.name = name == null ? "" : name;
         this.quantity = quantity;
         this.type = type == null ? "" : type;
@@ -135,11 +118,11 @@ public class Booking {
         return status;
     }
 
-    public void cancel() {
+    public void requestCancel() {
         status = BookingStatus.CANCEL_REQUESTED;
     }
 
-    public void confirm() {
+    public void setConfirmed() {
         status = BookingStatus.CONFIRMED;
     }
 
@@ -152,7 +135,7 @@ public class Booking {
         status = BookingStatus.CANCELLED;
     }
 
-    public void confirmirming() {
+    public void setConfirming() {
         status = BookingStatus.CONFIRMING;
     }
 
@@ -192,26 +175,8 @@ public class Booking {
     }
 
     public static Booking fromJson(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-
         try {
-/*            if (json.startsWith("[")) {
-                *//*
-                 * it's an encoded array so it is either
-                 * - from a nested compensator (so the array holds data for multiple compensators
-                 * - from a single compensator that has encoded array data
-                 * For now we tell compensators not to encode data as an array (though they can produce
-                 * a JSON object that itself contains arrays) {@link
-                 *//*
-
-
-                String[] ja = mapper.readValue(json, String[].class);
-
-                if (ja.length == 0)
-                    throw new IOException("Invalid json array: " + json);
-                return mapper.readValue(ja[0], Booking.class);
-            }*/
-            return mapper.readValue(json, Booking.class);
+            return new ObjectMapper().readValue(json, Booking.class);
         } catch (IOException e) {
             return new Booking(e);
         }

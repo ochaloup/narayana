@@ -116,8 +116,8 @@ public class AsyncTripController {
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
-    // longRunning because we want the LRA to be associated with a booking until the user confirms the booking
-    @LRA(value = LRA.Type.REQUIRED, longRunning = true)
+    // delayClose because we want the LRA to be associated with a booking until the user confirms the booking
+    @LRA(value = LRA.Type.REQUIRED, delayClose = true)
     public void bookTripAsync(@Suspended final AsyncResponse asyncResponse,
                               @HeaderParam(LRA_HTTP_HEADER) String lraId,
                               @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,

@@ -55,6 +55,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COMPENSATE;
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COMPLETE;
@@ -115,7 +116,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
 
         if (transactional != null) {
             type = ((LRA) transactional).value();
-            isLongRunning = ((LRA) transactional).longRunning();
+            isLongRunning = ((LRA) transactional).delayClose();
             Response.Status.Family[] cancel0nFamily = ((LRA) transactional).cancelOnFamily();
             Response.Status[] cancel0n = ((LRA) transactional).cancelOn();
 
@@ -353,7 +354,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
 //        getLRAClient(true);
         String clientId = method.getDeclaringClass().getName() +"#" + method.getName();
 
-        return lraClient.startLRA(parentLRA, clientId, timeout);
+        return lraClient.startLRA(parentLRA, clientId, timeout, TimeUnit.MILLISECONDS);
     }
 
     private void resumeTransaction(URL lraId) {

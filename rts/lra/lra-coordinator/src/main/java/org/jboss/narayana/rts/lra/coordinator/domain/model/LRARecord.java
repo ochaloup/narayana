@@ -41,9 +41,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
 
@@ -62,6 +67,8 @@ public class LRARecord extends AbstractRecord implements Comparable {
     private boolean isFailed;
 
     private String responseData;
+    private LocalTime cancelOn; // TODO make sure this acted upon during restore_state()
+    private ScheduledFuture<?> scheduledAbort;
 
     LRARecord(String lraId, String coordinatorURI, String linkURI) {
         super(new Uid());
@@ -178,6 +185,12 @@ public class LRARecord extends AbstractRecord implements Comparable {
         // put to completeURI
         URL endPath;
         Client client = null;
+
+        if (scheduledAbort != null) {
+            // NB this could have been called from the scheduler so don't cancel our self!
+            scheduledAbort.cancel(false);
+            scheduledAbort = null;
+        }
 
         if (compensate) {
             if (isCompensated())
@@ -393,4 +406,24 @@ public class LRARecord extends AbstractRecord implements Comparable {
         return 0;
     }
 
+    public void setTimeLimit(ScheduledExecutorService scheduler, long timeLimit) {
+        scheduleCancelation(this::topLevelAbort, scheduler, timeLimit);
+    }
+
+    private int scheduleCancelation(Runnable runnable, ScheduledExecutorService scheduler, Long timeLimit) {
+        if ((scheduledAbort != null && !scheduledAbort.cancel(false)))
+            return Response.Status.PRECONDITION_FAILED.getStatusCode();
+
+        if (timeLimit > 0) {
+            cancelOn = LocalTime.now().plusNanos(timeLimit * 1000000);
+
+            scheduledAbort = scheduler.schedule(runnable, timeLimit, TimeUnit.MILLISECONDS);
+        } else {
+            cancelOn = null;
+
+            scheduledAbort = null;
+        }
+
+        return Response.Status.OK.getStatusCode();
+    }
 }

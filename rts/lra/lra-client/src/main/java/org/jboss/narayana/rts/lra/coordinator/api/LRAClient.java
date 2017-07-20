@@ -66,6 +66,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RequestScoped
 public class LRAClient implements LRAClientAPI, Closeable {
@@ -97,6 +98,8 @@ public class LRAClient implements LRAClientAPI, Closeable {
     private static final String confirmFormat = "/%s/close";
     private static final String compensateFormat = "/%s/cancel";
     private static final String leaveFormat = "/%s/remove";
+    private static final String renewFormat = "/%s/renew";
+
 
     private static final String MISSING_ANNOTATION_FORMAT =
             "Cannot enlist resource class %s: annotated with LRA but is missing one or more of {@Complete. @Compensate, @Status}";
@@ -220,11 +223,11 @@ public class LRAClient implements LRAClientAPI, Closeable {
 
     @Override
     public URL startLRA(String clientID, Long timeout) throws GenericLRAException {
-        return startLRA(null, clientID, timeout);
+        return startLRA(null, clientID, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public URL startLRA(URL parentLRA, String clientID, Long timeout) throws GenericLRAException {
+    public URL startLRA(URL parentLRA, String clientID, Long timeout, TimeUnit unit) throws GenericLRAException {
         Response response = null;
         URL lra;
 
@@ -244,7 +247,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
             aquireConnection();
 
             response = getTarget().path(startLRAUrl)
-                    .queryParam(TIMELIMIT_PARAM_NAME, timeout)
+                    .queryParam(TIMELIMIT_PARAM_NAME, unit.toMillis(timeout))
                     .queryParam(CLIENT_ID_PARAM_NAME, clientID)
                     .queryParam(PARENT_LRA_PARAM_NAME, encodedParentLRA)
                     .request()
@@ -281,6 +284,28 @@ public class LRAClient implements LRAClientAPI, Closeable {
 //        isActiveLRA(lra);
 
         return lra;
+    }
+
+    @Override
+    public void renewTimeLimit(URL lraId, long limit, TimeUnit unit) {
+        Response response = null;
+
+        lraTrace("leaving LRA", lraId);
+
+        try {
+            aquireConnection();
+
+            response = getTarget().path(String.format(renewFormat, getLRAId(lraId.toString())))
+                    .queryParam(TIMELIMIT_PARAM_NAME, unit.toMillis(limit))
+                    .request()
+                    .header(LRA_HTTP_HEADER, lraId)
+                    .put(Entity.text(""));
+
+            if (Response.Status.OK.getStatusCode() != response.getStatus())
+                throw new GenericLRAException(lraId, response.getStatus(), "", null);
+        } finally {
+            releaseConnection(response);
+        }
     }
 
     @Override

@@ -112,8 +112,8 @@ public class TripController extends Compensator {
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
-    // longRunning because we want the LRA to be associated with a booking until the user confirms the booking
-    @LRA(value = LRA.Type.REQUIRED, longRunning = true)
+    // delayClose because we want the LRA to be associated with a booking until the user confirms the booking
+    @LRA(value = LRA.Type.REQUIRED, delayClose = true)
     public Response bookTrip( @HeaderParam(LRA_HTTP_HEADER) String lraId,
                               @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
                               @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,

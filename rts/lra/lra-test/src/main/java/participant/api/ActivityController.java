@@ -362,6 +362,29 @@ public class ActivityController {
         return Response.status(Response.Status.OK).entity(Entity.text("Simulate buisiness logic timeoout")).build();
     }
 
+    @GET
+    @Path("/renewTimeLimit")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TimeLimit(limit = 100, unit = TimeUnit.MILLISECONDS)
+    @LRA(value = LRA.Type.REQUIRED)
+    public Response extendTimeLimit(@HeaderParam(LRA_HTTP_HEADER) String lraId) {
+        activityService.add(new Activity(LRAClient.getLRAId(lraId)));
+
+        try {
+            /*
+             * the incomming LRA was created with a timeLimit of 100 ms via the @TimeLimit annotation
+             * update the timeLimit to 300
+             * sleep for 200
+             * return from the method so the LRA will have been running for 200 ms so it should not be cancelled
+             */
+            lraClient.renewTimeLimit(LRAClient.lraToURL(lraId), 300, TimeUnit.MILLISECONDS);
+            Thread.sleep(200); // sleep for 200000 micro seconds (should be longer than specified in the @TimeLimit annotation)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Response.status(Response.Status.OK).entity(Entity.text("Simulate buisiness logic timeoout")).build();
+    }
+
     /**
      * Performing a POST on <compensator URL>/compensate will cause the participant to compensate
      * the work that was done within the scope of the transaction.

@@ -254,4 +254,13 @@ public class LRAService {
             }
         }
     }
+
+    public int renewTimeLimit(URL lraId, Long timelimit) {
+        Transaction lra = transactions.get(lraId);
+
+        if (lra == null)
+            return Response.Status.PRECONDITION_FAILED.getStatusCode();
+
+        return lra.setTimeLimit(timelimit);
+    }
 }

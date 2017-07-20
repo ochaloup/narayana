@@ -59,10 +59,10 @@ public class TripClient {
         if (booking == null)
             return;
 
-        // cancel the first flight found (and use the second one)
+        // requestCancel the first flight found (and use the second one)
         Optional<Booking> firstFlight = Arrays.stream(booking.getDetails()).filter(b -> "Flight".equals(b.getType())).findFirst();
 
-        firstFlight.ifPresent(Booking::cancel);
+        firstFlight.ifPresent(Booking::requestCancel);
 
         System.out.printf("%nBooking Info:%n\t%s%n", booking);
         System.out.printf("Associated Bookings:%n");

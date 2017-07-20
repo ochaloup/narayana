@@ -160,7 +160,7 @@ public class Coordinator {
     public Response startLRA(
             @ApiParam( value = "Each client is expected to have a unique identity (which can be a URL).", required = false)
             @QueryParam(CLIENT_ID_PARAM_NAME) @DefaultValue("") String clientId,
-            @ApiParam( value = "Specifies the maximum time in seconds that the LRA will exist for.\n"
+            @ApiParam( value = "Specifies the maximum time in milli seconds that the LRA will exist for.\n"
                     + "If the LRA is terminated because of a timeout, the LRA URL is deleted.\n"
                     + "All further invocations on the URL will return 404.\n"
                     + "The invoker can assume this was equivalent to a compensate operation.")
@@ -195,6 +195,25 @@ public class Coordinator {
                 .entity(lraId)
                 .header(LRA_HTTP_HEADER, lraId)
                 .build();
+    }
+
+    @PUT
+    @Path("{LraId}/renew")
+    @ApiOperation(value = "Update the TimeLimit for an existing LRA",
+            notes = "LRAs can be automatically cancelled if they aren't closed or cancelled before the TimeLimit\n"
+                    + "specified at creation time is reached.\n"
+                    + "The time limit can be updated.\n")
+    @ApiResponses({
+            @ApiResponse( code = 200, message = "If the LRA timelimit has been updated" ),
+            @ApiResponse( code = 404, message = "The coordinator has no knowledge of this LRA" ),
+            @ApiResponse( code = 412, message = "The LRA is not longer active (ie in the complete or compensate messages have been sent" )
+    } )
+    public Response renewTimeLimit(
+            @ApiParam( value = "The new time limit for the LRA", required = true )
+            @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") Long timelimit,
+            @PathParam("LraId")String lraId) throws NotFoundException {
+
+        return Response.status(lraService.renewTimeLimit(toURL(lraId), timelimit)).build();
     }
 
     @GET

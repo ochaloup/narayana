@@ -23,6 +23,7 @@ package org.jboss.narayana.rts.lra.coordinator.api;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public interface LRAClientAPI {
 
@@ -53,10 +54,11 @@ public interface LRAClientAPI {
      *                terminated because of a timeout, the LRA URL is deleted. All further invocations
      *                on the URL will return 404. The invoker can assume this was equivalent to a compensate
      *                operation. (optional, default to 0)
+     * @param unit
      * @return the id of the new LRA
      * @throws GenericLRAException
      */
-    URL startLRA(URL parentLRA, String clientID, Long timeout) throws GenericLRAException;
+    URL startLRA(URL parentLRA, String clientID, Long timeout, TimeUnit unit) throws GenericLRAException;
 
     /**
      * Attempt to cancel an LRA
@@ -205,4 +207,12 @@ public interface LRAClientAPI {
     URL getCurrent();
 
     List<String> getResponseData(URL lraId);
+
+    /**
+     * LRAs can be created with timeouts after which they are cancelled. Use this method to update the timeout.
+     *  @param lraId the id of the lra to update
+     * @param limit the new timeout period
+     * @param unit the time unit for limit
+     */
+    void renewTimeLimit(URL lraId, long limit, TimeUnit unit);
 }

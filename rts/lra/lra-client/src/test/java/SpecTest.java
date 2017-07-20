@@ -547,6 +547,37 @@ public class SpecTest {
         }
     }
 
+
+    @Test
+    public void renewTimeLimit() {
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+        Response response = null;
+
+        try {
+            response = msTarget.path("activities")
+                    .path("renewTimeLimit")
+                    .request()
+                    .get();
+
+            checkStatusAndClose(response, -1, true);
+
+            // check that compensator was invoked
+            int[] cnt2 = {completedCount(true), completedCount(false)};
+
+            /*
+             * The call to activities/timeLimit should have started an LRA whch should not have timed out
+             * (because the called resource method renews the timeLimit before sleeping for longer than
+              * the @TimeLimit annotation specifies).
+             * Therefore the it should not have compensated:
+             */
+            assertEquals("compensate was called instead of complete", cnt1[0] + 1, cnt2[0]);
+            assertEquals("compensate should not have been called", cnt1[1], cnt2[1]);
+        } finally {
+            if (response != null)
+                response.close();
+        }
+    }
+
     private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
         try {
             if (expected != -1 && response.getStatus() != expected)
