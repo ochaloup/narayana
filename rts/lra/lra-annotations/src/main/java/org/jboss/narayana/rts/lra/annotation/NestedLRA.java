@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.compensator.api;
+package org.jboss.narayana.rts.lra.annotation;
 
 import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.ElementType;
@@ -30,15 +30,17 @@ import java.lang.annotation.Target;
 
 /**
  * Used on the interface or class. Defines that the container will create
- * a new LRA for each method invocation, regardless of whether there is
+ * a new LRA for each method invocation, regardless of whether or not there is
  * already an LRA associated with the caller. These LRAs will then
  * either be top-level LRAs or nested automatically depending upon the
  * context within which they are created.
  *
- * When a nested LRA is confirmed its' compensators are propagated to the enclosing LRA (in contrast to
- * top level LRAs where compensators are informed that the activity has terminated).
+ * When a nested LRA is closed its' compensators are completed but retained. At any time prior to the enclosing LRA
+ * being closed or cancelled the nested LRA can be told to compensate (even though it may have already been told
+ * to complete).
  *
- * Compatability with the @LRA annotation. If @LRA is not present @Nested is ignored, otherwise the behaviour depends upon the value of the Type attribute:
+ * Compatability with the @LRA annotation: if @LRA is not present @Nested is ignored, otherwise the behaviour depends
+ * upon the value of the Type attribute:
  *
  * REQUIRED
  *  if there is an LRA present a new LRA is nested under it
@@ -47,16 +49,18 @@ import java.lang.annotation.Target;
  *  the @Nested annotation is ignored
  *
  * MANDATORY,
- *  a new LRA is nested under the incomming LRA
+ *  a new LRA is nested under the incoming LRA
  *
  * SUPPORTS,
  *  if there is an LRA present a new LRA is nested under otherwise a new top level LRA is begun
  *
  * NOT_SUPPORTED,
- *  nested does not make sense and a WebApplicationException exception is thrown (with HTTP status code PRECONDITION_FAILED)
+ *  nested does not make sense and operations on this resource that contain a LRA context will immediately return
+ *  with a 412 Precondition Failed HTTP status code
  *
  * NEVER
- *  nested does not make sense and a WebApplicationException exception is thrown (with HTTP status code PRECONDITION_FAILED)
+ *  nested does not make sense and requests that carry a LRA context will immediately return
+ *  with a 412 Precondition Failed HTTP status code
  */
 @Inherited
 @InterceptorBinding

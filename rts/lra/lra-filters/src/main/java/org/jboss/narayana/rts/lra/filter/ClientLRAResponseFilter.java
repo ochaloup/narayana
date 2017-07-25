@@ -21,7 +21,7 @@
  */
 package org.jboss.narayana.rts.lra.filter;
 
-import org.jboss.narayana.rts.lra.coordinator.api.Current;
+import org.jboss.narayana.rts.lra.client.Current;
 
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
@@ -30,7 +30,7 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.net.URL;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 @Provider
 public class ClientLRAResponseFilter implements ClientResponseFilter {

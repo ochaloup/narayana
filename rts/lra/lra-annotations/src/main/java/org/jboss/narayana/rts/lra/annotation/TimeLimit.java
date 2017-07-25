@@ -20,22 +20,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.rts.lra.compensator.api;
+package org.jboss.narayana.rts.lra.annotation;
 
 import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
- This an
- Performing a POST on <URL>/compensate will cause the participant to compensate the work that was done within the scope of the transaction.
-
- The compensator will either return a 200 OK code or ...
+ * Used on ({@link LRA} and {@link Compensate} annotations to indicate the maximum time that the LRA or
+ * compensator should remain active for.
+ *
+ * When applied at the class level the timeout applies to any method that starts an LRA or registers a compensator.
  */
 @InterceptorBinding
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface Compensate {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface TimeLimit {
+    /**
+     * @return the period for which the LRA or compensator will remain valid. A value
+     * of zero indicates that it is always remain valid.
+     *
+     * For compensations the corresponding compensation (a method annotated with {@link Compensate} in the
+     * same class) will be invoked if the time limit is reached.
+     */
+    long limit() default 0;
+
+    TimeUnit unit() default TimeUnit.MILLISECONDS;
 }

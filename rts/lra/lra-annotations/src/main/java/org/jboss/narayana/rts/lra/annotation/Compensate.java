@@ -19,21 +19,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
 
+package org.jboss.narayana.rts.lra.annotation;
 
-import javax.ws.rs.core.Response;
+import javax.interceptor.InterceptorBinding;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class ParentLRAJoinException extends Exception {
-    public Response getReason() {
-        return reason;
-    }
-
-    private Response reason;
-
-    public ParentLRAJoinException(String lraId, String message, Response reason) {
-        super(String.format("%s: %s", lraId, message));
-
-        this.reason = reason;
-    }
+/**
+ * When a bean method executes in the context of an LRA any methods in the bean class that are annotated with @Compensate
+ * will be used as a compensator for that LRA and when it is present, so too must the {@link Compensate} and
+ * {@link Status} annotations. If it is applied to multiple methods an arbitrary one is chosen.
+ *
+ * If the associated LRA is subsequently cancelled the method annotated with @Compensate will be invoked.
+ *
+ * The annotation can be combined with {@link TimeLimit} annotation to limit the time that the compensator remains
+ * valid, after which the corresponding @Compensate method will be called.
+ */
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Compensate {
 }

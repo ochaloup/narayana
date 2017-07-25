@@ -19,19 +19,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+package org.jboss.narayana.rts.lra.annotation;
 
-@Provider
-public class GenericLRAExceptionMapper implements ExceptionMapper<GenericLRAException> {
-    @Override
-    public Response toResponse(GenericLRAException exception) {
-        return Response.status(exception.getStatusCode())
-                .entity(String.format("%s: %s", exception.getLraId() != null
-                        ? exception.getLraId()
-                        : "not present", exception.getMessage())).build();
-    }
+import javax.interceptor.InterceptorBinding;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * If a JAX-RS resource method is invoked in the context of an LRA and there are compensator annotations on the class
+ * it will join the LRA (as a compensator). In addition, if it also contains a method annotated with @Leave then any
+ * subsequent call to this @Leave method in the context of the same LRA will cause compensator to leave the LRA.
+ * But do note that if any of the other resource methods are invoked again in the same LRA context it will rejoin the LRA.
+ */
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Leave {
 }

@@ -23,12 +23,11 @@ package org.jboss.narayana.rts.lra.coordinator.domain.model;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
-import com.arjuna.ats.arjuna.coordinator.RecordType;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
-import org.jboss.narayana.rts.lra.coordinator.api.Current;
-import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
+import org.jboss.narayana.rts.lra.client.Current;
+import org.jboss.narayana.rts.lra.client.InvalidLRAId;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -45,12 +44,11 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 public class LRARecord extends AbstractRecord implements Comparable {
     private URL coordinatorURI;

@@ -21,7 +21,7 @@
  */
 package participant.model;
 
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
 
 import java.io.Serializable;
 

@@ -22,9 +22,9 @@
 package participant.demo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
-import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.LRA;
+import org.jboss.narayana.rts.lra.annotation.NestedLRA;
 import participant.model.Booking;
 import participant.model.BookingStatus;
 import participant.service.service.FlightService;
@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 //@ApplicationScoped
 @RequestScoped

@@ -19,12 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
+package org.jboss.narayana.rts.lra.client;
 
-import org.jboss.narayana.rts.lra.compensator.api.Compensate;
-import org.jboss.narayana.rts.lra.compensator.api.Complete;
-import org.jboss.narayana.rts.lra.compensator.api.Leave;
-import org.jboss.narayana.rts.lra.compensator.api.Status;
+import org.jboss.narayana.rts.lra.annotation.Compensate;
+import org.jboss.narayana.rts.lra.annotation.Complete;
+import org.jboss.narayana.rts.lra.annotation.Leave;
+import org.jboss.narayana.rts.lra.annotation.Status;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -35,7 +35,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.narayana.rts.lra.compensator.api.TimeLimit;
+import org.jboss.narayana.rts.lra.annotation.TimeLimit;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -68,6 +68,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A utility class for controlling the lifecycle of Long Running Actions (LRAs) but the prefered mechanism is to use
+ * the annotation in the {@link org.jboss.narayana.rts.lra.annotation} package
+ */
 @RequestScoped
 public class LRAClient implements LRAClientAPI, Closeable {
     public static final String LRA_HTTP_HEADER = "X-lra";

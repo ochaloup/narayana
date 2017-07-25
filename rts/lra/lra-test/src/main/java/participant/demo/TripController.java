@@ -21,9 +21,9 @@
  */
 package participant.demo;
 
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
-import org.jboss.narayana.rts.lra.compensator.api.Status;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.LRA;
+import org.jboss.narayana.rts.lra.annotation.Status;
 import participant.model.Booking;
 import participant.model.BookingStatus;
 import participant.service.service.TripService;
@@ -55,7 +55,7 @@ import java.net.URI;
 import java.net.URL;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 @RequestScoped
 @Path(TripController.TRIP_PATH)

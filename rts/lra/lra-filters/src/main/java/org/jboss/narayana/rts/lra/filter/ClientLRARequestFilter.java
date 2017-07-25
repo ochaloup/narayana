@@ -21,7 +21,7 @@
  */
 package org.jboss.narayana.rts.lra.filter;
 
-import org.jboss.narayana.rts.lra.coordinator.api.Current;
+import org.jboss.narayana.rts.lra.client.Current;
 
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;

@@ -21,7 +21,7 @@
  */
 package participant.demo;
 
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
+import org.jboss.narayana.rts.lra.annotation.LRA;
 import participant.model.Booking;
 import participant.model.BookingStatus;
 import participant.service.service.TripService;
@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 // TODO async doesn't work with the LRA implementation (since the interceptors that start LRAs need to create
 // the LRA before calling the async resource methods - ie it breaks the async nature of @Suspended

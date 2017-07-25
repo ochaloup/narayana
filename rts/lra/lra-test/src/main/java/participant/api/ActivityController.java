@@ -21,17 +21,18 @@
  */
 package participant.api;
 
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
-import org.jboss.narayana.rts.lra.compensator.api.Compensate;
-import org.jboss.narayana.rts.lra.compensator.api.Complete;
-import org.jboss.narayana.rts.lra.compensator.api.Leave;
-import org.jboss.narayana.rts.lra.compensator.api.NestedLRA;
-import org.jboss.narayana.rts.lra.compensator.api.Status;
-import org.jboss.narayana.rts.lra.compensator.api.TimeLimit;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
+import org.jboss.narayana.rts.lra.annotation.LRA;
+import org.jboss.narayana.rts.lra.annotation.Compensate;
+import org.jboss.narayana.rts.lra.annotation.Complete;
+import org.jboss.narayana.rts.lra.annotation.Leave;
+import org.jboss.narayana.rts.lra.annotation.NestedLRA;
+import org.jboss.narayana.rts.lra.annotation.Status;
+import org.jboss.narayana.rts.lra.annotation.TimeLimit;
+import org.jboss.narayana.rts.lra.client.IllegalLRAStateException;
+import org.jboss.narayana.rts.lra.client.LRAClient;
+import org.jboss.narayana.rts.lra.client.LRAClientAPI;
 import participant.model.Activity;
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
 import participant.service.service.ActivityService;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -61,8 +62,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_RECOVERY_HEADER;
 
 @ApplicationScoped
 @Path("/activities")
@@ -94,7 +95,7 @@ public class ActivityController {
         Activity activity = activityService.getActivity(txId);
 
         if (activity.status == null)
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new IllegalLRAStateException(lraId, "LRA is not active", null);
 
         return Response.ok(activity.status.name()).build();
     }

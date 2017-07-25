@@ -19,17 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
+package org.jboss.narayana.rts.lra.client;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import javax.ws.rs.WebApplicationException;
 
-@Provider
-public class InvalidLRAExceptionMapper implements ExceptionMapper<InvalidLRAId> {
-    @Override
-    public Response toResponse(InvalidLRAId exception) {
-        return Response.status(Response.Status.NOT_ACCEPTABLE)
-                .entity(String.format("Invalid LRA id: %s", exception.getMessage())).build();
+public class InvalidLRAId extends WebApplicationException {
+    public InvalidLRAId(String lraId, String message, Throwable cause) {
+        super(String.format("%s: %s", lraId, message), cause);
     }
 }

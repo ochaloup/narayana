@@ -21,8 +21,8 @@
  */
 package participant.service.service;
 
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClientAPI;
+import org.jboss.narayana.rts.lra.client.LRAClient;
+import org.jboss.narayana.rts.lra.client.LRAClientAPI;
 import participant.model.Booking;
 import participant.model.BookingStatus;
 

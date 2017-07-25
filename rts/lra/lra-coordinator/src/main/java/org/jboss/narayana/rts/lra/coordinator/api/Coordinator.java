@@ -28,7 +28,11 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ResponseHeader;
 import org.jboss.logging.Logger;
 
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
+import org.jboss.narayana.rts.lra.client.Current;
+import org.jboss.narayana.rts.lra.client.IllegalLRAStateException;
+import org.jboss.narayana.rts.lra.client.InvalidLRAId;
+import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
 import org.jboss.narayana.rts.lra.coordinator.domain.service.LRAService;
@@ -60,13 +64,13 @@ import java.util.List;
 
 import io.swagger.annotations.ApiOperation;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.CLIENT_ID_PARAM_NAME;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.COORDINATOR_PATH_NAME;
+import static org.jboss.narayana.rts.lra.client.LRAClient.CLIENT_ID_PARAM_NAME;
+import static org.jboss.narayana.rts.lra.client.LRAClient.COORDINATOR_PATH_NAME;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_RECOVERY_HEADER;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.PARENT_LRA_PARAM_NAME;
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.TIMELIMIT_PARAM_NAME;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_RECOVERY_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.PARENT_LRA_PARAM_NAME;
+import static org.jboss.narayana.rts.lra.client.LRAClient.TIMELIMIT_PARAM_NAME;
 
 @ApplicationScoped
 @Path(COORDINATOR_PATH_NAME)
@@ -227,8 +231,11 @@ public class Coordinator {
         Transaction lra = lraService.getTransaction(toURL(nestedLraId));
         CompensatorStatus status = lra.getLRAStatus();
 
-        if (status.equals(CompensatorStatus.Active))
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        if (status == null)
+            throw new IllegalLRAStateException(nestedLraId, "The LRA is still active", null);
+
+        if (lra.getLRAStatus() == null)
+            throw new IllegalLRAStateException(nestedLraId, "LRA is still active", null);
 
         return Response.ok(lra.getLRAStatus().name()).build();
     }

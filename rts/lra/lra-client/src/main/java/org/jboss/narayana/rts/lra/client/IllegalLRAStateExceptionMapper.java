@@ -19,12 +19,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
+package org.jboss.narayana.rts.lra.client;
 
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class InvalidLRAId extends WebApplicationException {
-    public InvalidLRAId(String lraId, String message, Throwable cause) {
-        super(String.format("%s: %s", lraId, message), cause);
+@Provider
+public class IllegalLRAStateExceptionMapper implements ExceptionMapper<IllegalLRAStateException> {
+    @Override
+    public Response toResponse(IllegalLRAStateException exception) {
+        return Response.status(Response.Status.PRECONDITION_FAILED)
+                .entity(String.format("LRA is in the wrong state for this operation: %s", exception.getMessage())).build();
     }
 }

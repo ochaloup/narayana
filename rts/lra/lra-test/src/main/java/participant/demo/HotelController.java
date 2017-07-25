@@ -22,8 +22,8 @@
 package participant.demo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.LRA;
 
 import participant.model.Booking;
 import participant.model.BookingStatus;

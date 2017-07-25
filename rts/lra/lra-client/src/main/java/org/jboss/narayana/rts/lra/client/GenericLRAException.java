@@ -1,4 +1,4 @@
-package org.jboss.narayana.rts.lra.coordinator.api;
+package org.jboss.narayana.rts.lra.client;
 
 import javax.ws.rs.WebApplicationException;
 import java.net.URL;

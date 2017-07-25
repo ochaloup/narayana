@@ -19,34 +19,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.jboss.narayana.rts.lra.compensator.api;
+package org.jboss.narayana.rts.lra.annotation;
 
 import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Used on ({@link LRA} and {@link Compensate} annotations to indicate the maximum time that the lra or
- * compensation should remain active
+ * In order to support recovery compensators must be able to report their status once the completion part of the protocol
+ * starts.
  *
- * When applied at the class level the timeout applies to any method that starts an LRA or registers a compensator.
+ * Methods annotated with this annotation must be JAX-RS resources and respond to GET requests (ie are annotated with
+ * @Path and @GET, respectively). They must report their status using one of the enum names listed
+ * in {@link CompensatorStatus} whenever an HTTP GET request is made on the method.
+ *
+ * If the compensator has not yet been asked to complete or compensate it should return with a 412 Precondition Failed
+ * HTTP status code. NB although this circumstance could be detected via the framework
+ * it would necessitate a network call to the LRA coordinator.
  */
 @InterceptorBinding
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface TimeLimit {
-    /**
-     * @return the period for which the LRA or compensator will remain valid. A value
-     * of zero indicates that it is always remain valid.
-     *
-     * For compensations the corresponding compensation (a method annotated with {@link Compensate} in the
-     * same class) will be invoked if the time limit is reached.
-     */
-    long limit() default 0;
-
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
+@Target({ElementType.METHOD})
+public @interface Status {
 }

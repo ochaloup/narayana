@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.narayana.rts.lra.compensator.api;
+package org.jboss.narayana.rts.lra.annotation;
 
 import javax.interceptor.InterceptorBinding;
 import java.lang.annotation.ElementType;
@@ -29,9 +29,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Performing a POST on <URL>/complete will cause the participant to tidy up and it can forget this transaction.
+ * When a bean method executes in the context of an LRA any methods in the bean class that are annotated with @Complete
+ * will be used as a compensator for that LRA and when it is present, so too must the {@link Compensate} and
+ * {@link Status} annotations. If it is applied to multiple methods an arbitrary one is chosen.
  *
- * The compensator will either return a 200 OK code or ...
+ * If the associated LRA is subsequently closed the method annotated with @Complete will be invoked.
+ *
+ * The annotation can be combined with {@link TimeLimit} annotation to limit the time that the compensator
+ * remains valid, after which the corresponding @Compensate method will be called.
  */
 @InterceptorBinding
 @Retention(RetentionPolicy.RUNTIME)

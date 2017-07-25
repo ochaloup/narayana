@@ -19,28 +19,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.compensator.api;
+package org.jboss.narayana.rts.lra.client;
 
-import javax.interceptor.InterceptorBinding;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
-/**
- * In order to supprt recovery compensators must be able to report their status once the completion part of the protocol
- * starts.
- *
- * Classes annotated with this annotation must be JAX-RS resources (ie are annotated with @Path).
- *
- * Methods that are annotated with the Status annotation must report their status using one of the enum
- * names listed in {@link CompensatorStatus} whenever an HTTP GET request is made on the method
- *
- * If the compensator has not yet been asked to complete or compensate it should throw a {@link javax.ws.rs.WebApplicationException}
- * with HTTP status code 400: Bad request
- */
-@InterceptorBinding
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface Status {
+public class ParentLRAJoinExceptionMapper implements ExceptionMapper<ParentLRAJoinException> {
+    @Override
+    public Response toResponse(ParentLRAJoinException exception) {
+        return exception.getReason();
+    }
 }

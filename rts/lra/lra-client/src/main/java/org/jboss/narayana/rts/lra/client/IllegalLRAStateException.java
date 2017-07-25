@@ -19,23 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.jboss.narayana.rts.lra.client;
 
-package org.jboss.narayana.rts.lra.compensator.api;
+import javax.ws.rs.WebApplicationException;
 
-import javax.interceptor.InterceptorBinding;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- This an
- Performing a POST on <URL>/compensate will cause the participant to compensate the work that was done within the scope of the transaction.
-
- The compensator will either return a 200 OK code or ...
- */
-@InterceptorBinding
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface Leave {
+public class IllegalLRAStateException extends WebApplicationException {
+    public IllegalLRAStateException(String lraId, String message, Throwable cause) {
+        super(String.format("%s: %s", lraId, message), cause);
+    }
 }

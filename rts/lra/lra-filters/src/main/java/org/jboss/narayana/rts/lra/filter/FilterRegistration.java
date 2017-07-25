@@ -21,7 +21,7 @@
  */
 package org.jboss.narayana.rts.lra.filter;
 
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
+import org.jboss.narayana.rts.lra.annotation.LRA;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.container.ResourceInfo;

@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.jboss.logging.Logger;
+import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.domain.service.LRAService;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -39,11 +40,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.RECOVERY_COORDINATOR_PATH_NAME;
-
 @ApplicationScoped
-@Path(RECOVERY_COORDINATOR_PATH_NAME)
-@Api(value = RECOVERY_COORDINATOR_PATH_NAME, tags = "LRA Recovery")
+@Path(LRAClient.RECOVERY_COORDINATOR_PATH_NAME)
+@Api(value = LRAClient.RECOVERY_COORDINATOR_PATH_NAME, tags = "LRA Recovery")
 public class RecoveryCoordinator {
 
     private final Logger logger = Logger.getLogger(RecoveryCoordinator.class.getName());

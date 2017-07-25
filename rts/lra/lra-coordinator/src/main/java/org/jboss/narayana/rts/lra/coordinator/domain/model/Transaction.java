@@ -32,7 +32,7 @@ import com.arjuna.ats.arjuna.coordinator.RecordListIterator;
 import com.arjuna.ats.internal.arjuna.thread.ThreadActionData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
         this.clientId = clientId;
         this.cancelOn = null;
 
-        status = CompensatorStatus.Active;
+        status = null; // means the LRA is active
 
         scheduler = Executors.newScheduledThreadPool(1);
     }
@@ -101,16 +101,21 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
         return clientId;
     }
 
+    /**
+     * return the current status of the LRA
+     *
+     * @return null if the LRA is still active (not closing, cancelling, closed or cancelled
+     */
     public CompensatorStatus getLRAStatus() {
         return status;
     }
 
     public boolean isComplete() {
-        return status.equals(CompensatorStatus.Completed);
+        return status != null && status.equals(CompensatorStatus.Completed);
     }
 
     public boolean isCompensated() {
-        return status.equals(CompensatorStatus.Compensated);
+        return status != null && status.equals(CompensatorStatus.Compensated);
     }
 
     public boolean isRecovering() {
@@ -235,7 +240,7 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
             case ActionStatus.H_ROLLBACK:
                 return CompensatorStatus.Compensated;
             default:
-                return CompensatorStatus.Active;
+                return null;
         }
     }
 
@@ -274,7 +279,7 @@ public class Transaction extends AtomicAction { //org.jboss.jbossts.star.resourc
     }
 
     public Boolean isActive() {
-        return status == CompensatorStatus.Active;
+        return status == null;
     }
 
     public boolean forgetParticipant(String participantUrl) {

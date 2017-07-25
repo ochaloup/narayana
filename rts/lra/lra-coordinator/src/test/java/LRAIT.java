@@ -24,7 +24,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 
 import org.jboss.narayana.rts.lra.coordinator.api.Coordinator;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -33,7 +33,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
@@ -41,10 +40,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.stream.StreamSupport;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;

@@ -23,9 +23,9 @@ package org.jboss.narayana.rts.lra.coordinator.domain.service;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
-import org.jboss.narayana.rts.lra.coordinator.api.IllegalLRAStateException;
-import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.client.IllegalLRAStateException;
+import org.jboss.narayana.rts.lra.client.InvalidLRAId;
+import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.LRAStatus;
 import org.jboss.narayana.rts.lra.coordinator.domain.model.Transaction;
 

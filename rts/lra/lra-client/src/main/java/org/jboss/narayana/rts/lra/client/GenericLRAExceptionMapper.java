@@ -19,14 +19,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.narayana.rts.lra.coordinator.api;
+package org.jboss.narayana.rts.lra.client;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class ParentLRAJoinExceptionMapper implements ExceptionMapper<ParentLRAJoinException> {
+@Provider
+public class GenericLRAExceptionMapper implements ExceptionMapper<GenericLRAException> {
     @Override
-    public Response toResponse(ParentLRAJoinException exception) {
-        return exception.getReason();
+    public Response toResponse(GenericLRAException exception) {
+        return Response.status(exception.getStatusCode())
+                .entity(String.format("%s: %s", exception.getLraId() != null
+                        ? exception.getLraId()
+                        : "not present", exception.getMessage())).build();
     }
 }

@@ -21,14 +21,14 @@
  */
 package participant.demo;
 
-import org.jboss.narayana.rts.lra.compensator.api.Compensate;
-import org.jboss.narayana.rts.lra.compensator.api.CompensatorStatus;
-import org.jboss.narayana.rts.lra.compensator.api.Complete;
-import org.jboss.narayana.rts.lra.compensator.api.LRA;
-import org.jboss.narayana.rts.lra.compensator.api.Leave;
-import org.jboss.narayana.rts.lra.compensator.api.Status;
-import org.jboss.narayana.rts.lra.coordinator.api.InvalidLRAId;
-import org.jboss.narayana.rts.lra.coordinator.api.LRAClient;
+import org.jboss.narayana.rts.lra.annotation.Compensate;
+import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
+import org.jboss.narayana.rts.lra.annotation.Complete;
+import org.jboss.narayana.rts.lra.annotation.LRA;
+import org.jboss.narayana.rts.lra.annotation.Leave;
+import org.jboss.narayana.rts.lra.annotation.Status;
+import org.jboss.narayana.rts.lra.client.InvalidLRAId;
+import org.jboss.narayana.rts.lra.client.LRAClient;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
@@ -49,7 +49,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.jboss.narayana.rts.lra.coordinator.api.LRAClient.LRA_HTTP_HEADER;
+import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
 @RequestScoped
 public abstract class Compensator {
