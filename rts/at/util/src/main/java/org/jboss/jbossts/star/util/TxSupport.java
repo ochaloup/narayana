@@ -520,10 +520,15 @@ public class TxSupport
 
     private static Map<String, String> extractLinkHeaders(String header, Map<String, String> links) {
         if (header != null) {
+            Pattern uriPattern = Pattern.compile("<([^>]*)>");
+            Pattern relParamPattern = Pattern.compile(";[\\t ]*rel[^=]*=[ \\t\"]*([^;\"]*)");
             for (String linkHeader : header.split(",")) {
-                Link lnk = Link.valueOf(linkHeader);
+                Matcher uriMatcher = uriPattern.matcher(linkHeader);
+                Matcher relMatcher = relParamPattern.matcher(linkHeader);
+                uriMatcher.find();
+                relMatcher.find();
 
-                links.put(lnk.getRel(), lnk.getUri().toString());
+                links.put(relMatcher.group(1), uriMatcher.group(1));
             }
         }
 
