@@ -80,6 +80,9 @@ public class LRAClient implements LRAClientAPI, Closeable {
     public static final String COORDINATOR_PATH_NAME = "lra-coordinator";
     public static final String RECOVERY_COORDINATOR_PATH_NAME = "lra-recovery-coordinator";
 
+    public static final String CORRDINATOR_HOST_PROP = "lra.http.host";
+    public static final String CORRDINATOR_PORT_PROP = "lra.http.port";
+
     public static final String COMPLETE = "complete";
     public static final String COMPENSATE = "compensate";
     public static final String STATUS = "status";
@@ -118,7 +121,9 @@ public class LRAClient implements LRAClientAPI, Closeable {
     private Map<URL, List<String>> responseDataMap;
 
     public LRAClient() throws URISyntaxException {
-        this("http", "localhost", 8080);
+        this("http",
+                System.getProperty(CORRDINATOR_HOST_PROP, "localhost"),
+                Integer.getInteger(CORRDINATOR_PORT_PROP, 8080));
     }
 
     public LRAClient(String host, int port) throws URISyntaxException {
@@ -275,7 +280,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             throw new GenericLRAException(null, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {
-            if (ConnectException.class.equals(e.getCause().getClass()))
+            if (e.getCause() != null && ConnectException.class.equals(e.getCause().getClass()))
                 throw new GenericLRAException(null, Response.Status.SERVICE_UNAVAILABLE.getStatusCode(),
                         "Cannont connect to an LRA coordinator: " + e.getCause().getMessage(), e);
 

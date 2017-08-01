@@ -23,6 +23,7 @@ package org.jboss.narayana.rts.lra.coordinator.domain.model;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
+import com.arjuna.ats.arjuna.coordinator.RecordType;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
@@ -216,6 +217,7 @@ public class LRARecord extends AbstractRecord implements Comparable {
 
             if (response.getStatus() != Response.Status.OK.getStatusCode()) {
                 isFailed = true;
+                System.out.printf("Compensator failed with code %s%n", response.getStatus());
                 return TwoPhaseOutcome.FINISH_ERROR;
             }
 
@@ -318,7 +320,7 @@ public class LRARecord extends AbstractRecord implements Comparable {
     }
 
     public int typeIs() {
-        return 166; // RecordType.LRA_RECORD; TODO we dependend on swarm for narayana which is using an earlier version
+        return RecordType.USER_DEF_FIRST0; // RecordType.LRA_RECORD; TODO we dependend on swarm for narayana which is using an earlier version
     }
 
     public int nestedAbort()

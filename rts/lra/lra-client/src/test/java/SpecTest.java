@@ -67,9 +67,12 @@ public class SpecTest {
 
     @BeforeClass
     public static void setupClass() throws MalformedURLException, URISyntaxException {
-        MICRSERVICE_BASE_URL = new URL("http://localhost:8081/");
+        int servicePort = Integer.getInteger("service.http.port", 8081);
+        MICRSERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
 
-        lraClient = new LRAClient("localhost", 8080);
+        lraClient = new LRAClient(
+                System.getProperty("lra.http.host", "localhost"),
+                Integer.getInteger("lra.http.port", 8080));
         msClient = ClientBuilder.newClient();
 
         oldLRAs = new ArrayList<>();

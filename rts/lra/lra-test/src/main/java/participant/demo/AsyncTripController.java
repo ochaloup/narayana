@@ -78,8 +78,9 @@ public class AsyncTripController {
     @PostConstruct
     private void initController() {
         try {
-            URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:8081");
-            URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            int servicePort = Integer.getInteger("service.http.port", 8081);
+            URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
+            URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
 
             hotelClient = ClientBuilder.newClient();
             flightClient = ClientBuilder.newClient();

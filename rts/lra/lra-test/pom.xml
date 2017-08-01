@@ -18,6 +18,10 @@
 
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <swarm.http.port>8081</swarm.http.port>
+        <lra.http.host>localhost</lra.http.host>
+        <lra.http.port>8080</lra.http.port>
+        <service.http.port>${swarm.http.port}</service.http.port>
     </properties>
 
     <dependencyManagement>
@@ -45,6 +49,16 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <environment>
+                        <swarm.http.port>${swarm.http.port}</swarm.http.port>
+                    </environment>
+                    <properties>
+                        <lra.http.host>${lra.http.host}</lra.http.host>
+                        <lra.http.port>${lra.http.port}</lra.http.port>
+                        <service.http.port>${service.http.port}</service.http.port>
+                    </properties>
+                </configuration>
             </plugin>
         </plugins>
     </build>

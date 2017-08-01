@@ -75,8 +75,9 @@ public class TripController extends Compensator {
     @PostConstruct
     private void initController() {
         try {
-            URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:8081");
-            URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:8081");
+            int servicePort = Integer.getInteger("service.http.port", 8081);
+            URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
+            URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
 
             hotelClient = ClientBuilder.newClient();
             flightClient = ClientBuilder.newClient();
@@ -120,7 +121,7 @@ public class TripController extends Compensator {
                               @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
                               @QueryParam(FlightController.ALT_FLIGHT_NUMBER_PARAM) @DefaultValue("") String altFlightNumber,
                               @QueryParam(FlightController.FLIGHT_SEATS_PARAM) @DefaultValue("1") Integer flightSeats,
-                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) {
+                              @QueryParam("mstimeout") @DefaultValue("500") Long timeout) throws BookingException {
 
         Booking hotelBooking = bookHotel(hotelName, hotelGuests);
         Booking flightBooking1 = bookFlight(flightNumber, flightSeats);
@@ -174,7 +175,7 @@ public class TripController extends Compensator {
         return Response.ok(booking.getStatus().name()).build(); // TODO convert to a CompensatorStatus if we we're enlisted in an LRA
     }
 
-    private Booking bookHotel(String name, int beds) {
+    private Booking bookHotel(String name, int beds) throws BookingException {
         if (name == null || name.length() == 0 || beds <= 0)
             return null;
 
@@ -182,10 +183,15 @@ public class TripController extends Compensator {
                 .path("book")
                 .queryParam(HotelController.HOTEL_NAME_PARAM, name).queryParam(HotelController.HOTEL_BEDS_PARAM, beds);
 
-        return webTarget.request().post(Entity.text("")).readEntity(Booking.class);
+        Response response = webTarget.request().post(Entity.text(""));
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode())
+            throw new BookingException(response.getStatus(), "flight booking problem");
+
+        return response.readEntity(Booking.class);
     }
 
-    private Booking bookFlight(String flightNumber, int seats) {
+    private Booking bookFlight(String flightNumber, int seats) throws BookingException {
         if (flightNumber == null || flightNumber.length() == 0 || seats <= 0)
             return null;
 
@@ -194,7 +200,12 @@ public class TripController extends Compensator {
                 .queryParam(FlightController.FLIGHT_NUMBER_PARAM, flightNumber)
                 .queryParam(FlightController.FLIGHT_SEATS_PARAM, seats);
 
-        return webTarget.request().post(Entity.text("")).readEntity(Booking.class);
+        Response response = webTarget.request().post(Entity.text(""));
+
+        if (response.getStatus() != Response.Status.OK.getStatusCode())
+            throw new BookingException(response.getStatus(), "flight booking problem");
+
+        return response.readEntity(Booking.class);
     }
 
     @GET

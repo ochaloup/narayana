@@ -44,7 +44,9 @@ public class TripClient {
     ObjectMapper objectMapper = new ObjectMapper();
 
     private static void initClient() {
-        PRIMARY_SERVER = "http://localhost:8081";
+        int servicePort = Integer.getInteger("service.http.port", 8081);
+
+        PRIMARY_SERVER = "http://localhost:" + servicePort;
         TRIP_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, TripController.TRIP_PATH);
         HOTEL_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, HotelController.HOTEL_PATH);
         FLIGHT_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, FlightController.FLIGHT_PATH);
