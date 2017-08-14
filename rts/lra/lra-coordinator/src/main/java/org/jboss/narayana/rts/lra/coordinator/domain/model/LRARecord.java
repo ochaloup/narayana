@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
 
-public class LRARecord extends AbstractRecord implements Comparable {
+public class LRARecord extends AbstractRecord implements Comparable<AbstractRecord> {
     private URL coordinatorURI;
     private String participantPath;
 
@@ -394,8 +394,7 @@ public class LRARecord extends AbstractRecord implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-        AbstractRecord other = (AbstractRecord) o;
+    public int compareTo(AbstractRecord other) {
 
         if (lessThan(other))
             return -1;
