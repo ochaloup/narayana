@@ -460,8 +460,9 @@ public class LRAClient implements LRAClientAPI, Closeable {
         Annotation resourcePathAnnotation = compensatorClass.getAnnotation(Path.class);
         String resourcePath = resourcePathAnnotation == null ? "/" : ((Path) resourcePathAnnotation).value();
 
-        String uriPrefix = String.format("%s:%s%s",
-                baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1));
+        final String uriPrefix = String.format("%s:%s%s",
+                baseUri.getScheme(), baseUri.getSchemeSpecificPart(), resourcePath.substring(1))
+                .replaceAll("/$", "");
 
         final int[] validCnt = {0};
 
