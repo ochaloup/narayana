@@ -343,10 +343,10 @@ public class LRAClient implements LRAClientAPI, Closeable {
     }
 
     @Override
-    public void joinLRA(URL lraId, Long timelimit, String compensatorUrl) throws GenericLRAException {
+    public String joinLRA(URL lraId, Long timelimit, String compensatorUrl) throws GenericLRAException {
         lraTrace(String.format("joining LRA with compensator %s", compensatorUrl), lraId);
 
-        enlistCompensator(lraId, timelimit, "",
+        return enlistCompensator(lraId, timelimit, "",
                 String.format("%s/compensate", compensatorUrl),
                 String.format("%s/complete", compensatorUrl),
                 String.format("%s/leave", compensatorUrl),
