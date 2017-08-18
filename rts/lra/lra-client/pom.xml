@@ -72,5 +72,11 @@
             <version>2.8.9</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>${version.resteasy-client}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
