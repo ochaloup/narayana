@@ -8,16 +8,21 @@
 mvn clean package
 ```
 
-## Start a SRA coordinator:
+## Making transactional service calls:
+
+Start a SRA coordinator:
 
 ```bash
 mvn wildfly-swarm:run -DskipTests -Dswarm.http.port=8080 # -Dswarm.debug.port=5006
 ```
 
-## Make a service call that should cause the service to start and end a SRA (vai CDI annotations):
+Make a service call:
 
 ```bash
 curl -X POST  "http://localhost:8080/trip/book?hotelName=Rex"
 ```
+
+this invocation should cause the service to start and end a SRA (via CDI annotations on the JAX-RS
+service methods).
 
 TODO create a test suite
