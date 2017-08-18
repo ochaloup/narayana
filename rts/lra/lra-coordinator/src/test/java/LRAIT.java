@@ -33,6 +33,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
@@ -72,5 +73,11 @@ public class LRAIT {
     @Before
     public void setupClass() throws MalformedURLException, URISyntaxException {
         lraClient = new LRAClient(base.getProtocol(), base.getHost(), base.getPort());
+    }
+
+    @Test
+    public void testStartLRA() {
+        URL lraId = lraClient.startLRA("testStartLRA");
+        lraClient.closeLRA(lraId);
     }
 }

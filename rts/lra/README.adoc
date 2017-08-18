@@ -4,6 +4,14 @@
 mvn clean install
 ```
 
+## Test the LRA coodinator using Arquillian:
+
+```bash
+mvn -f lra-coordinator/pom.xml verify
+```
+
+(if you need to debug the integration test then use -Dmaven.failsafe.debug).
+
 ## View the swagger documentation for the LRA coordinator
 
 Make sure the LRA coordinator is running:
