@@ -28,14 +28,14 @@
         </dependency>
         <dependency>
             <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>${version.cdi-api}</version>
+            <artifactId>cdi-sra.demo.api</artifactId>
+            <version>${version.cdi-sra.demo.api}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${version.jaxrs-api}</version>
+            <artifactId>javax.ws.rs-sra.demo.api</artifactId>
+            <version>${version.jaxrs-sra.demo.api}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -21,7 +21,7 @@
         <swarm.http.port>8081</swarm.http.port>
         <lra.http.host>localhost</lra.http.host>
         <lra.http.port>8080</lra.http.port>
-        <service.http.port>${swarm.http.port}</service.http.port>
+        <sra.demo.service.http.port>${swarm.http.port}</sra.demo.service.http.port>
     </properties>
 
     <dependencyManagement>
@@ -56,7 +56,7 @@
                     <properties>
                         <lra.http.host>${lra.http.host}</lra.http.host>
                         <lra.http.port>${lra.http.port}</lra.http.port>
-                        <service.http.port>${service.http.port}</service.http.port>
+                        <sra.demo.service.http.port>${sra.demo.service.http.port}</sra.demo.service.http.port>
                     </properties>
                 </configuration>
             </plugin>

@@ -34,7 +34,7 @@ you should see a json representation of the API. A pretty version is available v
 mvn -f lra-coordinator/pom.xml wildfly-swarm:run -DskipTests -Dswarm.http.port=8080
 ```
 
-### Start a service on port 8081
+### Start a sra.demo.service on port 8081
 
 ```bash
 mvn -f lra-test/pom.xml clean wildfly-swarm:run -DskipTests -Dswarm.http.port=8081 -Dlra.http.port=8080
@@ -51,7 +51,7 @@ and 8081, respectively
 mvn test -f lra-client/pom.xml -Dtest=SpecTest -DskipTests=false -Dlra.http.port=8080 -Dservice.http.port=8081
 ```
 
-The system properties *lra.http.port* and *service.http.port* specify the ports on which the LRA coordinator and example service are is listening, respectively.
+The system properties *lra.http.port* and *sra.demo.service.http.port* specify the ports on which the LRA coordinator and example sra.demo.service are is listening, respectively.
 
 ## Trip Demo
 
@@ -65,10 +65,10 @@ The system properties *lra.http.port* and *service.http.port* specify the ports 
     cancel LRA 3
     close LRA 1 (results in the hotel and flight option 2 being confirmed)
 
-### Make sure the coordinator and service (started above) are still running
+### Make sure the coordinator and sra.demo.service (started above) are still running
 
 For simplicity the trip, hotel and flight services all listen on the same http port but
-inter service requests are still performed using http so running each service in a separate
+inter sra.demo.service requests are still performed using http so running each sra.demo.service in a separate
 JVM is an option too.
 
 Start the coordinator and services:
@@ -88,7 +88,7 @@ mvn package -f lra-test/pom.xml
 java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -cp lra-test/target/classes:lra-test/target/lra-test/WEB-INF/lib/jackson-jaxrs-json-provider-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/javax.json-1.0.3.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-databind-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-core-2.7.4.jar:lra-test/target/lra-test/WEB-INF/lib/jackson-annotations-2.7.4.jar -Dservice.http.port=8081 TripClient
 ```
 
-where the *service.http.port* system property specifies the port the example service is running on.
+where the *sra.demo.service.http.port* system property specifies the port the example sra.demo.service is running on.
 
 ### One shot bookings using curl:
 

@@ -70,7 +70,7 @@
     </entry>
 
     <!--
-      Base port number for determining a unique number to associate with an instance of the transaction service
+      Base port number for determining a unique number to associate with an instance of the transaction sra.demo.service
       (which is needed in order to support multiple instances on the same machine).
       Use the value 0 to allow the system to select the first available port number.
       If the port number is non-zero and the port is in use then the value will be incremented until either a successful binding

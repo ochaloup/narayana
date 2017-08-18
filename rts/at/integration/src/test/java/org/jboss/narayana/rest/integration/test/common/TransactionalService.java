@@ -28,7 +28,7 @@ public final class TransactionalService {
 
     public static final String APPLICATION_ID = "org.jboss.narayana.rest.integration.test.common.TransactionalService";
 
-    public static final String PATH_SEGMENT = "transactional-service";
+    public static final String PATH_SEGMENT = "transactional-sra.demo.service";
 
     @GET
     public Response getParticipantInvocations(@QueryParam("participantId") final String participantId) {

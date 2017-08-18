@@ -23,10 +23,10 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>restat-api</artifactId>
+  <artifactId>restat-sra.demo.api</artifactId>
   <packaging>jar</packaging>
   <name>Narayana: restat tx</name>
-  <description>A JAX-RS service that implements the RESTAT specification</description>
+  <description>A JAX-RS sra.demo.service that implements the RESTAT specification</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
@@ -127,7 +127,7 @@
         </exclusion>
         <exclusion>
           <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
+          <artifactId>servlet-sra.demo.api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

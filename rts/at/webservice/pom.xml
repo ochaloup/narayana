@@ -36,12 +36,12 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
-      <artifactId>restat-api</artifactId>
+      <artifactId>restat-sra.demo.api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
-      <artifactId>restat-api</artifactId>
+      <artifactId>restat-sra.demo.api</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

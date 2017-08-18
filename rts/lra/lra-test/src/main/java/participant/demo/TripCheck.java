@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 /**
  * For testing - verify that the business data returned when ending an LRA is the same as that returned by directly
- * interrogating each service involved in the booking
+ * interrogating each sra.demo.service involved in the booking
  */
 class TripCheck {
     static boolean validateBooking(Booking booking, WebTarget hotelTarget, WebTarget flightTarget) throws BookingException {

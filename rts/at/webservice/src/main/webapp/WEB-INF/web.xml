@@ -4,7 +4,7 @@
 <display-name>REST-tx Web Application</display-name>
 
 	<listener>
-		<listener-class>org.jboss.jbossts.star.service.ContextListener</listener-class>
+		<listener-class>org.jboss.jbossts.star.sra.demo.service.ContextListener</listener-class>
 	</listener>
 
     <servlet>
@@ -14,7 +14,7 @@
         </servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
-      		<param-value>org.jboss.jbossts.star.service.TMApplication</param-value>
+      		<param-value>org.jboss.jbossts.star.sra.demo.service.TMApplication</param-value>
         </init-param>
     </servlet>
 

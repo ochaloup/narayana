@@ -76,7 +76,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.sun.grizzly.http.SelectorThread;
-//import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+//import com.sun.jersey.sra.demo.api.container.grizzly.GrizzlyWebContainerFactory;
 
 public class BaseTest {
     protected final static Logger log = Logger.getLogger(BaseTest.class);
@@ -164,7 +164,7 @@ public class BaseTest {
 //                threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
 
                 final ResourceConfig resourceConfig = new ResourceConfig();//Coordinator.class);
-                resourceConfig.packages("org.jboss.jbossts.star.service", "org.jboss.jbossts.star.provider", "org.jboss.jbossts.star.test");
+                resourceConfig.packages("org.jboss.jbossts.star.sra.demo.service", "org.jboss.jbossts.star.provider", "org.jboss.jbossts.star.test");
                 grizzlyServer = GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
 
             }
@@ -212,7 +212,7 @@ public class BaseTest {
 
     public static void startContainer(String txnMgrUrl) throws Exception {
         startContainer(txnMgrUrl,
-                "org.jboss.jbossts.star.service;org.jboss.jbossts.star.provider;org.jboss.jbossts.star.test",
+                "org.jboss.jbossts.star.sra.demo.service;org.jboss.jbossts.star.provider;org.jboss.jbossts.star.test",
                 TransactionalResource.class, Coordinator.class);
     }
 

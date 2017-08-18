@@ -27,7 +27,7 @@ import javax.ws.rs.ext.Provider;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 /**
- * Map service unavailable exceptions
+ * Map sra.demo.service unavailable exceptions
  */
 @Provider
 public class TMUnavailableMapper implements ExceptionMapper<TMUnavailableException>

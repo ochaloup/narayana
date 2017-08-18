@@ -58,8 +58,8 @@
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${version.javax.ws.rs-api}</version>
+            <artifactId>javax.ws.rs-sra.demo.api</artifactId>
+            <version>${version.javax.ws.rs-sra.demo.api}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -78,7 +78,7 @@
 
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
-            <artifactId>restat-api</artifactId>
+            <artifactId>restat-sra.demo.api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

@@ -77,8 +77,8 @@
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>${version.javax.ws.rs-api}</version>
+      <artifactId>javax.ws.rs-sra.demo.api</artifactId>
+      <version>${version.javax.ws.rs-sra.demo.api}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -94,7 +94,7 @@
         </exclusion>
         <exclusion>
           <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
+          <artifactId>servlet-sra.demo.api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
