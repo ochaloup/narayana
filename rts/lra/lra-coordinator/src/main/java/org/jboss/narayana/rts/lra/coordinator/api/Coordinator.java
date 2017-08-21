@@ -148,7 +148,7 @@ public class Coordinator {
     @Path("start")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @ApiOperation(value = "Start a new LRA",
-            notes = "The LRA model uses a presumed nothing protocol: the coordinator must communicate\n"
+            notes = "The LRA sra.demo.model uses a presumed nothing protocol: the coordinator must communicate\n"
                     + "with Compensators in order to inform them of the LRA activity. Every time a\n"
                     + "Compensator is enrolled with a LRA, the coordinator must make information about\n"
                     + "it durable so that the Compensator can be contacted when the LRA terminates,\n"
@@ -381,9 +381,9 @@ public class Coordinator {
                     + " complete, compensate and status",
                     required = true )
             @HeaderParam("Link") String linkHeader,
-            @ApiParam( value = "The time limit (in seconds) that the Compensator can guarantee that it can compensate the work performed by the service."
+            @ApiParam( value = "The time limit (in seconds) that the Compensator can guarantee that it can compensate the work performed by the sra.demo.service."
                     + " After this time period has elapsed, it may no longer be possible to undo the work within the scope of this (or any enclosing) LRA."
-                    + " It may therefore be necessary for the application or service to start other activities to explicitly try to compensate this work."
+                    + " It may therefore be necessary for the application or sra.demo.service to start other activities to explicitly try to compensate this work."
                     + " The application or coordinator may use this information to control the lifecycle of a LRA.",
                     required = true )
             @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") long timeLimit,
@@ -413,9 +413,9 @@ public class Coordinator {
     public Response joinLRAViaBody(
             @ApiParam( value = "The unique identifier of the LRA", required = true )
             @PathParam("LraId")String lraId,
-            @ApiParam( value = "The time limit (in seconds) that the Compensator can guarantee that it can compensate the work performed by the service."
+            @ApiParam( value = "The time limit (in seconds) that the Compensator can guarantee that it can compensate the work performed by the sra.demo.service."
                     + " After this time period has elapsed, it may no longer be possible to undo the work within the scope of this (or any enclosing) LRA."
-                    + " It may therefore be necessary for the application or service to start other activities to explicitly try to compensate this work."
+                    + " It may therefore be necessary for the application or sra.demo.service to start other activities to explicitly try to compensate this work."
                     + " The application or coordinator may use this information to control the lifecycle of a LRA.",
                     required = true )
             @QueryParam(TIMELIMIT_PARAM_NAME) @DefaultValue("0") int timeLimit,

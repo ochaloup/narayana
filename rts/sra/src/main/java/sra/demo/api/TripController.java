@@ -19,28 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package participant.demo;
+package sra.demo.api;
 
-import org.jboss.narayana.rts.lra.annotation.CompensatorStatus;
-import org.jboss.narayana.rts.lra.annotation.LRA;
-import org.jboss.narayana.rts.lra.annotation.Status;
-import participant.model.Booking;
-import participant.model.BookingStatus;
-import participant.service.service.TripService;
+import sra.annotation.SRA;
+import sra.annotation.Status;
+import sra.client.SRAParticipant;
+import sra.client.SRAStatus;
+import sra.demo.model.Booking;
+import sra.demo.service.BookingException;
+import sra.demo.service.TripService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
@@ -49,18 +47,16 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static org.jboss.narayana.rts.lra.client.LRAClient.LRA_HTTP_HEADER;
+import static sra.client.SRAClient.SRA_HTTP_HEADER;
 
 @RequestScoped
 @Path(TripController.TRIP_PATH)
-@LRA(LRA.Type.SUPPORTS)
-public class TripController extends Compensator {
+@SRA(SRA.Type.SUPPORTS)
+public class TripController extends SRAParticipant {
     public static final String TRIP_PATH = "/trip";
 
     private Client hotelClient;
@@ -75,7 +71,7 @@ public class TripController extends Compensator {
     @PostConstruct
     private void initController() {
         try {
-            int servicePort = Integer.getInteger("sra.demo.service.http.port", 8081);
+            int servicePort = Integer.getInteger("sra.demo.service.http.port", 8080);
             URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
             URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
 
@@ -114,8 +110,8 @@ public class TripController extends Compensator {
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
     // delayClose because we want the LRA to be associated with a booking until the user confirms the booking
-    @LRA(value = LRA.Type.REQUIRED, delayClose = true)
-    public Response bookTrip( @HeaderParam(LRA_HTTP_HEADER) String lraId,
+    @SRA(value = SRA.Type.REQUIRED, delayCommit = true)
+    public Response bookTrip( @HeaderParam(SRA_HTTP_HEADER) String SRAId,
                               @QueryParam(HotelController.HOTEL_NAME_PARAM) @DefaultValue("") String hotelName,
                               @QueryParam(HotelController.HOTEL_BEDS_PARAM) @DefaultValue("1") Integer hotelGuests,
                               @QueryParam(FlightController.FLIGHT_NUMBER_PARAM) @DefaultValue("") String flightNumber,
@@ -127,52 +123,20 @@ public class TripController extends Compensator {
         Booking flightBooking1 = bookFlight(flightNumber, flightSeats);
         Booking flightBooking2 = bookFlight(altFlightNumber, flightSeats);
 
-        Booking tripBooking = new Booking(lraId, "Trip", hotelBooking, flightBooking1, flightBooking2);
+        Booking tripBooking = new Booking(SRAId, "Trip", hotelBooking, flightBooking1, flightBooking2);
 
         return Response.status(Response.Status.CREATED).entity(tripBooking).build();
-    }
-
-    @PUT
-    @Path("/complete")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @LRA(LRA.Type.SUPPORTS) // the confirmation could be part of an enclosing LRA
-    public Booking confirmTrip(Booking booking) throws BookingException {
-        tripService.confirmBooking(booking);
-
-        if (!TripCheck.validateBooking(booking, hotelTarget, flightTarget))
-            throw new BookingException(INTERNAL_SERVER_ERROR.getStatusCode(), "LRA response data does not match booking data");
-
-        booking.setStatus(BookingStatus.CONFIRMED);
-
-        return booking;
-    }
-
-    @PUT
-    @Path("/compensate")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @LRA(LRA.Type.SUPPORTS) // the confirmation could be part of an enclosing LRA
-    public Booking cancelTrip(Booking booking) throws BookingException {
-        tripService.cancelBooking(booking);
-
-        if (!TripCheck.validateBooking(booking, hotelTarget, flightTarget))
-            throw new BookingException(INTERNAL_SERVER_ERROR.getStatusCode(), "LRA response data does not match booking data");
-
-        booking.setStatus(BookingStatus.CANCELLED);
-
-        return booking;
     }
 
     @GET
     @Path("/status")
     @Produces(MediaType.APPLICATION_JSON)
     @Status
-    @LRA(LRA.Type.NOT_SUPPORTED)
-    public Response status(@HeaderParam(LRA_HTTP_HEADER) String lraId) throws NotFoundException {
-        Booking booking = tripService.get(lraId);
+    @SRA(SRA.Type.NOT_SUPPORTED)
+    public Response status(@HeaderParam(SRA_HTTP_HEADER) String SRAId) throws NotFoundException {
+        Booking booking = tripService.get(SRAId);
 
-        return Response.ok(booking.getStatus().name()).build(); // TODO convert to a CompensatorStatus if we we're enlisted in an LRA
+        return Response.ok(booking.getStatus().name()).build(); // TODO convert to a CompensatorStatus if we we're enlisted in an SRA
     }
 
     private Booking bookHotel(String name, int beds) throws BookingException {
@@ -208,26 +172,10 @@ public class TripController extends Compensator {
         return response.readEntity(Booking.class);
     }
 
-    @GET
-    @Path("/{bookingId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @LRA(LRA.Type.SUPPORTS)
-    public Booking getBooking(@PathParam("bookingId") String bookingId) {
-        return tripService.get(bookingId);
-    }
-
     @Override
-    protected CompensatorStatus updateCompensator(CompensatorStatus status, String bookingId) {
-        switch (status) {
-            case Completed:
-                tripService.updateBookingStatus(bookingId, BookingStatus.CONFIRMED);
-                return status;
-            case Compensated:
-                tripService.updateBookingStatus(bookingId, BookingStatus.CANCELLED);
-                return status;
-            default:
-                return status;
-        }
+    protected SRAStatus updateParticipantState(SRAStatus status, String activityId) {
+        System.out.printf("SRA: %s: Updating trip participant state to: ", activityId, status);
+        return status;
     }
 }
 
