@@ -14,9 +14,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>rest-lra-parent</artifactId>
-    <name>REST-LRA: Parent</name>
-    <description>REST-LRA: Parent</description>
+    <artifactId>lra-parent</artifactId>
+    <name>LRA Parent</name>
+    <description>LRA Parent</description>
     <packaging>pom</packaging>
 
     <properties>
