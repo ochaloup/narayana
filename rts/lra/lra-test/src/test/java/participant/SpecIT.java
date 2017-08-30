@@ -80,6 +80,10 @@ public class SpecIT {
 
     private static List<LRAStatus> oldLRAs;
 
+    private enum CompletionType {
+        complete, compensate, mixed
+    }
+
     @Rule
     public TestName testName = new TestName();
 
@@ -210,7 +214,7 @@ public class SpecIT {
         lraClient.closeLRA(lra);
     }
 
-//    @Test
+    // @Test
     // the coordinator cleans up when canceled
     public void isCompensatedLRA() throws WebApplicationException {
         URL lra = lraClient.startLRA("SpecTest#isCompensatedLRA", LRA_TIMEOUT_MILLIS);
@@ -220,8 +224,8 @@ public class SpecIT {
         assertTrue(lraClient.isCompensatedLRA(lra));
     }
 
-//    @Test
-// the coordinator cleans up when completed
+    // @Test
+    // the coordinator cleans up when completed
     public void isCompletedLRA() throws WebApplicationException {
         URL lra = lraClient.startLRA("SpecTest#isCompletedLRA", LRA_TIMEOUT_MILLIS);
 
@@ -230,7 +234,7 @@ public class SpecIT {
         assertTrue(lraClient.isCompletedLRA(lra));
     }
 
-    // @Test - TODO: FIX
+    @Test
     public void joinLRAViaBody() throws WebApplicationException {
         Response response = msTarget.path("activities").path("work").request().put(Entity.text(""));
 
@@ -282,8 +286,223 @@ public class SpecIT {
         multiLevelNestedActivity(CompletionType.mixed, 2);
     }
 
-    private enum CompletionType {
-        complete, compensate, mixed
+    @Test
+    public void joinLRAViaHeader () throws WebApplicationException {
+        int cnt1 = completedCount(true);
+
+        URL lra = lraClient.startLRA("SpecTest#joinLRAViaBody", LRA_TIMEOUT_MILLIS);
+
+        Response response = msTarget.path("activities").path("work")
+                .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // validate that the LRA coordinator still knows about lraId
+        List<LRAStatus> lras = lraClient.getActiveLRAs();
+        assertTrue(lras.contains(new LRAStatus(lra)));
+
+        // close the LRA
+        lraClient.closeLRA(lra);
+
+        // check that LRA coordinator no longer knows about lraId
+        lras = lraClient.getActiveLRAs();
+        assertFalse(lras.contains(new LRAStatus(lra)));
+
+        // check that participant was told to complete
+        int cnt2 = completedCount(true);
+        assertEquals(cnt1 + 1, cnt2);
+    }
+
+    @Test
+    public void join () throws WebApplicationException {
+        List<LRAStatus> lras = lraClient.getActiveLRAs();
+        int count = lras.size();
+        URL lra = lraClient.startLRA("SpecTest#join", LRA_TIMEOUT_MILLIS);
+
+        Response response = msTarget.path("activities").path("work")
+                .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+        lraClient.closeLRA(lra);
+
+        lras = lraClient.getActiveLRAs();
+        System.out.printf("join ok %d versus %d lras%n", count, lras.size());
+        assertEquals(count, lras.size());
+    }
+
+    @Test
+    public void leaveLRA() throws WebApplicationException {
+        int cnt1 = completedCount(true);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
+
+        Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
+        response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // call a method annotated with @Leave (should remove the compensator from the LRA)
+        response = msTarget.path("activities").path("leave").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
+
+        lraClient.closeLRA(lra);
+
+        // check that participant was not told to complete
+        int cnt2 = completedCount(true);
+
+        assertEquals(cnt1, cnt2);
+    }
+
+    @Test
+    public void leaveLRAViaAPI() throws WebApplicationException {
+        int cnt1 = completedCount(true);
+        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
+
+        Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
+        response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // call a method annotated with @Leave (should remove the compensator from the LRA)
+        try {
+            response = msTarget.path("activities").path("leave").path(URLEncoder.encode(lra.toString(), "UTF-8"))
+                    .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
+        } catch (UnsupportedEncodingException e) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
+        }
+        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
+
+        // lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
+
+        lraClient.closeLRA(lra);
+
+        // check that participant was not told to complete
+        int cnt2 = completedCount(true);
+
+        assertEquals(cnt1, cnt2);
+    }
+
+    @Test
+    public void dependentLRA() throws WebApplicationException, MalformedURLException {
+        // call a method annotated with NOT_SUPPORTED but one which programatically starts an LRA and returns it via a header
+        Response response = msTarget.path("activities").path("startViaApi").request().put(Entity.text(""));
+        // check that the method started an LRA
+        Object lraHeader = response.getHeaders().getFirst(LRAClient.LRA_HTTP_HEADER);
+
+        String id = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
+
+        // the value returned via the header and body should be equal
+
+        assertNotNull(lraHeader);
+
+        assertEquals(id, lraHeader.toString());
+
+        lraClient.closeLRA(new URL(lraHeader.toString()));
+    }
+
+    @Test
+    public void cancelOn() {
+        cancelCheck("cancelOn");
+    }
+
+    @Test
+    public void cancelOnFamily() {
+        cancelCheck("cancelOnFamily");
+    }
+
+    @Test
+    public void timeLimit() {
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+        Response response = null;
+
+        try {
+            response = msTarget.path("activities")
+                    .path("timeLimit")
+                    .request()
+                    .get();
+
+            checkStatusAndClose(response, -1, true);
+
+            // check that compensator was invoked
+            int[] cnt2 = {completedCount(true), completedCount(false)};
+
+            /*
+             * The call to activities/timeLimit should have started an LRA whch should have timed out
+             * (because the called resource method sleeps for long than the @TimeLimit annotation specifies).
+             * Therefore the it should have compensated:
+             */
+            assertEquals("complete was called instead of compensate", cnt1[0], cnt2[0]);
+            assertEquals("compensate should have been called", cnt1[1] + 1, cnt2[1]);
+        } finally {
+            if (response != null)
+                response.close();
+        }
+    }
+
+
+    // @Test
+    public void renewTimeLimit() {
+        int[] cnt1 = {completedCount(true), completedCount(false)};
+        Response response = null;
+
+        try {
+            response = msTarget.path("activities")
+                    .path("renewTimeLimit")
+                    .request()
+                    .get();
+
+            checkStatusAndClose(response, -1, true);
+
+            // check that compensator was invoked
+            int[] cnt2 = {completedCount(true), completedCount(false)};
+
+            /*
+             * The call to activities/timeLimit should have started an LRA whch should not have timed out
+             * (because the called resource method renews the timeLimit before sleeping for longer than
+              * the @TimeLimit annotation specifies).
+             * Therefore the it should not have compensated:
+             */
+            assertEquals("compensate was called instead of complete", cnt1[0] + 1, cnt2[0]);
+            assertEquals("compensate should not have been called", cnt1[1], cnt2[1]);
+        } finally {
+            if (response != null)
+                response.close();
+        }
+    }
+
+    private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
+        try {
+            if (expected != -1 && response.getStatus() != expected)
+                throw new WebApplicationException(response);
+
+            if (readEntity)
+                return response.readEntity(String.class);
+        } finally {
+            response.close();
+        }
+
+        return null;
+    }
+
+    private int completedCount(boolean completed) {
+        Response response = null;
+        String path = completed ? "completedactivitycount" : "compensatedactivitycount";
+
+        try {
+            response = msTarget.path("activities").path(path).request().get();
+
+            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            return Integer.parseInt(response.readEntity(String.class));
+        } finally {
+            if (response != null)
+                response.close();
+        }
+
     }
 
     private void multiLevelNestedActivity(CompletionType how, int nestedCnt) throws WebApplicationException {
@@ -398,134 +617,6 @@ public class SpecIT {
         }
     }
 
-    @Test
-    public void joinLRAViaHeader () throws WebApplicationException {
-        int cnt1 = completedCount(true);
-
-        URL lra = lraClient.startLRA("SpecTest#joinLRAViaBody", LRA_TIMEOUT_MILLIS);
-
-        Response response = msTarget.path("activities").path("work")
-                .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-        // validate that the LRA coordinator still knows about lraId
-        List<LRAStatus> lras = lraClient.getActiveLRAs();
-        assertTrue(lras.contains(new LRAStatus(lra)));
-
-        // close the LRA
-        lraClient.closeLRA(lra);
-
-        // check that LRA coordinator no longer knows about lraId
-        lras = lraClient.getActiveLRAs();
-        assertFalse(lras.contains(new LRAStatus(lra)));
-
-        // check that participant was told to complete
-        int cnt2 = completedCount(true);
-        assertEquals(cnt1 + 1, cnt2);
-    }
-
-    @Test
-    public void join () throws WebApplicationException {
-        List<LRAStatus> lras = lraClient.getActiveLRAs();
-        int count = lras.size();
-        URL lra = lraClient.startLRA("SpecTest#join", LRA_TIMEOUT_MILLIS);
-
-        Response response = msTarget.path("activities").path("work")
-                .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-        lraClient.closeLRA(lra);
-
-        lras = lraClient.getActiveLRAs();
-        System.out.printf("join ok %d versus %d lras%n", count, lras.size());
-        assertEquals(count, lras.size());
-    }
-
-    @Test
-    public void leaveLRA() throws WebApplicationException {
-        int cnt1 = completedCount(true);
-        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
-
-        Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-        // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
-        response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-        // call a method annotated with @Leave (should remove the compensator from the LRA)
-        response = msTarget.path("activities").path("leave").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-//        lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
-
-        lraClient.closeLRA(lra);
-
-        // check that participant was not told to complete
-        int cnt2 = completedCount(true);
-
-        assertEquals(cnt1, cnt2);
-    }
-
-    @Test
-    public void leaveLRAViaAPI() throws WebApplicationException {
-        int cnt1 = completedCount(true);
-        URL lra = lraClient.startLRA("SpecTest#leaveLRA", LRA_TIMEOUT_MILLIS);
-
-        Response response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-        // perform a second request to the same method in the same LRA context to validate that multiple participants are not registered
-        response = msTarget.path("activities").path("work").request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-        // call a method annotated with @Leave (should remove the compensator from the LRA)
-        try {
-            response = msTarget.path("activities").path("leave").path(URLEncoder.encode(lra.toString(), "UTF-8"))
-                    .request().header(LRAClient.LRA_HTTP_HEADER, lra).put(Entity.text(""));
-        } catch (UnsupportedEncodingException e) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Entity.text(e.getMessage())).build());
-        }
-        checkStatusAndClose(response, Response.Status.OK.getStatusCode(), false);
-
-//        lraClient.leaveLRA(lra, "some compensator"); // ask the MS for the compensator url so we can test LRAClient
-
-        lraClient.closeLRA(lra);
-
-        // check that participant was not told to complete
-        int cnt2 = completedCount(true);
-
-        assertEquals(cnt1, cnt2);
-    }
-
-    @Test
-    public void dependentLRA() throws WebApplicationException, MalformedURLException {
-        // call a method annotated with NOT_SUPPORTED but one which programatically starts an LRA and returns it via a header
-        Response response = msTarget.path("activities").path("startViaApi").request().put(Entity.text(""));
-        // check that the method started an LRA
-        Object lraHeader = response.getHeaders().getFirst(LRAClient.LRA_HTTP_HEADER);
-
-        String id = checkStatusAndClose(response, Response.Status.OK.getStatusCode(), true);
-
-        // the value returned via the header and body should be equal
-
-        assertNotNull(lraHeader);
-
-        assertEquals(id, lraHeader.toString());
-
-        lraClient.closeLRA(new URL(lraHeader.toString()));
-    }
-
-    @Test
-    public void cancelOn() {
-        cancelCheck("cancelOn");
-    }
-
-    @Test
-    public void cancelOnFamily() {
-        cancelCheck("cancelOnFamily");
-    }
-
     private void cancelCheck(String path) {
         int[] cnt1 = {completedCount(true), completedCount(false)};
         URL lra = lraClient.startLRA("SpecTest#" + path, LRA_TIMEOUT_MILLIS);
@@ -550,98 +641,7 @@ public class SpecIT {
             if (response != null)
                 response.close();
 
-            assertFalse(lraClient.isActiveLRA(lra));
+                assertFalse(lraClient.isActiveLRA(lra));
         }
-    }
-
-    // @Test - TODO: FIX!
-    public void timeLimit() {
-        int[] cnt1 = {completedCount(true), completedCount(false)};
-        Response response = null;
-
-        try {
-            response = msTarget.path("activities")
-                    .path("timeLimit")
-                    .request()
-                    .get();
-
-            checkStatusAndClose(response, -1, true);
-
-            // check that compensator was invoked
-            int[] cnt2 = {completedCount(true), completedCount(false)};
-
-            /*
-             * The call to activities/timeLimit should have started an LRA whch should have timed out
-             * (because the called resource method sleeps for long than the @TimeLimit annotation specifies).
-             * Therefore the it should have compensated:
-             */
-            assertEquals("complete was called instead of compensate", cnt1[0], cnt2[0]);
-            assertEquals("compensate should have been called", cnt1[1] + 1, cnt2[1]);
-        } finally {
-            if (response != null)
-                response.close();
-        }
-    }
-
-
-//    @Test
-    public void renewTimeLimit() {
-        int[] cnt1 = {completedCount(true), completedCount(false)};
-        Response response = null;
-
-        try {
-            response = msTarget.path("activities")
-                    .path("renewTimeLimit")
-                    .request()
-                    .get();
-
-            checkStatusAndClose(response, -1, true);
-
-            // check that compensator was invoked
-            int[] cnt2 = {completedCount(true), completedCount(false)};
-
-            /*
-             * The call to activities/timeLimit should have started an LRA whch should not have timed out
-             * (because the called resource method renews the timeLimit before sleeping for longer than
-              * the @TimeLimit annotation specifies).
-             * Therefore the it should not have compensated:
-             */
-            assertEquals("compensate was called instead of complete", cnt1[0] + 1, cnt2[0]);
-            assertEquals("compensate should not have been called", cnt1[1], cnt2[1]);
-        } finally {
-            if (response != null)
-                response.close();
-        }
-    }
-
-    private String checkStatusAndClose(Response response, int expected, boolean readEntity) {
-        try {
-            if (expected != -1 && response.getStatus() != expected)
-                throw new WebApplicationException(response);
-
-            if (readEntity)
-                return response.readEntity(String.class);
-        } finally {
-            response.close();
-        }
-
-        return null;
-    }
-
-    private int completedCount(boolean completed) {
-        Response response = null;
-        String path = completed ? "completedactivitycount" : "compensatedactivitycount";
-
-        try {
-            response = msTarget.path("activities").path(path).request().get();
-
-            assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            return Integer.parseInt(response.readEntity(String.class));
-        } finally {
-            if (response != null)
-                response.close();
-        }
-
     }
 }
