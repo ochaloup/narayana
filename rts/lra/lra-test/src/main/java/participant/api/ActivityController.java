@@ -356,7 +356,7 @@ public class ActivityController {
         activityService.add(new Activity(LRAClient.getLRAId(lraId)));
 
         try {
-            Thread.sleep(200); // sleep for 200000 micro seconds (should be longer than specified in the @TimeLimit annotation)
+            Thread.sleep(200); // sleep for 200 miliseconds (should be longer than specified in the @TimeLimit annotation)
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
