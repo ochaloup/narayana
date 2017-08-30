@@ -48,6 +48,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.narayana.rts.lra.client.Current;
 import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.narayana.rts.lra.client.LRAStatus;
 import org.jboss.shrinkwrap.api.Archive;
@@ -141,6 +142,7 @@ public class SpecIT {
                 }
             });
         }
+        Current.popAll();
     }
 
     // TODO add a test for a compensator annotated with @TimeLimit
