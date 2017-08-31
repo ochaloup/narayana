@@ -44,7 +44,7 @@ public class TripClient {
     ObjectMapper objectMapper = new ObjectMapper();
 
     private static void initClient() {
-        int servicePort = Integer.getInteger("sra.demo.service.http.port", 8081);
+        int servicePort = Integer.getInteger("lra.demo.service.http.port", 8081);
 
         PRIMARY_SERVER = "http://localhost:" + servicePort;
         TRIP_SERVICE_BASE_URL = String.format("%s%s", PRIMARY_SERVER, TripController.TRIP_PATH);

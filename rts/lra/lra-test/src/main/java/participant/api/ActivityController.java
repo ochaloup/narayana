@@ -198,7 +198,7 @@ public class ActivityController {
         if (lraId != null)
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
 
-        // manually start an LRA via the injection LRAClient sra.demo.api
+        // manually start an LRA via the injection LRAClient lra.demo.api
         URL lra = lraClient.startLRA("subActivity", 0L);
 
         lraId = lra.toString();
