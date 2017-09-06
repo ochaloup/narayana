@@ -108,7 +108,8 @@ public class StartCdiCheckIT {
 
     @Test
     public void allCorrect() throws Exception {
-        Swarm swarm = new Swarm()
+        File logFile = tmpFolder.newFile();
+        Swarm swarm = new Swarm(getLoggingArgs(logFile))
             .fraction(new JAXRSFraction())
             .fraction(new CDIFraction())
             .start();
