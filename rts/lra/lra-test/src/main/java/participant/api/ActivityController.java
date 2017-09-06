@@ -28,6 +28,7 @@ import org.jboss.narayana.rts.lra.annotation.Leave;
 import org.jboss.narayana.rts.lra.annotation.NestedLRA;
 import org.jboss.narayana.rts.lra.annotation.Status;
 import org.jboss.narayana.rts.lra.annotation.TimeLimit;
+import org.jboss.narayana.rts.lra.client.Current;
 import org.jboss.narayana.rts.lra.client.IllegalLRAStateException;
 import org.jboss.narayana.rts.lra.client.LRAClient;
 import org.jboss.narayana.rts.lra.client.LRAClientAPI;
@@ -233,8 +234,13 @@ public class ActivityController {
 
     private String restPutInvocation(String path, String bodyText) {
         String id = null;
-        Response response = ClientBuilder.newClient().target(context.getBaseUri())
-                .path("activities").path(path).request().put(Entity.text(bodyText));
+        Response response = ClientBuilder.newClient()
+            .target(context.getBaseUri())
+            .path("activities")
+            .path(path)
+            .request()
+            .header(LRAClient.LRA_HTTP_HEADER, Current.peek())
+            .put(Entity.text(bodyText));
 
         if (response.hasEntity())
             id = response.readEntity(String.class);
