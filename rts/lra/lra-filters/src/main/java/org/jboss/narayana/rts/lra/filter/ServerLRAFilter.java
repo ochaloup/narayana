@@ -94,7 +94,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
 
 //    // TODO figure out how to disable the filters for the coordinator (they remove the
 //    private boolean isCoordinator() {
-//        return resourceInfo.getResourceClass().getName().equals("org.jboss.narayana.rts.lra.coordinator.lra.demo.api.Coordinator")
+//        return resourceInfo.getResourceClass().getName().equals("org.jboss.narayana.rts.lra.coordinator.api.Coordinator")
 //    }
 
     @Override
