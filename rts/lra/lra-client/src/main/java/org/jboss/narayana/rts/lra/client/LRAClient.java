@@ -207,7 +207,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
     }
 
     private WebTarget getTarget() {
-//        return target; // TODO can't share the target if a sra.demo.service makes multiple JAX-RS requests
+//        return target; // TODO can't share the target if a lra.demo.service makes multiple JAX-RS requests
         client.close(); // hacking
         client = ClientBuilder.newClient();
         return client.target(base);
@@ -299,7 +299,7 @@ public class LRAClient implements LRAClientAPI, Closeable {
     public void renewTimeLimit(URL lraId, long limit, TimeUnit unit) {
         Response response = null;
 
-        lraTrace("leaving LRA", lraId);
+        lraTrace(String.format("renew time limit to %s s of LRA", unit.toSeconds(limit)), lraId);
 
         try {
             aquireConnection();
