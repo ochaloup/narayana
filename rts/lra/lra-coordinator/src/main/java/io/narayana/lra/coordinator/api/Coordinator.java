@@ -189,7 +189,9 @@ public class Coordinator {
             String compensatorUrl = String.format("%s/%s", coordinatorUrl,
                     LRAClient.encodeURL(lraId, "Invalid parent LRA id"));
 
-            Response response = client.target(parentLRA).request().put(Entity.text(compensatorUrl));
+            Response response = client.target(parentLRA).request()
+                .header(LRA_HTTP_HEADER, coordinatorUrl)
+                .put(Entity.text(compensatorUrl));
 
             if (response.getStatus() != Response.Status.OK.getStatusCode())
                 return response;
