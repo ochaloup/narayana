@@ -1,5 +1,7 @@
 #!/bin/sh
 
+ls
+yum install -y maven 
 cd ../../..
 ./build.sh -B  -fae -DallTests -DskipTests
 cd -

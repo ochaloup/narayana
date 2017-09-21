@@ -1,0 +1,5 @@
+#!/bin/sh
+
+java -jar target/lra-coordinator-swarm.jar
+
+exit 0
