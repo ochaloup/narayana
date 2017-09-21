@@ -8,11 +8,12 @@ ENV JAVA_OPTIONS -Xmx512m
   
 EXPOSE 8080  
 
+CMD pwd
+CMD ls *
 CMD cd ../../.. &&\
     ./build.sh -B  -fae -DallTests -DskipTests &&\
-    cd - &&\
-    ls &&\
-    ls *
-  
+    cd -
+CMD ls *
+ 
 ADD target/lra-coordinator-swarm.jar /deployments/  
   
