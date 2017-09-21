@@ -16,4 +16,4 @@ spec:
         version: '8' 
       from:
         kind: DockerImage
-        name: 'openjdk/8-jdk:latest'
+        name: 'openjdk:8'
