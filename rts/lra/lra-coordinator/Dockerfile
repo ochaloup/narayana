@@ -11,9 +11,10 @@ EXPOSE 8080
 
 RUN pwd
 RUN ls 
-RUN cd ../../.. &&\
-    ./build.sh -B  -fae -DallTests -DskipTests &&\
-    cd -
+RUN find -name narayana
+RUN cd ../../..
+RUN ./build.sh -B  -fae -DallTests -DskipTests
+RUN cd -
 RUN ls *
  
 ADD target/lra-coordinator-swarm.jar /deployments/  
