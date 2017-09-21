@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd ../../..
+./build.sh -B  -fae -DallTests -DskipTests
+cd -
+
+exit 0
