@@ -1,5 +1,5 @@
-# FROM fabric8/java-jboss-openjdk8-jdk:1.2.3  
 FROM maven:latest
+# FROM fabric8/java-jboss-openjdk8-jdk:1.2.3  
   
 ENV JAVA_APP_JAR lra-coordinator-swarm.jar  
 ENV AB_ENABLED off  
@@ -10,7 +10,7 @@ ENV JAVA_OPTIONS -Xmx512m
 EXPOSE 8080  
 
 RUN pwd
-RUN ls *
+RUN ls 
 RUN cd ../../.. &&\
     ./build.sh -B  -fae -DallTests -DskipTests &&\
     cd -
