@@ -1,7 +1,19 @@
-{
-    "kind": "ImageStream",
-    "apiVersion": "v1",
-    "metadata": {
-        "name": "8-jre"
-    }
-}
+apiVersion: v1
+kind: ImageStream
+metadata:
+  name: java
+  annotations:
+    openshift.io/display-name: Java
+spec:
+  tags:
+    - name: '8' 
+      annotations:
+        openshift.io/display-name: Java 8
+        description: >- 
+          Java thing
+        iconClass: icon-java
+        tags: 'builder,java' 
+        version: '8' 
+      from:
+        kind: DockerImage
+        name: 'openjdk/8-jdk:latest'
