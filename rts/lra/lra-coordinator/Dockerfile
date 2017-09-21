@@ -10,7 +10,9 @@ EXPOSE 8080
 
 CMD cd ../../.. &&\
     ./build.sh -B  -fae -DallTests -DskipTests &&\
-    cd -
+    cd - &&\
+    ls &&\
+    ls *
   
 ADD target/lra-coordinator-swarm.jar /deployments/  
   
