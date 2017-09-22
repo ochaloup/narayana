@@ -1,13 +1,6 @@
 #!/bin/sh
 
-echo -x
-pwd
-ls /opt
-ls /opt/app
-ls /opt/app/src
 cd /opt/app/src
-echo +x
-
 ./build.sh -B  -fae -DallTests -DskipTests
 cp rts/lra/lra-coordinator/target/lra-coordinator-swarm.jar /opt/app/openshift-app.jar
 
