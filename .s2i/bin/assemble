@@ -1,0 +1,11 @@
+#!/bin/sh
+
+ls /opt/app/src/src/main/java/io/narayana
+
+pwd
+cd /opt/app/src/src/main/java/io/narayana
+
+./build.sh -B  -fae -DallTests -DskipTests
+cp rts/lra/lra-coordinator/target/lra-coordinator-swarm.jar /opt/app/openshift-app.jar
+
+exit 0
