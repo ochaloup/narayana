@@ -1,7 +1,7 @@
 #!/bin/sh
 
 cd /opt/app/src
-./build.sh -B  -fae -DallTests -DskipTests
+./build.sh clean install -Pcommunity -DskipTests -Didlj-enabled=true -am -pl rts/lra/lra-coordinator
 cp rts/lra/lra-coordinator/target/lra-coordinator-swarm.jar /opt/app/openshift-app.jar
 
 exit 0
