@@ -1,9 +1,12 @@
 #!/bin/sh
 
-ls /opt/app/src/src/main/java/io/narayana
-
+echo -x
 pwd
-cd /opt/app/src/src/main/java/io/narayana
+ls /opt
+ls /opt/app
+ls /opt/app/src
+cd /opt/app/src
+echo +x
 
 ./build.sh -B  -fae -DallTests -DskipTests
 cp rts/lra/lra-coordinator/target/lra-coordinator-swarm.jar /opt/app/openshift-app.jar
