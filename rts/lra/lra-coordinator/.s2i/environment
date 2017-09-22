@@ -1,0 +1,3 @@
+S2I_DEBUG=true
+BUILD_LOGLEVEL=5
+

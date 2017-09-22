@@ -1,7 +1,9 @@
 #!/bin/sh
 
-ls
-yum install -y maven 
+ls /opt/app/src/src/main/java/io/narayana
+
+pwd
+
 cd ../../..
 ./build.sh -B  -fae -DallTests -DskipTests
 cd -
