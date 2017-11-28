@@ -93,7 +93,7 @@ public class XATerminatorImpleUnitTest extends TestBase
     @Test
     public void testXARMERR () throws Exception {
         Uid uid = new Uid();
-        XidImple xid = new XidImple(uid);
+        Xid xid = XidUtils.getXid(uid, true);
         TransactionImporter imp = SubordinationManager.getTransactionImporter();
 
         SubordinateTransaction subordinateTransaction = imp.importTransaction(xid);
