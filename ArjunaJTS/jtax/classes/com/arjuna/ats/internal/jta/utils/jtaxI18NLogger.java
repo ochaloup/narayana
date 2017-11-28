@@ -24,10 +24,17 @@ import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 import static org.jboss.logging.annotations.Message.Format.MESSAGE_FORMAT;
 
+import java.io.IOException;
+
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+
+import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.state.InputObjectState;
+import com.arjuna.ats.arjuna.state.OutputObjectState;
+import com.arjuna.ats.jts.extensions.AtomicTransaction;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -282,6 +289,25 @@ public interface jtaxI18NLogger {
 	@Message(id = 24063, value = "Can't save state of xid {0}", format = MESSAGE_FORMAT)
 	@LogMessage(level = WARN)
 	public void warn_jtax_resources_jts_cant_save_state(Xid xid, @Cause() Throwable e);
+
+	@Message(id = 24064, value = "The current transaction {0} does not match this transaction", format = MESSAGE_FORMAT)
+	public String warn_get_jtax_transaction_jts_wrongstatetx(AtomicTransaction txn, @Cause() Exception e);
+
+	@Message(id = 24065, value = "Can't read node name from object store for Uid {0}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cant_read_nodename_from_objectstore(Uid actId, @Cause() Exception e);
+
+	@Message(id = 24066, value = "Can't save state of output object state {0} of object type {1}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cant_save_state(OutputObjectState os, int ot, @Cause() IOException e);
+
+	@Message(id = 24067, value = "Can't restore state of input object state {0} of object type {1}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_cant_restore_state(InputObjectState os, int ot, @Cause() IOException ex);
+
+	@Message(id = 24068, value = "Could not access object store to check for log for xid {0}", format = MESSAGE_FORMAT)
+	@LogMessage(level = WARN)
+	public void warn_could_not_access_object_store(Xid xid, @Cause() Exception e);
 
     /*
         Allocate new messages directly above this notice.
