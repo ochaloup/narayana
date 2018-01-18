@@ -20,8 +20,11 @@
  */
 package com.arjuna.ats.internal.jdbc.drivers;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -55,9 +58,18 @@ public class PropertyFileDynamicClass implements DynamicClass
 
         Properties properties = new Properties();
 
-        FileInputStream propertiesFileInputStream = null;
+        InputStream propertiesFileInputStream = null;
         try {
-            propertiesFileInputStream = new FileInputStream(propertyFileName);
+            if(new File(propertyFileName).exists()) {
+                propertiesFileInputStream = new FileInputStream(propertyFileName);
+            } else if(getClass().getResourceAsStream("/" + propertyFileName) != null) {
+                propertiesFileInputStream = getClass().getResourceAsStream("/" + propertyFileName);
+            } else if(getClass().getClassLoader().getResourceAsStream(propertyFileName) != null) {
+                propertiesFileInputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+            } else {
+                throw new FileNotFoundException("transactional jdbc driver property file "
+                    + propertyFileName + " can't be found");
+            }
             properties.load(propertiesFileInputStream);
             propertiesFileInputStream.close();
         } catch(IOException e) {

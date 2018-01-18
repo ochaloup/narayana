@@ -1,0 +1,6 @@
+xaDataSourceClassName=org.postgresql.xa.PGXADataSource
+ServerName=localhost
+PortNumber=5432
+DatabaseName=test
+User=test
+Password=test

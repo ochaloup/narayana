@@ -78,6 +78,7 @@ public class BaseITCase {
                 .addAsLibraries(libraries)
                 .addAsManifestResource("context.xml", "context.xml")
                 .addAsResource("jbossts-properties.xml", "jbossts-properties.xml")
+                .addAsWebInfResource("pg.resources", "classes/pg.resources")
                 .addAsWebInfResource("web.xml", "web.xml")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         System.out.println(archive.toString(true));
