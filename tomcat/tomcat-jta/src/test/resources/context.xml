@@ -6,21 +6,19 @@
               factory="org.jboss.narayana.tomcat.jta.TransactionManagerFactory"/>
     <Resource name="TransactionSynchronizationRegistry" type="javax.transaction.TransactionSynchronizationRegistry"
               factory="org.jboss.narayana.tomcat.jta.TransactionSynchronizationRegistryFactory"/>
-    
-    <!--type="org.postgresql.xa.PGXADataSource"-->
-    <!-- factory: org.apache.tomcat.jdbc.pool.DataSourceFactory on use whatever type - does not work or what :/ type="javax.sql.XADataSource" -->
-       <!-- javax.naming.NamingException: java.sql.SQLException: java.sql.SQLException: failed to locate properties file -->
-    <!-- new version of tomcat: org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory, knows only javax.sql.DataSource -->
-    <!-- old version of tomcat: org.apache.commons.dbcp.BasicDataSourceFactory, knows only javax.sql.DataSource -->
-    <!-- capable to playwith XA somehow: org.apache.tomcat.jdbc.pool.DataSourceFactory, knows javax.sql.XADataSource and javax.sql.DataSource-->
-              
-    <Resource name="transactionalDataSource" uniqueName="transactionalDataSource"
-              factory="org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory"
-              type="javax.sql.DataSource"
-              auth="Container"
-              username="test" password="test"
-              driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
-              url="jdbc:arjuna:pg.resources"
-              connectionProperties="DYNAMIC_CLASS=com.arjuna.ats.internal.jdbc.drivers.PropertyFileDynamicClass"
-              description="Transactional Driver Data Source"/>
+
+    <!-- Database resources -->
+    <Resource name="h2DataSource" uniqueName="h2Datasource" auth="Container"
+              factory="org.postgresql.xa.PGXADataSourceFactory"
+              type="org.postgresql.xa.PGXADataSource"
+              serverName="localhost"
+              portNumber="5432"
+              databaseName="test"
+              user="test"
+              password="test"
+              description="postgresql"/>
+
+    <Resource name="transactionalDataSource" uniqueName="transactionalDataSource" auth="Container" type="javax.sql.DataSource"
+              username="sa" password="sa" driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
+              url="jdbc:arjuna:java:comp/env/h2DataSource" description="Transactional Driver Data Source"/>
 </Context>
