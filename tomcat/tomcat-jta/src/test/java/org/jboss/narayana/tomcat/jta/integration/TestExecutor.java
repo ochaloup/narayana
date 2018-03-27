@@ -28,6 +28,7 @@ import com.arjuna.ats.internal.jta.recovery.arjunacore.XARecoveryModule;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import javax.sql.XAConnection;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -157,6 +158,7 @@ public class TestExecutor {
         String query = "INSERT INTO test VALUES ('" + entry + "')";
         try (Connection connection = getTransactionalDataSource().getConnection();
                 Statement statement = connection.createStatement()) {
+            // getTransactionManager().getTransaction().enlistResource(((XAConnection)connection).getXAResource());
             statement.execute(query);
         }
     }
@@ -174,6 +176,7 @@ public class TestExecutor {
     }
 
     private DataSource getTransactionalDataSource() throws NamingException {
+        // return InitialContext.doLookup("java:comp/env/pooledDataSource");
         return InitialContext.doLookup("java:comp/env/transactionalDataSource");
     }
 

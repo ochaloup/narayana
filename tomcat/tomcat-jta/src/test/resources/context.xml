@@ -8,10 +8,29 @@
               factory="org.jboss.narayana.tomcat.jta.TransactionSynchronizationRegistryFactory"/>
 
     <!-- Database resources -->
-    <Resource name="h2DataSource" uniqueName="h2Datasource" auth="Container" type="org.h2.jdbcx.JdbcDataSource" username="sa"
-              user="sa" password="sa" url="jdbc:h2:mem:testdb" description="H2 Data Source" loginTimeout="0"
-              factory="org.h2.jdbcx.JdbcDataSourceFactory"/>
+    <Resource name="psqlDataSource" uniqueName="psqlDataSource" auth="Container"
+      factory="org.postgresql.xa.PGXADataSourceFactory"
+      type="org.postgresql.xa.PGXADataSource"
+      serverName="localhost"
+      portNumber="5432"
+      databaseName="test"
+      user="test"
+      password="test"
+      description="PostgreSQL XA Data Source"/>
+
+    <Resource auth="Container"
+      description="Pooled Data Source"
+      name="pooledDataSource" uniqueName="pooledDataSource"
+      defaultAutoCommit="false"
+      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+      type="javax.sql.XADataSource"
+      dataSourceJNDI="psqlDataSource"/>
+
+
     <Resource name="transactionalDataSource" uniqueName="transactionalDataSource" auth="Container" type="javax.sql.DataSource"
-              username="sa" password="sa" driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
-              url="jdbc:arjuna:java:comp/env/h2DataSource" description="Transactional Driver Data Source"/>
+      driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
+      url="jdbc:arjuna:java:comp/env/pooledDataSource"
+      description="Transactional Driver Data Source"
+      connectionProperties="POOL_CONNECTIONS=false"/>
+
 </Context>
