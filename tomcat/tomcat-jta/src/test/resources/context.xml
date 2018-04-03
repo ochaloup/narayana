@@ -18,6 +18,7 @@
       password="test"
       description="PostgreSQL XA Data Source"/>
 
+    <!--
     <Resource auth="Container"
       description="Pooled Data Source"
       name="pooledDataSource" uniqueName="pooledDataSource"
@@ -25,11 +26,13 @@
       factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
       type="javax.sql.XADataSource"
       dataSourceJNDI="psqlDataSource"/>
+      -->
 
-
-    <Resource name="transactionalDataSource" uniqueName="transactionalDataSource" auth="Container" type="javax.sql.DataSource"
+    <Resource name="transactionalDataSource" uniqueName="transactionalDataSource" auth="Container"
+      type="javax.sql.XADataSource"
+      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
       driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
-      url="jdbc:arjuna:java:comp/env/pooledDataSource"
+      url="jdbc:arjuna:java:comp/env/psqlDataSource"
       description="Transactional Driver Data Source"
       connectionProperties="POOL_CONNECTIONS=false"/>
 
