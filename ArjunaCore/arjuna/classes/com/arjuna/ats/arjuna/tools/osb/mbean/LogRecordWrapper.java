@@ -198,6 +198,10 @@ public class LogRecordWrapper extends OSEntryBean implements LogRecordWrapperMBe
 		return listType.equals(ParticipantStatus.HEURISTIC);
 	}
 
+	public boolean isPrepared() {
+	    return listType.equals(ParticipantStatus.PREPARED);
+	}
+
 	@Override
 	public String getHeuristicStatus() {
 		Object heuristicInformation = rec.value();
@@ -235,6 +239,11 @@ public class LogRecordWrapper extends OSEntryBean implements LogRecordWrapperMBe
 
     public boolean removeFromList(RecordList rl) {
         if (rl != null && rl.size() > 0 && rec != null) {
+            if(isParticipant() && isPrepared()) {
+                // action to remove is designed only for heuristically finished participants
+                return false;
+            }
+
             boolean forgotten = forgetRec || rec.forgetHeuristic();
             boolean removeAllowed = arjPropertyManager.getObjectStoreEnvironmentBean().isIgnoreMBeanHeuristics();
 
