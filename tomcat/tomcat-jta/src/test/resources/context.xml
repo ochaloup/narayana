@@ -16,24 +16,23 @@
       databaseName="test"
       user="test"
       password="test"
+      loginTimeout="0"
       description="PostgreSQL XA Data Source"/>
 
-    <!--
-    <Resource auth="Container"
-      description="Pooled Data Source"
-      name="pooledDataSource" uniqueName="pooledDataSource"
-      defaultAutoCommit="false"
-      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-      type="javax.sql.XADataSource"
-      dataSourceJNDI="psqlDataSource"/>
-      -->
-
-    <Resource name="transactionalDataSource" uniqueName="transactionalDataSource" auth="Container"
-      type="javax.sql.XADataSource"
-      factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-      driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
-      url="jdbc:arjuna:java:comp/env/psqlDataSource"
-      description="Transactional Driver Data Source"
-      connectionProperties="POOL_CONNECTIONS=false"/>
+	<Resource
+	    name="transactionalDataSource"
+	    uniqueName="transactionalDataSource"
+	    auth="Container"
+	    type="javax.sql.DataSource"
+	    transactionManager="TransactionManager"
+	    xaDataSource="psqlDataSource"
+	    initialSize="20"
+	    maxWaitMillis="15000"
+	    maxTotal="75"
+	    maxIdle="20"
+	    maxAge="120000"
+	    testOnBorrow="true"
+	    validationQuery="select 1"
+	    factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory"/>
 
 </Context>
