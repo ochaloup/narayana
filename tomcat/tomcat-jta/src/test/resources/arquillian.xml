@@ -35,4 +35,9 @@
         </configuration>
     </container>
 
+    <!--
+    <engine>
+        <property name="deploymentExportPath">tomcat-deployment</property>
+    </engine>
+    -->
 </arquillian>

@@ -104,6 +104,7 @@ public class BaseITCase {
     @Test
     public void testRecovery() {
         test(EXECUTOR_URL + RECOVERY_TEST);
+        test(EXECUTOR_URL + RECOVERY_TEST);
     }
 
     private void test(String url) {
