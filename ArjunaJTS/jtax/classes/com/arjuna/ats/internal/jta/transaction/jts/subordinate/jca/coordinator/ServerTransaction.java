@@ -40,13 +40,10 @@ import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
-import com.arjuna.ats.arjuna.utils.Utility;
-import com.arjuna.ats.internal.arjuna.Header;
 import com.arjuna.ats.internal.jta.utils.jtaxLogger;
 import com.arjuna.ats.internal.jta.xa.XID;
 import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
-import com.arjuna.ats.jts.logging.jtsLogger;
 
 /**
  * This looks like an Transaction, but is only created for importing

@@ -31,6 +31,9 @@
 
 package com.arjuna.ats.internal.jta.transaction.jts.jca;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -190,6 +193,21 @@ public class TransactionImporterImple implements TransactionImporter
                 TransactionImple.removeTransaction(transactionImple);
             }
         }
+	}
+
+	public Set<Xid> getInflightXids(String parentNodeName) {
+		Iterator<AtomicReference<SubordinateTransaction>> iterator = _transactions.values().iterator();
+		Set<Xid> toReturn = new HashSet<Xid>();
+		while (iterator.hasNext()) {
+			AtomicReference<SubordinateTransaction> holder = iterator.next();
+			SubordinateTransaction imported = holder.get();
+
+			if (imported != null && imported instanceof com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple
+			    && ((com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.TransactionImple) imported).getParentNodeName().equals(parentNodeName)) {
+				toReturn.add(imported.baseXid());
+			}
+		}
+		return toReturn;
 	}
 
 	/**

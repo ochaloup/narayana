@@ -42,6 +42,7 @@ import javax.transaction.xa.Xid;
 
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
 import com.arjuna.ats.internal.jts.orbspecific.coordinator.ArjunaTransactionImple;
 import com.arjuna.ats.internal.jts.recovery.transactions.TransactionCache;
@@ -75,6 +76,10 @@ public class TransactionImple extends
 	public TransactionImple (Uid actId)
 	{
 		super(new SubordinateAtomicTransaction(actId));
+	}
+
+	public String getParentNodeName() {
+		return ((SubordinateAtomicTransaction)_theTransaction).getParentNodeName();
 	}
 	
 	/**
