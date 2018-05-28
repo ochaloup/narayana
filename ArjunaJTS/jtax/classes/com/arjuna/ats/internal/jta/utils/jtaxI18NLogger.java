@@ -20,6 +20,7 @@
  */
 package com.arjuna.ats.internal.jta.utils;
 
+import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 import static org.jboss.logging.annotations.Message.Format.MESSAGE_FORMAT;
@@ -39,6 +40,7 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.arjuna.state.OutputObjectState;
 import com.arjuna.ats.internal.jta.transaction.jts.AtomicTransaction;
+import com.arjuna.ats.jta.xa.XAModifier;
 
 /**
  * i18n log messages for the jtax module.
@@ -300,6 +302,26 @@ public interface jtaxI18NLogger {
 	@Message(id = 24066, value = "Can't restore state of input object state {0} of object type {1}", format = MESSAGE_FORMAT)
 	@LogMessage(level = WARN)
 	public void warn_cant_restore_state(InputObjectState os, int ot, @Cause() IOException ex);
+
+    @Message(id = 24067, value = "Can't modify newly created xid {0} with the modifier {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    void warn_cant_modify_created_xid(Xid id, XAModifier modifier, @Cause() Exception e);
+
+    @Message(id = 24068, value = "Can't create a new instance of Xid of base xid {0}, is branch: {1}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    void warn_cant_create_xid_of_xid(Xid id, Boolean branch, @Cause() Exception e);
+
+    @Message(id = 24069, value = "Failed to commit transaction {0} as it was rolled-back", format = MESSAGE_FORMAT)
+    @LogMessage(level = ERROR)
+    void error_to_commit_transaction_was_rolledback(AtomicTransaction txn, @Cause() Exception e);
+
+    @Message(id = 24070, value = "Can't read node name from object store for Uid {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_cant_read_nodename_from_objectstore(Uid actId, @Cause() Exception e);
+
+    @Message(id = 24071, value = "Could not access object store to check for log for xid {0}", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_could_not_access_object_store(Xid xid, @Cause() Exception e);
 
     /*
         Allocate new messages directly above this notice.

@@ -31,12 +31,10 @@
 
 package com.arjuna.ats.internal.jta.transaction.jts;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,7 +47,6 @@ import javax.transaction.xa.Xid;
 
 import org.omg.CORBA.INVALID_TRANSACTION;
 import org.omg.CORBA.TRANSACTION_ROLLEDBACK;
-import org.omg.CORBA.TRANSACTION_UNAVAILABLE;
 import org.omg.CORBA.UNKNOWN;
 import org.omg.CORBA.WrongTransaction;
 import org.omg.CosTransactions.NoTransaction;
@@ -80,7 +77,6 @@ import com.arjuna.ats.jta.resources.LastResourceCommitOptimisation;
 import com.arjuna.ats.jta.utils.JTAHelper;
 import com.arjuna.ats.jta.utils.XAHelper;
 import com.arjuna.ats.jta.xa.XAModifier;
-import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
 
 /**
@@ -441,8 +437,8 @@ public class TransactionImple implements javax.transaction.Transaction,
 			}
 		}
 		
-		if (jtaLogger.logger.isTraceEnabled()) {
-            jtaLogger.logger.trace("TransactionImple.getStatus: " + JTAHelper.stringForm(status));
+		if (jtaxLogger.logger.isTraceEnabled()) {
+            jtaxLogger.logger.trace("TransactionImple.getStatus: " + JTAHelper.stringForm(status));
         }
 
 		return status;
@@ -1427,8 +1423,8 @@ public class TransactionImple implements javax.transaction.Transaction,
 			}
 			catch (TRANSACTION_ROLLEDBACK e4)
 			{
-			    e4.printStackTrace();
-			    
+			    jtaxLogger.i18NLogger.error_to_commit_transaction_was_rolledback(_theTransaction, e4);
+
 				RollbackException rollbackException = new RollbackException(e4.toString());
                 if(_rollbackOnlyCallerStacktrace != null) {
                     // we rolled back beacuse the user explicitly told us not to commit. Attach the trace of who did that for debug:
@@ -1781,7 +1777,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					jtaxLogger.i18NLogger.warn_cant_modify_created_xid(jtaXid, theModifier, e);
 				}
 			}
 
@@ -1789,7 +1785,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			jtaxLogger.i18NLogger.warn_cant_create_xid_of_xid(jtaXid, branch, e);
 		}
 
 		return null;
