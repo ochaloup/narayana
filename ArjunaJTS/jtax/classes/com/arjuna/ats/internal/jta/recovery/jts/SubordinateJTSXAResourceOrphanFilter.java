@@ -20,31 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.arjuna.ats.internal.jta.recovery.arjunacore;
+package com.arjuna.ats.internal.jta.recovery.jts;
 
 import javax.transaction.xa.Xid;
 
 import com.arjuna.ats.arjuna.common.Uid;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.SubordinateXAResourceOrphanChecker;
+import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
-import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
+import com.arjuna.ats.jts.extensions.Arjuna;
 
 /**
- * An XAResourceOrphanFilter which uses detects orphaned subordinate XA Resources for JTA.
+ * An XAResourceOrphanFilter which uses detects orphaned subordinate XA Resources for JTS.
  */
-public class SubordinateJTAXAResourceOrphanFilter implements XAResourceOrphanFilter {
+public class SubordinateJTSXAResourceOrphanFilter implements XAResourceOrphanFilter {
     private SubordinateXAResourceOrphanChecker subordinateOrphanFilterImple = new SubordinateXAResourceOrphanChecker();
 
 	@Override
 	public Vote checkXid(Xid xid) {
 
-		if(xid.getFormatId() != XATxConverter.FORMAT_ID) {
-			// we only care about Xids created by the JTA
+		if(xid == null || xid.getFormatId() != Arjuna.XID()) {
+			// we only care about Xids created by the JTS
 			return Vote.ABSTAIN;
 		}
 
-		return subordinateOrphanFilterImple.checkXid(xid, () -> SubordinateAtomicAction.getType(),
-		    (Uid uid) -> (XidImple) (new SubordinateAtomicAction(uid, true).getXid()));
+	      return subordinateOrphanFilterImple.checkXid(xid, () -> ServerTransaction.getType(),
+	              (Uid uid) -> (XidImple) (new ServerTransaction(uid).getXid()));
 	}
 }

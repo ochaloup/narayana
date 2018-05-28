@@ -22,8 +22,8 @@ package com.arjuna.ats.internal.jta.recovery.arjunacore;
 
 import javax.transaction.xa.Xid;
 
+import com.arjuna.ats.internal.arjuna.FormatConstants;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
-import com.arjuna.ats.jta.xa.XATxConverter;
 
 /**
  * An XAResourceOrphanFilter for JTA top level transactions, which uses node name information
@@ -35,12 +35,10 @@ public class JTANodeNameXAResourceOrphanFilter implements XAResourceOrphanFilter
 {
     private final XAResourceOrphanFilter nodeNameFilter = new NodeNameXAResourceOrphanFilter();
 
-    protected final int myFormatId = XATxConverter.FORMAT_ID;
-
     @Override
     public Vote checkXid(Xid xid)
     {
-        if(xid.getFormatId() != myFormatId) {
+        if(xid.getFormatId() != FormatConstants.JTA_FORMAT_ID) {
             return Vote.ABSTAIN;
         }
 

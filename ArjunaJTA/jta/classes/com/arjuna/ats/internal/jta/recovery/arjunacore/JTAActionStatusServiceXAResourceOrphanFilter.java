@@ -27,16 +27,18 @@ import javax.transaction.xa.Xid;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import com.arjuna.ats.arjuna.recovery.ActionStatusService;
+import com.arjuna.ats.internal.arjuna.FormatConstants;
 import com.arjuna.ats.internal.jta.utils.XAUtils;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
-import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
 
 /**
+ * <p>
  * An XAResourceOrphanFilter which vetos rollback for xids which have an in-flight transaction.
- *
+ * The additional check verifies that the node name matches the responsibility of the recovery manager.
+ * <p>
  * Warning: If this is enabled and the recovery manager cannot contact the transaction manager then branches will remain locked.
  */
 public class JTAActionStatusServiceXAResourceOrphanFilter implements XAResourceOrphanFilter
@@ -44,8 +46,8 @@ public class JTAActionStatusServiceXAResourceOrphanFilter implements XAResourceO
     @Override
     public Vote checkXid(Xid xid)
     {
-        if (xid.getFormatId() != XATxConverter.FORMAT_ID) {
-            // we only care about Xids created by the JTA
+        if (!FormatConstants.isNarayanaFormatId(xid.getFormatId())) {
+            // we only care about Xids created by the JTA or JTS (jts at JTSActionStatusServiceXAResourceOrphanFilter)
             return Vote.ABSTAIN;
         }
 

@@ -170,10 +170,10 @@ public class TransactionImple extends
 		}
 		catch (ClassCastException ex)
 		{
-            jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
+			jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
 
-            UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
-            unexpectedConditionException.initCause(ex);
+            		UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
+        		unexpectedConditionException.initCause(ex);
 			throw unexpectedConditionException;
 		}
 		return true;
@@ -188,7 +188,7 @@ public class TransactionImple extends
 
 			if (!endSuspendedRMs())
 			{
-                jtaLogger.i18NLogger.warn_transaction_arjunacore_endsuspendfailed1();
+				jtaLogger.i18NLogger.warn_transaction_arjunacore_endsuspendfailed1();
 			}
 
 			// JBTM-927 the transaction reaper may have aborted this transaction already
@@ -216,8 +216,8 @@ public class TransactionImple extends
 		{
 			jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
 
-            UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
-            unexpectedConditionException.initCause(ex);
+			UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
+			unexpectedConditionException.initCause(ex);
 			throw unexpectedConditionException;
 		}
 	}
@@ -282,10 +282,10 @@ public class TransactionImple extends
 		}
 		catch (ClassCastException ex)
 		{
-            jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
+			jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
 
-            UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
-            unexpectedConditionException.initCause(ex);
+			UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
+			unexpectedConditionException.initCause(ex);
 			throw unexpectedConditionException;
 		}
 	}
@@ -300,7 +300,7 @@ public class TransactionImple extends
 	    }
 	    catch (final Exception ex)
 	    {
-			jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
+	        jtaLogger.i18NLogger.error_transaction_class_cast_fail(super._theTransaction, ex);
 
 	        UnexpectedConditionException unexpectedConditionException = new UnexpectedConditionException(ex.toString());
 	        unexpectedConditionException.initCause(ex);

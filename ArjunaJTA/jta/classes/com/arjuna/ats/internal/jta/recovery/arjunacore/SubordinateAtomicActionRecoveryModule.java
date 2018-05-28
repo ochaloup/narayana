@@ -44,7 +44,7 @@ import java.util.Vector;
  * At the time of writing this module is utilized by the SubordinationManagerXAResourceOrphanFilter to ensure that
  * it can check with the SubordinationManager if the transaction is in flight during orphan detection.
  */
-public class SubordinateAtomicActionRecoveryModule implements RecoveryModule {
+public class SubordinateAtomicActionRecoveryModule implements RecoveryModule, RecoveryModuleMarkerCompletedWithoutError {
 
     private boolean recoveryScanCompletedWithoutError;
     private boolean validatePosition;

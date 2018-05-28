@@ -89,7 +89,7 @@ public class XidImple implements javax.transaction.xa.Xid, Serializable {
 
 	public XidImple(Uid id, boolean branch, Integer eisName) {
 		try {
-			_theXid = XATxConverter.getXid(id, branch, eisName);
+			_theXid = XATxConverter.getJtaXid(id, branch, eisName);
 		} catch (Exception e) {
 			_theXid = null;
 

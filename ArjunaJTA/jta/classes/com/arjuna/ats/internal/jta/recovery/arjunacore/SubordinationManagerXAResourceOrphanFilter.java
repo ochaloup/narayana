@@ -20,9 +20,9 @@
  */
 package com.arjuna.ats.internal.jta.recovery.arjunacore;
 
-import com.arjuna.ats.arjuna.coordinator.TxControl;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import com.arjuna.ats.internal.arjuna.FormatConstants;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
@@ -43,12 +43,12 @@ import java.util.Vector;
  * of recovery modules for this to work so we verify that during orphan detection.
  */
 public class SubordinationManagerXAResourceOrphanFilter implements XAResourceOrphanFilter {
-    private SubordinateAtomicActionRecoveryModule subordinateAtomicActionRecoveryModule;
+    private RecoveryModuleMarkerCompletedWithoutError subordinateAtomicActionRecoveryModule;
 
     @Override
     public Vote checkXid(Xid xid) {
-        if (xid.getFormatId() != XATxConverter.FORMAT_ID) {
-            // we only care about Xids created by the JTA
+        if (!FormatConstants.isNarayanaFormatId(xid.getFormatId())) {
+            // we only care about Xids created by the JTA or JTS (used by JTSSubordinationManagerXAResourceOrphanFilter)
             return Vote.ABSTAIN;
         }
 
@@ -92,12 +92,9 @@ public class SubordinationManagerXAResourceOrphanFilter implements XAResourceOrp
     }
 
     /**
-     * This method retrieves a reference to the SubordinateAtomicActionRecoveryModule so that we can verify there
-     * were no failures in recovery transactions for this pass of the recovery cycle.
-     *
-     * @return a reference to the SubordinateAtomicActionRecoveryModule that is in use
+     * {@inheritDoc}
      */
-    private SubordinateAtomicActionRecoveryModule getSubordinateAtomicActionRecoveryModule() {
+    protected RecoveryModuleMarkerCompletedWithoutError getSubordinateAtomicActionRecoveryModule() {
         if (this.subordinateAtomicActionRecoveryModule == null) {
             Vector<RecoveryModule> modules = RecoveryManager.manager().getModules();
             for (RecoveryModule module : modules) {

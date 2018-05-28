@@ -22,29 +22,18 @@
 
 package com.arjuna.ats.internal.jta.recovery.arjunacore;
 
-import javax.transaction.xa.Xid;
-
-import com.arjuna.ats.arjuna.common.Uid;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction;
-import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
-import com.arjuna.ats.jta.xa.XATxConverter;
-import com.arjuna.ats.jta.xa.XidImple;
-
 /**
- * An XAResourceOrphanFilter which uses detects orphaned subordinate XA Resources for JTA.
+ * Prescription of the method that client could use to check
+ * if the recovery module scan run without errors or if there
+ * were some issues with the scan.
  */
-public class SubordinateJTAXAResourceOrphanFilter implements XAResourceOrphanFilter {
-    private SubordinateXAResourceOrphanChecker subordinateOrphanFilterImple = new SubordinateXAResourceOrphanChecker();
+public interface RecoveryModuleMarkerCompletedWithoutError {
 
-	@Override
-	public Vote checkXid(Xid xid) {
-
-		if(xid.getFormatId() != XATxConverter.FORMAT_ID) {
-			// we only care about Xids created by the JTA
-			return Vote.ABSTAIN;
-		}
-
-		return subordinateOrphanFilterImple.checkXid(xid, () -> SubordinateAtomicAction.getType(),
-		    (Uid uid) -> (XidImple) (new SubordinateAtomicAction(uid, true).getXid()));
-	}
+    /**
+     * Used to ensure that the orphan detection has fully loaded the transaction state before asserting
+     * a decision.
+     *
+     * @return Whether the last recovery scan completed without an error
+     */
+    boolean isRecoveryScanCompletedWithoutError();
 }

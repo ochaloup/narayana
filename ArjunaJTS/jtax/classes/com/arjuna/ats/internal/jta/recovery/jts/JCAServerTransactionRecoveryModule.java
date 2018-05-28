@@ -27,6 +27,7 @@ import com.arjuna.ats.arjuna.objectstore.StoreManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.arjuna.state.InputObjectState;
 import com.arjuna.ats.internal.arjuna.common.UidHelper;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.RecoveryModuleMarkerCompletedWithoutError;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinationManager;
 import com.arjuna.ats.internal.jta.transaction.jts.subordinate.jca.coordinator.ServerTransaction;
 
@@ -38,7 +39,8 @@ import java.io.IOException;
  * This class is purely used by the recovery system to load the transactions into memory so we can be sure
  * that bottom-up recovery could find a serverControl if the EIS has not called XATerminator::recover yet
  */
-public class JCAServerTransactionRecoveryModule implements RecoveryModule {
+public class JCAServerTransactionRecoveryModule implements RecoveryModule, RecoveryModuleMarkerCompletedWithoutError {
+    private boolean recoveryScanCompletedWithoutError;
 
     @Override
     public void periodicWorkFirstPass() {
@@ -71,8 +73,10 @@ public class JCAServerTransactionRecoveryModule implements RecoveryModule {
                 }
                 while (!finished);
             }
+            recoveryScanCompletedWithoutError = true;
         } catch (ObjectStoreException | XAException | IOException e) {
             e.printStackTrace();
+            recoveryScanCompletedWithoutError = false;
         }
     }
 
@@ -80,4 +84,16 @@ public class JCAServerTransactionRecoveryModule implements RecoveryModule {
     public void periodicWorkSecondPass() {
 
     }
+
+
+    /**
+     * Used to ensure that the orphan detection has fully loaded the transaction state before asserting
+     * a decision.
+     *
+     * @return Whether the last recovery scan completed without an error
+     */
+    public boolean isRecoveryScanCompletedWithoutError() {
+        return recoveryScanCompletedWithoutError;
+    }
+
 }

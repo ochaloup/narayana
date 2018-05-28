@@ -50,7 +50,7 @@ public class NodeNameXAResourceOrphanFilter implements XAResourceOrphanFilter
         List<String> _xaRecoveryNodes = jtaPropertyManager.getJTAEnvironmentBean().getXaRecoveryNodes();
 
         if(_xaRecoveryNodes == null || _xaRecoveryNodes.size() == 0) {
-            doWarning();
+            jtaLogger.i18NLogger.info_recovery_noxanodes();
             return Vote.ABSTAIN;
         }
 
@@ -77,9 +77,5 @@ public class NodeNameXAResourceOrphanFilter implements XAResourceOrphanFilter
         {
             return Vote.ABSTAIN;
         }
-    }
-
-    private void doWarning() {
-        jtaLogger.i18NLogger.info_recovery_noxanodes();
     }
 }

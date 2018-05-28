@@ -86,6 +86,9 @@
             <exclude>**/TestSynchronization.java</exclude>
             <exclude>**/TestXAResource.java</exclude>
           </excludes>
+          <systemPropertyVariables combine.children="append">
+            <java.util.logging.config.file>${basedir}/src/test/resources/logging.properties</java.util.logging.config.file>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>
@@ -378,6 +381,7 @@
                                 -->
                                 <server.jvm.args>${server.jvm.args}</server.jvm.args>
                                 <node.address>127.0.0.1</node.address>
+                                <java.util.logging.config.file>${basedir}/src/test/resources/logging.properties</java.util.logging.config.file>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                             <excludes>

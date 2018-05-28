@@ -27,15 +27,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.transaction.HeuristicCommitException;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
-
+ 
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.SubordinateJTAXAResourceOrphanFilter;
@@ -49,9 +44,9 @@ import org.junit.Test;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseCoordinator;
 import com.arjuna.ats.arjuna.coordinator.TxControl;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.JTAActionStatusServiceXAResourceOrphanFilter;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter;
-import com.arjuna.ats.internal.jta.recovery.arjunacore.JTAActionStatusServiceXAResourceOrphanFilter;
 import com.arjuna.ats.internal.jta.recovery.arjunacore.NodeNameXAResourceOrphanFilter;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.recovery.XAResourceOrphanFilter;
@@ -62,7 +57,7 @@ import com.arjuna.ats.jta.xa.XATxConverter;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com), 2010-03
  */
-public class XAResourceOrphanFilterTest
+public class XAResourceOrphanFilterUnitTest
 {
     @Test
     public void testJTANodeNameXAResourceOrphanFilter()
@@ -141,7 +136,7 @@ public class XAResourceOrphanFilterTest
     }
 
     @Test
-    public void testJTAActionStatusServiceXAResourceOrphanFilterSubordinate() throws HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException, SystemException, RollbackException, XAException {
+    public void testJTAActionStatusServiceXAResourceOrphanFilterSubordinate() throws Exception {
         XAResourceOrphanFilter orphanFilter = new SubordinationManagerXAResourceOrphanFilter();
 
         List<String> xaRecoveryNodes = jtaPropertyManager.getJTAEnvironmentBean().getXaRecoveryNodes();
@@ -185,7 +180,7 @@ public class XAResourceOrphanFilterTest
     }
 
     @Test
-    public void testSubordinateJTAXAResourceOrphanFilter() throws HeuristicRollbackException, HeuristicMixedException, HeuristicCommitException, SystemException, RollbackException, XAException {
+    public void testSubordinateJTAXAResourceOrphanFilter() throws Exception {
         XAResourceOrphanFilter orphanFilter = new SubordinateJTAXAResourceOrphanFilter();
         XidImple xid = (XidImple) XATxConverter.getXid(Uid.nullUid(), false, XATxConverter.FORMAT_ID);
         XATxConverter.setSubordinateNodeName(xid.getXID(), TxControl.getXANodeName());

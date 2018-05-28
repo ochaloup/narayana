@@ -75,7 +75,7 @@ public class SubordinateAtomicTransaction extends com.arjuna.ats.internal.jta.tr
 	{
 		try
 		{
-			ServerTransaction tx = (ServerTransaction) super._theAction.getImple().getImplHandle();
+			ServerTransaction tx = getServerTransaction();
 
             // could be null if activation failed.
             if (tx != null) {
@@ -92,4 +92,11 @@ public class SubordinateAtomicTransaction extends com.arjuna.ats.internal.jta.tr
 		return null;
 	}
 
+    public String getParentNodeName() {
+        return getServerTransaction().getParentNodeName();
+    }
+
+	private final ServerTransaction getServerTransaction() {
+	    return (ServerTransaction) super._theAction.getImple().getImplHandle();
+	}
 }

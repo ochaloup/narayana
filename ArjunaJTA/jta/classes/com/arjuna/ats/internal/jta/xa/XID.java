@@ -33,6 +33,7 @@ package com.arjuna.ats.internal.jta.xa;
 
 import java.io.Serializable;
 
+import com.arjuna.ats.internal.arjuna.FormatConstants;
 import com.arjuna.ats.jta.xa.XATxConverter;
 
 /**
@@ -144,7 +145,7 @@ public class XID implements Serializable
 	{
         // controversial and not too robust. see JBTM-297 before messing with this.
 
-        if(formatID == XATxConverter.FORMAT_ID) {
+        if(FormatConstants.isNarayanaFormatId(formatID)) {
             // it's one of ours, we know how to inspect it:
             return XATxConverter.getXIDString(this);
         }

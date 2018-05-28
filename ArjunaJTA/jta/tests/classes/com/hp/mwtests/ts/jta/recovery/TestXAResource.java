@@ -24,7 +24,11 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import org.jboss.logging.Logger;
+
 public class TestXAResource implements XAResource {
+	private static final Logger log = Logger.getLogger(TestXAResource.class);
+
 	private Xid xid;
 	private int commitCount;
 	private int rollbackCount;
@@ -45,18 +49,19 @@ public class TestXAResource implements XAResource {
 	}
 
 	public int prepare(Xid xid) throws XAException {
+		log.info("prepared, xid: " + xid);
 		this.xid = xid;
 		return XA_OK;
 	}
 
 	public void commit(Xid id, boolean onePhase) throws XAException {
-		System.out.println("committed");
+		log.info("committed, xid: " + xid + ", onephase: " + onePhase);
 		xid = null;
 		commitCount++;
 	}
 
 	public void rollback(Xid xid) throws XAException {
-		System.out.println("rolled back");
+		log.info("rolled back, xid: " + xid);
 		xid = null;
 		rollbackCount++;
 	}

@@ -23,8 +23,8 @@ package com.arjuna.ats.internal.jta.transaction.arjunacore.jca;
 
 import javax.transaction.xa.Xid;
 
+import com.arjuna.ats.internal.arjuna.FormatConstants;
 import com.arjuna.ats.internal.jta.xa.XID;
-import com.arjuna.ats.jta.xa.XATxConverter;
 import com.arjuna.ats.jta.xa.XidImple;
 
 public class SubordinateXidImple extends XidImple {
@@ -37,7 +37,7 @@ public class SubordinateXidImple extends XidImple {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (_theXid.formatID != XATxConverter.FORMAT_ID) {
+		if (!FormatConstants.isNarayanaFormatId(_theXid.formatID)) {
 			return super.equals(obj);
 		}
 		boolean toReturn = false;
@@ -60,7 +60,7 @@ public class SubordinateXidImple extends XidImple {
 		if (xid == null) {
 			return 0;
 		}
-		if (_theXid.formatID != XATxConverter.FORMAT_ID) {
+		if (!FormatConstants.isNarayanaFormatId(_theXid.formatID)) {
 			return super.getHash(xid);
 		}
 		return generateHash(xid.formatID, xid.data, 0, xid.gtrid_length);

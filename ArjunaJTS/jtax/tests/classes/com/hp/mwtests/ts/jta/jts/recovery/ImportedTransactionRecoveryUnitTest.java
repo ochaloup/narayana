@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
 import com.arjuna.ats.arjuna.coordinator.TwoPhaseOutcome;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
@@ -181,7 +182,7 @@ public class ImportedTransactionRecoveryUnitTest {
         // and subordinate is the current node identifier
         assertEquals("Expecting the subordinate Xid has defined parent node name as original Xid node name",
             parentNodeName, XAUtils.getXANodeName(subordinateTransaction.baseXid()));
-        assertNull("Expecting null as JTS subordinate Xid does not support use of the subordinate node name",
+        assertEquals("JTS subordinate Xid should be defined as node identifier",arjPropertyManager.getCoreEnvironmentBean().getNodeIdentifier(),
                 XAUtils.getSubordinateNodeName(subordinateTransaction.baseXid()));
         assertEquals("XAResource1 xid expects to have node name equal to the name of imported transaction node",
             parentNodeName, XAUtils.getXANodeName(xar1.getXid()));

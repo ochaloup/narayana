@@ -56,7 +56,7 @@ public class XATxConverter
             jtaPropertyManager.getJTAEnvironmentBean().getXAResourceRecordWrappingPlugin();
     public static final int FORMAT_ID = FormatConstants.JTA_FORMAT_ID; // different from JTS ones.
 
-    static XID getXid (Uid uid, boolean branch, Integer eisName) throws IllegalStateException
+    static XID getJtaXid (Uid uid, boolean branch, Integer eisName) throws IllegalStateException
     {
         if (branch)
             return getXid(uid, new Uid(), FORMAT_ID, eisName);
