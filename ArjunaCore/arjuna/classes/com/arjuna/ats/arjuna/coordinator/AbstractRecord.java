@@ -182,6 +182,20 @@ public abstract class AbstractRecord extends StateManager
 	}
 
 	/**
+	 * Returning ordering hint for self prioritizing of processing during
+	 * two phase commit protocol.
+	 *
+	 * @return the lower value the earlier the resource is processed
+	 *   relatively in the 2PC structure. Default value <code>0</code>
+	 *   means no priority in processing.
+	 */
+
+	public short getTwoPhaseOrderingHint ()
+	{
+		return 0;
+	}
+
+	/**
 	 * Determine if records are discarded on action abort or must be propagated
 	 * to parents.
 	 *

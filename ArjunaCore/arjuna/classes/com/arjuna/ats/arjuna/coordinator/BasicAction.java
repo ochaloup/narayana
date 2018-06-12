@@ -2126,6 +2126,26 @@ public class BasicAction extends StateManager
         createPreparedLists();
 
         /*
+         * Using ordering hint to define the processing order.
+         */
+        List<AbstractRecord> orderingList = new ArrayList<>();
+        while(pendingList.size() > 0) {
+            AbstractRecord record = pendingList.getFront();
+            int insertionIndex = 0;
+            for(AbstractRecord atOrderRecord: orderingList) {
+                if(atOrderRecord.getTwoPhaseOrderingHint() > record.getTwoPhaseOrderingHint()) {
+                    // the ordered record we stay at has to be ordered after the record we process from pending list
+                    break;
+                }
+                insertionIndex++;
+            }
+            orderingList.add(insertionIndex, record);
+        }
+        for(AbstractRecord orderedRecord: orderingList) {
+            pendingList.putRear(orderedRecord);
+        }
+
+        /*
            * Here is the start of the hard work. Walk down the pendingList
            * invoking the appropriate prepare operation. If it succeeds put the
            * record on either the preparedList or the read_only list and continue
