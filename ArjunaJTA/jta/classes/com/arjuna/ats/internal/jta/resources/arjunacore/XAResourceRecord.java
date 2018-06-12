@@ -73,6 +73,7 @@ import java.util.Vector;
 
 import org.jboss.tm.FirstResource;
 import org.jboss.tm.LastResource;
+import org.jboss.tm.XAResourceWithPriorityHint;
 
 /**
  * @author Mark Little (mark_little@hp.com)
@@ -149,6 +150,13 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
             return END_XARESOURCE;
 
         return super.order();
+    }
+
+    public short getPreparePriorityHint() {
+        if(_theXAResource == null || !(_theXAResource instanceof XAResourceWithPriorityHint))
+            return super.getPreparePriorityHint();
+
+        return ((XAResourceWithPriorityHint) _theXAResource).getPreparePriorityHint();
     }
 
 	public boolean propagateOnCommit()

@@ -182,6 +182,30 @@ public abstract class AbstractRecord extends StateManager
 	}
 
 	/**
+	 * <p>
+	 * Returning ordering hint for self prioritizing of processing during
+	 * two phase commit protocol, more specifically in prepare phase of the protocol.
+	 * <p>
+	 * The ordering hint can only influence ordering of the records
+	 * which are defined as equal to each other. It does not influence
+	 * the order prescribed by {@link #lessThan(AbstractRecord)}
+	 * and {@link #greaterThan(AbstractRecord)}.
+	 * <p>
+	 * Those methods first checks if the {@link AbstractRecord}
+	 * is of the same type (see {@link #typeIs()} which
+	 * declares ordering defined in numeric constants at {@link RecordType}.
+	 *
+	 * @return the lower value the earlier the resource is processed
+	 *   relatively in the 2PC structure. Default value <code>0</code>
+	 *   means no priority in processing.
+	 */
+
+	public short getPreparePriorityHint ()
+	{
+		return 0;
+	}
+
+	/**
 	 * Determine if records are discarded on action abort or must be propagated
 	 * to parents.
 	 *
