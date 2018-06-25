@@ -30,26 +30,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.transaction.xa.Xid;
 
-import com.arjuna.ats.arjuna.AtomicAction;
 import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
-import com.arjuna.ats.arjuna.objectstore.ObjectStoreIterator;
 import com.arjuna.ats.arjuna.objectstore.RecoveryStore;
 import com.arjuna.ats.arjuna.objectstore.StoreManager;
+import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import com.arjuna.ats.arjuna.recovery.TransactionStatusConnectionManager;
 import com.arjuna.ats.arjuna.state.InputObjectState;
@@ -79,6 +81,8 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 	private static final String ATOMIC_ACTION_TYPE = RecoverConnectableAtomicAction.ATOMIC_ACTION_TYPE;
 	private static final String CONNECTABLE_ATOMIC_ACTION_TYPE =
 	    RecoverConnectableAtomicAction.CONNECTABLE_ATOMIC_ACTION_TYPE;
+
+	private static CommitMarkableResourceRecordRecoveryModule registeredCMRRecoveryModule;
 
 	private InitialContext context;
 
@@ -114,6 +118,30 @@ public class CommitMarkableResourceRecordRecoveryModule implements
     private boolean inFirstPass;
 	private static String defaultTableName = jtaEnvironmentBean
 			.getDefaultCommitMarkableTableName();
+	private Set<Xid> xidsMovedToAtomicAction = new HashSet<>();
+
+	/**
+	 * Looking through registered recovery modules and trying to find the CMR one.
+	 *
+	 * @return CMRRecoveryModule when it was registered, otherwise null
+	 */
+	public static CommitMarkableResourceRecordRecoveryModule getRegisteredCMRRecoveryModule () {
+		if (registeredCMRRecoveryModule == null) {
+			RecoveryManager recMan = RecoveryManager.manager();
+			Vector recoveryModules = recMan.getModules();
+			if (recoveryModules != null) {
+				Enumeration modules = recoveryModules.elements();
+				while (modules.hasMoreElements()) {
+					RecoveryModule m = (RecoveryModule) modules.nextElement();
+					if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
+						registeredCMRRecoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
+						break;
+					}
+				}
+			}
+		}
+		return registeredCMRRecoveryModule;
+	}
 
 	public CommitMarkableResourceRecordRecoveryModule() throws NamingException,
 			ObjectStoreException {
@@ -198,6 +226,7 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 		this.committedXidsToJndiNames.clear();
 		this.queriedResourceManagers.clear();
 		this.jndiNamesToPossibleXidsForGC.clear();
+		this.xidsMovedToAtomicAction.clear();
 
 		// The algorithm occurs in three stages:
 		// 1. We query the database to find all the branches that were committed
@@ -349,7 +378,10 @@ public class CommitMarkableResourceRecordRecoveryModule implements
     							// Check if the resource manager is online yet
     							if (queriedResourceManagers
     									.contains(commitMarkableResourceJndiName)) {
-    
+	
+									if (tsLogger.logger.isTraceEnabled()) {
+										tsLogger.logger.trace("Moving " + currentUid + " back to being an AA");
+									}
     								// If it is remove the CRR and move it back and
     								// let
     								// the
@@ -367,6 +399,8 @@ public class CommitMarkableResourceRecordRecoveryModule implements
                                         CONNECTABLE_ATOMIC_ACTION_TYPE,
                                         ATOMIC_ACTION_TYPE);    						    
     						}
+    						// marking the xid as maintained by the CMR recovery module as possible for commit
+    						xidsMovedToAtomicAction.add(rcaa.getXid());
                         }
 					}
 					
@@ -446,6 +480,10 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 
 	@Override
 	public synchronized void periodicWorkSecondPass() {
+		if (tsLogger.logger.isTraceEnabled()) {
+			tsLogger.logger.trace("CommitMarkableResourceRecordRecoveryModule second pass");
+		}
+
 		/**
 		 * This is the list of AtomicActions that were prepared but not
 		 * completed.
@@ -522,6 +560,15 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 		return committed != null;
 	}
 
+	public synchronized boolean doesBelongsToCMRMovedToAtomicAction(Xid xid) {
+	    if(xid == null) return false;
+	    for(Xid proposedXid: this.xidsMovedToAtomicAction) {
+	        if(proposedXid.getFormatId() == xid.getFormatId() && Arrays.equals(proposedXid.getGlobalTransactionId(), xid.getGlobalTransactionId()))
+	            return true;
+	    }
+	    return false;
+	}
+
 	private List<Uid> convertToList(InputObjectState aa_uids) {
 		List<Uid> uids = new ArrayList<Uid>();
 
@@ -549,6 +596,8 @@ public class CommitMarkableResourceRecordRecoveryModule implements
 		}
 		return uids;
 	}
+
+
 
 	private boolean isTransactionInMidFlight(int status) {
 		boolean inFlight = false;

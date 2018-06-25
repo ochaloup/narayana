@@ -1234,29 +1234,16 @@ public class XAResourceRecord extends AbstractRecord implements ExceptionDeferre
 
 	private final XAResource getNewXAResource()
 	{
-		RecoveryManager recMan = RecoveryManager.manager();
-		Vector recoveryModules = recMan.getModules();
+	    XARecoveryModule xaRecoveryModule = XARecoveryModule.getRegisteredXARecoveryModule();
+	    if(xaRecoveryModule != null) {
+	        /*
+	         * Blaargh! There are better ways to do this!
+	         */
 
-		if (recoveryModules != null)
-		{
-			Enumeration modules = recoveryModules.elements();
-
-			while (modules.hasMoreElements())
-			{
-				RecoveryModule m = (RecoveryModule) modules.nextElement();
-
-				if (m instanceof XARecoveryModule)
-				{
-				    /*
-				     * Blaargh! There are better ways to do this!
-				     */
-
-					return ((XARecoveryModule) m).getNewXAResource(this);
-				}
-			}
-		}
-
-		return null;
+	        return xaRecoveryModule.getNewXAResource(this);
+	    } else {
+	        return null;
+	    }
 	}
 
 	private final void removeConnection()

@@ -321,6 +321,14 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 
 				// JBTM-1255 moved stale check back to bottomUpRecovery
 				if (xids.contains(xid)) {
+					// verification if the XA resource was not handled as part of the transaction where participated a CMR resource
+					// if the XAResource was part of such transaction we do want to remove it from _xidScans
+					// for not being handled twice by top-down and bottom-up recovery which brings commit and rollback being called both
+					CommitMarkableResourceRecordRecoveryModule cmrRecoveryModule  = CommitMarkableResourceRecordRecoveryModule.getRegisteredCMRRecoveryModule();
+					if(cmrRecoveryModule != null && cmrRecoveryModule.doesBelongsToCMRMovedToAtomicAction(xid)) {
+						xids.remove(xid);
+					}
+
 					// This Xid will hopefully be recovered by the AtomicAction
 					// We do not remove it from the map as there is garbage collection in RecoveryXids already
 					// and it is possible that the Xid is recovered by both txbridge and XATerminator - the second

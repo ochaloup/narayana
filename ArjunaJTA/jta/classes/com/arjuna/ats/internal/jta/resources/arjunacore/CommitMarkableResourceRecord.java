@@ -109,7 +109,6 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 	private String productName;
 	private String productVersion;
 	private boolean hasCompleted;
-	private static CommitMarkableResourceRecordRecoveryModule commitMarkableResourceRecoveryModule;
 	private static final JTAEnvironmentBean jtaEnvironmentBean = BeanPopulator
 			.getDefaultInstance(JTAEnvironmentBean.class);
 	private static final Map<String, String> commitMarkableResourceTableNameMap = jtaEnvironmentBean
@@ -123,24 +122,6 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 			.isNotifyCommitMarkableResourceRecoveryModuleOfCompleteBranches();
 	private static final Map<String, Boolean> isPerformImmediateCleanupOfCommitMarkableResourceBranchesMap = jtaEnvironmentBean
 			.getPerformImmediateCleanupOfCommitMarkableResourceBranchesMap();
-
-	static {
-		commitMarkableResourceRecoveryModule = null;
-		RecoveryManager recMan = RecoveryManager.manager();
-		Vector recoveryModules = recMan.getModules();
-		if (recoveryModules != null) {
-			Enumeration modules = recoveryModules.elements();
-
-			while (modules.hasMoreElements()) {
-				RecoveryModule m = (RecoveryModule) modules.nextElement();
-
-				if (m instanceof CommitMarkableResourceRecordRecoveryModule) {
-					commitMarkableResourceRecoveryModule = (CommitMarkableResourceRecordRecoveryModule) m;
-					break;
-				}
-			}
-		}
-	}
 
 	/**
 	 * For recovery
@@ -278,9 +259,8 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 				@Override
 				public void afterCompletion(int status) {
 					if (!onePhase && status == Status.STATUS_COMMITTED) {
-						commitMarkableResourceRecoveryModule
-								.notifyOfCompletedBranch(
-										commitMarkableJndiName, xid);
+					    CommitMarkableResourceRecordRecoveryModule.getRegisteredCMRRecoveryModule()
+							.notifyOfCompletedBranch(commitMarkableJndiName, xid);
 					}
 				}
 			});
@@ -365,7 +345,8 @@ public class CommitMarkableResourceRecord extends AbstractRecord {
 				// CommitMarkableRecoveryModule is
 				// between phases and the XID
 				// has not been GC'd
-                committed = commitMarkableResourceRecoveryModule.wasCommitted(commitMarkableJndiName, xid);
+                committed = CommitMarkableResourceRecordRecoveryModule.getRegisteredCMRRecoveryModule()
+                        .wasCommitted(commitMarkableJndiName, xid);
             }
 			productName = os.unpackString();
 			productVersion = os.unpackString();
