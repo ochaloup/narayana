@@ -217,7 +217,7 @@
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <version>${version.org.jboss.arquillian.core}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.narayana</groupId>
