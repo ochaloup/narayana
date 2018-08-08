@@ -240,12 +240,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>${version.javax.annotation}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
           <groupId>org.jboss.narayana</groupId>
           <artifactId>test-utils</artifactId>
           <version>${project.version}</version>
