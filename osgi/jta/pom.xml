@@ -82,7 +82,7 @@
 	   </dependency>
 	   <dependency>
 		   <groupId>org.jboss.narayana.jts</groupId>
-		   <artifactId>narayana-jts-integration</artifactId>
+		   <artifactId>narayana-jta-integration</artifactId>
 		   <version>${project.version}</version>
 		   <scope>provided</scope>
 	   </dependency>
@@ -222,7 +222,7 @@
 						   orbportability;inline=false,
 						   common;inline=false,
 						   arjuna;inline=false,
-						   narayana-jts-integration;inline=false,
+						   narayana-jta-integration;inline=false,
 						   artemis*;inline=false,
 						   netty*;inline=false
 					   </Embed-Dependency>
