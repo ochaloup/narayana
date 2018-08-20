@@ -81,7 +81,7 @@
 		   <scope>provided</scope>
 	   </dependency>
 	   <dependency>
-		   <groupId>org.jboss.narayana.jts</groupId>
+		   <groupId>org.jboss.narayana.jta</groupId>
 		   <artifactId>narayana-jta-integration</artifactId>
 		   <version>${project.version}</version>
 		   <scope>provided</scope>
