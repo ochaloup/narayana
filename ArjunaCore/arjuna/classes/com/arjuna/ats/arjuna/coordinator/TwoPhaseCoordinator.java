@@ -164,20 +164,42 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
 			// during the pre-commmit phase. This generic support is required for
 			// JTA Synchronization ordering behaviour
 			if(_currentRecord != null) {
-				if(sr.compareTo(_currentRecord) != 1) {
+				if(sr.compareTo(_currentRecord) != 1 && !_afterCalled) {
+				   // it's too late to add synchronization at this time as the synchronization callbacks are already in process
+				   // but we can execute in afterCompletion still
+				   if(tsLogger.logger.isTraceEnabled()) {
+					   tsLogger.logger.debugf("The synchronization " + sr + " can't be executed now. "
+						   + "There is synchronization " + _currentRecord + " already running which is ordered "
+						   + "as after this newly addition. This new synchronization can be still executed "
+						   + "in the afterCompletion() if now the beforeCompletion() is executing.");
+				   }
+				   synchronized (_syncLock) {
+						if (_additionalAfterCompletionSynchs == null) {
+							_additionalAfterCompletionSynchs = new TreeSet<SynchronizationRecord>();
+						}
+						if (_additionalAfterCompletionSynchs.add(sr)) {
+							return AddOutcome.AR_ADDED;
+						} else {
+							tsLogger.i18NLogger.warn_synchronization_already_added(sr);
+							return AddOutcome.AR_REJECTED;
+						}
+					}
+				} else if(sr.compareTo(_currentRecord) != 1) {
 					return AddOutcome.AR_REJECTED;
 				}
 			}
 
+			// need to guard against synchs being added while we are performing beforeCompletion processing
 			synchronized (_syncLock) {
 				if (_synchs == null) {
 					// Synchronizations should be stored (or at least iterated) in their natural order
 					_synchs = new TreeSet<SynchronizationRecord>();
 				}
 
-				// need to guard against synchs being added while we are performing beforeCompletion processing
 				if (_synchs.add(sr)) {
 					result = AddOutcome.AR_ADDED;
+				} else {
+					tsLogger.i18NLogger.warn_synchronization_already_added(sr);
 				}
 			}
             }
@@ -497,6 +519,10 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
 			{
 				_afterCalled = true;
 
+				if(_additionalAfterCompletionSynchs != null) {
+					_synchs.addAll(_additionalAfterCompletionSynchs);
+				}
+
                 if (_synchs == null) {
                     return !problem;
                 } else if (TxControl.asyncAfterSynch && _synchs.size() > 1) {
@@ -587,6 +613,7 @@ public class TwoPhaseCoordinator extends BasicAction implements Reapable
     }
 
     private SortedSet<SynchronizationRecord> _synchs;
+    private Set<SynchronizationRecord> _additionalAfterCompletionSynchs;
     private List<Future<Boolean>> runningSynchronizations = null;
     private CompletionService<Boolean> synchronizationCompletionService = null;
     private boolean executingInterposedSynchs = false;

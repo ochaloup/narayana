@@ -33,6 +33,7 @@ import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 
 import com.arjuna.ats.arjuna.common.Uid;
+import com.arjuna.ats.arjuna.coordinator.SynchronizationRecord;
 
 /**
  * i18n log messages for the arjuna module.
@@ -1562,6 +1563,10 @@ public interface arjunaI18NLogger {
     @Message(id = 12390, value = "Error constructing mbean", format = MESSAGE_FORMAT)
     @LogMessage(level = WARN)
     public void warn_osb_MBeanCtorFail(@Cause() Throwable arg0);
+
+    @Message(id = 16140, value = "Synchronization '{0}' can't be added as it has been already added", format = MESSAGE_FORMAT)
+    @LogMessage(level = WARN)
+    public void warn_synchronization_already_added(SynchronizationRecord sr);
 
     /*
         Allocate new messages directly above this notice.
