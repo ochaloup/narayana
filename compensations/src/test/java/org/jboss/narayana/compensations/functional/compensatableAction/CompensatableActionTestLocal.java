@@ -37,6 +37,7 @@ import org.jboss.narayana.compensations.api.EnlistException;
 import org.jboss.narayana.compensations.functional.common.DummyData;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,8 +54,11 @@ public class CompensatableActionTestLocal {
     @Deployment
     public static WebArchive createTestArchive() {
         WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-                .addClasses(DummyData.class, CompensatableActionTestLocal.class, ParticipantCompletionCoordinatorRules.class)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+                .addClasses(DummyData.class, ParticipantCompletionCoordinatorRules.class)
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                // archive.addAsResource(new StringAsset("Manifest-Version: 1.0\nDependencies: org.jboss.narayana.compensations \n"), "META-INF/MANIFEST.MF");
+                .setManifest(new StringAsset("Manifest-Version: 1.0\nDependencies: org.jboss.narayana.compensations\n"));
+
 
         return archive;
     }
