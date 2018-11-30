@@ -73,7 +73,7 @@ public abstract class AbstractCrashRecoveryTests extends AbstractBasicTests {
         String javaVmArguments = System.getProperty("server.jvm.args").trim();
         javaVmArguments = javaVmArguments.replaceFirst("byteman-dtest.jar", Matcher.quoteReplacement("byteman-dtest.jar,script:" + rulesFile.getAbsolutePath()));
         log.trace("javaVmArguments = " + javaVmArguments);
-        controller.start(CONTAINER, new Config().add("javaVmArguments", javaVmArguments).map());
+        controller.start(CONTAINER, new Config().add("javaVmArguments", javaVmArguments /* + " -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"*/).map());
     }
 
 

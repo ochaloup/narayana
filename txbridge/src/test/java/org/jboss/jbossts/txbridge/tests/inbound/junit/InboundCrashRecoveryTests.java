@@ -39,6 +39,7 @@ import org.jboss.byteman.contrib.dtest.*;
 import org.junit.runner.RunWith;
 
 import com.arjuna.ats.internal.arjuna.recovery.PeriodicRecovery;
+import com.arjuna.webservices11.wsarj.handler.InstanceIdentifierHandler;
 
 import java.net.URL;
 import java.util.concurrent.Executors;
@@ -144,6 +145,39 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentedTestXAResource.assertMethodCalled("recover");
         instrumentedTestXAResource.assertMethodCalled("rollback");
         instrumentedTestXAResource.assertMethodNotCalled("commit");
+    }
+    
+    @Test
+    @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)
+    public void testCrashCoCommit(@ArquillianResource URL baseURL) throws Exception {
+
+        InstrumentedClass durableParticipant = instrumentor.instrumentClass(BridgeDurableParticipant.class);
+        instrumentor.injectOnCall(TestClient.class, "terminateTransaction", "$2 = true"); // shouldCommit=true
+        instrumentor.crashAtMethodEntry(TestXAResource.class, "commit");
+        RuleConstructor.createRule("printing stuff")
+            .onClass(InstanceIdentifierHandler.class)
+            .inMethod("handlemessageInbound")
+            .atLine(133)
+            .bind("msg:javax.xml.soap.SOAPMessage = $soapMessage",
+                  "iden:String = $identifierString")
+            .ifTrue()
+            .doAction("System.out.println(\"msg: \" + msg + \", identifier: \" + iden)")
+            .install(instrumentor);
+        
+        execute(baseURL + TestClient.URL_PATTERN, false);
+
+        rebootServer(controller);
+        
+        doRecovery();
+        doRecovery();
+        
+        instrumentedTestXAResource.assertKnownInstances(1);
+        instrumentedTestXAResource.assertMethodCalled("recover");
+        instrumentedTestXAResource.assertMethodNotCalled("rollback");
+        instrumentedTestXAResource.assertMethodCalled("commit");
+        durableParticipant.assertMethodCalled("prepare");
+        durableParticipant.assertMethodNotCalled("rollback");
+        durableParticipant.assertMethodCalled("commit");
     }
 
     @Test
