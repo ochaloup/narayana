@@ -585,12 +585,12 @@ function tx_bridge_tests {
   echo "XTS: TXBRIDGE TESTS update conf"
   [ $XTS_TRACE ] && enable_xts_trace
   cd $WORKSPACE
+
   CONF="${JBOSS_HOME}/standalone/configuration/standalone-xts.xml"
   grep recovery-listener "$CONF"
   sed -e s/recovery-listener=\"true\"//g   $CONF > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
   sed -e "s#\(recovery-environment\) \(socket-binding\)#\\1 recovery-listener=\"true\" \\2#"   $CONF > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
 
-#  sed -e "s#\(recovery-environment\) \(socket-binding\)#\\1 recovery-listener=\"true\" \\2#" -i $CONF
   [ $? = 0 ] || fatal "#3.TXBRIDGE TESTS: sed failed"
 
   echo "XTS: TXBRIDGE TESTS"
