@@ -33,7 +33,10 @@
     <name>MicroProfile TCK: LRA</name>
 
     <properties>
-            <jvm.options></jvm.options>
+        <jvm.options></jvm.options>
+        <lra.tck.tests>timeLimit,startLRA,cancelLRA,closeLRA,getActiveLRAs,getAllLRAs,isActiveLRA,nestedActivity,joinLRAViaHeader,join,dependentLRA,cancelOn,cancelOnFamily,acceptTest</lra.tck.tests>
+        <!-- TODO debug completeMultiLevelNestedActivity,compensateMultiLevelNestedActivity,mixedMultiLevelNestedActivity,leaveLRA,leaveLRAViaAPI,noLRATest -->
+        <lra.tck.verbose>false</lra.tck.verbose>
     </properties>
 
     <build>
@@ -122,6 +125,8 @@
                                         <argument>-Dswarm.http.port=8080</argument>
                                         <argument>-Dlra.tck.run=TRUE</argument>
                                         <argument>-Dlra.tck.exit=TRUE</argument>
+                                        <argument>-Dlra.tck.tests=${lra.tck.tests}</argument>
+                                        <argument>-Dlra.tck.verbose=${lra.tck.verbose}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

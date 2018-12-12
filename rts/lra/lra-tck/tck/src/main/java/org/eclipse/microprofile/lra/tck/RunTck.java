@@ -97,7 +97,8 @@ public class RunTck implements ServletContextListener {
 
         test.before();
 
-        TckResult results = test.runTck(lraClient, String.join(",", testnames), false);
+        TckResult results = test.runTck(System.getProperty("lra.tck.tests", String.join(",", testnames)),
+                Boolean.getBoolean("lra.tck.verbose"));
 
         test.after();
 
@@ -107,7 +108,7 @@ public class RunTck implements ServletContextListener {
         if (failures.size() != 0) {
             System.out.printf("There were TCK failures:%n");
 
-            failures.forEach(f -> System.out.printf("%s%n", f));
+            failures.forEach(f -> System.out.printf("%s%n", f)); // TODO print out the full test data
 
             exitStatus = 1;
         }

@@ -319,12 +319,24 @@ public class Transaction extends AtomicAction {
     }
 
     public int end(boolean compensate) {
-        ReentrantLock lock = lraService.lockTransaction(getId());
+        ReentrantLock lock = null;
 
         try {
+            lock = lraService.tryLockTransaction(getId());
+
+            if (lock == null) {
+                if (LRALogger.logger.isInfoEnabled()) {
+                    LRALogger.logger.debugf("Transaction.endLRA Some other thread is finishing LRA %s", getId().toExternalForm());
+                }
+
+                return status();
+            }
+
             return doEnd(compensate);
         } finally {
-            lock.unlock();
+            if (lock != null) {
+                lock.unlock();
+            }
         }
     }
 

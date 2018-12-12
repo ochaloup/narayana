@@ -34,7 +34,7 @@
         <version.arquillian>1.1.12.Final</version.arquillian>
 
         <version.narayana>${project.version}</version.narayana>
-        <version.microprofile.lra>0.0.3.Final</version.microprofile.lra>
+        <version.microprofile.lra>1.0-SNAPSHOT</version.microprofile.lra>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -154,7 +154,7 @@
         <module>lra-proxy</module>
         <module>lra-coordinator</module>
         <module>lra-filters</module>
-        <module>lra-annotation-checker</module>
+        <!--module>lra-annotation-checker</module-->
         <module>lra-tck</module>
     </modules>
 
