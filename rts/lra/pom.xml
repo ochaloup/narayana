@@ -155,7 +155,7 @@
         <module>lra-coordinator</module>
         <module>lra-filters</module>
         <!--module>lra-annotation-checker</module-->
-        <module>lra-tck</module>
+        <module>lra-test</module>
     </modules>
 
     <profiles>
