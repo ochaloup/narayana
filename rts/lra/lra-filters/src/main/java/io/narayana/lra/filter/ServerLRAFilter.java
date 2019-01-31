@@ -51,6 +51,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -322,6 +323,17 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
         // TODO make sure it is possible to do compensations inside a new LRA
         if (!endAnnotation && enlist) { // don't enlist for methods marked with Compensate, Complete or Leave
             URI baseUri = containerRequestContext.getUriInfo().getBaseUri();
+            try {
+                if (System.getProperty("lra.enlist.base.uri") != null) {
+                    baseUri = new URI(System.getProperty("lra.enlist.base.uri"));
+                }
+                if (System.getenv("LRA_ENLIST_BASE_URI") != null) {
+                    baseUri = new URI(System.getenv("LRA_ENLIST_BASE_URI"));
+                }
+            } catch (URISyntaxException use) {
+                lraWarn(containerRequestContext, lraId, "Tried to define the lra enlist base uri with env property 'LRA_ENLIST_BASE_URI' "
+                        + "or system property 'lra.enlist.base.uri' but does not succeed. Using: " + baseUri);
+            }
 
             Map<String, String> terminateURIs = NarayanaLRAClient.getTerminationUris(resourceInfo.getResourceClass(), baseUri);
             String timeLimitStr = terminateURIs.get(NarayanaLRAClient.TIMELIMIT_PARAM_NAME);
