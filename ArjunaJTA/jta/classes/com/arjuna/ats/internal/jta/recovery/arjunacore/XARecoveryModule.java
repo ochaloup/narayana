@@ -42,6 +42,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -100,7 +102,8 @@ public class XARecoveryModule implements ExtendedRecoveryModule
     }
 
     public void removeXAResourceRecoveryHelper(XAResourceRecoveryHelper xaResourceRecoveryHelper) {
-        synchronized (scanState) {
+        scanStateLock.lock();
+        try {
             // the first pass collects xa resources from recovery helpers - wait for it to finish
         	// we can't just wait for BETWEEN_PHASES or even SECOND_PASS because its possible
         	// that we would miss seeing those states when there is contention
@@ -112,24 +115,33 @@ public class XARecoveryModule implements ExtendedRecoveryModule
                  * the target xaResourceRecoveryHelper and if so then we need to wait for second pass
                  * of the scanner to finish
                  */
-                if (isHelperInUse(xaResourceRecoveryHelper))
+                if (isHelperInUse(xaResourceRecoveryHelper)) {
                     waitForScanState(ScanStates.IDLE);
-                else if (getScanState().equals(ScanStates.BETWEEN_PASSES)) {
-					synchronized (this) { // Because we need to remove the _resources
-						XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
-						if (xaResources != null) {
-							for (XAResource xar : xaResources) {
-								xaRecoverySecondPass(xar);
-								_resources.remove(xar);
-							}
-						} else {
-							System.out.println("Was null");
-						}
-					}
-				}
+                } else {
+                    // synchronized(this) is needed as removing on the _resources; to avoid deadlock
+                    //   we need to preserve the order of acquiring locks - first 'this' then second 'scanStateLock'
+                    scanStateLock.unlock();
+                    synchronized (this) {
+                        scanStateLock.lock();
+                        if (getScanState().equals(ScanStates.BETWEEN_PASSES)) {
+                            XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
+                            if (xaResources != null) {
+                                for (XAResource xar : xaResources) {
+                                    xaRecoverySecondPass(xar);
+                                    _resources.remove(xar);
+                                }
+                            } else {
+                                jtaLogger.logger.debugf("nothing to remove - xa resources of recovery helper '%s' were null",
+                                        xaResourceRecoveryHelper);
+                            }
+                        }
+                    }
+                }
             }
 
             _xaResourceRecoveryHelpers.remove(xaResourceRecoveryHelper);
+        } finally {
+            scanStateLock.unlock();
         }
     }
 
@@ -170,7 +182,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 			endState = ScanStates.BETWEEN_PASSES; // Ensure if originally we are between periodic recovery scans we continue in that state and leave XAResource in STARTRSCAN
 		}
 
-		setScanState(ScanStates.FIRST_PASS); // synchronized uses a reentrant lock
+		setScanState(ScanStates.FIRST_PASS);
 
         if(jtaLogger.logger.isDebugEnabled()) {
             jtaLogger.logger.debugv("{0} - first pass", _logName);
@@ -1057,7 +1069,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
     private boolean waitForScanState(ScanStates state) {
         try {
             do {
-                scanState.wait();
+                scanStateChanged.await();
             } while (!getScanState().equals(state));
 
             return true;
@@ -1069,7 +1081,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
     private boolean waitForNotScanState(ScanStates state) {
         try {
 			while (getScanState().equals(state)) {
-				scanState.wait();
+				scanStateChanged.await();
 			} 
 
             return true;
@@ -1084,10 +1096,13 @@ public class XARecoveryModule implements ExtendedRecoveryModule
      * @param state the new state
      */
     private void setScanState(ScanStates state) {
-        synchronized (scanState) {
+        scanStateLock.lock();
+        try {
             tsLogger.logger.debugf("XARecoveryModule state change %s->%s%n", getScanState(), state);
             scanState.set(state.ordinal());
-            scanState.notifyAll();
+            scanStateChanged.signalAll();
+        } finally {
+            scanStateLock.unlock();
         }
     }
 
@@ -1120,7 +1135,11 @@ public class XARecoveryModule implements ExtendedRecoveryModule
         BETWEEN_PASSES,
         SECOND_PASS
     }
+
     private AtomicInteger scanState = new AtomicInteger(ScanStates.IDLE.ordinal());
+    // don't use synchronized directly on scanState, it can end up with deadlock
+    private ReentrantLock scanStateLock = new ReentrantLock();
+    private Condition scanStateChanged = scanStateLock.newCondition();
 
 	private final List<XAResourceRecovery> _xaRecoverers;
 
