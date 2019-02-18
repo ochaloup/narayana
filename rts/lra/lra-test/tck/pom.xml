@@ -26,6 +26,8 @@
         <lra.tck.suite.debug.params></lra.tck.suite.debug.params> <!-- has content when -Ddebug.tck is specified -->
         <lra.tck.suite.debug.port>8788</lra.tck.suite.debug.port>
 
+        <version.resteasy.client>3.6.3.Final</version.resteasy.client>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -45,6 +47,7 @@
                         <java.util.logging.config.file>${project.build.testOutputDirectory}/logging.properties</java.util.logging.config.file>
                         <lra.tck.suite.host>${lra.tck.suite.host}</lra.tck.suite.host>
                         <lra.tck.suite.port>${lra.tck.suite.port}</lra.tck.suite.port>
+                        <lra.tck.base.url>http://${lra.tck.suite.host}:${lra.tck.suite.port}</lra.tck.base.url>
                         <lra.tck.suite.swarm.trace.params>${lra.tck.suite.swarm.trace.params}</lra.tck.suite.swarm.trace.params>
                         <lra.coordinator.port>${lra.coordinator.port}</lra.coordinator.port>
                         <lra.tck.suite.debug.params>${lra.tck.suite.debug.params}</lra.tck.suite.debug.params>
@@ -73,6 +76,12 @@
             <artifactId>lra-filters</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>${version.resteasy.client}</version>
         </dependency>
 
         <dependency>
