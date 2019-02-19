@@ -118,12 +118,9 @@ public class XARecoveryModule implements ExtendedRecoveryModule
                 if (isHelperInUse(xaResourceRecoveryHelper)) {
                     waitForScanState(ScanStates.IDLE);
                 } else {
-                    // synchronized(this) is needed as removing on the _resources; to avoid deadlock
-                    //   we need to preserve the order of acquiring locks - first 'this' then second 'scanStateLock'
-                    scanStateLock.unlock();
-                    synchronized (this) {
-                        scanStateLock.lock();
-                        if (getScanState().equals(ScanStates.BETWEEN_PASSES)) {
+                    if (getScanState().equals(ScanStates.BETWEEN_PASSES)) {
+                        thisLock.lock();
+                        try {
                             XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
                             if (xaResources != null) {
                                 for (XAResource xar : xaResources) {
@@ -134,6 +131,8 @@ public class XARecoveryModule implements ExtendedRecoveryModule
                                 jtaLogger.logger.debugf("nothing to remove - xa resources of recovery helper '%s' were null",
                                         xaResourceRecoveryHelper);
                             }
+                        } finally {
+                            thisLock.unlock();
                         }
                     }
                 }
@@ -167,121 +166,136 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 		return _seriablizableXAResourceDeserializers;
 	}
 
-	public synchronized void periodicWorkFirstPass() {
-		periodicWorkFirstPass(ScanStates.BETWEEN_PASSES);
+	public void periodicWorkFirstPass() {
+	    thisLock.lock();
+	    try {
+	        periodicWorkFirstPass(ScanStates.BETWEEN_PASSES);
+	    } finally {
+	        thisLock.unlock();
+	    }
 	}
 
-	private synchronized void periodicWorkFirstPass(ScanStates endState)
+	private void periodicWorkFirstPass(ScanStates endState)
 	{
-		// JBTM-1354 JCA needs to be able to recover XAResources associated with a subordinate transaction so we have to do at least
-		// the start scan to make sure that we have loaded all the XAResources we possibly can to assist subordinate transactions recovering
-		// the reason we can't do bottom up recovery is if this server has an XAResource which tries to recover a remote server (e.g. distributed JTA)
-		// then we get deadlock on the secondpass
-		if (getScanState() == ScanStates.BETWEEN_PASSES) {
-			periodicWorkSecondPass();
-			endState = ScanStates.BETWEEN_PASSES; // Ensure if originally we are between periodic recovery scans we continue in that state and leave XAResource in STARTRSCAN
-		}
-
-		setScanState(ScanStates.FIRST_PASS);
-
-        if(jtaLogger.logger.isDebugEnabled()) {
-            jtaLogger.logger.debugv("{0} - first pass", _logName);
+	    thisLock.lock();
+	    try {
+    		// JBTM-1354 JCA needs to be able to recover XAResources associated with a subordinate transaction so we have to do at least
+    		// the start scan to make sure that we have loaded all the XAResources we possibly can to assist subordinate transactions recovering
+    		// the reason we can't do bottom up recovery is if this server has an XAResource which tries to recover a remote server (e.g. distributed JTA)
+    		// then we get deadlock on the secondpass
+    		if (getScanState() == ScanStates.BETWEEN_PASSES) {
+    			periodicWorkSecondPass();
+    			endState = ScanStates.BETWEEN_PASSES; // Ensure if originally we are between periodic recovery scans we continue in that state and leave XAResource in STARTRSCAN
+    		}
+    
+    		setScanState(ScanStates.FIRST_PASS);
+    
+            if(jtaLogger.logger.isDebugEnabled()) {
+                jtaLogger.logger.debugv("{0} - first pass", _logName);
+            }
+    
+            contactedJndiNames.clear();
+            jtaLogger.setRecoveryProblems(false);
+    
+    		_uids = new InputObjectState();
+    
+    		/*
+    		 * Scan for resources in the object store.
+    		 */
+    
+    		try
+    		{
+    			if (!_recoveryStore.allObjUids(_recoveryManagerClass.type(), _uids))
+    			{
+                    jtaLogger.i18NLogger.warn_recovery_alluids();
+    			}
+    		}
+    		catch (ObjectStoreException e)
+    		{
+                jtaLogger.i18NLogger.warn_recovery_objstoreerror(e);
+    		}
+    		catch (Exception e)
+    		{
+                jtaLogger.i18NLogger.warn_recovery_periodicfirstpass(_logName+".periodicWorkFirstPass", e);
+    		}
+    		// JBTM-1354 JCA needs to be able to recover XAResources associated with a subordinate transaction so we have to do at least
+    		// the start scan to make sure that we have loaded all the XAResources we possibly can to assist subordinate transactions recovering
+    
+    		// scan using statically configured plugins;
+    		_resources = resourceInitiatedRecovery();
+    		// scan using dynamically configured plugins:
+    		_resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
+    
+    		List<XAResource> resources = new ArrayList<XAResource>(_resources);
+    		for (XAResource xaResource : resources) {
+    			try {
+    				xaRecoveryFirstPass(xaResource);
+    			} catch (Exception ex) {
+    				jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+    			}
+    		}
+    
+    		if (endState != ScanStates.BETWEEN_PASSES) {
+    			for (XAResource xaResource : resources) {
+    				try {
+    					xaResource.recover(XAResource.TMENDRSCAN);
+    				} catch (Exception ex) {
+    					jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+    				}
+    			}
+            }
+    
+    		setScanState(endState);
+	    } finally {
+	        thisLock.unlock();
         }
-
-        contactedJndiNames.clear();
-        jtaLogger.setRecoveryProblems(false);
-
-		_uids = new InputObjectState();
-
-		/*
-		 * Scan for resources in the object store.
-		 */
-
-		try
-		{
-			if (!_recoveryStore.allObjUids(_recoveryManagerClass.type(), _uids))
-			{
-                jtaLogger.i18NLogger.warn_recovery_alluids();
-			}
-		}
-		catch (ObjectStoreException e)
-		{
-            jtaLogger.i18NLogger.warn_recovery_objstoreerror(e);
-		}
-		catch (Exception e)
-		{
-            jtaLogger.i18NLogger.warn_recovery_periodicfirstpass(_logName+".periodicWorkFirstPass", e);
-		}
-		// JBTM-1354 JCA needs to be able to recover XAResources associated with a subordinate transaction so we have to do at least
-		// the start scan to make sure that we have loaded all the XAResources we possibly can to assist subordinate transactions recovering
-
-		// scan using statically configured plugins;
-		_resources = resourceInitiatedRecovery();
-		// scan using dynamically configured plugins:
-		_resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
-
-		List<XAResource> resources = new ArrayList<XAResource>(_resources);
-		for (XAResource xaResource : resources) {
-			try {
-				xaRecoveryFirstPass(xaResource);
-			} catch (Exception ex) {
-				jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
-			}
-		}
-
-		if (endState != ScanStates.BETWEEN_PASSES) {
-			for (XAResource xaResource : resources) {
-				try {
-					xaResource.recover(XAResource.TMENDRSCAN);
-				} catch (Exception ex) {
-					jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
-				}
-			}
-        }
-
-		setScanState(endState);
 	}
 
-	public synchronized void periodicWorkSecondPass()
+	public void periodicWorkSecondPass()
 	{
-	    if (getScanState() == ScanStates.IDLE) {
-	        // a call to getNewXAResource must have already ran the second pass so it is safe to return
-			return;
-		}
-
-        setScanState(ScanStates.SECOND_PASS);
-
-		if (jtaLogger.logger.isDebugEnabled())
-		{
-            jtaLogger.logger.debugv("{0} - second pass", _logName);
-		}
-
-		try
-		{
-			// do the recovery on anything from the scan in first pass
-
-			transactionInitiatedRecovery();
-
-			if (jtaLogger.logger.isDebugEnabled()) {
-                jtaLogger.logger.debug(_logName
-                        + ".transactionInitiatedRecovery completed");
-            }
-
-            bottomUpRecovery();
-
-            if (jtaLogger.logger.isDebugEnabled()) {
-                jtaLogger.logger.debug(_logName
-                        + ".resourceInitiatedRecovery completed");
-            }
-		}
-		catch (Exception e)
-		{
-            jtaLogger.i18NLogger.warn_recovery_periodicsecondpass(_logName+".periodicWorkSecondPass", e);
-		}
-
-		clearAllFailures();
-
-        setScanState(ScanStates.IDLE);
+	    thisLock.lock();
+	    try {
+    	    if (getScanState() == ScanStates.IDLE) {
+    	        // a call to getNewXAResource must have already ran the second pass so it is safe to return
+    			return;
+    		}
+    
+            setScanState(ScanStates.SECOND_PASS);
+    
+    		if (jtaLogger.logger.isDebugEnabled())
+    		{
+                jtaLogger.logger.debugv("{0} - second pass", _logName);
+    		}
+    
+    		try
+    		{
+    			// do the recovery on anything from the scan in first pass
+    
+    			transactionInitiatedRecovery();
+    
+    			if (jtaLogger.logger.isDebugEnabled()) {
+                    jtaLogger.logger.debug(_logName
+                            + ".transactionInitiatedRecovery completed");
+                }
+    
+                bottomUpRecovery();
+    
+                if (jtaLogger.logger.isDebugEnabled()) {
+                    jtaLogger.logger.debug(_logName
+                            + ".resourceInitiatedRecovery completed");
+                }
+    		}
+    		catch (Exception e)
+    		{
+                jtaLogger.i18NLogger.warn_recovery_periodicsecondpass(_logName+".periodicWorkSecondPass", e);
+    		}
+    
+    		clearAllFailures();
+    
+            setScanState(ScanStates.IDLE);
+	    } finally {
+            thisLock.unlock();
+        }
  	}
 
  	public static XARecoveryModule getRegisteredXARecoveryModule () {
@@ -321,13 +335,16 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 		XAResource toReturn = getTheKey(xid);
 
 		if (toReturn == null) {
-			synchronized (this) {
+		    thisLock.lock();
+			try {
 				/*
 				 * run an xid scan with the lock held to avoid _xidScans being changed
 				 * after the call to periodicWorkFirstPass but before the call to getTheKey
 				 */
 				periodicWorkFirstPass(ScanStates.IDLE);
 				toReturn = getTheKey(xid);
+			} finally {
+			    thisLock.unlock();
 			}
 		}
 
@@ -1096,7 +1113,11 @@ public class XARecoveryModule implements ExtendedRecoveryModule
      * @param state the new state
      */
     private void setScanState(ScanStates state) {
-        scanStateLock.lock();
+        while(!scanStateLock.tryLock()) {
+            thisLock.unlock();
+            Thread.yield();
+            thisLock.lock();
+        }
         try {
             tsLogger.logger.debugf("XARecoveryModule state change %s->%s%n", getScanState(), state);
             scanState.set(state.ordinal());
@@ -1136,6 +1157,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
         SECOND_PASS
     }
 
+    private ReentrantLock thisLock = new ReentrantLock();
     private AtomicInteger scanState = new AtomicInteger(ScanStates.IDLE.ordinal());
     // don't use synchronized directly on scanState, it can end up with deadlock
     private ReentrantLock scanStateLock = new ReentrantLock();
