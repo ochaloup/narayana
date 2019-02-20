@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -115,16 +116,19 @@ public class XARecoveryModule implements ExtendedRecoveryModule
                 if (isHelperInUse(xaResourceRecoveryHelper))
                     waitForScanState(ScanStates.IDLE);
                 else if (getScanState().equals(ScanStates.BETWEEN_PASSES)) {
-					synchronized (this) { // Because we need to remove the _resources
-						XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
-						if (xaResources != null) {
-							for (XAResource xar : xaResources) {
-								xaRecoverySecondPass(xar);
-								_resources.remove(xar);
-							}
-						} else {
-							System.out.println("Was null");
-						}
+					XAResource[] xaResources = recoveryHelpersXAResource.get(xaResourceRecoveryHelper);
+					if (xaResources != null) {
+				        resourcesLock.lock();
+				        try {
+    						for (XAResource xar : xaResources) {
+    							xaRecoverySecondPass(xar);
+    							_resources.remove(xar);
+    						}
+				        } finally {
+				            resourcesLock.unlock();
+				        }
+					} else {
+						System.out.println("Was null");
 					}
 				}
             }
@@ -203,29 +207,34 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 		// JBTM-1354 JCA needs to be able to recover XAResources associated with a subordinate transaction so we have to do at least
 		// the start scan to make sure that we have loaded all the XAResources we possibly can to assist subordinate transactions recovering
 
-		// scan using statically configured plugins;
-		_resources = resourceInitiatedRecovery();
-		// scan using dynamically configured plugins:
-		_resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
+		resourcesLock.lock();
+		try {
+    		// scan using statically configured plugins;
+    		_resources = resourceInitiatedRecovery();
+    		// scan using dynamically configured plugins:
+    		_resources.addAll(resourceInitiatedRecoveryForRecoveryHelpers());
+    
+    		List<XAResource> resources = new ArrayList<XAResource>(_resources);
+    		for (XAResource xaResource : resources) {
+    			try {
+    				xaRecoveryFirstPass(xaResource);
+    			} catch (Exception ex) {
+    				jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+    			}
+    		}
 
-		List<XAResource> resources = new ArrayList<XAResource>(_resources);
-		for (XAResource xaResource : resources) {
-			try {
-				xaRecoveryFirstPass(xaResource);
-			} catch (Exception ex) {
-				jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
-			}
+    		if (endState != ScanStates.BETWEEN_PASSES) {
+    		    for (XAResource xaResource : resources) {
+    		        try {
+    		            xaResource.recover(XAResource.TMENDRSCAN);
+    		        } catch (Exception ex) {
+    		            jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
+    		        }
+    		    }
+    		}
+		} finally {
+		    resourcesLock.unlock();
 		}
-
-		if (endState != ScanStates.BETWEEN_PASSES) {
-			for (XAResource xaResource : resources) {
-				try {
-					xaResource.recover(XAResource.TMENDRSCAN);
-				} catch (Exception ex) {
-					jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
-				}
-			}
-        }
 
 		setScanState(endState);
 	}
@@ -502,6 +511,8 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 	 * @see XARecoveryModule#getNewXAResource(XAResourceRecord)
 	 */
     private void bottomUpRecovery() {
+        resourcesLock.lock();
+        try {
 			for (XAResource xaResource : _resources) {
 				try {
 					xaRecoverySecondPass(xaResource);
@@ -509,7 +520,9 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 					jtaLogger.i18NLogger.warn_recovery_getxaresource(ex);
 				}
 			}
-
+        } finally {
+            resourcesLock.unlock();
+        }
 
         // JBTM-895 garbage collection is now done when we return XAResources {@see XARecoveryModule#getNewXAResource(XAResourceRecord)}
         // JBTM-924 requires this here garbage collection, see JBTM-1155:
@@ -919,14 +932,19 @@ public class XARecoveryModule implements ExtendedRecoveryModule
             RecoveryXids recoveryXids = _xidScans.get(theKey);
 
             if(recoveryXids.updateIfEquivalentRM(xares, xids)) {
-                // recoveryXids is for this xares, but was originally obtained using
-                // a different XAResource. rekey the hashtable to use the new one.
-                _xidScans.remove(theKey);
-                _xidScans.put(xares, recoveryXids);
-                _resources.remove(theKey);
-                // There could be two datasources pointed at the same resource manager
-                if (!_resources.contains(xares)) {
-                	_resources.add(xares);
+                resourcesLock.lock();
+                try {
+                    // recoveryXids is for this xares, but was originally obtained using
+                    // a different XAResource. rekey the hashtable to use the new one.
+                    _xidScans.remove(theKey);
+                    _xidScans.put(xares, recoveryXids);
+                    _resources.remove(theKey);
+                    // There could be two datasources pointed at the same resource manager
+                    if (!_resources.contains(xares)) {
+                    	_resources.add(xares);
+                    }
+                } finally {
+                    resourcesLock.unlock();
                 }
             }
         }
@@ -1112,6 +1130,7 @@ public class XARecoveryModule implements ExtendedRecoveryModule
 	private InputObjectState _uids = new InputObjectState();
 
 	private List<XAResource> _resources;
+	private ReentrantLock resourcesLock = new ReentrantLock();
 
     // WARNING com.hp.mwtests.ts.jta.recovery.XARecoveryModuleUnitTest uses reflection to peek at the scan state of this recovery module
     private enum ScanStates {
