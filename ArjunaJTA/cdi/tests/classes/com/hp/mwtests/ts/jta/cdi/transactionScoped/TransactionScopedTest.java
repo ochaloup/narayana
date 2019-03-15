@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.arjuna.ats.jta.cdi.TransactionContext;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import javax.enterprise.context.ContextNotActiveException;
 import javax.inject.Inject;
@@ -70,6 +71,7 @@ public class TransactionScopedTest {
         return  ShrinkWrap.create(JavaArchive.class, "test.jar")
                 .addClass(TestCDITransactionScopeBean.class)
                 .addClass(TestCDITransactionScopeBean2.class)
+                .addPackages(true, TransactionContext.class.getPackage())
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
