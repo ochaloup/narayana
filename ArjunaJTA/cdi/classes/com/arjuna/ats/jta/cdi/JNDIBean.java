@@ -31,7 +31,6 @@ import java.util.Set;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -65,7 +64,7 @@ final class JNDIBean<T> extends AbstractBean<T> {
     @Override
     public final T create(final CreationalContext<T> cc) {
         try {
-            return this.type.cast(CDI.current().select(InitialContext.class).get().lookup(this.name));
+            return this.type.cast(new InitialContext().lookup(this.name));
         } catch (final NamingException namingException) {
             throw new CreationException(namingException.getMessage(), namingException);
         }
