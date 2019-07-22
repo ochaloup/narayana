@@ -1,20 +1,20 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors 
- * as indicated by the @author tags. 
+ * Copyright 2006, Red Hat Middleware LLC, and individual contributors
+ * as indicated by the @author tags.
  * See the copyright.txt in the distribution for a
- * full listing of individual contributors. 
+ * full listing of individual contributors.
  * This copyrighted material is made available to anyone wishing to use,
  * modify, copy, or redistribute it subject to the terms and conditions
  * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License,
  * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- * 
+ *
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
@@ -24,7 +24,7 @@
  * Arjuna Solutions Limited,
  * Newcastle upon Tyne,
  * Tyne and Wear,
- * UK.  
+ * UK.
  *
  * $Id: ModifierFactory.java 2342 2006-03-30 13:06:17Z  $
  */
@@ -54,7 +54,7 @@ import com.arjuna.common.internal.util.ClassloadingUtility;
 public class ModifierFactory
 {
 
-	public static synchronized void putModifier (String dbName, int major, int minor, String modclass)
+    public static synchronized void putModifier (String dbName, int major, int minor, String modclass)
     {
         ConnectionModifier connectionModifier = ClassloadingUtility.loadAndInstantiateClass(ConnectionModifier.class, modclass, null);
         if(connectionModifier != null) {
@@ -65,50 +65,50 @@ public class ModifierFactory
     /*
      * Convert input to lower case first.
      */
-    
+
     public static synchronized ConnectionModifier getModifier (String dbName, int major, int minor)
     {
-	String exactMatch = null;
-	String majorMatch = null;
-	String driverMatch = null;
-	Enumeration e = _modifiers.keys();
-	
-	dbName = dbName.toLowerCase();
+    String exactMatch = null;
+    String majorMatch = null;
+    String driverMatch = null;
+    Enumeration e = _modifiers.keys();
 
-	while (e.hasMoreElements())
-	{
-	    String s = (String) e.nextElement();
+    dbName = dbName.toLowerCase();
 
-	    if (s.equalsIgnoreCase(dbName + "_" + major + "_" + minor))
-		exactMatch = s;
-	    if (s.equalsIgnoreCase(dbName + "_" + major + "_-1"))
-		majorMatch = s;
-	    if (s.equalsIgnoreCase(dbName + "_-1_-1"))
-		driverMatch = s;
-	}
-	ConnectionModifier modifier = defaultIsSameRMOverride ? isSameRMModifier : null;
+    while (e.hasMoreElements())
+    {
+        String s = (String) e.nextElement();
 
-	if (driverMatch != null)
-		modifier = _modifiers.get(driverMatch);
-	if (majorMatch != null)
-		modifier = _modifiers.get(majorMatch);
-	if (exactMatch != null)
-		modifier = _modifiers.get(exactMatch);
+        if (s.equalsIgnoreCase(dbName + "_" + major + "_" + minor))
+        exactMatch = s;
+        if (s.equalsIgnoreCase(dbName + "_" + major + "_-1"))
+        majorMatch = s;
+        if (s.equalsIgnoreCase(dbName + "_-1_-1"))
+        driverMatch = s;
+    }
+    ConnectionModifier modifier = defaultIsSameRMOverride ? isSameRMModifier : null;
 
-	if (jdbcLogger.logger.isTraceEnabled()) {
-		jdbcLogger.logger.tracef("ConnectionModifier for: %s for %s %d/%d (defaultIsSameRMOverride was %b)", modifier == null? null : modifier.getClass().getName(), dbName, major, minor ,defaultIsSameRMOverride);
-	}
-	return modifier;
+    if (driverMatch != null)
+        modifier = _modifiers.get(driverMatch);
+    if (majorMatch != null)
+        modifier = _modifiers.get(majorMatch);
+    if (exactMatch != null)
+        modifier = _modifiers.get(exactMatch);
+
+    if (jdbcLogger.logger.isTraceEnabled()) {
+        jdbcLogger.logger.tracef("ConnectionModifier for: %s for %s %d/%d (defaultIsSameRMOverride was %b)", modifier == null? null : modifier.getClass().getName(), dbName, major, minor ,defaultIsSameRMOverride);
+    }
+    return modifier;
     }
 
     private static ConnectionModifier isSameRMModifier = new IsSameRMModifier();
 
-	private static boolean defaultIsSameRMOverride = jdbcPropertyManager.getJDBCEnvironmentBean().getDefaultIsSameRMOverride();
+    private static boolean defaultIsSameRMOverride = jdbcPropertyManager.getJDBCEnvironmentBean().getDefaultIsSameRMOverride();
 
     private static Hashtable<String,ConnectionModifier> _modifiers = new Hashtable<String,ConnectionModifier>();
-    
+
     static
     {
-	new list();
+    new list();
     }
 }

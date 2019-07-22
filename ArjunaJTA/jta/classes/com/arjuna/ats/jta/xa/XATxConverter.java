@@ -1,20 +1,20 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors 
- * as indicated by the @author tags. 
+ * Copyright 2006, Red Hat Middleware LLC, and individual contributors
+ * as indicated by the @author tags.
  * See the copyright.txt in the distribution for a
- * full listing of individual contributors. 
+ * full listing of individual contributors.
  * This copyrighted material is made available to anyone wishing to use,
  * modify, copy, or redistribute it subject to the terms and conditions
  * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License,
  * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- * 
+ *
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
@@ -24,7 +24,7 @@
  * Hewlett-Packard Arjuna Labs,
  * Newcastle upon Tyne,
  * Tyne and Wear,
- * UK.  
+ * UK.
  *
  * $Id: XATxConverter.java 2342 2006-03-30 13:06:17Z  $
  */
@@ -52,7 +52,7 @@ import com.arjuna.ats.jta.logging.jtaLogger;
 
 public class XATxConverter
 {
-	private static XAResourceRecordWrappingPlugin xaResourceRecordWrappingPlugin =
+    private static XAResourceRecordWrappingPlugin xaResourceRecordWrappingPlugin =
             jtaPropertyManager.getJTAEnvironmentBean().getXAResourceRecordWrappingPlugin();
     public static final int FORMAT_ID = FormatConstants.JTA_FORMAT_ID; // different from JTS ones.
 
@@ -78,7 +78,7 @@ public class XATxConverter
     private static XID getXid(Uid uid, Uid branch, int formatId, Integer eisName) throws IllegalStateException
     {
         if (uid == null) {
-    	    throw new IllegalStateException();
+            throw new IllegalStateException();
         }
 
         XID xid = new XID();
@@ -103,10 +103,10 @@ public class XATxConverter
         // src, srcPos, dest, destPos, length
         System.arraycopy(gtridUid, 0, xid.data, 0, gtridUid.length);
         System.arraycopy(nodeName.getBytes(StandardCharsets.UTF_8), 0, xid.data, gtridUid.length, nodeNameLengthToUse);
-        
-        
+
+
         if (branch.notEquals(Uid.nullUid()))
-		{
+        {
             // bqual is uid byte form plus EIS name.
             byte[] bqualUid = branch.getBytes();
 
@@ -115,7 +115,7 @@ public class XATxConverter
             }
 
             int spareBqualBytes = XID.MAXBQUALSIZE - (bqualUid.length + 4);
-           
+
             xid.bqual_length = bqualUid.length+4+4;
 
             // src, srcPos, dest, destPos, length
@@ -123,18 +123,18 @@ public class XATxConverter
             System.arraycopy (bqualUid, 0, xid.data, offset, bqualUid.length);
             setEisName(xid, eisName);
         }
-		else
-		{
-		    /*
-		     * Note: for some dbs we seem to be able to get
-		     * away with setting the size field to the size
-		     * of the actual branch. However, for Oracle,
-		     * it appears as though it must always be 64.
-		     * (At least for zero branches.)
-		     */
-		    xid.data[xid.gtrid_length] = (byte) 0;
-		    xid.bqual_length = 64;
-		}
+        else
+        {
+            /*
+             * Note: for some dbs we seem to be able to get
+             * away with setting the size field to the size
+             * of the actual branch. However, for Oracle,
+             * it appears as though it must always be 64.
+             * (At least for zero branches.)
+             */
+            xid.data[xid.gtrid_length] = (byte) 0;
+            xid.bqual_length = 64;
+        }
 
         return xid;
     }
@@ -173,73 +173,73 @@ public class XATxConverter
         System.arraycopy(databranch, 0, theXid.data, theXid.gtrid_length, databranch.length);
     }
 
-	public static String getNodeName(XID xid) {
-		if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
-			return null;
-		}
+    public static String getNodeName(XID xid) {
+        if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
+            return null;
+        }
 
-		Xid xidImple = new XidImple(xid);
-		byte[] globalTransactionId = xidImple.getGlobalTransactionId();
+        Xid xidImple = new XidImple(xid);
+        byte[] globalTransactionId = xidImple.getGlobalTransactionId();
 
-		// the node name follows the Uid with no separator, so the only
-		// way to tell where it starts is to figure out how long the Uid is.
-		int offset = Uid.UID_SIZE;
+        // the node name follows the Uid with no separator, so the only
+        // way to tell where it starts is to figure out how long the Uid is.
+        int offset = Uid.UID_SIZE;
 
-		return new String(Arrays.copyOfRange(globalTransactionId, offset, globalTransactionId.length), StandardCharsets.UTF_8);
-	}
+        return new String(Arrays.copyOfRange(globalTransactionId, offset, globalTransactionId.length), StandardCharsets.UTF_8);
+    }
 
-	public static void setSubordinateNodeName(XID theXid, String xaNodeName) {
-		if (theXid == null || !FormatConstants.isNarayanaFormatId(theXid.formatID)) {
-			return;
-		}
-		int length = 0;
-		if (xaNodeName != null) {
-			length = xaNodeName.length();
-		}
-		int offset = theXid.gtrid_length + Uid.UID_SIZE + 4;
-		theXid.data[offset++] = (byte) (length >>> 24);
-		theXid.data[offset++] = (byte) (length >>> 16);
-		theXid.data[offset++] = (byte) (length >>> 8);
-		theXid.data[offset++] = (byte) (length >>> 0);
-		if (length > 0) {
-			byte[] nameAsBytes = xaNodeName.getBytes(StandardCharsets.UTF_8);
-			System.arraycopy(nameAsBytes, 0, theXid.data, offset, length);
-		}
-		theXid.bqual_length = Uid.UID_SIZE+4+4+length;
-	}
-	public static String getSubordinateNodeName(XID xid) {
-		if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
-			return null;
-		}
+    public static void setSubordinateNodeName(XID theXid, String xaNodeName) {
+        if (theXid == null || !FormatConstants.isNarayanaFormatId(theXid.formatID)) {
+            return;
+        }
+        int length = 0;
+        if (xaNodeName != null) {
+            length = xaNodeName.length();
+        }
+        int offset = theXid.gtrid_length + Uid.UID_SIZE + 4;
+        theXid.data[offset++] = (byte) (length >>> 24);
+        theXid.data[offset++] = (byte) (length >>> 16);
+        theXid.data[offset++] = (byte) (length >>> 8);
+        theXid.data[offset++] = (byte) (length >>> 0);
+        if (length > 0) {
+            byte[] nameAsBytes = xaNodeName.getBytes(StandardCharsets.UTF_8);
+            System.arraycopy(nameAsBytes, 0, theXid.data, offset, length);
+        }
+        theXid.bqual_length = Uid.UID_SIZE+4+4+length;
+    }
+    public static String getSubordinateNodeName(XID xid) {
+        if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
+            return null;
+        }
 
-		Xid xidImple = new XidImple(xid);
-		byte[] branchQualifier = xidImple.getBranchQualifier();
+        Xid xidImple = new XidImple(xid);
+        byte[] branchQualifier = xidImple.getBranchQualifier();
 
-		// the node name follows the Uid with no separator, so the only
-		// way to tell where it starts is to figure out how long the Uid is.
-		int offset = Uid.UID_SIZE + 4;
+        // the node name follows the Uid with no separator, so the only
+        // way to tell where it starts is to figure out how long the Uid is.
+        int offset = Uid.UID_SIZE + 4;
 
-		int length = (branchQualifier[offset++] << 24)
-				+ ((branchQualifier[offset++] & 0xFF) << 16)
-				+ ((branchQualifier[offset++] & 0xFF) << 8)
-				+ (branchQualifier[offset++] & 0xFF);
-		if (length > 0) {
-			return new String(Arrays.copyOfRange(branchQualifier, offset, offset+length), StandardCharsets.UTF_8);
-		} else {
-			return null;
-		}
-	}
+        int length = (branchQualifier[offset++] << 24)
+                + ((branchQualifier[offset++] & 0xFF) << 16)
+                + ((branchQualifier[offset++] & 0xFF) << 8)
+                + (branchQualifier[offset++] & 0xFF);
+        if (length > 0) {
+            return new String(Arrays.copyOfRange(branchQualifier, offset, offset+length), StandardCharsets.UTF_8);
+        } else {
+            return null;
+        }
+    }
 
 
-	public static void setBranchUID(XID xid, Uid uid) {
-		if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
-			return;
-		}
+    public static void setBranchUID(XID xid, Uid uid) {
+        if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
+            return;
+        }
 
-		byte[] bqual = uid.getBytes();
-		System.arraycopy(bqual, 0, xid.data, xid.gtrid_length, Uid.UID_SIZE);
-	}
-	
+        byte[] bqual = uid.getBytes();
+        System.arraycopy(bqual, 0, xid.data, xid.gtrid_length, Uid.UID_SIZE);
+    }
+
     public static Uid getBranchUid(XID xid)
     {
         if (xid == null || !FormatConstants.isNarayanaFormatId(xid.formatID)) {
@@ -255,19 +255,19 @@ public class XATxConverter
         return tx;
     }
 
-	public static void setEisName(XID theXid, Integer eisName) {
-		if (theXid == null || !FormatConstants.isNarayanaFormatId(theXid.formatID)) {
-			return;
-		}
-		if (eisName == null) {
-			eisName = 0;
-		}
-		int offset = theXid.gtrid_length + Uid.UID_SIZE;
-		theXid.data[offset + 0] = (byte) (eisName >>> 24);
-		theXid.data[offset + 1] = (byte) (eisName >>> 16);
-		theXid.data[offset + 2] = (byte) (eisName >>> 8);
-		theXid.data[offset + 3] = (byte) (eisName >>> 0);
-	}
+    public static void setEisName(XID theXid, Integer eisName) {
+        if (theXid == null || !FormatConstants.isNarayanaFormatId(theXid.formatID)) {
+            return;
+        }
+        if (eisName == null) {
+            eisName = 0;
+        }
+        int offset = theXid.gtrid_length + Uid.UID_SIZE;
+        theXid.data[offset + 0] = (byte) (eisName >>> 24);
+        theXid.data[offset + 1] = (byte) (eisName >>> 16);
+        theXid.data[offset + 2] = (byte) (eisName >>> 8);
+        theXid.data[offset + 3] = (byte) (eisName >>> 0);
+    }
 
     public static Integer getEISName(XID xid)
     {
@@ -275,14 +275,14 @@ public class XATxConverter
             return -1;
         }
 
-		// the node name follows the Uid with no separator, so the only
-		// way to tell where it starts is to figure out how long the Uid is.
-		int offset = xid.gtrid_length + Uid.UID_SIZE;
+        // the node name follows the Uid with no separator, so the only
+        // way to tell where it starts is to figure out how long the Uid is.
+        int offset = xid.gtrid_length + Uid.UID_SIZE;
 
-		return (xid.data[offset + 0] << 24)
-				+ ((xid.data[offset + 1] & 0xFF) << 16)
-				+ ((xid.data[offset + 2] & 0xFF) << 8)
-				+ (xid.data[offset + 3] & 0xFF);
+        return (xid.data[offset + 0] << 24)
+                + ((xid.data[offset + 1] & 0xFF) << 16)
+                + ((xid.data[offset + 2] & 0xFF) << 8)
+                + (xid.data[offset + 3] & 0xFF);
     }
 
     public static String getXIDString(XID xid)
@@ -306,9 +306,9 @@ public class XATxConverter
         stringBuilder.append(getSubordinateNodeName(xid));
         stringBuilder.append(", eis_name=");
         if (xaResourceRecordWrappingPlugin != null) {
-        	stringBuilder.append(xaResourceRecordWrappingPlugin.getEISName(getEISName(xid)));
+            stringBuilder.append(xaResourceRecordWrappingPlugin.getEISName(getEISName(xid)));
         } else {
-        	stringBuilder.append(getEISName(xid));
+            stringBuilder.append(getEISName(xid));
         }
         stringBuilder.append(" >");
 

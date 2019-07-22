@@ -32,12 +32,11 @@ import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
  *
  * @author Jonathan Halliday (jonathan.halliday@redhat.com)
  */
-public class EnvironmentBeanTest
-{
+public class EnvironmentBeanTest {
     @Test
     public void testCoordinatorEnvironmentBean() throws Exception {
-    	CoordinatorEnvironmentBean coordinatorEnvironmentBean = new CoordinatorEnvironmentBean();
-    	coordinatorEnvironmentBean.setAllowCheckedActionFactoryOverride(true);
+        CoordinatorEnvironmentBean coordinatorEnvironmentBean = new CoordinatorEnvironmentBean();
+        coordinatorEnvironmentBean.setAllowCheckedActionFactoryOverride(true);
         com.arjuna.common.tests.simple.EnvironmentBeanTest.testBeanByReflection(coordinatorEnvironmentBean);
     }
 

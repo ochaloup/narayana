@@ -1,20 +1,20 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors 
- * as indicated by the @author tags. 
+ * Copyright 2006, Red Hat Middleware LLC, and individual contributors
+ * as indicated by the @author tags.
  * See the copyright.txt in the distribution for a
- * full listing of individual contributors. 
+ * full listing of individual contributors.
  * This copyrighted material is made available to anyone wishing to use,
  * modify, copy, or redistribute it subject to the terms and conditions
  * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License,
  * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- * 
+ *
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
@@ -37,74 +37,74 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.SubordinateTransaction;
 
 public class TransactionImple
-		extends
-		com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple implements SubordinateTransaction
+        extends
+        com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.TransactionImple implements SubordinateTransaction
 {
 
-	/**
-	 * Create a new transaction with the specified timeout.
-	 * 
-	 * @deprecated Only used by tests
-	 */
+    /**
+     * Create a new transaction with the specified timeout.
+     *
+     * @deprecated Only used by tests
+     */
 
-	public TransactionImple(int timeout)
-	{
-		this(timeout, null);
-	}
+    public TransactionImple(int timeout)
+    {
+        this(timeout, null);
+    }
 
-	public TransactionImple(int timeout, Xid importedXid)
-	{
-		super(new SubordinateAtomicAction(timeout, importedXid));
+    public TransactionImple(int timeout, Xid importedXid)
+    {
+        super(new SubordinateAtomicAction(timeout, importedXid));
 
-		TransactionImple.putTransaction(this);
-	}
+        TransactionImple.putTransaction(this);
+    }
 
-	/**
-	 * Used for failure recovery.
-	 * 
-	 * @param actId
-	 *            the transaction state to recover.
-	 */
+    /**
+     * Used for failure recovery.
+     *
+     * @param actId
+     *            the transaction state to recover.
+     */
 
-	public TransactionImple(Uid actId)
-	{
-		super(new SubordinateAtomicAction(actId));
+    public TransactionImple(Uid actId)
+    {
+        super(new SubordinateAtomicAction(actId));
 
-		// don't put it into list here: it may already be there!
-	}
-	
-	public String getParentNodeName() {
-		return ((SubordinateAtomicAction)_theTransaction).getParentNodeName();
-	}
+        // don't put it into list here: it may already be there!
+    }
 
-	public final void recordTransaction()
-	{
-		TransactionImple.putTransaction(this);
-	}
+    public String getParentNodeName() {
+        return ((SubordinateAtomicAction)_theTransaction).getParentNodeName();
+    }
 
-	public String toString()
-	{
-		if (super._theTransaction == null)
-			return "TransactionImple < jca-subordinate, NoTransaction >";
-		else
-		{
-			return "TransactionImple < jca-subordinate, "
-					+ super._theTransaction + " >";
-		}
-	}
+    public final void recordTransaction()
+    {
+        TransactionImple.putTransaction(this);
+    }
 
-	/**
-	 * If this is an imported transaction (via JCA) then this will be the Xid we
-	 * are pretending to be. Otherwise, it will be null.
-	 * 
-	 * @return null if we are a local transaction, a valid Xid if we have been
-	 *         imported.
-	 */
+    public String toString()
+    {
+        if (super._theTransaction == null)
+            return "TransactionImple < jca-subordinate, NoTransaction >";
+        else
+        {
+            return "TransactionImple < jca-subordinate, "
+                    + super._theTransaction + " >";
+        }
+    }
 
-	public final Xid baseXid()
-	{
-		return ((SubordinateAtomicAction) _theTransaction).getXid();
-	}
+    /**
+     * If this is an imported transaction (via JCA) then this will be the Xid we
+     * are pretending to be. Otherwise, it will be null.
+     *
+     * @return null if we are a local transaction, a valid Xid if we have been
+     *         imported.
+     */
+
+    public final Xid baseXid()
+    {
+        return ((SubordinateAtomicAction) _theTransaction).getXid();
+    }
 
     @Override
     public Object getId() {
@@ -112,21 +112,21 @@ public class TransactionImple
     }
 
     /**
-	 * Force this transaction to try to recover itself again.
-	 */
+     * Force this transaction to try to recover itself again.
+     */
 
-	public void recover()
-	{
-		_theTransaction.activate();
-	}
+    public void recover()
+    {
+        _theTransaction.activate();
+    }
 
-	/**
-	 * Has the transaction been activated successfully? If not, we wait and try
-	 * again later.
-	 */
+    /**
+     * Has the transaction been activated successfully? If not, we wait and try
+     * again later.
+     */
 
-	public boolean activated()
-	{
-		return ((SubordinateAtomicAction) _theTransaction).activated();
-	}
+    public boolean activated()
+    {
+        return ((SubordinateAtomicAction) _theTransaction).activated();
+    }
 }

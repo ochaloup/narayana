@@ -67,7 +67,7 @@ import org.jboss.tm.TransactionImportResult;
 
 /**
  * The XATerminator implementation.
- * 
+ *
  * @author mcl
  */
 
@@ -75,7 +75,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 {
     /**
      * Commit the transaction identified and hence any inflow-associated work.
-     * 
+     *
      * @param xid
      *            the transaction to commit
      * @param onePhase
@@ -182,7 +182,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
     /**
      * If the transaction subordinate generated a heuristic, then this operation
      * will be called later once that heuristic has been resolved.
-     * 
+     *
      * @param xid
      *            the transaction.
      * @throws XAException
@@ -219,7 +219,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
     /**
      * Prepare the imported transaction.
-     * 
+     *
      * @param xid
      *            the transaction to prepare.
      * @throws XAException
@@ -233,16 +233,16 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
     public int prepare (Xid xid) throws XAException
     {
 
-    	// JBTM-927 this can happen if the transaction has been rolled back by the TransactionReaper
-		SubordinateTransaction tx = null;
-		try {
-			tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
-		} catch (XAException xae) {
-			if (xae.errorCode == XAException.XA_RBROLLBACK) {
-				SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
-			}
-			throw xae;
-		}
+        // JBTM-927 this can happen if the transaction has been rolled back by the TransactionReaper
+        SubordinateTransaction tx = null;
+        try {
+            tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        } catch (XAException xae) {
+            if (xae.errorCode == XAException.XA_RBROLLBACK) {
+                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+            }
+            throw xae;
+        }
         try
         {
 
@@ -323,7 +323,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
      * Return a list of indoubt transactions. This may include those
      * transactions that are currently in-flight and running 2PC and do not need
      * recovery invoked on them.
-     * 
+     *
      * @param flag
      *            either XAResource.TMSTARTRSCAN to indicate the start of a
      *            recovery scan, or XAResource.TMENDRSCAN to indicate the end of
@@ -373,14 +373,14 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
         // if we are here, then check the object store
         return doRecover(null, null);
     }
-    
+
     /**
      * Return a list of indoubt transactions. This may include those
      * transactions that are currently in-flight and running 2PC and do not need
      * recovery invoked on them.
-     * 
+     *
      * @param nodeName
-     * 				Only recover transactions for this node (unless set to NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)
+     *                 Only recover transactions for this node (unless set to NodeNameXAResourceOrphanFilter.RECOVER_ALL_NODES)
      * @throws XAException
      *             thrown if any error occurs.
      * @return a list of potentially indoubt transactions or <code>null</code>.
@@ -426,47 +426,47 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
                     if (uid.notEquals(Uid.nullUid()))
                     {
-						if (parentNodeName != null) {
-							SubordinateAtomicAction saa = new SubordinateAtomicAction(uid, true);
-							XidImple loadedXid = (XidImple) saa.getXid();
-							if (loadedXid != null && loadedXid.getFormatId() == XATxConverter.FORMAT_ID) {
-								String loadedXidSubordinateNodeName = XATxConverter.getSubordinateNodeName(loadedXid.getXID());
+                        if (parentNodeName != null) {
+                            SubordinateAtomicAction saa = new SubordinateAtomicAction(uid, true);
+                            XidImple loadedXid = (XidImple) saa.getXid();
+                            if (loadedXid != null && loadedXid.getFormatId() == XATxConverter.FORMAT_ID) {
+                                String loadedXidSubordinateNodeName = XATxConverter.getSubordinateNodeName(loadedXid.getXID());
                                 if ((loadedXidSubordinateNodeName == null && loadedXidSubordinateNodeName == TxControl.getXANodeName())
                                         || loadedXidSubordinateNodeName.equals(TxControl.getXANodeName())) {
 
-									if (parentNodeName.equals(saa.getParentNodeName())) {
-										if (jtaLogger.logger.isDebugEnabled()) {
-											jtaLogger.logger.debug("Found record for " + saa);
-										}
-//										TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
+                                    if (parentNodeName.equals(saa.getParentNodeName())) {
+                                        if (jtaLogger.logger.isDebugEnabled()) {
+                                            jtaLogger.logger.debug("Found record for " + saa);
+                                        }
+//                                        TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
 
-										values.push(loadedXid);
-									}
-								}
-							}
+                                        values.push(loadedXid);
+                                    }
+                                }
+                            }
 
-						} else if (xid == null) {
-							TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
+                        } else if (xid == null) {
+                            TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
 
-							if (tx != null)
-								values.push(tx.baseXid());
-						} else {
-							SubordinateAtomicAction saa = new SubordinateAtomicAction(uid, true);
-							XidImple loadedXid = (XidImple) saa.getXid();
-							if (loadedXid != null && loadedXid.getFormatId() == XATxConverter.FORMAT_ID) {
-								String loadedXidSubordinateNodeName = XATxConverter.getSubordinateNodeName(loadedXid.getXID());
-								if (XATxConverter.getSubordinateNodeName(new XidImple(xid).getXID()).equals(loadedXidSubordinateNodeName)) {
-									if (Arrays.equals(loadedXid.getGlobalTransactionId(), xid.getGlobalTransactionId())) {
-										if (jtaLogger.logger.isDebugEnabled()) {
-											jtaLogger.logger.debug("Found record for " + saa);
-										}
-										TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
+                            if (tx != null)
+                                values.push(tx.baseXid());
+                        } else {
+                            SubordinateAtomicAction saa = new SubordinateAtomicAction(uid, true);
+                            XidImple loadedXid = (XidImple) saa.getXid();
+                            if (loadedXid != null && loadedXid.getFormatId() == XATxConverter.FORMAT_ID) {
+                                String loadedXidSubordinateNodeName = XATxConverter.getSubordinateNodeName(loadedXid.getXID());
+                                if (XATxConverter.getSubordinateNodeName(new XidImple(xid).getXID()).equals(loadedXidSubordinateNodeName)) {
+                                    if (Arrays.equals(loadedXid.getGlobalTransactionId(), xid.getGlobalTransactionId())) {
+                                        if (jtaLogger.logger.isDebugEnabled()) {
+                                            jtaLogger.logger.debug("Found record for " + saa);
+                                        }
+                                        TransactionImple tx = (TransactionImple) SubordinationManager.getTransactionImporter().recoverTransaction(uid);
 
-										values.push(loadedXid);
-									}
-								}
-							}
-						}
+                                        values.push(loadedXid);
+                                    }
+                                }
+                            }
+                        }
 
                     }
                     else
@@ -474,7 +474,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
                 }
                 while (!finished);
-                
+
                 if (values.size() > 0)
                 {
                     int index = 0;
@@ -504,7 +504,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
     /**
      * Rollback the imported transaction subordinate.
-     * 
+     *
      * @param xid
      *            the transaction to roll back.
      * @throws XAException
@@ -513,18 +513,18 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
 
     public void rollback (Xid xid) throws XAException
     {
-		// JBTM-927 this can happen if the transaction has been rolled back by
-		// the TransactionReaper
-		SubordinateTransaction tx = null;
-		try {
-			tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
-		} catch (XAException xae) {
-			if (xae.errorCode == XAException.XA_RBROLLBACK) {
-				SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
-				return;
-			}
-			throw xae;
-		}
+        // JBTM-927 this can happen if the transaction has been rolled back by
+        // the TransactionReaper
+        SubordinateTransaction tx = null;
+        try {
+            tx = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        } catch (XAException xae) {
+            if (xae.errorCode == XAException.XA_RBROLLBACK) {
+                SubordinationManager.getTransactionImporter().removeImportedTransaction(xid);
+                return;
+            }
+            throw xae;
+        }
         try
         {
 
@@ -591,7 +591,7 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
             throw new XAException(XAException.XAER_RMERR);
         }
     }
-    
+
     public boolean beforeCompletion (Xid xid) throws javax.transaction.SystemException
     {
         try
@@ -608,22 +608,22 @@ public class XATerminatorImple implements javax.resource.spi.XATerminator, XATer
         catch (final Exception ex)
         {
             UnexpectedConditionException e = new UnexpectedConditionException();
-            
+
             e.initCause(ex);
-            
+
             throw e;
         }
     }
 
-	public Transaction getTransaction(Xid xid) throws XAException {
-		// first see if the xid is a root coordinator
-		Transaction transaction = TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
-		// second see if the xid is a subordinate txn
-		if(transaction == null) {
-		    transaction = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
-		}
-		return transaction;
-	}
+    public Transaction getTransaction(Xid xid) throws XAException {
+        // first see if the xid is a root coordinator
+        Transaction transaction = TransactionImple.getTransaction(new XidImple(xid).getTransactionUid());
+        // second see if the xid is a subordinate txn
+        if(transaction == null) {
+            transaction = SubordinationManager.getTransactionImporter().getImportedTransaction(xid);
+        }
+        return transaction;
+    }
 
     public TransactionImportResult importTransaction(Xid xid, int timeoutIfNew) throws XAException {
         return SubordinationManager.getTransactionImporter().importRemoteTransaction(xid, timeoutIfNew);

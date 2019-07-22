@@ -30,42 +30,37 @@ import com.arjuna.ats.internal.arjuna.utils.FileProcessId;
 import com.arjuna.ats.internal.arjuna.utils.MBeanProcessId;
 import com.arjuna.ats.internal.arjuna.utils.ManualProcessId;
 
-public class ProcessIdUnitTest
-{
+public class ProcessIdUnitTest {
     @Test
-    public void testFileProcessId()
-    {
+    public void testFileProcessId() {
         FileProcessId fp = new FileProcessId();
 
         assertTrue(fp.getpid() != -1);
     }
-    
+
     @Test
-    public void testManualProcessId()
-    {
+    public void testManualProcessId() {
         arjPropertyManager.getCoreEnvironmentBean().setPid(1);
-        
+
         ManualProcessId mp = new ManualProcessId();
 
         assertTrue(mp.getpid() == 1);
     }
-    
-    @Test
-    public void testExecProcessId()
-    {
-		ExecProcessId xp = new ExecProcessId();
-		// TODO windows
-		if (System.getProperty("os.name").toLowerCase().indexOf("windows") == -1) {
-
-			assertTrue(xp.getpid() > 0);
-		}
-	}
 
     @Test
-    public void testMBeanProcessId()
-    {
+    public void testExecProcessId() {
+        ExecProcessId xp = new ExecProcessId();
+        // TODO windows
+        if (System.getProperty("os.name").toLowerCase().indexOf("windows") == -1) {
+
+            assertTrue(xp.getpid() > 0);
+        }
+    }
+
+    @Test
+    public void testMBeanProcessId() {
         MBeanProcessId mp = new MBeanProcessId();
-        
+
         assertTrue(mp.getpid() > 0);
     }
 }

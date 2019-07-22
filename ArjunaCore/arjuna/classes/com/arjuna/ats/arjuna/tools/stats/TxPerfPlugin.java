@@ -33,8 +33,7 @@ import com.sun.tools.jconsole.JConsoleContext;
 import com.sun.tools.jconsole.JConsoleContext.ConnectionState;
 import com.sun.tools.jconsole.JConsolePlugin;
 
-public class TxPerfPlugin extends JConsolePlugin implements PropertyChangeListener
-{
+public class TxPerfPlugin extends JConsolePlugin implements PropertyChangeListener {
     private TxPerfGraph graph;
     private Map<String, JPanel> tabs;
 
@@ -49,7 +48,7 @@ public class TxPerfPlugin extends JConsolePlugin implements PropertyChangeListen
     public synchronized Map<String, JPanel> getTabs() {
         if (tabs == null) {
             graph = new TxPerfGraph(new JFrame("TxPerf"));
-            
+
             graph.setMBeanServerConnection(
                 getContext().getMBeanServerConnection());
             // use LinkedHashMap if you want a predictable order

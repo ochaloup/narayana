@@ -1,8 +1,8 @@
 /*
  * JBoss, Home of Professional Open Source
  * Copyright 2006, Red Hat Middleware LLC, and individual contributors
- * as indicated by the @author tags. 
- * See the copyright.txt in the distribution for a full listing 
+ * as indicated by the @author tags.
+ * See the copyright.txt in the distribution for a full listing
  * of individual contributors.
  * This copyrighted material is made available to anyone wishing to use,
  * modify, copy, or redistribute it subject to the terms and conditions
@@ -14,7 +14,7 @@
  * v.2.1 along with this distribution; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- * 
+ *
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
@@ -24,7 +24,7 @@
  * Hewlett-Packard Arjuna Labs,
  * Newcastle upon Tyne,
  * Tyne and Wear,
- * UK.  
+ * UK.
  *
  * $Id: ServerTransaction.java 2342 2006-03-30 13:06:17Z  $
  */
@@ -67,7 +67,7 @@ import com.arjuna.ats.jts.utils.Utility;
  * This looks like an Transaction, but is only created for interposition
  * purposes. The classes ServerTopLevelAction and ServerNestedAction use
  * instances of this class to drive the server-side protocol.
- * 
+ *
  * @author Mark Little (mark@arjuna.com)
  * @version $Id: ServerTransaction.java 2342 2006-03-30 13:06:17Z  $
  * @since JTS 1.0.
@@ -81,18 +81,18 @@ import com.arjuna.ats.jts.utils.Utility;
 public class ServerTransaction extends ArjunaTransactionImple
 {
 
-	public ServerTransaction (Uid actUid, Control myParent)
-	{
-		this(actUid, myParent, null);
-	}
+    public ServerTransaction (Uid actUid, Control myParent)
+    {
+        this(actUid, myParent, null);
+    }
 
-	public ServerTransaction (Uid actUid, Control myParent, ArjunaTransactionImple parentImpl)
-	{
-		super(actUid, myParent, parentImpl);
+    public ServerTransaction (Uid actUid, Control myParent, ArjunaTransactionImple parentImpl)
+    {
+        super(actUid, myParent, parentImpl);
 
-		subordinate = true;
+        subordinate = true;
 
-		if (jtsLogger.logger.isTraceEnabled()) {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( "
                     + actUid
                     + ", Control myParent, "
@@ -100,93 +100,93 @@ public class ServerTransaction extends ArjunaTransactionImple
                     : Uid.nullUid()) + " )");
         }
 
-		_savingUid = new Uid();
-		_sync = null;
-		_beforeCompleted = false;
-		_recoveryCoordinator = null;
-		_prepState = ActionStatus.COMMITTING;
-	}
+        _savingUid = new Uid();
+        _sync = null;
+        _beforeCompleted = false;
+        _recoveryCoordinator = null;
+        _prepState = ActionStatus.COMMITTING;
+    }
 
     @Override
-	public void finalize ()
-	{
-		if (jtsLogger.logger.isTraceEnabled()) {
+    public void finalize ()
+    {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction.finalize ( "
                     + get_uid() + " )");
         }
 
-		_savingUid = null;
+        _savingUid = null;
 
-		if (_sync != null)
-		{
-			_sync.destroy();
-			_sync = null;
-		}
+        if (_sync != null)
+        {
+            _sync.destroy();
+            _sync = null;
+        }
 
-		/*
-		 * Remember to destroy the recovery coordinator.
-		 */
+        /*
+         * Remember to destroy the recovery coordinator.
+         */
 
-		_recoveryCoordinator = null;
+        _recoveryCoordinator = null;
 
-		super.finalizeInternal();
-	}
+        super.finalizeInternal();
+    }
 
-	public String type ()
-	{
-		return typeName();
-	}
+    public String type ()
+    {
+        return typeName();
+    }
 
-	public Uid getSavingUid ()
-	{
-		return _savingUid;
-	}
+    public Uid getSavingUid ()
+    {
+        return _savingUid;
+    }
 
-	public final int doPrepare ()
-	{
-		if (jtsLogger.logger.isTraceEnabled()) {
+    public final int doPrepare ()
+    {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction::doPrepare ( "
                     + get_uid() + " )");
         }
 
-		/*
-		 * If transaction has already been prepared then return error status.
-		 */
+        /*
+         * If transaction has already been prepared then return error status.
+         */
 
-		org.omg.CosTransactions.Status s = get_status();
+        org.omg.CosTransactions.Status s = get_status();
 
-		if ((s != org.omg.CosTransactions.Status.StatusActive) &&
-				(s != org.omg.CosTransactions.Status.StatusMarkedRollback))
-		{
-			return TwoPhaseOutcome.INVALID_TRANSACTION;
-		}
+        if ((s != org.omg.CosTransactions.Status.StatusActive) &&
+                (s != org.omg.CosTransactions.Status.StatusMarkedRollback))
+        {
+            return TwoPhaseOutcome.INVALID_TRANSACTION;
+        }
 
-		_prepState = ActionStatus.PREPARED;
+        _prepState = ActionStatus.PREPARED;
 
-		/*
-		 * If we do not have an interposed synchronization then
-		 * before_completions will not have been called yet. So, do it now.
-		 */
+        /*
+         * If we do not have an interposed synchronization then
+         * before_completions will not have been called yet. So, do it now.
+         */
 
-		if (!_interposedSynch)
-		{
-		    if ((s != org.omg.CosTransactions.Status.StatusMarkedRollback) || TxControl.isBeforeCompletionWhenRollbackOnly())
-		    {
-			try
-			{
-				doBeforeCompletion();
-			}
-			catch (Exception e)
-			{
-				/*
-				 * Transaction will have been put into a state which forces it
-				 * to rollback, so do nothing here.
-				 */
-			}			
-		    }
-		}
+        if (!_interposedSynch)
+        {
+            if ((s != org.omg.CosTransactions.Status.StatusMarkedRollback) || TxControl.isBeforeCompletionWhenRollbackOnly())
+            {
+            try
+            {
+                doBeforeCompletion();
+            }
+            catch (Exception e)
+            {
+                /*
+                 * Transaction will have been put into a state which forces it
+                 * to rollback, so do nothing here.
+                 */
+            }
+            }
+        }
 
-		if (!_beforeCompleted && (_sync != null)) {
+        if (!_beforeCompleted && (_sync != null)) {
             /*
                 * Synchronizations should have been called by now if we have them!
                 */
@@ -199,484 +199,484 @@ public class ServerTransaction extends ArjunaTransactionImple
 
             super.preventCommit();
         }
-	              
-		int res = super.prepare(true);
 
-		/*
-		 * If read-only, the coordinator will not talk to us again, so do commit
-		 * now and destroy the transaction.
-		 * 
-		 * Otherwise, the transaction is destroyed when the commit/abort/forget
-		 * protocol completes.
-		 */
+        int res = super.prepare(true);
 
-		if (res == TwoPhaseOutcome.PREPARE_READONLY)
-		{
-			doPhase2Commit();
-		}
+        /*
+         * If read-only, the coordinator will not talk to us again, so do commit
+         * now and destroy the transaction.
+         *
+         * Otherwise, the transaction is destroyed when the commit/abort/forget
+         * protocol completes.
+         */
 
-		return res;
-	}
+        if (res == TwoPhaseOutcome.PREPARE_READONLY)
+        {
+            doPhase2Commit();
+        }
 
-	public final void doForget ()
-	{
-		super.destroyAction();
-	}
+        return res;
+    }
 
-	public final int doPhase2Commit ()
-	{
-		if (jtsLogger.logger.isTraceEnabled()) {
+    public final void doForget ()
+    {
+        super.destroyAction();
+    }
+
+    public final int doPhase2Commit ()
+    {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction::doPhase2Commit ( "
                     + get_uid() + " )");
         }
 
-		/*
-		 * If the transaction has already terminated, then return the status.
-		 */
+        /*
+         * If the transaction has already terminated, then return the status.
+         */
 
-		org.omg.CosTransactions.Status s = get_status();
+        org.omg.CosTransactions.Status s = get_status();
 
-		if (s != org.omg.CosTransactions.Status.StatusPrepared) {
+        if (s != org.omg.CosTransactions.Status.StatusPrepared) {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_txnotprepared("ServerTransaction.doPhase2Commit", Utility.stringStatus(s));
 
             return finalStatus();
         }
 
-		super.phase2Commit(true);
-		if (super.failedList != null && super.failedList.size() > 0) {
-		    return ActionStatus.COMMITTING;
-		}
+        super.phase2Commit(true);
+        if (super.failedList != null && super.failedList.size() > 0) {
+            return ActionStatus.COMMITTING;
+        }
 
-		/*
-		 * Now do after completion stuff.
-		 */
+        /*
+         * Now do after completion stuff.
+         */
 
-		try
-		{
-			doAfterCompletion(get_status());
-		}
-		catch (Exception e)
-		{
-		}
+        try
+        {
+            doAfterCompletion(get_status());
+        }
+        catch (Exception e)
+        {
+        }
 
-		if (parentTransaction != null)
-			parentTransaction.removeChildAction(this);
+        if (parentTransaction != null)
+            parentTransaction.removeChildAction(this);
 
-		super.destroyAction();
+        super.destroyAction();
 
-		ActionManager.manager().remove(get_uid());
+        ActionManager.manager().remove(get_uid());
 
-		return finalStatus();
-	}
+        return finalStatus();
+    }
 
-	public final int doPhase2Abort ()
-	{
-		if (jtsLogger.logger.isTraceEnabled()) {
+    public final int doPhase2Abort ()
+    {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction::doPhase2Abort ( "
                     + get_uid() + " )");
         }
 
-		/*
-		 * If the transaction has already terminated, then return the status. If
-		 * there hasn't been a heuristic outcome then we try to massage the result
-		 * to be consistent with what the caller expects: the fact that the
-		 * transaction is marked as committed during prepare without any problems means
-		 * that the intentions lists are zero so it's fine to say that it aborted instead.
-		 */
+        /*
+         * If the transaction has already terminated, then return the status. If
+         * there hasn't been a heuristic outcome then we try to massage the result
+         * to be consistent with what the caller expects: the fact that the
+         * transaction is marked as committed during prepare without any problems means
+         * that the intentions lists are zero so it's fine to say that it aborted instead.
+         */
 
-		org.omg.CosTransactions.Status s = get_status();
+        org.omg.CosTransactions.Status s = get_status();
 
-		if ((s == org.omg.CosTransactions.Status.StatusCommitted && preparedList.size() == 0)
-				|| (s == org.omg.CosTransactions.Status.StatusRolledBack))
-		{
-		    int status = finalStatus();
-		    
-		    switch (status)
-		    {
-		    case ActionStatus.COMMITTED:
-		    case ActionStatus.COMMITTING:
-		    case ActionStatus.ABORTED:
-		    case ActionStatus.ABORTING:
-		        return ActionStatus.ABORTED;
-		    default:
-		        return status;
-		    }
-		}
+        if ((s == org.omg.CosTransactions.Status.StatusCommitted && preparedList.size() == 0)
+                || (s == org.omg.CosTransactions.Status.StatusRolledBack))
+        {
+            int status = finalStatus();
 
-		super.phase2Abort(true);
-		
-		/*
-		 * Now do after completion stuff.
-		 */
+            switch (status)
+            {
+            case ActionStatus.COMMITTED:
+            case ActionStatus.COMMITTING:
+            case ActionStatus.ABORTED:
+            case ActionStatus.ABORTING:
+                return ActionStatus.ABORTED;
+            default:
+                return status;
+            }
+        }
 
-		try
-		{
-			doAfterCompletion(get_status());
-		}
-		catch (Exception e)
-		{
-		}
+        super.phase2Abort(true);
 
-		if (parentTransaction != null)
-		{
-			parentTransaction.removeChildAction(this);
-		}
+        /*
+         * Now do after completion stuff.
+         */
 
-		super.destroyAction();
+        try
+        {
+            doAfterCompletion(get_status());
+        }
+        catch (Exception e)
+        {
+        }
 
-		ActionManager.manager().remove(get_uid());
+        if (parentTransaction != null)
+        {
+            parentTransaction.removeChildAction(this);
+        }
 
-		return finalStatus();
-	}
+        super.destroyAction();
 
-	/*
-	 * Called for one-phase commit.
-	 */
+        ActionManager.manager().remove(get_uid());
 
-	public void doCommit (boolean report_heuristics) throws HeuristicHazard,
-			SystemException
-	{
-		int outcome = super.status();
+        return finalStatus();
+    }
 
-		if ((outcome == ActionStatus.RUNNING)
-				|| (outcome == ActionStatus.ABORT_ONLY)) // have we already been
-														 // committed?
-		{
-			if (!_interposedSynch)
-			{
-			    if ((outcome != ActionStatus.ABORT_ONLY) || TxControl.isBeforeCompletionWhenRollbackOnly())
-			    {
-				try
-				{
-					doBeforeCompletion();
-				}
-				catch (Exception e)
-				{
-					/*
-					 * Transaction will have been put into a state which forces
-					 * it to rollback, so do nothing here.
-					 */
-				}			
-			    }
-			}
+    /*
+     * Called for one-phase commit.
+     */
 
-			outcome = super.End(report_heuristics);
-		}
-		else
-		{
-			/*
-			 * Differentiate between us committing the transaction and some
-			 * other thread doing it.
-			 */
+    public void doCommit (boolean report_heuristics) throws HeuristicHazard,
+            SystemException
+    {
+        int outcome = super.status();
 
-			if (parentTransaction != null)
-				parentTransaction.removeChildAction(this);
+        if ((outcome == ActionStatus.RUNNING)
+                || (outcome == ActionStatus.ABORT_ONLY)) // have we already been
+                                                         // committed?
+        {
+            if (!_interposedSynch)
+            {
+                if ((outcome != ActionStatus.ABORT_ONLY) || TxControl.isBeforeCompletionWhenRollbackOnly())
+                {
+                try
+                {
+                    doBeforeCompletion();
+                }
+                catch (Exception e)
+                {
+                    /*
+                     * Transaction will have been put into a state which forces
+                     * it to rollback, so do nothing here.
+                     */
+                }
+                }
+            }
 
-			throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION,
-					CompletionStatus.COMPLETED_NO);
-		}
+            outcome = super.End(report_heuristics);
+        }
+        else
+        {
+            /*
+             * Differentiate between us committing the transaction and some
+             * other thread doing it.
+             */
 
-		/*
-		 * Now do after completion stuff.
-		 */
+            if (parentTransaction != null)
+                parentTransaction.removeChildAction(this);
 
-		try
-		{
-			doAfterCompletion(get_status());
-		}
-		catch (Exception e)
-		{
-		}
+            throw new INVALID_TRANSACTION(ExceptionCodes.INVALID_ACTION,
+                    CompletionStatus.COMPLETED_NO);
+        }
 
-		if (parentTransaction != null)
-			parentTransaction.removeChildAction(this);
+        /*
+         * Now do after completion stuff.
+         */
 
-		super.destroyAction();
+        try
+        {
+            doAfterCompletion(get_status());
+        }
+        catch (Exception e)
+        {
+        }
 
-		switch (outcome)
-		{
-		case ActionStatus.COMMITTED:
-		case ActionStatus.H_COMMIT:
-		case ActionStatus.COMMITTING: // in case asynchronous commit!
-			return;
-		case ActionStatus.ABORTING:
-		case ActionStatus.ABORTED:
-		case ActionStatus.H_ROLLBACK:
-			throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT,
-					CompletionStatus.COMPLETED_NO);
-		case ActionStatus.H_HAZARD:
-		default:
-			throw new HeuristicHazard();
-		}
-	}
+        if (parentTransaction != null)
+            parentTransaction.removeChildAction(this);
 
-	public void rollback () throws SystemException
-	{
-		super.rollback();
-	}
+        super.destroyAction();
 
-	/**
-	 * Registering a synchronization with interposition is a bit complicated!
-	 * Synchronizations must be called prior to prepare; if no
-	 * interposed-synchronization is used then either synchronizations would be
-	 * registered locally (and then ignored by the commit protocol) or they
-	 * would need to be registered remotely, which would mean a cross-address
-	 * space call for each synchronization!
-	 * 
-	 * The first time a synchronization is registered locally, we register a
-	 * proxy back with the real coordinator. When that transaction commits, it
-	 * will call this proxy, which will then drive the locally registered
-	 * synchronizations (actually it calls appropriate on the transaction to do
-	 * this.)
-	 * 
-	 * However, one-phase commit complicates matters even more since we call
-	 * commit on the interposed coordinator, which runs through the commit and
-	 * then the after_completion code before returning to the real coordinator's
-	 * commit call. Rather than separate commit and synchronization code
-	 * completely from the transaction (in which case we could just call the
-	 * commit portion here) we let after_completion get called before returning
-	 * the commit response, and simply ignore the real coordinator's subsequent
-	 * call to after_completion.
-	 */
+        switch (outcome)
+        {
+        case ActionStatus.COMMITTED:
+        case ActionStatus.H_COMMIT:
+        case ActionStatus.COMMITTING: // in case asynchronous commit!
+            return;
+        case ActionStatus.ABORTING:
+        case ActionStatus.ABORTED:
+        case ActionStatus.H_ROLLBACK:
+            throw new TRANSACTION_ROLLEDBACK(ExceptionCodes.FAILED_TO_COMMIT,
+                    CompletionStatus.COMPLETED_NO);
+        case ActionStatus.H_HAZARD:
+        default:
+            throw new HeuristicHazard();
+        }
+    }
 
-	public synchronized void register_synchronization (Synchronization theSync)
-			throws Inactive, SynchronizationUnavailable, SystemException
-	{
-		if (!is_top_level_transaction()) // are we a top-level transaction?
-		{
-			throw new SynchronizationUnavailable();
-		}
-		else
-		{
-			/*
-			 * If we support interposed synchronizations then add one now,
-			 * otherwise just add all synchronizations locally.
-			 */
+    public void rollback () throws SystemException
+    {
+        super.rollback();
+    }
 
-			if (_interposedSynch)
-			{
-				if (_sync == null)
-				{
-					_sync = new ServerSynchronization(this);
+    /**
+     * Registering a synchronization with interposition is a bit complicated!
+     * Synchronizations must be called prior to prepare; if no
+     * interposed-synchronization is used then either synchronizations would be
+     * registered locally (and then ignored by the commit protocol) or they
+     * would need to be registered remotely, which would mean a cross-address
+     * space call for each synchronization!
+     *
+     * The first time a synchronization is registered locally, we register a
+     * proxy back with the real coordinator. When that transaction commits, it
+     * will call this proxy, which will then drive the locally registered
+     * synchronizations (actually it calls appropriate on the transaction to do
+     * this.)
+     *
+     * However, one-phase commit complicates matters even more since we call
+     * commit on the interposed coordinator, which runs through the commit and
+     * then the after_completion code before returning to the real coordinator's
+     * commit call. Rather than separate commit and synchronization code
+     * completely from the transaction (in which case we could just call the
+     * commit portion here) we let after_completion get called before returning
+     * the commit response, and simply ignore the real coordinator's subsequent
+     * call to after_completion.
+     */
 
-					Coordinator realCoord = null;
+    public synchronized void register_synchronization (Synchronization theSync)
+            throws Inactive, SynchronizationUnavailable, SystemException
+    {
+        if (!is_top_level_transaction()) // are we a top-level transaction?
+        {
+            throw new SynchronizationUnavailable();
+        }
+        else
+        {
+            /*
+             * If we support interposed synchronizations then add one now,
+             * otherwise just add all synchronizations locally.
+             */
 
-					/*
-					 * First register interposed-synchronization.
-					 */
+            if (_interposedSynch)
+            {
+                if (_sync == null)
+                {
+                    _sync = new ServerSynchronization(this);
 
-					try
-					{
-						ServerControl control = (ServerControl) super.controlHandle;
+                    Coordinator realCoord = null;
 
-						if (controlHandle != null)
-						{
-							realCoord = control.originalCoordinator();
+                    /*
+                     * First register interposed-synchronization.
+                     */
 
-							if (realCoord != null)
-							{
-								realCoord.register_synchronization(_sync.getSynchronization());
-							}
-							else
-								throw new BAD_OPERATION(
-										ExceptionCodes.NO_TRANSACTION,
-										CompletionStatus.COMPLETED_NO);
-						}
-						else
-							throw new BAD_OPERATION(
-									ExceptionCodes.NO_TRANSACTION,
-									CompletionStatus.COMPLETED_NO);
-					}
-					catch (Inactive e1)
-					{
-						realCoord = null;
+                    try
+                    {
+                        ServerControl control = (ServerControl) super.controlHandle;
 
-						throw e1;
-					}
-					catch (SynchronizationUnavailable e2)
-					{
-						realCoord = null;
+                        if (controlHandle != null)
+                        {
+                            realCoord = control.originalCoordinator();
 
-						throw e2;
-					}
-					catch (SystemException e3)
-					{
-						realCoord = null;
+                            if (realCoord != null)
+                            {
+                                realCoord.register_synchronization(_sync.getSynchronization());
+                            }
+                            else
+                                throw new BAD_OPERATION(
+                                        ExceptionCodes.NO_TRANSACTION,
+                                        CompletionStatus.COMPLETED_NO);
+                        }
+                        else
+                            throw new BAD_OPERATION(
+                                    ExceptionCodes.NO_TRANSACTION,
+                                    CompletionStatus.COMPLETED_NO);
+                    }
+                    catch (Inactive e1)
+                    {
+                        realCoord = null;
 
-						throw e3;
-					}
+                        throw e1;
+                    }
+                    catch (SynchronizationUnavailable e2)
+                    {
+                        realCoord = null;
 
-					realCoord = null;
-				}
-			}
+                        throw e2;
+                    }
+                    catch (SystemException e3)
+                    {
+                        realCoord = null;
 
-			/*
-			 * Now register the synchronization locally.
-			 */
+                        throw e3;
+                    }
 
-			super.register_synchronization(theSync);
-		}
-	}
+                    realCoord = null;
+                }
+            }
 
-	/*
-	 * These methods are here to make protected methods in
-	 * ArjunaTransactionImple available to ServerSynchronization.
-	 */
+            /*
+             * Now register the synchronization locally.
+             */
 
-	public void doBeforeCompletion () throws SystemException
-	{
-	    if (!_beforeCompleted)
-	    {
-		_beforeCompleted = true;
+            super.register_synchronization(theSync);
+        }
+    }
 
-		super.doBeforeCompletion();
-	    }
-	}
+    /*
+     * These methods are here to make protected methods in
+     * ArjunaTransactionImple available to ServerSynchronization.
+     */
 
-	public void doAfterCompletion (org.omg.CosTransactions.Status s)
-			throws SystemException
-	{
-		super.doAfterCompletion(s);
-	}
+    public void doBeforeCompletion () throws SystemException
+    {
+        if (!_beforeCompleted)
+        {
+        _beforeCompleted = true;
 
-	public static String typeName ()
-	{
-		return "/StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/ServerTransaction";
-	}
+        super.doBeforeCompletion();
+        }
+    }
 
-	public final synchronized void setRecoveryCoordinator (RecoveryCoordinator recCoord)
-	{
-		_recoveryCoordinator = recCoord;
-	}
+    public void doAfterCompletion (org.omg.CosTransactions.Status s)
+            throws SystemException
+    {
+        super.doAfterCompletion(s);
+    }
 
-	/*
-	 * If this is a top-level transaction then we should have a recovery
-	 * coordinator reference, so save it away.
-	 */
+    public static String typeName ()
+    {
+        return "/StateManager/BasicAction/TwoPhaseCoordinator/ArjunaTransactionImple/ServerTransaction";
+    }
 
-	public boolean save_state (OutputObjectState os, int ot)
-	{
-		try
-		{
-			if (_recoveryCoordinator != null)
-			{
-				os.packBoolean(true);
-				os.packString(ORBManager.getORB().orb().object_to_string(_recoveryCoordinator));
-			}
-			else
-				os.packBoolean(false);
+    public final synchronized void setRecoveryCoordinator (RecoveryCoordinator recCoord)
+    {
+        _recoveryCoordinator = recCoord;
+    }
 
-			return super.save_state(os, ot);
-		}
-		catch (IOException e)
-		{
+    /*
+     * If this is a top-level transaction then we should have a recovery
+     * coordinator reference, so save it away.
+     */
+
+    public boolean save_state (OutputObjectState os, int ot)
+    {
+        try
+        {
+            if (_recoveryCoordinator != null)
+            {
+                os.packBoolean(true);
+                os.packString(ORBManager.getORB().orb().object_to_string(_recoveryCoordinator));
+            }
+            else
+                os.packBoolean(false);
+
+            return super.save_state(os, ot);
+        }
+        catch (IOException e)
+        {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.save_state", e);
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean restore_state (InputObjectState os, int ot)
-	{
-		try
-		{
-			boolean haveRecCoord = os.unpackBoolean();
+    public boolean restore_state (InputObjectState os, int ot)
+    {
+        try
+        {
+            boolean haveRecCoord = os.unpackBoolean();
 
-			if (haveRecCoord)
-			{
-				try
-				{
-					String ior = os.unpackString();
-					org.omg.CORBA.Object objRef = ORBManager.getORB().orb().string_to_object(ior);
-					_recoveryCoordinator = RecoveryCoordinatorHelper.narrow(objRef);
-				}
-				catch (Exception e)
-				{
+            if (haveRecCoord)
+            {
+                try
+                {
+                    String ior = os.unpackString();
+                    org.omg.CORBA.Object objRef = ORBManager.getORB().orb().string_to_object(ior);
+                    _recoveryCoordinator = RecoveryCoordinatorHelper.narrow(objRef);
+                }
+                catch (Exception e)
+                {
                     jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state", e);
 
-					return false;
-				}
-			}
-			else
-				_recoveryCoordinator = null;
+                    return false;
+                }
+            }
+            else
+                _recoveryCoordinator = null;
 
-			return super.restore_state(os, ot);
-		}
-		catch (IOException ex)
-		{
+            return super.restore_state(os, ot);
+        }
+        catch (IOException ex)
+        {
             jtsLogger.i18NLogger.warn_orbspecific_interposition_coordinator_generror("ServerTransaction.restore_state", ex);
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public String toString ()
-	{
-		return "ServerTransaction < " + get_uid() + " >";
-	}
+    public String toString ()
+    {
+        return "ServerTransaction < " + get_uid() + " >";
+    }
 
-	/**
-	 * Used during crash recovery. The Uid is the identity of the state which
-	 * this transaction's log is stored in. It is not the identity of the
-	 * transaction!
-	 * 
-	 * Therefore you may pass nullUid to the base transaction and rely on activating the
-	 * transaction state to set up the transaction id.
-	 */
+    /**
+     * Used during crash recovery. The Uid is the identity of the state which
+     * this transaction's log is stored in. It is not the identity of the
+     * transaction!
+     *
+     * Therefore you may pass nullUid to the base transaction and rely on activating the
+     * transaction state to set up the transaction id.
+     */
 
-	protected ServerTransaction (Uid recoveringActUid)
-	{
-	    super(recoveringActUid);
+    protected ServerTransaction (Uid recoveringActUid)
+    {
+        super(recoveringActUid);
 
-		if (jtsLogger.logger.isTraceEnabled()) {
+        if (jtsLogger.logger.isTraceEnabled()) {
             jtsLogger.logger.trace("ServerTransaction::ServerTransaction ( "
                     + recoveringActUid + " )");
         }
 
-		_savingUid = recoveringActUid;
-		_sync = null;
-		_beforeCompleted = false;
-		_recoveryCoordinator = null;
-		_prepState = ActionStatus.COMMITTING;
-	}
+        _savingUid = recoveringActUid;
+        _sync = null;
+        _beforeCompleted = false;
+        _recoveryCoordinator = null;
+        _prepState = ActionStatus.COMMITTING;
+    }
 
-	protected final synchronized int preparedStatus ()
-	{
-		return _prepState;
-	}
+    protected final synchronized int preparedStatus ()
+    {
+        return _prepState;
+    }
 
-	private final int finalStatus ()
-	{
-		int heuristic = super.getHeuristicDecision();
+    private final int finalStatus ()
+    {
+        int heuristic = super.getHeuristicDecision();
 
-		switch (heuristic)
-		{
-		case TwoPhaseOutcome.PREPARE_OK:
-		case TwoPhaseOutcome.FINISH_OK:
-			return super.status();
-		case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
-			return ActionStatus.H_ROLLBACK;
-		case TwoPhaseOutcome.HEURISTIC_COMMIT:
-			return ActionStatus.H_COMMIT;
-		case TwoPhaseOutcome.HEURISTIC_MIXED:
-			return ActionStatus.H_MIXED;
-		case TwoPhaseOutcome.HEURISTIC_HAZARD:
-		default:
-			return ActionStatus.H_HAZARD;
-		}
-	}
+        switch (heuristic)
+        {
+        case TwoPhaseOutcome.PREPARE_OK:
+        case TwoPhaseOutcome.FINISH_OK:
+            return super.status();
+        case TwoPhaseOutcome.HEURISTIC_ROLLBACK:
+            return ActionStatus.H_ROLLBACK;
+        case TwoPhaseOutcome.HEURISTIC_COMMIT:
+            return ActionStatus.H_COMMIT;
+        case TwoPhaseOutcome.HEURISTIC_MIXED:
+            return ActionStatus.H_MIXED;
+        case TwoPhaseOutcome.HEURISTIC_HAZARD:
+        default:
+            return ActionStatus.H_HAZARD;
+        }
+    }
 
-	protected RecoveryCoordinator _recoveryCoordinator;
+    protected RecoveryCoordinator _recoveryCoordinator;
 
-	private Uid _savingUid;
+    private Uid _savingUid;
 
-	private ServerSynchronization _sync;
+    private ServerSynchronization _sync;
 
-	private boolean _beforeCompleted;
+    private boolean _beforeCompleted;
 
-	private int _prepState;
+    private int _prepState;
 
-	private static final boolean _interposedSynch = jtsPropertyManager.getJTSEnvironmentBean()
+    private static final boolean _interposedSynch = jtsPropertyManager.getJTSEnvironmentBean()
             .isSupportInterposedSynchronization();
 
 }

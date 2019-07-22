@@ -47,15 +47,15 @@ import javax.transaction.SystemException;
 public class UnexpectedConditionException extends SystemException
 {
     static final long serialVersionUID = -2536448376471820651L;
-    
+
     public UnexpectedConditionException ()
     {
-	super();
+    super();
     }
 
     public UnexpectedConditionException (String s)
     {
-	super(s);
+    super(s);
     }
 }
 

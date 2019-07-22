@@ -36,39 +36,37 @@ import com.arjuna.ats.internal.arjuna.abstractrecords.CadaverActivationRecord;
 import com.arjuna.ats.internal.arjuna.abstractrecords.PersistenceRecord;
 import com.hp.mwtests.ts.arjuna.resources.ExtendedObject;
 
-public class CadaverActivationUnitTest
-{
+public class CadaverActivationUnitTest {
     @Test
-    public void test ()
-    {
+    public void test() {
         ParticipantStore store = StoreManager.setupStore(null, StateType.OS_UNSHARED);
 
         CadaverActivationRecord cr = new CadaverActivationRecord(new ExtendedObject());
-        
+
         assertTrue(cr.propagateOnAbort());
         assertTrue(cr.propagateOnCommit());
         assertEquals(cr.typeIs(), RecordType.ACTIVATION);
-        
+
         assertTrue(cr.type() != null);
         assertEquals(cr.doSave(), false);
 
         assertFalse(cr.shouldReplace(new PersistenceRecord(new OutputObjectState(), store, new ExtendedObject())));
-        
+
         assertEquals(cr.nestedPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
         assertEquals(cr.nestedAbort(), TwoPhaseOutcome.FINISH_OK);
 
         cr = new CadaverActivationRecord(new ExtendedObject());
-        
+
         assertEquals(cr.nestedPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
         assertEquals(cr.nestedCommit(), TwoPhaseOutcome.FINISH_OK);
-        
+
         cr = new CadaverActivationRecord(new ExtendedObject());
 
         assertEquals(cr.topLevelPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
         assertEquals(cr.topLevelAbort(), TwoPhaseOutcome.FINISH_OK);
- 
+
         cr = new CadaverActivationRecord(new ExtendedObject());
-        
+
         assertEquals(cr.topLevelPrepare(), TwoPhaseOutcome.PREPARE_READONLY);
         assertEquals(cr.topLevelCommit(), TwoPhaseOutcome.FINISH_OK);
     }

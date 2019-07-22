@@ -25,7 +25,7 @@ import com.arjuna.ats.arjuna.tools.osb.mbean.UidWrapper;
 import com.arjuna.ats.internal.jta.transaction.arjunacore.subordinate.jca.SubordinateAtomicAction;
 
 /**
- * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to 
+ * @deprecated as of 5.0.5.Final In a subsequent release we will change packages names in order to
  * provide a better separation between public and internal classes.
  */
 @Deprecated // in order to provide a better separation between public and internal classes.
@@ -46,7 +46,7 @@ public class SubordinateActionBean extends JTAActionBean implements SubordinateA
             if (tsLogger.logger.isDebugEnabled()) {
                 BasicAction ba = ra.getAction();
 
-    		    tsLogger.logger.debug("unable to cast " + ba.toString() + e.getMessage());
+                tsLogger.logger.debug("unable to cast " + ba.toString() + e.getMessage());
             }
 
             return e.getMessage();
@@ -62,7 +62,7 @@ public class SubordinateActionBean extends JTAActionBean implements SubordinateA
             if (tsLogger.logger.isDebugEnabled()) {
                 BasicAction ba = ra.getAction();
 
-    		    tsLogger.logger.debug("unable to cast " + (ba == null ? "null" : ba.toString()) + ": " + e.getMessage());
+                tsLogger.logger.debug("unable to cast " + (ba == null ? "null" : ba.toString()) + ": " + e.getMessage());
             }
 
             return e.getMessage();

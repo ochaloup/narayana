@@ -1,20 +1,20 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2006, Red Hat Middleware LLC, and individual contributors 
- * as indicated by the @author tags. 
+ * Copyright 2006, Red Hat Middleware LLC, and individual contributors
+ * as indicated by the @author tags.
  * See the copyright.txt in the distribution for a
- * full listing of individual contributors. 
+ * full listing of individual contributors.
  * This copyrighted material is made available to anyone wishing to use,
  * modify, copy, or redistribute it subject to the terms and conditions
  * of the GNU Lesser General Public License, v. 2.1.
- * This program is distributed in the hope that it will be useful, but WITHOUT A 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
  * You should have received a copy of the GNU Lesser General Public License,
  * v.2.1 along with this distribution; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- * 
+ *
  * (C) 2005-2006,
  * @author JBoss Inc.
  */
@@ -35,55 +35,56 @@ import com.arjuna.ats.jta.utils.JTAHelper;
 
 public class Synchronization implements javax.transaction.Synchronization
 {
-	public final static int ERROR_STATUS = 0;
-	public final static int INITIAL_STATUS = 1;
-	public final static int BEFORE_COMPLETION_STATUS = 2;
-	public final static int AFTER_COMPLETION_STATUS = 3;
+    public final static int ERROR_STATUS = 0;
+    public final static int INITIAL_STATUS = 1;
+    public final static int BEFORE_COMPLETION_STATUS = 2;
+    public final static int AFTER_COMPLETION_STATUS = 3;
 
-	private int _currentStatus = INITIAL_STATUS;
+    private int _currentStatus = INITIAL_STATUS;
 
-	public int getCurrentStatus()
-	{
-		return _currentStatus;
-	}
-
-    public void beforeCompletion ()
+    public int getCurrentStatus()
     {
-	try
-	{
-	    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
-
-	    if (_currentStatus != INITIAL_STATUS)
-		_currentStatus = ERROR_STATUS;
-	    else
-		_currentStatus = BEFORE_COMPLETION_STATUS;
-	    System.out.println("beforeCompletion called from "+tm.getTransaction());
-	}
-	catch (Exception ex)
-	{
-	    ex.printStackTrace();
-	    _currentStatus = ERROR_STATUS;
-	}
+        return _currentStatus;
     }
 
+    @Override
+    public void beforeCompletion ()
+    {
+    try
+    {
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+
+        if (_currentStatus != INITIAL_STATUS)
+        _currentStatus = ERROR_STATUS;
+        else
+        _currentStatus = BEFORE_COMPLETION_STATUS;
+        System.out.println("beforeCompletion called from "+tm.getTransaction());
+    }
+    catch (Exception ex)
+    {
+        ex.printStackTrace();
+        _currentStatus = ERROR_STATUS;
+    }
+    }
+
+    @Override
     public void afterCompletion (int status)
     {
-	try
-	{
-	    javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+    try
+    {
+        javax.transaction.TransactionManager tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
-	    if (_currentStatus != BEFORE_COMPLETION_STATUS)
-		_currentStatus = ERROR_STATUS;
-	    else
-		_currentStatus = AFTER_COMPLETION_STATUS;
-
-	    System.out.println("afterCompletion called: "+JTAHelper.stringForm(status)+" from "+tm.getTransaction());
-	}
-	catch (Exception ex)
-	{
-	    ex.printStackTrace();
-	    _currentStatus = ERROR_STATUS;
-	}
+        if (_currentStatus != BEFORE_COMPLETION_STATUS)
+        _currentStatus = ERROR_STATUS;
+        else
+        _currentStatus = AFTER_COMPLETION_STATUS;
+        System.out.println("afterCompletion called: "+JTAHelper.stringForm(status)+" from "+tm.getTransaction());
+    }
+    catch (Exception ex)
+    {
+        ex.printStackTrace();
+        _currentStatus = ERROR_STATUS;
+    }
     }
 
 }
