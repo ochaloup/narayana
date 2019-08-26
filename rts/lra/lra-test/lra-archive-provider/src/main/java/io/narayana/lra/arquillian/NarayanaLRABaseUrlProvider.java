@@ -20,15 +20,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.tck.arquillian;
-
-import java.lang.annotation.Annotation;
-import java.net.MalformedURLException;
-import java.net.URL;
+package io.narayana.lra.arquillian;
 
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.test.spi.enricher.resource.ResourceProvider;
 import org.jboss.logging.Logger;
+
+import java.lang.annotation.Annotation;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class NarayanaLRABaseUrlProvider implements ResourceProvider {
     private static final Logger log = Logger.getLogger(NarayanaLRABaseUrlProvider.class);

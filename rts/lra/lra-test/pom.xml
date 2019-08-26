@@ -138,5 +138,6 @@
     <modules>
         <module>tck</module>
         <module>basic</module>
+        <module>lra-archive-provider</module>
     </modules>
 </project>

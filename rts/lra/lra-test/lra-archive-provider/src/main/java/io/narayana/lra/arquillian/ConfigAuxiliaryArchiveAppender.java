@@ -20,23 +20,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.tck.arquillian;
+package io.narayana.lra.arquillian;
 
+import io.narayana.lra.archive.LraArchiveProvider;
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
-import org.jboss.arquillian.core.spi.LoadableExtension;
-import org.jboss.arquillian.test.spi.enricher.resource.ResourceProvider;
+import org.jboss.shrinkwrap.api.Archive;
 
 /**
- * Extension defined under <code>resources/META-INF/org.jboss.arquillian.core.spi.LoadableExtension</code>
- * to be loaded by Arquillian.<br/>
- * The services here extends the Arquillian functionality for being able to run the LRA TCK with Narayana.
+ * The appender provides way to bundle LRA interfaces implementation classes to the deployment
+ * as the Thorntail container does not bundle the LRA classes to the fat jar until
+ * there is no fraction for it.
  */
-public class ArquillianLRATckExtension implements LoadableExtension {
+public class ConfigAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender {
 
-   @Override
-   public void register(ExtensionBuilder builder) {
-       builder.service(AuxiliaryArchiveAppender.class, ConfigAuxiliaryArchiveAppender.class);
-       builder.service(ResourceProvider.class, NarayanaLRABaseUrlProvider.class);
-   }
+    @Override
+    public Archive<?> createAuxiliaryArchive() {
+        return LraArchiveProvider.createLraArchive();
+    }
 
 }
