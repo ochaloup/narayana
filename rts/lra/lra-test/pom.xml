@@ -138,6 +138,6 @@
     <modules>
         <module>tck</module>
         <module>basic</module>
-        <module>lra-archive-provider</module>
+        <module>arquillian</module>
     </modules>
 </project>

@@ -88,7 +88,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
-            <artifactId>lra-archive-provider</artifactId>
+            <artifactId>lra-test-arquillian-extension</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

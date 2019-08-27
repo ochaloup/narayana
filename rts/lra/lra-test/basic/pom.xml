@@ -9,8 +9,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>basic</artifactId>
-  <name>LRA tests: basic</name>
+  <artifactId>lra-test-basic</artifactId>
+  <name>LRA tests: Basic</name>
+  <description>LRA basic integration tests</description>
 
   <properties>
     <application.host>localhost</application.host>
@@ -35,7 +36,7 @@
     
     <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
-      <artifactId>lra-archive-provider</artifactId>
+      <artifactId>lra-test-arquillian-extension</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
