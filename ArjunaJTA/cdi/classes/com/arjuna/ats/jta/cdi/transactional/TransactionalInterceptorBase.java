@@ -23,31 +23,29 @@
 package com.arjuna.ats.jta.cdi.transactional;
 
 
-import com.arjuna.ats.jta.cdi.RunnableWithException;
 import com.arjuna.ats.jta.cdi.TransactionExtension;
+import com.arjuna.ats.jta.cdi.async.AsyncHandler;
+import com.arjuna.ats.jta.cdi.common.RunnableWithException;
+import com.arjuna.ats.jta.cdi.common.TransactionHandler;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
 import org.jboss.tm.usertx.UserTransactionOperationsProvider;
 
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Intercepted;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.rmi.registry.Registry;
 import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
 
 import static java.security.AccessController.doPrivileged;
 
@@ -73,6 +71,12 @@ public abstract class TransactionalInterceptorBase implements Serializable {
 
     @Inject
     private TransactionManager transactionManager;
+
+    @Inject
+    private TransactionHandler txnCdiHandler;
+
+    @Inject
+    private Instance<AsyncHandler> asyncHandler;
 
     private final boolean userTransactionAvailable;
 
@@ -115,8 +119,9 @@ public abstract class TransactionalInterceptorBase implements Serializable {
                     break;
                 }
             }
-    
+
             // check existence of the stereotype on method
+            assert currentAnnotatedMethod != null;
             Transactional transactionalMethod = getTransactionalAnnotationRecursive(currentAnnotatedMethod.getAnnotations());
             if(transactionalMethod != null) return transactionalMethod;
             // stereotype recursive search, covering ones added by an extension too
@@ -132,7 +137,7 @@ public abstract class TransactionalInterceptorBase implements Serializable {
             if (transactional != null) {
                 return transactional;
             }
-    
+
             Class<?> targetClass = ic.getTarget().getClass();
             transactional = targetClass.getAnnotation(Transactional.class);
             if (transactional != null) {
@@ -163,7 +168,7 @@ public abstract class TransactionalInterceptorBase implements Serializable {
 
     private Transactional getTransactionalAnnotationRecursive(Set<Annotation> annotationsOnMember) {
         return getTransactionalAnnotationRecursive(
-            annotationsOnMember.toArray(new Annotation[annotationsOnMember.size()]));
+            annotationsOnMember.toArray(new Annotation[0]));
     }
 
     protected Object invokeInOurTx(InvocationContext ic, TransactionManager tm) throws Exception {
@@ -184,122 +189,18 @@ public abstract class TransactionalInterceptorBase implements Serializable {
             throwing = true;
             handleException(ic, e, tx);
         } finally {
-            // handle asynchronously if not throwing
-            if (!throwing && ret != null) {
-                ReactiveTypeConverter<Object> converter = null;
-                if (ret instanceof CompletionStage == false
-                        && ret instanceof Publisher == false) {
-                    @SuppressWarnings({ "rawtypes", "unchecked" })
-                    Optional<ReactiveTypeConverter<Object>> lookup = Registry.lookup((Class) ret.getClass());
-                    if (lookup.isPresent()) {
-                        converter = lookup.get();
-                        if (converter.emitAtMostOneItem()) {
-                            ret = converter.toCompletionStage(ret);
-                        } else {
-                            ret = converter.toRSPublisher(ret);
-                        }
-                    }
-                }
-                if (ret instanceof CompletionStage) {
-                    ret = handleAsync(tm, tx, ic, ret, afterEndTransaction);
-                    // convert back
-                    if (converter != null)
-                        ret = converter.fromCompletionStage((CompletionStage<?>) ret);
-                } else if (ret instanceof Publisher) {
-                    ret = handleAsync(tm, tx, ic, ret, afterEndTransaction);
-                    // convert back
-                    if (converter != null)
-                        ret = converter.fromPublisher((Publisher<?>) ret);
-                } else {
-                    // not async: handle synchronously
-                    endTransaction(tm, tx, afterEndTransaction);
-                }
+            if (asyncHandler.isUnsatisfied() || throwing || ret == null) {
+                // async handler not provided (OR) is throwing (OR) is null: handle synchronously
+                txnCdiHandler.endTransaction(tm, tx, afterEndTransaction);
             } else {
-                // throwing or null: handle synchronously
-                endTransaction(tm, tx, afterEndTransaction);
+                // handle asynchronously
+                if (!asyncHandler.get().handleReturnType(tm, tx, getTransactional(ic), ret, afterEndTransaction)) {
+                    // async handler is not capable to handle the type: handle synchronously
+                    txnCdiHandler.endTransaction(tm, tx, afterEndTransaction);
+                }
             }
         }
         return ret;
-    }
-
-    protected Object handleAsync(TransactionManager tm, Transaction tx, InvocationContext ic, Object ret,
-                                 RunnableWithException afterEndTransaction) throws Exception {
-        // Suspend the transaction to remove it from the main request thread
-        tm.suspend();
-        afterEndTransaction.run();
-        if (ret instanceof CompletionStage) {
-            return ((CompletionStage<?>) ret).handle((v, t) -> {
-                try {
-                    doInTransaction(tm, tx, () -> {
-                        if (t != null)
-                            handleExceptionNoThrow(ic, t, tx);
-                        endTransaction(tm, tx, () -> {});
-                    });
-                } catch (RuntimeException e) {
-                    if (t != null)
-                        e.addSuppressed(t);
-                    throw e;
-                } catch (Exception e) {
-                    CompletionException x = new CompletionException(e);
-                    if (t != null)
-                        x.addSuppressed(t);
-                    throw x;
-                }
-                // pass-through the previous results
-                if (t instanceof RuntimeException)
-                    throw (RuntimeException) t;
-                if (t != null)
-                    throw new CompletionException(t);
-                return v;
-            });
-        } else if (ret instanceof Publisher) {
-            ret = ReactiveStreams.fromPublisher(((Publisher<?>) ret))
-                    .onError(t -> {
-                        try {
-                            doInTransaction(tm, tx, () -> handleExceptionNoThrow(ic, t, tx));
-                        } catch (RuntimeException e) {
-                            e.addSuppressed(t);
-                            throw e;
-                        } catch (Exception e) {
-                            RuntimeException x = new RuntimeException(e);
-                            x.addSuppressed(t);
-                            throw x;
-                        }
-                        // pass-through the previous result
-                        if (t instanceof RuntimeException)
-                            throw (RuntimeException) t;
-                        throw new RuntimeException(t);
-                    }).onTerminate(() -> {
-                        try {
-                            doInTransaction(tm, tx, () -> endTransaction(tm, tx, () -> {
-                            }));
-                        } catch (RuntimeException e) {
-                            throw e;
-                        } catch (Exception e) {
-                            RuntimeException x = new RuntimeException(e);
-                            throw x;
-                        }
-                    })
-                    .buildRs();
-        }
-        return ret;
-    }
-
-    private void doInTransaction(TransactionManager tm, Transaction tx, RunnableWithException f) throws Exception {
-        // Verify if this thread's transaction is the right one
-        Transaction currentTransaction = tm.getTransaction();
-        // If not, install the right transaction
-        if (currentTransaction != tx) {
-            if (currentTransaction != null)
-                tm.suspend();
-            tm.resume(tx);
-        }
-        f.run();
-        if (currentTransaction != tx) {
-            tm.suspend();
-            if (currentTransaction != null)
-                tm.resume(currentTransaction);
-        }
     }
 
     protected Object invokeInCallerTx(InvocationContext ic, Transaction tx) throws Exception {
@@ -317,49 +218,9 @@ public abstract class TransactionalInterceptorBase implements Serializable {
         return ic.proceed();
     }
 
-    protected void handleExceptionNoThrow(InvocationContext ic, Throwable e, Transaction tx)
-            throws IllegalStateException, SystemException {
-
-        Transactional transactional = getTransactional(ic);
-
-        for (Class<?> dontRollbackOnClass : transactional.dontRollbackOn()) {
-            if (dontRollbackOnClass.isAssignableFrom(e.getClass())) {
-                return;
-            }
-        }
-
-        for (Class<?> rollbackOnClass : transactional.rollbackOn()) {
-            if (rollbackOnClass.isAssignableFrom(e.getClass())) {
-                tx.setRollbackOnly();
-                return;
-            }
-        }
-
-        if (e instanceof RuntimeException) {
-            tx.setRollbackOnly();
-            return;
-        }
-    }
-
     protected void handleException(InvocationContext ic, Exception e, Transaction tx) throws Exception {
-
-        handleExceptionNoThrow(ic, e, tx);
-        throw e;
-    }
-
-    protected void endTransaction(TransactionManager tm, Transaction tx, RunnableWithException afterEndTransaction) throws Exception {
-        try {
-            if (tx != tm.getTransaction()) {
-                throw new RuntimeException(jtaLogger.i18NLogger.get_wrong_tx_on_thread());
-            }
-
-            if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-                tm.rollback();
-            } else {
-                tm.commit();
-            }
-        } finally {
-            afterEndTransaction.run();
+        if(txnCdiHandler.handleExceptionNoThrow(getTransactional(ic), e, tx)) {
+            throw e;
         }
     }
 
