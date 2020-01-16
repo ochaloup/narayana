@@ -23,15 +23,12 @@
 package com.arjuna.ats.jta.cdi.transactional;
 
 
-import static java.security.AccessController.doPrivileged;
-
+import com.arjuna.ats.jta.cdi.RunnableWithException;
+import com.arjuna.ats.jta.cdi.TransactionExtension;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
+import org.jboss.tm.usertx.UserTransactionOperationsProvider;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.Intercepted;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -39,16 +36,20 @@ import javax.enterprise.inject.spi.Bean;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
 import javax.transaction.Status;
+import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
-
-import org.jboss.tm.usertx.UserTransactionOperationsProvider;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.rmi.registry.Registry;
 import java.security.PrivilegedAction;
-import com.arjuna.ats.jta.cdi.TransactionExtension;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+
+import static java.security.AccessController.doPrivileged;
 
 /**
  * @author paul.robinson@redhat.com 02/05/2013
@@ -166,18 +167,139 @@ public abstract class TransactionalInterceptorBase implements Serializable {
     }
 
     protected Object invokeInOurTx(InvocationContext ic, TransactionManager tm) throws Exception {
+        return invokeInOurTx(ic, tm, () -> {});
+    }
+
+    protected Object invokeInOurTx(InvocationContext ic, TransactionManager tm, RunnableWithException afterEndTransaction) throws Exception {
 
         tm.begin();
         Transaction tx = tm.getTransaction();
 
+        boolean throwing = false;
+        Object ret = null;
+
         try {
-            return ic.proceed();
+            ret = ic.proceed();
         } catch (Exception e) {
+            throwing = true;
             handleException(ic, e, tx);
         } finally {
-            endTransaction(tm, tx);
+            // handle asynchronously if not throwing
+            if (!throwing && ret != null) {
+                ReactiveTypeConverter<Object> converter = null;
+                if (ret instanceof CompletionStage == false
+                        && ret instanceof Publisher == false) {
+                    @SuppressWarnings({ "rawtypes", "unchecked" })
+                    Optional<ReactiveTypeConverter<Object>> lookup = Registry.lookup((Class) ret.getClass());
+                    if (lookup.isPresent()) {
+                        converter = lookup.get();
+                        if (converter.emitAtMostOneItem()) {
+                            ret = converter.toCompletionStage(ret);
+                        } else {
+                            ret = converter.toRSPublisher(ret);
+                        }
+                    }
+                }
+                if (ret instanceof CompletionStage) {
+                    ret = handleAsync(tm, tx, ic, ret, afterEndTransaction);
+                    // convert back
+                    if (converter != null)
+                        ret = converter.fromCompletionStage((CompletionStage<?>) ret);
+                } else if (ret instanceof Publisher) {
+                    ret = handleAsync(tm, tx, ic, ret, afterEndTransaction);
+                    // convert back
+                    if (converter != null)
+                        ret = converter.fromPublisher((Publisher<?>) ret);
+                } else {
+                    // not async: handle synchronously
+                    endTransaction(tm, tx, afterEndTransaction);
+                }
+            } else {
+                // throwing or null: handle synchronously
+                endTransaction(tm, tx, afterEndTransaction);
+            }
         }
-        throw new RuntimeException("UNREACHABLE");
+        return ret;
+    }
+
+    protected Object handleAsync(TransactionManager tm, Transaction tx, InvocationContext ic, Object ret,
+                                 RunnableWithException afterEndTransaction) throws Exception {
+        // Suspend the transaction to remove it from the main request thread
+        tm.suspend();
+        afterEndTransaction.run();
+        if (ret instanceof CompletionStage) {
+            return ((CompletionStage<?>) ret).handle((v, t) -> {
+                try {
+                    doInTransaction(tm, tx, () -> {
+                        if (t != null)
+                            handleExceptionNoThrow(ic, t, tx);
+                        endTransaction(tm, tx, () -> {});
+                    });
+                } catch (RuntimeException e) {
+                    if (t != null)
+                        e.addSuppressed(t);
+                    throw e;
+                } catch (Exception e) {
+                    CompletionException x = new CompletionException(e);
+                    if (t != null)
+                        x.addSuppressed(t);
+                    throw x;
+                }
+                // pass-through the previous results
+                if (t instanceof RuntimeException)
+                    throw (RuntimeException) t;
+                if (t != null)
+                    throw new CompletionException(t);
+                return v;
+            });
+        } else if (ret instanceof Publisher) {
+            ret = ReactiveStreams.fromPublisher(((Publisher<?>) ret))
+                    .onError(t -> {
+                        try {
+                            doInTransaction(tm, tx, () -> handleExceptionNoThrow(ic, t, tx));
+                        } catch (RuntimeException e) {
+                            e.addSuppressed(t);
+                            throw e;
+                        } catch (Exception e) {
+                            RuntimeException x = new RuntimeException(e);
+                            x.addSuppressed(t);
+                            throw x;
+                        }
+                        // pass-through the previous result
+                        if (t instanceof RuntimeException)
+                            throw (RuntimeException) t;
+                        throw new RuntimeException(t);
+                    }).onTerminate(() -> {
+                        try {
+                            doInTransaction(tm, tx, () -> endTransaction(tm, tx, () -> {
+                            }));
+                        } catch (RuntimeException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            RuntimeException x = new RuntimeException(e);
+                            throw x;
+                        }
+                    })
+                    .buildRs();
+        }
+        return ret;
+    }
+
+    private void doInTransaction(TransactionManager tm, Transaction tx, RunnableWithException f) throws Exception {
+        // Verify if this thread's transaction is the right one
+        Transaction currentTransaction = tm.getTransaction();
+        // If not, install the right transaction
+        if (currentTransaction != tx) {
+            if (currentTransaction != null)
+                tm.suspend();
+            tm.resume(tx);
+        }
+        f.run();
+        if (currentTransaction != tx) {
+            tm.suspend();
+            if (currentTransaction != null)
+                tm.resume(currentTransaction);
+        }
     }
 
     protected Object invokeInCallerTx(InvocationContext ic, Transaction tx) throws Exception {
@@ -195,41 +317,49 @@ public abstract class TransactionalInterceptorBase implements Serializable {
         return ic.proceed();
     }
 
-    protected void handleException(InvocationContext ic, Exception e, Transaction tx) throws Exception {
+    protected void handleExceptionNoThrow(InvocationContext ic, Throwable e, Transaction tx)
+            throws IllegalStateException, SystemException {
 
         Transactional transactional = getTransactional(ic);
 
         for (Class<?> dontRollbackOnClass : transactional.dontRollbackOn()) {
             if (dontRollbackOnClass.isAssignableFrom(e.getClass())) {
-                throw e;
+                return;
             }
         }
 
         for (Class<?> rollbackOnClass : transactional.rollbackOn()) {
             if (rollbackOnClass.isAssignableFrom(e.getClass())) {
                 tx.setRollbackOnly();
-                throw e;
+                return;
             }
         }
 
         if (e instanceof RuntimeException) {
             tx.setRollbackOnly();
-            throw e;
+            return;
         }
+    }
 
+    protected void handleException(InvocationContext ic, Exception e, Transaction tx) throws Exception {
+
+        handleExceptionNoThrow(ic, e, tx);
         throw e;
     }
 
-    protected void endTransaction(TransactionManager tm, Transaction tx) throws Exception {
+    protected void endTransaction(TransactionManager tm, Transaction tx, RunnableWithException afterEndTransaction) throws Exception {
+        try {
+            if (tx != tm.getTransaction()) {
+                throw new RuntimeException(jtaLogger.i18NLogger.get_wrong_tx_on_thread());
+            }
 
-        if (tx != tm.getTransaction()) {
-            throw new RuntimeException(jtaLogger.i18NLogger.get_wrong_tx_on_thread());
-        }
-
-        if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-            tm.rollback();
-        } else {
-            tm.commit();
+            if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
+                tm.rollback();
+            } else {
+                tm.commit();
+            }
+        } finally {
+            afterEndTransaction.run();
         }
     }
 
