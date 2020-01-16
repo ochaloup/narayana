@@ -23,32 +23,31 @@
 package com.arjuna.ats.jta.cdi.transactional;
 
 
-import static java.security.AccessController.doPrivileged;
-
+import com.arjuna.ats.jta.cdi.TransactionExtension;
+import com.arjuna.ats.jta.cdi.async.ContextPropagationAsyncHandler;
+import com.arjuna.ats.jta.cdi.RunnableWithException;
+import com.arjuna.ats.jta.cdi.TransactionHandler;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.logging.jtaLogger;
+import org.jboss.tm.usertx.UserTransactionOperationsProvider;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.inject.Intercepted;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.inject.Inject;
 import javax.interceptor.InvocationContext;
-import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
-
-import org.jboss.tm.usertx.UserTransactionOperationsProvider;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.security.PrivilegedAction;
-import com.arjuna.ats.jta.cdi.TransactionExtension;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.security.AccessController.doPrivileged;
 
 /**
  * @author paul.robinson@redhat.com 02/05/2013
@@ -57,8 +56,10 @@ import com.arjuna.ats.jta.cdi.TransactionExtension;
  * target="_parent">Laird Nelson</a>
  */
 public abstract class TransactionalInterceptorBase implements Serializable {
-
     private static final long serialVersionUID = 1L;
+
+    // check if classes for transaction asynchronous handling are available on classpath
+    private static boolean areReactiveClassesAvailable = areAsynchronousHandlerClassesAvailable();
 
     @Inject
     transient javax.enterprise.inject.spi.BeanManager beanManager;
@@ -114,8 +115,9 @@ public abstract class TransactionalInterceptorBase implements Serializable {
                     break;
                 }
             }
-    
+
             // check existence of the stereotype on method
+            assert currentAnnotatedMethod != null;
             Transactional transactionalMethod = getTransactionalAnnotationRecursive(currentAnnotatedMethod.getAnnotations());
             if(transactionalMethod != null) return transactionalMethod;
             // stereotype recursive search, covering ones added by an extension too
@@ -131,7 +133,7 @@ public abstract class TransactionalInterceptorBase implements Serializable {
             if (transactional != null) {
                 return transactional;
             }
-    
+
             Class<?> targetClass = ic.getTarget().getClass();
             transactional = targetClass.getAnnotation(Transactional.class);
             if (transactional != null) {
@@ -162,22 +164,39 @@ public abstract class TransactionalInterceptorBase implements Serializable {
 
     private Transactional getTransactionalAnnotationRecursive(Set<Annotation> annotationsOnMember) {
         return getTransactionalAnnotationRecursive(
-            annotationsOnMember.toArray(new Annotation[annotationsOnMember.size()]));
+            annotationsOnMember.toArray(new Annotation[0]));
     }
 
     protected Object invokeInOurTx(InvocationContext ic, TransactionManager tm) throws Exception {
+        return invokeInOurTx(ic, tm, () -> {});
+    }
+
+    protected Object invokeInOurTx(InvocationContext ic, TransactionManager tm, RunnableWithException afterEndTransaction) throws Exception {
 
         tm.begin();
         Transaction tx = tm.getTransaction();
 
+        boolean throwing = false;
+        Object ret = null;
+
         try {
-            return ic.proceed();
+            ret = ic.proceed();
         } catch (Exception e) {
+            throwing = true;
             handleException(ic, e, tx);
         } finally {
-            endTransaction(tm, tx);
+            if (!areReactiveClassesAvailable || throwing || ret == null) {
+                // no async handling classes on classpath (OR) is throwing (OR) is null: handle synchronously
+                TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
+            } else {
+                // try to handle asynchronously
+                if (!ContextPropagationAsyncHandler.handleReturnType(tm, tx, getTransactional(ic), ret, afterEndTransaction)) {
+                    // async handler is not capable to handle the type: handle synchronously
+                    TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
+                }
+            }
         }
-        throw new RuntimeException("UNREACHABLE");
+        return ret;
     }
 
     protected Object invokeInCallerTx(InvocationContext ic, Transaction tx) throws Exception {
@@ -195,42 +214,14 @@ public abstract class TransactionalInterceptorBase implements Serializable {
         return ic.proceed();
     }
 
+    /**
+     * It consider the transaction handling to be marked for rollback only in case the thrown exception
+     * is defined to have this effect (see {@link TransactionHandler#handleExceptionNoThrow(Transactional, Throwable, Transaction)}
+     * and then rethrows the {@link Exception} passed as the parameter 'e'.
+     */
     protected void handleException(InvocationContext ic, Exception e, Transaction tx) throws Exception {
-
-        Transactional transactional = getTransactional(ic);
-
-        for (Class<?> dontRollbackOnClass : transactional.dontRollbackOn()) {
-            if (dontRollbackOnClass.isAssignableFrom(e.getClass())) {
-                throw e;
-            }
-        }
-
-        for (Class<?> rollbackOnClass : transactional.rollbackOn()) {
-            if (rollbackOnClass.isAssignableFrom(e.getClass())) {
-                tx.setRollbackOnly();
-                throw e;
-            }
-        }
-
-        if (e instanceof RuntimeException) {
-            tx.setRollbackOnly();
-            throw e;
-        }
-
+        TransactionHandler.handleExceptionNoThrow(getTransactional(ic), e, tx);
         throw e;
-    }
-
-    protected void endTransaction(TransactionManager tm, Transaction tx) throws Exception {
-
-        if (tx != tm.getTransaction()) {
-            throw new RuntimeException(jtaLogger.i18NLogger.get_wrong_tx_on_thread());
-        }
-
-        if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK) {
-            tm.rollback();
-        } else {
-            tm.commit();
-        }
     }
 
     protected boolean setUserTransactionAvailable(boolean available) {
@@ -259,5 +250,31 @@ public abstract class TransactionalInterceptorBase implements Serializable {
                 return null;
             });
         }
+    }
+
+    /**
+     * It checks if classes used in {@link ContextPropagationAsyncHandler} class
+     * are available on the classpath. If it's so then the async handling may be enabled.
+     * Otherwise only synchronous handling is possible.
+     * See {@link #invokeInOurTx(InvocationContext, TransactionManager, RunnableWithException)}
+     */
+    private static boolean areAsynchronousHandlerClassesAvailable() {
+        return Arrays.asList(
+                "io.smallrye.reactive.converters.ReactiveTypeConverter",
+                "io.smallrye.reactive.converters.Registry",
+                "org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams",
+                "org.reactivestreams.Publisher")
+        .stream().allMatch(className -> {
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException cnfe) {
+                try {
+                    Thread.currentThread().getContextClassLoader().loadClass(className);
+                } catch (ClassNotFoundException cnfe2) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 }
