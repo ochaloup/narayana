@@ -36,6 +36,8 @@
 
         <test.logs.to.file>false</test.logs.to.file>
         <skipITs>true</skipITs> <!-- integration tests are disabled by default, use profile to run 'arq' -->
+
+        <thorntail.test.logging></thorntail.test.logging>
     </properties>
 
     <repositories>
@@ -111,6 +113,10 @@
                     <systemProperties>
                         <arquillian.xml>arquillian-thorntail.xml</arquillian.xml>
                     </systemProperties>
+                    <systemPropertyVariables>
+                        <java.util.logging.config.file>${project.build.testOutputDirectory}/logging.properties</java.util.logging.config.file>
+                        <thorntail.test.logging>${thorntail.test.logging}</thorntail.test.logging>
+                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>
@@ -167,6 +173,18 @@
           </activation>
           <properties>
               <skipITs>false</skipITs>
+          </properties>
+      </profile>
+
+      <profile>
+          <id>trace.thorntail.test</id>
+          <activation>
+              <property>
+                  <name>trace.thorntail.test</name>
+              </property>
+          </activation>
+          <properties>
+              <thorntail.test.logging>-Dthorntail.logging=TRACE</thorntail.test.logging>
           </properties>
       </profile>
 

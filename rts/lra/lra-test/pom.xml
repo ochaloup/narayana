@@ -75,7 +75,7 @@
                 </property>
             </activation>
             <properties>
-                <lra.coordinator.trace.params>-Dthorntail.logging=TRACE</lra.coordinator.trace.params>
+                <lra.coordinator.trace.params>-Dquarkus.log.level=TRACE</lra.coordinator.trace.params>
             </properties>
         </profile>
 
