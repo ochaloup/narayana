@@ -21,11 +21,13 @@ import com.arjuna.ats.jta.cdi.TransactionHandler;
 import io.smallrye.reactive.converters.ReactiveTypeConverter;
 import io.smallrye.reactive.converters.Registry;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.jboss.logging.Logger;
 import org.reactivestreams.Publisher;
 
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
@@ -35,50 +37,74 @@ import java.util.concurrent.CompletionStage;
  * It extends transactions until the intercepted method's async return type is completed.
  */
 public final class ContextPropagationAsyncHandler {
+    private static final Logger log = Logger.getLogger(ContextPropagationAsyncHandler.class);
+
+    // check if classes of reactive streams from smallrye for transaction asynchronous handling are available on classpath
+    private static final boolean areSmallRyeReactiveClassesAvailable = areSmallRyeReactiveClassesAvailable();
 
     /**
-     * Based on the type of 'objectToHandle' taking a way to await for async to return
-     * and delaying transaction completion.
+     * <p>
+     * Tries to handle asynchronously the returned type from the @{@link Transactional} call.
+     * This CDI interceptor method checks the return type intercepted method.
+     * If it's a asynchronous "type" (<code>objectToHandle</code> is <codde>instanceof</code> e.g. {@link CompletionStage})
+     * then the transaction completion (committing/roll-backing) will be suspended
+     * until the asynchronous code finishes.
+     * </p>
+     * <p>
+     * If the interceptor returns nothing or just some "normal" return type then synchronous handling is processed.
+     * Synchronous means that the transaction is completed just here when the method annotated with @{@link Transactional}
+     * ends.
+     * </p>
      *
      * @param tm  transaction manager
      * @param tx  the original transaction
      * @param transactional  link to method which is annotated with @{@link Transactional}
-     * @param objectToHandle  on interceptor proceed this is the returned type which differentiate the action
+     * @param objectToHandle  on interceptor proceed this is the returned type which differentiate the action;
+     *                        method changes the object when it was handled asynchronously
      * @param afterEndTransaction  a lamda invocation on transaction finalization
-     * @return true if async handling is possible and it was proceeded, false means async processing is not possible
+     * @return true if async handling is possible and it was proceeded, false means async processing is not possible;
+     *   the method changes the parameter 'objectToHandle', which is passed by reference, when 'true' is returned
      * @throws Exception failure on async processing error happens
      */
-    public static boolean handleReturnType(
+    public static boolean tryHandleAsynchronously(
             TransactionManager tm, Transaction tx, Transactional transactional, Object objectToHandle, RunnableWithException afterEndTransaction) throws Exception {
-
-        ReactiveTypeConverter<Object> converter = null;
-        if (objectToHandle instanceof CompletionStage == false
-                && objectToHandle instanceof Publisher == false) {
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            Optional<ReactiveTypeConverter<Object>> lookup = Registry.lookup((Class) objectToHandle.getClass());
-            if (lookup.isPresent()) {
-                converter = lookup.get();
-                if (converter.emitAtMostOneItem()) {
-                    objectToHandle = converter.toCompletionStage(objectToHandle);
-                } else {
-                    objectToHandle = converter.toRSPublisher(objectToHandle);
+        if (objectToHandle instanceof CompletionStage) {
+            // checking if the returned type is CompletionStage, it's certain to be s on classpath as it's under JDK java.util.concurrent package
+            objectToHandle = handleAsync(tm, tx, transactional, objectToHandle, afterEndTransaction);
+        } else if (areSmallRyeReactiveClassesAvailable) {
+            // the smallrye reactive classes and converter utility class are available, trying to convert the returned object to the known async type
+            ReactiveTypeConverter<Object> converter = null;
+            if (objectToHandle instanceof CompletionStage == false && objectToHandle instanceof Publisher == false) {
+                @SuppressWarnings({ "rawtypes", "unchecked" })
+                Optional<ReactiveTypeConverter<Object>> lookup = Registry.lookup((Class) objectToHandle.getClass());
+                if (lookup.isPresent()) {
+                    converter = lookup.get();
+                    if (converter.emitAtMostOneItem()) {
+                        objectToHandle = converter.toCompletionStage(objectToHandle);
+                    } else {
+                        objectToHandle = converter.toRSPublisher(objectToHandle);
+                    }
                 }
             }
-        }
-        if (objectToHandle instanceof CompletionStage) {
-            objectToHandle = handleAsync(tm, tx, transactional, objectToHandle, afterEndTransaction);
-            // convert back
-            if (converter != null)
-                objectToHandle = converter.fromCompletionStage((CompletionStage<?>) objectToHandle);
-        } else if (objectToHandle instanceof Publisher) {
-            objectToHandle = handleAsync(tm, tx, transactional, objectToHandle, afterEndTransaction);
-            // convert back
-            if (converter != null)
-                objectToHandle = converter.fromPublisher((Publisher<?>) objectToHandle);
+            if (objectToHandle instanceof CompletionStage) {
+                objectToHandle = handleAsync(tm, tx, transactional, objectToHandle, afterEndTransaction);
+                // convert back
+                if (converter != null)
+                    objectToHandle = converter.fromCompletionStage((CompletionStage<?>) objectToHandle);
+            } else if (objectToHandle instanceof Publisher) {
+                objectToHandle = handleAsync(tm, tx, transactional, objectToHandle, afterEndTransaction);
+                // convert back
+                if (converter != null)
+                    objectToHandle = converter.fromPublisher((Publisher<?>) objectToHandle);
+            } else {
+                // no way to handle the object as known asynchronous type
+                return false;
+            }
         } else {
-            // not async: handle synchronously
+            // we are not able to handle the returned type as asynchronous
             return false;
         }
+        // the returned type is the asynchronous type and the type was handled
         return true;
     }
 
@@ -160,5 +186,39 @@ public final class ContextPropagationAsyncHandler {
             if (currentTransaction != null)
                 tm.resume(currentTransaction);
         }
+    }
+
+    /**
+     * <p>
+     * Checks if classes from the following maven artifacts are available on classpath
+     * <ul>
+     *   <li>io.smallrye.reactive:smallrye-reactive-converter-api (WildFly module io.smallrye.reactive.streams-operators)</li>
+     *   <li>org.eclipse.microprofile.reactive-streams-operators.microprofile-reactive-streams-operators-api
+     *       (WildFly module org.eclipse.microprofile.reactive-streams-operators.api)</li>
+     *   <li>org.reactivestreams:reactive-streams (Wildfly module org.reactivestreams)</li>
+     * </ul>
+     * </p>
+     *
+     * @return true if the classes are available on classpath, false otherwise
+     */
+    private static boolean areSmallRyeReactiveClassesAvailable() {
+        return Arrays.asList(
+                "io.smallrye.reactive.converters.ReactiveTypeConverter",
+                "io.smallrye.reactive.converters.Registry",
+                "org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams",
+                "org.reactivestreams.Publisher")
+                .stream().allMatch(className -> {
+                    try {
+                        Class.forName(className);
+                    } catch (ClassNotFoundException cnfe) {
+                        log.debugf("Class %s is not available on classpath. Handling of asynchronous types in @Transactional " +
+                                "methods could not work properly. Consider to add java artifacts " +
+                                "'org.eclipse.microprofile.reactive-streams-operators.microprofile-reactive-streams-operators-api', " +
+                                "'org.reactivestreams:reactive-streams' and  'io.smallrye.reactive:smallrye-reactive-converter-api' " +
+                                "to your classpath", className);
+                        return false;
+                    }
+                    return true;
+                });
     }
 }

@@ -43,7 +43,6 @@ import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,9 +56,6 @@ import static java.security.AccessController.doPrivileged;
  */
 public abstract class TransactionalInterceptorBase implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    // check if classes for transaction asynchronous handling are available on classpath
-    private static boolean areReactiveClassesAvailable = areAsynchronousHandlerClassesAvailable();
 
     @Inject
     transient javax.enterprise.inject.spi.BeanManager beanManager;
@@ -185,15 +181,10 @@ public abstract class TransactionalInterceptorBase implements Serializable {
             throwing = true;
             handleException(ic, e, tx);
         } finally {
-            if (!areReactiveClassesAvailable || throwing || ret == null) {
-                // no async handling classes on classpath (OR) is throwing (OR) is null: handle synchronously
+            if (throwing || ret == null
+                || !ContextPropagationAsyncHandler.tryHandleAsynchronously(tm, tx, getTransactional(ic), ret, afterEndTransaction)) {
+                // is throwing (OR) is null (OR) is not asynchronous type (OR) no async handler classes on classpath : handle synchronously
                 TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
-            } else {
-                // try to handle asynchronously
-                if (!ContextPropagationAsyncHandler.handleReturnType(tm, tx, getTransactional(ic), ret, afterEndTransaction)) {
-                    // async handler is not capable to handle the type: handle synchronously
-                    TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
-                }
             }
         }
         return ret;
@@ -250,31 +241,5 @@ public abstract class TransactionalInterceptorBase implements Serializable {
                 return null;
             });
         }
-    }
-
-    /**
-     * It checks if classes used in {@link ContextPropagationAsyncHandler} class
-     * are available on the classpath. If it's so then the async handling may be enabled.
-     * Otherwise only synchronous handling is possible.
-     * See {@link #invokeInOurTx(InvocationContext, TransactionManager, RunnableWithException)}
-     */
-    private static boolean areAsynchronousHandlerClassesAvailable() {
-        return Arrays.asList(
-                "io.smallrye.reactive.converters.ReactiveTypeConverter",
-                "io.smallrye.reactive.converters.Registry",
-                "org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams",
-                "org.reactivestreams.Publisher")
-        .stream().allMatch(className -> {
-            try {
-                Class.forName(className);
-            } catch (ClassNotFoundException cnfe) {
-                try {
-                    Thread.currentThread().getContextClassLoader().loadClass(className);
-                } catch (ClassNotFoundException cnfe2) {
-                    return false;
-                }
-            }
-            return true;
-        });
     }
 }
