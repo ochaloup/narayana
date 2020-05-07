@@ -1,10 +1,8 @@
 package com.arjuna.ats.jta.cdi.common;
 
-import com.arjuna.ats.jta.cdi.TransactionExtension;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;

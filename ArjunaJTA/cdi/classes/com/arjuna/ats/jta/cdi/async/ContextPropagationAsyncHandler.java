@@ -9,9 +9,14 @@ import javax.interceptor.InvocationContext;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
-import java.rmi.registry.Registry;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
+import io.smallrye.reactive.converters.ReactiveTypeConverter;
+import io.smallrye.reactive.converters.Registry;
+import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
+import org.reactivestreams.Publisher;
+import java.util.Optional;
+
 
 @ApplicationScoped
 public class ContextPropagationAsyncHandler implements AsyncHandler {

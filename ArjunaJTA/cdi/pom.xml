@@ -146,6 +146,12 @@
         <version>${version.org.jboss.logging.jboss-logging-processor}</version>
         <scope>provided</scope>
       </dependency>
+      <dependency>
+        <groupId>io.smallrye.reactive</groupId>
+        <artifactId>smallrye-reactive-converter-api</artifactId>
+        <version>${version.smallrye-converter-api}</version>
+        <scope>provided</scope>
+      </dependency>
   </dependencies>
 
     <profiles>
