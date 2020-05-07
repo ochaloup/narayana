@@ -73,9 +73,6 @@ public abstract class TransactionalInterceptorBase implements Serializable {
     private TransactionManager transactionManager;
 
     @Inject
-    private TransactionHandler txnCdiHandler;
-
-    @Inject
     private Instance<AsyncHandler> asyncHandler;
 
     private final boolean userTransactionAvailable;
@@ -191,12 +188,12 @@ public abstract class TransactionalInterceptorBase implements Serializable {
         } finally {
             if (asyncHandler.isUnsatisfied() || throwing || ret == null) {
                 // async handler not provided (OR) is throwing (OR) is null: handle synchronously
-                txnCdiHandler.endTransaction(tm, tx, afterEndTransaction);
+                TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
             } else {
                 // handle asynchronously
                 if (!asyncHandler.get().handleReturnType(tm, tx, getTransactional(ic), ret, afterEndTransaction)) {
                     // async handler is not capable to handle the type: handle synchronously
-                    txnCdiHandler.endTransaction(tm, tx, afterEndTransaction);
+                    TransactionHandler.endTransaction(tm, tx, afterEndTransaction);
                 }
             }
         }
@@ -219,7 +216,7 @@ public abstract class TransactionalInterceptorBase implements Serializable {
     }
 
     protected void handleException(InvocationContext ic, Exception e, Transaction tx) throws Exception {
-        if(txnCdiHandler.handleExceptionNoThrow(getTransactional(ic), e, tx)) {
+        if(TransactionHandler.handleExceptionNoThrow(getTransactional(ic), e, tx)) {
             throw e;
         }
     }

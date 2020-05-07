@@ -20,8 +20,6 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class ContextPropagationAsyncHandler implements AsyncHandler {
-    @Inject
-    TransactionHandler txnCdiHandler;
 
     @Override
     public boolean handleReturnType(TransactionManager tm, Transaction tx, Transactional transactional, Object objectToHandle, RunnableWithException afterEndTransaction)
@@ -66,9 +64,9 @@ public class ContextPropagationAsyncHandler implements AsyncHandler {
                 try {
                     doInTransaction(tm, tx, () -> {
                         if (throwable != null) {
-                            txnCdiHandler.handleExceptionNoThrow(transactional, throwable, tx);
+                            TransactionHandler.handleExceptionNoThrow(transactional, throwable, tx);
                         }
-                        txnCdiHandler.endTransaction(tm, tx, () -> {});
+                        TransactionHandler.endTransaction(tm, tx, () -> {});
                     });
                 } catch (RuntimeException e) {
                     if (throwable != null)
@@ -91,7 +89,7 @@ public class ContextPropagationAsyncHandler implements AsyncHandler {
             ret = ReactiveStreams.fromPublisher(((Publisher<?>) ret))
                     .onError(throwable -> {
                         try {
-                            doInTransaction(tm, tx, () -> txnCdiHandler.handleExceptionNoThrow(transactional, throwable, tx));
+                            doInTransaction(tm, tx, () -> TransactionHandler.handleExceptionNoThrow(transactional, throwable, tx));
                         } catch (RuntimeException e) {
                             e.addSuppressed(throwable);
                             throw e;
@@ -106,7 +104,7 @@ public class ContextPropagationAsyncHandler implements AsyncHandler {
                         throw new RuntimeException(throwable);
                     }).onTerminate(() -> {
                         try {
-                            doInTransaction(tm, tx, () -> txnCdiHandler.endTransaction(tm, tx, () -> {
+                            doInTransaction(tm, tx, () -> TransactionHandler.endTransaction(tm, tx, () -> {
                             }));
                         } catch (RuntimeException e) {
                             throw e;

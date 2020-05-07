@@ -9,10 +9,9 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
 
-@ApplicationScoped
 public class TransactionHandler {
 
-    public boolean handleExceptionNoThrow(Transactional transactional, Throwable e, Transaction tx)
+    public static boolean handleExceptionNoThrow(Transactional transactional, Throwable e, Transaction tx)
             throws IllegalStateException, SystemException {
 
         for (Class<?> dontRollbackOnClass : transactional.dontRollbackOn()) {
@@ -36,7 +35,7 @@ public class TransactionHandler {
         return false;
     }
 
-    public void endTransaction(TransactionManager tm, Transaction tx, RunnableWithException afterEndTransaction) throws Exception {
+    public static void endTransaction(TransactionManager tm, Transaction tx, RunnableWithException afterEndTransaction) throws Exception {
         try {
             if (tx != tm.getTransaction()) {
                 throw new RuntimeException(jtaLogger.i18NLogger.get_wrong_tx_on_thread());
