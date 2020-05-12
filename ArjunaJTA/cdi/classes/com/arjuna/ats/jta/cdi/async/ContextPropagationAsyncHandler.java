@@ -23,6 +23,8 @@ import io.smallrye.reactive.converters.Registry;
 import org.eclipse.microprofile.reactive.streams.operators.ReactiveStreams;
 import org.jboss.logging.Logger;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -139,6 +141,49 @@ public final class ContextPropagationAsyncHandler {
                 return v;
             });
         } else if (ret instanceof Publisher) {
+            ((Publisher) ret).subscribe(new Subscriber() {
+                @Override
+                public void onSubscribe(Subscription s) {
+                    System.out.println("&&& subscribed " + s);
+                }
+
+                @Override
+                public void onNext(Object o) {
+                    System.out.println("&&& onNext " + o);
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    try {
+                        doInTransaction(tm, tx, () -> TransactionHandler.handleExceptionNoThrow(transactional, throwable, tx));
+                    } catch (RuntimeException e) {
+                        e.addSuppressed(throwable);
+                        throw e;
+                    } catch (Exception e) {
+                        RuntimeException x = new RuntimeException(e);
+                        x.addSuppressed(throwable);
+                        throw x;
+                    }
+                    // pass-through the previous result
+                    if (throwable instanceof RuntimeException)
+                        throw (RuntimeException) throwable;
+                    throw new RuntimeException(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    try {
+                        doInTransaction(tm, tx, () -> TransactionHandler.endTransaction(tm, tx, () -> {
+                        }));
+                    } catch (RuntimeException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        RuntimeException x = new RuntimeException(e);
+                        throw x;
+                    }
+                }
+            });
+            /*
             ret = ReactiveStreams.fromPublisher(((Publisher<?>) ret))
                     .onError(throwable -> {
                         try {
@@ -167,6 +212,7 @@ public final class ContextPropagationAsyncHandler {
                         }
                     })
                     .buildRs();
+             */
         }
         return ret;
     }
