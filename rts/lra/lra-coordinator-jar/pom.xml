@@ -23,7 +23,7 @@
         <!-- the resource path of the coordinator - must match the deployment URL (see arquillian.xml) -->
         <lra.coordinator.path>lra-coordinator/lra-coordinator</lra.coordinator.path>
         <jvm.args.other>
-            -Dlra.coordinator.path=${lra.coordinator.path}
+            -Dlra.coordinator.path=${lra.coordinator.path} -Dmp.jwt.verify.publickey=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAreInMnyCNtm3ogCuJRF62IlF6Z813nCveowCwpmtjCk62CVt/03LWOPT0HfpnkH4pRWPpqLODa97pMiTlP8YigBNIZRi9hJ9HObHH+CsNz1VJcUJQN8H8M7Z3ISLJ+8h8rtXtDM3ZVlFuJKwNC2uRbQyqVNxEeBxKUCE7exvfMEg8Q+GG6lq/PaOj7kb81TbdJQxJ4PM0Wpw/QZWAe8jRvB3nc5ijLgDZX5+apqcnOwR9IPDTkUS3Tu2Bb6RggoYYudv4ymCdboaE3DDAyE+0SgwB356FYPVQ4fplUpKWx3eMNzI31kJ2Lcx+3gemQbcn1YykPLUB2jAFMaWK3uNvwIDAQAB
         </jvm.args.other>
         <server.jvm.args>${jvm.args.other} ${jvm.args.byteman} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
 
@@ -31,9 +31,42 @@
         <server2.jvm.args>
             -Djboss.socket.binding.port-offset=${server.port.offset} ${jvm.args.other} ${jvm.args.memory} ${jvm.args.modular}
         </server2.jvm.args>
+        <version.quarkus>1.4.2.Final</version.quarkus>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.smallrye</groupId>
+            <artifactId>smallrye-jwt</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.microprofile.openapi</groupId>
+            <artifactId>microprofile-openapi-api</artifactId>
+            <version>${version.org.eclipse.microprofile.openapi}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.microprofile.lra</groupId>
             <artifactId>microprofile-lra-api</artifactId>
@@ -63,12 +96,6 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
             <version>${version.org.jboss.resteasy}</version>
             <scope>provided</scope>
@@ -79,12 +106,6 @@
             <artifactId>lra-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.microprofile.openapi</groupId>
-            <artifactId>microprofile-openapi-api</artifactId>
-            <version>${version.org.eclipse.microprofile.openapi}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
@@ -108,6 +129,11 @@
 
     <build>
         <finalName>lra-coordinator</finalName>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

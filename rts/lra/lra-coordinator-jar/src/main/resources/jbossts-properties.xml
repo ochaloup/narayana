@@ -22,4 +22,5 @@
 -->
 <properties>
     <entry key="CoreEnvironmentBean.nodeIdentifier">1</entry>
+    <entry key="mp.jwt.verify.publickey">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAreInMnyCNtm3ogCuJRF62IlF6Z813nCveowCwpmtjCk62CVt/03LWOPT0HfpnkH4pRWPpqLODa97pMiTlP8YigBNIZRi9hJ9HObHH+CsNz1VJcUJQN8H8M7Z3ISLJ+8h8rtXtDM3ZVlFuJKwNC2uRbQyqVNxEeBxKUCE7exvfMEg8Q+GG6lq/PaOj7kb81TbdJQxJ4PM0Wpw/QZWAe8jRvB3nc5ijLgDZX5+apqcnOwR9IPDTkUS3Tu2Bb6RggoYYudv4ymCdboaE3DDAyE+0SgwB356FYPVQ4fplUpKWx3eMNzI31kJ2Lcx+3gemQbcn1YykPLUB2jAFMaWK3uNvwIDAQAB</entry>
 </properties>
