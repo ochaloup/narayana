@@ -33,6 +33,24 @@ import java.net.URI;
 
 public class NarayanaLRARecovery implements LRARecoveryService {
 
+    /**
+     * A bit of hacking to change the internals of annotations defined in LRA TCK.
+     * There is need to adjust timeout defined on the annotation definition.
+     */
+    static {
+        String[] resourceClassNames = new String[]{
+                "org.eclipse.microprofile.lra.tck.participant.api.LraResource",
+                "org.eclipse.microprofile.lra.tck.participant.api.RecoveryResource"};
+        for(String resourceClassName: resourceClassNames) {
+            try {
+                Class<?> clazz = Class.forName(resourceClassName);
+                LRAAnnotationAdjuster.processWithClass(clazz);
+            } catch (Exception e) {
+                throw new IllegalStateException("!!!!");
+            }
+        }
+    }
+
     @Override
     public void waitForCallbacks(URI lraId) {
         // no action needed
