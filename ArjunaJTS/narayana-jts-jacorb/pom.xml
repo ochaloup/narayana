@@ -188,6 +188,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.narayana.tracing</groupId>
+      <artifactId>narayanatracing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.narayana.arjunacore</groupId>
       <artifactId>arjuna</artifactId>
       <version>${project.version}</version>
