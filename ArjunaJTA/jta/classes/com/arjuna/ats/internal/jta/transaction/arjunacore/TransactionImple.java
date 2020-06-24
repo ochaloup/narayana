@@ -55,7 +55,6 @@ import com.arjuna.ats.arjuna.coordinator.AbstractRecord;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import com.arjuna.ats.arjuna.coordinator.AddOutcome;
 import com.arjuna.ats.arjuna.coordinator.BasicAction;
-import com.arjuna.ats.arjuna.coordinator.ExceptionDeferrer;
 import com.arjuna.ats.arjuna.coordinator.TransactionReaper;
 import com.arjuna.ats.arjuna.exceptions.ObjectStoreException;
 import com.arjuna.ats.arjuna.logging.tsLogger;
@@ -80,6 +79,14 @@ import com.arjuna.ats.jta.xa.XAModifier;
 import com.arjuna.ats.jta.xa.XidImple;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
+import io.narayana.tracing.NarayanaSpanBuilder;
+import io.narayana.tracing.TracingUtils;
+import io.narayana.tracing.names.SpanName;
+import io.narayana.tracing.names.TagName;
+import io.opentracing.Scope;
+import io.opentracing.Span;
+
+
 /*
  * Is given an AtomicAction, but uses the TwoPhaseCoordinator aspects of it to
  * ensure that the thread association continues.
@@ -87,6 +94,8 @@ import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 public class TransactionImple implements javax.transaction.Transaction,
 		com.arjuna.ats.jta.transaction.Transaction
 {
+	static final boolean TRACING_ACTIVATED =
+			Boolean.valueOf(System.getProperty("org.jboss.narayana.tracingActivated", "true"));
 
 	/*
 	 * Only works with AtomicAction and TwoPhaseCoordinator.
@@ -460,8 +469,12 @@ public class TransactionImple implements javax.transaction.Transaction,
 			}
 		}
 
-		try
-		{
+		Span span = new NarayanaSpanBuilder(SpanName.RESOURCE_ENLISTMENT)
+				.tag(TagName.UID, get_uid())
+				.build();
+		Xid xid = null;
+		try (Scope scope = TracingUtils.activateSpan(span)) {
+
 			/*
 			 * For each transaction we maintain a list of resources registered
 			 * with it. Each element on this list also contains a list of
@@ -582,7 +595,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 			 * connected to.
 			 */
 
-			Xid xid = null;
+			xid = null;
 			TxInfo existingRM = isNewRM(xaRes);
 
 			if (existingRM == null)
@@ -761,8 +774,7 @@ public class TransactionImple implements javax.transaction.Transaction,
 
             return false;
         }
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			jtaLogger.i18NLogger.warn_failed_to_enlist_xa_resource(xaRes, e);
 			/*
 			 * Some exceptional condition arose and we probably could not enlist
@@ -773,6 +785,12 @@ public class TransactionImple implements javax.transaction.Transaction,
 			markRollbackOnly();
 
 			return false;
+		} finally {
+			if(TRACING_ACTIVATED) {
+				span.setTag(TagName.XID.name(), XAHelper.xidToString(xid));
+				span.setTag(TagName.TRANSACTION_TIMEOUT.name(), Integer.toString(_theTransaction.getTimeout()));
+				span.finish();
+			}
 		}
 	}
 
