@@ -26,8 +26,8 @@ import io.narayana.lra.arquillian.resource.NestedParticipant;
 import io.narayana.lra.arquillian.spi.NarayanaLRARecovery;
 import io.narayana.lra.client.NarayanaLRAClient;
 import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
+import org.eclipse.microprofile.lra.tck.service.LRAMetricAssertions;
 import org.eclipse.microprofile.lra.tck.service.LRAMetricService;
-import org.eclipse.microprofile.lra.tck.service.LRAMetricType;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -51,6 +51,9 @@ public class NestedParticipantIT {
 
     @ArquillianResource
     private URL baseURL;
+
+    @Inject
+    private LRAMetricAssertions lraMetric;
 
     @Inject
     private LRAMetricService lraMetricService;
@@ -104,7 +107,8 @@ public class NestedParticipantIT {
 
             nestedLRA = URI.create(response.readEntity(String.class));
             Assert.assertNotEquals(parentLRA, nestedLRA);
-            Assert.assertEquals(1, lraMetricService.getMetric(LRAMetricType.Nested, parentLRA));
+            lraMetric.assertNestedEquals("NestedParticipant has to be invoked as nested",
+                    1, parentLRA, NestedParticipant.class);
         } finally {
             if (response != null) {
                 response.close();
@@ -118,15 +122,18 @@ public class NestedParticipantIT {
         // https://issues.redhat.com/browse/JBTM-3330
         narayanaLRARecovery.waitForEndPhaseReplay(nestedLRA);
 
-        Assert.assertEquals(1, lraMetricService.getMetric(LRAMetricType.Completed, nestedLRA));
-        Assert.assertEquals(2, lraMetricService.getMetric(LRAMetricType.Nested, parentLRA));
-        Assert.assertEquals(0, lraMetricService.getMetric(LRAMetricType.AfterLRA, nestedLRA));
+        lraMetric.assertCompletedEquals("NestedParticipant completion is expected to be invoked",
+                1, nestedLRA, NestedParticipant.class);
+        lraMetric.assertNestedEquals("On parent LRA has to be invoked the nested for the second time",
+                2, parentLRA, NestedParticipant.class);
+        lraMetric.assertNotAfterLRA("AfterLRA is expected not being called for the nested participant",
+                nestedLRA, NestedParticipant.class);
 
         narayanaLRAClient.closeLRA(parentLRA);
         narayanaLRARecovery.waitForEndPhaseReplay(nestedLRA);
 
-        Assert.assertEquals("After LRA method for nested LRA enlist should have been called",
-            1, lraMetricService.getMetric(LRAMetricType.AfterLRA, nestedLRA));
+        lraMetric.assertAfterLRA("After LRA method for nested LRA enlist should have been called",
+                nestedLRA, NestedParticipant.class);
 
     }
 }
