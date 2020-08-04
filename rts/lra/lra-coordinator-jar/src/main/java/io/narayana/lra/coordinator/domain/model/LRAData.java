@@ -22,10 +22,7 @@ public class LRAData {
         this.lraId = lraId;
         this.clientId = clientId;
         this.status = status;
-        this.isClosed = isClosed;
-        this.isCancelled = isCancelled;
-        this.isRecovering = isRecovering;
-        this.isActive = isActive;
+
         this.isTopLevel = isTopLevel;
         this.startTime = startTime;
         this.finishTime = finishTime;
