@@ -26,7 +26,6 @@ import io.narayana.lra.Current;
 import io.narayana.lra.RequestBuilder;
 import io.narayana.lra.ResponseHolder;
 import io.narayana.lra.coordinator.domain.model.LRAData;
-import io.narayana.lra.coordinator.domain.model.LRAStatusHolder;
 import io.narayana.lra.coordinator.domain.model.Transaction;
 import io.narayana.lra.coordinator.domain.service.LRAService;
 import io.narayana.lra.logging.LRALogger;
@@ -57,6 +56,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,10 +112,15 @@ public class Coordinator {
     @APIResponse(description = "The LRA",
         content = @Content(schema = @Schema(type = SchemaType.ARRAY, implementation = LRAData.class))
     )
-    public List<LRAData> getAllLRAs(
+    public Collection<LRAData> getAllLRAs(
             @Parameter(name = STATUS_PARAM_NAME, description = "Filter the returned LRAs to only those in the give state (see CompensatorStatus)")
             @QueryParam(STATUS_PARAM_NAME) @DefaultValue("") String state) {
-        List<LRAStatusHolder> lras = lraService.getAll(state);
+        LRAStatus requestedLRAStatus = null;
+        if(state != null && !state.isEmpty()) {
+            requestedLRAStatus = LRAStatus.valueOf(state);
+        }
+
+        Collection<LRAData> lras = lraService.getAll(requestedLRAStatus);
 
         if (lras == null) {
             LRALogger.i18NLogger.error_invalidQueryForGettingLraStatuses(state);
@@ -123,14 +128,7 @@ public class Coordinator {
                     .entity(String.format("Invalid query '%s' to get LRAs", state)).build());
         }
 
-        return lras.stream().map(Coordinator::convert).collect(toList());
-    }
-
-    private static LRAData convert(LRAStatusHolder lra) {
-        return new LRAData(lra.getLraId(), lra.getClientId(),
-                lra.getStatus().name(),
-                lra.isClosed(), lra.isCancelled(), lra.isRecovering(), lra.isActive(), lra.isTopLevel(),
-                lra.getStartTime(), lra.getFinishTime());
+        return lras;
     }
 
     @GET
@@ -432,12 +430,9 @@ public class Coordinator {
 
 
     private LRAStatus endLRA(URI lraId, boolean compensate, boolean fromHierarchy) throws NotFoundException {
-        LRAStatusHolder status = lraService.endLRA(lraId, compensate, fromHierarchy);
+        LRAData lraData = lraService.endLRA(lraId, compensate, fromHierarchy);
 
-        return status.getStatus();
-//        return compensatorData == null
-//                ? Response.ok().status(status.getHttpStatus()).build()
-//                : Response.ok(compensatorData).status(status.getHttpStatus()).build();
+        return lraData.getLraStatus();
     }
 
     @PUT

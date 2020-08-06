@@ -32,7 +32,6 @@ import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import io.narayana.lra.coordinator.domain.model.LRARecord;
 import io.narayana.lra.coordinator.internal.Implementations;
 import io.narayana.lra.coordinator.internal.LRARecoveryModule;
-import io.narayana.lra.coordinator.domain.model.LRAStatusHolder;
 import io.narayana.lra.coordinator.domain.model.Transaction;
 
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
@@ -47,17 +46,17 @@ import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @ApplicationScoped
 public class LRAService {
@@ -72,7 +71,7 @@ public class LRAService {
         if (!lras.containsKey(lraId)) {
             String uid = getUid(lraId);
 
-            // try comparing on uid since differnt URIs can map to the same resource
+            // try comparing on uid since different URIs can map to the same resource
             // (eg localhost versus 127.0.0.1 versus :1 etc)
             for (Transaction lra : lras.values()) {
                 if (uid.equals(lra.getUid())) {
@@ -124,45 +123,50 @@ public class LRAService {
         return lock.tryLock() ? lock : null;
     }
 
-    public List<LRAStatusHolder> getAll(String state) {
-        if (state == null || state.isEmpty()) {
-            Set<LRAStatusHolder> all = getAllActive();
+    public Collection<LRAData> getAll() {
+        return getAll(null);
+    }
 
+    public Collection<LRAData> getAll(LRAStatus lraStatus) {
+        if (lraStatus == null) {
+            Collection<LRAData> all = lras.values().stream()
+                    .map(t -> t.getLRAData()).collect(Collectors.toCollection(HashSet::new));
             all.addAll(getAllRecovering());
-
-            return new ArrayList<>(all);
+            return all;
         }
 
-        if (LRAStatus.Cancelling.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isCancelling).collect(toList());
-        } else if (LRAStatus.Cancelled.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isCancelled).collect(toList());
-        } else if (LRAStatus.FailedToCancel.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isFailedToCancel).collect(toList());
-        } else if (LRAStatus.Closing.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isClosing).collect(toList());
-        } else if (LRAStatus.Closed.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isClosed).collect(toList());
-        } else if (LRAStatus.FailedToClose.name().equals(state)) {
-            return recoveringLRAs.values().stream().map(LRAStatusHolder::new).filter(LRAStatusHolder::isFailedToClose).collect(toList());
+        // TODO: why not consider the other states like Active? could not be some "Closing" LRAs part of the "lras" collection?
+        switch (lraStatus) {
+            case Cancelling:
+            case Cancelled:
+            case FailedToCancel:
+            case Closing:
+            case Closed:
+            case FailedToClose:
+                return getLraDataByStatus(recoveringLRAs, lraStatus);
+            default:
+                return new HashSet<>();
         }
-
-        return null;
     }
 
-    private Set<LRAStatusHolder> getAllActive() {
-        return lras.values().stream().map(LRAStatusHolder::new).collect(toSet());
-    }
-
-    public List<LRAStatusHolder> getAllRecovering(boolean scan) {
+    /**
+     * Getting all the LRA managed by recovery manager. This means all LRAs which are not mapped
+     * only in memory but that were already saved in object store.
+     *
+     * @param scan  defines if there is run recovery manager scanning before returning the collection,
+     *              when the recovery is run then the object store is touched and the returned
+     *              list may be updated with the new loaded objects
+     * @return list of the {@link LRAData} which define the recovering LRAs
+     */
+    public List<LRAData> getAllRecovering(boolean scan) {
         if (scan) {
             RecoveryManager.manager().scan();
         }
 
-        return recoveringLRAs.values().stream().map(LRAStatusHolder::new).collect(toList());
+        return recoveringLRAs.values().stream().map(t -> t.getLRAData()).collect(toList());
     }
 
-    public List<LRAStatusHolder> getAllRecovering() {
+    public List<LRAData> getAllRecovering() {
         return getAllRecovering(false);
     }
 
@@ -200,27 +204,21 @@ public class LRAService {
         }
     }
 
-    public boolean remove(Transaction lra) {
+    public void remove(Transaction lra) {
         if (lra.isFailed()) { // persist failed LRA state
             lra.deactivate();
         }
-        return remove(lra.getId());
+        remove(lra.getId());
     }
 
-    public boolean remove(URI lraId) {
+    public void remove(URI lraId) {
         lraTrace(lraId, "remove LRA");
 
-        if (lras.containsKey(lraId)) {
-            lras.get(lraId); // validate that the LRA exists
-
-            lras.remove(lraId);
-        }
+        lras.remove(lraId);
 
         recoveringLRAs.remove(lraId);
 
         locks.remove(lraId);
-
-        return true;
     }
 
     public void updateRecoveryURI(URI lraId, String compensatorUrl, String recoveryURI, boolean persist) {
@@ -278,7 +276,7 @@ public class LRAService {
         }
     }
 
-    public LRAStatusHolder endLRA(URI lraId, boolean compensate, boolean fromHierarchy) {
+    public LRAData endLRA(URI lraId, boolean compensate, boolean fromHierarchy) {
         lraTrace(lraId, "end LRA");
 
         Transaction transaction = getTransaction(lraId);
@@ -299,7 +297,7 @@ public class LRAService {
 
         finished(transaction, fromHierarchy);
 
-        return new LRAStatusHolder(transaction);
+        return transaction.getLRAData();
     }
 
     public int leave(URI lraId, String compensatorUrl) {
@@ -427,12 +425,12 @@ public class LRAService {
         return hasTransaction(lraId);
     }
 
-    public List<LRAStatusHolder> getFailedLRAs() {
+    public List<LRAData> getFailedLRAs() {
         Map<URI, Transaction> failedLRAs = new ConcurrentHashMap<>();
 
         lraRecoveryModule.getFailedLRAs(failedLRAs);
 
-        return failedLRAs.values().stream().map(LRAStatusHolder::new).collect(toList());
+        return failedLRAs.values().stream().map(t -> t.getLRAData()).collect(toList());
     }
 
     /**
@@ -473,5 +471,10 @@ public class LRAService {
                 LRALogger.logger.debugf("LRAServicve.disableRecovery");
             }
         }
+    }
+
+    private Collection<LRAData> getLraDataByStatus(Map<URI, Transaction> lrasToFilter, LRAStatus status) {
+        return lrasToFilter.values().stream().filter(t -> t.getLRAStatus() == status)
+                .map(t -> t.getLRAData()).collect(Collectors.toSet());
     }
 }

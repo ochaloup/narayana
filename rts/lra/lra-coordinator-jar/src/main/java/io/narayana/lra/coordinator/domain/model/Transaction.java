@@ -87,7 +87,7 @@ public class Transaction extends AtomicAction {
         this.id = new URI(String.format("%s/%s", baseUrl, get_uid().fileStringForm()));
         this.inFlight = true;
         this.parentId = parentId;
-        this.clientId = clientId;
+        this.clientId = clientId; // TODO: do we need this?
         this.finishTime = null;
         this.status = LRAStatus.Active;
 
@@ -108,12 +108,21 @@ public class Transaction extends AtomicAction {
         this.scheduler = Executors.newScheduledThreadPool(1);
     }
 
+    /**
+     * Creating {@link LRAData} from the current {@link Transaction} state.
+     * The data are immutable and represents the current state of the LRA transaction.
+     *
+     * @return  immutable {@link LRAData} representing the current state of the LRA transaction
+     */
     public LRAData getLRAData() {
-        return new LRAData(id.toASCIIString(), clientId, status == null ? "" : status.name(),
-                isClosed(), isCancelled(), isRecovering(),
-                isActive(), isTopLevel(),
-                startTime.toInstant(ZoneOffset.UTC).toEpochMilli(),
-                finishTime == null ? 0L : finishTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+        return LRAData.Builder.instanceOf()
+                .lraId(id.toASCIIString())
+                .clientId(clientId)
+                .status(status == null ? LRAStatus.Active.name() : status.name()) // TODO: may status be null?
+                .topLevel(isTopLevel())
+                .startTime(startTime.toInstant(ZoneOffset.UTC).toEpochMilli())
+                .finishTime(finishTime == null ? 0L : finishTime.toInstant(ZoneOffset.UTC).toEpochMilli())
+                .build();
     }
 
     public static String getType() {
@@ -145,12 +154,8 @@ public class Transaction extends AtomicAction {
                 os.packLong(finishTime.toInstant(ZoneOffset.UTC).toEpochMilli());
             }
 
-            if (status == null) {
-                os.packBoolean(false);
-            } else {
-                os.packBoolean(true);
-                os.packString(status.name());
-            }
+            os.packBoolean(true);
+            os.packString(status == null ? LRAStatus.Active.name() : status.name());
         } catch (IOException e) {
             return false;
         }
@@ -269,7 +274,7 @@ public class Transaction extends AtomicAction {
             clientId = os.unpackString();
             startTime = os.unpackBoolean() ? LocalDateTime.ofInstant(Instant.ofEpochMilli(os.unpackLong()), ZoneOffset.UTC) : null;
             finishTime = os.unpackBoolean() ? LocalDateTime.ofInstant(Instant.ofEpochMilli(os.unpackLong()), ZoneOffset.UTC) : null;
-            status = os.unpackBoolean() ? LRAStatus.valueOf(os.unpackString()) : null;
+            status = os.unpackBoolean() ? LRAStatus.valueOf(os.unpackString()) : LRAStatus.Active;
 
             /*
              * If the time limit has already been reached then the difference between now and the scheduled
@@ -351,9 +356,10 @@ public class Transaction extends AtomicAction {
     /**
      * return the current status of the LRA
      *
-     * @return null if the LRA is still active (not closing, cancelling, closed or cancelled
+     * @return current LRA status, will not return <code>null</code>
      */
     public LRAStatus getLRAStatus() {
+        assert status != null;
         return status;
     }
 
@@ -362,24 +368,27 @@ public class Transaction extends AtomicAction {
     }
 
     boolean isClosed() {
-        return status != null && status.equals(LRAStatus.Closed);
+        assert status != null;
+        return status.equals(LRAStatus.Closed);
     }
 
     boolean isCancelled() {
-        return status != null && status.equals(LRAStatus.Cancelled);
+        assert status != null;
+        return status.equals(LRAStatus.Cancelled);
     }
 
     public boolean isRecovering() {
-        return status != null &&
-                (status.equals(LRAStatus.Cancelling) || status.equals(LRAStatus.Closing));
+        assert status != null;
+        return status.equals(LRAStatus.Cancelling) || status.equals(LRAStatus.Closing);
     }
 
     public boolean isFailed() {
-        return status != null &&
-            (status.equals(LRAStatus.FailedToCancel) || status.equals(LRAStatus.FailedToClose));
+        assert status != null;
+        return status.equals(LRAStatus.FailedToCancel) || status.equals(LRAStatus.FailedToClose);
     }
 
     public boolean isCancel() {
+        assert status != null;
         switch (status) {
             case Cancelling: /* FALLTHRU */
             case Cancelled: /* FALLTHRU */
@@ -391,6 +400,7 @@ public class Transaction extends AtomicAction {
     }
 
     boolean isFinished() {
+        assert status != null;
         switch (status) {
             case Closed:
                 /* FALLTHRU */
@@ -693,7 +703,8 @@ public class Transaction extends AtomicAction {
     }
 
     public Boolean isActive() {
-        return status == null || status == LRAStatus.Active;
+        assert status != null;
+        return status == LRAStatus.Active;
     }
 
     public boolean forgetParticipant(String participantUrl) {
