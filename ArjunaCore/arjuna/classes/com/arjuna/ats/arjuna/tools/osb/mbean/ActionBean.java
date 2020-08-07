@@ -293,6 +293,8 @@ public class ActionBean extends OSEntryBean implements ActionBeanMBean {
                             break;
                         case PREPARED:
                             ra.clearHeuristicDecision(TwoPhaseOutcome.PREPARE_OK);
+                            // if record was not heuristically finished then eg. 'XAResource' ignores the `forget(Xid)` call
+                            targRecord.forgetHeuristic();
                             break;
                         case READONLY:
                             ra.clearHeuristicDecision(TwoPhaseOutcome.PREPARE_READONLY);
