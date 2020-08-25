@@ -268,24 +268,24 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
 
     @Test
     @OperateOnDeployment(INBOUND_CLIENT_DEPLOYMENT_NAME)
-    public void testRecoveryLivingTransactions(final @ArquillianResource URL baseURL) throws Exception {
-        log.info("testRecoveryLivingTransactions");
+    public void testRecoveryLivingTransactions(@ArquillianResource final URL baseURL) throws Exception {
 
         InstrumentedClass durableParticipant = instrumentor.instrumentClass(BridgeDurableParticipant.class);
         InstrumentedClass instrumentedTestXAResourceRecovered = instrumentor.instrumentClass(TestXAResourceRecovered.class);
 
         instrumentor.injectOnCall(TestClient.class, "terminateTransaction", "$2 = true"); // shouldCommit=true
-        instrumentor.injectOnCall(TestXAResource.class, "commit", "waitFor(\"recoveryProcessed\")");
-        instrumentor.injectOnCall(TestXAResourceRecoveryHelper.class, "recover", "waitFor(\"preparedXid\")");
+        instrumentor.injectOnExit(BridgeDurableParticipant.class, "prepare", "waitFor(\"recoveryProcessed\")");
 
-        instrumentor.injectOnExit(TestXAResource.class, "prepare", "signalWake(\"preparedXid\"), true");
-        // This should create a transaction that has a SystemException in CompletionStub:74
-        executeWithRuntimeException(baseURL + TestClient.URL_PATTERN, false);
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                executeWithRuntimeException(baseURL + TestClient.URL_PATTERN, false);
+            }
+        });
 
-        // Prevent recovery needing to see another prepare call
-        instrumentor.injectOnCall(TestXAResourceRecoveryHelper.class, "recover", "signalWake(\"preparedXid\")");
-        // Recovery should be leaving this alone as it is live
-        log.info("testRecoveryLivingTransactions will be requesting recovery for a live transaction");
+        instrumentor.injectOnExit(PeriodicRecovery.class, "doWorkInternal", "signalWake(\"recoveryProcessed\", flag(\"alreadyProcessed\"))");
+
+        doRecovery();
         doRecovery();
 
         durableParticipant.assertMethodCalled("prepare");
@@ -295,13 +295,8 @@ public class InboundCrashRecoveryTests extends AbstractCrashRecoveryTests {
         instrumentedTestXAResource.assertKnownInstances(1);
         instrumentedTestXAResource.assertMethodCalled("prepare");
         instrumentedTestXAResource.assertMethodNotCalled("rollback");
-        instrumentedTestXAResource.assertMethodCalled("commit"); // The transaction should still be waiting for recoveryProcessed
-        instrumentedTestXAResourceRecovered.assertMethodNotCalled("commit"); // We don't want recovery to have committed this Xid as it was live
+        instrumentedTestXAResourceRecovered.assertMethodCalled("commit");
         instrumentedTestXAResourceRecovered.assertMethodNotCalled("rollback");
-
-        // Allow the original transaction to release for cleanup including removal of islive
-        instrumentor.injectOnExit(PeriodicRecovery.class, "doWorkInternal", "signalWake(\"recoveryProcessed\", true)");
-        doRecovery();
     }
 
     // TODO: add test for 4log case i.e. commit
