@@ -37,7 +37,7 @@ function init_test_options {
         export QA_TESTS=0 SUN_ORB=0 JAC_ORB=0
     elif [[ $PROFILE == "XTS" ]] && [[ ! $PULL_DESCRIPTION =~ "!XTS" ]]; then
         comment_on_pull "Started testing this pull request with XTS profile: $BUILD_URL"
-        export AS_BUILD=1 NARAYANA_BUILD=1 NARAYANA_TESTS=0 XTS_AS_TESTS=1 XTS_TESTS=1 TXF_TESTS=0 txbridge=1
+        export AS_BUILD=1 NARAYANA_BUILD=1 NARAYANA_TESTS=0 XTS_AS_TESTS=0 XTS_TESTS=1 TXF_TESTS=0 txbridge=1
         export QA_TESTS=0 SUN_ORB=0 JAC_ORB=0
     elif [[ $PROFILE == "QA_JTA" ]] && [[ ! $PULL_DESCRIPTION =~ "!QA_JTA" ]]; then
         comment_on_pull "Started testing this pull request with QA_JTA profile: $BUILD_URL"
@@ -220,13 +220,18 @@ function xts_tests {
   cd $WORKSPACE
   ran_crt=1
 
-  if [ $WSTX_MODULES ]; then
-    [[ $WSTX_MODULES = *crash-recovery-tests* ]] || ran_crt=0
-    echo "BUILDING SPECIFIC WSTX11 modules"
-    ./build.sh -f XTS/localjunit/pom.xml --projects "$WSTX_MODULES" -P$ARQ_PROF "$@" $IPV6_OPTS -Dorg.jboss.remoting-jmx.timeout=300 -fn clean install
-  else
-    ./build.sh -f XTS/localjunit/pom.xml -P$ARQ_PROF "$@" $IPV6_OPTS -Dorg.jboss.remoting-jmx.timeout=300 -fn clean install
-  fi
+  wget "http://download.eng.brq.redhat.com/scratch/ochaloup/standalone-xts-xml-6.4.23.diff"
+  patch $JBOSS_HOME/docs/examples/configs/standalone-xts.xml ./standalone-xts-xml-6.4.23.diff
+
+  ./build.sh -f XTS/localjunit/crash-recovery-tests/pom.xml -Dtest=TestATCrashDuringSingleParticipantCommit -Parq "$@" $IPV6_OPTS -Dorg.jboss.remoting-jmx.timeout=300 -B -ff clean install
+
+  # if [ $WSTX_MODULES ]; then
+  #  [[ $WSTX_MODULES = *crash-recovery-tests* ]] || ran_crt=0
+  #  echo "BUILDING SPECIFIC WSTX11 modules"
+  #  ./build.sh -f XTS/localjunit/pom.xml --projects "$WSTX_MODULES" -P$ARQ_PROF "$@" $IPV6_OPTS -Dorg.jboss.remoting-jmx.timeout=300 -fn clean install
+  # else
+  #   ./build.sh -f XTS/localjunit/pom.xml -P$ARQ_PROF "$@" $IPV6_OPTS -Dorg.jboss.remoting-jmx.timeout=300 -fn clean install
+  # fi
 
   [ $? = 0 ] || fatal "XTS: SOME TESTS failed"
 
