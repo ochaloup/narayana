@@ -31,6 +31,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- for having the javax.enterprise.inject.spi.Extension on classpath
+           for arquillian setting it up into test archive -->
+      <artifactId>lra-proxy-api</artifactId>
+      <groupId>org.jboss.narayana.rts</groupId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-client</artifactId>
       <version>${project.version}</version>

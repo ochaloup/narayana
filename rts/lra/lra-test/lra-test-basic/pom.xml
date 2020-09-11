@@ -26,6 +26,13 @@
       <artifactId>narayana-lra</artifactId>
       <version>${project.version}</version>
     </dependency>
+<!--    <dependency>-->
+<!--      &lt;!&ndash; for having the javax.enterprise.inject.spi.Extension on classpath-->
+<!--           for arquillian setting it up into test archive &ndash;&gt;-->
+<!--      <artifactId>lra-proxy-api</artifactId>-->
+<!--      <groupId>org.jboss.narayana.rts</groupId>-->
+<!--      <version>${project.version}</version>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

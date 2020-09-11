@@ -22,24 +22,24 @@
 
 package io.narayana.lra.arquillian;
 
-import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveProcessor;
+import org.jboss.arquillian.container.test.spi.client.deployment.ApplicationArchiveProcessor;
+import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.container.ClassContainer;
 import org.jboss.shrinkwrap.api.container.ManifestContainer;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
  * The appender provides way to bundle LRA interfaces implementation classes to the deployment
  * as the Thorntail container does not bundle the LRA classes to the fat jar until
  * there is no fraction for it.
  */
-public class ConfigAuxiliaryArchiveProcessor implements AuxiliaryArchiveProcessor {
+public class ConfigApplicationArchiveProcessor implements ApplicationArchiveProcessor {
 
     @Override
-    public void process(Archive<?> auxiliaryArchive) {
-        if(auxiliaryArchive instanceof WebArchive) {
-            ClassContainer<?> archive = WebArchive.class.cast(auxiliaryArchive);
+    public void process(Archive<?> applicationArchive, TestClass testClass) {
+        if(applicationArchive instanceof ClassContainer) {
+            ClassContainer<?> archive = ClassContainer.class.cast(applicationArchive);
                 // adding LRA spec interfaces under the Thorntail deployment
                 archive.addPackages(true, org.eclipse.microprofile.lra.annotation.Compensate.class.getPackage());
                 // adding Narayana LRA implementation under the Thorntail deployment
@@ -61,8 +61,8 @@ public class ConfigAuxiliaryArchiveProcessor implements AuxiliaryArchiveProcesso
                     "META-INF/services/org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService");
         }
 
-        if(auxiliaryArchive instanceof ManifestContainer<?>) {
-            ((ManifestContainer) auxiliaryArchive)
+        if(applicationArchive instanceof ManifestContainer<?>) {
+            ((ManifestContainer) applicationArchive)
                     .addAsManifestResource(new StringAsset("<beans version=\"1.1\" bean-discovery-mode=\"annotated\"></beans>"), "beans.xml");
         }
     }
