@@ -10,8 +10,7 @@
             <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=n -Dthorntail.http.host=${application.host} -Dthorntail.http.port=${application.port} -Dlra.http.host=localhost -Dlra.http.port=${lra.coordinator.port} ${thorntail.test.logging.category.arjuna} ${thorntail.test.logging.category.narayana}</property>
         </configuration>
     </container>
-    <!-- -->
-    <engine>
-        <property name="deploymentExportPath">/tmp/archive-thorntail</property>
-    </engine>
+<engine>
+    <property name="deploymentExportPath">/tmp/archive-basic-old</property>
+</engine>
 </arquillian>
