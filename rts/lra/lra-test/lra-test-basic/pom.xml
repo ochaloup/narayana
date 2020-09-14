@@ -26,13 +26,6 @@
       <artifactId>narayana-lra</artifactId>
       <version>${project.version}</version>
     </dependency>
-<!--    <dependency>-->
-<!--      &lt;!&ndash; for having the javax.enterprise.inject.spi.Extension on classpath-->
-<!--           for arquillian setting it up into test archive &ndash;&gt;-->
-<!--      <artifactId>lra-proxy-api</artifactId>-->
-<!--      <groupId>org.jboss.narayana.rts</groupId>-->
-<!--      <version>${project.version}</version>-->
-<!--    </dependency>-->
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -61,26 +54,9 @@
     </dependency>
   </dependencies>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <redirectTestOutputToFile>${test.logs.to.file}</redirectTestOutputToFile>
-          <systemPropertyVariables>
-            <application.host>${application.host}</application.host>
-            <application.port>${application.port}</application.port>
-            <lra.coordinator.port>${lra.coordinator.port}</lra.coordinator.port>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <profiles>
     <profile>
-      <!-- when arq profile is activated we expect to start coordinator -->
+      <!-- when arq profile is activated we expect to start a quarkus coordinator -->
       <id>arq</id>
       <properties>
         <lra.coordinator.exec.plugin.phase>pre-integration-test</lra.coordinator.exec.plugin.phase>
@@ -98,6 +74,25 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>${test.logs.to.file}</redirectTestOutputToFile>
+              <systemPropertyVariables>
+                <application.host>${application.host}</application.host>
+                <application.port>${application.port}</application.port>
+                <lra.coordinator.port>${lra.coordinator.port}</lra.coordinator.port>
+                <thorntail.test.logging.category.arjuna>${thorntail.test.logging.category.arjuna}</thorntail.test.logging.category.arjuna>
+                <thorntail.test.logging.category.narayana>${thorntail.test.logging.category.narayana}</thorntail.test.logging.category.narayana>
+                <lra.testsuite.debug.params>${lra.testsuite.debug.params}</lra.testsuite.debug.params>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>

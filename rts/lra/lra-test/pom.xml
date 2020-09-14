@@ -32,6 +32,8 @@
         <lra.coordinator.debug.params></lra.coordinator.debug.params> <!-- has content when -Ddebug.coordinator is specified -->
         <lra.coordinator.debug.port>8787</lra.coordinator.debug.port>
         <lra.coordinator.jar.path>${project.basedir}/../lra-coordinator/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
+        <lra.testsuite.debug.params></lra.testsuite.debug.params> <!-- has content when -Ddebug.testsuite is specified -->
+        <lra.testsuite.debug.port>8788</lra.testsuite.debug.port>
     </properties>
     
     <dependencies>
@@ -150,6 +152,30 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>debug.lra.testsuite</id>
+            <activation>
+                <property>
+                    <name>debug.testsuite</name>
+                </property>
+            </activation>
+            <properties>
+                <lra.testsuite.debug.params>-Xrunjdwp:transport=dt_socket,address=${lra.testsuite.debug.port},server=y,suspend=y</lra.testsuite.debug.params>
+            </properties>
+        </profile>
+        <profile>
+            <id>trace.lra.testsuite</id>
+            <activation>
+                <property>
+                    <name>trace.testsuite</name>
+                </property>
+            </activation>
+            <properties>
+                <thorntail.test.logging.category.arjuna>-Dthorntail.logging.com.arjuna=TRACE</thorntail.test.logging.category.arjuna>
+                <thorntail.test.logging.category.narayana>-Dthorntail.logging.io.narayana.lra=TRACE</thorntail.test.logging.category.narayana>
+            </properties>
         </profile>
     </profiles>
 
