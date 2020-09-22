@@ -138,7 +138,7 @@ public class NarayanaLRAClient implements Closeable {
      */
     public NarayanaLRAClient() throws URISyntaxException {
         if (defaultCoordinatorURI != null) {
-                init(defaultCoordinatorURI);
+            setCoordinatorURI(defaultCoordinatorURI);
         } else {
             init("http",
                     System.getProperty(LRA_COORDINATOR_HOST_KEY, "localhost"),
@@ -173,14 +173,22 @@ public class NarayanaLRAClient implements Closeable {
      * Creating LRA client where expecting LRA coordinator being available
      * at the provided uri.
      *
-     * @param coordinatorUri  uri of the lra coordinator
+     * @param coordinatorUri  uri of the LRA coordinator
      */
-    public NarayanaLRAClient(URI coordinatorUri) throws MalformedURLException, URISyntaxException {
-        init(coordinatorUri);
+    public NarayanaLRAClient(URI coordinatorUri) {
+        setCoordinatorURI(coordinatorUri);
     }
 
-    private void init(URI coordinatorUri) {
-        setCoordinatorURI(coordinatorUri);
+    /**
+     * Creating LRA client where LRA coordinator will be searched at the host and port defined
+     * by {@link #LRA_COORDINATOR_HOST_KEY} and {@link #LRA_COORDINATOR_PORT_KEY}
+     * but the context path is defined by argument.
+     *
+     * @param contextPath  context path of the URI for the LRA coordinator
+     */
+    public NarayanaLRAClient(String contextPath) throws URISyntaxException {
+        init("http", System.getProperty(LRA_COORDINATOR_HOST_KEY, "localhost"),
+            Integer.getInteger(LRA_COORDINATOR_PORT_KEY, 8080), contextPath);
     }
 
     private void setCoordinatorURI(URI uri) {
@@ -188,7 +196,11 @@ public class NarayanaLRAClient implements Closeable {
     }
 
     private void init(String scheme, String host, int port) throws URISyntaxException {
-        setCoordinatorURI(new URI(scheme, null, host, port, "/" + COORDINATOR_PATH_NAME, null, null));
+        init(scheme, host, port, COORDINATOR_PATH_NAME);
+    }
+
+    private void init(String scheme, String host, int port, String contextPath) throws URISyntaxException {
+        setCoordinatorURI(new URI(scheme, null, host, port, "/" + contextPath, null, null));
     }
 
     /**
@@ -223,7 +235,7 @@ public class NarayanaLRAClient implements Closeable {
 
     public void setCurrentLRA(URI coordinatorUri) {
         try {
-            init(removeLRAId(coordinatorUri));
+            setCoordinatorURI(removeLRAId(coordinatorUri));
         } catch (URISyntaxException e) {
             LRALogger.i18NLogger.error_invalidCoordinatorId(coordinatorUri.toASCIIString(), e);
             throwGenericLRAException(coordinatorUri, BAD_REQUEST.getStatusCode(), e.getMessage());

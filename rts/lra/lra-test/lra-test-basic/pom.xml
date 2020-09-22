@@ -63,7 +63,6 @@
             <application.port>${application.port}</application.port>
             <lra.tck.suite.host>${application.host}</lra.tck.suite.host>
             <lra.tck.suite.port>${application.port}</lra.tck.suite.port>
-            <lra.coordinator.port>${lra.coordinator.port}</lra.coordinator.port>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -97,7 +96,7 @@
     <profile>
       <id>arq.wildfly</id>
       <properties>
-        <lra.coordinator.path>lra-coordinator/lra-coordinator</lra.coordinator.path>
+        <lra.coordinator.path>##DEPLOYMENT_NAME##</lra.coordinator.path> <!-- will be replaced in test by deployment name -->
         <application.host>localhost</application.host>
         <application.port>8080</application.port>
         <jvm.args.other>-Dlra.coordinator.path=${lra.coordinator.path}</jvm.args.other>
@@ -130,7 +129,6 @@
               <systemPropertyVariables combine.children="append">
                 <lra.http.host>127.0.0.1</lra.http.host>
                 <lra.http.port>8080</lra.http.port>
-                <lra.coordinator.path>${lra.coordinator.path}</lra.coordinator.path>
                 <lra-participant.address>127.0.0.1</lra-participant.address>
                 <lra-participant.port>9080</lra-participant.port>
                 <server.jvm.args>${server.jvm.args}</server.jvm.args>
