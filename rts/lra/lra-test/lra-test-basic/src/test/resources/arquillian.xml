@@ -26,14 +26,13 @@
 
     <container qualifier="managedContainer" default="true" mode="suite">
         <configuration>
-            <!--  <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y ${server.jvm.args}</property>-->
+            <!-- -Dlra.coordinator.path=NonRootLRAParticipantIT/lra-coordinator -->
+            <property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n ${server.jvm.args}</property>
             <property name="managementAddress">${lra.http.host}</property>
             <property name="startupTimeoutInSeconds">${server.startup.timeout:60}</property>
         </configuration>
     </container>
-    <!--
     <engine>
         <property name="deploymentExportPath">/tmp/archive</property>
     </engine>
-    -->
 </arquillian>

@@ -14,9 +14,6 @@
   <description>LRA basic integration tests</description>
 
   <properties>
-    <application.host>localhost</application.host>
-    <application.port>8180</application.port>
-
     <lra.coordinator.jar.path>${project.basedir}/../../lra-coordinator/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
   </properties>
 
@@ -61,9 +58,11 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>${test.logs.to.file}</redirectTestOutputToFile>
-          <systemPropertyVariables>
+          <systemPropertyVariables combine.children="append">
             <application.host>${application.host}</application.host>
             <application.port>${application.port}</application.port>
+            <lra.tck.suite.host>${application.host}</lra.tck.suite.host>
+            <lra.tck.suite.port>${application.port}</lra.tck.suite.port>
             <lra.coordinator.port>${lra.coordinator.port}</lra.coordinator.port>
           </systemPropertyVariables>
         </configuration>
@@ -77,6 +76,8 @@
       <id>arq</id>
       <properties>
         <lra.coordinator.exec.plugin.phase>pre-integration-test</lra.coordinator.exec.plugin.phase>
+        <application.host>localhost</application.host>
+        <application.port>8180</application.port>
       </properties>
       <dependencies>
         <dependency>
@@ -97,9 +98,9 @@
       <id>arq.wildfly</id>
       <properties>
         <lra.coordinator.path>lra-coordinator/lra-coordinator</lra.coordinator.path>
-        <jvm.args.other>
-          -Dlra.coordinator.path=${lra.coordinator.path}
-        </jvm.args.other>
+        <application.host>localhost</application.host>
+        <application.port>8080</application.port>
+        <jvm.args.other>-Dlra.coordinator.path=${lra.coordinator.path}</jvm.args.other>
         <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
       </properties>
       <dependencies>
