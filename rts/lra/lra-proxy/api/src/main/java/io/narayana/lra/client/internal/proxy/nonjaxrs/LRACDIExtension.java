@@ -29,6 +29,7 @@ import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
+import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -51,6 +52,11 @@ import java.util.Set;
  * in {@link LRAParticipantRegistry}.
  */
 public class LRACDIExtension implements Extension {
+    private static final Logger log = Logger.getLogger(LRACDIExtension.class);
+
+    public LRACDIExtension() {
+        log.infof(">>>>>> The extension %s was created of instance '%s'", LRACDIExtension.class.getName(), this.toString());
+    }
 
     private ClassPathIndexer classPathIndexer = new ClassPathIndexer();
     private Index index;
@@ -58,6 +64,7 @@ public class LRACDIExtension implements Extension {
 
     public void observe(@Observes AfterBeanDiscovery event, BeanManager beanManager) throws IOException, ClassNotFoundException {
         index = classPathIndexer.createIndex();
+        log.infof("Observing after bean discovery event of bean %s", event.toString());
 
         List<AnnotationInstance> annotations = index.getAnnotations(DotName.createSimple("javax.ws.rs.Path"));
 

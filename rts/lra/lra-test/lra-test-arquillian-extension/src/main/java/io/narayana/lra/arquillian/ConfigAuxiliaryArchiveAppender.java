@@ -36,6 +36,10 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public class ConfigAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender {
 
+    // manifest for WildFly deployment, it requires access to some other WildFly internal modules
+    final String ManifestMF = "Manifest-Version: 1.0\n"
+            + "Dependencies: org.jboss.jandex, org.jboss.logging\n";
+
     @Override
     public Archive<?> createAuxiliaryArchive() {
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class)
@@ -49,7 +53,8 @@ public class ConfigAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender 
             .addPackages(true, io.narayana.lra.client.internal.proxy.nonjaxrs.LRACDIExtension.class.getPackage())
             .addAsResource("META-INF/services/javax.enterprise.inject.spi.Extension")
             .addClass(org.jboss.weld.exceptions.DefinitionException.class)
-            .addAsManifestResource(new StringAsset("<beans version=\"1.1\" bean-discovery-mode=\"annotated\"></beans>"), "beans.xml");
+            .addAsManifestResource(new StringAsset("<beans version=\"1.1\" bean-discovery-mode=\"annotated\"></beans>"), "beans.xml")
+            .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF");
 
         // adding Narayana LRA filters under the Thorntail deployment
         String filtersAsset = String.format("%s%n%s",

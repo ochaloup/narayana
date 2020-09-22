@@ -40,7 +40,7 @@ public class Deployer {
                 .addPackages(true,
                     LRAMetricService.class.getPackage(),
                     org.codehaus.jettison.JSONSequenceTooLargeException.class.getPackage())
-                .addClasses(LRAClientOps.class, WrongHeaderException.class);
+                .addClasses(LRAClientOps.class, WrongHeaderException.class)
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF");
     }
 }
