@@ -83,7 +83,7 @@ public class NonRootLRAParticipantIT {
     public void testFinishLRA() throws URISyntaxException, MalformedURLException {
 
         NarayanaLRAClient client = new NarayanaLRAClient(NonRootLRAParticipantIT.class.getSimpleName()); // the narayana client API for using LRAs
-                URI.create(baseURL.toExternalForm() + "/" + LRAConstants.COORDINATOR_PATH_NAME));
+                // URI.create(baseURL.toExternalForm() + "/" + LRAConstants.COORDINATOR_PATH_NAME));
         URI lraId = client.startLRA("testFinishLRA");
         log.infof(">>>>> baseUrl: '%s', created LRA id: '%s'", baseURL, lraId);
         URI compensateURI = new URI(baseURL.toExternalForm() + "/participant/compensate");

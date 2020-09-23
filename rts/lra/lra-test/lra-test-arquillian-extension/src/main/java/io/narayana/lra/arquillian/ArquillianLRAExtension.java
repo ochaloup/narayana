@@ -33,10 +33,13 @@ import org.jboss.arquillian.test.spi.enricher.resource.ResourceProvider;
  */
 public class ArquillianLRAExtension implements LoadableExtension {
 
-   @Override
-   public void register(ExtensionBuilder builder) {
-       builder.service(AuxiliaryArchiveAppender.class, ConfigAuxiliaryArchiveAppender.class);
-       builder.service(ResourceProvider.class, NarayanaLRABaseUrlProvider.class);
-   }
+    @Override
+    public void register(ExtensionBuilder builder) {
+        builder
+            .service(AuxiliaryArchiveAppender.class, ConfigAuxiliaryArchiveAppender.class)
+            .service(ResourceProvider.class, NarayanaLRABaseUrlProvider.class);
 
+        builder
+            .observer(AppServerCoordinatorDeploymentObserver.class);
+    }
 }
