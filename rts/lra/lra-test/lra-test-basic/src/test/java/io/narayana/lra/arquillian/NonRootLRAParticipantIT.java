@@ -22,7 +22,6 @@
 
 package io.narayana.lra.arquillian;
 
-import io.narayana.lra.LRAConstants;
 import io.narayana.lra.client.NarayanaLRAClient;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -82,7 +81,8 @@ public class NonRootLRAParticipantIT {
     @Test
     public void testFinishLRA() throws URISyntaxException, MalformedURLException {
 
-        NarayanaLRAClient client = new NarayanaLRAClient(NonRootLRAParticipantIT.class.getSimpleName()); // the narayana client API for using LRAs
+        NarayanaLRAClient client = new NarayanaLRAClient();
+        // NonRootLRAParticipantIT.class.getSimpleName()); // the narayana client API for using LRAs
                 // URI.create(baseURL.toExternalForm() + "/" + LRAConstants.COORDINATOR_PATH_NAME));
         URI lraId = client.startLRA("testFinishLRA");
         log.infof(">>>>> baseUrl: '%s', created LRA id: '%s'", baseURL, lraId);

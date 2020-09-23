@@ -37,11 +37,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-coordinator-jar</artifactId>
       <version>${project.version}</version>
@@ -101,10 +96,10 @@
     <profile>
       <id>arq.wildfly</id>
       <properties>
-        <lra.coordinator.path>##DEPLOYMENT_NAME##</lra.coordinator.path> <!-- will be replaced in test by deployment name -->
+        <lra.coordinator.path>lra-coordinator/lra-coordinator</lra.coordinator.path>
+        <jvm.args.other>-Dlra.coordinator.path=${lra.coordinator.path}</jvm.args.other>
         <application.host>localhost</application.host>
         <application.port>8080</application.port>
-        <jvm.args.other>-Dlra.coordinator.path=${lra.coordinator.path}</jvm.args.other>
         <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
       </properties>
       <dependencies>
@@ -137,6 +132,7 @@
                 <lra-participant.address>127.0.0.1</lra-participant.address>
                 <lra-participant.port>9080</lra-participant.port>
                 <server.jvm.args>${server.jvm.args}</server.jvm.args>
+                <project.version>${project.version}</project.version>
               </systemPropertyVariables>
             </configuration>
           </plugin>
