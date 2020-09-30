@@ -1,7 +1,7 @@
 package io.narayana.lra.arquillian;
 
 import org.jboss.arquillian.container.spi.Container;
-import org.jboss.arquillian.container.spi.event.container.AfterDeploy;
+import org.jboss.arquillian.container.spi.event.container.AfterUnDeploy;
 import org.jboss.arquillian.container.spi.event.container.BeforeDeploy;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.core.api.annotation.Observes;
@@ -30,8 +30,8 @@ public class AppServerCoordinatorDeploymentObserver {
      * The goal of this method is to create a deployment of the LRA coordinator
      * which is deployed before the test deployment is put on the server.
      */
-    public void handleBeforeDeployment(@Observes BeforeDeploy event, Container container) throws Exception {
-        log.info(">>>>> handleBeforeDeployment");
+    public void handleBeforeDeploy(@Observes BeforeDeploy event, Container container) throws Exception {
+        log.info(">>>>> handleBeforeDeploy");
         Archive<?> deployment = createDeployment();
         if(deployments.put(deployment.getName(), deployment) == null) {
             log.infof("Deploying %s", deployment.getName());
@@ -41,10 +41,11 @@ public class AppServerCoordinatorDeploymentObserver {
     }
 
     /**
-     * This method undeploys the LRA coordinator deployed at {@link #handleBeforeDeployment(BeforeDeploy, Container)}.
+     * This method undeploys the LRA coordinator deployed by method
+     * {@link #handleBeforeDeploy(BeforeDeploy, Container)}.
      */
-    public void handleAfterDeployment(@Observes AfterDeploy event, Container container) throws Exception {
-        log.info(">>>>> handleAfterDeployment");
+    public void handleAfterUnDeploy(@Observes AfterUnDeploy event, Container container) throws Exception {
+        log.info(">>>>> handleAfterUnDeploy");
         for(Archive<?> deployment: deployments.values()) {
             log.infof("Undeploying %s", deployment.getName());
             container.getDeployableContainer().undeploy(deployment);
@@ -52,8 +53,7 @@ public class AppServerCoordinatorDeploymentObserver {
     }
 
     public static WebArchive createDeployment() {
-        // LRA uses ArjunaCore so pull in the jts module to get them on the classpath
-        // (maybe in the future we can add a WFLY LRA subsystem)
+        // LRA uses ArjunaCore - for WildFly we need to pull the org.jboss.jts module to get it on the classpath
         final String ManifestMF = "Manifest-Version: 1.0\n"
                 + "Dependencies: org.jboss.jts, org.jboss.logging\n";
 

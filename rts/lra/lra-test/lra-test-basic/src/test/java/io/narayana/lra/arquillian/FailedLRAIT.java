@@ -32,6 +32,7 @@ import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
@@ -66,6 +67,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class FailedLRAIT {
+    private static final Logger log = Logger.getLogger(FailedLRAIT.class);
 
     @ArquillianResource
     private URL baseURL;
@@ -147,7 +149,8 @@ public class FailedLRAIT {
      * test that only failed LRAs can be deleted via the recovery coordinator
      */
     @Test
-    public void testCannotDeleteNonFailedLRAs() throws Exception {
+    public void testCannotDeleteNonFailedLRAs(@ArquillianResource URL baseURL) throws Exception {
+        log.infof(">>>>> BASE URL is '%s'", baseURL);
         // start an LRA which will return 202 when asked to compensate
         URI lra = invokeInTransaction(SIMPLE_PARTICIPANT_RESOURCE_PATH,
                 START_LRA_PATH, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
