@@ -55,6 +55,7 @@ import java.util.List;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.RESET_ACCEPTED_PATH;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.START_LRA_PATH;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.SIMPLE_PARTICIPANT_RESOURCE_PATH;
+import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_RECOVERY_HEADER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -149,7 +150,7 @@ public class FailedLRAIT {
      * test that only failed LRAs can be deleted via the recovery coordinator
      */
     @Test
-    public void testCannotDeleteNonFailedLRAs(@ArquillianResource URL baseURL) throws Exception {
+    public void testCannotDeleteNonFailedLRAs() throws Exception {
         log.infof(">>>>> BASE URL is '%s'", baseURL);
         // start an LRA which will return 202 when asked to compensate
         URI lra = invokeInTransaction(SIMPLE_PARTICIPANT_RESOURCE_PATH,
@@ -194,6 +195,7 @@ public class FailedLRAIT {
             assertEquals(expectedStatus, response.getStatus());
             Assert.assertTrue(response.hasEntity());
 
+            log.infof(">>>> RECOVERY URL %s", response.getHeaderString(LRA_HTTP_RECOVERY_HEADER));
             return URI.create(response.readEntity(String.class));
         } finally {
             if (response != null) {
