@@ -55,7 +55,8 @@ public class SimpleLRAParticipant {
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .header(LRA_HTTP_RECOVERY_HEADER, recoveryUrl.toASCIIString())
-                .entity(lraId.toASCIIString()).build();
+                .header(LRA_HTTP_CONTEXT_HEADER, lraId.toASCIIString())
+                .build();
     }
 
     @GET

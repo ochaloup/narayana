@@ -55,9 +55,12 @@ import java.util.List;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.RESET_ACCEPTED_PATH;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.START_LRA_PATH;
 import static io.narayana.lra.arquillian.resource.SimpleLRAParticipant.SIMPLE_PARTICIPANT_RESOURCE_PATH;
+import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT_HEADER;
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_RECOVERY_HEADER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.isEmptyString;
 
 /**
  * There is a spec requirement to report failed LRAs but the spec only requires that a failure message is reported
@@ -97,7 +100,7 @@ public class FailedLRAIT {
      */
     @Test
     public void testWithStatusCompensateFailed() throws Exception {
-        URI lra = invokeInTransaction(LRAParticipantWithStatusURI.LRA_PARTICIPANT_PATH,
+        LRAURIHolder lra = invokeInTransaction(LRAParticipantWithStatusURI.LRA_PARTICIPANT_PATH,
                 LRAParticipantWithStatusURI.TRANSACTIONAL_CANCEL_PATH, 500);
 
         if (!validateStateAndRemove(lra, LRAStatus.FailedToCancel)) {
@@ -182,7 +185,7 @@ public class FailedLRAIT {
         assertEquals("deleting a failed LRA", 204, status4);
     }
 
-    private URI invokeInTransaction(String resourcePrefix, String resourcePath, int expectedStatus) {
+    private LRAURIHolder invokeInTransaction(String resourcePrefix, String resourcePath, int expectedStatus) {
         Response response = null;
 
         try {
@@ -192,11 +195,11 @@ public class FailedLRAIT {
                     .request()
                     .get();
 
-            assertEquals(expectedStatus, response.getStatus());
-            Assert.assertTrue(response.hasEntity());
+            Assert.assertThat(response.getHeaderString(LRA_HTTP_CONTEXT_HEADER), not(isEmptyString()));
+            Assert.assertThat(response.getHeaderString(LRA_HTTP_RECOVERY_HEADER), not(isEmptyString()));
 
-            log.infof(">>>> RECOVERY URL %s", response.getHeaderString(LRA_HTTP_RECOVERY_HEADER));
-            return URI.create(response.readEntity(String.class));
+            return new LRAURIHolder(response.getHeaderString(LRA_HTTP_CONTEXT_HEADER),
+                    response.getHeaderString(LRA_HTTP_RECOVERY_HEADER));
         } finally {
             if (response != null) {
                 response.close();
@@ -234,7 +237,7 @@ public class FailedLRAIT {
     }
 
     // look up LRAs that are in a failed state (ie FailedToCancel or FailedToClose)
-    private List<JSONObject> getFailedRecords(URI lra) throws Exception {
+    private List<JSONObject> getFailedRecords(LRAURIHolder lra) throws Exception {
         Response response = null;
         String recoveryUrl = String.format("http://%s:%d/%s",
                 lra.getHost(), lra.getPort(), LRAConstants.RECOVERY_COORDINATOR_PATH_NAME);
@@ -288,6 +291,24 @@ public class FailedLRAIT {
         } finally {
             if (response != null) {
                 response.close();
+            }
+        }
+    }
+
+    private static class LRAURIHolder {
+        final URI lraId;
+        final URI recoveryId;
+
+        public LRAURIHolder(String lraId, String recoveryId) {
+            try {
+                this.lraId = new URI(lraId);
+            } catch (URISyntaxException use) {
+                throw new IllegalArgumentException("LRA id string '" + lraId + "' cannot be converted to URI");
+            }
+            try {
+                this.recoveryId = new URI(recoveryId);
+            } catch (URISyntaxException use) {
+                throw new IllegalArgumentException("Recovery LRA id string '" + recoveryId + "' cannot be converted to URI");
             }
         }
     }
