@@ -35,6 +35,7 @@ import org.apache.http.HttpConnection;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -50,6 +51,7 @@ import org.junit.runner.RunWith;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,11 +68,12 @@ import static org.junit.Assert.fail;
  * Test that check that LRA deadlines are respected during crash recovery
  */
 @RunWith(Arquillian.class)
+@RunAsClient
 public class LRACoordinatorRecovery2TestCase extends TestBase {
     private static final Long LONG_TIMEOUT = 600000L; // 10 minutes
     private static final Long SHORT_TIMEOUT = 10000L; // 10 seconds
 
-    private static Package[] coordinatorPackages = {
+    private static final Package[] coordinatorPackages = {
             RecoveryModule.class.getPackage(),
             Coordinator.class.getPackage(),
             LRAData.class.getPackage(),
@@ -82,14 +85,14 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
             LRARecoveryModule.class.getPackage()
     };
 
-    private static Package[] participantPackages = {
+    private static final Package[] participantPackages = {
             LRAListener.class.getPackage(),
             LRA.class.getPackage(),
             ServerLRAFilter.class.getPackage(),
             LRAParticipantRegistry.class.getPackage()
     };
 
-    private String lraListenerURL;
+    private URI lraListenerURI;
 
     private Client client;
 
@@ -111,7 +114,7 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
     public void before() throws MalformedURLException, URISyntaxException {
         super.before();
 
-        lraListenerURL = String.format("%s/%s", getDeploymentUrl(), LRAListener.LRA_LISTENER_PATH);
+        lraListenerURI = UriBuilder.fromUri(deploymentUri).path(LRAListener.LRA_LISTENER_PATH).build();
         client = ClientBuilder.newClient();
     }
 
@@ -140,7 +143,7 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
         URI shortLRA = lraClient.startLRA(null, "Short Timeout Recovery Test", SHORT_TIMEOUT, ChronoUnit.MILLIS);
 
         // invoke a method that will trigger a byteman rule to kill the JVM
-        try (Response ignore = client.target(lraListenerURL).path(LRA_LISTENER_KILL)
+        try (Response ignore = client.target(lraListenerURI).path(LRA_LISTENER_KILL)
                 .request()
                 .get()) {
 
@@ -169,7 +172,7 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
                         LRAStatus.Cancelled.equals(shortStatus) || LRAStatus.Cancelling.equals(shortStatus));
 
         // verify that it is still possible to join in with the LRA
-        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_UNTIMED_ACTION)
+        try (Response response = client.target(lraListenerURI).path(LRA_LISTENER_UNTIMED_ACTION)
                 .request()
                 .header(LRA_HTTP_CONTEXT_HEADER, longLRA)
                 .put(null)) {
@@ -191,7 +194,7 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
      * @return the listeners view of the LRA status
      */
     private String getStatusFromListener() {
-        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_STATUS)
+        try (Response response = client.target(lraListenerURI).path(LRA_LISTENER_STATUS)
                 .request()
                 .get()) {
 

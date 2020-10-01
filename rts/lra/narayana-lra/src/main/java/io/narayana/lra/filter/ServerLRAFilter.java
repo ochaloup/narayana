@@ -58,7 +58,6 @@ import java.util.Map;
 import static io.narayana.lra.LRAConstants.AFTER;
 import static io.narayana.lra.LRAConstants.COMPENSATE;
 import static io.narayana.lra.LRAConstants.COMPLETE;
-import static io.narayana.lra.LRAConstants.COORDINATOR_PATH_NAME;
 import static io.narayana.lra.LRAConstants.FORGET;
 import static io.narayana.lra.LRAConstants.LEAVE;
 import static io.narayana.lra.LRAConstants.STATUS;
@@ -77,26 +76,18 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
     private static final String SUSPENDED_LRA_PROP = "suspendLRA";
     private static final String NEW_LRA_PROP = "newLRA";
 
+    private static final long DEFAULT_TIMEOUT_MILLIS = 0L;
+
     @Context
     protected ResourceInfo resourceInfo;
 
     @Inject
     private LRAParticipantRegistry lraParticipantRegistry;
 
+    @Inject
     private NarayanaLRAClient lraClient;
 
     public ServerLRAFilter() throws Exception {
-        if (!NarayanaLRAClient.isInitialised()) {
-            String lcHost = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_HOST_KEY, "localhost");
-            int lcPort = Integer.getInteger(NarayanaLRAClient.LRA_COORDINATOR_PORT_KEY, 8080);
-            String lraCoordinatorPath = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_PATH_KEY, COORDINATOR_PATH_NAME);
-            String lraCoordinatorUrl = String.format("http://%s:%d/%s", lcHost, lcPort, lraCoordinatorPath);
-
-            NarayanaLRAClient.setDefaultCoordinatorEndpoint(new URI(lraCoordinatorUrl));
-        }
-
-        lraClient = new NarayanaLRAClient();
-
         if (lraParticipantRegistry == null) {
             LRALogger.i18NLogger.warn_nonJaxRsParticipantsNotAllowed();
         }
@@ -311,7 +302,7 @@ public class ServerLRAFilter implements ContainerRequestFilter, ContainerRespons
 
             Map<String, String> terminateURIs = NarayanaLRAClient.getTerminationUris(resourceInfo.getResourceClass(), containerRequestContext.getUriInfo(), timeout);
             String timeLimitStr = terminateURIs.get(TIMELIMIT_PARAM_NAME);
-            long timeLimit = timeLimitStr == null ? NarayanaLRAClient.DEFAULT_TIMEOUT_MILLIS : Long.valueOf(timeLimitStr);
+            long timeLimit = timeLimitStr == null ? DEFAULT_TIMEOUT_MILLIS : Long.valueOf(timeLimitStr);
 
             LRAParticipant participant = lraParticipantRegistry != null ?
                 lraParticipantRegistry.getParticipant(resourceInfo.getResourceClass().getName()) : null;
