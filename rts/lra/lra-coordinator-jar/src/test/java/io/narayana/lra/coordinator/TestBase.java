@@ -21,6 +21,7 @@
  */
 package io.narayana.lra.coordinator;
 
+import io.narayana.lra.LRAConstants;
 import io.narayana.lra.client.NarayanaLRAClient;
 import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
@@ -40,6 +41,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -51,8 +53,6 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Optional;
 
-import static io.narayana.lra.LRAConstants.COORDINATOR_PATH_NAME;
-import static io.narayana.lra.LRAConstants.RECOVERY_COORDINATOR_PATH_NAME;
 import static io.narayana.lra.LRAConstants.RECOVERY_COORDINATOR_SUB_RESOURCE_NAME;
 
 public abstract class TestBase {
@@ -63,13 +63,12 @@ public abstract class TestBase {
 
     static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
 
-    private static String coordinatorUrl;
-    private static String recoveryUrl;
     private static String jvmArgs;
     private static Path storeDir;
-    private static String deploymentURL;
 
-    NarayanaLRAClient lraClient;
+    private URI listRecoveryLRAUri;
+    protected NarayanaLRAClient lraClient;
+    protected URI deploymentUri;
 
     @ArquillianResource
     private ContainerController containerController;
@@ -79,24 +78,22 @@ public abstract class TestBase {
 
     @BeforeClass
     public static void beforeClass() {
-        String host = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_HOST_KEY, "localhost");
-        String port = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_PORT_KEY, "8080");
-        String path = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_PATH_KEY, COORDINATOR_PATH_NAME);
-
-        coordinatorUrl = String.format("http://%s:%s/%s", host, port, path);
-        recoveryUrl = String.format("%s/%s/%s",
-                coordinatorUrl, RECOVERY_COORDINATOR_PATH_NAME, RECOVERY_COORDINATOR_SUB_RESOURCE_NAME);
         storeDir = Paths.get(String.format("%s/standalone/data/tx-object-store", System.getProperty("env.JBOSS_HOME", "null")));
         jvmArgs = System.getProperty("server.jvm.args");
-
-        deploymentURL = String.format("http://%s:%s/%s", host, port, COORDINATOR_DEPLOYMENT);
     }
 
     @Before
     public void before() throws URISyntaxException, MalformedURLException {
         LRALogger.logger.debugf("Starting test %s", testName);
 
-        lraClient = new NarayanaLRAClient(new URI(coordinatorUrl));
+        lraClient = new NarayanaLRAClient(COORDINATOR_DEPLOYMENT + "/" + LRAConstants.COORDINATOR_PATH_NAME,
+                COORDINATOR_DEPLOYMENT + "/" + LRAConstants.RECOVERY_COORDINATOR_PATH_NAME);
+        listRecoveryLRAUri = UriBuilder.fromUri(lraClient.getRecoveryUrl()).path(RECOVERY_COORDINATOR_SUB_RESOURCE_NAME).build();
+        deploymentUri = UriBuilder.fromPath(COORDINATOR_DEPLOYMENT)
+                .scheme(NarayanaLRAClient.getLRACoordinatorProtocol())
+                .host(NarayanaLRAClient.getLRACoordinatorHost())
+                .port(NarayanaLRAClient.getLRACoordinatorPort())
+                .build();
     }
 
     @After
@@ -152,7 +149,7 @@ public abstract class TestBase {
     int recover() throws URISyntaxException {
         Client client = ClientBuilder.newClient();
 
-        try (Response response = client.target(new URI(recoveryUrl))
+        try (Response response = client.target(listRecoveryLRAUri)
                 .request()
                 .get()) {
 
@@ -202,13 +199,5 @@ public abstract class TestBase {
         } catch (NotFoundException ignore) {
             return null;
         }
-    }
-
-    String getCoordinatorUrl() {
-        return coordinatorUrl;
-    }
-
-    String getDeploymentUrl() {
-        return deploymentURL;
     }
 }

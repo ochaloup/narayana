@@ -38,7 +38,6 @@ import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -52,6 +51,7 @@ import org.junit.runner.RunWith;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -69,7 +69,7 @@ import static org.junit.Assert.fail;
 @RunWith(Arquillian.class)
 @RunAsClient
 public class LRACoordinatorRecovery1TestCase extends TestBase {
-    private static Package[] coordinatorPackages = {
+    private static final Package[] coordinatorPackages = {
             RecoveryModule.class.getPackage(),
             Coordinator.class.getPackage(),
             LRAData.class.getPackage(),
@@ -82,14 +82,14 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
             Transaction.class.getPackage()
     };
 
-    private static Package[] participantPackages = {
+    private static final Package[] participantPackages = {
             LRAListener.class.getPackage(),
             LRA.class.getPackage(),
             ServerLRAFilter.class.getPackage(),
             LRAParticipantRegistry.class.getPackage()
     };
 
-    private String lraListenerURL;
+    private URI lraListenerURI;
 
     private Client client;
 
@@ -111,7 +111,7 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
     public void before() throws MalformedURLException, URISyntaxException {
         super.before();
 
-        lraListenerURL = String.format("%s/%s", getDeploymentUrl(), LRAListener.LRA_LISTENER_PATH);
+        lraListenerURI = UriBuilder.fromUri(deploymentUri).path(LRAListener.LRA_LISTENER_PATH).build();
         client = ClientBuilder.newClient();
     }
 
@@ -134,7 +134,7 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
         String lraId;
 
         // start an LRA with a short time limit by invoking a resource annotated with @LRA
-        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_ACTION)
+        try (Response response = client.target(lraListenerURI).path(LRA_LISTENER_ACTION)
                 .request()
                 .put(null)) {
 
@@ -147,7 +147,7 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
             // we could have started the LRA via lraClient (which we do in the next test) but it is useful to test the filters
             lraId = getFirstLRA();
             assertNotNull("LRA should have been added to the object store before byteman killed the JVM", lraId);
-            lraId = String.format("%s/%s", getCoordinatorUrl(), lraId);
+            lraId = String.format("%s/%s", lraClient.getUrl(), lraId);
         }
 
         // the byteman script should have killed the JVM
@@ -187,7 +187,7 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
      * @return the listeners view of the LRA status
      */
     private String getStatusFromListener() {
-        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_STATUS)
+        try (Response response = client.target(lraListenerURI).path(LRA_LISTENER_STATUS)
                 .request()
                 .get()) {
 
