@@ -32,6 +32,8 @@ import static io.narayana.lra.LRAConstants.PARENT_LRA_PARAM_NAME;
 import static io.narayana.lra.LRAConstants.STATUS;
 import static io.narayana.lra.LRAConstants.TIMELIMIT_PARAM_NAME;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.GONE;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.PRECONDITION_FAILED;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
@@ -529,7 +531,7 @@ public class NarayanaLRAClient implements Closeable {
                 .header("Accept", MediaType.APPLICATION_JSON)
                 .get();
 
-        if (status.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (status.getStatus() == NOT_FOUND.getStatusCode()) {
             return false;
         } else {
             String info = status.getResponseString();
@@ -581,10 +583,11 @@ public class NarayanaLRAClient implements Closeable {
             return null;
         }
 
-        if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+        if (response.getStatus() == NOT_FOUND.getStatusCode()) {
             String responseContent = response.readEntity();
-            throw new NotFoundException("Failed to get status of LRA id " + lraId
-                    + (responseContent != null ? ": " + responseContent : ""));
+            String errorMsg = "Failed to get status of LRA id " + lraId
+                    + (responseContent != null ? ": " + responseContent : "");
+            throw new NotFoundException(errorMsg, Response.status(NOT_FOUND).entity(errorMsg).build());
         }
 
         if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
@@ -706,11 +709,14 @@ public class NarayanaLRAClient implements Closeable {
 
         if (response.getStatus() == Response.Status.PRECONDITION_FAILED.getStatusCode()) {
                 LRALogger.i18NLogger.error_tooLateToJoin(lraId, response.toString());
-            throw new WebApplicationException(lraId + ": Too late to join with this LRA ", PRECONDITION_FAILED);
-        } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-            LRALogger.logger.infof("Failed enlisting to LRA '%s', coordinator '%s' responded with status '%s'",
-                    lraId, base, Response.Status.NOT_FOUND.getStatusCode());
-            throw new WebApplicationException(uri.toASCIIString(), Response.Status.GONE);
+                String errorMsg = lraId + ": Too late to join with this LRA ";
+            throw new WebApplicationException(errorMsg,
+                    Response.status(PRECONDITION_FAILED).entity(errorMsg).build());
+        } else if (response.getStatus() == NOT_FOUND.getStatusCode()) {
+            LRALogger.logger.infof("Failed enlisting to LRA '%s', coordinator '%s' responded with status '%d (%s)'. Returning '%d (%s)'.",
+                    lraId, base, NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(), GONE.getStatusCode(), GONE.getReasonPhrase());
+            throw new WebApplicationException(uri.toASCIIString(),
+                    Response.status(GONE).entity(uri.toASCIIString()).build());
         } else if (response.getStatus() != Response.Status.OK.getStatusCode()) {
             LRALogger.i18NLogger.error_failedToEnlist(lraId, base, response.getStatus());
 
@@ -739,16 +745,18 @@ public class NarayanaLRAClient implements Closeable {
         try {
             response = getTarget().path(confirmUrl).request().put();
 
-            if (isUnexpectedResponseStatus(response, Response.Status.OK, Response.Status.ACCEPTED, Response.Status.NOT_FOUND)) {
+            if (isUnexpectedResponseStatus(response, Response.Status.OK, Response.Status.ACCEPTED, NOT_FOUND)) {
                 LRALogger.i18NLogger.error_lraTerminationUnexpectedStatus(response.getStatus(), response.toString());
                 throwGenericLRAException(lra, INTERNAL_SERVER_ERROR.getStatusCode(),
                         "LRA finished with an unexpected status code: " + response.getStatus());
             }
 
-            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
-                LRALogger.logger.infof("Could not %s LRA '%s': coordinator '%s' responded with status '%s'",
-                        confirm ? "close" : "compensate", lra, base, Response.Status.NOT_FOUND.getReasonPhrase());
-                throw new NotFoundException(lra.toASCIIString());
+            if (response.getStatus() == NOT_FOUND.getStatusCode()) {
+                String errorMsg = String.format("Could not %s LRA '%s': coordinator '%s' responded with status '%s'",
+                        confirm ? "close" : "compensate", lra, base, NOT_FOUND.getReasonPhrase());
+                LRALogger.logger.info(errorMsg);
+                throw new NotFoundException(errorMsg,
+                        Response.status(NOT_FOUND).entity(lra.toASCIIString()).build());
             }
         } finally {
             Current.pop(lra);
@@ -816,7 +824,8 @@ public class NarayanaLRAClient implements Closeable {
     }
 
     private void throwGenericLRAException(URI lraId, int statusCode, String message) throws WebApplicationException {
-        throw new WebApplicationException(Response.status(statusCode)
-                .entity(String.format("%s: %s", lraId, message)).build());
+        String errorMsg = String.format("%s: %s", lraId, message);
+        throw new WebApplicationException(errorMsg, Response.status(statusCode)
+                .entity(errorMsg).build());
     }
 }
