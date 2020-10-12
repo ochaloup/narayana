@@ -23,6 +23,7 @@
 package io.narayana.lra.arquillian.spi;
 
 import io.narayana.lra.LRAConstants;
+import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService;
 import org.jboss.logging.Logger;
 
@@ -31,6 +32,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public class NarayanaLRARecovery implements LRARecoveryService {
     private static final Logger log = Logger.getLogger(NarayanaLRARecovery.class);
@@ -55,7 +57,25 @@ public class NarayanaLRARecovery implements LRARecoveryService {
 
     @Override
     public void waitForCallbacks(URI lraId) {
-        // no action needed
+//        try {
+//            HttpClientBuilder.create().
+//            new org.apache.http.client.HttpClient().
+//            HttpClient.New(lraId.toURL());
+//        } catch (Exception ee) {
+//            throw new IllegalStateException(ee); // TODO: add info
+//        }
+//        Request.Get("http://somehost/")
+//                .connectTimeout(1000)
+//                .socketTimeout(1000)
+//                .execute().returnContent().asString();
+
+        URI coordinatorUri = null;
+        try {
+            coordinatorUri = new URIBuilder(String.format("%s://%s", lraId.getScheme(), lraId.getAuthority())).build();
+        } catch (URISyntaxException use) {
+            throw new IllegalStateException("Cannot construct the coordinator URI from lra id " + lraId, use);
+        }
+        log.infof("Boooooooooo: %s, raw path: %s", coordinatorUri, lraId.getRawPath());
     }
 
     @Override
