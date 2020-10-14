@@ -22,20 +22,32 @@
 
 package io.narayana.lra.arquillian.spi;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import io.narayana.lra.LRAConstants;
-import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService;
 import org.jboss.logging.Logger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class NarayanaLRARecovery implements LRARecoveryService {
     private static final Logger log = Logger.getLogger(NarayanaLRARecovery.class);
+    private static final ThreadLocalRandom randomGenerator = ThreadLocalRandom.current();
 
     /**
      * A bit of hacking to change the internals of annotations defined in LRA TCK.
@@ -57,25 +69,103 @@ public class NarayanaLRARecovery implements LRARecoveryService {
 
     @Override
     public void waitForCallbacks(URI lraId) {
-//        try {
-//            HttpClientBuilder.create().
-//            new org.apache.http.client.HttpClient().
-//            HttpClient.New(lraId.toURL());
-//        } catch (Exception ee) {
-//            throw new IllegalStateException(ee); // TODO: add info
-//        }
-//        Request.Get("http://somehost/")
-//                .connectTimeout(1000)
-//                .socketTimeout(1000)
-//                .execute().returnContent().asString();
+        log.infof("waitForCallback called with lraId: %s", lraId);
 
-        URI coordinatorUri = null;
+        HttpServer server = null;
+        ThreadPoolExecutor threadPoolExecutor = null;
+        String httpCallbackSuffix = Integer.toString(randomGenerator.nextInt(Integer.MAX_VALUE));
+        String callbackServerHost = "localhost"; // TODO: parametrize me
+        int callbackServerPort = 8181; // TODO: parametrize me
+        int timeout_s = (int) TimeAdjuster.adjust(10); // TODO: make the constant from me
+        MyHttpHandler httpHandler = new MyHttpHandler(httpCallbackSuffix);
+
         try {
-            coordinatorUri = new URIBuilder(String.format("%s://%s", lraId.getScheme(), lraId.getAuthority())).build();
-        } catch (URISyntaxException use) {
-            throw new IllegalStateException("Cannot construct the coordinator URI from lra id " + lraId, use);
+            threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+            server = HttpServer.create(new InetSocketAddress(callbackServerHost, callbackServerPort), 0);
+            server.createContext("/", httpHandler);
+            server.setExecutor(threadPoolExecutor);
+            server.start();
+            log.infof(" Server started on port %d", callbackServerPort);
+
+            Client client = ClientBuilder.newClient();
+            String coordinatorHost = lraId.getHost();
+            int coordinatorPort = lraId.getPort();
+            String coordinatorEnlistUrl = String.format("http://%s:%d/%s/%s",
+                    coordinatorHost, coordinatorPort, LRAConstants.COORDINATOR_PATH_NAME,
+                    URLEncoder.encode(lraId.toASCIIString(), StandardCharsets.UTF_8.name()));
+            String linkTargetBase = "http://" + callbackServerHost + ":" + String.valueOf(callbackServerPort); // TODO: what about IPv6?
+            String link = String.format("<%s/compensate-%s>;rel=\"compensate\", <%s/after-%s>;rel=\"after\"",
+                    linkTargetBase, httpCallbackSuffix, linkTargetBase, httpCallbackSuffix);
+            Response response = client.target(coordinatorEnlistUrl)
+                    .request()
+                    .header("Link", link)
+                    .put(Entity.text(""));
+            if (Response.Status.fromStatusCode(response.getStatus()).getFamily().equals(Response.Status.Family.CLIENT_ERROR)) {
+                // We are fine here to return! Considering the LRA has been already finished.
+                // We can't enlist, the LRA does not exist anymore or(!) yet. Either way we can't enlist the callback and wait for it. Ok.
+            } else if (Response.Status.fromStatusCode(response.getStatus()).getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+                // waiting for callback
+                log.infof("Successfully enlisted the 'waitForCallback' with compensator content %s", link);
+                long startTime = System.currentTimeMillis();
+                while(!httpHandler.isAfterLRACalled()) {
+                    if(startTime + TimeUnit.SECONDS.toMillis((long) timeout_s) < System.currentTimeMillis()) {
+                        throw new RuntimeException("Callback with 'waitForCallback' was not received until timeout of "
+                                + timeout_s + " seconds elapsed.");
+                    }
+                    Thread.yield();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot create HTTPServer to serve callbacks", e);
+        } finally {
+            if (server != null) {
+                server.stop(timeout_s);
+            }
+            if (threadPoolExecutor != null) {
+                threadPoolExecutor.shutdown();
+                try {
+                    if (!threadPoolExecutor.awaitTermination(timeout_s, TimeUnit.SECONDS)) {
+                        threadPoolExecutor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    threadPoolExecutor.shutdownNow();
+                }
+            }
         }
-        log.infof("Boooooooooo: %s, raw path: %s", coordinatorUri, lraId.getRawPath());
+    }
+
+    private static class MyHttpHandler implements HttpHandler {
+        private volatile boolean afterLRACalled = false;
+        private final String completeCompensatePath;
+
+        public MyHttpHandler(String completeCompensatePath) {
+            this.completeCompensatePath = completeCompensatePath;
+        }
+
+        @Override
+        public void handle(HttpExchange httpExchange) throws IOException {
+            String requestParamValue = null;
+            log.infof(">>>>>> handle called with httpExchange: %s", httpExchange);
+            if ("PUT".equals(httpExchange.getRequestMethod())) {
+                log.info(">>>> PUT request received at: " + httpExchange.getRequestURI().toASCIIString());
+                if(httpExchange.getRequestURI().toASCIIString().endsWith(completeCompensatePath)) {
+                    afterLRACalled = true;
+                }
+            }
+            // return OK (200) to caller
+            handleResponse(httpExchange);
+        }
+
+        private void handleResponse(HttpExchange httpExchange) throws IOException {
+            OutputStream outputStream = httpExchange.getResponseBody();
+            httpExchange.sendResponseHeaders(200, 0);
+            outputStream.flush();
+            outputStream.close();
+        }
+
+        public boolean isAfterLRACalled() {
+            return afterLRACalled;
+        }
     }
 
     @Override

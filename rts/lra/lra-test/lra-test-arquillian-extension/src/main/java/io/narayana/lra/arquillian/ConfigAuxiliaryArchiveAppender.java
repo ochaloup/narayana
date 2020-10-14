@@ -22,7 +22,7 @@
 
 package io.narayana.lra.arquillian;
 
-import io.narayana.lra.arquillian.rest.RestEndpoint;
+import com.sun.net.httpserver.HttpHandler;
 import io.narayana.lra.arquillian.spi.NarayanaLRARecovery;
 import io.narayana.lra.client.internal.proxy.nonjaxrs.LRACDIExtension;
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
@@ -60,11 +60,10 @@ public class ConfigAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender 
                .addAsResource(new StringAsset(filtersAsset), "META-INF/services/javax.ws.rs.ext.Providers")
                .addAsResource(new StringAsset("org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder"),
                     "META-INF/services/javax.ws.rs.client.ClientBuilder");
+        archive.addPackages(true, HttpHandler.class.getPackage());
 
         // adding TCK required SPI implementations
         archive.addPackage(NarayanaLRARecovery.class.getPackage());
-        // adding TCK helper rest class
-        archive.addPackage(RestEndpoint.class.getPackage());
         archive.addAsResource(new StringAsset("io.narayana.lra.arquillian.spi.NarayanaLRARecovery"),
             "META-INF/services/org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService");
 

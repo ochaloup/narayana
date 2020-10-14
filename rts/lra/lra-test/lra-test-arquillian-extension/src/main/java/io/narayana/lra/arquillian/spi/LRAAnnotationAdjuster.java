@@ -163,7 +163,6 @@ public class LRAAnnotationAdjuster {
     }
 
     private static class LRAWrapped implements LRA {
-        private static final String TIMEOUT_FACTOR_PROPERTY = "lra.tck.timeout.factor";
         private final LRA wrapped;
 
         LRAWrapped(LRA lraInstance) {
@@ -221,15 +220,7 @@ public class LRAAnnotationAdjuster {
         }
 
         private long getTimeout(long originalTimeout) {
-            if (originalTimeout <= 0) {
-                return 0;
-            }
-            String timeoutFactorString = System.getProperty(TIMEOUT_FACTOR_PROPERTY, "1.0");
-            double timeoutFactor = Double.parseDouble(timeoutFactorString);
-            if (timeoutFactor <= 0) {
-                return originalTimeout;
-            }
-            return (long) Math.ceil(originalTimeout * timeoutFactor);
+            return TimeAdjuster.adjust(originalTimeout);
         }
     }
 }
