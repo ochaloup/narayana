@@ -22,7 +22,6 @@
 
 package io.narayana.lra.arquillian.spi;
 
-import io.narayana.lra.LRAConstants;
 import org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService;
 import org.jboss.logging.Logger;
 
