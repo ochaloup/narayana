@@ -32,6 +32,9 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
+import static io.narayana.lra.LRAConstants.RECOVERY_COORDINATOR_PATH_NAME;
+import static io.narayana.lra.LRAConstants.COORDINATOR_PATH_NAME;
+
 public class NarayanaLRARecovery implements LRARecoveryService {
     private static final Logger log = Logger.getLogger(NarayanaLRARecovery.class);
 
@@ -84,8 +87,8 @@ public class NarayanaLRARecovery implements LRARecoveryService {
         Client recoveryCoordinatorClient = ClientBuilder.newClient();
 
         try {
-            String recoveryCoordinatorUrl = String.format("http://%s:%d/%s/recovery",
-                host, port, LRAConstants.RECOVERY_COORDINATOR_PATH_NAME);
+            String recoveryCoordinatorUrl = String.format("http://%s:%d/%s/%s/recovery",
+                host, port, COORDINATOR_PATH_NAME, RECOVERY_COORDINATOR_PATH_NAME);
             WebTarget recoveryTarget = recoveryCoordinatorClient.target(URI.create(recoveryCoordinatorUrl));
 
             // send the request to the recovery coordinator
@@ -102,6 +105,27 @@ public class NarayanaLRARecovery implements LRARecoveryService {
         } finally {
             recoveryCoordinatorClient.close();
         }
+    }
 
+    /**
+     * <p>
+     * This method extracts the coordinator URI from the provided LRA id.
+     * The Narayana LRA id consist of URI of the LRA coordinator followed with the LRA id.
+     * </p>
+     * <p>
+     * The Narayana LRA works with HTTP requests and URL is used for identification. An example of the standard pattern of the provided URI is:
+     * {@code http://localhost:8080/deployment/lra-coordinator/0_ffff0a28054b_9133_5f855916_a7}.
+     * This told us that the LRA can be accessed at the provided address by HTTP call.
+     * The LRA coordinator base API address is available at {@code http://localhost:8080/deployment/lra-coordinator}
+     * and the {@code 0_ffff0a28054b_9133_5f855916_a7} is the LRA transaction identifier used inside of the Coordinator
+     * to differentiate the LRA instances.
+     * </p>
+     *
+     * @param lraId  LRA URI for LRA Coordinator base API address being extracted from
+     * @return LRA Coordinator base address
+     */
+    URI extractLRACoordinatorUri(URI lraId) {
+        // we know the LRA coordinator API is hardcoded at address of LRAConstants.COORDINATOR_PATH_NAME
+        return null;
     }
 }
