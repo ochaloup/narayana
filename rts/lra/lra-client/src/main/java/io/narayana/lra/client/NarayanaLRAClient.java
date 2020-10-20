@@ -101,35 +101,10 @@ import static io.narayana.lra.LRAConstants.RECOVERY_COORDINATOR_PATH_NAME;
 @RequestScoped
 public class NarayanaLRAClient implements Closeable {
     /**
-     * Key for looking up the config property that specifies URL protocol ('http', 'https')
-     * for connection to coordinator.
-     * There is used term 'scheme' for 'protocol' in {@link URI#getScheme()}.
+     * Key for looking up the config property that specifies which is the URL
+     * to connect to the Narayana LRA coordinator
      */
-    private static final String LRA_COORDINATOR_PROTOCOL_KEY = "lra.http.protocol";
-
-    /**
-     * Key for looking up the config property that specifies which host a
-     * coordinator is running on
-     */
-    private static final String LRA_COORDINATOR_HOST_KEY = "lra.http.host";
-
-    /**
-     * Key for looking up the config property that specifies which port a
-     * coordinator is running on
-     */
-    private static final String LRA_COORDINATOR_PORT_KEY = "lra.http.port";
-
-    /**
-     * Key for looking up the config property that specifies which JAX-RS path a
-     * coordinator is running on
-     */
-    private static final String LRA_COORDINATOR_PATH_KEY = "lra.coordinator.path";
-
-    /**
-     * Key for looking up the config property that specifies which JAX-RS path
-     * a recovery coordinator is running on
-     */
-    private static final String LRA_RECOVERY_COORDINATOR_PATH_KEY = "lra.recovery.coordinator.path";
+    public static final String LRA_COORDINATOR_URL_KEY = "lra.coordinator.url";
 
     // LRA Coordinator API
     private static final String START_PATH = "/start";
@@ -145,19 +120,29 @@ public class NarayanaLRAClient implements Closeable {
     private URI recoveryCoordinatorsUri;
 
     /**
+     * <p>
      * Creating LRA client. The LRA client expects the LRA coordinator runs at place defined
-     * by system properties {@value NarayanaLRAClient#LRA_COORDINATOR_PROTOCOL_KEY},
-     * {@value NarayanaLRAClient#LRA_COORDINATOR_HOST_KEY}, {@value NarayanaLRAClient#LRA_COORDINATOR_PORT_KEY},
-     * {@value NarayanaLRAClient#LRA_COORDINATOR_PATH_KEY}.
-     * And the recovery coordinator as {@value NarayanaLRAClient#LRA_RECOVERY_COORDINATOR_PATH_KEY}.
-     * <br>
-     * Default value to connect is <code>http://localhost:8080/{@value LRAConstants#COORDINATOR_PATH_NAME}</code>
+     * by system property {@value NarayanaLRAClient#LRA_COORDINATOR_URL_KEY}.
+     * The recovery coordinator will be searched at the sub-path {@link LRAConstants#RECOVERY_COORDINATOR_PATH_NAME}.
+     * </p>
+     * <p>
+     * When providing the system property {@value NarayanaLRAClient#LRA_COORDINATOR_URL_KEY} consider that
+     * the Narayana LRA Coordinator is bound to be on sub-path {@link LRAConstants#COORDINATOR_PATH_NAME}.
+     * </p>
+     * <p>
+     * If the property is not defined then the default path to look for the coordinator is at
+     * <code>http://localhost:8080/{@value LRAConstants#COORDINATOR_PATH_NAME}</code>
+     * </p>
      */
     public NarayanaLRAClient() {
         this(getLRACoordinatorProtocol(),
              getLRACoordinatorHost(),
              getLRACoordinatorPort(),
              getLRACoordinatorPathName());
+    }
+
+    public static String getLRACoordinatorHost() {
+        return System.getProperty(LRA_COORDINATOR_HOST_KEY, "localhost");
     }
 
     /**
@@ -235,30 +220,25 @@ public class NarayanaLRAClient implements Closeable {
     /**
      * Creating LRA client where expecting LRA coordinator being available
      * at the provided uri.
+     * The LRA recovery coordinator will be searched at the sub-path {@value LRAConstants#RECOVERY_COORDINATOR_PATH_NAME}.
      *
      * @param coordinatorUri  uri of the LRA coordinator
-     * @param recoveryCoordinatorsUri uri of the LRA recovery coordinator
+     */
+    public NarayanaLRAClient(URI coordinatorUri) {
+        this(coordinatorUri,
+                UriBuilder.fromUri(coordinatorUri).path(RECOVERY_COORDINATOR_PATH_NAME).build());
+    }
+
+    /**
+     * Creating LRA client where expecting LRA coordinator being available
+     * at the provided uri.
+     *
+     * @param coordinatorUri  uri of the LRA coordinator
+     * @param recoveryCoordinatorsUri uri of the LRA recovery coordinator manually defined
      */
     public NarayanaLRAClient(URI coordinatorUri, URI recoveryCoordinatorsUri) {
         this.coordinatorUri = coordinatorUri;
         this.recoveryCoordinatorsUri = recoveryCoordinatorsUri;
-    }
-
-    // TODO: javadoc here!
-    public static String getLRACoordinatorProtocol() {
-        return System.getProperty(LRA_COORDINATOR_PROTOCOL_KEY, "http");
-    }
-    public static String getLRACoordinatorHost() {
-        return System.getProperty(LRA_COORDINATOR_HOST_KEY, "localhost");
-    }
-    public static int getLRACoordinatorPort() {
-        return Integer.getInteger(LRA_COORDINATOR_PORT_KEY, 8080);
-    }
-    public static String getLRACoordinatorPathName() {
-        return System.getProperty(LRA_COORDINATOR_PATH_KEY, COORDINATOR_PATH_NAME);
-    }
-    public static String getLRARecoveryCoordinatorPathName() {
-        return System.getProperty(COORDINATOR_PATH_NAME, RECOVERY_COORDINATOR_PATH_NAME);
     }
 
     /**
