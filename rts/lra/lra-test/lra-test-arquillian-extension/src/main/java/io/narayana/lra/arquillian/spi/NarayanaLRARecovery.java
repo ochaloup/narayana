@@ -22,7 +22,6 @@
 
 package io.narayana.lra.arquillian.spi;
 
-import io.narayana.lra.LRAConstants;
 import org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService;
 import org.jboss.logging.Logger;
 
@@ -30,12 +29,16 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.net.URISyntaxException;
+
+import static io.narayana.lra.LRAConstants.*;
 
 public class NarayanaLRARecovery implements LRARecoveryService {
     private static final Logger log = Logger.getLogger(NarayanaLRARecovery.class);
 
-    /**
+    /*
      * A bit of hacking to change the internals of annotations defined in LRA TCK.
      * There is need to adjust timeout defined on the annotation definition.
      */
@@ -60,48 +63,85 @@ public class NarayanaLRARecovery implements LRARecoveryService {
 
     @Override
     public boolean waitForEndPhaseReplay(URI lraId) {
-        String host = lraId.getHost();
-        int port = lraId.getPort();
-        if (!recoverLRAs(host, port, lraId)) {
+        if (!recoverLRAs(lraId)) {
             // first recovery scan probably collided with periodic recovery which started
             // before the test execution so try once more
-            return recoverLRAs(host, port, lraId);
+            return recoverLRAs(lraId);
         }
-
         return true;
     }
 
     /**
-     * Invokes LRA coordinator recovery REST endpoint and returns whether the recovery of intended LRAs happended
+     * Invokes LRA coordinator recovery REST endpoint and returns whether the recovery of intended LRAs happened
      *
-     * @param host  the LRA coordinator host address
-     * @param port  the LRA coordinator port
      * @param lraId the LRA id of the LRA that is intended to be recovered
      * @return true the intended LRA recovered, false otherwise
      */
-    private boolean recoverLRAs(String host, int port, URI lraId) {
+    private boolean recoverLRAs(URI lraId) {
         // trigger a recovery scan
         Client recoveryCoordinatorClient = ClientBuilder.newClient();
 
         try {
-            String recoveryCoordinatorUrl = String.format("http://%s:%d/%s/recovery",
-                host, port, LRAConstants.RECOVERY_COORDINATOR_PATH_NAME);
-            WebTarget recoveryTarget = recoveryCoordinatorClient.target(URI.create(recoveryCoordinatorUrl));
+            URI lraCoordinatorUri = extractLRACoordinatorUri(lraId);
+            URI recoveryCoordinatorUri = UriBuilder.fromUri(lraCoordinatorUri)
+                    .path(RECOVERY_COORDINATOR_PATH_NAME).path(RECOVERY_COORDINATOR_SUB_RESOURCE_NAME).build();
+            WebTarget recoveryTarget = recoveryCoordinatorClient.target(recoveryCoordinatorUri);
 
             // send the request to the recovery coordinator
             Response response = recoveryTarget.request().get();
             String json = response.readEntity(String.class);
             response.close();
 
-            if (json.contains(lraId.toASCIIString())) {
-                // intended LRA didn't recover
-                return false;
-            }
-
-            return true;
+            // intended LRA didn't recover
+            return !json.contains(lraId.toASCIIString());
         } finally {
             recoveryCoordinatorClient.close();
         }
+    }
 
+    /**
+     * <p>
+     * This method extracts the coordinator URI from the provided LRA id.
+     * The Narayana LRA id consist of URI of the LRA coordinator followed with the LRA id.
+     * We know the LRA coordinator API is hardcoded with path {@value io.narayana.lra.LRAConstants#COORDINATOR_PATH_NAME}
+     * and the string will be searched in the original LRA id for.
+     * </p>
+     * <p>
+     * The Narayana LRA works with HTTP requests and URL is used for identification. An example of the standard pattern of the provided URI is:
+     * {@code http://localhost:8080/deployment/lra-coordinator/0_ffff0a28054b_9133_5f855916_a7}.
+     * This told us that the LRA can be accessed at the provided address by HTTP call.
+     * The LRA coordinator base API address is available at {@code http://localhost:8080/deployment/lra-coordinator}
+     * and the {@code 0_ffff0a28054b_9133_5f855916_a7} is the LRA transaction identifier used inside of the Coordinator
+     * to differentiate the LRA instances.
+     * </p>
+     *
+     * @param lraId  LRA URI for LRA Coordinator base API address being extracted from
+     * @return LRA Coordinator base address
+     */
+    static URI extractLRACoordinatorUri(URI lraId) {
+        // we know the LRA coordinator API is hardcoded at address of LRAConstants.COORDINATOR_PATH_NAME
+        try {
+            String lraCoordinatorSubPath = lraId.getPath(); // as base taking the whole LRA id path
+            int coordinatorPathIndex = lraCoordinatorSubPath.lastIndexOf(COORDINATOR_PATH_NAME);
+            if (coordinatorPathIndex != lraCoordinatorSubPath.indexOf(COORDINATOR_PATH_NAME)) {
+                log.warnf("Extracting LRA coordinator URI from LRA id '%s' but the string contains multiple " +
+                        "occurrences of the path '%s'. The coordinator path could not be constructed properly.",
+                        lraId, COORDINATOR_PATH_NAME);
+                if (coordinatorPathIndex == -1) {
+                    coordinatorPathIndex = lraCoordinatorSubPath.length();
+                }
+            }
+            if (coordinatorPathIndex == -1) {
+                log.warnf("Extracting LRA coordinator URI from LRA id '%s' but the string contains no " +
+                                "occurrences of the path '%s'. Returning just the LRA id path as it is.",
+                                lraId, COORDINATOR_PATH_NAME);
+            } else {
+                lraCoordinatorSubPath = lraCoordinatorSubPath.substring(0, coordinatorPathIndex) + COORDINATOR_PATH_NAME;
+            }
+            return new URI(lraId.getScheme(), lraId.getUserInfo(), lraId.getHost(), lraId.getPort(), lraCoordinatorSubPath,
+                    null, null); // not using the query and fragment from the original LRA id URI
+        } catch (URISyntaxException use) {
+            throw new IllegalStateException("Cannot build LRA coordinator URI based on the LRA id " + lraId, use);
+        }
     }
 }

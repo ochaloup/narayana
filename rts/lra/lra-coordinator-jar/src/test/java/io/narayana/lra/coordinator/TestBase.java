@@ -84,8 +84,8 @@ public abstract class TestBase {
         String path = System.getProperty(NarayanaLRAClient.LRA_COORDINATOR_PATH_KEY, COORDINATOR_PATH_NAME);
 
         coordinatorUrl = String.format("http://%s:%s/%s", host, port, path);
-        recoveryUrl = String.format("http://%s:%s/%s/%s/%s",
-                host, port, COORDINATOR_DEPLOYMENT, RECOVERY_COORDINATOR_PATH_NAME, RECOVERY_COORDINATOR_SUB_RESOURCE_NAME);
+        recoveryUrl = String.format("%s/%s/%s",
+                coordinatorUrl, RECOVERY_COORDINATOR_PATH_NAME, RECOVERY_COORDINATOR_SUB_RESOURCE_NAME);
         storeDir = Paths.get(String.format("%s/standalone/data/tx-object-store", System.getProperty("env.JBOSS_HOME", "null")));
         jvmArgs = System.getProperty("server.jvm.args");
 
@@ -155,7 +155,7 @@ public abstract class TestBase {
                 .request()
                 .get()) {
 
-            Assert.assertEquals("Unexpected status from reovery call:", 200, response.getStatus());
+            Assert.assertEquals("Unexpected status from recovery call to " + recoveryUrl, 200, response.getStatus());
 
             // the result will be a List<LRAStatusHolder> of recovering LRAs but we just need the count
             String recoveringLRAs = response.readEntity(String.class);
