@@ -31,6 +31,8 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
 import io.narayana.lra.Current;
 import io.narayana.lra.LRAConstants;
 import io.narayana.lra.LRAData;
+import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
 import io.narayana.lra.coordinator.domain.service.LRAService;
 import io.narayana.lra.logging.LRALogger;
 import org.apache.http.HttpHeaders;
@@ -369,10 +371,16 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
                 httpStatus == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
             // the body should contain a valid ParticipantStatus
             try {
+                lraService.emitEvent(new LRAEventInfo.Builder(compensate ? LRAAction.COMPENSATE_ATTEMPT_FAILURE : LRAAction.COMPLETE_ATTEMPT_FAILURE , lraId)
+                        .parentLraId(parentId).participantUri(participantPath).build());
                 return atEnd(reportFailure(compensate, endPath,
                         ParticipantStatus.valueOf(responseData).name()));
             } catch (IllegalArgumentException ignore) {
                 // ignore the body and let recovery discover the status of the participant
+                if (LRALogger.logger.isDebugEnabled()) {
+                    LRALogger.logger.debugf(ignore, "Error on finishing participant %s which failed with status %d with responded data '%s'." +
+                            "Finishing of participant will be retried by recovery.", endPath, httpStatus, responseData);
+                }
             }
         }
 
@@ -443,6 +451,8 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
             Response response = responseFuture.get(PARTICIPANT_TIMEOUT, TimeUnit.SECONDS);
 
             if (response.getStatus() == 200) {
+                lraService.emitEvent(new LRAEventInfo.Builder(target.equals(forgetURI) ? LRAAction.FORGOTTEN : LRAAction.AFTER_CALLBACK_FINISHED,
+                        lraId).parentLraId(parentId).participantUri(participantPath).build());
                 return true;
             }
         } catch (Exception e) {
@@ -459,6 +469,8 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
             }
         }
 
+        lraService.emitEvent(new LRAEventInfo.Builder(target.equals(forgetURI) ? LRAAction.FORGET_ATTEMPT : LRAAction.AFTER_CALLBACK_ATTEMPT,
+                lraId).parentLraId(parentId).participantUri(participantPath).build());
         return false;
     }
 
@@ -499,11 +511,16 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
     }
 
     private void updateStatus(boolean compensate) {
+        LRAAction eventLRAAction;
         if (compensate) {
             status = accepted ? ParticipantStatus.Compensating : ParticipantStatus.Compensated;
+            eventLRAAction = status == ParticipantStatus.Compensated ? LRAAction.COMPENSATED : LRAAction.COMPENSATE_IN_PROGRESS;
         } else {
             status = accepted ? ParticipantStatus.Completing : ParticipantStatus.Completed;
+            eventLRAAction = status == ParticipantStatus.Completed ? LRAAction.COMPLETED : LRAAction.COMPLETE_IN_PROGRESS;
         }
+        lraService.emitEvent(new LRAEventInfo.Builder(eventLRAAction, lraId)
+                .parentLraId(parentId).participantUri(participantPath).build());
     }
 
     private int reportFailure(boolean compensate, URI endPath, String failureReason) {
@@ -511,6 +528,8 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
 
         LRALogger.logger.warnf("LRARecord: participant %s reported a failure to %s (cause %s)",
                 endPath.toASCIIString(), compensate ? COMPENSATE_REL : COMPLETE_REL, failureReason);
+        lraService.emitEvent(new LRAEventInfo.Builder(compensate ? LRAAction.COMPENSATE_ATTEMPT_FAILURE : LRAAction.COMPLETE_ATTEMPT_FAILURE , lraId)
+                .parentLraId(parentId).participantUri(participantPath).build());
 
         // permanently failed so ask recovery to ignore us in the future.
         return TwoPhaseOutcome.FINISH_ERROR;
@@ -955,10 +974,6 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
 
     public String getCompensator() {
         return compensateURI != null ? compensateURI.toASCIIString() : null;
-    }
-
-    void setLRAService(LRAService lraService) {
-        this.lraService = lraService;
     }
 
     public void setLraService(LRAService lraService) {

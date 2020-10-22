@@ -31,15 +31,10 @@
         <lra.coordinator.log.file.module.narayana></lra.coordinator.log.file.module.narayana>
         <lra.coordinator.debug.params></lra.coordinator.debug.params> <!-- has content when -Ddebug.coordinator is specified -->
         <lra.coordinator.debug.port>8787</lra.coordinator.debug.port>
-        <lra.coordinator.jar.path>${project.basedir}/../coordinator-quarkus/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>
+        <lra.coordinator.jar.path>${project.basedir}/event-listener/target/lra-coordinator-with-listener-runner.jar</lra.coordinator.jar.path>
     </properties>
     
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-        </dependency>
         <dependency>
             <groupId>org.jboss.narayana.rts</groupId>
             <artifactId>lra-client</artifactId>
@@ -159,6 +154,7 @@
     </profiles>
 
     <modules>
+        <module>event-listener</module>
         <module>tck</module>
         <module>basic</module>
         <module>arquillian-extension</module>

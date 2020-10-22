@@ -213,7 +213,7 @@ public class Transaction extends AtomicAction {
 
                 if (record instanceof LRARecord) {
                     LRARecord lraRecord = (LRARecord) record;
-                    lraRecord.setLRAService(lraService);
+                    lraRecord.setLraService(lraService);
                     lraRecord.setLRA(this);
                 }
 
@@ -977,7 +977,7 @@ public class Transaction extends AtomicAction {
         }  // else another thread finishing this LRA so it is too late to cancel
     }
 
-    URI getParentId() {
+    public URI getParentId() {
         return parentId;
     }
 

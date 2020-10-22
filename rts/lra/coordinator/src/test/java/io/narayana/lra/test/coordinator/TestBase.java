@@ -19,11 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package io.narayana.lra.coordinator;
+package io.narayana.lra.test.coordinator;
 
+import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import io.narayana.lra.Current;
+import io.narayana.lra.LRAData;
 import io.narayana.lra.client.NarayanaLRAClient;
+import io.narayana.lra.client.internal.proxy.nonjaxrs.LRAParticipantRegistry;
+import io.narayana.lra.coordinator.api.Coordinator;
+import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.coordinator.domain.model.Transaction;
+import io.narayana.lra.coordinator.domain.service.LRAService;
+import io.narayana.lra.coordinator.internal.LRARecoveryModule;
+import io.narayana.lra.filter.ServerLRAFilter;
 import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
+import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 import org.jboss.arquillian.container.test.api.Config;
 import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -58,9 +69,9 @@ public abstract class TestBase {
     @Rule
     public TestName testName = new TestName();
 
-    private static final String COORDINATOR_CONTAINER = "lra-coordinator";
-
-    static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
+    protected static final String MANAGED_COORDINATOR_CONTAINER = "managed-lra-coordinator";
+    protected static final String MANUAL_COORDINATOR_CONTAINER = "manual-lra-coordinator";
+    protected static final String COORDINATOR_DEPLOYMENT = "lra-coordinator";
 
     private static String coordinatorUrl;
     private static String recoveryUrl;
@@ -68,13 +79,32 @@ public abstract class TestBase {
     private static Path storeDir;
     private static String deploymentURL;
 
-    NarayanaLRAClient lraClient;
+    protected NarayanaLRAClient lraClient;
 
     @ArquillianResource
     private ContainerController containerController;
 
     @ArquillianResource
     private Deployer deployer;
+
+    protected static final Package[] coordinatorPackages = {
+            RecoveryModule.class.getPackage(),
+            Coordinator.class.getPackage(),
+            LRAData.class.getPackage(),
+            LRAStatus.class.getPackage(),
+            LRALogger.class.getPackage(),
+            NarayanaLRAClient.class.getPackage(),
+            Current.class.getPackage(),
+            LRAService.class.getPackage(),
+            LRARecoveryModule.class.getPackage(),
+            Transaction.class.getPackage(),
+            LRAAction.class.getPackage()
+    };
+    protected static final Package[] participantPackages = {
+            LRA.class.getPackage(),
+            ServerLRAFilter.class.getPackage(),
+            LRAParticipantRegistry.class.getPackage()
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -104,7 +134,12 @@ public abstract class TestBase {
         lraClient.close();
     }
 
-    void startContainer(String bytemanScript) {
+    protected void startContainer(String bytemanScript) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+            // none
+        }
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
 
@@ -118,14 +153,14 @@ public abstract class TestBase {
 
         config.add("javaVmArguments", javaVmArguments);
 
-        containerController.start(COORDINATOR_CONTAINER, config.map());
+        containerController.start(MANUAL_COORDINATOR_CONTAINER, config.map());
         deployer.deploy(COORDINATOR_DEPLOYMENT);
     }
 
     void restartContainer() {
         try {
             // ensure that the controller is not running
-            containerController.kill(COORDINATOR_CONTAINER);
+            containerController.kill(MANUAL_COORDINATOR_CONTAINER);
             LRALogger.logger.debug("jboss-as kill worked");
         } catch (Exception e) {
             LRALogger.logger.debugf("jboss-as kill: %s", e.getMessage());
@@ -134,17 +169,17 @@ public abstract class TestBase {
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
         config.add("javaVmArguments", javaVmArguments);
-        containerController.start(COORDINATOR_CONTAINER);
+        containerController.start(MANUAL_COORDINATOR_CONTAINER);
     }
 
-    void stopContainer() {
-        if (containerController.isStarted(COORDINATOR_CONTAINER)) {
+    protected void stopContainer() {
+        if (containerController.isStarted(MANUAL_COORDINATOR_CONTAINER)) {
             LRALogger.logger.debug("Stopping container");
 
             deployer.undeploy(COORDINATOR_DEPLOYMENT);
 
-            containerController.stop(COORDINATOR_CONTAINER);
-            containerController.kill(COORDINATOR_CONTAINER);
+            containerController.stop(MANUAL_COORDINATOR_CONTAINER);
+            containerController.kill(MANUAL_COORDINATOR_CONTAINER);
         }
     }
 
@@ -207,7 +242,7 @@ public abstract class TestBase {
         return coordinatorUrl;
     }
 
-    String getDeploymentUrl() {
+    protected String getDeploymentUrl() {
         return deploymentURL;
     }
 }

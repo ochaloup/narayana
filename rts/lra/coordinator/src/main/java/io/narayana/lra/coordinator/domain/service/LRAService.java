@@ -26,6 +26,8 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import io.narayana.lra.LRAConstants;
 import io.narayana.lra.LRAData;
+import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
+import io.narayana.lra.coordinator.domain.event.LRAAction;
 import io.narayana.lra.logging.LRALogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 
@@ -39,6 +41,9 @@ import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Any;
+import javax.inject.Inject;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
@@ -53,9 +58,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static java.util.stream.Collectors.toList;
+import static javax.ws.rs.core.Response.Status.*;
 
 @ApplicationScoped
 public class LRAService {
@@ -67,6 +71,8 @@ public class LRAService {
 
     private Map<String, String> participants = new ConcurrentHashMap<>();
     private LRARecoveryModule lraRecoveryModule;
+
+    @Inject @Any Event<LRAEventInfo> infoEvent;
 
     public Transaction getTransaction(URI lraId) throws NotFoundException {
         if (!lras.containsKey(lraId)) {
@@ -163,9 +169,14 @@ public class LRAService {
         if (transaction.isRecovering()) {
             recoveringLRAs.put(transaction.getId(), transaction);
         } else if (fromHierarchy || transaction.isTopLevel()) {
+            // inform the event listener that the close/cancel of LRA happens
+            if(lras.get(transaction.getId()) != null) {
+                infoEvent.fire(new LRAEventInfo.Builder(
+                        transaction.isCancel() ? LRAAction.CANCELED : LRAAction.CLOSED, transaction.getId())
+                        .parentLraId(transaction.getParentId()).clientId(transaction.getClientId()).build());
+            }
             // the LRA is top level or it's a nested LRA that was closed by a
             // parent LRA (ie when fromHierarchy is true) then it's okay to forget about the LRA
-
             if (!transaction.hasPendingActions()) {
                 // this call is only required to clean up cached LRAs (JBTM-3250 will remove this cache).
                 remove(transaction);
@@ -235,7 +246,7 @@ public class LRAService {
 
         if (lra.currentLRA() != null) {
             if (LRALogger.logger.isInfoEnabled()) {
-                LRALogger.logger.infof("LRAServicve.startLRA LRA %s is already associated%n",
+                LRALogger.logger.infof("LRAService.startLRA LRA %s is already associated%n",
                         lra.currentLRA().get_uid().fileStringForm());
             }
         }
@@ -244,6 +255,8 @@ public class LRAService {
 
         if (status != ActionStatus.RUNNING) {
             lraTrace(lra.getId(), "failed to start LRA");
+            infoEvent.fire(new LRAEventInfo.Builder(
+                    LRAAction.FAILED_TO_START, lra.getId()).parentLraId(parentLRA).clientId(clientId).build());
 
             lra.abort();
 
@@ -255,6 +268,8 @@ public class LRAService {
                 addTransaction(lra);
 
                 lraTrace(lra.getId(), "started LRA");
+                infoEvent.fire(new LRAEventInfo.Builder(
+                        LRAAction.STARTED, lra.getId()).parentLraId(parentLRA).clientId(clientId).build());
 
                 return lra.getId();
             } finally {
@@ -277,7 +292,7 @@ public class LRAService {
 
         if (transaction.currentLRA() != null) {
             if (LRALogger.logger.isInfoEnabled()) {
-                LRALogger.logger.infof("LRAServicve.endLRA LRA %s ended but is still associated with %s%n",
+                LRALogger.logger.infof("LRAService.endLRA LRA %s ended but is still associated with %s%n",
                         lraId, transaction.currentLRA().get_uid().fileStringForm());
             }
         }
@@ -299,7 +314,7 @@ public class LRAService {
         try {
             if (!transaction.forgetParticipant(compensatorUrl)) {
                 if (LRALogger.logger.isInfoEnabled()) {
-                    LRALogger.logger.infof("LRAServicve.forget %s failed%n", lraId);
+                    LRALogger.logger.infof("LRAService.forget %s failed%n", lraId);
                 }
             }
 
@@ -370,6 +385,8 @@ public class LRAService {
 
         recoveryUrl.append(recoveryURI);
 
+        infoEvent.fire(new LRAEventInfo.Builder(LRAAction.ENLISTED,lra)
+                .parentLraId(transaction.getParentId()).participantUri(participant.getParticipantURI()).build());
         return Response.Status.OK.getStatusCode();
     }
 
@@ -462,5 +479,14 @@ public class LRAService {
     private List<LRAData> getDataByStatus(Map<URI, Transaction> lrasToFilter, LRAStatus status) {
         return lrasToFilter.values().stream().filter(t -> t.getLRAStatus() == status)
                 .map(t -> t.getLRAData()).collect(toList());
+    }
+
+    /**
+     * Emitting the {@link LRAEventInfo} to inform about LRA processing happened.
+     *
+     * @param dataInfoEvent  data of the event which will be emitted
+     */
+    public void emitEvent(LRAEventInfo dataInfoEvent) {
+        infoEvent.fire(dataInfoEvent);
     }
 }

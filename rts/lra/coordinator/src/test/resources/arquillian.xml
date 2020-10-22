@@ -24,10 +24,26 @@
         http://jboss.org/schema/arquillian
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
-    <container qualifier="lra-coordinator" default="true" mode="manual">
-        <configuration>
-            <property name="managementAddress">${lra.http.host}</property>
-            <property name="startupTimeoutInSeconds">${server.startup.timeout:60}</property>
-        </configuration>
-    </container>
+    <group qualifier="manual">
+        <container qualifier="manual-lra-coordinator" default="true" mode="manual">
+            <configuration>
+                <property name="managementAddress">${lra.http.host}</property>
+                <property name="startupTimeoutInSeconds">${server.startup.timeout:60}</property>
+            </configuration>
+        </container>
+    </group>
+    <group qualifier="managed">
+        <container qualifier="managed-lra-coordinator" default="true" mode="class">
+            <configuration>
+                <property name="javaVmArguments">${server.jvm.args}</property>
+                <property name="managementAddress">${lra.http.host}</property>
+                <property name="startupTimeoutInSeconds">${server.startup.timeout:60}</property>
+            </configuration>
+        </container>
+    </group>
+    <!--
+    <engine>
+        <property name="deploymentExportPath">/tmp/lra-test</property>
+    </engine>
+    -->
 </arquillian>
