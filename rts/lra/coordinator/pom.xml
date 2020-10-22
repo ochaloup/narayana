@@ -99,6 +99,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.narayana.arjunacore</groupId>
+            <artifactId>arjunacore</artifactId>
+            <version>5.10.7.Final-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
