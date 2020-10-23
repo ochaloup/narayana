@@ -31,8 +31,8 @@ import com.arjuna.ats.arjuna.state.OutputObjectState;
 import io.narayana.lra.Current;
 import io.narayana.lra.LRAConstants;
 import io.narayana.lra.LRAData;
-import io.narayana.lra.coordinator.domain.event.Action;
-import io.narayana.lra.coordinator.domain.event.LRAInfoEvent;
+import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
 import io.narayana.lra.coordinator.domain.service.LRAService;
 import io.narayana.lra.logging.LRALogger;
 import org.apache.http.HttpHeaders;
@@ -371,7 +371,7 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
                 httpStatus == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
             // the body should contain a valid ParticipantStatus
             try {
-                lraService.emitEvent(new LRAInfoEvent.Builder(compensate ? Action.COMPENSATE_ATTEMPT_FAILURE : Action.COMPLETE_ATTEMPT_FAILURE , lraId)
+                lraService.emitEvent(new LRAEventInfo.Builder(compensate ? LRAAction.COMPENSATE_ATTEMPT_FAILURE : LRAAction.COMPLETE_ATTEMPT_FAILURE , lraId)
                         .parentLraId(parentId).participantUri(participantPath).build());
                 return atEnd(reportFailure(compensate, endPath,
                         ParticipantStatus.valueOf(responseData).name()));
@@ -451,7 +451,7 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
             Response response = responseFuture.get(PARTICIPANT_TIMEOUT, TimeUnit.SECONDS);
 
             if (response.getStatus() == 200) {
-                lraService.emitEvent(new LRAInfoEvent.Builder(target.equals(forgetURI) ? Action.FORGOTTEN : Action.AFTER_CALLBACK_FINISHED,
+                lraService.emitEvent(new LRAEventInfo.Builder(target.equals(forgetURI) ? LRAAction.FORGOTTEN : LRAAction.AFTER_CALLBACK_FINISHED,
                         lraId).parentLraId(parentId).participantUri(participantPath).build());
                 return true;
             }
@@ -469,7 +469,7 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
             }
         }
 
-        lraService.emitEvent(new LRAInfoEvent.Builder(target.equals(forgetURI) ? Action.FORGET_ATTEMPT : Action.AFTER_CALLBACK_ATTEMPT,
+        lraService.emitEvent(new LRAEventInfo.Builder(target.equals(forgetURI) ? LRAAction.FORGET_ATTEMPT : LRAAction.AFTER_CALLBACK_ATTEMPT,
                 lraId).parentLraId(parentId).participantUri(participantPath).build());
         return false;
     }
@@ -511,15 +511,15 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
     }
 
     private void updateStatus(boolean compensate) {
-        Action eventAction;
+        LRAAction eventLRAAction;
         if (compensate) {
             status = accepted ? ParticipantStatus.Compensating : ParticipantStatus.Compensated;
-            eventAction = status == ParticipantStatus.Compensated ? Action.COMPENSATED : Action.COMPENSATE_ATTEMPT;
+            eventLRAAction = status == ParticipantStatus.Compensated ? LRAAction.COMPENSATED : LRAAction.COMPENSATE_ATTEMPT;
         } else {
             status = accepted ? ParticipantStatus.Completing : ParticipantStatus.Completed;
-            eventAction = status == ParticipantStatus.Completed ? Action.COMPLETED : Action.COMPLETE_ATTEMPT;
+            eventLRAAction = status == ParticipantStatus.Completed ? LRAAction.COMPLETED : LRAAction.COMPLETE_ATTEMPT;
         }
-        lraService.emitEvent(new LRAInfoEvent.Builder(eventAction, lraId)
+        lraService.emitEvent(new LRAEventInfo.Builder(eventLRAAction, lraId)
                 .parentLraId(parentId).participantUri(participantPath).build());
     }
 
@@ -528,7 +528,7 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
 
         LRALogger.logger.warnf("LRARecord: participant %s reported a failure to %s (cause %s)",
                 endPath.toASCIIString(), compensate ? COMPENSATE_REL : COMPLETE_REL, failureReason);
-        lraService.emitEvent(new LRAInfoEvent.Builder(compensate ? Action.COMPENSATE_ATTEMPT_FAILURE : Action.COMPLETE_ATTEMPT_FAILURE , lraId)
+        lraService.emitEvent(new LRAEventInfo.Builder(compensate ? LRAAction.COMPENSATE_ATTEMPT_FAILURE : LRAAction.COMPLETE_ATTEMPT_FAILURE , lraId)
                 .parentLraId(parentId).participantUri(participantPath).build());
 
         // permanently failed so ask recovery to ignore us in the future.

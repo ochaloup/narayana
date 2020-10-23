@@ -28,21 +28,21 @@ import java.util.Optional;
 /**
  * An object to be used as CDI event informing about LRA processing.
  */
-public class LRAInfoEvent {
-    private final Action state;
+public class LRAEventInfo {
+    private final LRAAction lraAction;
     private final URI lraId, parentLraId;
     private final String participantUri, clientId;
 
-    private LRAInfoEvent(Builder builder) {
-        this.state = builder.state;
+    private LRAEventInfo(Builder builder) {
+        this.lraAction = builder.lraAction;
         this.lraId = builder.lraId;
         this.participantUri = builder.participantUri;
         this.parentLraId = builder.parentLraId;
         this.clientId = builder.clientId;
     }
 
-    public Action getState() {
-        return state;
+    public LRAAction getLraAction() {
+        return lraAction;
     }
 
     public URI getLraId() {
@@ -64,7 +64,7 @@ public class LRAInfoEvent {
     @Override
     public String toString() {
         return "LRAInfoEvent{" +
-                "state=" + state +
+                "lraAction=" + lraAction +
                 ", lraId=" + lraId +
                 (parentLraId != null ? ", parentLraId=" + parentLraId : "" ) +
                 (participantUri != null ? ", participantUri='" + participantUri + '\'' : "" ) +
@@ -73,14 +73,14 @@ public class LRAInfoEvent {
     }
 
     public static class Builder {
-        private final Action state;
+        private final LRAAction lraAction;
         private final URI lraId;
         private URI parentLraId;
         private String participantUri;
         private String clientId;
 
-        public Builder(final Action state, final URI lraId) {
-            this.state = state;
+        public Builder(final LRAAction lraAction, final URI lraId) {
+            this.lraAction = lraAction;
             this.lraId = lraId;
         }
         public Builder participantUri(final String participantUri) {
@@ -95,8 +95,8 @@ public class LRAInfoEvent {
             this.clientId = clientId;
             return this;
         }
-        public LRAInfoEvent build() {
-            return new LRAInfoEvent(this);
+        public LRAEventInfo build() {
+            return new LRAEventInfo(this);
         }
     }
 }

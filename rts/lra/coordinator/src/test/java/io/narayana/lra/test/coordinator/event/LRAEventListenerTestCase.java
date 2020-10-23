@@ -20,13 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.coordinator.domain.event;
+package io.narayana.lra.test.coordinator.event;
 
-import io.narayana.lra.coordinator.TestBase;
+import io.narayana.lra.test.coordinator.TestBase;
 import org.apache.http.HttpConnection;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -46,6 +47,8 @@ import java.net.URISyntaxException;
 @RunWith(Arquillian.class)
 @RunAsClient
 public class LRAEventListenerTestCase extends TestBase {
+    private static final Logger log = Logger.getLogger(LRAEventListenerTestCase.class);
+
     private Client client;
 
     @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT, testable = false, managed = false)
@@ -56,8 +59,8 @@ public class LRAEventListenerTestCase extends TestBase {
         return ShrinkWrap.create(WebArchive.class, COORDINATOR_DEPLOYMENT + ".war")
                 .addPackages(false, coordinatorPackages)
                 .addPackages(false, participantPackages)
-                .addPackage(EventLogListener.class.getPackage())
                 .addPackages(true, HttpConnection.class.getPackage())
+                .addClasses(EventLogListener.class)
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
@@ -82,9 +85,12 @@ public class LRAEventListenerTestCase extends TestBase {
     public void startAndClose() throws URISyntaxException {
         startContainer(null);
 
-        String participantURL = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
-        try (Response ignore = client.target(participantURL).request().get()) {
+        String participantUrl = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
+        String eventsUrl = String.format("%s/%s", getDeploymentUrl(), EventLogListener.EVENTS_PATH);
+
+        try (Response ignore = client.target(participantUrl).request().get()) {
             Assert.assertEquals(Response.Status.OK.getStatusCode(), ignore.getStatus());
         }
+        log.infof(">>>>>> %s", client.target(eventsUrl).request().get());
     }
 }

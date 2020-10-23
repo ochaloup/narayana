@@ -25,7 +25,7 @@ package io.narayana.lra.coordinator.domain.event;
 /**
  * A state representing on what type of LRA event was created.
  */
-public enum Action {
+public enum LRAAction {
     /**
      * Start of an LRA instance.
      */

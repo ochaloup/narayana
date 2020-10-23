@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package io.narayana.lra.coordinator;
+package io.narayana.lra.test.coordinator;
 
 import com.arjuna.ats.arjuna.recovery.RecoveryModule;
 import io.narayana.lra.Current;
@@ -27,6 +27,8 @@ import io.narayana.lra.LRAData;
 import io.narayana.lra.client.NarayanaLRAClient;
 import io.narayana.lra.client.internal.proxy.nonjaxrs.LRAParticipantRegistry;
 import io.narayana.lra.coordinator.api.Coordinator;
+import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.coordinator.domain.model.Transaction;
 import io.narayana.lra.coordinator.domain.service.LRAService;
 import io.narayana.lra.coordinator.internal.LRARecoveryModule;
 import io.narayana.lra.filter.ServerLRAFilter;
@@ -95,7 +97,9 @@ public abstract class TestBase {
             NarayanaLRAClient.class.getPackage(),
             Current.class.getPackage(),
             LRAService.class.getPackage(),
-            LRARecoveryModule.class.getPackage()
+            LRARecoveryModule.class.getPackage(),
+            Transaction.class.getPackage(),
+            LRAAction.class.getPackage()
     };
     protected static final Package[] participantPackages = {
             LRA.class.getPackage(),

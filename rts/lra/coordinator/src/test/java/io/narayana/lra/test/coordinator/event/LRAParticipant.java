@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source.
- * Copyright 2019, Red Hat, Inc., and individual contributors
+ * Copyright 2020, Red Hat, Inc., and individual contributors
  * as indicated by the @author tags. See the copyright.txt file in the
  * distribution for a full listing of individual contributors.
  *
@@ -19,9 +19,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package io.narayana.lra.coordinator;
+
+package io.narayana.lra.test.coordinator.event;
 
 import org.eclipse.microprofile.lra.annotation.AfterLRA;
+import org.eclipse.microprofile.lra.annotation.Compensate;
+import org.eclipse.microprofile.lra.annotation.Complete;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 
@@ -34,54 +37,35 @@ import java.net.URI;
 
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT_HEADER;
 
-@Path(LRAListener.LRA_LISTENER_PATH)
-public class LRAListener {
-    static final String LRA_LISTENER_PATH = "lra-listener";
-    static final String LRA_LISTENER_ACTION = "action";
-    static final String LRA_LISTENER_UNTIMED_ACTION = "untimed";
-    static final String LRA_LISTENER_STATUS = "status";
-    static final String LRA_LISTENER_KILL = "kill";
+@Path(LRAParticipant.PARTICIPANT_PATH)
+public class LRAParticipant {
+    static final String PARTICIPANT_PATH = "participant";
 
-    static final long LRA_SHORT_TIMELIMIT = 10L;
-    private static LRAStatus status = LRAStatus.Active;
-
-    @PUT
-    @Path(LRA_LISTENER_ACTION)
-    @LRA(value = LRA.Type.REQUIRED, end = false, timeLimit = LRA_SHORT_TIMELIMIT) // the default unit is SECONDS
-    public Response actionWithLRA(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
-        status = LRAStatus.Active;
-
+    @GET
+    @Path("/")
+    @LRA(value = LRA.Type.REQUIRED)
+    public Response action(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
         return Response.ok(lraId.toASCIIString()).build();
     }
 
+    @Complete
     @PUT
-    @Path(LRA_LISTENER_UNTIMED_ACTION)
-    @LRA(value = LRA.Type.REQUIRED, end = false)
-    public Response untimedActionWithLRA(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
-        status = LRAStatus.Active;
-
+    @Path("/complete")
+    public Response complete(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
         return Response.ok(lraId.toASCIIString()).build();
     }
 
+    @Compensate
     @PUT
-    @Path("after")
+    @Path("/compensate")
+    public Response compensate(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
+        return Response.ok(lraId.toASCIIString()).build();
+    }
+
     @AfterLRA
-    public Response lraEndStatus(LRAStatus endStatus) {
-        status = endStatus;
-
+    @PUT
+    @Path("/afterlra")
+    public Response afterLra(LRAStatus endStatus) {
         return Response.ok().build();
-    }
-
-    @GET
-    @Path(LRA_LISTENER_STATUS)
-    public Response getStatus() {
-        return Response.ok(status.name()).build();
-    }
-
-    @GET
-    @Path(LRA_LISTENER_KILL)
-    public Response killJVM() {
-        Runtime.getRuntime().halt(1);
-        return Response.ok(status.name()).build();
     }
 }

@@ -20,18 +20,39 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.coordinator.domain.event;
+package io.narayana.lra.test.coordinator.event;
 
+import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
+@Path(EventLogListener.EVENTS_PATH)
 public class EventLogListener {
     private static final Logger log = Logger.getLogger(EventLogListener.class);
+    public static final String EVENTS_PATH = "events";
 
-    public void onLraInfoEvent(@Observes LRAInfoEvent infoEvent) {
-        log.infof(">>>> %s", infoEvent);
+    private Map<LRAAction, Integer> counter = new ConcurrentHashMap<>();
+
+    public void onLraEvent(@Observes LRAEventInfo eventInfo) {
+        log.debugf("LRA event observed: %s", eventInfo);
+        counter.putIfAbsent(eventInfo.getLraAction(), 0);
+        counter.compute(eventInfo.getLraAction(), (k,v) -> v++);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Map<LRAAction,Integer> listEvents() {
+        return counter;
     }
 }

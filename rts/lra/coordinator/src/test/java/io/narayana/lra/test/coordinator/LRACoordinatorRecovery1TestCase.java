@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package io.narayana.lra.coordinator;
+package io.narayana.lra.test.coordinator;
 
 import io.narayana.lra.logging.LRALogger;
 import org.apache.http.HttpConnection;
@@ -27,6 +27,7 @@ import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
+
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -34,7 +35,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -44,13 +44,12 @@ import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.temporal.ChronoUnit;
 
-import static io.narayana.lra.coordinator.LRAListener.LRA_LISTENER_KILL;
-import static io.narayana.lra.coordinator.LRAListener.LRA_LISTENER_STATUS;
-import static io.narayana.lra.coordinator.LRAListener.LRA_LISTENER_UNTIMED_ACTION;
-import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT_HEADER;
+import static io.narayana.lra.test.coordinator.LRAListener.LRA_LISTENER_ACTION;
+import static io.narayana.lra.test.coordinator.LRAListener.LRA_LISTENER_STATUS;
+import static io.narayana.lra.test.coordinator.LRAListener.LRA_SHORT_TIMELIMIT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -58,10 +57,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class LRACoordinatorRecovery2TestCase extends TestBase {
-    private static final Long LONG_TIMEOUT = 600000L; // 10 minutes
-    private static final Long SHORT_TIMEOUT = 10000L; // 10 seconds
-
+public class LRACoordinatorRecovery1TestCase extends TestBase {
     private String lraListenerURL;
 
     private Client client;
@@ -75,8 +71,8 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
         return ShrinkWrap.create(WebArchive.class, COORDINATOR_DEPLOYMENT + ".war")
                 .addPackages(false, coordinatorPackages)
                 .addPackages(false, participantPackages)
-                .addPackage(LRAListener.class.getPackage())
                 .addPackages(true, HttpConnection.class.getPackage())
+                .addClasses(LRAListener.class)
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
@@ -98,66 +94,62 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
 
     /**
      * Test that an LRA which times out while there is no running coordinator is cancelled
-     * when a coordinator is restarted.
-     *
-     * Test that an LRA which times out after a coordinator is restarted after a crash is still active
+     * when a coordinator is restarted
      * @throws URISyntaxException if the LRA or recovery URIs are invalid (should never happen)
      */
     @Test
-    @Ignore
-    public void testRecovery2() throws URISyntaxException {
-        startContainer(null);
+    public void testRecovery() throws URISyntaxException, InterruptedException {
+        startContainer("participant-byteman-rules");
 
-        // start an LRA with a long timeout to validate that timed LRAs do not finish early during recovery
-        URI longLRA = lraClient.startLRA(null, "Long Timeout Recovery Test", LONG_TIMEOUT, ChronoUnit.MILLIS);
-        // start an LRA with a short timeout to validate that timed LRAs that time out when the coordinator is unavailable are cancelled
-        URI shortLRA = lraClient.startLRA(null, "Short Timeout Recovery Test", SHORT_TIMEOUT, ChronoUnit.MILLIS);
+        String lraId;
 
-        // invoke a method that will trigger a byteman rule to kill the JVM
-        try (Response ignore = client.target(lraListenerURL).path(LRA_LISTENER_KILL)
+        // start an LRA with a short time limit by invoking a resource annotated with @LRA
+        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_ACTION)
                 .request()
-                .get()) {
-
-            fail(testName + ": the container should have halted");
-        } catch (RuntimeException e) {
-            LRALogger.logger.infof("%s: the container halted", testName);
-        }
-
-        // restart the container
-        restartContainer();
-
-        // check that on restart an LRA whose deadline has expired are cancelled
-        int sc = recover();
-
-        if (sc != 0) {
-            recover();
-        }
-
-        LRAStatus longStatus = getStatus(longLRA);
-        LRAStatus shortStatus = getStatus(shortLRA);
-
-        Assert.assertEquals("LRA with long timeout should still be active",
-                LRAStatus.Active.name(), longStatus.name());
-        Assert.assertTrue("LRA with short timeout should not be active",
-                shortStatus == null ||
-                        LRAStatus.Cancelled.equals(shortStatus) || LRAStatus.Cancelling.equals(shortStatus));
-
-        // verify that it is still possible to join in with the LRA
-        try (Response response = client.target(lraListenerURL).path(LRA_LISTENER_UNTIMED_ACTION)
-                .request()
-                .header(LRA_HTTP_CONTEXT_HEADER, longLRA)
                 .put(null)) {
 
             Assert.assertEquals("LRA participant action", 200, response.getStatus());
+
+            lraId = response.readEntity(String.class);
+            fail(testName + ": byteman should have killed the container");
+        } catch (RuntimeException e) {
+            LRALogger.logger.infof("%s: byteman killed the container", testName);
+            // we could have started the LRA via lraClient (which we do in the next test) but it is useful to test the filters
+            lraId = getFirstLRA();
+            assertNotNull("LRA should have been added to the object store before byteman killed the JVM", lraId);
+            lraId = String.format("%s/%s", getCoordinatorUrl(), lraId);
         }
 
-        lraClient.closeLRA(longLRA);
+        // the byteman script should have killed the JVM
+        // wait for a period longer than the timeout before restarting the coordinator
+        doWait(LRA_SHORT_TIMELIMIT * 1000);
 
-        // check that the participant was notified that the LRA has closed
+        restartContainer();
+
+        // check recovery
+        LRAStatus status = getStatus(new URI(lraId));
+
+        LRALogger.logger.infof("%s: Status after restart is %s%n", status == null ? "GONE" : status.name());
+
+        if (status == null || status == LRAStatus.Cancelling) {
+            int sc = recover();
+
+            if (sc != 0) {
+                recover();
+            }
+        }
+
+        // the LRA with the short timeout should have timed out and cancelled
+        status = getStatus(new URI(lraId));
+
+        Assert.assertTrue("LRA with short timeout should have cancelled",
+                status == null || status == LRAStatus.Cancelled);
+
+        // verify that the resource was notified that the LRA finished
         String listenerStatus = getStatusFromListener();
 
-        assertEquals("LRA listener should have been told that the final state of the LRA was closed",
-                LRAStatus.Closed.name(), listenerStatus);
+        assertEquals("LRA listener should have been told that the final state of the LRA was cancelled",
+                LRAStatus.Cancelled.name(), listenerStatus);
     }
 
     /**
