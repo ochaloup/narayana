@@ -21,20 +21,9 @@
  */
 package io.narayana.lra.coordinator;
 
-import com.arjuna.ats.arjuna.recovery.RecoveryModule;
-import io.narayana.lra.Current;
-import io.narayana.lra.client.NarayanaLRAClient;
-import io.narayana.lra.client.internal.proxy.nonjaxrs.LRAParticipantRegistry;
-import io.narayana.lra.coordinator.api.Coordinator;
-import io.narayana.lra.LRAData;
-import io.narayana.lra.coordinator.domain.model.Transaction;
-import io.narayana.lra.coordinator.domain.service.LRAService;
-import io.narayana.lra.coordinator.internal.LRARecoveryModule;
-import io.narayana.lra.filter.ServerLRAFilter;
 import io.narayana.lra.logging.LRALogger;
 import org.apache.http.HttpConnection;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
-import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -69,26 +58,6 @@ import static org.junit.Assert.fail;
 @RunWith(Arquillian.class)
 @RunAsClient
 public class LRACoordinatorRecovery1TestCase extends TestBase {
-    private static Package[] coordinatorPackages = {
-            RecoveryModule.class.getPackage(),
-            Coordinator.class.getPackage(),
-            LRAData.class.getPackage(),
-            LRAStatus.class.getPackage(),
-            LRALogger.class.getPackage(),
-            NarayanaLRAClient.class.getPackage(),
-            Current.class.getPackage(),
-            LRAService.class.getPackage(),
-            LRARecoveryModule.class.getPackage(),
-            Transaction.class.getPackage()
-    };
-
-    private static Package[] participantPackages = {
-            LRAListener.class.getPackage(),
-            LRA.class.getPackage(),
-            ServerLRAFilter.class.getPackage(),
-            LRAParticipantRegistry.class.getPackage()
-    };
-
     private String lraListenerURL;
 
     private Client client;
@@ -102,6 +71,7 @@ public class LRACoordinatorRecovery1TestCase extends TestBase {
         return ShrinkWrap.create(WebArchive.class, COORDINATOR_DEPLOYMENT + ".war")
                 .addPackages(false, coordinatorPackages)
                 .addPackages(false, participantPackages)
+                .addPackage(LRAListener.class.getPackage())
                 .addPackages(true, HttpConnection.class.getPackage())
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");

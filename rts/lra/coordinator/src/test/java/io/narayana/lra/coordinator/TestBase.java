@@ -21,9 +21,18 @@
  */
 package io.narayana.lra.coordinator;
 
+import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import io.narayana.lra.Current;
+import io.narayana.lra.LRAData;
 import io.narayana.lra.client.NarayanaLRAClient;
+import io.narayana.lra.client.internal.proxy.nonjaxrs.LRAParticipantRegistry;
+import io.narayana.lra.coordinator.api.Coordinator;
+import io.narayana.lra.coordinator.domain.service.LRAService;
+import io.narayana.lra.coordinator.internal.LRARecoveryModule;
+import io.narayana.lra.filter.ServerLRAFilter;
 import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
+import org.eclipse.microprofile.lra.annotation.ws.rs.LRA;
 import org.jboss.arquillian.container.test.api.Config;
 import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -61,7 +70,7 @@ public abstract class TestBase {
 
     private static final String COORDINATOR_CONTAINER = "lra-coordinator";
 
-    static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
+    protected static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
 
     private static String coordinatorUrl;
     private static String recoveryUrl;
@@ -69,13 +78,30 @@ public abstract class TestBase {
     private static Path storeDir;
     private static String deploymentURL;
 
-    NarayanaLRAClient lraClient;
+    protected NarayanaLRAClient lraClient;
 
     @ArquillianResource
     private ContainerController containerController;
 
     @ArquillianResource
     private Deployer deployer;
+
+    protected static final Package[] coordinatorPackages = {
+            RecoveryModule.class.getPackage(),
+            Coordinator.class.getPackage(),
+            LRAData.class.getPackage(),
+            LRAStatus.class.getPackage(),
+            LRALogger.class.getPackage(),
+            NarayanaLRAClient.class.getPackage(),
+            Current.class.getPackage(),
+            LRAService.class.getPackage(),
+            LRARecoveryModule.class.getPackage()
+    };
+    protected static final Package[] participantPackages = {
+            LRA.class.getPackage(),
+            ServerLRAFilter.class.getPackage(),
+            LRAParticipantRegistry.class.getPackage()
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -105,7 +131,7 @@ public abstract class TestBase {
         lraClient.close();
     }
 
-    void startContainer(String bytemanScript) {
+    protected void startContainer(String bytemanScript) {
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
 
@@ -138,7 +164,7 @@ public abstract class TestBase {
         containerController.start(COORDINATOR_CONTAINER);
     }
 
-    void stopContainer() {
+    protected void stopContainer() {
         if (containerController.isStarted(COORDINATOR_CONTAINER)) {
             LRALogger.logger.debug("Stopping container");
 
@@ -208,7 +234,7 @@ public abstract class TestBase {
         return coordinatorUrl;
     }
 
-    String getDeploymentUrl() {
+    protected String getDeploymentUrl() {
         return deploymentURL;
     }
 }
