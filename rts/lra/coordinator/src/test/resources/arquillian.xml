@@ -30,7 +30,9 @@
             <property name="startupTimeoutInSeconds">${server.startup.timeout:60}</property>
         </configuration>
     </container>
+    <!--
     <engine>
         <property name="deploymentExportPath">/tmp/lra-test</property>
     </engine>
+    -->
 </arquillian>

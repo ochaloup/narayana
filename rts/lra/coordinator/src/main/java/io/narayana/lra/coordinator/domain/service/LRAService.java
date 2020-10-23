@@ -178,13 +178,15 @@ public class LRAService {
         if (transaction.isRecovering()) {
             recoveringLRAs.put(transaction.getId(), transaction);
         } else if (fromHierarchy || transaction.isTopLevel()) {
-            // the LRA is top level or it's a nested LRA that was closed by a
-            // parent LRA (ie when fromHierarchy is true) then it's okay to forget about the LRA
-
-            if (!transaction.hasPendingActions()) {
+            // inform the event listener that the close/cancel of LRA happens
+            if(lras.get(transaction.getId()) != null) {
                 infoEvent.fire(new LRAEventInfo.Builder(
                         transaction.isCancel() ? LRAAction.CANCEL : LRAAction.CLOSED, transaction.getId())
                         .parentLraId(transaction.getParentId()).clientId(transaction.getClientId()).build());
+            }
+            // the LRA is top level or it's a nested LRA that was closed by a
+            // parent LRA (ie when fromHierarchy is true) then it's okay to forget about the LRA
+            if (!transaction.hasPendingActions()) {
                 // this call is only required to clean up cached LRAs (JBTM-3250 will remove this cache).
                 remove(transaction);
             }

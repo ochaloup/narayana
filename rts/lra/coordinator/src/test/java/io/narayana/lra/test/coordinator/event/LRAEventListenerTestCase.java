@@ -22,8 +22,8 @@
 
 package io.narayana.lra.test.coordinator.event;
 
+import io.narayana.lra.coordinator.domain.event.LRAAction;
 import io.narayana.lra.test.coordinator.TestBase;
-import org.apache.http.HttpConnection;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -41,8 +41,10 @@ import org.junit.Assert;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 @RunWith(Arquillian.class)
 @RunAsClient
@@ -50,6 +52,7 @@ public class LRAEventListenerTestCase extends TestBase {
     private static final Logger log = Logger.getLogger(LRAEventListenerTestCase.class);
 
     private Client client;
+    private String participantUrl, eventsUrl;
 
     @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT, testable = false, managed = false)
     public static WebArchive createDeployment() {
@@ -59,14 +62,17 @@ public class LRAEventListenerTestCase extends TestBase {
         return ShrinkWrap.create(WebArchive.class, COORDINATOR_DEPLOYMENT + ".war")
                 .addPackages(false, coordinatorPackages)
                 .addPackages(false, participantPackages)
-                .addPackages(true, HttpConnection.class.getPackage())
-                .addClasses(EventLogListener.class)
+                .addClasses(EventLogListener.class, LRAParticipant.class)
                 .addAsManifestResource(new StringAsset(ManifestMF), "MANIFEST.MF")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @Before
     public void before() throws MalformedURLException, URISyntaxException {
+        participantUrl = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
+        eventsUrl = String.format("%s/%s", getDeploymentUrl(), EventLogListener.EVENTS_PATH);
+
+        startContainer(null);
         super.before();
         client = ClientBuilder.newClient();
     }
@@ -83,14 +89,29 @@ public class LRAEventListenerTestCase extends TestBase {
 
     @Test
     public void startAndClose() throws URISyntaxException {
-        startContainer(null);
-
-        String participantUrl = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
-        String eventsUrl = String.format("%s/%s", getDeploymentUrl(), EventLogListener.EVENTS_PATH);
-
-        try (Response ignore = client.target(participantUrl).request().get()) {
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), ignore.getStatus());
+        try (Response testInvocation = client.target(participantUrl).request().get()) {
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), testInvocation.getStatus());
         }
-        log.infof(">>>>>> %s", client.target(eventsUrl).request().get());
+        try (Response eventListenerInvocation = client.target(eventsUrl).request().get()) {
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), eventListenerInvocation.getStatus());
+            Assert.assertTrue("Expecting the event listener returns data in response body", eventListenerInvocation.hasEntity());
+            Map<String,BigDecimal> counterData = eventListenerInvocation.readEntity(Map.class);
+            log.infof("Invocation listener returned counter data: %s, size: %d", counterData, counterData.size());
+            /* TODO: delete me!
+            for(Map.Entry<String,BigDecimal> e: counterData.entrySet()) {
+                log.infof(">>>>>>>>>>>>> %s [%s:%s] cl:%s", e, e.getKey(), e.getValue(), e.getKey().getClass().getName());
+                // if (e.getKey() == LRAAction.STARTED) log.warnf(")))))))))))))))))))))))))) " + e);
+            }
+            log.infof("oh classnof: %s", LRAAction.STARTED);
+             */
+            Assert.assertEquals("Expecting one LRA was started", BigDecimal.valueOf(1), counterData.get(LRAAction.STARTED.name()));
+            Assert.assertEquals("Expecting one participant enlisted to LRA", BigDecimal.valueOf(1), counterData.get(LRAAction.ENLISTED.name()));
+            Assert.assertEquals("Expecting the participant was completed", BigDecimal.valueOf(1), counterData.get(LRAAction.COMPLETED.name()));
+            Assert.assertEquals("Expecting the LRA was closed once", BigDecimal.valueOf(1), counterData.get(LRAAction.CLOSED.name()));
+            Assert.assertEquals("Expecting the LRA participant's after LRA callback was called",
+                    BigDecimal.valueOf(1), counterData.get(LRAAction.AFTER_CALLBACK_FINISHED.name()));
+            Assert.assertEquals("Not expecting other callback should observed by event listener but the result data contains more events",
+                    5, counterData.size());
+        }
     }
 }

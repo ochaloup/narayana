@@ -45,8 +45,7 @@ public class EventLogListener {
 
     public void onLraEvent(@Observes LRAEventInfo eventInfo) {
         log.debugf("LRA event observed: %s", eventInfo);
-        counter.putIfAbsent(eventInfo.getLraAction(), 0);
-        counter.compute(eventInfo.getLraAction(), (k,v) -> v++);
+        counter.compute(eventInfo.getLraAction(), (k, v) -> (v == null) ? 1 : v + 1);
     }
 
     @GET
