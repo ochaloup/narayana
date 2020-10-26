@@ -26,6 +26,7 @@ import io.narayana.lra.coordinator.domain.event.LRAAction;
 import io.narayana.lra.test.coordinator.TestBase;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -54,7 +55,8 @@ public class LRAEventListenerTestCase extends TestBase {
     private Client client;
     private String participantUrl, eventsUrl;
 
-    @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT, testable = false, managed = false)
+    @TargetsContainer("managed-lra-coordinator")
+    @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT)
     public static WebArchive createDeployment() {
         // LRA uses ArjunaCore so pull in the jts module to get them on the classpath
         final String ManifestMF = "Manifest-Version: 1.0\n"
@@ -72,7 +74,7 @@ public class LRAEventListenerTestCase extends TestBase {
         participantUrl = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
         eventsUrl = String.format("%s/%s", getDeploymentUrl(), EventLogListener.EVENTS_PATH);
 
-        startContainer(null);
+        // startContainer(null);
         super.before();
         client = ClientBuilder.newClient();
     }
@@ -82,9 +84,9 @@ public class LRAEventListenerTestCase extends TestBase {
         try {
             client.close();
         } finally {
-            stopContainer();
+            // stopContainer();
+            super.after();
         }
-        super.after();
     }
 
     @Test
