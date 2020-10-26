@@ -26,6 +26,7 @@
             -Dlra.coordinator.path=${lra.coordinator.path}
         </jvm.args.other>
         <server.jvm.args>${jvm.args.other} ${jvm.args.byteman} ${jvm.args.memory} ${jvm.args.debug} ${jvm.args.modular}</server.jvm.args>
+        <lllaunch></lllaunch>
     </properties>
 
     <dependencies>
@@ -177,24 +178,32 @@
                             </systemPropertyVariables>
                             <systemProperties>
                                 <arquillian.xml>arquillian.xml</arquillian.xml>
-                                <arquillian.launch>manual</arquillian.launch>
                             </systemProperties>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>maven-failsafe-arquillian-manual-mode</id>
+                                <id>default</id> <!-- for maven-failsafe-plugin works correctly with execution and system properties we need to use id of 'default' -->
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
                                 <configuration>
-                                    <properties>
-                                        <lllaunch>ABC</lllaunch>
-                                    </properties>
+                                    <systemProperties>
+                                        <arquillian.launch>manual</arquillian.launch>
+                                    </systemProperties>
                                     <includes>
                                         <include>**/*Recovery*TestCase.java</include>
                                     </includes>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>maven-failsafe-arquillian-managed-mode</id>
+                                <id>integration-tests-managed</id> <!-- use whatever id but goal of 'integration-test' is required -->
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
                                 <configuration>
+                                    <systemProperties>
+                                        <arquillian.launch>managed</arquillian.launch>
+                                    </systemProperties>
                                     <includes>
                                         <include>LRAEventListenerTestCase.java</include>
                                     </includes>
