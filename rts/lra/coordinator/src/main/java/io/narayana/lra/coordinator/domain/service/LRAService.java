@@ -181,7 +181,7 @@ public class LRAService {
             // inform the event listener that the close/cancel of LRA happens
             if(lras.get(transaction.getId()) != null) {
                 infoEvent.fire(new LRAEventInfo.Builder(
-                        transaction.isCancel() ? LRAAction.CANCEL : LRAAction.CLOSED, transaction.getId())
+                        transaction.isCancel() ? LRAAction.CANCELED : LRAAction.CLOSED, transaction.getId())
                         .parentLraId(transaction.getParentId()).clientId(transaction.getClientId()).build());
             }
             // the LRA is top level or it's a nested LRA that was closed by a

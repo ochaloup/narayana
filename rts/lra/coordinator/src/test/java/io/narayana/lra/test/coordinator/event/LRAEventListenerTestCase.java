@@ -76,6 +76,8 @@ public class LRAEventListenerTestCase extends TestBase {
 
         super.before();
         client = ClientBuilder.newClient();
+
+        try (Response ignore = client.target(eventsUrl).request().delete()){}
     }
 
     @After
@@ -88,8 +90,8 @@ public class LRAEventListenerTestCase extends TestBase {
     }
 
     @Test
-    public void startAndClose() throws URISyntaxException {
-        try (Response testInvocation = client.target(participantUrl).request().get()) {
+    public void startAndComplete() {
+        try (Response testInvocation = client.target(participantUrl).path(LRAParticipant.ACTION_COMPLETE).request().get()) {
             Assert.assertEquals(Response.Status.OK.getStatusCode(), testInvocation.getStatus());
         }
         try (Response eventListenerInvocation = client.target(eventsUrl).request().get()) {
@@ -101,6 +103,27 @@ public class LRAEventListenerTestCase extends TestBase {
             Assert.assertEquals("Expecting one participant enlisted to LRA", BigDecimal.valueOf(1), counterData.get(LRAAction.ENLISTED.name()));
             Assert.assertEquals("Expecting the participant was completed", BigDecimal.valueOf(1), counterData.get(LRAAction.COMPLETED.name()));
             Assert.assertEquals("Expecting the LRA was closed once", BigDecimal.valueOf(1), counterData.get(LRAAction.CLOSED.name()));
+            Assert.assertEquals("Expecting the LRA participant's after LRA callback was called",
+                    BigDecimal.valueOf(1), counterData.get(LRAAction.AFTER_CALLBACK_FINISHED.name()));
+            Assert.assertEquals("Not expecting other callback should observed by event listener but the result data contains more events",
+                    5, counterData.size());
+        }
+    }
+
+    @Test
+    public void startAndCompensate() throws InterruptedException {
+        try (Response testInvocation = client.target(participantUrl).path(LRAParticipant.ACTION_COMPENSATE).request().get()) {
+            Assert.assertEquals(418, testInvocation.getStatus());
+        }
+        try (Response eventListenerInvocation = client.target(eventsUrl).request().get()) {
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), eventListenerInvocation.getStatus());
+            Assert.assertTrue("Expecting the event listener returns data in response body", eventListenerInvocation.hasEntity());
+            Map<String,BigDecimal> counterData = eventListenerInvocation.readEntity(Map.class);
+            log.infof("Invocation listener returned counter data: %s, size: %d", counterData, counterData.size());
+            Assert.assertEquals("Expecting one LRA was started", BigDecimal.valueOf(1), counterData.get(LRAAction.STARTED.name()));
+            Assert.assertEquals("Expecting one participant enlisted to LRA", BigDecimal.valueOf(1), counterData.get(LRAAction.ENLISTED.name()));
+            Assert.assertEquals("Expecting the participant was completed", BigDecimal.valueOf(1), counterData.get(LRAAction.COMPENSATED.name()));
+            Assert.assertEquals("Expecting the LRA was closed once", BigDecimal.valueOf(1), counterData.get(LRAAction.CANCELED.name()));
             Assert.assertEquals("Expecting the LRA participant's after LRA callback was called",
                     BigDecimal.valueOf(1), counterData.get(LRAAction.AFTER_CALLBACK_FINISHED.name()));
             Assert.assertEquals("Not expecting other callback should observed by event listener but the result data contains more events",

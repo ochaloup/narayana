@@ -40,12 +40,21 @@ import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT
 @Path(LRAParticipant.PARTICIPANT_PATH)
 public class LRAParticipant {
     static final String PARTICIPANT_PATH = "participant";
+    static final String ACTION_COMPLETE = "action-complete";
+    static final String ACTION_COMPENSATE = "action-compensate";
 
     @GET
-    @Path("/")
+    @Path(ACTION_COMPLETE)
     @LRA(value = LRA.Type.REQUIRED)
-    public Response action(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
+    public Response actionComplete(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
         return Response.ok(lraId.toASCIIString()).build();
+    }
+
+    @GET
+    @Path(ACTION_COMPENSATE)
+    @LRA(value = LRA.Type.REQUIRED)
+    public Response actionCompensate(@HeaderParam(LRA_HTTP_CONTEXT_HEADER) URI lraId) {
+        return Response.status(418).build();
     }
 
     @Complete

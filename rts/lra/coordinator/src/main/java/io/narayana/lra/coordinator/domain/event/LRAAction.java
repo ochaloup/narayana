@@ -41,7 +41,7 @@ public enum LRAAction {
     /**
      * LRA was cancelled, aka. finished with the abort.
      */
-    CANCEL,
+    CANCELED,
     /**
      * LRA was closed, aka. finished with the commit.
      */
