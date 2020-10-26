@@ -56,7 +56,7 @@ public class LRAEventListenerTestCase extends TestBase {
     private String participantUrl, eventsUrl;
 
     @TargetsContainer("managed-lra-coordinator")
-    @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT)
+    @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT, testable = false)
     public static WebArchive createDeployment() {
         // LRA uses ArjunaCore so pull in the jts module to get them on the classpath
         final String ManifestMF = "Manifest-Version: 1.0\n"
@@ -74,7 +74,6 @@ public class LRAEventListenerTestCase extends TestBase {
         participantUrl = String.format("%s/%s", getDeploymentUrl(), LRAParticipant.PARTICIPANT_PATH);
         eventsUrl = String.format("%s/%s", getDeploymentUrl(), EventLogListener.EVENTS_PATH);
 
-        // startContainer(null);
         super.before();
         client = ClientBuilder.newClient();
     }
@@ -84,7 +83,6 @@ public class LRAEventListenerTestCase extends TestBase {
         try {
             client.close();
         } finally {
-            // stopContainer();
             super.after();
         }
     }
@@ -99,13 +97,6 @@ public class LRAEventListenerTestCase extends TestBase {
             Assert.assertTrue("Expecting the event listener returns data in response body", eventListenerInvocation.hasEntity());
             Map<String,BigDecimal> counterData = eventListenerInvocation.readEntity(Map.class);
             log.infof("Invocation listener returned counter data: %s, size: %d", counterData, counterData.size());
-            /* TODO: delete me!
-            for(Map.Entry<String,BigDecimal> e: counterData.entrySet()) {
-                log.infof(">>>>>>>>>>>>> %s [%s:%s] cl:%s", e, e.getKey(), e.getValue(), e.getKey().getClass().getName());
-                // if (e.getKey() == LRAAction.STARTED) log.warnf(")))))))))))))))))))))))))) " + e);
-            }
-            log.infof("oh classnof: %s", LRAAction.STARTED);
-             */
             Assert.assertEquals("Expecting one LRA was started", BigDecimal.valueOf(1), counterData.get(LRAAction.STARTED.name()));
             Assert.assertEquals("Expecting one participant enlisted to LRA", BigDecimal.valueOf(1), counterData.get(LRAAction.ENLISTED.name()));
             Assert.assertEquals("Expecting the participant was completed", BigDecimal.valueOf(1), counterData.get(LRAAction.COMPLETED.name()));

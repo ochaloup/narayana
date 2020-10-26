@@ -175,6 +175,7 @@
                             </systemPropertyVariables>
                             <systemProperties>
                                 <arquillian.xml>arquillian.xml</arquillian.xml>
+                                <arquillian.launch>wildfly-lra-containers</arquillian.launch>
                             </systemProperties>
                         </configuration>
                     </plugin>
