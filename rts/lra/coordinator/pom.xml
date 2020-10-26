@@ -166,6 +166,8 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <version>2.22.2</version>
                         <configuration>
                             <systemPropertyVariables combine.children="append">
                                 <lra.http.host>127.0.0.1</lra.http.host>
@@ -175,9 +177,30 @@
                             </systemPropertyVariables>
                             <systemProperties>
                                 <arquillian.xml>arquillian.xml</arquillian.xml>
-                                <arquillian.launch>wildfly-lra-containers</arquillian.launch>
+                                <arquillian.launch>manual</arquillian.launch>
                             </systemProperties>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>maven-failsafe-arquillian-manual-mode</id>
+                                <configuration>
+                                    <properties>
+                                        <lllaunch>ABC</lllaunch>
+                                    </properties>
+                                    <includes>
+                                        <include>**/*Recovery*TestCase.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>maven-failsafe-arquillian-managed-mode</id>
+                                <configuration>
+                                    <includes>
+                                        <include>LRAEventListenerTestCase.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
