@@ -55,7 +55,7 @@ public class LRAEventListenerTestCase extends TestBase {
     private Client client;
     private String participantUrl, eventsUrl;
 
-    @TargetsContainer("managed-lra-coordinator")
+    @TargetsContainer(TestBase.MANAGED_COORDINATOR_CONTAINER)
     @Deployment(name = TestBase.COORDINATOR_DEPLOYMENT, testable = false)
     public static WebArchive createDeployment() {
         // LRA uses ArjunaCore so pull in the jts module to get them on the classpath

@@ -25,6 +25,7 @@ import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -65,6 +66,7 @@ public class LRACoordinatorRecovery2TestCase extends TestBase {
 
     private Client client;
 
+    @TargetsContainer(MANUAL_COORDINATOR_CONTAINER)
     @Deployment(name = COORDINATOR_DEPLOYMENT, testable = false, managed = false)
     public static WebArchive createDeployment() {
         // LRA uses ArjunaCore so pull in the jts module to get them on the classpath

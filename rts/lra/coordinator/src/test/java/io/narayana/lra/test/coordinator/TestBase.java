@@ -70,9 +70,9 @@ public abstract class TestBase {
     @Rule
     public TestName testName = new TestName();
 
-    private static final String COORDINATOR_CONTAINER = "lra-coordinator";
-
-    protected static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
+    protected static final String MANAGED_COORDINATOR_CONTAINER = "managed-lra-coordinator";
+    protected static final String MANUAL_COORDINATOR_CONTAINER = "manual-lra-coordinator";
+    protected static final String COORDINATOR_DEPLOYMENT = "lra-coordinator";
 
     private static String coordinatorUrl;
     private static String recoveryUrl;
@@ -136,6 +136,11 @@ public abstract class TestBase {
     }
 
     protected void startContainer(String bytemanScript) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+            // none
+        }
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
 
@@ -149,14 +154,14 @@ public abstract class TestBase {
 
         config.add("javaVmArguments", javaVmArguments);
 
-        containerController.start(COORDINATOR_CONTAINER, config.map());
+        containerController.start(MANUAL_COORDINATOR_CONTAINER, config.map());
         deployer.deploy(COORDINATOR_DEPLOYMENT);
     }
 
     void restartContainer() {
         try {
             // ensure that the controller is not running
-            containerController.kill(COORDINATOR_CONTAINER);
+            containerController.kill(MANUAL_COORDINATOR_CONTAINER);
             LRALogger.logger.debug("jboss-as kill worked");
         } catch (Exception e) {
             LRALogger.logger.debugf("jboss-as kill: %s", e.getMessage());
@@ -165,17 +170,17 @@ public abstract class TestBase {
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
         config.add("javaVmArguments", javaVmArguments);
-        containerController.start(COORDINATOR_CONTAINER);
+        containerController.start(MANUAL_COORDINATOR_CONTAINER);
     }
 
     protected void stopContainer() {
-        if (containerController.isStarted(COORDINATOR_CONTAINER)) {
+        if (containerController.isStarted(MANUAL_COORDINATOR_CONTAINER)) {
             LRALogger.logger.debug("Stopping container");
 
             deployer.undeploy(COORDINATOR_DEPLOYMENT);
 
-            containerController.stop(COORDINATOR_CONTAINER);
-            containerController.kill(COORDINATOR_CONTAINER);
+            containerController.stop(MANUAL_COORDINATOR_CONTAINER);
+            containerController.kill(MANUAL_COORDINATOR_CONTAINER);
         }
     }
 
