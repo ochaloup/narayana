@@ -23,7 +23,6 @@
 package io.narayana.lra.arquillian;
 
 import io.narayana.lra.arquillian.spi.NarayanaLRARecovery;
-import io.narayana.lra.cdi.LRAActionListener;
 import io.narayana.lra.client.internal.proxy.nonjaxrs.LRACDIExtension;
 import org.jboss.arquillian.container.test.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.shrinkwrap.api.Archive;
@@ -63,7 +62,6 @@ public class ConfigAuxiliaryArchiveAppender implements AuxiliaryArchiveAppender 
 
         // adding TCK required SPI implementations
         archive.addPackage(NarayanaLRARecovery.class.getPackage());
-        archive.addPackage(LRAActionListener.class.getPackage());
 
         archive.addAsResource(new StringAsset("io.narayana.lra.arquillian.spi.NarayanaLRARecovery"),
             "META-INF/services/org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService");

@@ -55,7 +55,20 @@ public class NarayanaLRARecovery implements LRARecoveryService {
 
     @Override
     public void waitForCallbacks(URI lraId) {
-        // no action needed
+        String host = lraId.getHost();
+        int port = lraId.getPort();
+        String listenerUrl = String.format("http://%s:%d/%s",
+                host, port, "listener");
+        Client listenerClient = ClientBuilder.newClient();
+        try {
+            WebTarget listenerTarget = listenerClient.target(URI.create(listenerUrl));
+            Response response = listenerTarget.request().get();
+            String json = response.readEntity(String.class);
+            response.close();
+            log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> response: " + json);
+        } finally {
+            listenerClient.close();
+        }
     }
 
     @Override
