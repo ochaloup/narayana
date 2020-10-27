@@ -76,17 +76,6 @@
             <artifactId>httpclient</artifactId>
             <version>${version.apache.httpclient}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.thorntail</groupId>
-            <artifactId>arquillian</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-        </dependency>
     </dependencies>
 
     <profiles>

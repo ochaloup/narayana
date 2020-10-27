@@ -18,7 +18,6 @@
       <groupId>org.eclipse.microprofile.lra</groupId>
       <artifactId>microprofile-lra-api</artifactId>
       <version>${version.microprofile.lra.api}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.microprofile.lra</groupId>
@@ -44,12 +43,17 @@
       <groupId>org.jboss.narayana.rts</groupId>
       <artifactId>lra-test-coordinator-cdi-event-listener</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.narayana.rts</groupId>
+          <artifactId>lra-coordinator</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-api</artifactId>
       <version>${version.org.jboss.shrinkwrap}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
@@ -59,7 +63,11 @@
       <groupId>org.jboss.weld.se</groupId>
       <artifactId>weld-se-shaded</artifactId>
       <version>${version.org.jboss.weld.se}</version>
-      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <version>${version.org.jboss.resteasy}</version>
     </dependency>
   </dependencies>
 

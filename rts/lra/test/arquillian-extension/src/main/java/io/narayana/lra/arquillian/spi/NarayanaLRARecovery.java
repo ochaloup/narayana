@@ -30,7 +30,10 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class NarayanaLRARecovery implements LRARecoveryService {
     private static final Logger log = Logger.getLogger(NarayanaLRARecovery.class);
@@ -57,15 +60,18 @@ public class NarayanaLRARecovery implements LRARecoveryService {
     public void waitForCallbacks(URI lraId) {
         String host = lraId.getHost();
         int port = lraId.getPort();
-        String listenerUrl = String.format("http://%s:%d/%s",
-                host, port, "listener");
         Client listenerClient = ClientBuilder.newClient();
         try {
+            String listenerUrl = String.format("http://%s:%d/%s/%s",
+                    host, port, "listener", URLEncoder.encode(lraId.toASCIIString(), StandardCharsets.UTF_8.name()));
             WebTarget listenerTarget = listenerClient.target(URI.create(listenerUrl));
             Response response = listenerTarget.request().get();
             String json = response.readEntity(String.class);
             response.close();
             log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> response: " + json);
+        } catch (UnsupportedEncodingException uee) {
+            log.errorf("Cannot encode the LRA id %s with encoding %s. The waitForCallbacks returned immediately.",
+                    lraId, StandardCharsets.UTF_8.name());
         } finally {
             listenerClient.close();
         }
