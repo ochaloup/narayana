@@ -59,11 +59,11 @@ public enum LRAAction {
     /**
      * LRA participant was tried to be compensated but the callback has not been finished yet.
      */
-    COMPENSATE_ATTEMPT,
+    COMPENSATE_IN_PROGRESS,
     /**
      * LRA participant was tried to be completed but the callback has not been finished yet.
      */
-    COMPLETE_ATTEMPT,
+    COMPLETE_IN_PROGRESS,
     /**
      * LRA participant was tried to be compensated but the callback call failed.
      */

@@ -514,10 +514,10 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
         LRAAction eventLRAAction;
         if (compensate) {
             status = accepted ? ParticipantStatus.Compensating : ParticipantStatus.Compensated;
-            eventLRAAction = status == ParticipantStatus.Compensated ? LRAAction.COMPENSATED : LRAAction.COMPENSATE_ATTEMPT;
+            eventLRAAction = status == ParticipantStatus.Compensated ? LRAAction.COMPENSATED : LRAAction.COMPENSATE_IN_PROGRESS;
         } else {
             status = accepted ? ParticipantStatus.Completing : ParticipantStatus.Completed;
-            eventLRAAction = status == ParticipantStatus.Completed ? LRAAction.COMPLETED : LRAAction.COMPLETE_ATTEMPT;
+            eventLRAAction = status == ParticipantStatus.Completed ? LRAAction.COMPLETED : LRAAction.COMPLETE_IN_PROGRESS;
         }
         lraService.emitEvent(new LRAEventInfo.Builder(eventLRAAction, lraId)
                 .parentLraId(parentId).participantUri(participantPath).build());
