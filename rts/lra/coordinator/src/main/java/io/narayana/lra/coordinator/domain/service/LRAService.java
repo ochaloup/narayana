@@ -26,8 +26,8 @@ import com.arjuna.ats.arjuna.common.Uid;
 import com.arjuna.ats.arjuna.coordinator.ActionStatus;
 import io.narayana.lra.LRAConstants;
 import io.narayana.lra.LRAData;
-import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
-import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.event.LRAAction;
+import io.narayana.lra.event.LRAEventInfo;
 import io.narayana.lra.logging.LRALogger;
 import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 

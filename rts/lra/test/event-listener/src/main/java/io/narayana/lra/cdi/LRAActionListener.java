@@ -22,8 +22,8 @@
 
 package io.narayana.lra.cdi;
 
-import io.narayana.lra.coordinator.domain.event.LRAAction;
-import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
+import io.narayana.lra.event.LRAAction;
+import io.narayana.lra.event.LRAEventInfo;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -66,6 +66,7 @@ public class LRAActionListener {
     @Produces(MediaType.APPLICATION_JSON)
     public List<LRAAction> listEvents(@PathParam("lraId") String lraId) {
         List<LRAAction> events = counter.get(lraId);
+        log.infof("****** For lra id %s returning events: %s", lraId, events);
         if(events == null) return new ArrayList<>();
         return events;
     }

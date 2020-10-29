@@ -23,7 +23,7 @@
 package io.narayana.lra.arquillian.spi;
 
 import io.narayana.lra.LRAConstants;
-import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.event.LRAAction;
 import org.eclipse.microprofile.lra.tck.service.spi.LRARecoveryService;
 import org.jboss.logging.Logger;
 

@@ -15,6 +15,7 @@
 
     <properties>        
         <lra.coordinator.jar.path>${project.basedir}/../event-listener/target/lra-coordinator-with-listener-runner.jar</lra.coordinator.jar.path>
+        <!--<lra.coordinator.jar.path>${project.basedir}/../../coordinator-quarkus/target/lra-coordinator-runner.jar</lra.coordinator.jar.path>-->
         
         <lra.tck.suite.host>localhost</lra.tck.suite.host>
         <lra.tck.suite.port>8180</lra.tck.suite.port>
@@ -24,6 +25,11 @@
         <lra.tck.timeout.factor>1.0</lra.tck.timeout.factor>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <it.test>
+          <!-- https://issues.redhat.com/browse/JBTM-3318 -->
+          !TckTests#compensateMultiLevelNestedActivity
+        </it.test>
+
     </properties>
 
     <build>

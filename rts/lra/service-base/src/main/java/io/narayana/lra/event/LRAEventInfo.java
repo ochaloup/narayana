@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.coordinator.domain.event;
+package io.narayana.lra.event;
 
 import java.net.URI;
 import java.util.Optional;

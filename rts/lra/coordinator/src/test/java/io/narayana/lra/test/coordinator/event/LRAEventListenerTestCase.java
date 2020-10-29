@@ -22,7 +22,7 @@
 
 package io.narayana.lra.test.coordinator.event;
 
-import io.narayana.lra.coordinator.domain.event.LRAAction;
+import io.narayana.lra.event.LRAAction;
 import io.narayana.lra.test.coordinator.TestBase;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -111,7 +111,7 @@ public class LRAEventListenerTestCase extends TestBase {
     }
 
     @Test
-    public void startAndCompensate() throws InterruptedException {
+    public void startAndCompensate() {
         try (Response testInvocation = client.target(participantUrl).path(LRAParticipant.ACTION_COMPENSATE).request().get()) {
             Assert.assertEquals(418, testInvocation.getStatus());
         }

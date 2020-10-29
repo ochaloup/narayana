@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.narayana.lra.coordinator.domain.event;
+package io.narayana.lra.event;
 
 /**
  * A state representing on what type of LRA event was created.

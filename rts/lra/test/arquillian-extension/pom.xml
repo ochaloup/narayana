@@ -35,23 +35,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.narayana.rts</groupId>
-      <artifactId>lra-coordinator-jar</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.narayana.rts</groupId>
-      <artifactId>lra-test-coordinator-cdi-event-listener</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.narayana.rts</groupId>
-          <artifactId>lra-coordinator</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-api</artifactId>
       <version>${version.org.jboss.shrinkwrap}</version>

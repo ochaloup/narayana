@@ -22,8 +22,8 @@
 
 package io.narayana.lra.test.coordinator.event;
 
-import io.narayana.lra.coordinator.domain.event.LRAAction;
-import io.narayana.lra.coordinator.domain.event.LRAEventInfo;
+import io.narayana.lra.event.LRAAction;
+import io.narayana.lra.event.LRAEventInfo;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -42,7 +42,7 @@ public class EventLogListener {
     private static final Logger log = Logger.getLogger(EventLogListener.class);
     public static final String EVENTS_PATH = "events";
 
-    private Map<LRAAction, Integer> counter = new ConcurrentHashMap<>();
+    private final Map<LRAAction, Integer> counter = new ConcurrentHashMap<>();
 
     public void onLraEvent(@Observes LRAEventInfo eventInfo) {
         log.debugf("LRA event observed: %s", eventInfo);
