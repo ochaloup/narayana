@@ -27,7 +27,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <it.test>
           <!-- https://issues.redhat.com/browse/JBTM-3318 -->
-          !TckTests#compensateMultiLevelNestedActivity
+          !TckTests#compensateMultiLevelNestedActivity,!TckTests#mixedMultiLevelNestedActivity,!TckTest#completeMultiLevelNestedActivity
         </it.test>
 
     </properties>
