@@ -21,7 +21,9 @@
  */
 package io.narayana.lra.coordinator.api;
 
+import io.narayana.lra.APIVersion;
 import io.narayana.lra.Current;
+import io.narayana.lra.LRAConstants;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -35,15 +37,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static io.narayana.lra.LRAConstants.LRA_API_VERSION_HEADER_NAME;
+import static io.narayana.lra.LRAConstants.NARAYANA_LRA_API_VERSION_STRING;
+import static javax.ws.rs.core.Response.Status.EXPECTATION_FAILED;
 import static javax.ws.rs.core.Response.Status.PRECONDITION_FAILED;
 import static org.eclipse.microprofile.lra.annotation.ws.rs.LRA.LRA_HTTP_CONTEXT_HEADER;
 
 @Provider
 public class CoordinatorContainerFilter implements ContainerRequestFilter, ContainerResponseFilter {
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         MultivaluedMap<String, String> headers = requestContext.getHeaders();
         URI lraId = null;
+
+        verifyHighestSupportedVersion(requestContext);
 
         if (headers.containsKey(LRA_HTTP_CONTEXT_HEADER)) {
             try {
@@ -71,6 +79,50 @@ public class CoordinatorContainerFilter implements ContainerRequestFilter, Conta
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        if(!responseContext.getHeaders().containsKey(LRAConstants.LRA_API_VERSION_HEADER_NAME)) { // app code did not provide version to header
+            // as version using the api version which came at request or the current version of the api in the library
+            String responseVersion = requestContext.getHeaders().containsKey(LRAConstants.LRA_API_VERSION_HEADER_NAME) ?
+                    requestContext.getHeaderString(LRAConstants.LRA_API_VERSION_HEADER_NAME) :  NARAYANA_LRA_API_VERSION_STRING;
+            responseContext.getHeaders().putSingle(LRAConstants.LRA_API_VERSION_HEADER_NAME, responseVersion);
+        }
+
         Current.updateLRAContext(responseContext);
+    }
+
+    /**
+     * Verification if the version in the header is in right format
+     * and if demanded version is not higher than the supported one
+     * (ie. if version is lower than {@link LRAConstants#NARAYANA_LRA_API_VERSION}).
+     */
+    private void verifyHighestSupportedVersion(ContainerRequestContext requestContext) {
+        if (!requestContext.getHeaders().containsKey(LRAConstants.LRA_API_VERSION_HEADER_NAME)) {
+            // no header specified, going with 'null' further into processing
+            return;
+        }
+        if (requestContext.getHeaders().get(LRAConstants.LRA_API_VERSION_HEADER_NAME).size() > 1) {
+            String errorMsg = "Multiple headers " + LRAConstants.LRA_API_VERSION_HEADER_NAME + " with API version provided."
+                    +" Please, pass only one version header in the request.";
+            throw new WebApplicationException(errorMsg,
+                    Response.status(EXPECTATION_FAILED).entity(errorMsg)
+                            .header(LRA_API_VERSION_HEADER_NAME, NARAYANA_LRA_API_VERSION_STRING).build());
+        }
+
+        String apiVersionString = requestContext.getHeaderString(LRAConstants.LRA_API_VERSION_HEADER_NAME);
+        APIVersion apiVersion;
+        try {
+            apiVersion = APIVersion.instanceOf(apiVersionString);
+        } catch (Exception iae) {
+            String errorMsg = "Wrong format of the provided version " + apiVersionString + ": " + iae.getMessage();
+            throw new WebApplicationException(errorMsg, iae,
+                    Response.status(EXPECTATION_FAILED).entity(errorMsg)
+                            .header(LRA_API_VERSION_HEADER_NAME, NARAYANA_LRA_API_VERSION_STRING).build());
+        }
+        if (apiVersion.compareTo(LRAConstants.NARAYANA_LRA_API_VERSION) > 0) {
+            String errorMsg = "Demanded API version " + apiVersionString
+                    + " is bigger than the supported one " + NARAYANA_LRA_API_VERSION_STRING;
+            throw new WebApplicationException(errorMsg,
+                    Response.status(EXPECTATION_FAILED).entity(errorMsg)
+                            .header(LRA_API_VERSION_HEADER_NAME, NARAYANA_LRA_API_VERSION_STRING).build());
+        }
     }
 }

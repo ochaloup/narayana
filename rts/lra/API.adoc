@@ -1,0 +1,85 @@
+= Versioning of Narayna LRA REST API
+
+The goal of this document is summarize the approach to REST API versioning
+in Narayana LRA coordinator service.
+This document is written for developer of Narayana LRA services.
+
+The version format is `major.minor`[`-preRelease`].
+The `major` and `minor` parts are required and `-preRelease` is used
+during development and is optional.
+
+NOTE: Any final `minor.major` release is considered higher than
+      the same version with `-preRelease` part.
+
+Client may demand behaviour based on particular API version
+by providing HTTP header link:./service-base/src/main/java/io/narayana/lra/LRAConstants.java[`Narayana-LRA-API-version`] on the call.
+
+== API definition as Open API document
+
+The Narayana LRA API is documented with Open API annotations at the java
+classes. The Open API definition needs to be published at the http://narayana.io
+page.
+
+== Changes in LRA REST API
+
+The Narayana LRA REST API is expected to support for at least two previous
+`major` versions (ie. support is expected in parallel at least of versions 1.x,
+2.x and 3.x until the 4.0 is released).
+
+Changes which do not make a trouble for backward compatibility
+from client perspective (ie. addition of features or enhancing the API
+with return types or similar) are considered to bump a `minor` version.
+Incompatible changes needs to bump the `major` version.
+
+== Unsupported version errors
+
+When client demands unsupported version from the REST API endpoint
+the code returns HTTP status
+link:http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.18[`417` EXPECTATION_FAILED`].
+
+On returning the `417` error the API is expected to return the header
+`Narayana-LRA-API-version` with the highest supported
+API version.
+
+For an unsupported version is considered any request to the REST API endpoint
+which demands (via HTTP header `Narayana-LRA-API-version`) version
+higher than the current API version (ie. the highest version that the API
+is created for).
+The unsupported version could be one that is already deprecated
+and not supported anymore.
+
+== Code changes
+
+There are not concrete rules on changing the code when
+a new API feature or functionality change is provided.
+It's up to developer to write the code the best possible way.
+
+But for the start there is expected similar pattern like following
+
+NOTE: The verification of the highest supported API version could
+      be part of the `ContainerRequestFilter`/`ContainerResponseFilter`.
+
+[source,java]
+----
+private static final APIVersion currentAPIVersion = APIVersion.instanceOf("2.0");
+
+@GET
+@Path("{LraId}/status")
+public Response getLRAStatus((@HeaderParam("Narayana-LRA-API-version")
+    @DefaultValue("2.0") String version) {
+  APIVersion apiVersion = APIVersion.instanceOf(version);
+  if (apiVersion.compareTo(currentAPIVersion) > 0) {
+      // API version is bigger than the supported one
+      return Response.Status(EXPECTATION_FAILED)
+               .header(LRA_API_VERSION_HEADER_NAME, currentAPIVersion)
+               .build();
+  }
+  if (apiVersion.compareTo(currentAPIVersion) == 0) {
+      // the code for the newly added version 2.0
+      // which behaves differently than the older 1.x
+  } else {
+      // version is smaller than 2.0
+      // the behaviour for 1.x has to be still supported
+  }
+}
+----

@@ -46,6 +46,16 @@ public final class LRAConstants {
     public static final String HTTP_METHOD_NAME = "method"; // the name of the HTTP method used to invoke participants
 
     /**
+     * The Narayana API version for LRA coordinator supported for the release.
+     * Any bigger version is considered as unimplemented and unknown.
+     * Any lower version is considered as older, implemented but it could be deprecated.
+     */
+    public static final String NARAYANA_LRA_API_VERSION_STRING = "1.0";
+    public static final APIVersion NARAYANA_LRA_API_VERSION = APIVersion.instanceOf(NARAYANA_LRA_API_VERSION_STRING);
+
+    public static final String LRA_API_VERSION_HEADER_NAME = "Narayana-LRA-API-version";
+
+    /**
      * Number of seconds to wait for requests to participant.
      * The timeout is hardcoded as the protocol expects retry in case of failure and timeout.
      */
