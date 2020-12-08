@@ -112,11 +112,11 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
                 });
 
                 if (parseException[0] != null) {
-                    String errorMsg = lraId + ": Invalid link URI: " + parseException[0];
+                    String errorMsg = lra.getId() + ": Invalid link URI: " + parseException[0];
                     throw new WebApplicationException(errorMsg, parseException[0],
                             Response.status(BAD_REQUEST).entity(errorMsg).build());
                 } else if (compensateURI == null && afterURI == null) {
-                    String errorMsg = lraId + ": Invalid link URI: missing compensator";
+                    String errorMsg = lra.getId() + ": Invalid link URI: missing compensator or after LRA callback";
                     throw new WebApplicationException(errorMsg, Response.status(BAD_REQUEST).entity(errorMsg).build());
                 }
             } else {
@@ -155,7 +155,7 @@ public class LRARecord extends AbstractRecord implements Comparable<AbstractReco
 
     static String cannonicalForm(String linkStr) throws URISyntaxException {
         if (!linkStr.contains(">;")) {
-            return cannonicalURI(new URI(linkStr)).toASCIIString();
+            return new URI(linkStr).toASCIIString();
         }
 
         SortedMap<String, String> lm = new TreeMap<>();

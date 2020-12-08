@@ -60,7 +60,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -744,9 +743,8 @@ public class NarayanaLRAClient implements Closeable {
             String recoveryUrl = null;
             try {
                 recoveryUrl = response.getHeaderString(LRA_HTTP_RECOVERY_HEADER);
-                String url = URLDecoder.decode(recoveryUrl, StandardCharsets.UTF_8.name());
-                return new URI(url);
-            } catch (URISyntaxException | UnsupportedEncodingException e) {
+                return new URI(recoveryUrl);
+            } catch (URISyntaxException e) {
                 LRALogger.logger.infof(e,"join %s returned an invalid recovery URI '%s': %s", lraId, recoveryUrl, responseEntity);
                 throwGenericLRAException(null, Response.Status.SERVICE_UNAVAILABLE.getStatusCode(),
                         "join " + lraId + " returned an invalid recovery URI '" + recoveryUrl + "' : " + responseEntity, e);

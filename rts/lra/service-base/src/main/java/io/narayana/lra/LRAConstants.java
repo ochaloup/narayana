@@ -45,6 +45,8 @@ public final class LRAConstants {
     public static final String RECOVERY_PARAM = "recoveryCount";
     public static final String HTTP_METHOD_NAME = "method"; // the name of the HTTP method used to invoke participants
 
+    public static final String LRA_API_VERSION_HEADER_NAME = "Narayana-LRA-API-version";
+
     /**
      * Number of seconds to wait for requests to participant.
      * The timeout is hardcoded as the protocol expects retry in case of failure and timeout.

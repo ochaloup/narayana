@@ -60,8 +60,9 @@ public class LRAData {
         return this.lraId;
     }
 
-    public void setLraId(URI lraId) {
+    public LRAData setLraId(URI lraId) {
         this.lraId = lraId;
+        return this;
     }
 
     @Transient
@@ -73,56 +74,63 @@ public class LRAData {
         return this.clientId;
     }
 
-    public void setClientId(String clientId) {
+    public LRAData setClientId(String clientId) {
         this.clientId = clientId;
+        return this;
     }
 
     public LRAStatus getStatus() {
         return this.status;
     }
 
-    public void setStatus(LRAStatus status) {
+    public LRAData setStatus(LRAStatus status) {
         this.status = status;
+        return this;
     }
 
     public boolean isTopLevel() {
         return this.isTopLevel;
     }
 
-    public void setTopLevel(boolean topLevel) {
+    public LRAData setTopLevel(boolean topLevel) {
         isTopLevel = topLevel;
+        return this;
     }
 
     public boolean isRecovering() {
         return this.isRecovering;
     }
 
-    public void setRecovering(boolean recovering) {
+    public LRAData setRecovering(boolean recovering) {
         isRecovering = recovering;
+        return this;
     }
 
     public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public LRAData setStartTime(long startTime) {
         this.startTime = startTime;
+        return this;
     }
 
     public long getFinishTime() {
         return finishTime;
     }
 
-    public void setFinishTime(long finishTime) {
+    public LRAData setFinishTime(long finishTime) {
         this.finishTime = finishTime;
+        return this;
     }
 
     public int getHttpStatus() {
         return this.httpStatus;
     }
 
-    public void setHttpStatus(int httpStatus) {
+    public LRAData setHttpStatus(int httpStatus) {
         this.httpStatus = httpStatus;
+        return this;
     }
 
     public boolean equals(Object o) {

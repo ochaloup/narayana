@@ -21,15 +21,7 @@
  */
 package io.narayana.lra.coordinator;
 
-import com.arjuna.ats.arjuna.recovery.RecoveryModule;
-import io.narayana.lra.Current;
-import io.narayana.lra.client.NarayanaLRAClient;
 import io.narayana.lra.client.internal.proxy.nonjaxrs.LRAParticipantRegistry;
-import io.narayana.lra.coordinator.api.Coordinator;
-import io.narayana.lra.LRAData;
-import io.narayana.lra.coordinator.domain.model.LongRunningAction;
-import io.narayana.lra.coordinator.domain.service.LRAService;
-import io.narayana.lra.coordinator.internal.LRARecoveryModule;
 import io.narayana.lra.filter.ServerLRAFilter;
 import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
@@ -75,19 +67,6 @@ import static org.junit.Assert.fail;
 public class LRACoordinatorRecovery2TestCase extends TestBase {
     private static final Long LONG_TIMEOUT = TimeoutValueAdjuster.adjustTimeout(600000L); // 10 minutes
     private static final Long SHORT_TIMEOUT = 10000L; // 10 seconds
-
-    private static final Package[] coordinatorPackages = {
-            RecoveryModule.class.getPackage(),
-            Coordinator.class.getPackage(),
-            LRAData.class.getPackage(),
-            LRAStatus.class.getPackage(),
-            LRALogger.class.getPackage(),
-            NarayanaLRAClient.class.getPackage(),
-            Current.class.getPackage(),
-            LRAService.class.getPackage(),
-            LRARecoveryModule.class.getPackage(),
-            LongRunningAction.class.getPackage()
-    };
 
     private static final Package[] participantPackages = {
             LRAListener.class.getPackage(),

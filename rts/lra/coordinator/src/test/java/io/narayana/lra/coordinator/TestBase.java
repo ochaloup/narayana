@@ -21,8 +21,14 @@
  */
 package io.narayana.lra.coordinator;
 
+import com.arjuna.ats.arjuna.recovery.RecoveryModule;
+import io.narayana.lra.Current;
+import io.narayana.lra.LRAData;
 import io.narayana.lra.client.NarayanaLRAClient;
+import io.narayana.lra.coordinator.api.Coordinator;
 import io.narayana.lra.coordinator.domain.model.LongRunningAction;
+import io.narayana.lra.coordinator.domain.service.LRAService;
+import io.narayana.lra.coordinator.internal.LRARecoveryModule;
 import io.narayana.lra.logging.LRALogger;
 import org.eclipse.microprofile.lra.annotation.LRAStatus;
 import org.jboss.arquillian.container.test.api.Config;
@@ -57,9 +63,8 @@ public abstract class TestBase {
     @Rule
     public TestName testName = new TestName();
 
-    private static final String COORDINATOR_CONTAINER = "lra-coordinator";
-
-    static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
+    public static final String COORDINATOR_CONTAINER = "lra-coordinator";
+    public static final String COORDINATOR_DEPLOYMENT = COORDINATOR_CONTAINER;
 
     private static Path storeDir;
 
@@ -76,6 +81,19 @@ public abstract class TestBase {
         storeDir = Paths.get(String.format("%s/standalone/data/tx-object-store", System.getProperty("env.JBOSS_HOME", "null")));
     }
 
+    public static final Package[] coordinatorPackages = {
+            RecoveryModule.class.getPackage(),
+            Coordinator.class.getPackage(),
+            LRAData.class.getPackage(),
+            LRAStatus.class.getPackage(),
+            LRALogger.class.getPackage(),
+            NarayanaLRAClient.class.getPackage(),
+            Current.class.getPackage(),
+            LRAService.class.getPackage(),
+            LRARecoveryModule.class.getPackage(),
+            LongRunningAction.class.getPackage()
+    };
+
     @Before
     public void before() throws URISyntaxException, MalformedURLException {
         LRALogger.logger.debugf("Starting test %s", testName);
@@ -88,7 +106,7 @@ public abstract class TestBase {
         lraClient.close();
     }
 
-    void startContainer(String bytemanScript) {
+    public void startContainer(String bytemanScript) {
         Config config = new Config();
         String javaVmArguments = System.getProperty("server.jvm.args");
 
@@ -106,7 +124,7 @@ public abstract class TestBase {
         deployer.deploy(COORDINATOR_DEPLOYMENT);
     }
 
-    void restartContainer() {
+    public void restartContainer() {
         try {
             // ensure that the controller is not running
             containerController.kill(COORDINATOR_CONTAINER);
@@ -121,7 +139,7 @@ public abstract class TestBase {
         containerController.start(COORDINATOR_CONTAINER);
     }
 
-    void stopContainer() {
+    public void stopContainer() {
         if (containerController.isStarted(COORDINATOR_CONTAINER)) {
             LRALogger.logger.debug("Stopping container");
 
