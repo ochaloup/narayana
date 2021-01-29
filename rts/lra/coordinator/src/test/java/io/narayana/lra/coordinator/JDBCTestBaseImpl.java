@@ -41,7 +41,7 @@ public class JDBCTestBaseImpl extends AbstractTestBase {
         LRAList = lraClient.getAllLRAs();
         } catch (Exception ex) {
          // transaction logs will only exists after there has been a previous run
-            LRALogger.logger.debugf(ex,"Cannot fetch LRAs through the client");
+            LRALogger.logger.warnf(ex,"Cannot fetch LRAs through the client");
         }
 
         for (LRAData lra : LRAList) {
@@ -58,7 +58,7 @@ public class JDBCTestBaseImpl extends AbstractTestBase {
         LRAList = lraClient.getAllLRAs();
         } catch (Exception ex) {
          // transaction logs will only exists after there has been a previous run
-            LRALogger.logger.debugf(ex,"Cannot fetch LRAs through the client");
+            LRALogger.logger.warnf(ex,"Cannot fetch LRAs through the client");
         }
 
         return (LRAList.isEmpty() ? null : LRAList.get(0).getLraIdAsString());

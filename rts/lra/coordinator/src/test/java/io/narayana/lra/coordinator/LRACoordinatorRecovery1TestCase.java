@@ -54,7 +54,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class LRACoordinatorRecovery1TestCase extends FileSystemTestBaseImpl {
+public class LRACoordinatorRecovery1TestCase extends JDBCTestBaseImpl {
 
     private Client client;
 
