@@ -46,7 +46,6 @@ import static io.narayana.lra.coordinator.LRAListener.LRA_LISTENER_ACTION;
 import static io.narayana.lra.coordinator.LRAListener.LRA_LISTENER_STATUS;
 import static io.narayana.lra.coordinator.LRAListener.LRA_SHORT_TIMELIMIT;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -94,36 +93,20 @@ public class LRACoordinatorRecovery1TestCase extends JDBCTestBaseImpl {
             fail(testName + ": byteman should have killed the container");
         } catch (RuntimeException e) {
             LRALogger.logger.infof("%s: byteman killed the container", testName);
-            // we could have started the LRA via lraClient (which we do in the next test) but it is useful to test the filters
-            lraId = getFirstLRA();
-            assertNotNull("LRA should have been added to the object store before byteman killed the JVM", lraId);
-            lraId = String.format("%s/%s", lraClient.getCoordinatorUrl(), lraId);
         }
 
         // the byteman script should have killed the JVM
-        // wait for a period longer than the timeout before restarting the coordinator
+        // wait for a period longer than the timeout - ie. waiting for the LRA timeouts - before restarting the coordinator
         doWait(LRA_SHORT_TIMELIMIT * 1000);
 
         restartContainer();
 
-        // check recovery
-        LRAStatus status = getStatus(new URI(lraId));
-
-        LRALogger.logger.infof("%s: Status after restart is %s%n", status == null ? "GONE" : status.name());
-
-        if (status == null || status == LRAStatus.Cancelling) {
-            int sc = recover();
-
-            if (sc != 0) {
-                recover();
-            }
+        // expecting the LRA was timeouted, forcing recovery to invoke the participant's callbacks
+        int sc = recover();
+        if (sc != 0) {
+            // first  recover() was not able to finish all penging LRAs, forcing for second time to be sure the callbacks were called
+            recover();
         }
-
-        // the LRA with the short timeout should have timed out and cancelled
-        status = getStatus(new URI(lraId));
-
-        Assert.assertTrue("LRA with short timeout should have cancelled",
-                status == null || status == LRAStatus.Cancelled);
 
         // verify that the resource was notified that the LRA finished
         String listenerStatus = getStatusFromListener(lraListenerURI);

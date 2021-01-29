@@ -7,6 +7,5 @@ AT EXIT
 BIND NOTHING
 IF TRUE
         DO debug("LRAListener: XXXXXXXXXXXXXXXXXXXXXXXXXXXX: Killing JVM after actionWithLRA"),
-        delay(3000),
         killJVM()
 ENDRULE
