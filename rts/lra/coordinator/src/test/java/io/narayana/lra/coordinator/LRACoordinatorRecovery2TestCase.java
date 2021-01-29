@@ -87,6 +87,8 @@ public class LRACoordinatorRecovery2TestCase extends JDBCTestBaseImpl {
         // start an LRA with a short timeout to validate that timed LRAs that time out when the coordinator is unavailable are cancelled
         URI shortLRA = lraClient.startLRA(null, "Short Timeout Recovery Test", SHORT_TIMEOUT, ChronoUnit.MILLIS);
 
+        doWait(TimeoutValueAdjuster.adjustTimeout(500));
+
         // invoke a method that will trigger a byteman rule to kill the JVM
         try (Response ignore = client.target(lraListenerURI).path(LRA_LISTENER_KILL)
                 .request()

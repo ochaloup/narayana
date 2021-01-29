@@ -54,7 +54,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class LRACoordinatorRecovery1TestCase extends FileSystemTestBaseImpl {
+public class LRACoordinatorRecovery1TestCase extends JDBCTestBaseImpl {
 
     private Client client;
 
@@ -94,10 +94,6 @@ public class LRACoordinatorRecovery1TestCase extends FileSystemTestBaseImpl {
             fail(testName + ": byteman should have killed the container");
         } catch (RuntimeException e) {
             LRALogger.logger.infof("%s: byteman killed the container", testName);
-            // we could have started the LRA via lraClient (which we do in the next test) but it is useful to test the filters
-            lraId = getFirstLRA();
-            assertNotNull("LRA should have been added to the object store before byteman killed the JVM", lraId);
-            lraId = String.format("%s/%s", lraClient.getCoordinatorUrl(), lraId);
         }
 
         // the byteman script should have killed the JVM
@@ -105,6 +101,11 @@ public class LRACoordinatorRecovery1TestCase extends FileSystemTestBaseImpl {
         doWait(LRA_SHORT_TIMELIMIT * 1000);
 
         restartContainer();
+
+        // we could have started the LRA via lraClient (which we do in the next test) but it is useful to test the filters
+        lraId = getFirstLRA();
+        assertNotNull("LRA should have been added to the object store before byteman killed the JVM", lraId);
+        lraId = String.format("%s/%s", lraClient.getCoordinatorUrl(), lraId);
 
         // check recovery
         LRAStatus status = getStatus(new URI(lraId));
