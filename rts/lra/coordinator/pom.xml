@@ -171,6 +171,7 @@
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
+                            <argLine>-Dlra.internal.client.timeout=3600</argLine>
                             <systemPropertyVariables combine.children="append">
                                 <lra.coordinator.host>${lra.coordinator.host}</lra.coordinator.host>
                                 <lra.coordinator.url>${lra.coordinator.url}</lra.coordinator.url>

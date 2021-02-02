@@ -108,7 +108,7 @@ public class LRARecoveryModule implements RecoveryModule {
             }
 
             if (LRALogger.logger.isDebugEnabled()) {
-                LRALogger.logger.debug("LRARecoverModule: transaction type is " + _transactionType + " uid is " +
+                LRALogger.logger.debug("LRARecoveryModule: transaction type is " + _transactionType + " uid is " +
                         recoverUid.toString() + "\n ActionStatus is " + Status +
                         " in flight is " + inFlight);
             }
@@ -124,7 +124,7 @@ public class LRARecoveryModule implements RecoveryModule {
         } catch (Exception e) {
             if (LRALogger.logger.isInfoEnabled()) {
                 LRALogger.logger.infof(
-                        "LRARecoverModule: Error '%s' while recovering LRA record %s",
+                        "LRARecoveryModule: Error '%s' while recovering LRA record %s",
                         e.getMessage(), recoverUid.fileStringForm());
             }
         }
@@ -134,7 +134,7 @@ public class LRARecoveryModule implements RecoveryModule {
         Vector<Uid> uidVector = new Vector<>();
 
         if (LRALogger.logger.isDebugEnabled()) {
-            LRALogger.logger.debugf("LRARecoverModule: processing transaction type %s", _transactionType);
+            LRALogger.logger.debugf("LRARecoveryModule: processing transaction type %s", _transactionType);
         }
 
         Consumer<Uid> uidUnpacker = uidVector::addElement;
@@ -159,11 +159,11 @@ public class LRARecoveryModule implements RecoveryModule {
                 } catch (ObjectStoreException e) {
                     if (LRALogger.logger.isTraceEnabled()) {
                         LRALogger.logger.tracef(e,
-                     "LRARecoverModule: Object store exception '%s' while reading the current state of LRA record %s:",
+                     "LRARecoveryModule: Object store exception '%s' while reading the current state of LRA record %s:",
                                 e.getMessage(), currentUid.fileStringForm());
                     } else if (LRALogger.logger.isInfoEnabled()) {
                         LRALogger.logger.infof(
-                    "LRARecoverModule: Object store exception '%s' while reading the current state of LRA record %s",
+                    "LRARecoveryModule: Object store exception '%s' while reading the current state of LRA record %s",
                                 e.getMessage(), currentUid.fileStringForm());
                     }
                 }
@@ -186,7 +186,7 @@ public class LRARecoveryModule implements RecoveryModule {
                 if (lra.isActivated()) {
                     lras.put(lra.getId(), lra);
                 } else {
-                    LRALogger.logger.infof("LRARecoverModule: failed to activate LRA record %s",
+                    LRALogger.logger.infof("LRARecoveryModule: failed to activate LRA record %s",
                             currentUid.fileStringForm());
                 }
             }
@@ -241,11 +241,11 @@ public class LRARecoveryModule implements RecoveryModule {
             } catch (ObjectStoreException e) {
                 if (LRALogger.logger.isTraceEnabled()) {
                     LRALogger.logger.tracef(e,
-                            "LRARecoverModule: Object store exception %s while unpacking records of type %s",
+                            "LRARecoveryModule: Object store exception %s while unpacking records of type %s",
                             e.getMessage(), _transactionType);
                 } else if (LRALogger.logger.isInfoEnabled()) {
                     LRALogger.logger.infof(
-                            "LRARecoverModule: Object store exception %s while unpacking records of type %s",
+                            "LRARecoveryModule: Object store exception %s while unpacking records of type %s",
                             e.getMessage(), _transactionType);
                 }
 
@@ -277,11 +277,11 @@ public class LRARecoveryModule implements RecoveryModule {
             } catch (IOException e) {
                 if (LRALogger.logger.isTraceEnabled()) {
                     LRALogger.logger.tracef(e,
-                            "LRARecoverModule: Object store exception %s while unpacking a record of type %s",
+                            "LRARecoveryModule: Object store exception %s while unpacking a record of type %s",
                             e.getMessage(), _transactionType);
                 } else if (LRALogger.logger.isInfoEnabled()) {
                     LRALogger.logger.infof(
-                            "LRARecoverModule: Object store exception %s while unpacking a record of type: %s",
+                            "LRARecoveryModule: Object store exception %s while unpacking a record of type: %s",
                             e.getMessage());
                 }
 

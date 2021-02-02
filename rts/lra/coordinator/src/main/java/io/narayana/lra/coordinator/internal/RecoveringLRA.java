@@ -66,8 +66,8 @@ class RecoveringLRA extends LongRunningAction {
      */
     private void tryReplayPhase2() {
         if (LRALogger.logger.isDebugEnabled()) {
-            LRALogger.logger.debugf("RecoveringLRA.replayPhase2 recovering %s ActionStatus is %s",
-                    get_uid(), ActionStatus.stringForm(_theStatus));
+            LRALogger.logger.debugf("RecoveringLRA.replayPhase2 recovering %s ActionStatus is %s, %s",
+                    get_uid(), ActionStatus.stringForm(_theStatus), getLRAData());
         }
 
         if (_activated) {

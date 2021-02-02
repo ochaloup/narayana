@@ -55,6 +55,7 @@ import static org.junit.Assert.fail;
 @RunWith(Arquillian.class)
 @RunAsClient
 public class LRACoordinatorRecovery1TestCase extends JDBCTestBaseImpl {
+// public class LRACoordinatorRecovery1TestCase extends FileSystemTestBaseImpl {
 
     private Client client;
 
@@ -118,12 +119,15 @@ public class LRACoordinatorRecovery1TestCase extends JDBCTestBaseImpl {
             if (sc != 0) {
                 recover();
             }
+            if (sc != 0) {
+                recover();
+            }
         }
 
         // the LRA with the short timeout should have timed out and cancelled
         status = getStatus(new URI(lraId));
 
-        Assert.assertTrue("LRA with short timeout should have cancelled",
+        Assert.assertTrue("LRA with short timeout should have cancelled. Status: " + status,
                 status == null || status == LRAStatus.Cancelled);
 
         // verify that the resource was notified that the LRA finished

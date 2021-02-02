@@ -29,6 +29,7 @@ import com.arjuna.ats.arjuna.coordinator.BasicAction;
 import com.arjuna.ats.arjuna.coordinator.RecordList;
 import com.arjuna.ats.arjuna.coordinator.RecordListIterator;
 import com.arjuna.ats.arjuna.coordinator.RecordType;
+import com.arjuna.ats.arjuna.logging.tsLogger;
 import io.narayana.lra.Current;
 import io.narayana.lra.LRAData;
 import io.narayana.lra.logging.LRALogger;
@@ -151,6 +152,7 @@ public class LongRunningAction extends BasicAction {
 
             os.packString(status.name());
         } catch (IOException e) {
+            tsLogger.logger.trace("Error packing a LRA id " + id, e);
             return false;
         }
 
@@ -171,12 +173,16 @@ public class LongRunningAction extends BasicAction {
                 }
 
                 try {
+                    if (tsLogger.logger.isTraceEnabled()) {
+                        tsLogger.logger.trace("Packing a LRA " + temp.typeIs() + " record");
+                    }
                     os.packInt(temp.typeIs());
-
                     if (!temp.save_state(os, ot)) {
+                        tsLogger.logger.trace("TODO error: Packing a LRA " + temp.typeIs() + " record");
                         return false;
                     }
                 } catch (IOException e) {
+                    tsLogger.logger.debug("Cannot save LRA " + temp.typeIs() + " record", e);
                     return false;
                 }
 
@@ -192,6 +198,7 @@ public class LongRunningAction extends BasicAction {
         try {
             os.packInt(RecordType.NONE_RECORD);
         } catch (IOException e) {
+            tsLogger.logger.trace("TODO error: Packing a LRA NONE", e);
             return false;
         }
 
@@ -205,6 +212,10 @@ public class LongRunningAction extends BasicAction {
         try {
             while ((record_type = os.unpackInt()) != RecordType.NONE_RECORD) {
                 AbstractRecord record = AbstractRecord.create(record_type);
+
+                if (tsLogger.logger.isTraceEnabled()) {
+                    tsLogger.logger.trace("Unpacked a LRA " + record_type + " record to the list");
+                }
 
                 if (record == null || !record.restore_state(os, ot) || !list.insert(record)) {
                     return false;
